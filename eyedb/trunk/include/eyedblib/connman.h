@@ -29,12 +29,19 @@
 #include <stropts.h>
 #endif
 
+#ifdef STUART_AUTH
+struct rpc_Auth {
+  int uid;
+  int gid;
+};
+#else
 typedef struct {
   int uid;
   int gid;
 } rpc_Stream;
+#endif
 
-typedef struct {
+struct rpc_User {
   enum {
     ON,
     NOT,
@@ -42,13 +49,27 @@ typedef struct {
     ALL
   } mode;
   char *user;
-} rpc_User;
+};
 
-typedef struct {
+struct rpc_TcpIp {
   int user_cnt;
   rpc_User *users;
-} rpc_TcpIp;
+};
 
+#ifdef STUART_AUTH
+struct rpc_ConnInfo {
+
+  rpc_Auth auth;
+
+  enum {
+    STREAM,
+    UNIX,
+    TCPIP
+  } mode;
+
+  rpc_TcpIp tcpip;
+};
+#else
 typedef struct {
 
   enum {
@@ -62,6 +83,7 @@ typedef struct {
     rpc_TcpIp tcpip;
   } u;
 } rpc_ConnInfo;
+#endif
 
 extern int
 rpc_connman_init(const char *access_file);

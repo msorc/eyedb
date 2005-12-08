@@ -325,9 +325,12 @@ namespace eyedb {
 			unsigned int pathlen);
 
   extern RPCStatus
-  IDB_setConnInfo(const char *hostname, const char *username,
+  IDB_setConnInfo(const char *hostname, int uid, const char *username,
 		  const char *progname, int pid, int *sv_pid, int *sv_uid,
-		  int cli_version);
+		  int cli_version, char **challenge);
+
+  extern RPCStatus
+  IDB_checkAuth(const char *);
 
   extern RPCStatus
   IDB_setLogMask(eyedblib::int64);

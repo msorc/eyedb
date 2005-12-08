@@ -328,10 +328,58 @@ namespace eyedb {
   static SessionLog *sesslog;
   static ClientSessionLog *clinfo;
 
+  static std::string rpc_challenge;
+  static int rpc_uid;
+  static rpc_ConnInfo *rpc_ci;
+
   RPCStatus
-  IDB_setConnInfo(const char *hostname, const char *username,
+  IDB_checkAuth(const char *file)
+  {
+    int fd = open(file, O_RDONLY);
+    if (fd < 0)
+      return rpcStatusMake
+	(Exception::make(IDB_ERROR, "cannot open authentification file: "
+			 "%s", file));
+
+    char buf[1024];
+    int n = read(fd, buf, sizeof buf);
+    if (n <= 0) {
+      close(fd);
+      return rpcStatusMake
+	(Exception::make(IDB_ERROR, "cannot read authentification file: "
+			 "%s", file));
+    }
+
+    buf[n] = 0;
+
+    if (strcmp(buf, rpc_challenge.c_str())) {
+      close(fd);
+      return rpcStatusMake
+	(Exception::make(IDB_ERROR, "invalid challenge in authentification file: "
+			 "%s", file));
+    }
+
+    struct stat rstat;
+    if (fstat(fd, &rstat) == 0) {
+      if (rpc_uid != rstat.st_uid) {
+	close(fd);
+	return rpcStatusMake
+	  (Exception::make(IDB_ERROR, "invalid uid authentification file: "
+			   "%s", file));
+      }
+
+      rpc_ci->auth.uid = rpc_uid;
+    }
+
+    close(fd);
+    
+    return RPCSuccess;
+  }
+
+  RPCStatus
+  IDB_setConnInfo(const char *hostname, int uid, const char *username,
 		  const char *progname, int pid, int *sv_pid,
-		  int *sv_uid, int cli_version)
+		  int *sv_uid, int cli_version, char **challenge)
   {
     IDB_LOG(IDB_LOG_CONN,
 	    ("connected hostname='%s', username='%s', progname='%s', pid=%d\n",
@@ -346,6 +394,14 @@ namespace eyedb {
 			 "client version is %s, server version is %s",
 			 eyedb::convertVersionNumber(cli_version),
 			 eyedb::getVersion()));
+
+    if (rpc_ci && rpc_ci->mode == rpc_ConnInfo::UNIX)
+      *challenge = "random-283746";
+    else
+      *challenge = "";
+
+    rpc_challenge = *challenge;
+    rpc_uid = uid;
 
     return rpcStatusMake(sesslog->add(hostname, username,
 					  progname, pid, clinfo));
@@ -845,8 +901,6 @@ namespace eyedb {
 
   /* administration */
 
-  static rpc_ConnInfo *rpc_ci;
-
   void setConnInfo(rpc_ConnInfo *ci)
   {
     rpc_ci = ci;
@@ -864,8 +918,13 @@ namespace eyedb {
     need_passwd = True;
     superuser = False;
 
-    if (!rpc_ci || rpc_ci->mode == rpc_ConnInfo::STREAM) {
+    if (!rpc_ci || rpc_ci->mode == rpc_ConnInfo::STREAM ||
+	rpc_ci->mode == rpc_ConnInfo::UNIX) {
+#ifdef STUART_AUTH
+      int uid = (rpc_ci ? rpc_ci->auth.uid : getuid());
+#else
       int uid = (rpc_ci ? rpc_ci->u.stream.uid : getuid());
+#endif
       const char *authusername = getpwuid(uid)->pw_name;
       if (!*username || !strcmp(username, authusername)) {
 	need_passwd = False;
@@ -881,7 +940,11 @@ namespace eyedb {
 
     if (true) { //rpc_ci->mode == rpc_ConnInfo::TCPIP) {
       const char *chuser = 0;
+#ifdef STUART_AUTH
+      tcpip = &rpc_ci->tcpip;
+#else
       tcpip = &rpc_ci->u.tcpip;
+#endif
 
       for (i = 0; i < tcpip->user_cnt; i++) {
 	if (!*username) {
