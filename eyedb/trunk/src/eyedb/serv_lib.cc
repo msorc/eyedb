@@ -128,6 +128,7 @@ namespace eyedb {
     *OQL_GETRESULT_RPC,
 
     *SET_CONN_INFO_RPC,
+    *CHECK_AUTH_RPC,
 
     *SET_LOG_MASK_RPC,
 
@@ -506,6 +507,9 @@ namespace eyedb {
     SET_CONN_INFO_RPC =
       rpc_makeUserServerFunction(server, makeSET_CONN_INFO(),
 				 SET_CONN_INFO_realize);
+
+    CHECK_AUTH_RPC =
+      rpc_makeUserServerFunction(server, makeCHECK_AUTH(), CHECK_AUTH_realize);
 
     SET_LOG_MASK_RPC =
       rpc_makeUserServerFunction(server, makeSET_LOG_MASK(), SET_LOG_MASK_realize);

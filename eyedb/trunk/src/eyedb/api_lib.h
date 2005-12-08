@@ -138,6 +138,7 @@ namespace eyedb {
     *OQL_GETRESULT_RPC,
 
     *SET_CONN_INFO_RPC,
+    *CHECK_AUTH_RPC,
 
     *INDEX_GET_COUNT_RPC,
     *INDEX_GET_STATS_RPC,
@@ -454,9 +455,18 @@ namespace eyedb {
   execGetExtRefPath(ConnHandle *, const char *user, const char *passwd,
 			char path[], unsigned int pathlen);
 
+#ifdef STUART_AUTH
+  extern RPCStatus
+  set_conn_info(ConnHandle *, const char *, int, const char *, const char *,
+		int *, int *, int, char **);
+#else
   extern RPCStatus
   set_conn_info(ConnHandle *, const char *, const char *, const char *,
-		    int *, int *, int);
+		int *, int *, int);
+#endif
+
+  extern RPCStatus
+  checkAuth(ConnHandle *, const char *);
 
   extern RPCStatus
   oqlCreate(ConnHandle *, DbHandle *, const char *, int *, void *);

@@ -1418,14 +1418,33 @@ namespace eyedb {
     ServerArg *ua = (ServerArg *)xua;
     RPCStatus status;
 
+#ifdef STUART_AUTH
+    status = IDB_setConnInfo(ua[0].a_string, ua[1].a_int, ua[2].a_string,
+			     ua[3].a_string,
+			     ua[4].a_int, &ua[5].a_int, &ua[6].a_int,
+			     ua[7].a_int, &ua[8].a_string);
+    if (status)
+      forbidden = 1;
+    RPC_STATUS_MAKE(status, ua, 9);
+#else
     status = IDB_setConnInfo(ua[0].a_string, ua[1].a_string, ua[2].a_string,
 			     ua[3].a_int, &ua[4].a_int, &ua[5].a_int,
 			     ua[6].a_int);
-
     if (status)
       forbidden = 1;
-
     RPC_STATUS_MAKE(status, ua, 7);
+#endif
+  }
+
+  void
+  CHECK_AUTH_realize(rpc_ClientId clientid, void *xua)
+  {
+    ServerArg *ua = (ServerArg *)xua;
+    RPCStatus status;
+
+    status = IDB_checkAuth(ua[0].a_string);
+    
+    RPC_STATUS_MAKE(status, ua, 1);
   }
 
   void

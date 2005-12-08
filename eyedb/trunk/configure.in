@@ -84,7 +84,7 @@ AC_PREFIX_DEFAULT(/usr)
 AC_PROG_CXX
 
 # -D are taken verbatim for now. Later, may use autodetection and/or command line flags
-DEFINES="-DOPTOPEN -DMOZILLA -DNEW_COLL_XDR -DNEW_COLL_XDR2 -DSUPPORT_NON_BASIC_LITERAL_COLL"
+DEFINES="-DOPTOPEN -DMOZILLA -DNEW_COLL_XDR -DNEW_COLL_XDR2 -DSUPPORT_NON_BASIC_LITERAL_COLL -DSTUART_AUTH"
 # should add -DIDB_STREAM for named pipes (not supported on linux)
 
 # check for architecture (temporary, must be replaced by more generic tests)

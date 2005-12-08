@@ -137,6 +137,7 @@ namespace eyedb {
     *OQL_GETRESULT_RPC,
 
     *SET_CONN_INFO_RPC,
+    *CHECK_AUTH_RPC,
 
     *INDEX_GET_COUNT_RPC,
     *INDEX_GET_STATS_RPC,
@@ -407,6 +408,9 @@ namespace eyedb {
 
   extern void
   SET_CONN_INFO_realize(rpc_ClientId, void *);
+
+  extern void
+  CHECK_AUTH_realize(rpc_ClientId, void *);
 
   extern void
   SET_LOG_MASK_realize(rpc_ClientId, void *);

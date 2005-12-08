@@ -2236,16 +2236,70 @@ execGetExtRefPath(ConnHandle *ch, const char *user,
     }
 }
 
+#ifdef STUART_AUTH
+RPCStatus
+checkAuth(ConnHandle *ch, const char *file)
+{
+  if (!ch)
+    return IDB_checkAuth(file);
+  else
+   {
+      ClientArg ua[IDB_MAXARGS], *pua = ua;
+      int r, offset;
+      pua++->a_string = (char *)file;
+
+      RPC_RPCMAKE(ch->ch, CHECK_AUTH_RPC, ua);
+
+      status_copy(status_r, ua[1].a_status);
+      STATUS_RETURN(status_r);
+    }
+}
+
+
 RPCStatus
 set_conn_info(ConnHandle *ch, const char *hostname,
-		  const char *username, const char *progname,
-		  int *sv_pid, int *sv_uid, int sv_version)
+	      int uid, const char *username, const char *progname,
+	      int *sv_pid, int *sv_uid, int sv_version, char **challenge)
+{
+  if (!ch)
+    return IDB_setConnInfo(hostname, uid, username, progname, getpid(),
+			   sv_pid, sv_uid, sv_version, challenge);
+  else {
+      ClientArg ua[IDB_MAXARGS], *pua = ua;
+      int r, min;
+
+      start_rpc();
+
+      pua++->a_string = (char *)hostname;
+      pua++->a_int    = uid;
+      pua++->a_string = (char *)username;
+      pua++->a_string = (char *)progname;
+      pua++->a_int    = getpid();
+      pua++;            /* sv_pid */
+      pua++;            /* sv_uid */
+      pua++->a_int    = sv_version;
+
+      RPC_RPCMAKE(ch->ch, SET_CONN_INFO_RPC, ua);
+
+      *sv_pid = ua[5].a_int;
+      *sv_uid = ua[6].a_int;
+      *challenge = ua[8].a_string;
+
+      status_copy(status_r, ua[9].a_status);
+
+      STATUS_RETURN(status_r);
+    }
+}
+#else
+RPCStatus
+set_conn_info(ConnHandle *ch, const char *hostname,
+	      int uid, const char *username, const char *progname,
+	      int *sv_pid, int *sv_uid, int sv_version, char **challenge)
 {
   if (!ch)
     return IDB_setConnInfo(hostname, username, progname, getpid(),
 			   sv_pid, sv_uid, sv_version);
-  else
-    {
+  else {
       ClientArg ua[IDB_MAXARGS], *pua = ua;
       int r, min;
 
@@ -2269,6 +2323,7 @@ set_conn_info(ConnHandle *ch, const char *hostname,
       STATUS_RETURN(status_r);
     }
 }
+#endif
 
 RPCStatus
 setLogMask(ConnHandle *ch, eyedblib::int64 logmask)

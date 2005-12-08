@@ -23,6 +23,7 @@
 
 
 #include <config.h>
+#include <fcntl.h>
 
 #include "eyedb_p.h"
 
@@ -115,9 +116,27 @@ namespace eyedb {
 
 	char hostname[256];
 	gethostname(hostname, sizeof(hostname)-1);
+#ifdef STUART_AUTH
+	char *challenge;
+	RPCStatus rpc_status = 
+	  set_conn_info(connh, hostname, getuid(), getUserName(), prog_name,
+			&sv_pid, &sv_uid, getVersionNumber(),
+			&challenge);
+	if (!rpc_status && strlen(challenge) > 0) {
+	  char *file = tempnam("/tmp", ".eyedb");
+	  int fd = creat(file, 0664);
+	  if (fd > 0) {
+	    write(fd, challenge, strlen(challenge));
+	    rpc_status = checkAuth(connh, file);
+	    ::close(fd);
+	    unlink(file);
+	  }
+	}
+#else
 	RPCStatus rpc_status = 
 	  set_conn_info(connh, hostname, getUserName(), prog_name,
-			    &sv_pid, &sv_uid, getVersionNumber());
+			&sv_pid, &sv_uid, getVersionNumber());
+#endif
 	if (rpc_status)
 	  return Exception::make(IDB_CONNECTION_FAILURE, rpc_status->err_msg);
 

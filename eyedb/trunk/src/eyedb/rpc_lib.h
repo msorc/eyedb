@@ -124,6 +124,7 @@ namespace eyedb {
     IDB_EXECUTABLE_GET_EXTREF_PATH,
 
     IDB_SET_CONN_INFO,
+    IDB_CHECK_AUTH,
 
     IDB_INDEX_GET_COUNT,
     IDB_INDEX_GET_STATS,
@@ -287,6 +288,7 @@ namespace eyedb {
     *makeOQL_GETRESULT(void),
 
     *makeSET_CONN_INFO(void),
+    *makeCHECK_AUTH(void),
 
     *makeSET_LOG_MASK(void),
 
