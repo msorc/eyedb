@@ -23,7 +23,7 @@
 
 package org.eyedb.syscls;
 
-import org.eyedb.*;
+//import org.eyedb.*;
 import org.eyedb.utils.*;
 import org.eyedb.syscls.*;
 
@@ -89,10 +89,10 @@ public class Root extends org.eyedb.Struct {
   static int idr_psize;
   static int idr_objsz;
   public static org.eyedb.Class idbclass;
-  static StructClass make(StructClass Root_class, org.eyedb.Schema m)
+  static org.eyedb.StructClass make(org.eyedb.StructClass Root_class, org.eyedb.Schema m)
    throws org.eyedb.Exception {
     if (Root_class == null)
-      return new StructClass("Root", ((m != null) ? m.getClass("org.eyedb.Struct") : org.eyedb.Struct.idbclass));
+      return new org.eyedb.StructClass("Root", ((m != null) ? m.getClass("org.eyedb.Struct") : org.eyedb.Struct.idbclass));
     org.eyedb.Attribute[] attr = new org.eyedb.Attribute[2];
     int[] dims;
 
@@ -113,7 +113,7 @@ public class Root extends org.eyedb.Struct {
 
   static void init()
    throws org.eyedb.Exception {
-    make((StructClass)idbclass, null);
+    make((org.eyedb.StructClass)idbclass, null);
 
     idr_objsz = idbclass.getObjectSize();
     idr_psize = idbclass.getObjectPSize();
