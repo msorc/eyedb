@@ -1205,7 +1205,7 @@ Status AgregatClass::generateClassDesc_Java(GenContext *ctx,
 {
   FILE *fd = ctx->getFile();
   Status status;
-  const char *_type = (asStructClass() ? "Struct" : "Union");
+  const char *_type = (asStructClass() ? "org.eyedb.Struct" : "org.eyedb.Union");
   
   fprintf(fd, "%sstatic %sClass make(%sClass %s_class, org.eyedb.Schema m)\n", ctx->get(), _type, _type, name);
   fprintf(fd, "%s throws org.eyedb.Exception {\n", ctx->get());
@@ -1614,7 +1614,7 @@ Status CollectionClass::generateCode_Java(Schema *,
   fprintf(fd, "%s}\n\n", ctx.get());
   fprintf(fd, "%spublic static org.eyedb.Class idbclass;\n\n", ctx.get());
 
-  fprintf(fd, "%sstatic %sClass make(%sClass cls, "
+  fprintf(fd, "%sstatic org.eyedb.%sClass make(org.eyedb.%sClass cls, "
 	  "org.eyedb.Schema m)\n", ctx.get(), _type, _type);
   fprintf(fd, "%s{\n", ctx.get());
   ctx.push();

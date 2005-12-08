@@ -1822,7 +1822,8 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
     fprintf(fd, "//\n\n");
 
     fprintf(fd, "package %s;\n\n", package);
-    fprintf(fd, "import org.eyedb.*;\n");
+    // (fd): commented out next line for compilation with gcj (org.eyedb.Object conflicts with java.lang.Object)
+    //    fprintf(fd, "import org.eyedb.*;\n"); 
     fprintf(fd, "import org.eyedb.utils.*;\n");
     fprintf(fd, "import org.eyedb.syscls.*;\n\n");
 
