@@ -1,0 +1,21 @@
+#
+# Makefile
+#
+# C++Binding/scheme-oriented/admin package
+#
+
+include @prefix@/share/@PACKAGE@/Makefile.eyedb
+
+EXTRA_CXXFLAGS= -I@prefix@/share/doc/@PACKAGE@-@VERSION@/examples/C++Binding/schema-oriented/share
+
+EYEDBOPTS = -g
+
+all: admin
+
+admin: admin.o
+	$(CXX) -o $@ $+ $(LDXXFLAGS) $(LDXXLIBS)
+
+init:
+
+clean:
+	rm -f *.o admin

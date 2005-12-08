@@ -1,0 +1,17 @@
+#
+# Makefile
+#
+# C++Binding/generic/basic package
+#
+
+include @prefix@/share/@PACKAGE@/Makefile.eyedb
+
+EYEDBOPTS = -g
+
+all: basic
+
+basic: basic.o
+	$(CXX) -o $@ $+ $(LDXXFLAGS) $(LDXXLIBS)
+
+clean:
+	rm -f *.o basic

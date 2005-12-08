@@ -1,0 +1,17 @@
+#
+# Makefile
+#
+# C++Binding/generic/store package
+#
+
+include @prefix@/share/@PACKAGE@/Makefile.eyedb
+
+EYEDBOPTS = -g
+
+all: store
+
+store: store.o
+	$(CXX) -o $@ $+ $(LDXXFLAGS) $(LDXXLIBS)
+
+clean:
+	rm -f *.o store
