@@ -1,0 +1,66 @@
+#
+# EyeDB package, version @EYEDB_VERSION@ arch debug-linux-x86
+#
+# EyeDB Configuration File
+#
+
+# Top directory
+topdir = @eyedbtopdir@;
+
+# Hostname
+host = localhost;
+
+sv_datdir = %topdir%/var/lib/eyedb/db; 
+
+# pipes:
+sv_pipedir = %topdir%/var/lib/eyedb/pipes; 
+
+# tmpdir
+sv_tmpdir = %topdir%/var/lib/eyedb/tmp; 
+
+# sopath
+sopath = %topdir%/lib/eyedb ; 
+
+# EYEDBDBM Database
+
+dbm = %sv_datdir%/dbmdb.dbs;
+
+# Set the following variables for a default authentication
+
+#user   = guest;
+#passwd = guest;
+
+# Server Parameters
+
+sv_access_file = %topdir%/etc/eyedb/Access;
+sv_passwd_file = %topdir%/etc/eyedb/Password;
+sv_smdport = %sv_pipedir%/eyedbsmd;
+
+# Version Number
+
+version = @EYEDB_VERSION@;
+numversion = @EYEDB_NUMVERSION@;
+
+# Port
+# 
+# By default, a UNIX named pipe is used.
+# To use the server on a remote machine, use a numeric TCP/IP port.
+
+port = %sv_pipedir%/eyedbd; # a UNIX named pipe
+#port = 6680;          # a TCP/IP port
+
+# Server Parameters
+
+sv_port = %port%;
+
+# OQL path
+
+oqlpath = %topdir%/var/lib/eyedb/oql;
+
+# Java Class Path
+
+classpath = %topdir%/var/lib/eyedb/classes.jar;
+
+# CGI class path
+
+#cgi = http:// ;

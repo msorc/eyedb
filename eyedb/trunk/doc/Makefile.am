@@ -1,0 +1,20 @@
+if COND_DOXYGEN
+DOXYGEN_DIR= doxygen
+else
+DOXYGEN_DIR= 
+endif
+
+if COND_XSLTPROC
+MANPAGES_DIR= manpages
+else
+MANPAGES_DIR= 
+endif
+
+if COND_LATEX
+MANUAL_DIR= manual
+else
+MANUAL_DIR= 
+endif
+
+
+SUBDIRS=$(DOXYGEN_DIR) $(MANPAGES_DIR) $(MANUAL_DIR)

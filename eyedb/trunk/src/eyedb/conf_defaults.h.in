@@ -1,0 +1,9 @@
+static struct {
+  const char *name, *value;
+} conf_defaults[] = {
+  { "bindir", "@eyedbbindir@"},
+  { "sysconfdir", "@eyedbsysconfdir@"},
+  { "version", "@EYEDB_VERSION@"},
+  { "numversion", "@EYEDB_NUMVERSION@"}
+};
+

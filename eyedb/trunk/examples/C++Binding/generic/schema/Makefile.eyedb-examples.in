@@ -1,0 +1,20 @@
+#
+# Makefile
+#
+# C++Binding/generic/query package
+#
+
+include @prefix@/share/@PACKAGE@/Makefile.eyedb
+
+EYEDBOPTS = -g
+
+all: schema_dump object_dump
+
+schema_dump: schema_dump.o
+	$(CXX) -o $@ $+ $(LDXXFLAGS) $(LDXXLIBS)
+
+object_dump: object_dump.o
+	$(CXX) -o $@ $+ $(LDXXFLAGS) $(LDXXLIBS)
+
+clean:
+	rm -f *.o schema_dump object_dump
