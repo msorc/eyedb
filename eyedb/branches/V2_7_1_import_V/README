@@ -1,0 +1,128 @@
+
+-------------------------------------------------------------------------------
+
+                           EyeDB Distribution
+                 Copyright (c) SYSRA, 1995-1999,2004,2005
+
+-------------------------------------------------------------------------------
+
+EyeDB home: http://www.eyedb.org
+
+
+Introduction
+------------
+
+EyeDB is an Object Database Management System.
+
+It is distributed under the GNU Lesser General Public. Refer to file
+COPYING to get the license.
+
+
+Compiling EyeDB
+---------------
+
+In order to compile EyeDB, you need the following tools: 
+GNU make
+C++ compiler
+bison
+flex
+
+If you want to build the Java part, you need a java compiler (currently, EyeDB
+has been tested with Sun's JDK, but gcj should work as well).
+
+If you want to build documentation, you will need the following additional tools:
+latex, dvips, ps2pdf (for manual)
+doxygen (for api documentation)
+xsltproc (for manpages)
+
+Please refer to your distribution to check if these tools are packaged for your distribution (which is very likely the case) and to get their respective installation instructions.
+
+To compile EyeDB, just run:
+./configure
+make
+
+configure script takes the following useful options:
+--prefix=PREFIX           to specify EyeDB installation root directory (default is /usr)
+--enable-debug            to compile with debug (default is no)
+--enable-optimize=flag    to compile with given optimization flag, for instance --enable-optimize=-O2 (default is no optimization)
+--enable-java             to compile java part (default is no). If yes, you need a Java compiler
+--enable-swig             to generate various languages bindings with SWIG (default is no)
+--with-javac=JAVAC        to specify java javac compiler path
+--with-jar=JAR            to specify java jar path
+
+Full description of configure options can be obtained with:
+./configure --help
+
+Note that doc and examples are not build from the top-level directory:
+- to build the documentation, you need to cd to the doc/ directory and run make:
+cd doc
+make
+- to build the examples, you need to cd to the examples/ directory and run make: 
+cd examples
+make
+
+
+
+Installing EyeDB
+----------------
+
+After compiling EyeDB, you can install it with the usual:
+make install
+
+This will install EyeDB under the root directory that you have given
+when running the configure script (--prefix=PREFIX option).
+
+After installing EyeDB, you need to run the post-install script, as:
+PREFIX/share/eyedb/tools/eyedb-postinstall.sh 
+
+For instance, if you have installed EyeDB in /usr/local (by running 
+./configure --prefix=/usr/local), the post-install script is:
+/usr/local/share/eyedb/tools/eyedb-postinstall.sh 
+
+NOTE: running the post-install script is mandatory, otherwise your
+installation will not work.
+
+
+Running EyeDB
+-------------
+
+Before running EyeDB tools, you need to source the eyedbenv.sh located in 
+PREFIX/etc/profile.d/eyedbenv.sh
+by:
+. PREFIX/etc/profile.d/eyedbenv.sh
+On most systems, this will be done automatically when starting a shell.
+
+
+To run EyeDB, you need first to start the server by:
+eyedbrc start
+
+You can then check that the server is running by:
+eyedbrc status
+
+To check that EyeDB runs, after starting the server, you can run the 
+following command:
+eyedboql -U eyedbroot -P eyedbroot -c "select schema" --print
+
+This should print a number of EyeDB base structures.
+
+
+Finding documentation
+---------------------
+
+You can find EyeDB documentation in the following places, in the source 
+tree after compilation:
+- doc/eyedb-VERSION/manual: the different manuals
+- doc/eyedb-VERSION/api: the API documentation build using doxygen
+- doc/eyedb-VERSION/examples: EyeDB programming examples (you can build 
+the examples by cd'ing to this directory and run make)
+
+
+Getting help
+------------
+
+EyeDB mailing list: eyedb-devel@lists.sourceforge.net
+Mailman page: http://lists.sourceforge.net/lists/listinfo/eyedb-devel
+
+EyeDB wiki: http://wiki.eyedb.org
+
+EyeDB IRC: irc.freenode.net #eyedb

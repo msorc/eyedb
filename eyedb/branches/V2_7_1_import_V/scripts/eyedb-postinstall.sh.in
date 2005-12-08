@@ -1,0 +1,46 @@
+#!/bin/bash
+#
+# eyedb-postinstall.sh
+#
+#
+
+PACKAGE=@PACKAGE@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+bindir=@bindir@
+sysconfdir=@sysconfdir@
+
+port=/tmp/eyedb-port.$$
+root=eyedbroot
+passwd=eyedbroot
+
+crypt_passwd()
+{
+    rm -f $sysconfdir/$PACKAGE/Password
+    $bindir/eyedbcrypt $sysconfdir/$PACKAGE/Password eyedbroot
+}
+
+start_server()
+{
+    $bindir/eyedbrc start --port=$port --nod > /dev/null 2>&1 
+}
+
+create_dbm()
+{
+    $bindir/eyedbdbmcreate $root $passwd --passwd=$passwd --port=$port
+    $bindir/eyedbdbaccess EYEDBDBM r --user=$root --passwd=$passwd --port=$port
+}
+
+stop_server()
+{
+    $bindir/eyedbrc stop --port=$port > /dev/null 2>&1
+    rm -f $port
+}
+
+crypt_passwd
+start_server
+sleep 4
+create_dbm
+stop_server
+
+

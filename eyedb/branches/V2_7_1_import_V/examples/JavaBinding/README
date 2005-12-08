@@ -1,0 +1,32 @@
+
+EyeDB Package, Java Binding examples
+------------------------------------
+
+[Directory $EYEDBROOT/examples/JavaBinding]
+
+This directory contains a few examples about Java binding.
+
+To compile the examples in this directory, you must:
+
+(1) Then type `make init' and `make all' in the current directory 
+    using GNU make.
+
+(2) To run the generated example, go to the following directories and
+    perform the indicated actions:
+
+    DIRECTORY                   RUNNING EXAMPLES
+    --------------------------------------------------------------
+    generic/appli/basic       eyedbjrun Basic person
+    ----------------------------------------------------------------
+    generic/appli/query       eyedbjrun Query person <any valid query>
+                              for instance:
+			      eyedbjrun Query person "select Person"
+    ----------------------------------------------------------------
+    generic/appli/store       eyedbjrun Store person <name> <age>
+    ----------------------------------------------------------------
+    generic/appli/collections eyedbjrun Collections person <prefix>
+    ----------------------------------------------------------------
+    generic/appli/schema      eyedbjrun Store person
+    ----------------------------------------------------------------
+    generic/applet            with Netscape, open the applet.html page
+    ----------------------------------------------------------------
