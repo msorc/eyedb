@@ -145,10 +145,10 @@ namespace eyedb {
       return "org.eyedb.CollList";
 
     if (!strcmp(name, "image"))
-      return "org.eyedb.syscls.Image";
+      return "org.eyedb.utils.Image";
 
     if (!strcmp(name, "URL"))
-      return "org.eyedb.syscls.URL";
+      return "org.eyedb.utils.URL";
 
     if (!strcmp(name, "bool"))
       return "org.eyedb.Bool";
@@ -157,49 +157,47 @@ namespace eyedb {
       if (!strcmp(name, class_info[i].name))
 	return /*Class::*/classNameToJavaName(name);
 
-    if (makeC)
-      {
-	if (!strcmp(name, char_class_name))
-	  return "Char";
+    if (makeC) {
+      if (!strcmp(name, char_class_name))
+	return "org.eyedb.Char";
 
-	if (!strcmp(name, int32_class_name))
-	  return "Int32";
+      if (!strcmp(name, int32_class_name))
+	return "org.eyedb.Int32";
       
-	if (!strcmp(name, int64_class_name))
-	  return "Int64";
+      if (!strcmp(name, int64_class_name))
+	return "org.eyedb.Int64";
       
-	if (!strcmp(name, int16_class_name))
-	  return "Int16";
+      if (!strcmp(name, int16_class_name))
+	return "org.eyedb.Int16";
       
-	if (!strcmp(name, "float"))
-	  return "Float";
+      if (!strcmp(name, "float"))
+	return "org.eyedb.Float";
 
-	if (!strcmp(name, "oid"))
-	  return "OidP";
+      if (!strcmp(name, "oid"))
+	return "org.eyedb.OidP";
 
-	if (!strcmp(name, "byte"))
-	  return "org.eyedb.Byte";
-      }
-    else
-      {
-	if (!strcmp(name, int32_class_name))
-	  return "int";
+      if (!strcmp(name, "byte"))
+	return "org.eyedb.Byte";
+    }
+    else {
+      if (!strcmp(name, int32_class_name))
+	return "int";
       
-	if (!strcmp(name, int64_class_name))
-	  return "long";
+      if (!strcmp(name, int64_class_name))
+	return "long";
       
-	if (!strcmp(name, int16_class_name))
-	  return "short";
+      if (!strcmp(name, int16_class_name))
+	return "short";
       
-	if (!strcmp(name, "oid"))
-	  return "org.eyedb.Oid";
+      if (!strcmp(name, "oid"))
+	return "org.eyedb.Oid";
 
-	if (!strcmp(name, "byte"))
-	  return "byte";
+      if (!strcmp(name, "byte"))
+	return "byte";
 
-	if (!strcmp(name, "float"))
-	  return "double";
-      }
+      if (!strcmp(name, "float"))
+	return "double";
+    }
 
     // 1/10/01: what about enums ??
     const char *sCName = Class::getSCName(name);
@@ -316,10 +314,10 @@ namespace eyedb {
   
     if (cls->asCollectionClass())
       fprintf(fd, "((m != null) ? m.getClass(\"%s\") : %s.idbclass), idbclass, \"%s\", ",
-	      cls->getAliasName(), getJavaName(cls), name);
+	      cls->getAliasName(), getJavaName(cls), className(cls)); // 10/12/05
     else
       fprintf(fd, "((m != null) ? m.getClass(\"%s\") : %s.idbclass), idbclass, \"%s\", ",
-	      cls->getAliasName(), className(cls), name);
+	      cls->getAliasName(), className(cls), className(cls)); //10/12/05
   
     fprintf(fd, "%d, %s, %d, dims);\n",
 	    num, (isIndirect() ? "true" : "false"), ndims);
@@ -1149,7 +1147,7 @@ namespace eyedb {
     fprintf(fd, "%sprivate void initialize(org.eyedb.Database db) throws org.eyedb.Exception {\n", ctx->get(),
 	    name, name);
     ctx->push();
-    fprintf(fd, "%ssetClass(((db != null) ? db.getSchema().getClass(\"%s\") : %s.idbclass));\n\n", ctx->get(), getAliasName(), name);
+    fprintf(fd, "%ssetClass(((db != null) ? db.getSchema().getClass(\"%s\") : %s.idbclass));\n\n", ctx->get(), getAliasName(), className(this)); // 10/12/05
     /*
       fprintf(fd, "%sidr_objsz = getClass(true).getObjectSize();\n", ctx->get());
       fprintf(fd, "%sidr_psize = getClass(true).getObjectPSize();\n\n", ctx->get());
@@ -1601,7 +1599,8 @@ namespace eyedb {
     int i;
     Status status;
     const char *c_name = getCName();
-    const char *_type = getCSuffix();
+    //    const char *_type = getCSuffix();
+    const char *_type = className(this); // 10/12/05
   
     fprintf(fd, "public class %s extends org.eyedb.CollSetClass {\n\n", c_name);
 
@@ -1615,7 +1614,7 @@ namespace eyedb {
     fprintf(fd, "%spublic static org.eyedb.Class idbclass;\n\n", ctx.get());
 
     // FD modif 8/12/05: added org.eyedb.
-    fprintf(fd, "%sstatic org.eyedb.%sClass make(org.eyedb.%sClass cls, "
+    fprintf(fd, "%sstatic %sClass make(%sClass cls, "
 	    "org.eyedb.Schema m)\n", ctx.get(), _type, _type);
     fprintf(fd, "%s{\n", ctx.get());
     ctx.push();
@@ -1623,7 +1622,7 @@ namespace eyedb {
   
     ctx.push();
     fprintf(fd, "%scls = new %sClass(((m != null) ? m.getClass(\"%s\") : %s.idbclass), ", ctx.get(), _type, coll_class->getName(),
-	    className(coll_class, False));
+	    className(coll_class)); // 10/12/05 <- className(coll_class, False));
   
     if (dim > 1)
       fprintf(fd, "%d);\n", dim);
