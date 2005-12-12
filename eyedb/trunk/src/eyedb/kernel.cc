@@ -18,7 +18,7 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
+  Author: Eric Viara <viara@sysra.com>
 */
 
 
@@ -75,11 +75,11 @@ namespace eyedb {
   get_dbm_passwd(const char *passwdfile);
 
   /*
-  static char *
-  crypt(const char *passwd, const char *salt)
-  {
+    static char *
+    crypt(const char *passwd, const char *salt)
+    {
     return crypt(passwd, salt);
-  }
+    }
   */
 
   //static const char sch_default_name[] = "eyedb";
@@ -101,7 +101,7 @@ namespace eyedb {
 
   static Data
   code_locarr(const eyedbsm::ObjectLocation *locarr, const eyedbsm::Oid *oids,
-		  unsigned int cnt, int *size);
+	      unsigned int cnt, int *size);
 
   static Data
   code_datinfo(const eyedbsm::DatafileInfo *info, int *size);
@@ -111,7 +111,7 @@ namespace eyedb {
 
   static void
   make_locarr(const eyedbsm::ObjectLocation *se_locarr, const eyedbsm::Oid *oids,
-		  unsigned int oid_cnt, void *locarr);
+	      unsigned int oid_cnt, void *locarr);
   static void
   make_datinfo(const eyedbsm::DatafileInfo *se_datinfo, Data *info);
 
@@ -376,6 +376,23 @@ namespace eyedb {
     return RPCSuccess;
   }
 
+  static std::string
+  gen_random()
+  {
+    struct timeval tv;
+    int r0, r1;
+    char buf[512];
+
+    gettimeofday(&tv, 0);
+    srand(tv.tv_usec);
+    r0 = rand();
+    srand(tv.tv_usec + 2*tv.tv_sec);
+    r1 = rand();
+    sprintf(buf, "%d.%06d.%d.%d", tv.tv_sec, tv.tv_usec, r0, r1);
+
+    return buf;
+  }
+
   RPCStatus
   IDB_setConnInfo(const char *hostname, int uid, const char *username,
 		  const char *progname, int pid, int *sv_pid,
@@ -396,15 +413,15 @@ namespace eyedb {
 			 eyedb::getVersion()));
 
     if (rpc_ci && rpc_ci->mode == rpc_ConnInfo::UNIX)
-      *challenge = "random-283746";
+      rpc_challenge = gen_random();
     else
-      *challenge = "";
+      rpc_challenge = "";
 
-    rpc_challenge = *challenge;
+    *challenge = (char *)rpc_challenge.c_str();
     rpc_uid = uid;
 
     return rpcStatusMake(sesslog->add(hostname, username,
-					  progname, pid, clinfo));
+				      progname, pid, clinfo));
   }
 
   void
@@ -435,8 +452,8 @@ namespace eyedb {
     // TBD: should improved that!
     // should check whether `dbmdb' belongs to an authoritative list!
     return rpcStatusMake(IDB_ERROR,
-			     "security violation: cannot use "
-			     "'%s' EYEDBDBM database.", dbmdb);
+			 "security violation: cannot use "
+			 "'%s' EYEDBDBM database.", dbmdb);
   }
 
   static RPCStatus
@@ -564,25 +581,25 @@ namespace eyedb {
     // check file $IDBSVPASSWDFILE against passwdauth
 
     /*
-    if (!*dbm_passwd) {
+      if (!*dbm_passwd) {
       const char *passwdfile;
       const char *s;
       if (passwdfile)
-	passwdfile = strdup(passwdfile);
+      passwdfile = strdup(passwdfile);
       else if (s = eyedb::getConfigValue("sv_passwd_file"))
-	passwdfile = strdup(s);
+      passwdfile = strdup(s);
       else {
-	fprintf(stderr, "eyedbd: EyeDB passwd file is not set, check your 'sv_passwd_file' configuration variable or the '-passwdfile' command line option\n");
-	exit(1);
+      fprintf(stderr, "eyedbd: EyeDB passwd file is not set, check your 'sv_passwd_file' configuration variable or the '-passwdfile' command line option\n");
+      exit(1);
       }
       
       get_dbm_passwd(passwdfile);
-    }
+      }
     */
 
     if (strcmp(crypt(passwdauth, salt), dbm_passwd))
       return rpcStatusMake(Exception::make(IDB_AUTHENTICATION_FAILED,
-					       "not a valid password to create a DBM database"));
+					   "not a valid password to create a DBM database"));
 
     RPCStatus rpc_status;
     rpc_status = IDB_dbCreate_realize(ch, 0, DBM_Database::getDbid(), dbmdb,
@@ -760,10 +777,10 @@ namespace eyedb {
 	  {
 	    if ((*pdbname)[0])
 	      return rpcStatusMake(IDB_ERROR,
-				       "cannot open database '%s'", *pdbname);
+				   "cannot open database '%s'", *pdbname);
 	    else
 	      return rpcStatusMake(IDB_ERROR,
-				       "cannot open database dbid #%d", *dbid);
+				   "cannot open database dbid #%d", *dbid);
 	  }
       }
     else
@@ -805,7 +822,7 @@ namespace eyedb {
       return rpcStatusMake(s);
     if (copy && xdbfile)
       return rpcStatusMake(IDB_ERROR,
-			       "database '%s' already exists", newdbname);
+			   "database '%s' already exists", newdbname);
 
     eyedbsm::DbMoveDescription mvcpdesc;
     strcpy(mvcpdesc.dbfile, dbdesc->dbfile);
@@ -894,8 +911,8 @@ namespace eyedb {
 
     if (ndbfile)
       return rpcStatusMake(IDB_DATABASE_RENAME_ERROR,
-			       "database '%s' already exists",
-			       newdbname);
+			   "database '%s' already exists",
+			   newdbname);
     return rpcStatusMake(dbm->updateEntry(dbid, dbname, newdbname, dbfile));
   }
 
@@ -911,7 +928,7 @@ namespace eyedb {
 
   static const char *
   getUserAuth(const char *username, Bool &need_passwd,
-		  Bool &superuser)
+	      Bool &superuser)
   {
     int i;
     rpc_TcpIp *tcpip;
@@ -978,11 +995,11 @@ namespace eyedb {
       {
 	if (*userauth)
 	  return rpcStatusMake(IDB_INSUFFICIENT_PRIVILEGES,
-				   "access denied for user '%s'",
-				   userauth);
+			       "access denied for user '%s'",
+			       userauth);
 
 	return rpcStatusMake(IDB_INSUFFICIENT_PRIVILEGES,
-				 "access denied for unspecified user");
+			     "access denied for unspecified user");
       }
 
     userauth = u;
@@ -1045,9 +1062,9 @@ namespace eyedb {
 	    sysaccess->release();
 	    dbm->transactionCommit();
 	    return rpcStatusMake(IDB_AUTHENTICATION_FAILED,
-				     "user '%s' can be used only in a "
-				     "strict unix authentication mode",
-				     userauth);
+				 "user '%s' can be used only in a "
+				 "strict unix authentication mode",
+				 userauth);
 	  }
 
 	const char *pwd = sysaccess->user()->passwd();
@@ -1179,9 +1196,9 @@ namespace eyedb {
 	    user->release();
 	    dbm->transactionCommit();
 	    return rpcStatusMake(IDB_AUTHENTICATION_FAILED,
-				     "user '%s' can be used only in a "
-				     "strict unix authentication mode",
-				     userauth);
+				 "user '%s' can be used only in a "
+				 "strict unix authentication mode",
+				 userauth);
 	  }
 
 	if (user->passwd() &&
@@ -1340,8 +1357,8 @@ namespace eyedb {
 
     if (!user)
       return rpcStatusMake(Exception::make(IDB_SET_PASSWD_ERROR,
-					       "user '%s' not found",
-					       username));
+					   "user '%s' not found",
+					   username));
 
     if (user->passwd() && strcmp(user->passwd(), crypt(passwd, salt)))
       {
@@ -1490,7 +1507,7 @@ namespace eyedb {
       se_flags = eyedbsm::VOLRW;
     else
       return rpcStatusMake(IDB_INVALID_DBOPEN_FLAG,
-			       "opening flag `%d' is invalid", flags);
+			   "opening flag `%d' is invalid", flags);
 
     const char *dbfile;
 
@@ -2170,9 +2187,9 @@ namespace eyedb {
     if (xhdr->size > IDB_OBJ_HEAD_SIZE && !(xhdr->xinfo & IDB_XINFO_REMOVED))
       rpc_status =
 	rpcStatusMake_se(eyedbsm::objectRead(dbh->sedbh, IDB_OBJ_HEAD_SIZE,
-						 xhdr->size - IDB_OBJ_HEAD_SIZE,
-						 idr + IDB_OBJ_HEAD_SIZE,
-						 (eyedbsm::LockMode)lockmode, 0, 0, oid));
+					     xhdr->size - IDB_OBJ_HEAD_SIZE,
+					     idr + IDB_OBJ_HEAD_SIZE,
+					     (eyedbsm::LockMode)lockmode, 0, 0, oid));
     else
       rpc_status = RPCSuccess;
 
@@ -2414,9 +2431,9 @@ namespace eyedb {
       {
 	Oid xoid(oid);
 	return rpcStatusMake(Exception::make(IDB_ERROR,
-						 "object '%s' does not exist "
-						 "anymore",
-						 xoid.getString()));
+					     "object '%s' does not exist "
+					     "anymore",
+					     xoid.getString()));
       }
 #endif
 
@@ -2498,8 +2515,8 @@ namespace eyedb {
     /*rpc_status = rpcStatusMake_se(eyedbsm::objectCreate(dbh->sedbh, se_ObjectNone,
       size, oid));*/
     rpc_status = rpcStatusMake_se(eyedbsm::objectCreate(dbh->sedbh,
-							    eyedbsm::ObjectZero,
-							    size, dspid, oid));
+							eyedbsm::ObjectZero,
+							size, dspid, oid));
 
     if (rpc_status)
       return rpc_status;
@@ -2595,7 +2612,7 @@ namespace eyedb {
   IDB_dataSizeModify(DbHandle *dbh, unsigned int size, const eyedbsm::Oid *oid)
   {
     return rpcStatusMake_se(eyedbsm::objectSizeModify(dbh->sedbh, size, eyedbsm::True,
-							  oid));
+						      oid));
   }
 
   /* vardim */
@@ -2607,19 +2624,19 @@ namespace eyedb {
 
     if (!cls)
       return rpcStatusMake(IDB_FATAL_ERROR,
-			       "class '%s' not found in %s()",
-			       OidGetString(oid_cl), fname);
+			   "class '%s' not found in %s()",
+			   OidGetString(oid_cl), fname);
 
     if (!cls->asAgregatClass())
       return rpcStatusMake(IDB_FATAL_ERROR,
-			       "class '%s' is not a agregat_class in %s()",
-			       cls->getName(), fname);
+			   "class '%s' is not a agregat_class in %s()",
+			   cls->getName(), fname);
 
     int count;
     const Attribute **items = ((AgregatClass *)cls)->getAttributes(count);
     if (num < 0 || num >= count)
       return rpcStatusMake(IDB_FATAL_ERROR, "invalid item number `%d' in for class '%s' in %s()",
-			       num, cls->getName(), fname);
+			   num, cls->getName(), fname);
 
     *pitem = (Attribute *)items[num];
     return RPCSuccess;
@@ -2896,7 +2913,7 @@ namespace eyedb {
 
     if (!attr)
       return rpcStatusMake(IDB_ERROR, "cannot find attribute #%d "
-			       "in class %s\n", num, cl->getName());
+			   "in class %s\n", num, cl->getName());
   
     lock_data((Data *)&idx_ctx_data, xdata);
 
@@ -2930,7 +2947,7 @@ namespace eyedb {
     Attribute *attr = (Attribute *)cl->asAgregatClass()->getAttribute(num);
     if (!attr)
       return rpcStatusMake(IDB_ERROR, "cannot find attribute #%d in class %s\n",
-			       num, cl->getName());
+			   num, cl->getName());
     lock_data((Data *)&idx_ctx_data, xdata);
 
     AttrIdxContext idx_ctx(idx_ctx_data, size);
@@ -2967,7 +2984,7 @@ namespace eyedb {
 
     if (attr_comp->isRemoved())
       return rpcStatusMake(IDB_ERROR, "attribute component %s is removed",
-			       oid.toString());
+			   oid.toString());
 
     s = Attribute::checkAttrPath(db->getSchema(), cls, attr,
 				 attr_comp->getAttrpath(), idx_ctx);
@@ -2976,9 +2993,9 @@ namespace eyedb {
     if (!attr->isIndirect() && !attr->isBasicOrEnum() &&
 	!attr->getClass()->asCollectionClass())
       return rpcStatusMake(Exception::make
-			       (IDB_ERROR,
-				"attribute path '%s' is not indirect neither "
-				"basic literal", attr_comp->getAttrpath()));
+			   (IDB_ERROR,
+			    "attribute path '%s' is not indirect neither "
+			    "basic literal", attr_comp->getAttrpath()));
 
     /*
       if (!check || !attr_comp->getPropagate())
@@ -3282,10 +3299,10 @@ namespace eyedb {
     if (attr_comp->asCollAttrImpl()) {
       if (!attr->getClass()->asCollectionClass() || attr->isIndirect())
 	return rpcStatusMake(IDB_ERROR,
-				 "attribute path %s: "
-				 "a collection implementation can be tied "
-				 "only to a literal collection attribute",
-				 attr_comp->getAttrpath());
+			     "attribute path %s: "
+			     "a collection implementation can be tied "
+			     "only to a literal collection attribute",
+			     attr_comp->getAttrpath());
     }
 
     Status s = attr->addComponent(db, attr_comp);
@@ -3334,7 +3351,7 @@ namespace eyedb {
       if (s) return rpcStatusMake(s);
       if (!idx->idx)
 	return rpcStatusMake(IDB_ERROR, "invalid null index %s",
-				 idxoid.toString());
+			     idxoid.toString());
     }
 
     return RPCSuccess;
@@ -3381,7 +3398,7 @@ namespace eyedb {
       if (data) {
 	data->status = rpc_TempDataUsed;
 	data->data = code_index_stats(IndexImpl::Hash, &stats,
-					  &data->size);
+				      &data->size);
       }
       else
 	make_index_stats(stats, rstats);
@@ -3393,7 +3410,7 @@ namespace eyedb {
       if (data) {
 	data->status = rpc_TempDataUsed;
 	data->data = code_index_stats(IndexImpl::BTree, &stats,
-					  &data->size);
+				      &data->size);
       }
       else
 	make_index_stats(stats, rstats);
@@ -3455,7 +3472,7 @@ namespace eyedb {
       if (rdata) {
 	rdata->status = rpc_TempDataUsed;
 	rdata->data = code_index_stats(IndexImpl::Hash, &stats,
-					   &rdata->size);
+				       &rdata->size);
       }
       else
 	make_index_stats(stats, rstats);
@@ -3487,7 +3504,7 @@ namespace eyedb {
       if (rdata) {
 	rdata->status = rpc_TempDataUsed;
 	rdata->data = code_index_stats(IndexImpl::Hash, &stats,
-					   &rdata->size);
+				       &rdata->size);
       }
       else
 	make_index_stats(stats, rstats);
@@ -3502,7 +3519,7 @@ namespace eyedb {
       if (rdata) {
 	rdata->status = rpc_TempDataUsed;
 	rdata->data = code_index_stats(IndexImpl::BTree, &stats,
-					   &rdata->size);
+				       &rdata->size);
       }
       else
 	make_index_stats(stats, rstats);
@@ -3554,7 +3571,7 @@ namespace eyedb {
       if (rdata) {
 	rdata->status = rpc_TempDataUsed;
 	rdata->data = code_index_stats(IndexImpl::Hash,
-					   &stats, &rdata->size);
+				       &stats, &rdata->size);
       }
       else
 	make_index_stats(stats, rstats);
@@ -3563,8 +3580,8 @@ namespace eyedb {
       *(BTreeIndexStats **)rstats = 0;
       unlock_data(impl, xidata);
       return rpcStatusMake(Exception::make(IDB_ERROR,
-					       "btree simulation is not "
-					       "yet implemented"));
+					   "btree simulation is not "
+					   "yet implemented"));
     }
 
     unlock_data(impl, xidata);
@@ -3671,9 +3688,9 @@ namespace eyedb {
     }
 
     /*
-    printf("getCollBE called from %s\n", from);
-    printf("%s: size=%d locked=%d: ", 
-	   db->getName(), db->getBEQueue()->getCollectionCount(), locked);
+      printf("getCollBE called from %s\n", from);
+      printf("%s: size=%d locked=%d: ", 
+      db->getName(), db->getBEQueue()->getCollectionCount(), locked);
     */
 
     Oid _oid(colloid);
@@ -3688,9 +3705,9 @@ namespace eyedb {
 
       if (locked)
 	db->getBEQueue()->addCollection(collbe, dbh);
-      }
+    }
     /*
-    else
+      else
       printf("FOUND -> %p\n", collbe);
     */
 
@@ -3809,7 +3826,7 @@ namespace eyedb {
 #ifdef COLLBE_BTREE
       if (1) {
 #else
-      if (idximpl->getType() == IndexImpl::BTree) {
+	//if (idximpl->getType() == IndexImpl::BTree)
 #endif
 	eyedbsm::BIdx::KeyType ktypes;
       
@@ -3875,1833 +3892,1873 @@ namespace eyedb {
     return RPCSuccess;
   }
   
-static RPCStatus
-IDB_collectionCardWrite(DbHandle *dbh, Data idr, ObjectHeader *hdr, const eyedbsm::Oid *oid)
-{
-  CHECK_WRITE((Database *)dbh->db);
+  static RPCStatus
+  IDB_collectionCardWrite(DbHandle *dbh, Data idr, ObjectHeader *hdr, const eyedbsm::Oid *oid)
+  {
+    CHECK_WRITE((Database *)dbh->db);
 
-  Offset offset = IDB_OBJ_HEAD_SIZE;
-  eyedbsm::Status se_status;
+    Offset offset = IDB_OBJ_HEAD_SIZE;
+    eyedbsm::Status se_status;
 
-  eyedbsm::Oid xoid;
+    eyedbsm::Oid xoid;
 
-  oid_decode(idr, &offset, &xoid);
+    oid_decode(idr, &offset, &xoid);
 
-  // XDR: should really decode ??
-  se_status = eyedbsm::objectWrite(dbh->sedbh, IDB_COLL_OFF_CARD_OID,
-				   sizeof(eyedbsm::Oid), &xoid, oid);
-  if (se_status)
-    return rpcStatusMake_se(se_status);
+    // XDR: should really decode ??
+    se_status = eyedbsm::objectWrite(dbh->sedbh, IDB_COLL_OFF_CARD_OID,
+				     sizeof(eyedbsm::Oid), &xoid, oid);
+    if (se_status)
+      return rpcStatusMake_se(se_status);
 	
-  return RPCSuccess;
-}
-
-static RPCStatus
-IDB_collectionInvWrite(DbHandle *dbh, Data idr, ObjectHeader *hdr, const eyedbsm::Oid *oid)
-{
-  Database *db = (Database *)dbh->db;
-  CHECK_WRITE(db);
-
-  eyedbsm::Status se_status;
-
-  se_status = eyedbsm::objectWrite(dbh->sedbh, IDB_COLL_OFF_INV_OID,
-				   sizeof(eyedbsm::Oid)+sizeof(eyedblib::int16),
-				   idr+IDB_OBJ_HEAD_SIZE, oid);
-  if (se_status)
-    return rpcStatusMake_se(se_status);
-	
-  return RPCSuccess;
-}
-
-static RPCStatus
-IDB_collectionUpdateCount(DbHandle *dbh, CollectionBE *collbe,
-			  const eyedbsm::Oid *oid,
-			  int is_idx2, int change_cnt,
-			  int items_bottom, int items_top)
-{
-  Database *db = (Database *)dbh->db;
-  CHECK_WRITE(db);
-  eyedbsm::Status se_status;
-
-  if (is_idx2) {
-    int xitems_top, xitems_bottom;
-
-    se_status = eyedbsm::objectRead(dbh->sedbh, IDB_COLL_OFF_ITEMS_BOT,
-				    sizeof(eyedblib::int32), &xitems_bottom, eyedbsm::DefaultLock,
-				    0, 0, oid);
-
-    RCHECK(se_status);
-    se_status = eyedbsm::objectRead(dbh->sedbh, IDB_COLL_OFF_ITEMS_TOP,
-				    sizeof(eyedblib::int32), &xitems_top, eyedbsm::DefaultLock,
-				    0, 0, oid);
-    
-    RCHECK(se_status);
-    
-    xitems_top = x2h_32(xitems_top);
-    xitems_bottom = x2h_32(xitems_bottom);
-
-    items_top    = (items_top > xitems_top) ? items_top : xitems_top;
-    items_bottom = (items_bottom < xitems_bottom) ? items_bottom :
-      xitems_bottom;
-    
-    if (items_bottom != xitems_bottom) {
-#ifdef E_XDR
-      eyedblib::int32 items_bottom_x = h2x_32(items_bottom);
-#else
-      eyedblib::int32 items_bottom_x = items_bottoms;
-#endif
-      se_status = eyedbsm::objectWrite(dbh->sedbh, IDB_COLL_OFF_ITEMS_BOT,
-				       sizeof(eyedblib::int32), &items_bottom_x, oid);
-      
-      RCHECK(se_status);
-    }
-
-    if (items_top != xitems_top) {
-#ifdef E_XDR
-      eyedblib::int32 items_top_x = h2x_32(items_top);
-#else
-      eyedblib::int32 items_top_x = items_tops;
-#endif
-      se_status = eyedbsm::objectWrite(dbh->sedbh, IDB_COLL_OFF_ITEMS_TOP,
-				       sizeof(eyedblib::int32), &items_top_x, oid);
-      RCHECK(se_status);
-    }
-  }
-  
-  if (!change_cnt)
     return RPCSuccess;
+  }
 
-  eyedblib::int32 items_cnt, xitems_cnt;
-  se_status = eyedbsm::objectRead(dbh->sedbh, IDB_COLL_OFF_ITEMS_CNT,
-				  sizeof(eyedblib::int32), &xitems_cnt, eyedbsm::DefaultLock,
-				  0, 0, oid);
+  static RPCStatus
+  IDB_collectionInvWrite(DbHandle *dbh, Data idr, ObjectHeader *hdr, const eyedbsm::Oid *oid)
+  {
+    Database *db = (Database *)dbh->db;
+    CHECK_WRITE(db);
+
+    eyedbsm::Status se_status;
+
+    se_status = eyedbsm::objectWrite(dbh->sedbh, IDB_COLL_OFF_INV_OID,
+				     sizeof(eyedbsm::Oid)+sizeof(eyedblib::int16),
+				     idr+IDB_OBJ_HEAD_SIZE, oid);
+    if (se_status)
+      return rpcStatusMake_se(se_status);
+	
+    return RPCSuccess;
+  }
+
+  static RPCStatus
+  IDB_collectionUpdateCount(DbHandle *dbh, CollectionBE *collbe,
+			    const eyedbsm::Oid *oid,
+			    int is_idx2, int change_cnt,
+			    int items_bottom, int items_top)
+  {
+    Database *db = (Database *)dbh->db;
+    CHECK_WRITE(db);
+    eyedbsm::Status se_status;
+
+    if (is_idx2) {
+      int xitems_top, xitems_bottom;
+
+      se_status = eyedbsm::objectRead(dbh->sedbh, IDB_COLL_OFF_ITEMS_BOT,
+				      sizeof(eyedblib::int32), &xitems_bottom, eyedbsm::DefaultLock,
+				      0, 0, oid);
+
+      RCHECK(se_status);
+      se_status = eyedbsm::objectRead(dbh->sedbh, IDB_COLL_OFF_ITEMS_TOP,
+				      sizeof(eyedblib::int32), &xitems_top, eyedbsm::DefaultLock,
+				      0, 0, oid);
+    
+      RCHECK(se_status);
+    
+      xitems_top = x2h_32(xitems_top);
+      xitems_bottom = x2h_32(xitems_bottom);
+
+      items_top    = (items_top > xitems_top) ? items_top : xitems_top;
+      items_bottom = (items_bottom < xitems_bottom) ? items_bottom :
+	xitems_bottom;
+    
+      if (items_bottom != xitems_bottom) {
+#ifdef E_XDR
+	eyedblib::int32 items_bottom_x = h2x_32(items_bottom);
+#else
+	eyedblib::int32 items_bottom_x = items_bottoms;
+#endif
+	se_status = eyedbsm::objectWrite(dbh->sedbh, IDB_COLL_OFF_ITEMS_BOT,
+					 sizeof(eyedblib::int32), &items_bottom_x, oid);
+      
+	RCHECK(se_status);
+      }
+
+      if (items_top != xitems_top) {
+#ifdef E_XDR
+	eyedblib::int32 items_top_x = h2x_32(items_top);
+#else
+	eyedblib::int32 items_top_x = items_tops;
+#endif
+	se_status = eyedbsm::objectWrite(dbh->sedbh, IDB_COLL_OFF_ITEMS_TOP,
+					 sizeof(eyedblib::int32), &items_top_x, oid);
+	RCHECK(se_status);
+      }
+    }
+  
+    if (!change_cnt)
+      return RPCSuccess;
+
+    eyedblib::int32 items_cnt, xitems_cnt;
+    se_status = eyedbsm::objectRead(dbh->sedbh, IDB_COLL_OFF_ITEMS_CNT,
+				    sizeof(eyedblib::int32), &xitems_cnt, eyedbsm::DefaultLock,
+				    0, 0, oid);
 
 #ifdef E_XDR
-  eyedblib::int32 xitems_cnt_x = x2h_32(xitems_cnt);
+    eyedblib::int32 xitems_cnt_x = x2h_32(xitems_cnt);
 #else
-  eyedblib::int32 xitems_cnt_x = xitems_cnt;
+    eyedblib::int32 xitems_cnt_x = xitems_cnt;
 #endif
-  /*
-    printf("items_cnt %d vs. xitems_cnt %d, change_cnt %d, new count %d\n",
-    items_cnt, xitems_cnt, change_cnt, xitems_cnt + change_cnt);
-  */
+    /*
+      printf("items_cnt %d vs. xitems_cnt %d, change_cnt %d, new count %d\n",
+      items_cnt, xitems_cnt, change_cnt, xitems_cnt + change_cnt);
+    */
 
-  items_cnt = xitems_cnt_x + change_cnt;
+    items_cnt = xitems_cnt_x + change_cnt;
 
 #ifdef E_XDR
-  eyedblib::int32 items_cnt_x = x2h_32(items_cnt);
+    eyedblib::int32 items_cnt_x = x2h_32(items_cnt);
 #else
-  eyedblib::int32 items_cnt_x = items_cnt;
+    eyedblib::int32 items_cnt_x = items_cnt;
 #endif
-  se_status = eyedbsm::objectWrite(dbh->sedbh, IDB_COLL_OFF_ITEMS_CNT,
-				   sizeof(eyedblib::int32), &items_cnt_x, oid);
-  RCHECK(se_status);
+    se_status = eyedbsm::objectWrite(dbh->sedbh, IDB_COLL_OFF_ITEMS_CNT,
+				     sizeof(eyedblib::int32), &items_cnt_x, oid);
+    RCHECK(se_status);
 
-  IDB_free(db, collbe);  
-  return RPCSuccess;
-}
+    IDB_free(db, collbe);  
+    return RPCSuccess;
+  }
 
 #define UPDATE_COUNT() \
   IDB_collectionUpdateCount(dbh, collbe, oid, \
 			    is_idx2, change_cnt, items_bottom, \
 			    items_top)
 
-static RPCStatus
-IDB_collImplManage(DbHandle *dbh, const eyedbsm::Oid *oid,
-		   eyedbsm::Idx *idx1, eyedbsm::Idx *idx2,
-		   Data idr, Offset offset)
-{
-  Database *db = (Database *)dbh->db;
-  short c;
-  int16_decode (idr, &offset, &c);
-
-  if (c == IDB_COLL_IMPL_CHANGED) {
-    IndexImpl *idximpl;
-    Offset offset_impl = offset;
-    Status status = IndexImpl::decode(db, idr, offset, idximpl);
-    if (status)
-      return rpcStatusMake(status);
-    //printf("NEW IMPLEMENTATION %s\n", (const char *)idximpl->toString());
-
-    eyedbsm::Idx *idxs[2] = {idx1, idx2};
-    eyedbsm::Status s;
-    eyedbsm::Oid newoid[2] = {eyedbsm::Oid::nullOid, eyedbsm::Oid::nullOid};
-
-    if (idximpl->getType() == IndexImpl::Hash) {
-      unsigned int impl_hints_cnt;
-      const int *impl_hints = idximpl->getImplHints(impl_hints_cnt);
-
-      for (int i = 0; i < 2; i++) {
-	eyedbsm::HIdx *idx = (idxs[i] ? idxs[i]->asHIdx() : 0);
-	if (idx) {
-	  eyedbsm::Idx::KeyType ktype = idx->getKeyType();
-	  eyedbsm::Boolean change;
-
-	  //printf("KTYPE BEFORE %d\n", ktype.type);
-
-	  if (ktype.type == eyedbsm::Idx::tUnsignedChar &&
-	      ktype.count == sizeof(eyedbsm::Oid)) {
-	    ktype.type = eyedbsm::Idx::tOid;
-	    ktype.count = 1;
-	    change = eyedbsm::True;
-	  }
-	  else
-	    change = eyedbsm::False;
-
-	  s = idx->reimplementToHash
-	    (newoid[i], idximpl->getKeycount(), 0,
-	     idx->getDefaultDspid(), 
-	     impl_hints, impl_hints_cnt,
-	     (idximpl->getHashMethod() ? hash_key : 0),
-	     idximpl->getHashMethod(), (change ? &ktype : 0));
-      
-	  if (s)
-	    return rpcStatusMake_se(s);
-	  //printf("KTYPE AFTER %d\n", idx->getKeyType().type);
-	}
-      }
-    }
-    else {
-      for (int i = 0; i < 2; i++) {
-	eyedbsm::Idx *idx = idxs[i];
-	if (idx) {
-	  s = idx->reimplementToBTree(newoid[i], idximpl->getDegree(),
-				      idx->getDefaultDspid());
-      
-	  if (s)
-	    return rpcStatusMake_se(s);
-	}
-      }
-    }
-
-    /*
-      printf("NEWOIDS IDX1 %s vs. %s\n", Oid(newoid[0]).toString(),
-      Oid(idx1->oid()).toString());
-      if (idx2)
-      printf("NEWOIDS IDX2 %s vs. %s\n", Oid(newoid[1]).toString(),
-      Oid(idx2->oid()).toString());
-    */
-
-    eyedbsm::Oid data_oid[2];
-    Data data = (Data)&data_oid;
-    Size alloc_size = 2 * sizeof(eyedbsm::Oid);
-    offset = 0;
-    oid_code(&data, &offset, &alloc_size, &newoid[0]);
-    oid_code(&data, &offset, &alloc_size, &newoid[1]);
-    assert(data == (Data)data_oid);
-    RPCStatus rpc_status = 
-      IDB_dataWrite(dbh, IDB_COLL_OFF_IDX1_OID, 2 * sizeof(eyedbsm::Oid),
-		    data, oid, 0);
-    if (rpc_status) return rpc_status;
-    return IDB_dataWrite(dbh, IDB_COLL_OFF_IMPL_BEGIN, IDB_IMPL_CODE_SIZE,
-			 &idr[offset_impl], oid, 0);
-  }
-
-  if (c != IDB_COLL_IMPL_UNCHANGED)
-    return rpcStatusMake(IDB_ERROR, "collection write internal error: "
-			     "unexpected magic number %x", c);
-
-  return RPCSuccess;
-}
-
-
-static RPCStatus
-IDB_collectionWrite(DbHandle *dbh, Data idr, ObjectHeader *hdr, const eyedbsm::Oid *oid, void *xdata)
-{
-  if (hdr->xinfo == IDB_XINFO_CARD)
-    return IDB_collectionCardWrite(dbh, idr, hdr, oid);
-
-  if (hdr->xinfo == IDB_XINFO_INV)
-    return IDB_collectionInvWrite(dbh, idr, hdr, oid);
-
-  Database *db = (Database *)dbh->db;
-
-  CollectionBE *collbe;
-  Status status;
-  collbe = IDB_getCollBE("collectionWrite", db, dbh, oid, &status);
-
-  if (!collbe)
-    return rpcStatusMake(status);
-
-  collbe->unlock();
-
-  eyedbsm::Idx *idx1, *idx2;
-  collbe->getIdx(&idx1, &idx2);
-
-  eyedbsm::Status se_status;
-
-  Offset offset = IDB_OBJ_HEAD_SIZE + sizeof(eyedblib::int32);
-  eyedblib::int32 oid_cnt;
-  int32_decode (idr, &offset, &oid_cnt);
-
-  int is_idx2 = (is_type(*hdr, _CollList_Type) ||
-		 is_type(*hdr, _CollArray_Type));
-
-  Data temp = collbe->getTempBuff();
-  eyedblib::int16 item_size = collbe->getItemSize();
-
-  int change_cnt = 0;
-  int items_bottom = 0xffffff;
-  int items_top = 0;
-
-  Oid inv_oid;
-  const Attribute *inv_item = NULL;
-  eyedbsm::Idx *idx = 0;
-  status = collbe->getInvItem(db, inv_item, inv_oid, idx);
-
-  if (status)
-    return rpcStatusMake(status);
-
-    
-  int i;
-  for (i = 0; i < oid_cnt; i++) {
-    eyedbsm::Boolean found;
-    eyedblib::int32 ind;
-    char state;
-
-#if 0
-    eyedbsm::Oid toid;
-    memcpy(&toid, idr + offset, sizeof(toid));
-    printf("COLLECTION_WRITE: %s -> %s %s\n", Oid(toid).toString(),
-	   Oid(idx1->oid()).toString(),
-	   (idx2 ? Oid(idx2->oid()).toString() : Oid::nullOid.toString()));
-#endif
-
-    buffer_decode(idr, &offset, temp, item_size);
-
-    int32_decode(idr, &offset, &ind);
-    char_decode(idr, &offset, &state);
-    if (is_idx2) {
-      unsigned char *temp1 = (unsigned char *)malloc(collbe->getItemSize());
-      if (state == CollectionPeer::removed) {
-	se_status = idx1->remove(temp, &ind, &found);
-	if (se_status || !found) {
-	  UPDATE_COUNT();
-	  free(temp1);
-	  if (se_status)
-	    return rpcStatusMake_se(se_status);
-	  
-	  Oid _tmp;
-	  memcpy(&_tmp, temp, sizeof(Oid));
-	  return rpcStatusMake(IDB_COLLECTION_ERROR,
-				   "item %s not found at %d in %s",
-				   _tmp.toString(), ind,
-				   eyedbsm::getOidString(oid));
-	}
-
-	se_status = idx2->remove(&ind, temp, &found);
-	if (se_status || !found) {
-	  UPDATE_COUNT();
-	  free(temp1);
-	  if (se_status)
-	    return rpcStatusMake_se(se_status);
-	  Oid _tmp;
-	  memcpy(&_tmp, temp, sizeof(Oid));
-	  return rpcStatusMake(IDB_COLLECTION_ERROR,
-				   "item %s not found at %d in %s",
-				   _tmp.toString(), ind,
-				   eyedbsm::getOidString(oid));
-	}
-	
-	if (idx) {
-	  se_status = idx->remove(temp, inv_oid.getOid(), &found);
-	  if ((eyedblib::log_mask & IDB_LOG_IDX_SUPPRESS) == IDB_LOG_IDX_SUPPRESS) {
-	    Oid _tmp;
-	    mcp(&_tmp, temp, sizeof(Oid));
-	    IDB_LOG(IDB_LOG_IDX_SUPPRESS,
-		    ("Removing Collection index entry '%s'"
-		     " %s <-> %s\n", inv_item->getName(),
-		     _tmp.toString(), inv_oid.toString()));
-	  }
-	  if (se_status || !found)
-	    return rpcStatusMake_se(se_status);
-	}
-	
-	change_cnt--;
-	
-	if (ind < items_bottom)
-	  items_bottom = ind;
-      }
-      else if (state == CollectionPeer::added) {
-	se_status = idx1->insert(temp, &ind);
-	if (se_status) {
-	  UPDATE_COUNT();
-	  free(temp1);
-	  return rpcStatusMake_se(se_status);
-	}
-
-	se_status = idx2->search(&ind, &found, temp1);
-	if (se_status) {
-	  UPDATE_COUNT();
-	  free(temp1);
-	  return rpcStatusMake_se(se_status);
-	}
-
-	if (found) {
-	  if (se_status = idx1->remove(temp1, &ind)) {
-	    UPDATE_COUNT();
-	    free(temp1);
-	    return rpcStatusMake_se(se_status);
-	  }
-
-	  if (se_status = idx2->remove(&ind, temp1)) {
-	    UPDATE_COUNT();
-	    free(temp1);
-	    return rpcStatusMake_se(se_status);
-	  }
-	  change_cnt--; // to cancel next change_cnt++
-	}
-
-	se_status = idx2->insert(&ind, temp);
-	if (se_status) {
-	  UPDATE_COUNT();
-	  free(temp1);
-	  return rpcStatusMake_se(se_status);
-	}
-
-	if (idx) {
-	  se_status = idx->insert(temp, inv_oid.getOid());
-	  if ((eyedblib::log_mask & IDB_LOG_IDX_CREATE) ==
-	      IDB_LOG_IDX_CREATE) {
-	    Oid _tmp;
-	    mcp(&_tmp, temp, sizeof(Oid));
-	    IDB_LOG(IDB_LOG_IDX_CREATE,
-		    ("Inserting Collection index entry '%s'"
-		     " %s <-> %s\n",
-		     inv_item->getName(),
-		     _tmp.toString(), inv_oid.toString()));
-	  }
-
-	  if (se_status)
-	    return rpcStatusMake_se(se_status);
-	}
-
-	if (ind >= items_top)
-	  items_top = ind+1;
-
-	change_cnt++;
-      }
-      
-      free(temp1);
-    }
-    else {
-      ind = 1;
-      if (state == CollectionPeer::removed) {
-	se_status = idx1->remove(temp, &ind, &found);
-	if (se_status || !found) {
-	  UPDATE_COUNT();
-	  if (se_status)
-	    return rpcStatusMake_se(se_status);
-	  Oid _tmp;
-	  memcpy(&_tmp, temp, sizeof(Oid));
-	  return rpcStatusMake(IDB_COLLECTION_ERROR,
-				   "item %s not found in %s",
-				   _tmp.toString(),
-				   eyedbsm::getOidString(oid));
-	}
-
-	if (idx) {
-	  se_status = idx->remove(temp, inv_oid.getOid(), &found);
-	  if ((eyedblib::log_mask & IDB_LOG_IDX_SUPPRESS) ==
-	      IDB_LOG_IDX_SUPPRESS) {
-	    Oid _tmp;
-	    mcp(&_tmp, temp, sizeof(Oid));
-	    IDB_LOG(IDB_LOG_IDX_SUPPRESS,
-		    ("Removing Collection index entry '%s'"
-		     " %s <-> %s\n",
-		     inv_item->getName(),
-		     _tmp.toString(), inv_oid.toString()));
-	  }
-	  if (se_status || !found)
-	    return rpcStatusMake_se(se_status);
-	}
-
-	change_cnt--;
-      }
-      else if (state == CollectionPeer::added) {
-	se_status = idx1->insert(temp, &ind);
-	if (se_status) {
-	  UPDATE_COUNT();
-	  return rpcStatusMake_se(se_status);
-	}
-
-	if (idx) {
-	  se_status = idx->insert(temp, inv_oid.getOid());
-	  if ((eyedblib::log_mask & IDB_LOG_IDX_CREATE) == IDB_LOG_IDX_CREATE) {
-	    Oid _tmp;
-	    mcp(&_tmp, temp, sizeof(Oid));
-	    IDB_LOG(IDB_LOG_IDX_CREATE,
-		    ("Inserting Collection index entry '%s'"
-		     " %s <-> %s\n",
-		     inv_item->getName(),
-		     _tmp.toString(), inv_oid.toString()));
-	  }
-
-	  if (se_status)
-	    return rpcStatusMake_se(se_status);
-	}
-	change_cnt++;
-      }
-      /* else coherent: do nothing!! */
-    }
-  }
-
-  if (inv_item && inv_item->hasInverse() &&
-      hdr->xinfo != IDB_XINFO_INVALID_INV)
-    {
-      /*
-	printf("inv_item %s for %s\n", inv_item->getName(),
-	Oid(oid).toString());
-      */
-      offset = IDB_OBJ_HEAD_SIZE + sizeof(eyedblib::int32) + sizeof(eyedblib::int32);
-      for (i = 0; i < oid_cnt; i++) {
-	eyedblib::int32 ind;
-	char state;
-
-#ifdef E_XDR
-	eyedbsm::Oid toid;
-	oid_decode(idr, &offset, &toid);
-	memcpy(temp, &toid, sizeof(toid));
-#else
-	buffer_decode  (idr, &offset, temp, item_size);
-#endif
-	int32_decode   (idr, &offset, &ind);
-	char_decode    (idr, &offset, &state);
-	
-	Oid _oid;
-	memcpy(&_oid, temp, sizeof(Oid));
-	
-	status = inv_item->inverse_coll_perform
-	  (db, (state == CollectionPeer::removed ?
-		Attribute::invObjRemove :
-		Attribute::invObjUpdate),
-	   inv_oid, _oid);
-	
-	if (status) {
-	  IDB_free(db, collbe);
-	  return rpcStatusMake(status);
-	}
-      }
-    }
-
-  RPCStatus rpc_status = 
-    IDB_collImplManage(dbh, oid, idx1, idx2, idr, offset);
-  if (rpc_status) return rpc_status;
-
-  return UPDATE_COUNT();
-}
-
-RPCStatus
-IDB_collectionRead(DbHandle *dbh, Data idr, ObjectHeader *hdr,
-		   LockMode lockmode,
-		   const eyedbsm::Oid *oid, void *xdata)
-{
-  return RPCSuccess;
-}
-
-static RPCStatus
-IDB_collectionInverseDelete(Database *db, CollectionBE *collbe,
-			    eyedbsm::Idx *idx, const Attribute *inv_item,
-			    const Oid &inv_oid)
-{
-  if (!inv_item)
-    return RPCSuccess;
-
-  Data temp = collbe->getTempBuff();
-  eyedblib::int16 item_size = collbe->getItemSize();
-
-  eyedbsm::IdxCursor *curs;
-  //if (collbe->isBIdx())
-  if (idx->asBIdx())
-    curs = new eyedbsm::BIdxCursor(idx->asBIdx(), 0, 0, eyedbsm::False, eyedbsm::False);
-  else
-    curs = new eyedbsm::HIdxCursor(idx->asHIdx(), 0, 0, eyedbsm::False, eyedbsm::False);
-
-  for (;;)
-    {
-      eyedbsm::Boolean sefound;
-      memset(temp, 0, item_size);
-      eyedbsm::Idx::Key key;
-      eyedbsm::Status se_status = curs->next(&sefound, temp, &key);
-      if (!sefound)
-	break;
-
-      if (se_status)
-	{
-	  IDB_free(db, collbe);  
-	  delete curs;
-	  return rpcStatusMake_se(se_status);
-	}
-
-      Oid _oid;
-      memcpy(&_oid, key.getKey(), sizeof(Oid));
-      inv_item->inverse_coll_perform(db, Attribute::invObjRemove,
-				     inv_oid, _oid);
-    }
-
-  delete curs;
-  return RPCSuccess;
-}
-
-static RPCStatus
-IDB_collectionDelete(DbHandle *dbh, Data idr, ObjectHeader *hdr, const eyedbsm::Oid *oid)
-{
-  Database *db = (Database *)dbh->db;
-
-  CollectionBE *collbe;
-
-  Status status;
-
-  collbe = IDB_getCollBE("collectionDelete", db, dbh, oid, &status);
-
-  if (!collbe)
-    return rpcStatusMake(status);
-
-  eyedbsm::Idx *idx1, *idx2;
-  collbe->getIdx(&idx1, &idx2);
-
-  eyedbsm::Status se_status;
-
-  Oid inv_oid;
-  const Attribute *inv_item = NULL;
-  eyedbsm::Idx *se_idx = 0;
-  if (hdr->xinfo != IDB_XINFO_INVALID_INV)
-    {
-      status = collbe->getInvItem(db, inv_item, inv_oid, se_idx);
-
+  static RPCStatus
+  IDB_collImplManage(DbHandle *dbh, const eyedbsm::Oid *oid,
+		     eyedbsm::Idx *idx1, eyedbsm::Idx *idx2,
+		     Data idr, Offset offset)
+  {
+    Database *db = (Database *)dbh->db;
+    short c;
+    int16_decode (idr, &offset, &c);
+
+    if (c == IDB_COLL_IMPL_CHANGED) {
+      IndexImpl *idximpl;
+      Offset offset_impl = offset;
+      Status status = IndexImpl::decode(db, idr, offset, idximpl);
       if (status)
 	return rpcStatusMake(status);
-    }
+      //printf("NEW IMPLEMENTATION %s\n", (const char *)idximpl->toString());
 
-  if (idx1)
-    {
-      RPCStatus rpc_status =
-	IDB_collectionInverseDelete(db, collbe, idx1, inv_item, inv_oid);
+      eyedbsm::Idx *idxs[2] = {idx1, idx2};
+      eyedbsm::Status s;
+      eyedbsm::Oid newoid[2] = {eyedbsm::Oid::nullOid, eyedbsm::Oid::nullOid};
 
-      if (rpc_status)
-	{
-	  IDB_free(db, collbe);  
-	  return rpc_status;
+      if (idximpl->getType() == IndexImpl::Hash) {
+	unsigned int impl_hints_cnt;
+	const int *impl_hints = idximpl->getImplHints(impl_hints_cnt);
+
+	for (int i = 0; i < 2; i++) {
+	  eyedbsm::HIdx *idx = (idxs[i] ? idxs[i]->asHIdx() : 0);
+	  if (idx) {
+	    eyedbsm::Idx::KeyType ktype = idx->getKeyType();
+	    eyedbsm::Boolean change;
+
+	    //printf("KTYPE BEFORE %d\n", ktype.type);
+
+	    if (ktype.type == eyedbsm::Idx::tUnsignedChar &&
+		ktype.count == sizeof(eyedbsm::Oid)) {
+	      ktype.type = eyedbsm::Idx::tOid;
+	      ktype.count = 1;
+	      change = eyedbsm::True;
+	    }
+	    else
+	      change = eyedbsm::False;
+
+	    s = idx->reimplementToHash
+	      (newoid[i], idximpl->getKeycount(), 0,
+	       idx->getDefaultDspid(), 
+	       impl_hints, impl_hints_cnt,
+	       (idximpl->getHashMethod() ? hash_key : 0),
+	       idximpl->getHashMethod(), (change ? &ktype : 0));
+      
+	    if (s)
+	      return rpcStatusMake_se(s);
+	    //printf("KTYPE AFTER %d\n", idx->getKeyType().type);
+	  }
 	}
-
-      se_status = idx1->destroy();
-      if (se_status)
-	{
-	  IDB_free(db, collbe);  
-	  return rpcStatusMake_se(se_status);
-	}
-    }
-
-  if (idx2)
-    {
-      se_status = idx2->destroy();
-      if (se_status)
-	{
-	  IDB_free(db, collbe);  
-	  return rpcStatusMake_se(se_status);
-	}
-    }
-
-  IDB_free(db, collbe);  
-  return IDB_instanceDelete(dbh, idr, hdr, oid);
-}
-
-RPCStatus
-IDB_collectionGetByInd(DbHandle *dbh, const eyedbsm::Oid *colloid, int ind, int *found, Data idr, void *xdata)
-{
-  /*
-    1) get coll from the cache:
-    if is not put it (coll = new CollectionBE(db, colloid) -> bequeue)
-    2) coll->getIdx1()->search(ind) -> found?
-  */
-  Database *db = (Database *)dbh->db;
-  CollectionBE *collbe;
-  Status status;
-
-  if (!(collbe = IDB_getCollBE("collectionGetByInd", db, dbh, colloid, &status)))
-    return rpcStatusMake(status);
-
-  int item_size = collbe->getItemSize();
-  
-  rpc_ServerData *data = (rpc_ServerData *)xdata;
-
-  if (data) {
-    if (item_size <= data->buff_size)
-      data->status = rpc_BuffUsed;
-    else {
-      data->status = rpc_TempDataUsed;
-      data->data = malloc(item_size);
-    }
-
-    data->size = item_size;
-    idr = (Data)data->data;
-  }
-
-  *found = 0;
-
-  eyedbsm::Idx *idx2;
-  collbe->getIdx(0, &idx2);
-  eyedbsm::Boolean sefound;
-
-  eyedbsm::Status se_status;
-
-  if (!(se_status = idx2->search(&ind, &sefound, idr))) {
-    if (sefound) {
-      *found = 1;
-#ifndef NEW_COLL_XDR2
-      collbe->decode(idr, idr);
-#endif
-    }
-  }
-  else {
-    IDB_free(db, collbe);  
-    return rpcStatusMake_se(se_status);
-  }
-
-  IDB_free(db, collbe);  
-  return RPCSuccess;
-}
-
-RPCStatus
-IDB_collectionGetByValue(DbHandle *dbh, const eyedbsm::Oid *colloid,
-			 Data val, int *found, int *ind)
-{
-  /*
-    1) get coll from the cache (see above)
-    2) coll->getIdx2()->search(oid) -> found?
-  */
-
-  Database *db = (Database *)dbh->db;
-  *found = 0;
-
-  CollectionBE *collbe;
-
-  Status status;
-
-  if (!(collbe = IDB_getCollBE("collectionGetByValue", db, dbh, colloid, &status)))
-    return rpcStatusMake(status);
-
-  eyedbsm::Idx *idx1;
-  collbe->getIdx(&idx1, 0);
-  eyedbsm::Boolean sefound;
-
-  // 30/08/05 : code suppressed because HIdx::search() performs the swap
-  // seems that other code does not perform swap before
-  // 09/09/05: reconnected
-
-  // 9/9/05 (later): new doit pas etre fait la, mais dans le client (si E_XDR)
-  // disconnected !
-#if 0 /*defined(E_XDR) && defined(NEW_COLL_XDR)*/
-  eyedbsm::Oid toid;
-  /*
-  Offset offset = 0;
-  printf("GET_BY_VALUE\n");
-  oid_decode(val, &offset, &toid);
-  val = (Data)&toid;
-  */
-  memcpy(&toid, val, sizeof(toid));
-  Offset offset_0 = 0;
-  Size alloc_size_0 = sizeof(toid);
-  oid_code(&val, &offset_0, &alloc_size_0, &toid);
-#endif
-
-  eyedbsm::Status se_status;
-  if (!(se_status = idx1->search(val, &sefound, ind))) {
-    if (sefound)
-      *found = 1;
-  }
-  else {
-    IDB_free(db, collbe);  
-    return rpcStatusMake_se(se_status);
-  }
-
-  IDB_free(db, collbe);  
-  return RPCSuccess;
-}
-
-RPCStatus
-IDB_setObjectLock(DbHandle *dbh, const eyedbsm::Oid * oid, int lockmode, int * rlockmode)
-{
-  eyedbsm::LockMode _rlockmode;
-  eyedbsm::Status se = eyedbsm::objectLock(dbh->sedbh, oid, (eyedbsm::LockMode)lockmode, &_rlockmode);
-  if (se) return rpcStatusMake_se(se);
-
-  if (rlockmode)
-    *rlockmode = _rlockmode;
-
-  return RPCSuccess;
-}
-
-RPCStatus
-IDB_getObjectLock(DbHandle *dbh, const eyedbsm::Oid * oid, int * lockmode)
-{
-  eyedbsm::LockMode _rlockmode;
-  eyedbsm::Status se = eyedbsm::objectGetLock(dbh->sedbh, oid, &_rlockmode);
-  if (se) return rpcStatusMake_se(se);
-
-  *lockmode = _rlockmode;
-
-  return RPCSuccess;
-}
-
-/* queries */
-
-/*
-static void
-IDB_schCode(IteratorBE *qbe, void *pschinfo, void *sch_data)
-{
-  rpc_ServerData *data = (rpc_ServerData *)sch_data;
-
-  if (data)
-    {
-      data->status = rpc_TempDataUsed;
-      code_sch_info(qbe->getSchemaInfo(),
-			(Data *)&data->data, &data->size);
-    }
-  else
-    *((SchemaInfo **)pschinfo) = qbe->getSchemaInfo();
-}
-
-RPCStatus
-IDB_queryLangCreate(DbHandle *dbh, const char *qstr, int *qid,
-		    int *pcount, void *pschinfo, void *qstr_data,
-		    void *sch_data)
-{
-  Database *db = (Database *)dbh->db;
-  Status status;
-
-  lock_data((Data *)&qstr, qstr_data);
-  IteratorBE *qbe = new IteratorBE(db, dbh, qstr, *pcount);
-
-  if ((status = qbe->getStatus()) == Success)
-    {
-      *qid = qbe->getQid();
-
-      IDB_schCode(qbe, pschinfo, sch_data);
-      unlock_data((Data)qstr, qstr_data);
-
-      return RPCSuccess;
-    }
-  
-  *qid = 0;
-
-  IDB_schCode(qbe, pschinfo, sch_data);
-
-  db->getBEQueue()->removeIterator(qbe);
-  delete qbe;
-
-  unlock_data((Data)qstr, qstr_data);
-  return rpcStatusMake(status);
-}
-
-RPCStatus
-IDB_queryDatabaseCreate(DbHandle *dbh, int *qid)
-{
-  return RPCSuccess;
-}
-
-RPCStatus
-IDB_queryClassCreate(DbHandle *dbh, const eyedbsm::Oid *cloid, int *qid)
-{
-  return RPCSuccess;
-}
-*/
-
-RPCStatus
-IDB_queryCollectionCreate(DbHandle *dbh, const eyedbsm::Oid *colloid, int index,
-			  int *qid)
-{
-  Oid xcolloid(colloid);
-
-  if (!xcolloid.isValid())
-    return rpcStatusMake(Exception::make(IDB_ERROR, "invalid null oid for collection query"));
-
-  Database *db = (Database *)dbh->db;
-  CollectionBE *collbe;
-
-  Status status;
-
-  if (!(collbe = IDB_getCollBE("queryCollectionCreate", db, dbh, colloid, &status)))
-    return rpcStatusMake(status);
-
-  IteratorBE *qbe = new IteratorBE(collbe, (index ? True : False));
-
-  if ((status = qbe->getStatus()) == Success)
-    {
-      *qid = qbe->getQid();
-      return RPCSuccess;
-    }
-  
-  IDB_free(db, collbe);  
-  return rpcStatusMake(status);
-}
-
-RPCStatus
-IDB_queryAttributeCreate(DbHandle *dbh, const eyedbsm::Oid *cloid,
-			 int num, int ind, Data start,
-			 Data end, int sexcl, int eexcl, int x_size,
-			 int *qid)
-{
-  Database *db = (Database *)dbh->db;
-  Class *cl = db->getSchema()->getClass(*cloid);
-  const Attribute *attr = (Attribute *)((AgregatClass *)cl)->getAttribute(num);
-
-  if (attr)
-    {
-      IteratorBE *qbe = new IteratorBE((Database *)dbh->db,
-				       attr, ind, start, end,
-				       (Bool)sexcl, (Bool)eexcl,
-				       x_size);
-      Status status;
-      if ((status = qbe->getStatus()) == Success)
-	{
-	  *qid = qbe->getQid();
-	  return RPCSuccess;
-	}
-
-      return rpcStatusMake(status);
-    }
-
-  return rpcStatusMake(IDB_ERROR, "invalid attribute");
-}
-
-RPCStatus
-IDB_queryDelete(DbHandle *dbh, int qid)
-{
-  Database *db = (Database *)dbh->db;
-  IteratorBE *qbe;
-  if (qbe = db->getBEQueue()->getIterator(qid))
-    {
-      delete qbe;
-      db->getBEQueue()->removeIterator(qid);
-      return RPCSuccess;
-    }
-
-  return rpcStatusMake(IDB_ERROR, "invalid query");
-}
-
-int
-IDB_getSeTrsCount(DbHandle *dbh)
-{
-  return dbh->sedbh->tr_cnt;
-}
-
-RPCStatus
-IDB_queryScanNext(DbHandle *dbh, int qid, int wanted, int *found,
-		  void *atom_array, void *xdata)
-{
-  Database *db = (Database *)dbh->db;
-  IteratorBE *qbe;
-  IteratorAtom *temp_array;
-  rpc_ServerData *data = (rpc_ServerData *)xdata;
-
-  if (data)
-    {
-#ifdef IDB_VECT
-      temp_array = idbNewVect(IteratorAtom, wanted);
-#else
-      temp_array = new IteratorAtom[wanted];
-#endif
-    }
-  else
-    temp_array = (IteratorAtom *)atom_array;
-
-  if (!qid)
-    {
-      *found = 0;
-      if (data)
-	code_atom_array(data, temp_array, *found, wanted);
-      return RPCSuccess;
-    }
-
-  if (qbe = db->getBEQueue()->getIterator(qid))
-    {
-      Status status;
-
-      if ((status = qbe->scanNext(wanted, found, temp_array)) == Success)
-	{
-	  if (data)
-	    code_atom_array(data, temp_array, *found, wanted);
-	  return RPCSuccess;
-	}
-
-      return rpcStatusMake(status);
-    }
-
-  *found = 0;
-  return rpcStatusMake(IDB_ERROR, "invalid query");
-}
-
-/* OQL */
-
-static void
-IDB_schCode(OQLBE *oqlbe, void *pschinfo, void *sch_data)
-{
-  rpc_ServerData *data = (rpc_ServerData *)sch_data;
-
-  if (data)
-    {
-      data->status = rpc_TempDataUsed;
-      code_sch_info(oqlbe->getSchemaInfo(),
-			(Data *)&data->data, &data->size);
-    }
-  else
-    *((SchemaInfo **)pschinfo) = oqlbe->getSchemaInfo();
-}
-
-RPCStatus
-IDB_oqlCreate(DbHandle *dbh, const char *qstr, int *qid,
-	      void *pschinfo, void *qstr_data,
-	      void *sch_data)
-{
-  Database *db = (Database *)dbh->db;
-  Status status;
-
-  lock_data((Data *)&qstr, qstr_data);
-  OQLBE *oqlbe = new OQLBE(db, dbh, qstr);
-
-  if ((status = oqlbe->getStatus()) == Success)
-    {
-      *qid = oqlbe->getQid();
-
-      IDB_schCode(oqlbe, pschinfo, sch_data);
-      unlock_data((Data)qstr, qstr_data);
-
-      return RPCSuccess;
-    }
-  
-  *qid = 0;
-
-  IDB_schCode(oqlbe, pschinfo, sch_data);
-
-  db->getBEQueue()->removeOQL(oqlbe);
-  delete oqlbe;
-
-  unlock_data((Data)qstr, qstr_data);
-  return rpcStatusMake(status);
-}
-
-RPCStatus
-IDB_oqlDelete(DbHandle *dbh, int qid)
-{
-  Database *db = (Database *)dbh->db;
-  OQLBE *oqlbe;
-  if (oqlbe = db->getBEQueue()->getOQL(qid))
-    {
-      delete oqlbe;
-      db->getBEQueue()->removeOQL(qid);
-      return RPCSuccess;
-    }
-
-  return rpcStatusMake(IDB_ERROR, "invalid query");
-}
-
-RPCStatus
-IDB_oqlGetResult(DbHandle *dbh, int qid, void *value, void *xdata)
-{
-  Database *db = (Database *)dbh->db;
-  OQLBE *oqlbe;
-  Value *temp_value;
-  rpc_ServerData *data = (rpc_ServerData *)xdata;
-
-  if (data)
-    temp_value = new Value();
-  else
-    temp_value = (Value *)value;
-
-  if (oqlbe = db->getBEQueue()->getOQL(qid))
-    {
-      Status status;
-
-      if ((status = oqlbe->getResult(temp_value)) == Success)
-	{
-	  if (data)
-	    code_value(data, temp_value);
-	  return RPCSuccess;
-	}
-
-      if (data) delete temp_value;
-      return rpcStatusMake(status);
-    }
-
-  if (data) delete temp_value;
-  return rpcStatusMake(IDB_ERROR, "invalid query");
-}
-
-/* schema functions */
-
-static const char schema_key[] = ".idb.schema";
-
-static RPCStatus
-IDB_schemaClassHeadGet(DbHandle *dbh)
-{
-  eyedbsm::DbHandle *sedbh = dbh->sedbh;
-  eyedbsm::Status status;
-  RPCStatus rpc_status;
-  SchemaHead *sch = &dbh->sch;
-
-  //  printf("IDB_schemaClassHeadGet()\n");
-  if ((rpc_status = IDB_transactionBegin(dbh, 0, True)) ==
-      RPCSuccess)
-    {
-      eyedbsm::Oid toid;
-      status = eyedbsm::rootEntryGet(sedbh, schema_key,
-				     &sch->oid, sizeof(eyedbsm::Oid));
-      // 9/9/05: must swap oid read
-#ifdef E_XDR
-      eyedbsm::x2h_oid(&sch->oid, &sch->oid);
-#endif
-      if (status == eyedbsm::Success) {
-	status = eyedbsm::objectRead(sedbh, IDB_SCH_CNT_INDEX, IDB_SCH_CNT_SIZE,
-				     &sch->cnt, eyedbsm::DefaultLock, 0, 0, &sch->oid);
-#ifdef E_XDR
-	sch->cnt = x2h_32(sch->cnt);
-#endif
-	sch->modify = False;
-	rpc_status = rpcStatusMake_se(status);
       }
-      else
-	rpc_status = rpcStatusMake(IDB_INVALID_SCHEMA, "no schema associated with database");
+      else {
+	for (int i = 0; i < 2; i++) {
+	  eyedbsm::Idx *idx = idxs[i];
+	  if (idx) {
+	    s = idx->reimplementToBTree(newoid[i], idximpl->getDegree(),
+					idx->getDefaultDspid());
+      
+	    if (s)
+	      return rpcStatusMake_se(s);
+	  }
+	}
+      }
 
-      IDB_transactionCommit(dbh, True);
+      /*
+	printf("NEWOIDS IDX1 %s vs. %s\n", Oid(newoid[0]).toString(),
+	Oid(idx1->oid()).toString());
+	if (idx2)
+	printf("NEWOIDS IDX2 %s vs. %s\n", Oid(newoid[1]).toString(),
+	Oid(idx2->oid()).toString());
+      */
 
-      return rpc_status;
+      eyedbsm::Oid data_oid[2];
+      Data data = (Data)&data_oid;
+      Size alloc_size = 2 * sizeof(eyedbsm::Oid);
+      offset = 0;
+      oid_code(&data, &offset, &alloc_size, &newoid[0]);
+      oid_code(&data, &offset, &alloc_size, &newoid[1]);
+      assert(data == (Data)data_oid);
+      RPCStatus rpc_status = 
+	IDB_dataWrite(dbh, IDB_COLL_OFF_IDX1_OID, 2 * sizeof(eyedbsm::Oid),
+		      data, oid, 0);
+      if (rpc_status) return rpc_status;
+      return IDB_dataWrite(dbh, IDB_COLL_OFF_IMPL_BEGIN, IDB_IMPL_CODE_SIZE,
+			   &idr[offset_impl], oid, 0);
     }
 
-  return rpc_status;
-}
+    if (c != IDB_COLL_IMPL_UNCHANGED)
+      return rpcStatusMake(IDB_ERROR, "collection write internal error: "
+			   "unexpected magic number %x", c);
 
-static RPCStatus
-IDB_schemaClassCreate(DbHandle *dbh)
-{
-  CHECK_WRITE((Database *)dbh->db);
-  eyedbsm::DbHandle *sedbh = dbh->sedbh;
-  eyedbsm::Status status;
-  char temp[IDB_OBJ_HEAD_SIZE + IDB_SCH_CNT_SIZE + IDB_SCH_NAME_SIZE];
-  Data data = (Data)temp;
-  Size alloc = sizeof temp;
-  ObjectHeader hdr;
-  SchemaHead *sch = &dbh->sch;
-  Offset offset;
+    return RPCSuccess;
+  }
 
-  memset(temp, 0, sizeof(temp));
-  status = eyedbsm::rootEntryGet(sedbh, schema_key,
-				 &sch->oid, sizeof(eyedbsm::Oid));
 
-#ifdef E_XDR
-  eyedbsm::x2h_oid(&sch->oid, &sch->oid);
-#endif
+  static RPCStatus
+  IDB_collectionWrite(DbHandle *dbh, Data idr, ObjectHeader *hdr, const eyedbsm::Oid *oid, void *xdata)
+  {
+    if (hdr->xinfo == IDB_XINFO_CARD)
+      return IDB_collectionCardWrite(dbh, idr, hdr, oid);
 
-  if (status == eyedbsm::Success)
-    return rpcStatusMake(IDB_SCHEMA_ALREADY_CREATED, 
-			     "schema already created");
+    if (hdr->xinfo == IDB_XINFO_INV)
+      return IDB_collectionInvWrite(dbh, idr, hdr, oid);
 
-  // must swap sch->oid
-  clear(hdr);
-  hdr.magic = IDB_OBJ_HEAD_MAGIC;
-  hdr.type = _Schema_Type;
-  hdr.size = sizeof temp;
-  memset(&hdr.oid_cl, 0, sizeof(eyedbsm::Oid));
+    Database *db = (Database *)dbh->db;
 
-  offset = 0;
-  object_header_code(&data, &offset, &alloc, &hdr);
-  sch->cnt = 0;
-  int32_code(&data, &offset, &alloc, &sch->cnt);
-  string_code(&data, &offset, &alloc, "");
+    CollectionBE *collbe;
+    Status status;
+    collbe = IDB_getCollBE("collectionWrite", db, dbh, oid, &status);
 
-  assert(offset <= sizeof(temp));
-
-  status = eyedbsm::objectCreate(sedbh, temp,
-				 sizeof(temp), Dataspace::DefaultDspid, &sch->oid);
-
-  if (status)
-    return rpcStatusMake_se(status);
-
-  // must swap before sch->oid
-#ifdef E_XDR
-  eyedbsm::Oid toid;
-  eyedbsm::h2x_oid(&toid, &sch->oid);
-#else
-  toid = sch->oid;
-#endif
-
-  status = eyedbsm::rootEntrySet(sedbh, schema_key, &toid,
-				 sizeof(eyedbsm::Oid), eyedbsm::True);
-
-  if (status)
-    return rpcStatusMake_se(status);
-
-  sch->modify = False;
-
-  return RPCSuccess;
-}
-
-/* classes functions */
-static RPCStatus
-IDB_makeColl(DbHandle *dbh, Data idr, const eyedbsm::Oid *oid,
-	     const char *name, const IndexImpl *idximpl,
-	     Offset offset, Bool lock)
-{
-  CHECK_WRITE((Database *)dbh->db);
-
-  CollSet *coll = CollectionPeer::collSet(name, idximpl);
-  Status status;
-  eyedbsm::Oid colloid;
-
-  if ((status = coll->getStatus()) != Success)
-    {
-      coll->release();
+    if (!collbe)
       return rpcStatusMake(status);
+
+    collbe->unlock();
+
+    eyedbsm::Idx *idx1, *idx2;
+    collbe->getIdx(&idx1, &idx2);
+
+    eyedbsm::Status se_status;
+
+    Offset offset = IDB_OBJ_HEAD_SIZE + sizeof(eyedblib::int32);
+    eyedblib::int32 oid_cnt;
+    int32_decode (idr, &offset, &oid_cnt);
+
+    int is_idx2 = (is_type(*hdr, _CollList_Type) ||
+		   is_type(*hdr, _CollArray_Type));
+
+    Data temp = collbe->getTempBuff();
+    eyedblib::int16 item_size = collbe->getItemSize();
+
+    int change_cnt = 0;
+    int items_bottom = 0xffffff;
+    int items_top = 0;
+
+    Oid inv_oid;
+    const Attribute *inv_item = NULL;
+    eyedbsm::Idx *idx = 0;
+    status = collbe->getInvItem(db, inv_item, inv_oid, idx);
+
+    if (status)
+      return rpcStatusMake(status);
+
+    
+    int i;
+    for (i = 0; i < oid_cnt; i++) {
+      eyedbsm::Boolean found;
+      eyedblib::int32 ind;
+      char state;
+
+#if 0
+      eyedbsm::Oid toid;
+      memcpy(&toid, idr + offset, sizeof(toid));
+      printf("COLLECTION_WRITE: %s -> %s %s\n", Oid(toid).toString(),
+	     Oid(idx1->oid()).toString(),
+	     (idx2 ? Oid(idx2->oid()).toString() : Oid::nullOid.toString()));
+#endif
+
+      buffer_decode(idr, &offset, temp, item_size);
+
+      int32_decode(idr, &offset, &ind);
+      char_decode(idr, &offset, &state);
+      if (is_idx2) {
+	unsigned char *temp1 = (unsigned char *)malloc(collbe->getItemSize());
+	if (state == CollectionPeer::removed) {
+	  se_status = idx1->remove(temp, &ind, &found);
+	  if (se_status || !found) {
+	    UPDATE_COUNT();
+	    free(temp1);
+	    if (se_status)
+	      return rpcStatusMake_se(se_status);
+	  
+	    Oid _tmp;
+	    memcpy(&_tmp, temp, sizeof(Oid));
+	    return rpcStatusMake(IDB_COLLECTION_ERROR,
+				 "item %s not found at %d in %s",
+				 _tmp.toString(), ind,
+				 eyedbsm::getOidString(oid));
+	  }
+
+	  se_status = idx2->remove(&ind, temp, &found);
+	  if (se_status || !found) {
+	    UPDATE_COUNT();
+	    free(temp1);
+	    if (se_status)
+	      return rpcStatusMake_se(se_status);
+	    Oid _tmp;
+	    memcpy(&_tmp, temp, sizeof(Oid));
+	    return rpcStatusMake(IDB_COLLECTION_ERROR,
+				 "item %s not found at %d in %s",
+				 _tmp.toString(), ind,
+				 eyedbsm::getOidString(oid));
+	  }
+	
+	  if (idx) {
+	    se_status = idx->remove(temp, inv_oid.getOid(), &found);
+	    if ((eyedblib::log_mask & IDB_LOG_IDX_SUPPRESS) == IDB_LOG_IDX_SUPPRESS) {
+	      Oid _tmp;
+	      mcp(&_tmp, temp, sizeof(Oid));
+	      IDB_LOG(IDB_LOG_IDX_SUPPRESS,
+		      ("Removing Collection index entry '%s'"
+		       " %s <-> %s\n", inv_item->getName(),
+		       _tmp.toString(), inv_oid.toString()));
+	    }
+	    if (se_status || !found)
+	      return rpcStatusMake_se(se_status);
+	  }
+	
+	  change_cnt--;
+	
+	  if (ind < items_bottom)
+	    items_bottom = ind;
+	}
+	else if (state == CollectionPeer::added) {
+	  se_status = idx1->insert(temp, &ind);
+	  if (se_status) {
+	    UPDATE_COUNT();
+	    free(temp1);
+	    return rpcStatusMake_se(se_status);
+	  }
+
+	  se_status = idx2->search(&ind, &found, temp1);
+	  if (se_status) {
+	    UPDATE_COUNT();
+	    free(temp1);
+	    return rpcStatusMake_se(se_status);
+	  }
+
+	  if (found) {
+	    if (se_status = idx1->remove(temp1, &ind)) {
+	      UPDATE_COUNT();
+	      free(temp1);
+	      return rpcStatusMake_se(se_status);
+	    }
+
+	    if (se_status = idx2->remove(&ind, temp1)) {
+	      UPDATE_COUNT();
+	      free(temp1);
+	      return rpcStatusMake_se(se_status);
+	    }
+	    change_cnt--; // to cancel next change_cnt++
+	  }
+
+	  se_status = idx2->insert(&ind, temp);
+	  if (se_status) {
+	    UPDATE_COUNT();
+	    free(temp1);
+	    return rpcStatusMake_se(se_status);
+	  }
+
+	  if (idx) {
+	    se_status = idx->insert(temp, inv_oid.getOid());
+	    if ((eyedblib::log_mask & IDB_LOG_IDX_CREATE) ==
+		IDB_LOG_IDX_CREATE) {
+	      Oid _tmp;
+	      mcp(&_tmp, temp, sizeof(Oid));
+	      IDB_LOG(IDB_LOG_IDX_CREATE,
+		      ("Inserting Collection index entry '%s'"
+		       " %s <-> %s\n",
+		       inv_item->getName(),
+		       _tmp.toString(), inv_oid.toString()));
+	    }
+
+	    if (se_status)
+	      return rpcStatusMake_se(se_status);
+	  }
+
+	  if (ind >= items_top)
+	    items_top = ind+1;
+
+	  change_cnt++;
+	}
+      
+	free(temp1);
+      }
+      else {
+	ind = 1;
+	if (state == CollectionPeer::removed) {
+	  se_status = idx1->remove(temp, &ind, &found);
+	  if (se_status || !found) {
+	    UPDATE_COUNT();
+	    if (se_status)
+	      return rpcStatusMake_se(se_status);
+	    Oid _tmp;
+	    memcpy(&_tmp, temp, sizeof(Oid));
+	    return rpcStatusMake(IDB_COLLECTION_ERROR,
+				 "item %s not found in %s",
+				 _tmp.toString(),
+				 eyedbsm::getOidString(oid));
+	  }
+
+	  if (idx) {
+	    se_status = idx->remove(temp, inv_oid.getOid(), &found);
+	    if ((eyedblib::log_mask & IDB_LOG_IDX_SUPPRESS) ==
+		IDB_LOG_IDX_SUPPRESS) {
+	      Oid _tmp;
+	      mcp(&_tmp, temp, sizeof(Oid));
+	      IDB_LOG(IDB_LOG_IDX_SUPPRESS,
+		      ("Removing Collection index entry '%s'"
+		       " %s <-> %s\n",
+		       inv_item->getName(),
+		       _tmp.toString(), inv_oid.toString()));
+	    }
+	    if (se_status || !found)
+	      return rpcStatusMake_se(se_status);
+	  }
+
+	  change_cnt--;
+	}
+	else if (state == CollectionPeer::added) {
+	  se_status = idx1->insert(temp, &ind);
+	  if (se_status) {
+	    UPDATE_COUNT();
+	    return rpcStatusMake_se(se_status);
+	  }
+
+	  if (idx) {
+	    se_status = idx->insert(temp, inv_oid.getOid());
+	    if ((eyedblib::log_mask & IDB_LOG_IDX_CREATE) == IDB_LOG_IDX_CREATE) {
+	      Oid _tmp;
+	      mcp(&_tmp, temp, sizeof(Oid));
+	      IDB_LOG(IDB_LOG_IDX_CREATE,
+		      ("Inserting Collection index entry '%s'"
+		       " %s <-> %s\n",
+		       inv_item->getName(),
+		       _tmp.toString(), inv_oid.toString()));
+	    }
+
+	    if (se_status)
+	      return rpcStatusMake_se(se_status);
+	  }
+	  change_cnt++;
+	}
+	/* else coherent: do nothing!! */
+      }
     }
 
-  if (lock)
-    CollectionPeer::setLock(coll, True);
+    if (inv_item && inv_item->hasInverse() &&
+	hdr->xinfo != IDB_XINFO_INVALID_INV)
+      {
+	/*
+	  printf("inv_item %s for %s\n", inv_item->getName(),
+	  Oid(oid).toString());
+	*/
+	offset = IDB_OBJ_HEAD_SIZE + sizeof(eyedblib::int32) + sizeof(eyedblib::int32);
+	for (i = 0; i < oid_cnt; i++) {
+	  eyedblib::int32 ind;
+	  char state;
 
-  status = coll->setDatabase((Database *)dbh->db);
-  if (status)
-    return rpcStatusMake(status);
+#ifdef E_XDR
+	  eyedbsm::Oid toid;
+	  oid_decode(idr, &offset, &toid);
+	  memcpy(temp, &toid, sizeof(toid));
+#else
+	  buffer_decode  (idr, &offset, temp, item_size);
+#endif
+	  int32_decode   (idr, &offset, &ind);
+	  char_decode    (idr, &offset, &state);
+	
+	  Oid _oid;
+	  memcpy(&_oid, temp, sizeof(Oid));
+	
+	  status = inv_item->inverse_coll_perform
+	    (db, (state == CollectionPeer::removed ?
+		  Attribute::invObjRemove :
+		  Attribute::invObjUpdate),
+	     inv_oid, _oid);
+	
+	  if (status) {
+	    IDB_free(db, collbe);
+	    return rpcStatusMake(status);
+	  }
+	}
+      }
 
-  //collectionLocked = True;
-  status = coll->realize();
-  //collectionLocked = False;
+    RPCStatus rpc_status = 
+      IDB_collImplManage(dbh, oid, idx1, idx2, idr, offset);
+    if (rpc_status) return rpc_status;
+
+    return UPDATE_COUNT();
+  }
+
+  RPCStatus
+  IDB_collectionRead(DbHandle *dbh, Data idr, ObjectHeader *hdr,
+		     LockMode lockmode,
+		     const eyedbsm::Oid *oid, void *xdata)
+  {
+    return RPCSuccess;
+  }
+
+  static RPCStatus
+  IDB_collectionInverseDelete(Database *db, CollectionBE *collbe,
+			      eyedbsm::Idx *idx, const Attribute *inv_item,
+			      const Oid &inv_oid)
+  {
+    if (!inv_item)
+      return RPCSuccess;
+
+    Data temp = collbe->getTempBuff();
+    eyedblib::int16 item_size = collbe->getItemSize();
+
+    eyedbsm::IdxCursor *curs;
+    //if (collbe->isBIdx())
+    if (idx->asBIdx())
+      curs = new eyedbsm::BIdxCursor(idx->asBIdx(), 0, 0, eyedbsm::False, eyedbsm::False);
+    else
+      curs = new eyedbsm::HIdxCursor(idx->asHIdx(), 0, 0, eyedbsm::False, eyedbsm::False);
+
+    for (;;)
+      {
+	eyedbsm::Boolean sefound;
+	memset(temp, 0, item_size);
+	eyedbsm::Idx::Key key;
+	eyedbsm::Status se_status = curs->next(&sefound, temp, &key);
+	if (!sefound)
+	  break;
+
+	if (se_status)
+	  {
+	    IDB_free(db, collbe);  
+	    delete curs;
+	    return rpcStatusMake_se(se_status);
+	  }
+
+	Oid _oid;
+	memcpy(&_oid, key.getKey(), sizeof(Oid));
+	inv_item->inverse_coll_perform(db, Attribute::invObjRemove,
+				       inv_oid, _oid);
+      }
+
+    delete curs;
+    return RPCSuccess;
+  }
+
+  static RPCStatus
+  IDB_collectionDelete(DbHandle *dbh, Data idr, ObjectHeader *hdr, const eyedbsm::Oid *oid)
+  {
+    Database *db = (Database *)dbh->db;
+
+    CollectionBE *collbe;
+
+    Status status;
+
+    collbe = IDB_getCollBE("collectionDelete", db, dbh, oid, &status);
+
+    if (!collbe)
+      return rpcStatusMake(status);
+
+    eyedbsm::Idx *idx1, *idx2;
+    collbe->getIdx(&idx1, &idx2);
+
+    eyedbsm::Status se_status;
+
+    Oid inv_oid;
+    const Attribute *inv_item = NULL;
+    eyedbsm::Idx *se_idx = 0;
+    if (hdr->xinfo != IDB_XINFO_INVALID_INV)
+      {
+	status = collbe->getInvItem(db, inv_item, inv_oid, se_idx);
+
+	if (status)
+	  return rpcStatusMake(status);
+      }
+
+    if (idx1)
+      {
+	RPCStatus rpc_status =
+	  IDB_collectionInverseDelete(db, collbe, idx1, inv_item, inv_oid);
+
+	if (rpc_status)
+	  {
+	    IDB_free(db, collbe);  
+	    return rpc_status;
+	  }
+
+	se_status = idx1->destroy();
+	if (se_status)
+	  {
+	    IDB_free(db, collbe);  
+	    return rpcStatusMake_se(se_status);
+	  }
+      }
+
+    if (idx2)
+      {
+	se_status = idx2->destroy();
+	if (se_status)
+	  {
+	    IDB_free(db, collbe);  
+	    return rpcStatusMake_se(se_status);
+	  }
+      }
+
+    IDB_free(db, collbe);  
+    return IDB_instanceDelete(dbh, idr, hdr, oid);
+  }
+
+  RPCStatus
+  IDB_collectionGetByInd(DbHandle *dbh, const eyedbsm::Oid *colloid, int ind, int *found, Data idr, void *xdata)
+  {
+    /*
+      1) get coll from the cache:
+      if is not put it (coll = new CollectionBE(db, colloid) -> bequeue)
+      2) coll->getIdx1()->search(ind) -> found?
+    */
+    Database *db = (Database *)dbh->db;
+    CollectionBE *collbe;
+    Status status;
+
+    if (!(collbe = IDB_getCollBE("collectionGetByInd", db, dbh, colloid, &status)))
+      return rpcStatusMake(status);
+
+    int item_size = collbe->getItemSize();
+  
+    rpc_ServerData *data = (rpc_ServerData *)xdata;
+
+    if (data) {
+      if (item_size <= data->buff_size)
+	data->status = rpc_BuffUsed;
+      else {
+	data->status = rpc_TempDataUsed;
+	data->data = malloc(item_size);
+      }
+
+      data->size = item_size;
+      idr = (Data)data->data;
+    }
+
+    *found = 0;
+
+    eyedbsm::Idx *idx2;
+    collbe->getIdx(0, &idx2);
+    eyedbsm::Boolean sefound;
+
+    eyedbsm::Status se_status;
+
+    if (!(se_status = idx2->search(&ind, &sefound, idr))) {
+      if (sefound) {
+	*found = 1;
+#ifndef NEW_COLL_XDR2
+	collbe->decode(idr, idr);
+#endif
+      }
+    }
+    else {
+      IDB_free(db, collbe);  
+      return rpcStatusMake_se(se_status);
+    }
+
+    IDB_free(db, collbe);  
+    return RPCSuccess;
+  }
+
+  RPCStatus
+  IDB_collectionGetByValue(DbHandle *dbh, const eyedbsm::Oid *colloid,
+			   Data val, int *found, int *ind)
+  {
+    /*
+      1) get coll from the cache (see above)
+      2) coll->getIdx2()->search(oid) -> found?
+    */
+
+    Database *db = (Database *)dbh->db;
+    *found = 0;
+
+    CollectionBE *collbe;
+
+    Status status;
+
+    if (!(collbe = IDB_getCollBE("collectionGetByValue", db, dbh, colloid, &status)))
+      return rpcStatusMake(status);
+
+    eyedbsm::Idx *idx1;
+    collbe->getIdx(&idx1, 0);
+    eyedbsm::Boolean sefound;
+
+    // 30/08/05 : code suppressed because HIdx::search() performs the swap
+    // seems that other code does not perform swap before
+    // 09/09/05: reconnected
+
+    // 9/9/05 (later): new doit pas etre fait la, mais dans le client (si E_XDR)
+    // disconnected !
+#if 0 /*defined(E_XDR) && defined(NEW_COLL_XDR)*/
+    eyedbsm::Oid toid;
+    /*
+      Offset offset = 0;
+      printf("GET_BY_VALUE\n");
+      oid_decode(val, &offset, &toid);
+      val = (Data)&toid;
+    */
+    memcpy(&toid, val, sizeof(toid));
+    Offset offset_0 = 0;
+    Size alloc_size_0 = sizeof(toid);
+    oid_code(&val, &offset_0, &alloc_size_0, &toid);
+#endif
+
+    eyedbsm::Status se_status;
+    if (!(se_status = idx1->search(val, &sefound, ind))) {
+      if (sefound)
+	*found = 1;
+    }
+    else {
+      IDB_free(db, collbe);  
+      return rpcStatusMake_se(se_status);
+    }
+
+    IDB_free(db, collbe);  
+    return RPCSuccess;
+  }
+
+  RPCStatus
+  IDB_setObjectLock(DbHandle *dbh, const eyedbsm::Oid * oid, int lockmode, int * rlockmode)
+  {
+    eyedbsm::LockMode _rlockmode;
+    eyedbsm::Status se = eyedbsm::objectLock(dbh->sedbh, oid, (eyedbsm::LockMode)lockmode, &_rlockmode);
+    if (se) return rpcStatusMake_se(se);
+
+    if (rlockmode)
+      *rlockmode = _rlockmode;
+
+    return RPCSuccess;
+  }
+
+  RPCStatus
+  IDB_getObjectLock(DbHandle *dbh, const eyedbsm::Oid * oid, int * lockmode)
+  {
+    eyedbsm::LockMode _rlockmode;
+    eyedbsm::Status se = eyedbsm::objectGetLock(dbh->sedbh, oid, &_rlockmode);
+    if (se) return rpcStatusMake_se(se);
+
+    *lockmode = _rlockmode;
+
+    return RPCSuccess;
+  }
+
+  /* queries */
 
   /*
-    printf("has created %s collection -> %s class=[%d, %s]\n",
-    name, coll->getOid().getString(),
-    coll->getClass(), coll->getClass()->getName());
+    static void
+    IDB_schCode(IteratorBE *qbe, void *pschinfo, void *sch_data)
+    {
+    rpc_ServerData *data = (rpc_ServerData *)sch_data;
+
+    if (data)
+    {
+    data->status = rpc_TempDataUsed;
+    code_sch_info(qbe->getSchemaInfo(),
+    (Data *)&data->data, &data->size);
+    }
+    else
+    *((SchemaInfo **)pschinfo) = qbe->getSchemaInfo();
+    }
+
+    RPCStatus
+    IDB_queryLangCreate(DbHandle *dbh, const char *qstr, int *qid,
+    int *pcount, void *pschinfo, void *qstr_data,
+    void *sch_data)
+    {
+    Database *db = (Database *)dbh->db;
+    Status status;
+
+    lock_data((Data *)&qstr, qstr_data);
+    IteratorBE *qbe = new IteratorBE(db, dbh, qstr, *pcount);
+
+    if ((status = qbe->getStatus()) == Success)
+    {
+    *qid = qbe->getQid();
+
+    IDB_schCode(qbe, pschinfo, sch_data);
+    unlock_data((Data)qstr, qstr_data);
+
+    return RPCSuccess;
+    }
+  
+    *qid = 0;
+
+    IDB_schCode(qbe, pschinfo, sch_data);
+
+    db->getBEQueue()->removeIterator(qbe);
+    delete qbe;
+
+    unlock_data((Data)qstr, qstr_data);
+    return rpcStatusMake(status);
+    }
+
+    RPCStatus
+    IDB_queryDatabaseCreate(DbHandle *dbh, int *qid)
+    {
+    return RPCSuccess;
+    }
+
+    RPCStatus
+    IDB_queryClassCreate(DbHandle *dbh, const eyedbsm::Oid *cloid, int *qid)
+    {
+    return RPCSuccess;
+    }
   */
 
-  if (status != Success)
+  RPCStatus
+  IDB_queryCollectionCreate(DbHandle *dbh, const eyedbsm::Oid *colloid, int index,
+			    int *qid)
+  {
+    Oid xcolloid(colloid);
+
+    if (!xcolloid.isValid())
+      return rpcStatusMake(Exception::make(IDB_ERROR, "invalid null oid for collection query"));
+
+    Database *db = (Database *)dbh->db;
+    CollectionBE *collbe;
+
+    Status status;
+
+    if (!(collbe = IDB_getCollBE("queryCollectionCreate", db, dbh, colloid, &status)))
+      return rpcStatusMake(status);
+
+    IteratorBE *qbe = new IteratorBE(collbe, (index ? True : False));
+
+    if ((status = qbe->getStatus()) == Success)
+      {
+	*qid = qbe->getQid();
+	return RPCSuccess;
+      }
+  
+    IDB_free(db, collbe);  
     return rpcStatusMake(status);
+  }
 
-  colloid = *coll->getOid().getOid();
+  RPCStatus
+  IDB_queryAttributeCreate(DbHandle *dbh, const eyedbsm::Oid *cloid,
+			   int num, int ind, Data start,
+			   Data end, int sexcl, int eexcl, int x_size,
+			   int *qid)
+  {
+    Database *db = (Database *)dbh->db;
+    Class *cl = db->getSchema()->getClass(*cloid);
+    const Attribute *attr = (Attribute *)((AgregatClass *)cl)->getAttribute(num);
 
-  eyedbsm::Status se_status;
+    if (attr)
+      {
+	IteratorBE *qbe = new IteratorBE((Database *)dbh->db,
+					 attr, ind, start, end,
+					 (Bool)sexcl, (Bool)eexcl,
+					 x_size);
+	Status status;
+	if ((status = qbe->getStatus()) == Success)
+	  {
+	    *qid = qbe->getQid();
+	    return RPCSuccess;
+	  }
+
+	return rpcStatusMake(status);
+      }
+
+    return rpcStatusMake(IDB_ERROR, "invalid attribute");
+  }
+
+  RPCStatus
+  IDB_queryDelete(DbHandle *dbh, int qid)
+  {
+    Database *db = (Database *)dbh->db;
+    IteratorBE *qbe;
+    if (qbe = db->getBEQueue()->getIterator(qid))
+      {
+	delete qbe;
+	db->getBEQueue()->removeIterator(qid);
+	return RPCSuccess;
+      }
+
+    return rpcStatusMake(IDB_ERROR, "invalid query");
+  }
+
+  int
+  IDB_getSeTrsCount(DbHandle *dbh)
+  {
+    return dbh->sedbh->tr_cnt;
+  }
+
+  RPCStatus
+  IDB_queryScanNext(DbHandle *dbh, int qid, int wanted, int *found,
+		    void *atom_array, void *xdata)
+  {
+    Database *db = (Database *)dbh->db;
+    IteratorBE *qbe;
+    IteratorAtom *temp_array;
+    rpc_ServerData *data = (rpc_ServerData *)xdata;
+
+    if (data)
+      {
+#ifdef IDB_VECT
+	temp_array = idbNewVect(IteratorAtom, wanted);
+#else
+	temp_array = new IteratorAtom[wanted];
+#endif
+      }
+    else
+      temp_array = (IteratorAtom *)atom_array;
+
+    if (!qid)
+      {
+	*found = 0;
+	if (data)
+	  code_atom_array(data, temp_array, *found, wanted);
+	return RPCSuccess;
+      }
+
+    if (qbe = db->getBEQueue()->getIterator(qid))
+      {
+	Status status;
+
+	if ((status = qbe->scanNext(wanted, found, temp_array)) == Success)
+	  {
+	    if (data)
+	      code_atom_array(data, temp_array, *found, wanted);
+	    return RPCSuccess;
+	  }
+
+	return rpcStatusMake(status);
+      }
+
+    *found = 0;
+    return rpcStatusMake(IDB_ERROR, "invalid query");
+  }
+
+  /* OQL */
+
+  static void
+  IDB_schCode(OQLBE *oqlbe, void *pschinfo, void *sch_data)
+  {
+    rpc_ServerData *data = (rpc_ServerData *)sch_data;
+
+    if (data)
+      {
+	data->status = rpc_TempDataUsed;
+	code_sch_info(oqlbe->getSchemaInfo(),
+		      (Data *)&data->data, &data->size);
+      }
+    else
+      *((SchemaInfo **)pschinfo) = oqlbe->getSchemaInfo();
+  }
+
+  RPCStatus
+  IDB_oqlCreate(DbHandle *dbh, const char *qstr, int *qid,
+		void *pschinfo, void *qstr_data,
+		void *sch_data)
+  {
+    Database *db = (Database *)dbh->db;
+    Status status;
+
+    lock_data((Data *)&qstr, qstr_data);
+    OQLBE *oqlbe = new OQLBE(db, dbh, qstr);
+
+    if ((status = oqlbe->getStatus()) == Success)
+      {
+	*qid = oqlbe->getQid();
+
+	IDB_schCode(oqlbe, pschinfo, sch_data);
+	unlock_data((Data)qstr, qstr_data);
+
+	return RPCSuccess;
+      }
+  
+    *qid = 0;
+
+    IDB_schCode(oqlbe, pschinfo, sch_data);
+
+    db->getBEQueue()->removeOQL(oqlbe);
+    delete oqlbe;
+
+    unlock_data((Data)qstr, qstr_data);
+    return rpcStatusMake(status);
+  }
+
+  RPCStatus
+  IDB_oqlDelete(DbHandle *dbh, int qid)
+  {
+    Database *db = (Database *)dbh->db;
+    OQLBE *oqlbe;
+    if (oqlbe = db->getBEQueue()->getOQL(qid))
+      {
+	delete oqlbe;
+	db->getBEQueue()->removeOQL(qid);
+	return RPCSuccess;
+      }
+
+    return rpcStatusMake(IDB_ERROR, "invalid query");
+  }
+
+  RPCStatus
+  IDB_oqlGetResult(DbHandle *dbh, int qid, void *value, void *xdata)
+  {
+    Database *db = (Database *)dbh->db;
+    OQLBE *oqlbe;
+    Value *temp_value;
+    rpc_ServerData *data = (rpc_ServerData *)xdata;
+
+    if (data)
+      temp_value = new Value();
+    else
+      temp_value = (Value *)value;
+
+    if (oqlbe = db->getBEQueue()->getOQL(qid))
+      {
+	Status status;
+
+	if ((status = oqlbe->getResult(temp_value)) == Success)
+	  {
+	    if (data)
+	      code_value(data, temp_value);
+	    return RPCSuccess;
+	  }
+
+	if (data) delete temp_value;
+	return rpcStatusMake(status);
+      }
+
+    if (data) delete temp_value;
+    return rpcStatusMake(IDB_ERROR, "invalid query");
+  }
+
+  /* schema functions */
+
+  static const char schema_key[] = ".idb.schema";
+
+  static RPCStatus
+  IDB_schemaClassHeadGet(DbHandle *dbh)
+  {
+    eyedbsm::DbHandle *sedbh = dbh->sedbh;
+    eyedbsm::Status status;
+    RPCStatus rpc_status;
+    SchemaHead *sch = &dbh->sch;
+
+    //  printf("IDB_schemaClassHeadGet()\n");
+    if ((rpc_status = IDB_transactionBegin(dbh, 0, True)) ==
+	RPCSuccess)
+      {
+	eyedbsm::Oid toid;
+	status = eyedbsm::rootEntryGet(sedbh, schema_key,
+				       &sch->oid, sizeof(eyedbsm::Oid));
+	// 9/9/05: must swap oid read
+#ifdef E_XDR
+	eyedbsm::x2h_oid(&sch->oid, &sch->oid);
+#endif
+	if (status == eyedbsm::Success) {
+	  status = eyedbsm::objectRead(sedbh, IDB_SCH_CNT_INDEX, IDB_SCH_CNT_SIZE,
+				       &sch->cnt, eyedbsm::DefaultLock, 0, 0, &sch->oid);
+#ifdef E_XDR
+	  sch->cnt = x2h_32(sch->cnt);
+#endif
+	  sch->modify = False;
+	  rpc_status = rpcStatusMake_se(status);
+	}
+	else
+	  rpc_status = rpcStatusMake(IDB_INVALID_SCHEMA, "no schema associated with database");
+
+	IDB_transactionCommit(dbh, True);
+
+	return rpc_status;
+      }
+
+    return rpc_status;
+  }
+
+  static RPCStatus
+  IDB_schemaClassCreate(DbHandle *dbh)
+  {
+    CHECK_WRITE((Database *)dbh->db);
+    eyedbsm::DbHandle *sedbh = dbh->sedbh;
+    eyedbsm::Status status;
+    char temp[IDB_OBJ_HEAD_SIZE + IDB_SCH_CNT_SIZE + IDB_SCH_NAME_SIZE];
+    Data data = (Data)temp;
+    Size alloc = sizeof temp;
+    ObjectHeader hdr;
+    SchemaHead *sch = &dbh->sch;
+    Offset offset;
+
+    memset(temp, 0, sizeof(temp));
+    status = eyedbsm::rootEntryGet(sedbh, schema_key,
+				   &sch->oid, sizeof(eyedbsm::Oid));
+
+#ifdef E_XDR
+    eyedbsm::x2h_oid(&sch->oid, &sch->oid);
+#endif
+
+    if (status == eyedbsm::Success)
+      return rpcStatusMake(IDB_SCHEMA_ALREADY_CREATED, 
+			   "schema already created");
+
+    // must swap sch->oid
+    clear(hdr);
+    hdr.magic = IDB_OBJ_HEAD_MAGIC;
+    hdr.type = _Schema_Type;
+    hdr.size = sizeof temp;
+    memset(&hdr.oid_cl, 0, sizeof(eyedbsm::Oid));
+
+    offset = 0;
+    object_header_code(&data, &offset, &alloc, &hdr);
+    sch->cnt = 0;
+    int32_code(&data, &offset, &alloc, &sch->cnt);
+    string_code(&data, &offset, &alloc, "");
+
+    assert(offset <= sizeof(temp));
+
+    status = eyedbsm::objectCreate(sedbh, temp,
+				   sizeof(temp), Dataspace::DefaultDspid, &sch->oid);
+
+    if (status)
+      return rpcStatusMake_se(status);
+
+    // must swap before sch->oid
+#ifdef E_XDR
+    eyedbsm::Oid toid;
+    eyedbsm::h2x_oid(&toid, &sch->oid);
+#else
+    toid = sch->oid;
+#endif
+
+    status = eyedbsm::rootEntrySet(sedbh, schema_key, &toid,
+				   sizeof(eyedbsm::Oid), eyedbsm::True);
+
+    if (status)
+      return rpcStatusMake_se(status);
+
+    sch->modify = False;
+
+    return RPCSuccess;
+  }
+
+  /* classes functions */
+  static RPCStatus
+  IDB_makeColl(DbHandle *dbh, Data idr, const eyedbsm::Oid *oid,
+	       const char *name, const IndexImpl *idximpl,
+	       Offset offset, Bool lock)
+  {
+    CHECK_WRITE((Database *)dbh->db);
+
+    CollSet *coll = CollectionPeer::collSet(name, idximpl);
+    Status status;
+    eyedbsm::Oid colloid;
+
+    if ((status = coll->getStatus()) != Success)
+      {
+	coll->release();
+	return rpcStatusMake(status);
+      }
+
+    if (lock)
+      CollectionPeer::setLock(coll, True);
+
+    status = coll->setDatabase((Database *)dbh->db);
+    if (status)
+      return rpcStatusMake(status);
+
+    //collectionLocked = True;
+    status = coll->realize();
+    //collectionLocked = False;
+
+    /*
+      printf("has created %s collection -> %s class=[%d, %s]\n",
+      name, coll->getOid().getString(),
+      coll->getClass(), coll->getClass()->getName());
+    */
+
+    if (status != Success)
+      return rpcStatusMake(status);
+
+    colloid = *coll->getOid().getOid();
+
+    eyedbsm::Status se_status;
 
 #ifndef E_XDR
-  se_status = eyedbsm::objectWrite(dbh->sedbh, offset, sizeof(eyedbsm::Oid),
-				   &colloid, oid);
-  // XDR: should be h2x ??
-  memcpy(idr + offset, &colloid, sizeof(eyedbsm::Oid));
+    se_status = eyedbsm::objectWrite(dbh->sedbh, offset, sizeof(eyedbsm::Oid),
+				     &colloid, oid);
+    // XDR: should be h2x ??
+    memcpy(idr + offset, &colloid, sizeof(eyedbsm::Oid));
 #else
-  eyedbsm::Oid xoid;
-  eyedbsm::h2x_oid(&xoid, &colloid);
-  se_status = eyedbsm::objectWrite(dbh->sedbh, offset, sizeof(eyedbsm::Oid),
-				   &xoid, oid);
-  // XDR: we h2x !
-  memcpy(idr + offset, &xoid, sizeof(eyedbsm::Oid));
-  // DONT!
-  //memcpy(idr + offset, &colloid, sizeof(eyedbsm::Oid));
+    eyedbsm::Oid xoid;
+    eyedbsm::h2x_oid(&xoid, &colloid);
+    se_status = eyedbsm::objectWrite(dbh->sedbh, offset, sizeof(eyedbsm::Oid),
+				     &xoid, oid);
+    // XDR: we h2x !
+    memcpy(idr + offset, &xoid, sizeof(eyedbsm::Oid));
+    // DONT!
+    //memcpy(idr + offset, &colloid, sizeof(eyedbsm::Oid));
 #endif
 
-  coll->release();
-  return rpcStatusMake_se(se_status);
-}
+    coll->release();
+    return rpcStatusMake_se(se_status);
+  }
 
-static RPCStatus
-IDB_collClassCreate(DbHandle *dbh, Data idr, const eyedbsm::Oid *oid,
-		    const char *name, const IndexImpl *idximpl)
-{
-  RPCStatus rpc_status;
-  char tok[256];
+  static RPCStatus
+  IDB_collClassCreate(DbHandle *dbh, Data idr, const eyedbsm::Oid *oid,
+		      const char *name, const IndexImpl *idximpl)
+  {
+    RPCStatus rpc_status;
+    char tok[256];
 
-  Offset offset = IDB_CLASS_EXTENT;
-  Oid extent_oid;
-  oid_decode(idr, &offset, extent_oid.getOid());
-  if (!extent_oid.isValid())
-    {
-      sprintf(tok, "%s::extent", name);
-      rpc_status = IDB_makeColl(dbh, idr, oid, tok, idximpl,
-				IDB_CLASS_EXTENT, True);
-      if (rpc_status)
-	return rpc_status;
-    }
+    Offset offset = IDB_CLASS_EXTENT;
+    Oid extent_oid;
+    oid_decode(idr, &offset, extent_oid.getOid());
+    if (!extent_oid.isValid())
+      {
+	sprintf(tok, "%s::extent", name);
+	rpc_status = IDB_makeColl(dbh, idr, oid, tok, idximpl,
+				  IDB_CLASS_EXTENT, True);
+	if (rpc_status)
+	  return rpc_status;
+      }
 
-  offset = IDB_CLASS_COMPONENTS;
-  Oid comp_oid;
-  oid_decode(idr, &offset, comp_oid.getOid());
-  if (!comp_oid.isValid())
-    {
-      sprintf(tok, "%s::component", name);
-      return IDB_makeColl(dbh, idr, oid, tok, 0, IDB_CLASS_COMPONENTS,
-			  False);
-    }
+    offset = IDB_CLASS_COMPONENTS;
+    Oid comp_oid;
+    oid_decode(idr, &offset, comp_oid.getOid());
+    if (!comp_oid.isValid())
+      {
+	sprintf(tok, "%s::component", name);
+	return IDB_makeColl(dbh, idr, oid, tok, 0, IDB_CLASS_COMPONENTS,
+			    False);
+      }
 
-  return RPCSuccess;
-}
+    return RPCSuccess;
+  }
 
-RPCStatus
-IDB_collClassRegister(DbHandle *dbh, const eyedbsm::Oid *colloid,
-		      const eyedbsm::Oid *oid, Bool insert)
-{
-  Database *db = (Database *)dbh->db;
-  CHECK_WRITE(db);
-  CollectionBE *collbe;
+  RPCStatus
+  IDB_collClassRegister(DbHandle *dbh, const eyedbsm::Oid *colloid,
+			const eyedbsm::Oid *oid, Bool insert)
+  {
+    Database *db = (Database *)dbh->db;
+    CHECK_WRITE(db);
+    CollectionBE *collbe;
 	  
-  Status status;
-  if (!(collbe = IDB_getCollBE("collClassRegister", db, dbh, colloid, &status, True)))
-    return rpcStatusMake(status);
+    Status status;
+    if (!(collbe = IDB_getCollBE("collClassRegister", db, dbh, colloid, &status, True)))
+      return rpcStatusMake(status);
   
-  eyedbsm::Idx *idx1;
-  collbe->getIdx(&idx1, 0);
+    eyedbsm::Idx *idx1;
+    collbe->getIdx(&idx1, 0);
   
-  eyedblib::int32 ind = 1;
-  eyedbsm::Status se_status;
+    eyedblib::int32 ind = 1;
+    eyedbsm::Status se_status;
 
 #if defined(E_XDR) && defined(NEW_COLL_XDR)
-  unsigned char data[sizeof(eyedbsm::Oid)];
-  oid_code(data, (Data)oid);
+    unsigned char data[sizeof(eyedbsm::Oid)];
+    oid_code(data, (Data)oid);
 #else
-  Data data = (Data)oid;
+    Data data = (Data)oid;
 #endif
 
-  if (insert)
-    se_status = idx1->insert(data, &ind);
-  else {
+    if (insert)
+      se_status = idx1->insert(data, &ind);
+    else {
       eyedblib::int32 ind = 1;
       eyedbsm::Boolean found = eyedbsm::False;
       se_status = idx1->remove(data, &ind, &found);
       if (!found)
 	return rpcStatusMake(IDB_ERROR,
-				 "instance delete: oid %s not found "
-				 "in collection",
-				 getOidString(oid));
-  }
+			     "instance delete: oid %s not found "
+			     "in collection",
+			     getOidString(oid));
+    }
 
-  if (se_status)
-    return rpcStatusMake_se(se_status);
+    if (se_status)
+      return rpcStatusMake_se(se_status);
 
 
-  int items_cnt;
-  se_status = eyedbsm::objectRead(dbh->sedbh, IDB_COLL_OFF_ITEMS_CNT,
-				  sizeof(eyedblib::int32), &items_cnt, eyedbsm::DefaultLock, 0, 0, colloid);
-  if (se_status)
-    return rpcStatusMake_se(se_status);
+    int items_cnt;
+    se_status = eyedbsm::objectRead(dbh->sedbh, IDB_COLL_OFF_ITEMS_CNT,
+				    sizeof(eyedblib::int32), &items_cnt, eyedbsm::DefaultLock, 0, 0, colloid);
+    if (se_status)
+      return rpcStatusMake_se(se_status);
 
-  items_cnt = x2h_32(items_cnt);
-  items_cnt += (insert ? 1 : -1);
+    items_cnt = x2h_32(items_cnt);
+    items_cnt += (insert ? 1 : -1);
 
-  collbe->setItemsCount(items_cnt);
+    collbe->setItemsCount(items_cnt);
   
 #ifdef E_XDR
-  eyedblib::int32 items_cnt_x = h2x_32(items_cnt);
+    eyedblib::int32 items_cnt_x = h2x_32(items_cnt);
 #else
-  eyedblib::int32 items_cnt_x = items_cnt;
+    eyedblib::int32 items_cnt_x = items_cnt;
 #endif
 
-  se_status = eyedbsm::objectWrite(dbh->sedbh, IDB_COLL_OFF_ITEMS_CNT,
-				   sizeof(eyedblib::int32), &items_cnt_x, colloid);
-  if (se_status)
-    return rpcStatusMake_se(se_status);
+    se_status = eyedbsm::objectWrite(dbh->sedbh, IDB_COLL_OFF_ITEMS_CNT,
+				     sizeof(eyedblib::int32), &items_cnt_x, colloid);
+    if (se_status)
+      return rpcStatusMake_se(se_status);
 
-  return RPCSuccess;
-}
-
-static RPCStatus
-IDB_collClassUpdate(DbHandle *dbh, Data idr, const eyedbsm::Oid *oid,
-		    const char *name, Bool insert)
-{
-  Database *db = (Database *)dbh->db;
-  eyedbsm::Oid colloid;
-
-  eyedbsm::Oid oid_cl = ClassOidDecode(idr);
-  Schema *sch = db->getSchema();
-  Class *cl = sch->getClass(oid_cl);
-
-  if (!cl) {
-    sch->deferredCollRegister(name ? name : "class", oid);
     return RPCSuccess;
   }
 
-  Collection *extent;
-  Status status = cl->getExtent(extent);
-  if (status)
-    return rpcStatusMake(status);
+  static RPCStatus
+  IDB_collClassUpdate(DbHandle *dbh, Data idr, const eyedbsm::Oid *oid,
+		      const char *name, Bool insert)
+  {
+    Database *db = (Database *)dbh->db;
+    eyedbsm::Oid colloid;
 
-  if (!extent) {
-    // tries again
-    status = cl->wholeComplete();
-    if (status)
-      return rpcStatusMake(status);
-    status = cl->getExtent(extent);
+    eyedbsm::Oid oid_cl = ClassOidDecode(idr);
+    Schema *sch = db->getSchema();
+    Class *cl = sch->getClass(oid_cl);
+
+    if (!cl) {
+      sch->deferredCollRegister(name ? name : "class", oid);
+      return RPCSuccess;
+    }
+
+    Collection *extent;
+    Status status = cl->getExtent(extent);
     if (status)
       return rpcStatusMake(status);
 
     if (!extent) {
-      // no chance 
-      sch->deferredCollRegister(cl->getName(), oid);
-      return RPCSuccess;
+      // tries again
+      status = cl->wholeComplete();
+      if (status)
+	return rpcStatusMake(status);
+      status = cl->getExtent(extent);
+      if (status)
+	return rpcStatusMake(status);
+
+      if (!extent) {
+	// no chance 
+	sch->deferredCollRegister(cl->getName(), oid);
+	return RPCSuccess;
+      }
     }
-  }
   
-  colloid = *extent->getOid().getOid();
+    colloid = *extent->getOid().getOid();
 
-  return IDB_collClassRegister(dbh, &colloid, oid, insert);
-}
+    return IDB_collClassRegister(dbh, &colloid, oid, insert);
+  }
 
-static const int SCH_INC = 128;
+  static const int SCH_INC = 128;
 
-static void
-DUMP_SCH_OID(DbHandle *dbh, const eyedbsm::Oid *oid, int cnt)
-{
-  for (int i = 0; i < cnt; i++)
-    {
-      eyedbsm::Oid zoid;
-      eyedbsm::objectRead(dbh->sedbh, IDB_SCH_OID_INDEX(i), sizeof(Oid), &zoid,
-			  eyedbsm::DefaultLock, 0, 0, oid);
-      printf("%s ", Oid(zoid).getString());
-    }
-  printf("\n");
-}
+  static void
+  DUMP_SCH_OID(DbHandle *dbh, const eyedbsm::Oid *oid, int cnt)
+  {
+    for (int i = 0; i < cnt; i++)
+      {
+	eyedbsm::Oid zoid;
+	eyedbsm::objectRead(dbh->sedbh, IDB_SCH_OID_INDEX(i), sizeof(Oid), &zoid,
+			    eyedbsm::DefaultLock, 0, 0, oid);
+	printf("%s ", Oid(zoid).getString());
+      }
+    printf("\n");
+  }
 
-static RPCStatus
-be_class_name_code(DbHandle *dbh, Data *idr, Offset *offset,
-		       Size *alloc_size, const char *name)
-{
-  int len = strlen(name);
-  if (len >= IDB_CLASS_NAME_LEN)
-    {
-      eyedbsm::Oid data_oid;
-      RPCStatus rpc_status = IDB_dataCreate(dbh, Dataspace::DefaultDspid,
-					    len+1, (Data)name,
-					    &data_oid, 0);
-      if (rpc_status) return rpc_status;
-      char c = IDB_NAME_OUT_PLACE;
-      char_code(idr, offset, alloc_size, &c);
-      oid_code (idr, offset, alloc_size, &data_oid);
-      bound_string_code (idr, offset, alloc_size,
-			 IDB_CLASS_NAME_PAD, 0);
-      return RPCSuccess;
-    }
+  static RPCStatus
+  be_class_name_code(DbHandle *dbh, Data *idr, Offset *offset,
+		     Size *alloc_size, const char *name)
+  {
+    int len = strlen(name);
+    if (len >= IDB_CLASS_NAME_LEN)
+      {
+	eyedbsm::Oid data_oid;
+	RPCStatus rpc_status = IDB_dataCreate(dbh, Dataspace::DefaultDspid,
+					      len+1, (Data)name,
+					      &data_oid, 0);
+	if (rpc_status) return rpc_status;
+	char c = IDB_NAME_OUT_PLACE;
+	char_code(idr, offset, alloc_size, &c);
+	oid_code (idr, offset, alloc_size, &data_oid);
+	bound_string_code (idr, offset, alloc_size,
+			   IDB_CLASS_NAME_PAD, 0);
+	return RPCSuccess;
+      }
 
-  char c = IDB_NAME_IN_PLACE;
-  char_code(idr, offset, alloc_size, &c);
-  bound_string_code(idr, offset, alloc_size, IDB_CLASS_NAME_LEN,
-		    name);
-  return RPCSuccess;
-}
+    char c = IDB_NAME_IN_PLACE;
+    char_code(idr, offset, alloc_size, &c);
+    bound_string_code(idr, offset, alloc_size, IDB_CLASS_NAME_LEN,
+		      name);
+    return RPCSuccess;
+  }
 
 
-static RPCStatus
-be_class_name_decode(DbHandle *dbh, Data idr, Offset *offset,
-			 char **name)
-{
-  char c;
-  char_decode(idr, offset, &c);
+  static RPCStatus
+  be_class_name_decode(DbHandle *dbh, Data idr, Offset *offset,
+		       char **name)
+  {
+    char c;
+    char_decode(idr, offset, &c);
 
-  if (c == IDB_NAME_OUT_PLACE)
-    {
-      eyedbsm::Oid data_oid;
+    if (c == IDB_NAME_OUT_PLACE)
+      {
+	eyedbsm::Oid data_oid;
+	RPCStatus rpc_status;
+
+	oid_decode (idr, offset, &data_oid);
+	unsigned int size;
+	rpc_status = IDB_dataSizeGet(dbh, &data_oid, &size);
+	if (rpc_status) return rpc_status;
+	*name = (char *)malloc(size);
+	rpc_status = IDB_dataRead(dbh, 0, 0, (Data)*name, 0, &data_oid, 0);
+	if (rpc_status) return rpc_status;
+	bound_string_decode (idr, offset, IDB_CLASS_NAME_PAD, 0);
+	return RPCSuccess;
+      }
+
+    char *s;
+    bound_string_decode(idr, offset, IDB_CLASS_NAME_LEN, &s);
+    *name = strdup(s);
+    return RPCSuccess;
+  }
+
+  static RPCStatus
+  IDB_classCreate(DbHandle *dbh, short dspid, Data idr, ObjectHeader *hdr, eyedbsm::Oid *oid, void *xdata)
+  {
+    CHECK_WRITE((Database *)dbh->db);
+    SchemaHead *sch = &dbh->sch;
+    rpc_ServerData *data = (rpc_ServerData *)xdata;
+
+    if (isOidValid(&sch->oid)) {
+      eyedbsm::DbHandle *sedbh = dbh->sedbh;
+      eyedbsm::Status se_status;
       RPCStatus rpc_status;
+      eyedblib::int32 cnt;
 
-      oid_decode (idr, offset, &data_oid);
-      unsigned int size;
-      rpc_status = IDB_dataSizeGet(dbh, &data_oid, &size);
+      Bool skipIfFound = IDBBOOL(hdr->xinfo == IDB_XINFO_CLASS_UPDATE);
+      hdr->xinfo = 0;
+
+      rpc_status = IDB_instanceCreate(dbh, dspid, idr, hdr, oid, data, False);
       if (rpc_status) return rpc_status;
-      *name = (char *)malloc(size);
-      rpc_status = IDB_dataRead(dbh, 0, 0, (Data)*name, 0, &data_oid, 0);
+
+      Database *db = (Database *)dbh->db;
+      Offset offset = IDB_CLASS_HEAD_SIZE;
+      char *name;
+      rpc_status = be_class_name_decode(dbh, idr, &offset, &name);
       if (rpc_status) return rpc_status;
-      bound_string_decode (idr, offset, IDB_CLASS_NAME_PAD, 0);
-      return RPCSuccess;
-    }
-
-  char *s;
-  bound_string_decode(idr, offset, IDB_CLASS_NAME_LEN, &s);
-  *name = strdup(s);
-  return RPCSuccess;
-}
-
-static RPCStatus
-IDB_classCreate(DbHandle *dbh, short dspid, Data idr, ObjectHeader *hdr, eyedbsm::Oid *oid, void *xdata)
-{
-  CHECK_WRITE((Database *)dbh->db);
-  SchemaHead *sch = &dbh->sch;
-  rpc_ServerData *data = (rpc_ServerData *)xdata;
-
-  if (isOidValid(&sch->oid)) {
-    eyedbsm::DbHandle *sedbh = dbh->sedbh;
-    eyedbsm::Status se_status;
-    RPCStatus rpc_status;
-    eyedblib::int32 cnt;
-
-    Bool skipIfFound = IDBBOOL(hdr->xinfo == IDB_XINFO_CLASS_UPDATE);
-    hdr->xinfo = 0;
-
-    rpc_status = IDB_instanceCreate(dbh, dspid, idr, hdr, oid, data, False);
-    if (rpc_status) return rpc_status;
-
-    Database *db = (Database *)dbh->db;
-    Offset offset = IDB_CLASS_HEAD_SIZE;
-    char *name;
-    rpc_status = be_class_name_decode(dbh, idr, &offset, &name);
-    if (rpc_status) return rpc_status;
     
-    //printf("ClassCreate(%s, %s)\n", name, Oid(oid).toString());
-    offset = IDB_CLASS_IMPL_TYPE;
-    IndexImpl *idximpl = 0;
-    Status status = IndexImpl::decode(db, idr, offset, idximpl);
-    if (status) return rpcStatusMake(status);
-    /*
-      printf("decoding idximpl for class %s: %s\n", name,
-      (const char *)idximpl->toString());
-    */
-    /*
-      offset = IDB_CLASS_MAG_ORDER;
-      eyedblib::int32 mag_order;
-      int32_decode(idr, &offset, &mag_order);
-    */
+      //printf("ClassCreate(%s, %s)\n", name, Oid(oid).toString());
+      offset = IDB_CLASS_IMPL_TYPE;
+      IndexImpl *idximpl = 0;
+      Status status = IndexImpl::decode(db, idr, offset, idximpl);
+      if (status) return rpcStatusMake(status);
+      /*
+	printf("decoding idximpl for class %s: %s\n", name,
+	(const char *)idximpl->toString());
+      */
+      /*
+	offset = IDB_CLASS_MAG_ORDER;
+	eyedblib::int32 mag_order;
+	int32_decode(idr, &offset, &mag_order);
+      */
     
-    rpc_status = IDB_collClassCreate(dbh, idr, oid, name, idximpl);
+      rpc_status = IDB_collClassCreate(dbh, idr, oid, name, idximpl);
     
-    if (rpc_status != RPCSuccess)
-      return rpc_status;
-
-    if ((sch->cnt % SCH_INC) == 0) {
-      rpc_status = 
-	IDB_objectSizeModify(dbh,
-			     IDB_SCH_OID_SIZE(sch->cnt + SCH_INC),
-			     &sch->oid);
       if (rpc_status != RPCSuccess)
 	return rpc_status;
+
+      if ((sch->cnt % SCH_INC) == 0) {
+	rpc_status = 
+	  IDB_objectSizeModify(dbh,
+			       IDB_SCH_OID_SIZE(sch->cnt + SCH_INC),
+			       &sch->oid);
+	if (rpc_status != RPCSuccess)
+	  return rpc_status;
+      }
+    
+      cnt = sch->cnt + 1;
+#ifdef E_XDR
+      int cnt_x = h2x_32(cnt);
+#else
+      int cnt_x = cnt;
+#endif
+      se_status = eyedbsm::objectWrite(sedbh, IDB_SCH_CNT_INDEX, IDB_SCH_CNT_SIZE,
+				       (void *)&cnt_x, &sch->oid);
+
+      if (se_status)
+	return rpcStatusMake_se(se_status);
+      
+      eyedbsm::Oid oid_x;
+#ifdef E_XDR
+      eyedbsm::h2x_oid(&oid_x, oid);
+#else
+      oid_x = *oid;
+#endif
+      se_status = eyedbsm::objectWrite(sedbh, IDB_SCH_OID_INDEX(sch->cnt),
+				       sizeof(eyedbsm::Oid),
+				       (void *)&oid_x, &sch->oid);
+      
+      if (se_status)
+	return rpcStatusMake_se(se_status);
+      
+#ifdef E_XDR
+      eyedblib::int32 hdr_type = h2x_32(hdr->type);
+#else
+      eyedblib::int32 hdr_type = hdr->type;
+#endif
+      se_status = eyedbsm::objectWrite(sedbh, IDB_SCH_TYPE_INDEX(sch->cnt),
+				       sizeof(eyedblib::int32),
+				       (void *)&hdr_type, &sch->oid);
+      
+      if (se_status)
+	return rpcStatusMake_se(se_status);
+      
+      Data tmpdata = 0;
+      offset = 0;
+      Size alloc_size = 0;
+      rpc_status = be_class_name_code(dbh, &tmpdata, &offset, &alloc_size,
+				      name);
+      if (rpc_status) return rpc_status;
+      
+      se_status = eyedbsm::objectWrite(sedbh, IDB_SCH_CLSNAME_INDEX(sch->cnt),
+				       IDB_CLASS_NAME_TOTAL_LEN,
+				       (void *)tmpdata, &sch->oid);
+      
+      free(tmpdata);
+
+      if (se_status)
+	return rpcStatusMake_se(se_status);
+      
+      sch->cnt++;
+      sch->modify = True;
+
+      Object *o;
+      Oid _oid(oid);
+      status = db->makeObject(&_oid, hdr, idr, &o);
+
+      free(name); name = 0;
+      if (status) return rpcStatusMake(status);
+
+      assert(o->getOid() == Oid(_oid));
+      if (!(db->getOpenFlag() & _DBOpenLocal) ||
+	  !strcmp(db->getName(), DBM_Database::getDbName())) {
+	if (status = db->getSchema()->addClass(o->asClass())) {
+	  /*
+	    status->print(stdout);
+	    const Class *x = db->getSchema()->getClass(o->asClass()->getName());
+	    printf("adding class error %s [%s %s]\n", o->asClass()->getName(),
+	    o->getOid().toString(), x->getOid().toString());
+	  */
+	}
+      }
+	
+      rpc_status = IDB_attrCompPropagate(db, o->asClass(), skipIfFound);
+      if (rpc_status) return rpc_status;
+
+      return IDB_collClassUpdate(dbh, idr, oid, "class", True);
+    }
+
+    return RPCSuccess;
+  }
+
+  static RPCStatus
+  IDB_collClassCheck(DbHandle *dbh, Offset offset, Data idr,
+		     const eyedbsm::Oid *oid)
+  {
+    eyedbsm::Oid colloid;
+    Offset xoffset = offset;
+
+    oid_decode(idr, &xoffset, &colloid);
+
+    Oid xoid(colloid);
+
+    if (!xoid.isValid())
+      {
+	eyedbsm::Status status =
+	  eyedbsm::objectRead(dbh->sedbh, offset, sizeof(eyedbsm::Oid), &colloid,
+			      eyedbsm::DefaultLock, 0, 0, oid);
+
+	if (status)
+	  return rpcStatusMake_se(status);
+
+	Size alloc_size = offset + sizeof(eyedbsm::Oid);
+#ifdef E_XDR
+	buffer_code(&idr, &offset, &alloc_size, (unsigned char *)&colloid,
+		    sizeof(colloid));
+#else
+	oid_code(&idr, &offset, &alloc_size, &colloid);
+#endif
+      }
+
+    return RPCSuccess;
+  }
+
+  static void
+  trace_oids(Class *cls)
+  {
+    printf("TRACE %s cls=%p\n", cls->getName(), cls);
+    int attr_cnt;
+    const Attribute **attrs = cls->getAttributes(attr_cnt);
+    for (int i = 0; i < attr_cnt; i++)
+      printf("%s -> %s\n", attrs[i]->getName(), attrs[i]->getAttrCompSetOid().toString());
+  }
+
+  static void
+  IDB_reportAttrCompSetOids(Class *cls, Data idr)
+  {
+    int attr_cnt;
+    const Attribute **attrs = cls->getAttributes(attr_cnt);
+    Offset offset = IDB_CLASS_ATTR_START;
+    for (int i = 0; i < attr_cnt; i++)
+      attrs[i]->reportAttrCompSetOid(&offset, idr);
+  }
+
+  static RPCStatus
+  IDB_classWrite(DbHandle *dbh, Data idr, ObjectHeader *hdr, const eyedbsm::Oid *oid, void *xdata)
+  {
+    Database *db = (Database *)dbh->db;
+    Class *cl = db->getSchema()->getClass(*oid);
+    Object *o;
+    Oid _oid(oid);
+    Status status;
+
+    //printf("ClassWrite(%s, %s, cl=%p)\n", cl->getName(),
+    //cl->getOid().toString(), cl);
+    //trace_oids(cl);
+    IDB_reportAttrCompSetOids(cl, idr);
+    if ((status = db->getSchema()->suppressClass(cl)) != Success)
+      return rpcStatusMake(status);
+
+    status = db->makeObject(&_oid, hdr, idr, &o);
+
+    //printf("writing class %s [%p vs. %p]\n", o->asClass()->getName(), o, cl);
+
+    dbh->sch.modify = True;
+
+    if (status == Success)
+      {
+	if (!(db->getOpenFlag() & _DBOpenLocal) ||
+	    !strcmp(db->getName(), DBM_Database::getDbName()))
+	  {
+	    //printf("ClassWrite adding class %p\n", o);
+	    //trace_oids((Class *)o);
+	    if ((status = db->getSchema()->addClass((Class *)o))
+		!= Success)
+	      {
+		return rpcStatusMake(status);
+	      
+	      }
+	  }
+      }
+
+#if 0
+    status = db->getSchema()->checkDuplicates();
+    if (status)
+      return rpcStatusMake(status);
+#endif
+    status = db->getSchema()->clean(db);
+    if (status)
+      return rpcStatusMake(status);
+
+    RPCStatus rpc_status;
+
+    if (rpc_status = IDB_collClassCheck(dbh, IDB_CLASS_EXTENT, idr, oid))
+      return rpc_status;
+
+    if (rpc_status = IDB_collClassCheck(dbh, IDB_CLASS_COMPONENTS, idr, oid))
+      return rpc_status;
+
+    return IDB_instanceWrite(dbh, idr, hdr, oid, xdata);
+  }
+
+  static void
+  IDB_suppressClassFromSchema(Database *db, const Oid &cloid)
+  {
+    Schema *m = db->getSchema();
+    const LinkedList *list = m->getClassList();
+    Class **clx = new Class *[list->getCount()];
+    int clx_cnt = 0;
+    LinkedListCursor c(list);
+  
+    Class *cls;
+    while (c.getNext((void *&)cls))
+      if (cls->getOid().compare(cloid))
+	clx[clx_cnt++] = cls;
+
+    for (int i = 0; i < clx_cnt; i++)
+      m->suppressClass(clx[i]);
+
+    delete [] clx;
+  }
+
+  struct ClassHead {
+    eyedbsm::Oid oid;
+    eyedblib::int32 type;
+    char clsname[IDB_CLASS_NAME_TOTAL_LEN];
+
+    void x2h() {
+      eyedbsm::x2h_oid(&oid, &oid);
+      type = x2h_32(type);
+    }
+
+    void h2x() {
+      eyedbsm::h2x_oid(&oid, &oid);
+      type = h2x_32(type);
+    }
+  };
+
+  static RPCStatus
+  IDB_removeInstances(DbHandle *dbh, Database *db, Class *cl)
+  {
+    Collection *extent;
+    Status s = cl->getExtent(extent, True);
+    if (s) return rpcStatusMake(s);
+
+    if (!extent)
+      return rpcStatusMake(Exception::make(IDB_ERROR,
+					   "cannot find extent for "
+					   "class %s %s",
+					   cl->getOid().toString(),
+					   cl->getName()));
+    IDB_LOG(IDB_LOG_SCHEMA_EVOLVE, ("removing the %d instance(s) of class %s)\n",
+				    extent->getCount(), cl->getName()));
+    // 19/06/01: instance removing does not work
+    // suppressed for now!
+    // 4/04/03: reconnected
+    OidArray oid_arr;
+    s = extent->getElements(oid_arr);
+    if (s) return rpcStatusMake(s);
+
+    int cnt = oid_arr.getCount();
+    //printf("removing %d instances of class %s\n", cnt, cl->getName());
+    for (int i = 0; i < cnt; i++) {
+      Data inv_data;
+      RPCStatus rpc_status = IDB_objectDelete(dbh, oid_arr[i].getOid(),
+					      0, &inv_data, 0);
+      if (rpc_status) return rpc_status;
     }
     
-    cnt = sch->cnt + 1;
+    s = extent->remove();
+    if (s) return rpcStatusMake(s);
+
+    return RPCSuccess;
+  }
+
+  static RPCStatus
+  IDB_removeAttrCompSet(Database *db, Class *cl)
+  {
+    int attr_cnt;
+    const Attribute **attrs = cl->getAttributes(attr_cnt);
+    for (int n = 0; n < attr_cnt; n++) {
+      Oid attr_comp_oid = attrs[n]->getAttrCompSetOid();
+      if (attr_comp_oid.isValid()) {
+	Bool removed;
+	Status s = db->isRemoved(attr_comp_oid, removed);
+	if (s) return rpcStatusMake(s);
+	if (!removed) {
+	  s = db->removeObject(attrs[n]->getAttrCompSetOid());
+	  if (s) return rpcStatusMake(s);
+	}
+      }
+    }
+
+    return RPCSuccess;
+  }
+
+  static RPCStatus
+  IDB_classDelete(DbHandle *dbh, Data idr, ObjectHeader *hdr, const eyedbsm::Oid *oid, unsigned int flags)
+  {
+    Database *db = (Database *)dbh->db;
+    CHECK_WRITE(db);
+    Class *cl = db->getSchema()->getClass(*oid);
+    SchemaHead *sch = &dbh->sch;
+
+    IDB_LOG(IDB_LOG_SCHEMA_EVOLVE, ("deleting class(%s, %p, %s, flags=%x)\n", Oid(oid).toString(), cl, cl->getName(), flags));
+    if (!cl)
+      return rpcStatusMake(IDB_ERROR, "class %s not found",
+			   Oid(*oid).toString());
+
+    if (!isOidValid(&sch->oid))
+      return rpcStatusMake(IDB_ERROR, "schema oid is null");
+
+    RPCStatus rpc_status;
+
+    if (flags == Class::RemoveInstances) {
+      rpc_status = IDB_removeInstances(dbh, db, cl);
+      if (rpc_status) return rpc_status;
+
+      // remove components collection
+      Collection *components;
+      Status s = cl->getComponents(components, True);
+      if (s) return rpcStatusMake(s);
+      s = components->remove();
+      if (s) return rpcStatusMake(s);
+    }
+
+    rpc_status = IDB_removeAttrCompSet(db, cl);
+    if (rpc_status) return rpc_status;
+  
+    eyedbsm::DbHandle *sedbh = dbh->sedbh;
+    eyedbsm::Status se_status;
+    eyedblib::int32 cnt;
+
+    se_status = eyedbsm::objectRead(sedbh, IDB_SCH_CNT_INDEX, IDB_SCH_CNT_SIZE,
+				    (void *)&cnt, eyedbsm::DefaultLock, 0, 0, &sch->oid);
+
+    cnt = x2h_32(cnt);
+
+    ClassHead *clsheads = new ClassHead[cnt];
+
+    for (int k = 0; k < cnt; k++) {
+      se_status = eyedbsm::objectRead(sedbh, IDB_SCH_OID_INDEX(k),
+				      IDB_SCH_INCR_SIZE,
+				      &clsheads[k], eyedbsm::DefaultLock, 0, 0, &sch->oid);
+  
+      if (se_status) {
+	assert(0);
+	delete [] clsheads;
+	return rpcStatusMake_se(se_status);
+      }
+
+      clsheads[k].x2h();
+    }
+
+    int i, n;
+    for (i = 0, n = 0; i < cnt; i++) {
+      if (n != i)
+	clsheads[n] = clsheads[i];
+
+      if (memcmp(&clsheads[i].oid, oid, sizeof(*oid)))
+	n++;
+    }
+  
+    for (int j = n; j < cnt; j++)
+      memset(&clsheads[j], 0, sizeof(ClassHead));
+
+    if (n == i) {
+      assert(0);
+      delete [] clsheads;
+      return rpcStatusMake
+	(Exception::make(IDB_ERROR, "incoherent schema for class "
+			 "deletion %s", Oid(oid).toString()));
+    }
+
+    assert(n == cnt-1);
+    cnt--;
+    sch->cnt--;
 #ifdef E_XDR
-    int cnt_x = h2x_32(cnt);
+    eyedblib::int32 cnt_x = h2x_32(cnt);
 #else
-    int cnt_x = cnt;
+    eyedblib::int32 cnt_x = cnt;
 #endif
     se_status = eyedbsm::objectWrite(sedbh, IDB_SCH_CNT_INDEX, IDB_SCH_CNT_SIZE,
 				     (void *)&cnt_x, &sch->oid);
-
-    if (se_status)
-      return rpcStatusMake_se(se_status);
-      
-    eyedbsm::Oid oid_x;
-#ifdef E_XDR
-    eyedbsm::h2x_oid(&oid_x, oid);
-#else
-    oid_x = *oid;
-#endif
-    se_status = eyedbsm::objectWrite(sedbh, IDB_SCH_OID_INDEX(sch->cnt),
-				     sizeof(eyedbsm::Oid),
-				     (void *)&oid_x, &sch->oid);
-      
-    if (se_status)
-      return rpcStatusMake_se(se_status);
-      
-#ifdef E_XDR
-    eyedblib::int32 hdr_type = h2x_32(hdr->type);
-#else
-    eyedblib::int32 hdr_type = hdr->type;
-#endif
-    se_status = eyedbsm::objectWrite(sedbh, IDB_SCH_TYPE_INDEX(sch->cnt),
-				     sizeof(eyedblib::int32),
-				     (void *)&hdr_type, &sch->oid);
-      
-    if (se_status)
-      return rpcStatusMake_se(se_status);
-      
-    Data tmpdata = 0;
-    offset = 0;
-    Size alloc_size = 0;
-    rpc_status = be_class_name_code(dbh, &tmpdata, &offset, &alloc_size,
-					name);
-    if (rpc_status) return rpc_status;
-      
-    se_status = eyedbsm::objectWrite(sedbh, IDB_SCH_CLSNAME_INDEX(sch->cnt),
-				     IDB_CLASS_NAME_TOTAL_LEN,
-				     (void *)tmpdata, &sch->oid);
-      
-    free(tmpdata);
-
-    if (se_status)
-      return rpcStatusMake_se(se_status);
-      
-    sch->cnt++;
-    sch->modify = True;
-
-    Object *o;
-    Oid _oid(oid);
-    status = db->makeObject(&_oid, hdr, idr, &o);
-
-    free(name); name = 0;
-    if (status) return rpcStatusMake(status);
-
-    assert(o->getOid() == Oid(_oid));
-    if (!(db->getOpenFlag() & _DBOpenLocal) ||
-	!strcmp(db->getName(), DBM_Database::getDbName())) {
-      if (status = db->getSchema()->addClass(o->asClass())) {
-	/*
-	  status->print(stdout);
-	  const Class *x = db->getSchema()->getClass(o->asClass()->getName());
-	  printf("adding class error %s [%s %s]\n", o->asClass()->getName(),
-	  o->getOid().toString(), x->getOid().toString());
-	*/
-      }
-    }
-	
-    rpc_status = IDB_attrCompPropagate(db, o->asClass(), skipIfFound);
-    if (rpc_status) return rpc_status;
-
-    return IDB_collClassUpdate(dbh, idr, oid, "class", True);
-  }
-
-  return RPCSuccess;
-}
-
-static RPCStatus
-IDB_collClassCheck(DbHandle *dbh, Offset offset, Data idr,
-		   const eyedbsm::Oid *oid)
-{
-  eyedbsm::Oid colloid;
-  Offset xoffset = offset;
-
-  oid_decode(idr, &xoffset, &colloid);
-
-  Oid xoid(colloid);
-
-  if (!xoid.isValid())
-    {
-      eyedbsm::Status status =
-	eyedbsm::objectRead(dbh->sedbh, offset, sizeof(eyedbsm::Oid), &colloid,
-			    eyedbsm::DefaultLock, 0, 0, oid);
-
-      if (status)
-	return rpcStatusMake_se(status);
-
-      Size alloc_size = offset + sizeof(eyedbsm::Oid);
-#ifdef E_XDR
-      buffer_code(&idr, &offset, &alloc_size, (unsigned char *)&colloid,
-		  sizeof(colloid));
-#else
-      oid_code(&idr, &offset, &alloc_size, &colloid);
-#endif
-    }
-
-  return RPCSuccess;
-}
-
-static void
-trace_oids(Class *cls)
-{
-  printf("TRACE %s cls=%p\n", cls->getName(), cls);
-  int attr_cnt;
-  const Attribute **attrs = cls->getAttributes(attr_cnt);
-  for (int i = 0; i < attr_cnt; i++)
-    printf("%s -> %s\n", attrs[i]->getName(), attrs[i]->getAttrCompSetOid().toString());
-}
-
-static void
-IDB_reportAttrCompSetOids(Class *cls, Data idr)
-{
-  int attr_cnt;
-  const Attribute **attrs = cls->getAttributes(attr_cnt);
-  Offset offset = IDB_CLASS_ATTR_START;
-  for (int i = 0; i < attr_cnt; i++)
-    attrs[i]->reportAttrCompSetOid(&offset, idr);
-}
-
-static RPCStatus
-IDB_classWrite(DbHandle *dbh, Data idr, ObjectHeader *hdr, const eyedbsm::Oid *oid, void *xdata)
-{
-  Database *db = (Database *)dbh->db;
-  Class *cl = db->getSchema()->getClass(*oid);
-  Object *o;
-  Oid _oid(oid);
-  Status status;
-
-  //printf("ClassWrite(%s, %s, cl=%p)\n", cl->getName(),
-  //cl->getOid().toString(), cl);
-  //trace_oids(cl);
-  IDB_reportAttrCompSetOids(cl, idr);
-  if ((status = db->getSchema()->suppressClass(cl)) != Success)
-    return rpcStatusMake(status);
-
-  status = db->makeObject(&_oid, hdr, idr, &o);
-
-  //printf("writing class %s [%p vs. %p]\n", o->asClass()->getName(), o, cl);
-
-  dbh->sch.modify = True;
-
-  if (status == Success)
-    {
-      if (!(db->getOpenFlag() & _DBOpenLocal) ||
-	  !strcmp(db->getName(), DBM_Database::getDbName()))
-	{
-	  //printf("ClassWrite adding class %p\n", o);
-	  //trace_oids((Class *)o);
-	  if ((status = db->getSchema()->addClass((Class *)o))
-	      != Success)
-	    {
-	      return rpcStatusMake(status);
-	      
- 	    }
-	}
-    }
-
-#if 0
-  status = db->getSchema()->checkDuplicates();
-  if (status)
-    return rpcStatusMake(status);
-#endif
-  status = db->getSchema()->clean(db);
-  if (status)
-    return rpcStatusMake(status);
-
-  RPCStatus rpc_status;
-
-  if (rpc_status = IDB_collClassCheck(dbh, IDB_CLASS_EXTENT, idr, oid))
-    return rpc_status;
-
-  if (rpc_status = IDB_collClassCheck(dbh, IDB_CLASS_COMPONENTS, idr, oid))
-    return rpc_status;
-
-  return IDB_instanceWrite(dbh, idr, hdr, oid, xdata);
-}
-
-static void
-IDB_suppressClassFromSchema(Database *db, const Oid &cloid)
-{
-  Schema *m = db->getSchema();
-  const LinkedList *list = m->getClassList();
-  Class **clx = new Class *[list->getCount()];
-  int clx_cnt = 0;
-  LinkedListCursor c(list);
-  
-  Class *cls;
-  while (c.getNext((void *&)cls))
-    if (cls->getOid().compare(cloid))
-      clx[clx_cnt++] = cls;
-
-  for (int i = 0; i < clx_cnt; i++)
-    m->suppressClass(clx[i]);
-
-  delete [] clx;
-}
-
-struct ClassHead {
-  eyedbsm::Oid oid;
-  eyedblib::int32 type;
-  char clsname[IDB_CLASS_NAME_TOTAL_LEN];
-
-  void x2h() {
-    eyedbsm::x2h_oid(&oid, &oid);
-    type = x2h_32(type);
-  }
-
-  void h2x() {
-    eyedbsm::h2x_oid(&oid, &oid);
-    type = h2x_32(type);
-  }
-};
-
-static RPCStatus
-IDB_removeInstances(DbHandle *dbh, Database *db, Class *cl)
-{
-  Collection *extent;
-  Status s = cl->getExtent(extent, True);
-  if (s) return rpcStatusMake(s);
-
-  if (!extent)
-    return rpcStatusMake(Exception::make(IDB_ERROR,
-					     "cannot find extent for "
-					     "class %s %s",
-					     cl->getOid().toString(),
-					     cl->getName()));
-  IDB_LOG(IDB_LOG_SCHEMA_EVOLVE, ("removing the %d instance(s) of class %s)\n",
-				  extent->getCount(), cl->getName()));
-  // 19/06/01: instance removing does not work
-  // suppressed for now!
-  // 4/04/03: reconnected
-  OidArray oid_arr;
-  s = extent->getElements(oid_arr);
-  if (s) return rpcStatusMake(s);
-
-  int cnt = oid_arr.getCount();
-  //printf("removing %d instances of class %s\n", cnt, cl->getName());
-  for (int i = 0; i < cnt; i++) {
-    Data inv_data;
-    RPCStatus rpc_status = IDB_objectDelete(dbh, oid_arr[i].getOid(),
-					    0, &inv_data, 0);
-    if (rpc_status) return rpc_status;
-  }
-    
-  s = extent->remove();
-  if (s) return rpcStatusMake(s);
-
-  return RPCSuccess;
-}
-
-static RPCStatus
-IDB_removeAttrCompSet(Database *db, Class *cl)
-{
-  int attr_cnt;
-  const Attribute **attrs = cl->getAttributes(attr_cnt);
-  for (int n = 0; n < attr_cnt; n++) {
-    Oid attr_comp_oid = attrs[n]->getAttrCompSetOid();
-    if (attr_comp_oid.isValid()) {
-      Bool removed;
-      Status s = db->isRemoved(attr_comp_oid, removed);
-      if (s) return rpcStatusMake(s);
-      if (!removed) {
-	s = db->removeObject(attrs[n]->getAttrCompSetOid());
-	if (s) return rpcStatusMake(s);
-      }
-    }
-  }
-
-  return RPCSuccess;
-}
-
-static RPCStatus
-IDB_classDelete(DbHandle *dbh, Data idr, ObjectHeader *hdr, const eyedbsm::Oid *oid, unsigned int flags)
-{
-  Database *db = (Database *)dbh->db;
-  CHECK_WRITE(db);
-  Class *cl = db->getSchema()->getClass(*oid);
-  SchemaHead *sch = &dbh->sch;
-
-  IDB_LOG(IDB_LOG_SCHEMA_EVOLVE, ("deleting class(%s, %p, %s, flags=%x)\n", Oid(oid).toString(), cl, cl->getName(), flags));
-  if (!cl)
-    return rpcStatusMake(IDB_ERROR, "class %s not found",
-			     Oid(*oid).toString());
-
-  if (!isOidValid(&sch->oid))
-    return rpcStatusMake(IDB_ERROR, "schema oid is null");
-
-  RPCStatus rpc_status;
-
-  if (flags == Class::RemoveInstances) {
-    rpc_status = IDB_removeInstances(dbh, db, cl);
-    if (rpc_status) return rpc_status;
-
-    // remove components collection
-    Collection *components;
-    Status s = cl->getComponents(components, True);
-    if (s) return rpcStatusMake(s);
-    s = components->remove();
-    if (s) return rpcStatusMake(s);
-  }
-
-  rpc_status = IDB_removeAttrCompSet(db, cl);
-  if (rpc_status) return rpc_status;
-  
-  eyedbsm::DbHandle *sedbh = dbh->sedbh;
-  eyedbsm::Status se_status;
-  eyedblib::int32 cnt;
-
-  se_status = eyedbsm::objectRead(sedbh, IDB_SCH_CNT_INDEX, IDB_SCH_CNT_SIZE,
-				  (void *)&cnt, eyedbsm::DefaultLock, 0, 0, &sch->oid);
-
-  cnt = x2h_32(cnt);
-
-  ClassHead *clsheads = new ClassHead[cnt];
-
-  for (int k = 0; k < cnt; k++) {
-    se_status = eyedbsm::objectRead(sedbh, IDB_SCH_OID_INDEX(k),
-				    IDB_SCH_INCR_SIZE,
-				    &clsheads[k], eyedbsm::DefaultLock, 0, 0, &sch->oid);
   
     if (se_status) {
       assert(0);
@@ -5709,405 +5766,365 @@ IDB_classDelete(DbHandle *dbh, Data idr, ObjectHeader *hdr, const eyedbsm::Oid *
       return rpcStatusMake_se(se_status);
     }
 
-    clsheads[k].x2h();
-  }
-
-  int i, n;
-  for (i = 0, n = 0; i < cnt; i++) {
-    if (n != i)
-      clsheads[n] = clsheads[i];
-
-    if (memcmp(&clsheads[i].oid, oid, sizeof(*oid)))
-      n++;
-  }
+    for (int k = 0; k < cnt+1; k++) {
+      clsheads[k].h2x();
+      se_status = eyedbsm::objectWrite(sedbh, IDB_SCH_OID_INDEX(k),
+				       IDB_SCH_INCR_SIZE,
+				       &clsheads[k], &sch->oid);
   
-  for (int j = n; j < cnt; j++)
-    memset(&clsheads[j], 0, sizeof(ClassHead));
+      if (se_status) {
+	assert(0);
+	delete [] clsheads;
+	return rpcStatusMake_se(se_status);
+      }
+    }
 
-  if (n == i) {
-    assert(0);
     delete [] clsheads;
-    return rpcStatusMake
-      (Exception::make(IDB_ERROR, "incoherent schema for class "
-		       "deletion %s", Oid(oid).toString()));
+
+    IDB_suppressClassFromSchema(db, cl->getOid());
+    return IDB_instanceDelete(dbh, idr, hdr, oid);
   }
 
-  assert(n == cnt-1);
-  cnt--;
-  sch->cnt--;
-#ifdef E_XDR
-  eyedblib::int32 cnt_x = h2x_32(cnt);
-#else
-  eyedblib::int32 cnt_x = cnt;
-#endif
-  se_status = eyedbsm::objectWrite(sedbh, IDB_SCH_CNT_INDEX, IDB_SCH_CNT_SIZE,
-				   (void *)&cnt_x, &sch->oid);
-  
-  if (se_status) {
-    assert(0);
-    delete [] clsheads;
+  /* class functions */
+  static eyedblib::int32
+  clean_xinfo(Data idr, ObjectHeader *hdr)
+  {
+    eyedblib::int32 xinfo;
+    Offset offset = IDB_OBJ_HEAD_XINFO_INDEX;
+
+    int32_decode(idr, &offset, &xinfo);
+    if ((xinfo & IDB_XINFO_LOCAL_OBJ) == IDB_XINFO_LOCAL_OBJ)
+      {
+	Size alloc_size = hdr->size;
+	eyedblib::int32 xinfo_n = xinfo & ~IDB_XINFO_LOCAL_OBJ;
+	offset = IDB_OBJ_HEAD_XINFO_INDEX;
+	int32_code(&idr, &offset, &alloc_size, &xinfo_n);
+      }
+
+    return xinfo;
+  }
+
+  static void
+  restore_xinfo(Data idr, ObjectHeader *hdr, eyedblib::int32 xinfo)
+  {
+    if ((xinfo & IDB_XINFO_LOCAL_OBJ) == IDB_XINFO_LOCAL_OBJ)
+      {
+	Size alloc_size = hdr->size;
+	Offset offset = IDB_OBJ_HEAD_XINFO_INDEX;
+	int32_code(&idr, &offset, &alloc_size, &xinfo);
+      }
+  }
+
+  static eyedblib::int64 current_time()
+  {
+    struct timeval tv;
+
+    gettimeofday(&tv, 0);
+
+    return (eyedblib::int64)tv.tv_sec * 1000000 + tv.tv_usec;
+  }
+
+  static RPCStatus
+  IDB_instanceCreate(DbHandle *dbh, short dspid, Data idr, ObjectHeader *hdr, eyedbsm::Oid *oid, void *xdata, Bool coll_update)
+  {
+    CHECK_WRITE((Database *)dbh->db);
+    eyedbsm::Status se_status;
+    Offset offset;
+    rpc_ServerData *data = (rpc_ServerData *)xdata;
+    Size alloc_size = hdr->size;
+
+    eyedblib::int32 xinfo = clean_xinfo(idr, hdr);
+
+    // 24/08/05: MODIF time()
+    eyedblib::int64 t = current_time();
+
+    offset = IDB_OBJ_HEAD_CTIME_INDEX;
+    int64_code(&idr, &offset, &alloc_size, &t);
+    offset = IDB_OBJ_HEAD_MTIME_INDEX;
+    int64_code(&idr, &offset, &alloc_size, &t);
+
+    if (isOidValid(oid))
+      se_status = eyedbsm::objectWrite(dbh->sedbh, 0, hdr->size, idr, oid);
+    else
+      se_status = eyedbsm::objectCreate(dbh->sedbh, idr, hdr->size, dspid, oid);
+
+    restore_xinfo(idr, hdr, xinfo);
+
+    /* then must pass object to high level back end to create
+       index entries */
+
+    if (!se_status && coll_update)
+      return IDB_collClassUpdate(dbh, idr, oid, 0, True);
+
     return rpcStatusMake_se(se_status);
   }
 
-  for (int k = 0; k < cnt+1; k++) {
-    clsheads[k].h2x();
-    se_status = eyedbsm::objectWrite(sedbh, IDB_SCH_OID_INDEX(k),
-				     IDB_SCH_INCR_SIZE,
-				     &clsheads[k], &sch->oid);
-  
-    if (se_status) {
-      assert(0);
-      delete [] clsheads;
-      return rpcStatusMake_se(se_status);
-    }
+  static RPCStatus
+  IDB_instanceWrite(DbHandle *dbh, Data idr, ObjectHeader *hdr, const eyedbsm::Oid *oid, void *xdata)
+  {
+    CHECK_WRITE((Database *)dbh->db);
+    eyedbsm::Status status;
+    eyedblib::int32 k;
+    Offset offset;
+    rpc_ServerData *data = (rpc_ServerData *)xdata;
+    Size alloc_size = hdr->size;
+
+    eyedblib::int32 xinfo = clean_xinfo(idr, hdr);
+
+    (void)eyedbsm::objectRead(dbh->sedbh, IDB_OBJ_HEAD_CTIME_INDEX, sizeof(int),
+			      &k, eyedbsm::DefaultLock, 0, 0, oid);
+#ifdef E_XDR
+    k = x2h_32(k);
+#endif
+    offset = IDB_OBJ_HEAD_CTIME_INDEX;
+    int32_code(&idr, &offset, &alloc_size, &k);
+
+    // 24/08/05: MODIF time()
+    eyedblib::int64 t = current_time();
+
+    offset = IDB_OBJ_HEAD_MTIME_INDEX;
+    int64_code(&idr, &offset, &alloc_size, &t);
+
+    status = eyedbsm::objectWrite(dbh->sedbh, 0, hdr->size, idr, oid);
+
+    restore_xinfo(idr, hdr, xinfo);
+    return rpcStatusMake_se(status);
   }
 
-  delete [] clsheads;
-
-  IDB_suppressClassFromSchema(db, cl->getOid());
-  return IDB_instanceDelete(dbh, idr, hdr, oid);
-}
-
-/* class functions */
-static eyedblib::int32
-clean_xinfo(Data idr, ObjectHeader *hdr)
-{
-  eyedblib::int32 xinfo;
-  Offset offset = IDB_OBJ_HEAD_XINFO_INDEX;
-
-  int32_decode(idr, &offset, &xinfo);
-  if ((xinfo & IDB_XINFO_LOCAL_OBJ) == IDB_XINFO_LOCAL_OBJ)
-    {
-      Size alloc_size = hdr->size;
-      eyedblib::int32 xinfo_n = xinfo & ~IDB_XINFO_LOCAL_OBJ;
-      offset = IDB_OBJ_HEAD_XINFO_INDEX;
-      int32_code(&idr, &offset, &alloc_size, &xinfo_n);
-    }
-
-  return xinfo;
-}
-
-static void
-restore_xinfo(Data idr, ObjectHeader *hdr, eyedblib::int32 xinfo)
-{
-  if ((xinfo & IDB_XINFO_LOCAL_OBJ) == IDB_XINFO_LOCAL_OBJ)
-    {
-      Size alloc_size = hdr->size;
-      Offset offset = IDB_OBJ_HEAD_XINFO_INDEX;
-      int32_code(&idr, &offset, &alloc_size, &xinfo);
-    }
-}
-
-static eyedblib::int64 current_time()
-{
-  struct timeval tv;
-
-  gettimeofday(&tv, 0);
-
-  return (eyedblib::int64)tv.tv_sec * 1000000 + tv.tv_usec;
-}
-
-static RPCStatus
-IDB_instanceCreate(DbHandle *dbh, short dspid, Data idr, ObjectHeader *hdr, eyedbsm::Oid *oid, void *xdata, Bool coll_update)
-{
-  CHECK_WRITE((Database *)dbh->db);
-  eyedbsm::Status se_status;
-  Offset offset;
-  rpc_ServerData *data = (rpc_ServerData *)xdata;
-  Size alloc_size = hdr->size;
-
-  eyedblib::int32 xinfo = clean_xinfo(idr, hdr);
-
-  // 24/08/05: MODIF time()
-  eyedblib::int64 t = current_time();
-
-  offset = IDB_OBJ_HEAD_CTIME_INDEX;
-  int64_code(&idr, &offset, &alloc_size, &t);
-  offset = IDB_OBJ_HEAD_MTIME_INDEX;
-  int64_code(&idr, &offset, &alloc_size, &t);
-
-  if (isOidValid(oid))
-    se_status = eyedbsm::objectWrite(dbh->sedbh, 0, hdr->size, idr, oid);
-  else
-    se_status = eyedbsm::objectCreate(dbh->sedbh, idr, hdr->size, dspid, oid);
-
-  restore_xinfo(idr, hdr, xinfo);
-
-  /* then must pass object to high level back end to create
-     index entries */
-
-  if (!se_status && coll_update)
-    return IDB_collClassUpdate(dbh, idr, oid, 0, True);
-
-  return rpcStatusMake_se(se_status);
-}
-
-static RPCStatus
-IDB_instanceWrite(DbHandle *dbh, Data idr, ObjectHeader *hdr, const eyedbsm::Oid *oid, void *xdata)
-{
-  CHECK_WRITE((Database *)dbh->db);
-  eyedbsm::Status status;
-  eyedblib::int32 k;
-  Offset offset;
-  rpc_ServerData *data = (rpc_ServerData *)xdata;
-  Size alloc_size = hdr->size;
-
-  eyedblib::int32 xinfo = clean_xinfo(idr, hdr);
-
-  (void)eyedbsm::objectRead(dbh->sedbh, IDB_OBJ_HEAD_CTIME_INDEX, sizeof(int),
-			    &k, eyedbsm::DefaultLock, 0, 0, oid);
-#ifdef E_XDR
-  k = x2h_32(k);
-#endif
-  offset = IDB_OBJ_HEAD_CTIME_INDEX;
-  int32_code(&idr, &offset, &alloc_size, &k);
-
-  // 24/08/05: MODIF time()
-  eyedblib::int64 t = current_time();
-
-  offset = IDB_OBJ_HEAD_MTIME_INDEX;
-  int64_code(&idr, &offset, &alloc_size, &t);
-
-  status = eyedbsm::objectWrite(dbh->sedbh, 0, hdr->size, idr, oid);
-
-  restore_xinfo(idr, hdr, xinfo);
-  return rpcStatusMake_se(status);
-}
-
-static RPCStatus
-IDB_instanceRead(DbHandle *dbh, Data idr, Data *pidr,
-		 ObjectHeader *hdr, LockMode lockmode, const eyedbsm::Oid *oid,
-		 void *xdata, int minsize)
-{
-  eyedbsm::Status status;
-  rpc_ServerData *data = (rpc_ServerData *)xdata;
-  unsigned int size;
+  static RPCStatus
+  IDB_instanceRead(DbHandle *dbh, Data idr, Data *pidr,
+		   ObjectHeader *hdr, LockMode lockmode, const eyedbsm::Oid *oid,
+		   void *xdata, int minsize)
+  {
+    eyedbsm::Status status;
+    rpc_ServerData *data = (rpc_ServerData *)xdata;
+    unsigned int size;
 
 #ifdef LOAD_RM_BUG
-  if (hdr->xinfo & IDB_XINFO_REMOVED)
-    size = hdr->size = IDB_OBJ_HEAD_SIZE;
+    if (hdr->xinfo & IDB_XINFO_REMOVED)
+      size = hdr->size = IDB_OBJ_HEAD_SIZE;
 #endif
-  else if (hdr->size < minsize)
-    size = minsize;
-  else
-    size = hdr->size;
+    else if (hdr->size < minsize)
+      size = minsize;
+    else
+      size = hdr->size;
 
-  if (data)
-    {
-      if (size <= data->buff_size)
-	data->status = rpc_BuffUsed;
-      else
-	{
-	  data->status = rpc_TempDataUsed;
-	  data->data = malloc(size);
-	}
+    if (data)
+      {
+	if (size <= data->buff_size)
+	  data->status = rpc_BuffUsed;
+	else
+	  {
+	    data->status = rpc_TempDataUsed;
+	    data->data = malloc(size);
+	  }
 
-      data->size = size;
-      status = eyedbsm::objectRead(dbh->sedbh, 0, hdr->size, data->data,
-				   (eyedbsm::LockMode)lockmode, 0, 0, oid);
-    }
-  else
-    {
-      if (pidr)
-	idr = *pidr = (Data)malloc(size);
+	data->size = size;
+	status = eyedbsm::objectRead(dbh->sedbh, 0, hdr->size, data->data,
+				     (eyedbsm::LockMode)lockmode, 0, 0, oid);
+      }
+    else
+      {
+	if (pidr)
+	  idr = *pidr = (Data)malloc(size);
 
-      status = eyedbsm::objectRead(dbh->sedbh, 0, hdr->size, idr,
-				   (eyedbsm::LockMode)lockmode, 0, 0, oid);
-    }
+	status = eyedbsm::objectRead(dbh->sedbh, 0, hdr->size, idr,
+				     (eyedbsm::LockMode)lockmode, 0, 0, oid);
+      }
 
 
-  return rpcStatusMake_se(status);
-}
+    return rpcStatusMake_se(status);
+  }
 
-static RPCStatus
-IDB_instanceDelete(DbHandle *dbh, Data idr, ObjectHeader *hdr, const eyedbsm::Oid *oid, Bool really)
-{
-  Database *db = (Database *)dbh->db;
-  CHECK_WRITE(db);
-  eyedbsm::Oid oid_cl = ClassOidDecode(idr);
-  Class *cl = db->getSchema()->getClass(oid_cl);
-  eyedbsm::Status se_status;
-  Oid toid(oid);
+  static RPCStatus
+  IDB_instanceDelete(DbHandle *dbh, Data idr, ObjectHeader *hdr, const eyedbsm::Oid *oid, Bool really)
+  {
+    Database *db = (Database *)dbh->db;
+    CHECK_WRITE(db);
+    eyedbsm::Oid oid_cl = ClassOidDecode(idr);
+    Class *cl = db->getSchema()->getClass(oid_cl);
+    eyedbsm::Status se_status;
+    Oid toid(oid);
 
 #ifdef NEW_COLL_XDR
-  RPCStatus rpc_status = IDB_collClassUpdate(dbh, idr, oid, 0, False);
-  if (rpc_status)
-    return rpc_status;
+    RPCStatus rpc_status = IDB_collClassUpdate(dbh, idr, oid, 0, False);
+    if (rpc_status)
+      return rpc_status;
 #else
-  if (cl) {
-    Collection *extent;
-    Status status = cl->getExtent(extent);
-    if (status) return rpcStatusMake(status);
-    if (extent)	{
-      eyedbsm::Oid colloid = *extent->getOid().getOid();
-      CollectionBE *collbe;
+    if (cl) {
+      Collection *extent;
+      Status status = cl->getExtent(extent);
+      if (status) return rpcStatusMake(status);
+      if (extent)	{
+	eyedbsm::Oid colloid = *extent->getOid().getOid();
+	CollectionBE *collbe;
 	  
-      Status status;
-      if (!(collbe = IDB_getCollBE("instanceDelete", db, dbh, &colloid, &status, True)))
-	return rpcStatusMake(status);
+	Status status;
+	if (!(collbe = IDB_getCollBE("instanceDelete", db, dbh, &colloid, &status, True)))
+	  return rpcStatusMake(status);
 	  
-      eyedbsm::Idx *idx1;
-      collbe->getIdx(&idx1, 0);
+	eyedbsm::Idx *idx1;
+	collbe->getIdx(&idx1, 0);
 
-      eyedblib::int32 ind = 1;
-      eyedbsm::Boolean found;
-      se_status = idx1->remove(oid, &ind, &found);
-      if (se_status)
-	return rpcStatusMake_se(se_status);
+	eyedblib::int32 ind = 1;
+	eyedbsm::Boolean found;
+	se_status = idx1->remove(oid, &ind, &found);
+	if (se_status)
+	  return rpcStatusMake_se(se_status);
 
-      if (!found)
-	return rpcStatusMake(IDB_ERROR,
-				 "instance delete: oid %s not found "
-				 "in collection",
-				 getOidString(oid));
+	if (!found)
+	  return rpcStatusMake(IDB_ERROR,
+			       "instance delete: oid %s not found "
+			       "in collection",
+			       getOidString(oid));
 
-      int items_cnt;
-      se_status = eyedbsm::objectRead(dbh->sedbh, IDB_COLL_OFF_ITEMS_CNT,
-				      sizeof(eyedblib::int32), &items_cnt,
-				      eyedbsm::DefaultLock, 0, 0, &colloid);
-      items_cnt = x2h_32(items_cnt);
+	int items_cnt;
+	se_status = eyedbsm::objectRead(dbh->sedbh, IDB_COLL_OFF_ITEMS_CNT,
+					sizeof(eyedblib::int32), &items_cnt,
+					eyedbsm::DefaultLock, 0, 0, &colloid);
+	items_cnt = x2h_32(items_cnt);
 
-      if (se_status)
-	return rpcStatusMake_se(se_status);
+	if (se_status)
+	  return rpcStatusMake_se(se_status);
 	  
-      items_cnt--;
+	items_cnt--;
 
-      collbe->setItemsCount(items_cnt);
+	collbe->setItemsCount(items_cnt);
   
 #ifdef E_XDR
-      eyedblib::int32 items_cnt_x = h2x_32(items_cnt);
+	eyedblib::int32 items_cnt_x = h2x_32(items_cnt);
 #else
-      eyedblib::int32 items_cnt_x = items_cnt;
+	eyedblib::int32 items_cnt_x = items_cnt;
 #endif
-      se_status = eyedbsm::objectWrite(dbh->sedbh, IDB_COLL_OFF_ITEMS_CNT,
-				       sizeof(eyedblib::int32), &items_cnt_x, &colloid);
-      if (se_status)
-	return rpcStatusMake_se(se_status);
+	se_status = eyedbsm::objectWrite(dbh->sedbh, IDB_COLL_OFF_ITEMS_CNT,
+					 sizeof(eyedblib::int32), &items_cnt_x, &colloid);
+	if (se_status)
+	  return rpcStatusMake_se(se_status);
+      }
     }
-  }
 #endif
 
 
 #define DELETED_KEEP
-  /*
-    BUG concurrence sur le delete.
+    /*
+      BUG concurrence sur le delete.
 
-    client A: delete obj1 (sans faire commit ou abort!).
+      client A: delete obj1 (sans faire commit ou abort!).
 
-    client B: obj1 :
-    oql error: eyedb error: object `obj1' does not exist anymore
-    ou bien
-    oql error: storage manager: invalid oid: invalid oid `obj1'
+      client B: obj1 :
+      oql error: eyedb error: object `obj1' does not exist anymore
+      ou bien
+      oql error: storage manager: invalid oid: invalid oid `obj1'
 
-    -> ce probleme vient du fait qu'on ne detruit pas un objet (lorsque
-    DELETED_KEEP est definit)
-    -> on le modifie, puis on le change de taille! -> c.a.d. qu'on
-    en cree un nouveau de la nouvelle taille et on affecte l'OID
-    a ce nouveau. => ce nouvel oid (qui est en fait l'ancien) est
-    locké en private.
-    -> j'ai donc essaye de le locker en lockS normal!
-    dans ce cas, l'object peut etre lu mais l'object_header qu'il
-    contient est different de l'objet stocké puisque la taille stockée et
-    la taille souhaitée (qui est la taille de tous les objets de sa classe)
-    est differente.
+      -> ce probleme vient du fait qu'on ne detruit pas un objet (lorsque
+      DELETED_KEEP est definit)
+      -> on le modifie, puis on le change de taille! -> c.a.d. qu'on
+      en cree un nouveau de la nouvelle taille et on affecte l'OID
+      a ce nouveau. => ce nouvel oid (qui est en fait l'ancien) est
+      locké en private.
+      -> j'ai donc essaye de le locker en lockS normal!
+      dans ce cas, l'object peut etre lu mais l'object_header qu'il
+      contient est different de l'objet stocké puisque la taille stockée et
+      la taille souhaitée (qui est la taille de tous les objets de sa classe)
+      est differente.
 
-    Solutions:
-    - ne plus garder les OIDs detruits
-    - les garder et:
-    + reparer le probleme de concurrence de object size modify
-    + ou ne pas modifier la taille de l'object: c.a.d. le garder en
-    totalité (un peu couteux!).
+      Solutions:
+      - ne plus garder les OIDs detruits
+      - les garder et:
+      + reparer le probleme de concurrence de object size modify
+      + ou ne pas modifier la taille de l'object: c.a.d. le garder en
+      totalité (un peu couteux!).
 
-    De toute facon, le fait de garder ou non les OIDs detruits devrait
-    etre controllable:
-    = un flag stocké dans la DB (default flag): modifiable par programme.
-    = ce flag pourrait etre overloadé au runtime.
-  */
+      De toute facon, le fait de garder ou non les OIDs detruits devrait
+      etre controllable:
+      = un flag stocké dans la DB (default flag): modifiable par programme.
+      = ce flag pourrait etre overloadé au runtime.
+    */
 
-  /*
-    Une list markDeleted attaché à Database a été introduite
-    afin de différer le changement de size => le bug précédant
-    a été corrigé.
-    Cependant il en reste un:
-    si le create/remove d'un objet a lieu dans la meme transaction,
-    cet objet est definitivement oublié: meme apres un commit,
-    il n'apparait pas dans les autres clients: ce qui peut etre
-    assez normal (en fait, non!).
-    Cependant, il continue apparaitre dans le processus qui
-    a cree et detruit cet objet => un peu bizarre.
+    /*
+      Une list markDeleted attaché à Database a été introduite
+      afin de différer le changement de size => le bug précédant
+      a été corrigé.
+      Cependant il en reste un:
+      si le create/remove d'un objet a lieu dans la meme transaction,
+      cet objet est definitivement oublié: meme apres un commit,
+      il n'apparait pas dans les autres clients: ce qui peut etre
+      assez normal (en fait, non!).
+      Cependant, il continue apparaitre dans le processus qui
+      a cree et detruit cet objet => un peu bizarre.
 
-    client 1: [eyedb] new Person();
-    this_oid
-    [eyedb] delete this_oid;
-    [eyedb] !print
-    <object removed>
+      client 1: [eyedb] new Person();
+      this_oid
+      [eyedb] delete this_oid;
+      [eyedb] !print
+      <object removed>
 
-    client 2: [eyedb] this_oid;
-    invalid oid ....
+      client 2: [eyedb] this_oid;
+      invalid oid ....
 
-    client 1: [eyedb] !commit
-    [eyedb] !print this_oid
-    <object removed>
+      client 1: [eyedb] !commit
+      [eyedb] !print this_oid
+      <object removed>
 
-    client 2: [eyedb] this_oid;
-    invalid oid ....
+      client 2: [eyedb] this_oid;
+      invalid oid ....
 
-    client 3: eyedboql -db <db>
-    [eyedb] this_oid;
-    invalid oid ....
+      client 3: eyedboql -db <db>
+      [eyedb] this_oid;
+      invalid oid ....
 
-    Par contre, si un !abort est fait au lieu d'un commit, c'est completement
-    coherent.
+      Par contre, si un !abort est fait au lieu d'un commit, c'est completement
+      coherent.
 
-    A noter que c'est le sizeModify qui fout le bordel.
-    En supprimant l'appel a sizeModify, l'objet apparait bien dans
-    les autres clients apres le commit sous forme d'une 'object removed'.
-    C'est donc bien un bug!
+      A noter que c'est le sizeModify qui fout le bordel.
+      En supprimant l'appel a sizeModify, l'objet apparait bien dans
+      les autres clients apres le commit sous forme d'une 'object removed'.
+      C'est donc bien un bug!
 
-    => corrected! (see se_trs.c: SE_TRObjectUnlock)
+      => corrected! (see se_trs.c: SE_TRObjectUnlock)
 
-  */
+    */
 
 #ifdef DELETED_KEEP
-  int info;
-  se_status = eyedbsm::objectRead(dbh->sedbh, IDB_OBJ_HEAD_XINFO_INDEX,
-				  sizeof(int), &info, eyedbsm::DefaultLock, 0, 0, oid);
-  if (se_status)
-    return rpcStatusMake_se(se_status);
+    int info;
+    se_status = eyedbsm::objectRead(dbh->sedbh, IDB_OBJ_HEAD_XINFO_INDEX,
+				    sizeof(int), &info, eyedbsm::DefaultLock, 0, 0, oid);
+    if (se_status)
+      return rpcStatusMake_se(se_status);
 
-  info |= IDB_XINFO_REMOVED;
-
-#ifdef E_XDR
-  eyedblib::int32 info_x = h2x_32(info);
-#else
-  eyedblib::int32 info_x = info;
-#endif
-  se_status = eyedbsm::objectWrite(dbh->sedbh, IDB_OBJ_HEAD_XINFO_INDEX,
-				   sizeof(int), &info_x, oid);
-  // 24/08/05: MODIF time()
-  eyedblib::int64 t = current_time();
+    info |= IDB_XINFO_REMOVED;
 
 #ifdef E_XDR
-  eyedblib::int64 t_x = h2x_64(t);
+    eyedblib::int32 info_x = h2x_32(info);
 #else
-  eyedblib::int64 t_x = t;
+    eyedblib::int32 info_x = info;
 #endif
-  se_status = eyedbsm::objectWrite(dbh->sedbh, IDB_OBJ_HEAD_MTIME_INDEX,
-				   sizeof(eyedblib::int64), &t_x, oid);
-  if (se_status)
+    se_status = eyedbsm::objectWrite(dbh->sedbh, IDB_OBJ_HEAD_XINFO_INDEX,
+				     sizeof(int), &info_x, oid);
+    // 24/08/05: MODIF time()
+    eyedblib::int64 t = current_time();
+
+#ifdef E_XDR
+    eyedblib::int64 t_x = h2x_64(t);
+#else
+    eyedblib::int64 t_x = t;
+#endif
+    se_status = eyedbsm::objectWrite(dbh->sedbh, IDB_OBJ_HEAD_MTIME_INDEX,
+				     sizeof(eyedblib::int64), &t_x, oid);
+    if (se_status)
+      return rpcStatusMake_se(se_status);
+
+    // added the 27/02/02
+    if (really)
+      return rpcStatusMake_se(eyedbsm::objectDelete(dbh->sedbh, oid));
+
+    db->getMarkDeleted().insertObject(new Oid(oid));
+    return RPCSuccess;
+#else
+    se_status = eyedbsm::objectDelete(dbh->sedbh, oid);
+#endif
     return rpcStatusMake_se(se_status);
-
-  // added the 27/02/02
-  if (really)
-    return rpcStatusMake_se(eyedbsm::objectDelete(dbh->sedbh, oid));
-
-  db->getMarkDeleted().insertObject(new Oid(oid));
-  return RPCSuccess;
-#else
-  se_status = eyedbsm::objectDelete(dbh->sedbh, oid);
-#endif
-  return rpcStatusMake_se(se_status);
-}
+  }
 
 #if 1
 #define IDX_MANAGE(DB, MCL, HDR, IDR, OID, OP)
@@ -6138,1683 +6155,1683 @@ do { \
 } while(0)
 #endif
 
-/* agregats */
-static RPCStatus
-IDB_agregatCreate(DbHandle *dbh, short dspid, Data idr, ObjectHeader *hdr, eyedbsm::Oid *oid, void *xdata)
-{
-  RPCStatus rpc_status = IDB_instanceCreate(dbh, dspid, idr, hdr, oid, xdata, True);
+  /* agregats */
+  static RPCStatus
+  IDB_agregatCreate(DbHandle *dbh, short dspid, Data idr, ObjectHeader *hdr, eyedbsm::Oid *oid, void *xdata)
+  {
+    RPCStatus rpc_status = IDB_instanceCreate(dbh, dspid, idr, hdr, oid, xdata, True);
 
-  if (rpc_status != RPCSuccess)
-    return rpc_status;
-
-  Database *db = (Database *)dbh->db;
-  eyedbsm::Oid oid_cl = ClassOidDecode(idr);
-  Class *cl = db->getSchema()->getClass(oid_cl);
-
-  if (!cl)
-    {
-      rpc_status = IDB_agregatDelete(dbh, idr, hdr, oid, True);
-      if (rpc_status) {
-	//fprintf(stderr, "error deletion %s\n", rpc_status->err_msg);
-	IDB_instanceDelete(dbh, idr, hdr, oid, True);
-      }
-      return rpcStatusMake(IDB_ERROR, "creating agregat");
-    }
-
-  Oid _oid(oid);
-  Status status;
-
-  AttrIdxContext idx_ctx;
-  status = cl->asAgregatClass()->createIndexEntries_realize(db, idr, &_oid,
-							    idx_ctx);
-  if (status)
-    {
-      rpc_status = IDB_agregatDelete(dbh, idr, hdr, oid, True);
-      if (rpc_status) {
-	//fprintf(stderr, "error deletion %s\n", rpc_status->err_msg);
-	IDB_instanceDelete(dbh, idr, hdr, oid, True);
-      }
-      return rpcStatusMake(status);
-    }
-
-  status = cl->asAgregatClass()->createInverses_realize(db, idr, &_oid);
-
-  if (status)
-    {
-      rpc_status = IDB_agregatDelete(dbh, idr, hdr, oid, True);
-      if (rpc_status) {
-	//fprintf(stderr, "error deletion %s\n", rpc_status->err_msg);
-	IDB_instanceDelete(dbh, idr, hdr, oid, True);
-      }
-    }
-
-  if (!status)
-    IDX_MANAGE(db, cl, hdr, idr, &_oid, create_index);
-
-  return rpcStatusMake(status);
-}
-
-static RPCStatus
-IDB_agregatWrite(DbHandle *dbh, Data idr, ObjectHeader *hdr, const eyedbsm::Oid *oid, void *xdata)
-{
-  Database *db = (Database *)dbh->db;
-  eyedbsm::Oid oid_cl = ClassOidDecode(idr);
-  Class *cl = db->getSchema()->getClass(oid_cl);
-  RPCStatus rpc_status;
-
-  Oid _oid(oid);
-  AttrIdxContext idx_ctx;
-  Status status = ((AgregatClass *)cl)->updateIndexEntries_realize(db, idr, &_oid, idx_ctx);
-
-  if (status)
-    return rpcStatusMake(status);
-
-  status = ((AgregatClass *)cl)->updateInverses_realize(db, idr, &_oid);
-
-  if (status)
-    return rpcStatusMake(status);
-
-  if (!status)
-    IDX_MANAGE(db, cl, hdr, idr, &_oid, update_index);
-
-  return IDB_instanceWrite(dbh, idr, hdr, oid, xdata);
-}
-
-static RPCStatus
-IDB_agregatDelete(DbHandle *dbh, Data idr, ObjectHeader *hdr, const eyedbsm::Oid *oid, Bool really)
-{
-  Database *db = (Database *)dbh->db;
-
-  eyedbsm::Oid oid_cl = ClassOidDecode(idr);
-  Class *cl = db->getSchema()->getClass(oid_cl);
-  Oid _oid(oid);
-  AttrIdxContext idx_ctx;
-  Status status = cl->asAgregatClass()->removeIndexEntries_realize(db, idr, &_oid, idx_ctx);
-
-  if (status)
-    return rpcStatusMake(status);
-
-  status = cl->asAgregatClass()->removeInverses_realize(db, idr, &_oid);
-
-  if (status)
-    return rpcStatusMake(status);
-
-  if (!status)
-    IDX_MANAGE(db, cl, hdr, idr, &_oid, delete_index);
-
-  return IDB_instanceDelete(dbh, idr, hdr, oid, really);
-}
-
-/* protections */
-static RPCStatus
-IDB_protectionDescriptionMake(DbHandle *dbh,
-			      Protection *prot, Database *dbm,
-			      eyedbsm::ProtectionDescription *&pdesc)
-{
-  int pusers_cnt = prot->getPusersCount();
-
-  if (!pusers_cnt)
-    return rpcStatusMake(IDB_ERROR, "invalid protection description");
-
-  pdesc = (eyedbsm::ProtectionDescription *)
-    calloc(eyedbsm::protectionDescriptionSize(pusers_cnt), 1);
-
-  strcpy(pdesc->name, prot->getName());
-  pdesc->nprot = pusers_cnt;
-
-  for (int i = 0; i < pusers_cnt; i++)
-    {
-      ProtectionUser *puser = prot->getPusers(i);
-      if (!puser)
-	return rpcStatusMake(IDB_ERROR, "user #%d is not set in protection description", i);
-
-      ProtectionMode mode = puser->getMode();
-
-      if (!mode)
-	mode = (ProtectionMode)0; // idbProtRead;
-
-      UserEntry *user = (UserEntry *)puser->getUser();
-      if (!puser)
-	return rpcStatusMake(IDB_ERROR, "user #%d is not set in protection description", i);
-
-      pdesc->desc[i].uid    = user->uid();
-      pdesc->desc[i].prot.r = ((mode == ProtRead || mode == ProtRW) ?
-			       eyedbsm::ReadAll : eyedbsm::ReadNone);
-      pdesc->desc[i].prot.w = ((mode == ProtRW) ? eyedbsm::WriteAll : eyedbsm::WriteNone);
-
-      eyedbsm::DbProtectionDescription dbdesc;
-      dbdesc.uid = pdesc->desc[i].uid;
-      dbdesc.prot.r = eyedbsm::ReadAll;
-      dbdesc.prot.w = eyedbsm::WriteAll;
-      eyedbsm::Status se_status = eyedbsm::dbProtectionAdd(dbh->sedbh, &dbdesc, 1);
-
-      if (se_status)
-	return rpcStatusMake_se(se_status);
-    }
-
-  return RPCSuccess;
-}
-
-static RPCStatus
-IDB_protectionRealize(DbHandle *dbh, Data idr, ObjectHeader *hdr, eyedbsm::Oid *oid, Bool create)
-{
-  Database *db = (Database *)dbh->db;
-  Protection *prot;
-  Oid xoid(oid);
-  Status status;
-  RPCStatus rpc_status;
-
-  status = db->makeObject(&xoid, hdr, idr, (Object **)&prot);
-
-  if (status)
-    return rpcStatusMake(status);
-
-  //  printf(create ? "IDB_protectionCreate()\n" : "IDB_protectionMofidy\n");
-
-  DBM_Database *dbm;
-  rpc_status = IDB_dbmOpen(dbh->ch, db->getDBMDB(), True, &dbm);
-
-  if (rpc_status)
-    {
-      prot->release();
+    if (rpc_status != RPCSuccess)
       return rpc_status;
-    }
 
-  eyedbsm::ProtectionDescription *pdesc;
+    Database *db = (Database *)dbh->db;
+    eyedbsm::Oid oid_cl = ClassOidDecode(idr);
+    Class *cl = db->getSchema()->getClass(oid_cl);
 
-  rpc_status = IDB_protectionDescriptionMake(dbh, prot, dbm, pdesc);
-
-  if (rpc_status)
-    {
-      prot->release();
-      return rpc_status;
-    }
-
-  eyedbsm::Oid poid;
-
-  if (create)
-    {
-      rpc_status = rpcStatusMake_se
-	(eyedbsm::protectionCreate(dbh->sedbh, pdesc, &poid));
-      if (!rpc_status)
-	{
-	  prot->setPoid(poid);
-	  Size psize;
-	  (void)prot->getClass()->getIDRObjectSize(&psize);
-	  memcpy(idr, prot->getIDR(), psize);
-	  //	  printf("OID : %s\n", prot->getPoid().getString());
+    if (!cl)
+      {
+	rpc_status = IDB_agregatDelete(dbh, idr, hdr, oid, True);
+	if (rpc_status) {
+	  //fprintf(stderr, "error deletion %s\n", rpc_status->err_msg);
+	  IDB_instanceDelete(dbh, idr, hdr, oid, True);
 	}
-    }
-  else
-    {
-      //      printf("ROID : %s\n", prot->getOid().getString());
-      rpc_status = rpcStatusMake_se
-	(eyedbsm::protectionModify(dbh->sedbh, pdesc, prot->getPoid().getOid()));
-    }
+	return rpcStatusMake(IDB_ERROR, "creating agregat");
+      }
 
-  free(pdesc);
-  prot->release();
-  return rpc_status;
-}
+    Oid _oid(oid);
+    Status status;
 
-static RPCStatus
-IDB_protectionGetPoid(DbHandle *dbh, const eyedbsm::Oid *prot_oid, eyedbsm::Oid &poid)
-{
-  Oid xoid(prot_oid);
-  Status status;
-  RPCStatus rpc_status;
-  Protection *prot;
-  Database *db = (Database *)dbh->db;
+    AttrIdxContext idx_ctx;
+    status = cl->asAgregatClass()->createIndexEntries_realize(db, idr, &_oid,
+							      idx_ctx);
+    if (status)
+      {
+	rpc_status = IDB_agregatDelete(dbh, idr, hdr, oid, True);
+	if (rpc_status) {
+	  //fprintf(stderr, "error deletion %s\n", rpc_status->err_msg);
+	  IDB_instanceDelete(dbh, idr, hdr, oid, True);
+	}
+	return rpcStatusMake(status);
+      }
 
-  status = db->loadObject(&xoid, (Object **)&prot);
+    status = cl->asAgregatClass()->createInverses_realize(db, idr, &_oid);
 
-  if (status)
+    if (status)
+      {
+	rpc_status = IDB_agregatDelete(dbh, idr, hdr, oid, True);
+	if (rpc_status) {
+	  //fprintf(stderr, "error deletion %s\n", rpc_status->err_msg);
+	  IDB_instanceDelete(dbh, idr, hdr, oid, True);
+	}
+      }
+
+    if (!status)
+      IDX_MANAGE(db, cl, hdr, idr, &_oid, create_index);
+
     return rpcStatusMake(status);
-
-  poid = *prot->getPoid().getOid();
-  prot->release();
-
-  return RPCSuccess;
-}
-
-static RPCStatus
-IDB_protectionCreate(DbHandle *dbh, short dspid, Data idr, ObjectHeader *hdr, eyedbsm::Oid *oid, void *xdata, Bool coll_update)
-{
-  RPCStatus rpc_status;
-
-  rpc_status = IDB_protectionRealize(dbh, idr, hdr, oid, True);
-  if (rpc_status)
-    return rpc_status;
-
-  return IDB_agregatCreate(dbh, dspid, idr, hdr, oid, xdata);
-}
-
-static RPCStatus
-IDB_protectionWrite(DbHandle *dbh, Data idr, ObjectHeader *hdr, const eyedbsm::Oid *oid, void *xdata)
-{
-  RPCStatus rpc_status;
-
-  rpc_status = IDB_protectionRealize(dbh, idr, hdr, (eyedbsm::Oid *)oid, False);
-  if (rpc_status)
-    return rpc_status;
-
-  return IDB_agregatWrite(dbh, idr, hdr, oid, xdata);
-}
-
-static RPCStatus
-IDB_protectionDelete(DbHandle *dbh, Data idr, ObjectHeader *hdr, const eyedbsm::Oid *oid)
-{
-  printf("IDB_protectionDelete()\n");
-  return IDB_agregatDelete(dbh, idr, hdr, oid);
-}
-
-RPCStatus
-IDB_objectProtectionSet(DbHandle *dbh, const eyedbsm::Oid *obj_oid, const eyedbsm::Oid *prot_oid)
-{
-  Oid xobj_oid(obj_oid);
-  Oid xprot_oid(prot_oid);
-  RPCStatus rpc_status;
-  eyedbsm::Oid rprot_oid;
-
-  /*
-    printf("objectProtectionSet(%s, %s)\n", xobj_oid.getString(),
-    xprot_oid.getString());
-  */
-
-  if (xprot_oid.isValid())
-    {
-      rpc_status = IDB_protectionGetPoid(dbh, prot_oid, rprot_oid);
-
-      if (rpc_status)
-	return rpc_status;
-    }
-  else
-    memset(&rprot_oid, 0, sizeof(rprot_oid));
-
-  rpc_status = rpcStatusMake_se(eyedbsm::objectProtectionSet(dbh->sedbh, obj_oid, &rprot_oid));
-
-  if (!rpc_status)
-    {
-      ObjectHeader hdr;
-      rpc_status = IDB_objectHeaderRead(dbh, obj_oid, &hdr);
-      if (rpc_status)
-	return rpc_status;
-      hdr.oid_prot = *prot_oid;
-      return IDB_objectHeaderWrite(dbh, obj_oid, &hdr);
-    }
-
-  return rpc_status;
-}
-
-RPCStatus
-IDB_objectProtectionGet(DbHandle *dbh, const eyedbsm::Oid *obj_oid, eyedbsm::Oid *prot_oid)
-{
-  Oid xobj_oid(obj_oid);
-  //  printf("objectProtectionGet(%s)\n", xobj_oid.getString());
-  ObjectHeader hdr;
-  RPCStatus rpc_status = IDB_objectHeaderRead(dbh, obj_oid, &hdr);
-  if (rpc_status)
-    return rpc_status;
-  *prot_oid = hdr.oid_prot;
-  return RPCSuccess;
-  //  return rpcStatusMake_se(eyedbsm::objectProtectionGet(dbh->sedbh, obj_oid, prot_oid));
-}
-
-static void
-get_dbm_passwd(const char *passwdfile)
-{
-  int fd = open(passwdfile, O_RDONLY);
-
-  if (fd < 0)
-    {
-      fprintf(stderr, "eyedbd: cannot open passwd file '%s' for reading\n",
-	      passwdfile);
-      exit(1);
-    }
-
-  if (read(fd, dbm_passwd, sizeof(dbm_passwd)) != sizeof(dbm_passwd))
-    {
-      fprintf(stderr, "eyedbd: error while reading passwd file '%s'\n",
-	      passwdfile);
-      exit(1);
-    }
-
-  close(fd);
-}
-
-//extern void idbInit_();
-
-void new_handler()
-{
-  static Bool _new = False;
-  if (!_new)
-    {
-      char tok[128];
-      sprintf(tok, "PID %d: Ran out of memory\n", getpid());
-      write(2, tok, strlen(tok));
-
-      _new = True;
-      quit_handler(db_list, 0);
-    }
-
-  exit(1);
-}
-
-static int timeout = -1;
-
-void
-config_init()
-{
-  Config::init();
-
-  const char *passwdfile;
-  const char *s;
-
-  if (edb_passwdfile)
-    passwdfile = strdup(edb_passwdfile);
-  else if (s = eyedb::getConfigValue("sv_passwd_file"))
-    passwdfile = strdup(s);
-  else
-    {
-      fprintf(stderr, "eyedbd: EyeDB passwd file is not set, check your 'sv_passwd_file' configuration variable or the '-passwdfile' command line option\n");
-      exit(1);
-    }
-
-  if (settimeout)
-    {
-      if (timeout >= 0)
-	settimeout(timeout);
-      else
-	{
-	  const char *x = eyedb::getConfigValue("sv_timeout");
-	  if (x)
-	    settimeout(atoi(x));
-	}
-    }
-
-  get_dbm_passwd(passwdfile);
-
-  // kludge
-  s = eyedb::getConfigValue("coll_hidx_oid");
-  if (s) {
-    if (!strcasecmp(s, "no")) {
-      coll_hidx_oid = False;
-    }
-    else if (!strcasecmp(s, "yes")) {
-      coll_hidx_oid = True;
-    }
-    else {
-      printf("invalid value for coll_hidx_oid %s\n", s);
-      exit(1);
-    }
   }
-}
 
-void
-IDB_init(const char *voldir, const char *_passwdfile,
-	 void *xsesslog, int _timeout)
-{
-  sesslog = (SessionLog *)xsesslog;
-  set_new_handler(new_handler);
+  static RPCStatus
+  IDB_agregatWrite(DbHandle *dbh, Data idr, ObjectHeader *hdr, const eyedbsm::Oid *oid, void *xdata)
+  {
+    Database *db = (Database *)dbh->db;
+    eyedbsm::Oid oid_cl = ClassOidDecode(idr);
+    Class *cl = db->getSchema()->getClass(oid_cl);
+    RPCStatus rpc_status;
 
-  edb_passwdfile = _passwdfile;
-  timeout = _timeout;
+    Oid _oid(oid);
+    AttrIdxContext idx_ctx;
+    Status status = ((AgregatClass *)cl)->updateIndexEntries_realize(db, idr, &_oid, idx_ctx);
 
-  Database::setDefaultVolumeDirectory(voldir);
+    if (status)
+      return rpcStatusMake(status);
 
-  eyedb::init();
-  config_init();
-}
+    status = ((AgregatClass *)cl)->updateInverses_realize(db, idr, &_oid);
 
-RPCStatus
-IDB_setLogMask(eyedblib::int64)
-{
-  return RPCSuccess;
-}
+    if (status)
+      return rpcStatusMake(status);
 
-RPCStatus
-IDB_getDefaultDataspace(DbHandle * dbh, int *_dspid)
-{
-  short dspid;
-  eyedbsm::Status s = eyedbsm::dspGetDefault(dbh->sedbh, &dspid);
-  if (s)
-    return rpcStatusMake_se(s);
+    if (!status)
+      IDX_MANAGE(db, cl, hdr, idr, &_oid, update_index);
 
-  *_dspid = dspid;
-  return RPCSuccess;
-}
+    return IDB_instanceWrite(dbh, idr, hdr, oid, xdata);
+  }
 
-RPCStatus
-IDB_setDefaultDataspace(DbHandle * dbh, int dspid)
-{
-  std::string dataspace = str_convert((long)dspid);
-  eyedbsm::Status s = eyedbsm::dspSetDefault(dbh->sedbh, dataspace.c_str());
+  static RPCStatus
+  IDB_agregatDelete(DbHandle *dbh, Data idr, ObjectHeader *hdr, const eyedbsm::Oid *oid, Bool really)
+  {
+    Database *db = (Database *)dbh->db;
 
-  if (!s) return RPCSuccess;
-  return rpcStatusMake_se(s);
-}
+    eyedbsm::Oid oid_cl = ClassOidDecode(idr);
+    Class *cl = db->getSchema()->getClass(oid_cl);
+    Oid _oid(oid);
+    AttrIdxContext idx_ctx;
+    Status status = cl->asAgregatClass()->removeIndexEntries_realize(db, idr, &_oid, idx_ctx);
 
-RPCStatus
-IDB_dataspaceSetCurrentDatafile(DbHandle * dbh, int dspid, int datid)
-{
-  std::string dataspace = str_convert((long)dspid);
-  std::string datafile = str_convert((long)datid);
-  eyedbsm::Status s = eyedbsm::dspSetCurDat(dbh->sedbh, dataspace.c_str(),
-					    datafile.c_str());
-  if (!s) return RPCSuccess;
-  return rpcStatusMake_se(s);
-}
+    if (status)
+      return rpcStatusMake(status);
 
-RPCStatus
-IDB_dataspaceGetCurrentDatafile(DbHandle * dbh, int dspid, int * datid)
-{
-  std::string dataspace = str_convert((long)dspid);
-  short datid_s;
-  eyedbsm::Status s = eyedbsm::dspGetCurDat(dbh->sedbh, dataspace.c_str(), &datid_s);
+    status = cl->asAgregatClass()->removeInverses_realize(db, idr, &_oid);
 
-  if (!s) {
-    *datid = datid_s;
+    if (status)
+      return rpcStatusMake(status);
+
+    if (!status)
+      IDX_MANAGE(db, cl, hdr, idr, &_oid, delete_index);
+
+    return IDB_instanceDelete(dbh, idr, hdr, oid, really);
+  }
+
+  /* protections */
+  static RPCStatus
+  IDB_protectionDescriptionMake(DbHandle *dbh,
+				Protection *prot, Database *dbm,
+				eyedbsm::ProtectionDescription *&pdesc)
+  {
+    int pusers_cnt = prot->getPusersCount();
+
+    if (!pusers_cnt)
+      return rpcStatusMake(IDB_ERROR, "invalid protection description");
+
+    pdesc = (eyedbsm::ProtectionDescription *)
+      calloc(eyedbsm::protectionDescriptionSize(pusers_cnt), 1);
+
+    strcpy(pdesc->name, prot->getName());
+    pdesc->nprot = pusers_cnt;
+
+    for (int i = 0; i < pusers_cnt; i++)
+      {
+	ProtectionUser *puser = prot->getPusers(i);
+	if (!puser)
+	  return rpcStatusMake(IDB_ERROR, "user #%d is not set in protection description", i);
+
+	ProtectionMode mode = puser->getMode();
+
+	if (!mode)
+	  mode = (ProtectionMode)0; // idbProtRead;
+
+	UserEntry *user = (UserEntry *)puser->getUser();
+	if (!puser)
+	  return rpcStatusMake(IDB_ERROR, "user #%d is not set in protection description", i);
+
+	pdesc->desc[i].uid    = user->uid();
+	pdesc->desc[i].prot.r = ((mode == ProtRead || mode == ProtRW) ?
+				 eyedbsm::ReadAll : eyedbsm::ReadNone);
+	pdesc->desc[i].prot.w = ((mode == ProtRW) ? eyedbsm::WriteAll : eyedbsm::WriteNone);
+
+	eyedbsm::DbProtectionDescription dbdesc;
+	dbdesc.uid = pdesc->desc[i].uid;
+	dbdesc.prot.r = eyedbsm::ReadAll;
+	dbdesc.prot.w = eyedbsm::WriteAll;
+	eyedbsm::Status se_status = eyedbsm::dbProtectionAdd(dbh->sedbh, &dbdesc, 1);
+
+	if (se_status)
+	  return rpcStatusMake_se(se_status);
+      }
+
     return RPCSuccess;
   }
 
-  return rpcStatusMake_se(s);
-}
-
-RPCStatus
-IDB_realizeDefaultIndexDataspace(DbHandle * dbh, const eyedbsm::Oid * idxoid,
-				 int * dspid, int type, Bool get)
-{
-  eyedbsm::Idx *idx;
-
-  if (type)
-    idx = new eyedbsm::HIdx(dbh->sedbh, idxoid);
-  else
-    idx = new eyedbsm::BIdx(dbh->sedbh, *idxoid);
-
-  eyedbsm::Status s = idx->status();
-  if (s) {
-    delete idx;
-    return rpcStatusMake_se(s);
-  }
-
-  if (get)
-    *dspid = idx->getDefaultDspid();
-  else
-    idx->setDefaultDspid(*dspid);
-
-  delete idx;
-  return RPCSuccess;
-}
-
-RPCStatus
-IDB_getDefaultIndexDataspace(DbHandle * dbh, const eyedbsm::Oid * oid, int type, int * dspid)
-{
-  return IDB_realizeDefaultIndexDataspace(dbh, oid, dspid, type, True);
-}
-
-RPCStatus
-IDB_setDefaultIndexDataspace(DbHandle * dbh, const eyedbsm::Oid * oid, int type, int dspid)
-{
-  return IDB_realizeDefaultIndexDataspace(dbh, oid, &dspid, type, False);
-}
-
-static RPCStatus
-IDB_getIndexObjects(DbHandle * dbh, const eyedbsm::Oid * idxoid, int type,
-		    eyedbsm::Oid *&oids, unsigned int &cnt)
-{
-  cnt = 0;
-  eyedbsm::Idx *idx;
-
-  if (type) 
-    idx = new eyedbsm::HIdx(dbh->sedbh, idxoid);
-  else
-    idx = new eyedbsm::BIdx(dbh->sedbh, *idxoid);
-
-  eyedbsm::Status s = idx->status();
-  if (s) {
-    delete idx;
-    return rpcStatusMake_se(s);
-  }
-
-  time_t t0, t1;
-  time(&t0);
-  //printf("getIndexObjects start\n");
-  s = idx->getObjects(oids, cnt);
-  time(&t1);
-  //printf("getIndexObjects end count=%d [elapsed %d]\n", t1-t0);
-
-  delete idx;
-  return rpcStatusMake_se(s);
-}
-
-RPCStatus
-IDB_getIndexLocations(DbHandle * dbh, const eyedbsm::Oid * oid, int type,
-		      Data * locarr, void *xlocarr)
-{
-  eyedbsm::Oid *oids;
-  unsigned int cnt;
-  RPCStatus rpc_status = IDB_getIndexObjects(dbh, oid, type, oids, cnt);
-  if (rpc_status) return rpc_status;
-  rpc_status = IDB_getObjectsLocations(dbh, oids, cnt, 0, locarr, xlocarr);
-  free(oids);
-  return rpc_status;
-}
-
-RPCStatus
-IDB_moveIndex(DbHandle * dbh, const eyedbsm::Oid * oid, int type, int dspid)
-{
-  eyedbsm::Oid *oids;
-  unsigned int cnt;
-  RPCStatus rpc_status = IDB_getIndexObjects(dbh, oid, type, oids, cnt);
-  if (rpc_status) return rpc_status;
-
-  rpc_status = IDB_moveObjects(dbh, oids, cnt, dspid, 0);
-  free(oids);
-  return rpc_status;
-}
-
-extern eyedbsm::Oid *
-oidArrayToOids(const OidArray &oid_arr, unsigned int &cnt);
-
-RPCStatus
-IDB_getInstanceClassLocations(DbHandle * dbh, const eyedbsm::Oid * oid,
-			      int subclasses, Data * locarr, void *xlocarr)
-{
-  Database *db = (Database *)dbh->db;
-  const Class *cls = db->getSchema()->getClass(*oid);
-  if (!cls)
-    return rpcStatusMake(IDB_ERROR, "class %s not found",
-			     Oid(*oid).toString());
-  Iterator iter(const_cast<Class *>(cls),	IDBBOOL(subclasses));
-  OidArray oid_arr;
-  Status s = iter.scan(oid_arr);
-  if (s) return rpcStatusMake(s);
-
-  unsigned int cnt;
-  eyedbsm::Oid *oids = oidArrayToOids(oid_arr, cnt);
-  RPCStatus rpc_status = IDB_getObjectsLocations(dbh, oids, cnt, 0, locarr,
-						 xlocarr);
-  delete [] oids;
-  return rpc_status;
-}
-
-RPCStatus
-IDB_moveInstanceClass(DbHandle * dbh, const eyedbsm::Oid * oid, int subclasses,
-		      int dspid)
-{
-  Database *db = (Database *)dbh->db;
-  const Class *cls = db->getSchema()->getClass(*oid);
-  if (!cls)
-    return rpcStatusMake(IDB_ERROR, "class %s not found",
-			     Oid(*oid).toString());
-  Iterator iter(const_cast<Class *>(cls), IDBBOOL(subclasses));
-  OidArray oid_arr;
-  Status s = iter.scan(oid_arr);
-  if (s) return rpcStatusMake(s);
-
-  unsigned int cnt;
-  eyedbsm::Oid *oids = oidArrayToOids(oid_arr, cnt);
-  if (!cnt) return RPCSuccess;
-  RPCStatus rpc_status = IDB_moveObjects(dbh, oids, cnt, dspid, 0);
-  delete [] oids;
-  return rpc_status;
-}
-
-RPCStatus
-IDB_getObjectsLocations(DbHandle * dbh, const eyedbsm::Oid * yoids, unsigned int oid_cnt, void *xoids, Data * locarr, void *xlocarr)
-{
-  lock_data((Data *)&yoids, xoids);
-
-  const eyedbsm::Oid * oids;
-  if (xoids)
-    oids = decode_oids((Data)yoids, &oid_cnt);
-  else
-    oids = yoids;
-
-  eyedbsm::ObjectLocation *se_locarr = new eyedbsm::ObjectLocation[oid_cnt];
-  eyedbsm::Status s = eyedbsm::objectsLocationGet(dbh->sedbh, oids, se_locarr, oid_cnt);
-
-  if (xlocarr) {
-    rpc_ServerData *data = (rpc_ServerData *)xlocarr;
-    data->status = rpc_TempDataUsed;
-    data->data = code_locarr(se_locarr, oids, oid_cnt, &data->size);
-  }
-  else
-    make_locarr(se_locarr, oids, oid_cnt, locarr);
-
-  if (xoids)
-    delete [] oids;
-
-  delete [] se_locarr;
-
-  unlock_data((Data)yoids, xoids);
-  return rpcStatusMake_se(s);
-}
-
-RPCStatus
-IDB_moveObjects(DbHandle * dbh, const eyedbsm::Oid *yoids, unsigned oid_cnt,
-		int dspid, void *xoids)
-{
-  CHECK_WRITE((Database *)dbh->db);
-  lock_data((Data *)&yoids, xoids);
-
-  const eyedbsm::Oid * oids;
-  if (xoids)
-    oids = decode_oids((Data)yoids, &oid_cnt);
-  else
-    oids = yoids;
-
-  eyedbsm::Status s = eyedbsm::objectsMoveDsp(dbh->sedbh, oids, oid_cnt, dspid);
-
-  if (xoids)
-    delete [] oids;
-
-  unlock_data((Data)yoids, xoids);
-  return rpcStatusMake_se(s);
-}
-
-RPCStatus
-IDB_getAttributeLocations(DbHandle * dbh, const eyedbsm::Oid * clsoid, int attrnum, Data * locarr, void *xlocarr)
-{
-  return RPCSuccess;
-}
-
-RPCStatus
-IDB_moveAttribute(DbHandle * dbh, const eyedbsm::Oid * clsoid, int attrnum, int dspid)
-{
-  return RPCSuccess;
-}
-
-RPCStatus
-IDB_createDatafile(DbHandle * dbh, const char * datfile, const char * name, int maxsize, int slotsize, int dtype)
-{
-  eyedbsm::Status s = eyedbsm::datCreate(dbh->sedbh, datfile, name, maxsize,
-					 eyedbsm::BitmapType, slotsize, (eyedbsm::DatType)dtype);
-
-  return rpcStatusMake_se(s);
-}
-
-RPCStatus
-IDB_deleteDatafile(DbHandle * dbh, int datid)
-{
-  eyedbsm::Status s = eyedbsm::datDelete(dbh->sedbh,
-					 str_convert((long)datid).c_str());
-  return rpcStatusMake_se(s);
-}
-
-RPCStatus
-IDB_moveDatafile(DbHandle * dbh, int datid, const char * newdatafile)
-{
-  eyedbsm::Status s = eyedbsm::datMove(dbh->sedbh,
-				       str_convert((long)datid).c_str(),
-				       newdatafile);
-  return rpcStatusMake_se(s);
-}
-
-RPCStatus
-IDB_defragmentDatafile(DbHandle * dbh, int datid)
-{
-  eyedbsm::Status s = eyedbsm::datDefragment(dbh->sedbh,
-					     str_convert((long)datid).c_str());
-  return rpcStatusMake_se(s);
-}
-
-RPCStatus
-IDB_resizeDatafile(DbHandle * dbh, int datid, unsigned int size)
-{
-  eyedbsm::Status s = eyedbsm::datResize(dbh->sedbh,
-					 str_convert((long)datid).c_str(),
-					 size);
-  return rpcStatusMake_se(s);
-}
-
-RPCStatus
-IDB_getDatafileInfo(DbHandle * dbh, int datid, Data * info,
-		    void *xinfo)
-{
-  eyedbsm::DatafileInfo datinfo;
-  eyedbsm::Status s = eyedbsm::datGetInfo(dbh->sedbh,
-					  str_convert((long)datid).c_str(),
-					  &datinfo);
-  if (xinfo) {
-    rpc_ServerData *data = (rpc_ServerData *)xinfo;
-    data->status = rpc_TempDataUsed;
-    data->data = code_datinfo(&datinfo, &data->size);
-  }
-  else
-    make_datinfo(&datinfo, info);
-
-  return rpcStatusMake_se(s);
-}
-
-RPCStatus
-IDB_renameDatafile(DbHandle * dbh, int datid, const char * name)
-{
-  eyedbsm::Status s = eyedbsm::datRename(dbh->sedbh,
-					 str_convert((long)datid).c_str(),
-					 name);
-  return rpcStatusMake_se(s);
-}
-
-RPCStatus
-IDB_createDataspace(DbHandle * dbh, const char * dspname, void *ydatids,
-		    unsigned int datafile_cnt, void *xdatids)
-{
-  CHECK_WRITE((Database *)dbh->db);
-  lock_data((Data *)&ydatids, xdatids);
-
-  const char **datids;
-  if (xdatids)
-    datids = decode_datids((Data)ydatids, &datafile_cnt);
-  else
-    datids = (const char **)ydatids;
-
-  eyedbsm::Status s = eyedbsm::dspCreate(dbh->sedbh, dspname, datids, datafile_cnt);
-  if (xdatids)
-    free(datids);
-
-  unlock_data((Data)ydatids, xdatids);
-  return rpcStatusMake_se(s);
-}
-
-RPCStatus
-IDB_updateDataspace(DbHandle * dbh, int dspid,  void *ydatids,
-		    unsigned int datafile_cnt, void *xdatids)
-{
-  CHECK_WRITE((Database *)dbh->db);
-  lock_data((Data *)&ydatids, xdatids);
-
-  const char **datids;
-  if (xdatids)
-    datids = decode_datids((Data)ydatids, &datafile_cnt);
-  else
-    datids = (const char **)ydatids;
-
-  eyedbsm::Status s = eyedbsm::dspUpdate(dbh->sedbh,
-					 str_convert((long)dspid).c_str(),
-					 datids, datafile_cnt);
-  if (xdatids)
-    free(datids);
-
-  unlock_data((Data)ydatids, xdatids);
-  return rpcStatusMake_se(s);
-}
-
-RPCStatus
-IDB_deleteDataspace(DbHandle * dbh, int dspid)
-{
-  eyedbsm::Status s = eyedbsm::dspDelete(dbh->sedbh,
-					 str_convert((long)dspid).c_str());
-  return rpcStatusMake_se(s);
-}
-
-RPCStatus
-IDB_renameDataspace(DbHandle * dbh, int dspid, const char * name)
-{
-  eyedbsm::Status s = eyedbsm::dspRename(dbh->sedbh,
-					 str_convert((long)dspid).c_str(),
-					 name);
-  return rpcStatusMake_se(s);
-}
-
-static Status
-IDB_makeDatabase(ConnHandle *ch, const char *dbmdb, const char *dbname,
-		 int dbid, int flags, DbHandle *ldbh,
-		 rpcDB_LocalDBContext *ldbctx,
-		 const eyedbsm::Oid *sch_oid, unsigned int version, Database *&db)
-{
-  Status status;
-  db = new Database(dbname, dbmdb);
-
-  Oid _oid(sch_oid);
-
-  if ((status = db->set(ch, dbid, flags, ldbh, ldbctx, &_oid, version)) == Success)
-    return status;
-  else
-    {
-      db->release();
-      return status;
-    }
-}
-
-/*
-const char *
-time()
-{
-  time_t t;
-  time(&t);
-  char *s = ctime(&t);
-  s[strlen(s)-1] = 0;
-  return s;
-}
-*/
-
-//#define EPITRACE
-
-void object_epilogue(void *xdb, const eyedbsm::Oid *oid,
-			 Data inv_data, Bool creating)
-{
-  // should cache Object.here
-  /*
-    if (creating)
-    db->cacheObject(oid);
-  */
-
-  if (!inv_data)
-    return;
-
-  Database *db = (Database *)xdb;
-
-  LinkedList inv_list;
-
-  InvOidContext::decode(inv_data, inv_list);
-
-  free(inv_data);
-
-  LinkedListCursor c(inv_list);
-  InvOidContext *ctx;
-
-#ifdef EPITRACE
-  if (inv_list.getCount())
-    printf("object_epilogue -> %d\n", inv_list.getCount());
-#endif
-
-  for (int i = 0; c.getNext((void *&)ctx); i++)
-    {
-#ifdef EPITRACE
-      printf("object_epilogue[%d] -> %s %d %d %s\n",
-	     i, ctx->objoid.toString(), ctx->attr_num, ctx->attr_offset,
-	     ctx->valoid.toString());
-#endif
-      Object *o = db->getCacheObject(ctx->objoid);
-      if (o)
-	{
-#ifdef EPITRACE
-	  printf("object_epilogue: updating object %s\n",
-		 ctx->objoid.toString());
-#endif
-	  mcp(o->getIDR()+ctx->attr_offset, &ctx->valoid, sizeof(Oid));
-	}
-
-      delete ctx;
-    }
-}
-
-eyedbsm::DbHandle *
-IDB_get_se_DbHandle(Database *db)
-{
-  return database_getDbHandle(db)->sedbh;
-}
-
-//
-// coding and decoding functions
-//
-
-Data code_oids(const eyedbsm::Oid *oids, unsigned int oid_cnt, int *size)
-{
-  Data idr = 0;
-  Size alloc_size = 0;
-  Offset offset = 0;
-  int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&oid_cnt);
-
-  for (int i = 0; i < oid_cnt; i++)
-    oid_code(&idr, &offset, &alloc_size, &oids[i]);
-
-  *size = offset;
-  return idr;
-}
-
-static eyedbsm::Oid *
-decode_oids(Data idr, unsigned int *poid_cnt)
-{
-  *poid_cnt = 0;
-  Offset offset = 0;
-  int32_decode(idr, &offset, (eyedblib::int32 *)poid_cnt);
-  eyedbsm::Oid *oids = new eyedbsm::Oid[*poid_cnt];
-  for (int i = 0; i < *poid_cnt; i++) 
-    oid_decode(idr, &offset, &oids[i]);
-  return oids;
-}
-
-void
-decode_locarr(Data idr, void *xlocarr)
-{
-  Offset offset = 0;
-  eyedblib::int32 cnt;
-  int32_decode(idr, &offset, &cnt);
-
-  ObjectLocation *locs = new ObjectLocation[cnt];
-  for (int i = 0; i < cnt; i++) {
-    eyedbsm::Oid oid;
-    eyedblib::int16 dspid;
-    eyedblib::int16 datid;
-    ObjectLocation::Info info;
-
-    oid_decode(idr, &offset, &oid);
-    int16_decode(idr, &offset, &dspid);
-    int16_decode(idr, &offset, &datid);
-    int32_decode(idr, &offset, (eyedblib::int32 *)&info.size);
-    int32_decode(idr, &offset, (eyedblib::int32 *)&info.slot_start_num);
-    int32_decode(idr, &offset, (eyedblib::int32 *)&info.slot_end_num);
-    int32_decode(idr, &offset, (eyedblib::int32 *)&info.dat_start_pagenum);
-    int32_decode(idr, &offset, (eyedblib::int32 *)&info.dat_end_pagenum);
-    int32_decode(idr, &offset, (eyedblib::int32 *)&info.omp_start_pagenum);
-    int32_decode(idr, &offset, (eyedblib::int32 *)&info.omp_end_pagenum);
-    int32_decode(idr, &offset, (eyedblib::int32 *)&info.dmp_start_pagenum);
-    int32_decode(idr, &offset, (eyedblib::int32 *)&info.dmp_end_pagenum);
-
-    locs[i].set(oid, dspid, datid, info);
-  }
-
-  ((ObjectLocationArray *)xlocarr)->set(locs, cnt);
-}
-
-static Data
-code_locarr(const eyedbsm::ObjectLocation *se_locarr, const eyedbsm::Oid *oids,
-		unsigned int cnt, int *size)
-{
-  Data idr = 0;
-  Size alloc_size = 0;
-  Offset offset = 0;
-
-  int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&cnt);
-  for (int i = 0; i < cnt; i++) {
-    const eyedbsm::ObjectLocation *loc = &se_locarr[i];
-
-    oid_code(&idr, &offset, &alloc_size, &oids[i]);
-    int16_code(&idr, &offset, &alloc_size, &loc->dspid);
-    int16_code(&idr, &offset, &alloc_size, &loc->datid);
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&loc->size);
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&loc->slot_start_num);
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&loc->slot_end_num);
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&loc->dat_start_pagenum);
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&loc->dat_end_pagenum);
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&loc->omp_start_pagenum);
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&loc->omp_end_pagenum);
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&loc->dmp_start_pagenum);
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&loc->dmp_end_pagenum);
-  }
-
-  *size = offset;
-  return idr;
-}
-
-static void
-make_locarr(const eyedbsm::ObjectLocation *se_locarr, const eyedbsm::Oid *oids,
-		unsigned int cnt, void *xlocarr)
-{
-  ObjectLocationArray *locarr = (ObjectLocationArray *)xlocarr;
-  ObjectLocation *locs = new ObjectLocation[cnt];
-  for (int i = 0; i < cnt; i++) {
-    const eyedbsm::ObjectLocation *loc = &se_locarr[i];
-
-    ObjectLocation::Info info;
-    info.size = loc->size;
-    info.slot_start_num = loc->slot_start_num;
-    info.slot_end_num = loc->slot_end_num;
-    info.dat_start_pagenum = loc->dat_start_pagenum;
-    info.dat_end_pagenum = loc->dat_end_pagenum;
-    info.omp_start_pagenum = loc->omp_start_pagenum;
-    info.omp_end_pagenum = loc->omp_end_pagenum;
-    info.dmp_start_pagenum = loc->dmp_start_pagenum;
-    info.dmp_end_pagenum = loc->dmp_end_pagenum;
-
-    locs[i].set(oids[i], loc->dspid, loc->datid, info);
-  }
-
-  locarr->set(locs, cnt);
-}
-
-Data
-code_dbdescription(const DbCreateDescription *dbdesc, int *size)
-{
-  Data idr = 0;
-  Size alloc_size = 0;
-  Offset offset = 0;
-  const eyedbsm::DbCreateDescription *d = &dbdesc->sedbdesc;
-  int i;
-
-  string_code(&idr, &offset, &alloc_size, dbdesc->dbfile);
-  //int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&d->sizeslot);
-  int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&d->dbid);
-  int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&d->nbobjs);
-  int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&d->dbsfilesize);
-  int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&d->dbsfileblksize);
-  int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&d->ompfilesize);
-  int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&d->ompfileblksize);
-  int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&d->shmfilesize);
-  int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&d->shmfileblksize);
-  int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&d->ndat);
-  int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&d->ndsp);
-  //int type = d->mtype;
-  //int32_code(&idr, &offset, &alloc_size, &type);
-
-  for (i = 0; i < d->ndat; i++)
-    {
-      const eyedbsm::Datafile *v = &d->dat[i];
-      string_code(&idr, &offset, &alloc_size, v->file);
-      string_code(&idr, &offset, &alloc_size, v->name);
-      int type = v->mtype;
-      int16_code(&idr, &offset, &alloc_size, &v->dspid);
-      int32_code(&idr, &offset, &alloc_size, &type);
-      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&v->sizeslot);
-      int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&v->maxsize);
-      eyedblib::int32 dtype = v->dtype;
-      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&dtype);
-      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&v->extflags);
-    }
-
-  for (i = 0; i < d->ndsp; i++)
-    {
-      const eyedbsm::Dataspace *v = &d->dsp[i];
-      string_code(&idr, &offset, &alloc_size, v->name);
-      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&v->ndat);
-      for (int j = 0; j < v->ndat; j++)
-	int16_code(&idr, &offset, &alloc_size, &v->datid[j]);
-    }
-
-  *size = offset;
-  return idr;
-}
-
-static const char **
-decode_datids(Data idr, unsigned int *oid_cnt)
-{
-  Offset offset = 0;
-  eyedblib::int32 cnt;
-  int32_decode(idr, &offset, &cnt);
-  const char **datids = new const char *[cnt];
-
-  for (int i = 0; i < cnt; i++)
-    string_decode(idr, &offset, (char **)&datids[i]);
-
-  *oid_cnt = cnt;
-  return datids;
-}
-
-Data
-code_datafiles(void *datafiles, unsigned int datafile_cnt, int *size)
-{
-  char **s = (char **)datafiles;
-  Data idr = 0;
-  Size alloc_size = 0;
-  Offset offset = 0;
-  int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&datafile_cnt);
-  for (int i = 0; i < datafile_cnt; i++)
-    string_code(&idr, &offset, &alloc_size, s[i]);
-  *size = offset;
-  return idr;
-}
-
-static Data
-code_datinfo(const eyedbsm::DatafileInfo *info, int *size)
-{
-  Data idr = 0;
-  Size alloc_size = 0;
-  Offset offset = 0;
-
-  int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&info->objcnt);
-  int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&info->slotcnt);
-  int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&info->busyslotcnt);
-  int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&info->totalsize);
-  int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&info->avgsize);
-  int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&info->lastbusyslot);
-  int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&info->lastslot);
-  int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&info->busyslotsize);
-  int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&info->datfilesize);
-  int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&info->datfileblksize);
-  int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&info->dmpfilesize);
-  int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&info->dmpfileblksize);
-  int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&info->curslot);
-  int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&info->defragmentablesize);
-  int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&info->slotfragcnt);
-  double_code(&idr, &offset, &alloc_size, &info->used);
-
-  *size = offset;
-  return idr;
-}
-
-void
-decode_datinfo(Data idr, void *xinfo)
-{
-  DatafileInfo::Info *info = (DatafileInfo::Info *)xinfo;
-  Offset offset = 0;
-
-  int32_decode(idr, &offset, (eyedblib::int32 *)&info->objcnt);
-  int32_decode(idr, &offset, (eyedblib::int32 *)&info->slotcnt);
-  int32_decode(idr, &offset, (eyedblib::int32 *)&info->busyslotcnt);
-  int64_decode(idr, &offset, (eyedblib::int64 *)&info->totalsize);
-  int32_decode(idr, &offset, (eyedblib::int32 *)&info->avgsize);
-  int32_decode(idr, &offset, (eyedblib::int32 *)&info->lastbusyslot);
-  int32_decode(idr, &offset, (eyedblib::int32 *)&info->lastslot);
-  int64_decode(idr, &offset, (eyedblib::int64 *)&info->busyslotsize);
-  int64_decode(idr, &offset, (eyedblib::int64 *)&info->datfilesize);
-  int64_decode(idr, &offset, (eyedblib::int64 *)&info->datfileblksize);
-  int64_decode(idr, &offset, (eyedblib::int64 *)&info->dmpfilesize);
-  int64_decode(idr, &offset, (eyedblib::int64 *)&info->dmpfileblksize);
-  int32_decode(idr, &offset, (eyedblib::int32 *)&info->curslot);
-  int64_decode(idr, &offset, (eyedblib::int64 *)&info->defragmentablesize);
-  int32_decode(idr, &offset, (eyedblib::int32 *)&info->slotfragcnt);
-  double_decode(idr, &offset, &info->used);
-}
-
-static void
-make_datinfo(const eyedbsm::DatafileInfo *datinfo, Data *xinfo)
-{
-  DatafileInfo::Info *info = (DatafileInfo::Info *)xinfo;
-
-  info->objcnt = datinfo->objcnt;
-  info->slotcnt = datinfo->slotcnt;
-  info->busyslotcnt = datinfo->busyslotcnt;
-  info->totalsize = datinfo->totalsize;
-  info->avgsize = datinfo->avgsize;
-  info->lastbusyslot = datinfo->lastbusyslot;
-  info->lastslot = datinfo->lastslot;
-  info->busyslotsize = datinfo->busyslotsize;
-  info->datfilesize = datinfo->datfilesize;
-  info->datfileblksize = datinfo->datfileblksize;
-  info->dmpfilesize = datinfo->dmpfilesize;
-  info->dmpfileblksize = datinfo->dmpfileblksize;
-  info->curslot = datinfo->curslot;
-  info->defragmentablesize = datinfo->defragmentablesize;
-  info->slotfragcnt = datinfo->slotfragcnt;
-  info->used = datinfo->used;
-}
-
-
-void
-decode_dbdescription(Data idr, void *xdata, DbCreateDescription *dbdesc)
-{
-  Offset offset = 0;
-  eyedbsm::DbCreateDescription *d = &dbdesc->sedbdesc;
-  int i;
-  char *s;
-
-  memset(dbdesc, 0, sizeof(*dbdesc));
-  lock_data(&idr, xdata);
-  string_decode(idr, &offset, &s);
-  strcpy(dbdesc->dbfile, s);
-  //  int32_decode(idr, &offset, (eyedblib::int32 *)&d->sizeslot);
-  int32_decode(idr, &offset, (eyedblib::int32 *)&d->dbid);
-  int32_decode(idr, &offset, (eyedblib::int32 *)&d->nbobjs);
-  int64_decode(idr, &offset, (eyedblib::int64 *)&d->dbsfilesize);
-  int64_decode(idr, &offset, (eyedblib::int64 *)&d->dbsfileblksize);
-  int64_decode(idr, &offset, (eyedblib::int64 *)&d->ompfilesize);
-  int64_decode(idr, &offset, (eyedblib::int64 *)&d->ompfileblksize);
-  int64_decode(idr, &offset, (eyedblib::int64 *)&d->shmfilesize);
-  int64_decode(idr, &offset, (eyedblib::int64 *)&d->shmfileblksize);
-  int32_decode(idr, &offset, (eyedblib::int32 *)&d->ndat);
-  int32_decode(idr, &offset, (eyedblib::int32 *)&d->ndsp);
-  //int mtype;
-  //int32_decode(idr, &offset, &mtype);
-  //d->mtype = (se_MapType)mtype;
-
-  for (i = 0; i < d->ndat; i++)
-    {
-      eyedbsm::Datafile *v = &d->dat[i];
-      string_decode(idr, &offset, &s);
-      strcpy(v->file, s);
-      string_decode(idr, &offset, &s);
-      strcpy(v->name, s);
-      eyedblib::int32 type;
-      int16_decode(idr, &offset, &v->dspid);
-      int32_decode(idr, &offset, &type);
-      v->mtype = (eyedbsm::MapType)type;
-      int32_decode(idr, &offset, (eyedblib::int32 *)&v->sizeslot);
-      int64_decode(idr, &offset, (eyedblib::int64 *)&v->maxsize);
-      eyedblib::int32 dtype;
-      int32_decode(idr, &offset, (eyedblib::int32 *)&dtype);
-      v->dtype = (DatType)dtype;
-      int32_decode(idr, &offset, (eyedblib::int32 *)&v->extflags);
-    }
-
-  for (i = 0; i < d->ndsp; i++)
-    {
-      eyedbsm::Dataspace *v = &d->dsp[i];
-      string_decode(idr, &offset, &s);
-      strcpy(v->name, s);
-      int32_decode(idr, &offset, (eyedblib::int32 *)&v->ndat);
-      for (int j = 0; j < v->ndat; j++)
-	int16_decode(idr, &offset, &v->datid[j]);
-    }	
-
-  unlock_data(idr, xdata);
-}
-
-static void
-decode_index_impl_r(Data data, void *ximpl, Offset &offset)
-{
-  short type;
-  int16_decode(data, &offset, &type);
-
-  if (type == IndexImpl::Hash) {
-    int key_count;
-    /*
-      short dspid;
-      int16_decode(data, &offset, &dspid);
-    */
-    int32_decode(data, &offset, &key_count);
-    int impl_hints[eyedbsm::HIdxImplHintsCount];
-    for (int i = 0; i < eyedbsm::HIdxImplHintsCount; i++)
-      int32_decode(data, &offset, &impl_hints[i]);
-
-    *(IndexImpl **)ximpl = new IndexImpl(IndexImpl::Hash,
-					 0, // dspid ???
-					 key_count,
-					 0, // mth ???
-					 impl_hints,
-					 eyedbsm::HIdxImplHintsCount);
-  }
-  else {
-    int degree;
-    int32_decode(data, &offset, &degree);
-    int impl_hints[eyedbsm::HIdxImplHintsCount];
-    for (int i = 0; i < eyedbsm::HIdxImplHintsCount; i++)
-      int32_decode(data, &offset, &impl_hints[i]);
-
-    *(IndexImpl **)ximpl = new IndexImpl(IndexImpl::BTree,
-					 0,
-					 degree,
-					 0,
-					 impl_hints,
-					 eyedbsm::HIdxImplHintsCount);
-  }
-}
-
-void decode_index_impl(Data data, void *ximpl)
-{
-  Offset offset = 0;
-  decode_index_impl_r(data, ximpl, offset);
-}
-
-void decode_index_stats(Data data, void *xstats)
-{
-  Offset offset = 0;
-
-  short type;
-  int16_decode(data, &offset, &type);
-
-  if (type == IndexImpl::Hash) {
-    HashIndexStats *stats = new HashIndexStats();
-    decode_index_impl_r(data, &stats->idximpl, offset);
-
-    int32_decode(data, &offset, (eyedblib::int32 *)&stats->min_objects_per_entry);
-    int32_decode(data, &offset, (eyedblib::int32 *)&stats->max_objects_per_entry);
-    int32_decode(data, &offset, (eyedblib::int32 *)&stats->total_object_count);
-    int32_decode(data, &offset, (eyedblib::int32 *)&stats->total_hash_object_count);
-    int32_decode(data, &offset, (eyedblib::int32 *)&stats->total_hash_object_size);
-    int32_decode(data, &offset, (eyedblib::int32 *)&stats->total_hash_object_busy_size);
-    int32_decode(data, &offset, (eyedblib::int32 *)&stats->busy_key_count);
-    int32_decode(data, &offset, (eyedblib::int32 *)&stats->free_key_count);
-
-    int32_decode(data, &offset, (eyedblib::int32 *)&stats->key_count);
-    HashIndexStats::Entry *entry = stats->entries =
-      new HashIndexStats::Entry[stats->key_count];
-    for (int i = 0; i < stats->key_count; i++, entry++) {
-      int32_decode(data, &offset, (eyedblib::int32 *)&entry->object_count);
-      int32_decode(data, &offset, (eyedblib::int32 *)&entry->hash_object_count);
-      int32_decode(data, &offset, (eyedblib::int32 *)&entry->hash_object_size);
-      int32_decode(data, &offset, (eyedblib::int32 *)&entry->hash_object_busy_size);
-    }
-    *(HashIndexStats **)xstats = stats;
-  }
-  else {
-    BTreeIndexStats *stats = new BTreeIndexStats();
-    decode_index_impl_r(data, &stats->idximpl, offset);
-
-    int32_decode(data, &offset, (eyedblib::int32 *)&stats->degree);
-    int32_decode(data, &offset, (eyedblib::int32 *)&stats->dataSize);
-    int32_decode(data, &offset, (eyedblib::int32 *)&stats->keySize);
-    int32_decode(data, &offset, (eyedblib::int32 *)&stats->keyOffset);
-    int32_decode(data, &offset, (eyedblib::int32 *)&stats->keyType);
-
-    int32_decode(data, &offset, (eyedblib::int32 *)&stats->total_object_count);
-    int32_decode(data, &offset, (eyedblib::int32 *)&stats->total_btree_object_count);
-    int32_decode(data, &offset, (eyedblib::int32 *)&stats->btree_node_size);
-    int32_decode(data, &offset, (eyedblib::int32 *)&stats->total_btree_node_count);
-    int32_decode(data, &offset, (eyedblib::int32 *)&stats->btree_key_object_size);
-    int32_decode(data, &offset, (eyedblib::int32 *)&stats->btree_data_object_size);
-    int32_decode(data, &offset, (eyedblib::int32 *)&stats->total_btree_object_size);
-
-    *(BTreeIndexStats **)xstats = stats;
-  }
-}
-
-static void
-make_index_stats(const eyedbsm::BIdx::Stats &stats, Data *xrstats)
-{
-  BTreeIndexStats *rstats = new BTreeIndexStats();
-  rstats->degree = stats.idx->getDegree();
-  rstats->dataSize = stats.idx->getDataSize();
-  rstats->keySize = stats.idx->getKeySize();
-  rstats->keyOffset = stats.keyOffset;
-  rstats->keyType = stats.keyType;
-
-  rstats->total_object_count = stats.total_object_count;
-  rstats->total_btree_object_count = stats.total_btree_object_count;
-  rstats->btree_node_size = stats.btree_node_size;
-  rstats->total_btree_node_count = stats.total_btree_node_count;
-  rstats->btree_key_object_size = stats.btree_key_object_size;
-  rstats->btree_data_object_size = stats.btree_data_object_size;
-  rstats->total_btree_object_size = stats.total_btree_object_size;
-
-  rstats->idximpl = new IndexImpl(IndexImpl::BTree, 0,
-				  stats.idx->getDegree(),
-				  0, 0, 0);
-  *(BTreeIndexStats **)xrstats = rstats;
-}
-
-static void
-make_index_stats(const eyedbsm::HIdx::Stats &stats, Data *xrstats)
-{
-  HashIndexStats *rstats = new HashIndexStats();
-  rstats->min_objects_per_entry = stats.min_objects_per_entry;
-  rstats->max_objects_per_entry = stats.max_objects_per_entry;
-  rstats->total_object_count = stats.total_object_count;
-  rstats->total_hash_object_count = stats.total_hash_object_count;
-  rstats->total_hash_object_size = stats.total_hash_object_size;
-  rstats->total_hash_object_busy_size = stats.total_hash_object_busy_size;
-  rstats->busy_key_count = stats.busy_key_count;
-  rstats->free_key_count = stats.free_key_count;
-
-  rstats->key_count = stats.idx.key_count;
-  rstats->entries = new HashIndexStats::Entry[rstats->key_count];
-  for (int i = 0; i < rstats->key_count; i++) {
-    rstats->entries[i].object_count = stats.entries[i].object_count;
-    rstats->entries[i].hash_object_count = stats.entries[i].hash_object_count;
-    rstats->entries[i].hash_object_size = stats.entries[i].hash_object_size;
-    rstats->entries[i].hash_object_busy_size = stats.entries[i].hash_object_busy_size;
-  }
-
-  rstats->idximpl = new IndexImpl(IndexImpl::Hash, 0,
-				  stats.idx.key_count,
-				  0, stats.idx.impl_hints,
-				  eyedbsm::HIdxImplHintsCount);
-  *(HashIndexStats **)xrstats = rstats;
-}
-
-
-static Data
-code_index_impl(const eyedbsm::BIdx &idx, int *size,
-		    Data &idr, Offset &offset, Size &alloc_size)
-{
-
-  short xtype = IndexImpl::BTree;
-  int16_code(&idr, &offset, &alloc_size, &xtype);
-
-  //int16_code(&idr, &offset, &alloc_size, &idx.dspid);
-  unsigned int degree = idx.getDegree();
-  int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&degree);
-  for (int i = 0; i < eyedbsm::HIdxImplHintsCount; i++) {
-    int zero = 0;
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&zero);
-  }
-  *size = offset;
-  return idr;
-}
-
-static Data
-code_index_impl(const eyedbsm::BIdx &idx, int *size)
-{
-  Data idr = 0;
-  Offset offset = 0;
-  Size alloc_size = 0;
-  return code_index_impl(idx, size, idr, offset, alloc_size);
-}
-
-static Data
-code_index_impl(const eyedbsm::HIdx::_Idx &idx, int *size,
-		    Data &idr, Offset &offset, Size &alloc_size)
-{
-
-  short xtype = IndexImpl::Hash;
-  int16_code(&idr, &offset, &alloc_size, &xtype);
-
-  //int16_code(&idr, &offset, &alloc_size, &idx.dspid);
-  int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&idx.key_count);
-  for (int i = 0; i < eyedbsm::HIdxImplHintsCount; i++)
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&idx.impl_hints[i]);
-
-  *size = offset;
-  return idr;
-}
-
-static Data
-code_index_impl(const eyedbsm::HIdx::_Idx &idx, int *size)
-{
-  Data idr = 0;
-  Offset offset = 0;
-  Size alloc_size = 0;
-  return code_index_impl(idx, size, idr, offset, alloc_size);
-}
-
-static void
-make_index_impl(const eyedbsm::BIdx &idx, Data *data)
-{
-  *(IndexImpl **)data = new IndexImpl(IndexImpl::BTree,
-				      0, idx.getDegree(), 0,
-				      0, 0);
-}
-
-static void
-make_index_impl(const eyedbsm::HIdx::_Idx &idx, Data *data)
-{
-  *(IndexImpl **)data = new IndexImpl(IndexImpl::Hash,
-				      0,
-				      idx.key_count, 0,
-				      idx.impl_hints,
-				      eyedbsm::HIdxImplHintsCount);
-}
-
-static Data
-code_index_stats(IndexImpl::Type type, const void *xstats,
-		     int *size)
-{
-  Data idr = 0;
-  Offset offset = 0;
-  Size alloc_size = 0;
-  short xtype = type;
-  int16_code(&idr, &offset, &alloc_size, &xtype);
-
-  if (type == IndexImpl::Hash) {
-    const eyedbsm::HIdx::Stats *stats = (const eyedbsm::HIdx::Stats *)xstats;
-    int dummy;
-    code_index_impl(stats->idx, &dummy, idr, offset, alloc_size);
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->min_objects_per_entry);
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->max_objects_per_entry);
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->total_object_count);
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->total_hash_object_count);
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->total_hash_object_size);
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->total_hash_object_busy_size);
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->busy_key_count);
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->free_key_count);
-    const eyedbsm::HIdx::Stats::Entry *entry = stats->entries;
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->idx.key_count);
-    for (int i = 0; i < stats->idx.key_count; i++, entry++) {
-      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&entry->object_count);
-      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&entry->hash_object_count);
-      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&entry->hash_object_size);
-      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&entry->hash_object_busy_size);
-    }
-  }
-  else {
-    const eyedbsm::BIdx::Stats *stats = (const eyedbsm::BIdx::Stats *)xstats;
-    int dummy;
-    code_index_impl(*stats->idx, &dummy, idr, offset, alloc_size);
-
-    unsigned int x = stats->idx->getDegree();
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&x);
-    x = stats->idx->getDataSize();
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&x);
-    x = stats->idx->getKeySize();
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&x);
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->keyOffset);
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->keyType);
-
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->total_object_count);
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->total_btree_object_count);
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->btree_node_size);
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->total_btree_node_count);
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->btree_key_object_size);
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->btree_data_object_size);
-    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->total_btree_object_size);
-  }
-
-  *size = offset;
-  return idr;
-}
-
-
-
-static void
-code_atom_array(rpc_ServerData *data, void *atom_array, int count,
-		    int nalloc)
-{
-  Offset offset = 0;
-  Data idr;
-  Size alloc_size;
-  int c, size = sizeof(eyedblib::int32);
-  IteratorAtom *p = (IteratorAtom *)atom_array;
-
-  for (c = 0; c < count; c++, p++)
-    size += sizeof(eyedblib::int16) + p->getSize();
-
-  if (size <= data->buff_size)
-    data->status = rpc_BuffUsed;
-  else
-    {
-      data->status = rpc_TempDataUsed;
-      data->data = (unsigned char *)malloc(size);
-    }
-
-  alloc_size = size;
-  data->size = size;
-  idr = (Data)data->data;
-
-  p = (IteratorAtom *)atom_array;
-  
-  for (c = 0; c < count; c++, p++)
-    p->code(&idr, &offset, &alloc_size);
-
-  idbFreeVect((IteratorAtom *)atom_array, IteratorAtom, nalloc);
-}
-
-static void
-code_value(rpc_ServerData *data, Value *value)
-{
-  Offset offset = 0;
-  Size alloc_size = 0;
-  Data idr = 0;
-
-  value->code(idr, offset, alloc_size);
-
-  if (alloc_size <= data->buff_size)
-    {
-      data->status = rpc_BuffUsed;
-      memcpy(data->data, idr, alloc_size);
-      // MIND! ne faut-il pas détruire idr !?
-    }
-  else
-    {
-      data->status = rpc_TempDataUsed;
-      data->data = idr;
-    }
-
-  data->size = offset;
-  delete value;
-}
-
-//
-// Server message management
-//
-
-struct ServerOutOfBandData {
-  ServerOutOfBandData(unsigned int _type, unsigned char *_data,
-		      unsigned int _size) {
-    type = _type;
-    size = _size;
-    data = new unsigned char[size];
-    memcpy(data, _data, size);
-  }
-
-  ~ServerOutOfBandData() {delete [] data;}
-
-  unsigned int type;
-  unsigned char *data;
-  unsigned int size;
-};
-
-LinkedList server_data_list;
-static unsigned max_server_data = 1024;
-static eyedblib::Mutex server_data_mt;
-static eyedblib::Condition server_data_cnd;
-
-void
-setServerOutOfBandData(unsigned int type, unsigned char *data,
-			   unsigned int len)
-{
-  server_data_mt.lock();
-
-  while (server_data_list.getCount() >= max_server_data)
-    server_data_list.deleteObject(server_data_list.getFirstObject());
-    
-  server_data_list.insertObjectLast
-    (new ServerOutOfBandData(type, data, len));
-  server_data_mt.unlock();
-  server_data_cnd.signal();
-}
-
-void
-setServerMessage(const char *msg)
-{
-  setServerOutOfBandData(IDB_SERVER_MESSAGE, (unsigned char *)msg,
-			     strlen(msg)+1);
-}
-
-//
-// should be executed in a parallel thread
-//
-
-RPCStatus
-IDB_getServerOutOfBandData(ConnHandle *, int *type, Data *ldata,
-			   unsigned int *size, void *xdata)
-{
-  rpc_ServerData *data = (rpc_ServerData *)xdata;
-
-  for (;;) {
-    server_data_cnd.wait();
-    server_data_mt.lock();
-    ServerOutOfBandData *srvdata = (ServerOutOfBandData *)server_data_list.getFirstObject();
-    if (srvdata) {
-      if ((*type) & srvdata->type) {
-	*type = srvdata->type;
-	if (data) {
-	  data->status = rpc_TempDataUsed;
-	  data->size = srvdata->size;
-	  data->data = new unsigned char[data->size];
-	  memcpy(data->data, srvdata->data, data->size);
-	}
-	else {
-	  *size = srvdata->size;
-	  *ldata = new unsigned char[*size];
-	  memcpy(*ldata, srvdata->data, *size);
-	}
-	server_data_list.deleteObject(srvdata);
-	delete srvdata;
-	server_data_mt.unlock();
-	return RPCSuccess;
+  static RPCStatus
+  IDB_protectionRealize(DbHandle *dbh, Data idr, ObjectHeader *hdr, eyedbsm::Oid *oid, Bool create)
+  {
+    Database *db = (Database *)dbh->db;
+    Protection *prot;
+    Oid xoid(oid);
+    Status status;
+    RPCStatus rpc_status;
+
+    status = db->makeObject(&xoid, hdr, idr, (Object **)&prot);
+
+    if (status)
+      return rpcStatusMake(status);
+
+    //  printf(create ? "IDB_protectionCreate()\n" : "IDB_protectionMofidy\n");
+
+    DBM_Database *dbm;
+    rpc_status = IDB_dbmOpen(dbh->ch, db->getDBMDB(), True, &dbm);
+
+    if (rpc_status)
+      {
+	prot->release();
+	return rpc_status;
       }
 
-      server_data_list.deleteObject(srvdata);
-      delete srvdata;
-    }
-    server_data_mt.unlock();
-  }
-}
+    eyedbsm::ProtectionDescription *pdesc;
 
-// moved from p.h
-eyedbsm::DbHandle *get_eyedbsm_DbHandle(DbHandle *dbh)
-{
-  return dbh->sedbh;
-}
+    rpc_status = IDB_protectionDescriptionMake(dbh, prot, dbm, pdesc);
+
+    if (rpc_status)
+      {
+	prot->release();
+	return rpc_status;
+      }
+
+    eyedbsm::Oid poid;
+
+    if (create)
+      {
+	rpc_status = rpcStatusMake_se
+	  (eyedbsm::protectionCreate(dbh->sedbh, pdesc, &poid));
+	if (!rpc_status)
+	  {
+	    prot->setPoid(poid);
+	    Size psize;
+	    (void)prot->getClass()->getIDRObjectSize(&psize);
+	    memcpy(idr, prot->getIDR(), psize);
+	    //	  printf("OID : %s\n", prot->getPoid().getString());
+	  }
+      }
+    else
+      {
+	//      printf("ROID : %s\n", prot->getOid().getString());
+	rpc_status = rpcStatusMake_se
+	  (eyedbsm::protectionModify(dbh->sedbh, pdesc, prot->getPoid().getOid()));
+      }
+
+    free(pdesc);
+    prot->release();
+    return rpc_status;
+  }
+
+  static RPCStatus
+  IDB_protectionGetPoid(DbHandle *dbh, const eyedbsm::Oid *prot_oid, eyedbsm::Oid &poid)
+  {
+    Oid xoid(prot_oid);
+    Status status;
+    RPCStatus rpc_status;
+    Protection *prot;
+    Database *db = (Database *)dbh->db;
+
+    status = db->loadObject(&xoid, (Object **)&prot);
+
+    if (status)
+      return rpcStatusMake(status);
+
+    poid = *prot->getPoid().getOid();
+    prot->release();
+
+    return RPCSuccess;
+  }
+
+  static RPCStatus
+  IDB_protectionCreate(DbHandle *dbh, short dspid, Data idr, ObjectHeader *hdr, eyedbsm::Oid *oid, void *xdata, Bool coll_update)
+  {
+    RPCStatus rpc_status;
+
+    rpc_status = IDB_protectionRealize(dbh, idr, hdr, oid, True);
+    if (rpc_status)
+      return rpc_status;
+
+    return IDB_agregatCreate(dbh, dspid, idr, hdr, oid, xdata);
+  }
+
+  static RPCStatus
+  IDB_protectionWrite(DbHandle *dbh, Data idr, ObjectHeader *hdr, const eyedbsm::Oid *oid, void *xdata)
+  {
+    RPCStatus rpc_status;
+
+    rpc_status = IDB_protectionRealize(dbh, idr, hdr, (eyedbsm::Oid *)oid, False);
+    if (rpc_status)
+      return rpc_status;
+
+    return IDB_agregatWrite(dbh, idr, hdr, oid, xdata);
+  }
+
+  static RPCStatus
+  IDB_protectionDelete(DbHandle *dbh, Data idr, ObjectHeader *hdr, const eyedbsm::Oid *oid)
+  {
+    printf("IDB_protectionDelete()\n");
+    return IDB_agregatDelete(dbh, idr, hdr, oid);
+  }
+
+  RPCStatus
+  IDB_objectProtectionSet(DbHandle *dbh, const eyedbsm::Oid *obj_oid, const eyedbsm::Oid *prot_oid)
+  {
+    Oid xobj_oid(obj_oid);
+    Oid xprot_oid(prot_oid);
+    RPCStatus rpc_status;
+    eyedbsm::Oid rprot_oid;
+
+    /*
+      printf("objectProtectionSet(%s, %s)\n", xobj_oid.getString(),
+      xprot_oid.getString());
+    */
+
+    if (xprot_oid.isValid())
+      {
+	rpc_status = IDB_protectionGetPoid(dbh, prot_oid, rprot_oid);
+
+	if (rpc_status)
+	  return rpc_status;
+      }
+    else
+      memset(&rprot_oid, 0, sizeof(rprot_oid));
+
+    rpc_status = rpcStatusMake_se(eyedbsm::objectProtectionSet(dbh->sedbh, obj_oid, &rprot_oid));
+
+    if (!rpc_status)
+      {
+	ObjectHeader hdr;
+	rpc_status = IDB_objectHeaderRead(dbh, obj_oid, &hdr);
+	if (rpc_status)
+	  return rpc_status;
+	hdr.oid_prot = *prot_oid;
+	return IDB_objectHeaderWrite(dbh, obj_oid, &hdr);
+      }
+
+    return rpc_status;
+  }
+
+  RPCStatus
+  IDB_objectProtectionGet(DbHandle *dbh, const eyedbsm::Oid *obj_oid, eyedbsm::Oid *prot_oid)
+  {
+    Oid xobj_oid(obj_oid);
+    //  printf("objectProtectionGet(%s)\n", xobj_oid.getString());
+    ObjectHeader hdr;
+    RPCStatus rpc_status = IDB_objectHeaderRead(dbh, obj_oid, &hdr);
+    if (rpc_status)
+      return rpc_status;
+    *prot_oid = hdr.oid_prot;
+    return RPCSuccess;
+    //  return rpcStatusMake_se(eyedbsm::objectProtectionGet(dbh->sedbh, obj_oid, prot_oid));
+  }
+
+  static void
+  get_dbm_passwd(const char *passwdfile)
+  {
+    int fd = open(passwdfile, O_RDONLY);
+
+    if (fd < 0)
+      {
+	fprintf(stderr, "eyedbd: cannot open passwd file '%s' for reading\n",
+		passwdfile);
+	exit(1);
+      }
+
+    if (read(fd, dbm_passwd, sizeof(dbm_passwd)) != sizeof(dbm_passwd))
+      {
+	fprintf(stderr, "eyedbd: error while reading passwd file '%s'\n",
+		passwdfile);
+	exit(1);
+      }
+
+    close(fd);
+  }
+
+  //extern void idbInit_();
+
+  void new_handler()
+  {
+    static Bool _new = False;
+    if (!_new)
+      {
+	char tok[128];
+	sprintf(tok, "PID %d: Ran out of memory\n", getpid());
+	write(2, tok, strlen(tok));
+
+	_new = True;
+	quit_handler(db_list, 0);
+      }
+
+    exit(1);
+  }
+
+  static int timeout = -1;
+
+  void
+  config_init()
+  {
+    Config::init();
+
+    const char *passwdfile;
+    const char *s;
+
+    if (edb_passwdfile)
+      passwdfile = strdup(edb_passwdfile);
+    else if (s = eyedb::getConfigValue("sv_passwd_file"))
+      passwdfile = strdup(s);
+    else
+      {
+	fprintf(stderr, "eyedbd: EyeDB passwd file is not set, check your 'sv_passwd_file' configuration variable or the '-passwdfile' command line option\n");
+	exit(1);
+      }
+
+    if (settimeout)
+      {
+	if (timeout >= 0)
+	  settimeout(timeout);
+	else
+	  {
+	    const char *x = eyedb::getConfigValue("sv_timeout");
+	    if (x)
+	      settimeout(atoi(x));
+	  }
+      }
+
+    get_dbm_passwd(passwdfile);
+
+    // kludge
+    s = eyedb::getConfigValue("coll_hidx_oid");
+    if (s) {
+      if (!strcasecmp(s, "no")) {
+	coll_hidx_oid = False;
+      }
+      else if (!strcasecmp(s, "yes")) {
+	coll_hidx_oid = True;
+      }
+      else {
+	printf("invalid value for coll_hidx_oid %s\n", s);
+	exit(1);
+      }
+    }
+  }
+
+  void
+  IDB_init(const char *voldir, const char *_passwdfile,
+	   void *xsesslog, int _timeout)
+  {
+    sesslog = (SessionLog *)xsesslog;
+    set_new_handler(new_handler);
+
+    edb_passwdfile = _passwdfile;
+    timeout = _timeout;
+
+    Database::setDefaultVolumeDirectory(voldir);
+
+    eyedb::init();
+    config_init();
+  }
+
+  RPCStatus
+  IDB_setLogMask(eyedblib::int64)
+  {
+    return RPCSuccess;
+  }
+
+  RPCStatus
+  IDB_getDefaultDataspace(DbHandle * dbh, int *_dspid)
+  {
+    short dspid;
+    eyedbsm::Status s = eyedbsm::dspGetDefault(dbh->sedbh, &dspid);
+    if (s)
+      return rpcStatusMake_se(s);
+
+    *_dspid = dspid;
+    return RPCSuccess;
+  }
+
+  RPCStatus
+  IDB_setDefaultDataspace(DbHandle * dbh, int dspid)
+  {
+    std::string dataspace = str_convert((long)dspid);
+    eyedbsm::Status s = eyedbsm::dspSetDefault(dbh->sedbh, dataspace.c_str());
+
+    if (!s) return RPCSuccess;
+    return rpcStatusMake_se(s);
+  }
+
+  RPCStatus
+  IDB_dataspaceSetCurrentDatafile(DbHandle * dbh, int dspid, int datid)
+  {
+    std::string dataspace = str_convert((long)dspid);
+    std::string datafile = str_convert((long)datid);
+    eyedbsm::Status s = eyedbsm::dspSetCurDat(dbh->sedbh, dataspace.c_str(),
+					      datafile.c_str());
+    if (!s) return RPCSuccess;
+    return rpcStatusMake_se(s);
+  }
+
+  RPCStatus
+  IDB_dataspaceGetCurrentDatafile(DbHandle * dbh, int dspid, int * datid)
+  {
+    std::string dataspace = str_convert((long)dspid);
+    short datid_s;
+    eyedbsm::Status s = eyedbsm::dspGetCurDat(dbh->sedbh, dataspace.c_str(), &datid_s);
+
+    if (!s) {
+      *datid = datid_s;
+      return RPCSuccess;
+    }
+
+    return rpcStatusMake_se(s);
+  }
+
+  RPCStatus
+  IDB_realizeDefaultIndexDataspace(DbHandle * dbh, const eyedbsm::Oid * idxoid,
+				   int * dspid, int type, Bool get)
+  {
+    eyedbsm::Idx *idx;
+
+    if (type)
+      idx = new eyedbsm::HIdx(dbh->sedbh, idxoid);
+    else
+      idx = new eyedbsm::BIdx(dbh->sedbh, *idxoid);
+
+    eyedbsm::Status s = idx->status();
+    if (s) {
+      delete idx;
+      return rpcStatusMake_se(s);
+    }
+
+    if (get)
+      *dspid = idx->getDefaultDspid();
+    else
+      idx->setDefaultDspid(*dspid);
+
+    delete idx;
+    return RPCSuccess;
+  }
+
+  RPCStatus
+  IDB_getDefaultIndexDataspace(DbHandle * dbh, const eyedbsm::Oid * oid, int type, int * dspid)
+  {
+    return IDB_realizeDefaultIndexDataspace(dbh, oid, dspid, type, True);
+  }
+
+  RPCStatus
+  IDB_setDefaultIndexDataspace(DbHandle * dbh, const eyedbsm::Oid * oid, int type, int dspid)
+  {
+    return IDB_realizeDefaultIndexDataspace(dbh, oid, &dspid, type, False);
+  }
+
+  static RPCStatus
+  IDB_getIndexObjects(DbHandle * dbh, const eyedbsm::Oid * idxoid, int type,
+		      eyedbsm::Oid *&oids, unsigned int &cnt)
+  {
+    cnt = 0;
+    eyedbsm::Idx *idx;
+
+    if (type) 
+      idx = new eyedbsm::HIdx(dbh->sedbh, idxoid);
+    else
+      idx = new eyedbsm::BIdx(dbh->sedbh, *idxoid);
+
+    eyedbsm::Status s = idx->status();
+    if (s) {
+      delete idx;
+      return rpcStatusMake_se(s);
+    }
+
+    time_t t0, t1;
+    time(&t0);
+    //printf("getIndexObjects start\n");
+    s = idx->getObjects(oids, cnt);
+    time(&t1);
+    //printf("getIndexObjects end count=%d [elapsed %d]\n", t1-t0);
+
+    delete idx;
+    return rpcStatusMake_se(s);
+  }
+
+  RPCStatus
+  IDB_getIndexLocations(DbHandle * dbh, const eyedbsm::Oid * oid, int type,
+			Data * locarr, void *xlocarr)
+  {
+    eyedbsm::Oid *oids;
+    unsigned int cnt;
+    RPCStatus rpc_status = IDB_getIndexObjects(dbh, oid, type, oids, cnt);
+    if (rpc_status) return rpc_status;
+    rpc_status = IDB_getObjectsLocations(dbh, oids, cnt, 0, locarr, xlocarr);
+    free(oids);
+    return rpc_status;
+  }
+
+  RPCStatus
+  IDB_moveIndex(DbHandle * dbh, const eyedbsm::Oid * oid, int type, int dspid)
+  {
+    eyedbsm::Oid *oids;
+    unsigned int cnt;
+    RPCStatus rpc_status = IDB_getIndexObjects(dbh, oid, type, oids, cnt);
+    if (rpc_status) return rpc_status;
+
+    rpc_status = IDB_moveObjects(dbh, oids, cnt, dspid, 0);
+    free(oids);
+    return rpc_status;
+  }
+
+  extern eyedbsm::Oid *
+  oidArrayToOids(const OidArray &oid_arr, unsigned int &cnt);
+
+  RPCStatus
+  IDB_getInstanceClassLocations(DbHandle * dbh, const eyedbsm::Oid * oid,
+				int subclasses, Data * locarr, void *xlocarr)
+  {
+    Database *db = (Database *)dbh->db;
+    const Class *cls = db->getSchema()->getClass(*oid);
+    if (!cls)
+      return rpcStatusMake(IDB_ERROR, "class %s not found",
+			   Oid(*oid).toString());
+    Iterator iter(const_cast<Class *>(cls),	IDBBOOL(subclasses));
+    OidArray oid_arr;
+    Status s = iter.scan(oid_arr);
+    if (s) return rpcStatusMake(s);
+
+    unsigned int cnt;
+    eyedbsm::Oid *oids = oidArrayToOids(oid_arr, cnt);
+    RPCStatus rpc_status = IDB_getObjectsLocations(dbh, oids, cnt, 0, locarr,
+						   xlocarr);
+    delete [] oids;
+    return rpc_status;
+  }
+
+  RPCStatus
+  IDB_moveInstanceClass(DbHandle * dbh, const eyedbsm::Oid * oid, int subclasses,
+			int dspid)
+  {
+    Database *db = (Database *)dbh->db;
+    const Class *cls = db->getSchema()->getClass(*oid);
+    if (!cls)
+      return rpcStatusMake(IDB_ERROR, "class %s not found",
+			   Oid(*oid).toString());
+    Iterator iter(const_cast<Class *>(cls), IDBBOOL(subclasses));
+    OidArray oid_arr;
+    Status s = iter.scan(oid_arr);
+    if (s) return rpcStatusMake(s);
+
+    unsigned int cnt;
+    eyedbsm::Oid *oids = oidArrayToOids(oid_arr, cnt);
+    if (!cnt) return RPCSuccess;
+    RPCStatus rpc_status = IDB_moveObjects(dbh, oids, cnt, dspid, 0);
+    delete [] oids;
+    return rpc_status;
+  }
+
+  RPCStatus
+  IDB_getObjectsLocations(DbHandle * dbh, const eyedbsm::Oid * yoids, unsigned int oid_cnt, void *xoids, Data * locarr, void *xlocarr)
+  {
+    lock_data((Data *)&yoids, xoids);
+
+    const eyedbsm::Oid * oids;
+    if (xoids)
+      oids = decode_oids((Data)yoids, &oid_cnt);
+    else
+      oids = yoids;
+
+    eyedbsm::ObjectLocation *se_locarr = new eyedbsm::ObjectLocation[oid_cnt];
+    eyedbsm::Status s = eyedbsm::objectsLocationGet(dbh->sedbh, oids, se_locarr, oid_cnt);
+
+    if (xlocarr) {
+      rpc_ServerData *data = (rpc_ServerData *)xlocarr;
+      data->status = rpc_TempDataUsed;
+      data->data = code_locarr(se_locarr, oids, oid_cnt, &data->size);
+    }
+    else
+      make_locarr(se_locarr, oids, oid_cnt, locarr);
+
+    if (xoids)
+      delete [] oids;
+
+    delete [] se_locarr;
+
+    unlock_data((Data)yoids, xoids);
+    return rpcStatusMake_se(s);
+  }
+
+  RPCStatus
+  IDB_moveObjects(DbHandle * dbh, const eyedbsm::Oid *yoids, unsigned oid_cnt,
+		  int dspid, void *xoids)
+  {
+    CHECK_WRITE((Database *)dbh->db);
+    lock_data((Data *)&yoids, xoids);
+
+    const eyedbsm::Oid * oids;
+    if (xoids)
+      oids = decode_oids((Data)yoids, &oid_cnt);
+    else
+      oids = yoids;
+
+    eyedbsm::Status s = eyedbsm::objectsMoveDsp(dbh->sedbh, oids, oid_cnt, dspid);
+
+    if (xoids)
+      delete [] oids;
+
+    unlock_data((Data)yoids, xoids);
+    return rpcStatusMake_se(s);
+  }
+
+  RPCStatus
+  IDB_getAttributeLocations(DbHandle * dbh, const eyedbsm::Oid * clsoid, int attrnum, Data * locarr, void *xlocarr)
+  {
+    return RPCSuccess;
+  }
+
+  RPCStatus
+  IDB_moveAttribute(DbHandle * dbh, const eyedbsm::Oid * clsoid, int attrnum, int dspid)
+  {
+    return RPCSuccess;
+  }
+
+  RPCStatus
+  IDB_createDatafile(DbHandle * dbh, const char * datfile, const char * name, int maxsize, int slotsize, int dtype)
+  {
+    eyedbsm::Status s = eyedbsm::datCreate(dbh->sedbh, datfile, name, maxsize,
+					   eyedbsm::BitmapType, slotsize, (eyedbsm::DatType)dtype);
+
+    return rpcStatusMake_se(s);
+  }
+
+  RPCStatus
+  IDB_deleteDatafile(DbHandle * dbh, int datid)
+  {
+    eyedbsm::Status s = eyedbsm::datDelete(dbh->sedbh,
+					   str_convert((long)datid).c_str());
+    return rpcStatusMake_se(s);
+  }
+
+  RPCStatus
+  IDB_moveDatafile(DbHandle * dbh, int datid, const char * newdatafile)
+  {
+    eyedbsm::Status s = eyedbsm::datMove(dbh->sedbh,
+					 str_convert((long)datid).c_str(),
+					 newdatafile);
+    return rpcStatusMake_se(s);
+  }
+
+  RPCStatus
+  IDB_defragmentDatafile(DbHandle * dbh, int datid)
+  {
+    eyedbsm::Status s = eyedbsm::datDefragment(dbh->sedbh,
+					       str_convert((long)datid).c_str());
+    return rpcStatusMake_se(s);
+  }
+
+  RPCStatus
+  IDB_resizeDatafile(DbHandle * dbh, int datid, unsigned int size)
+  {
+    eyedbsm::Status s = eyedbsm::datResize(dbh->sedbh,
+					   str_convert((long)datid).c_str(),
+					   size);
+    return rpcStatusMake_se(s);
+  }
+
+  RPCStatus
+  IDB_getDatafileInfo(DbHandle * dbh, int datid, Data * info,
+		      void *xinfo)
+  {
+    eyedbsm::DatafileInfo datinfo;
+    eyedbsm::Status s = eyedbsm::datGetInfo(dbh->sedbh,
+					    str_convert((long)datid).c_str(),
+					    &datinfo);
+    if (xinfo) {
+      rpc_ServerData *data = (rpc_ServerData *)xinfo;
+      data->status = rpc_TempDataUsed;
+      data->data = code_datinfo(&datinfo, &data->size);
+    }
+    else
+      make_datinfo(&datinfo, info);
+
+    return rpcStatusMake_se(s);
+  }
+
+  RPCStatus
+  IDB_renameDatafile(DbHandle * dbh, int datid, const char * name)
+  {
+    eyedbsm::Status s = eyedbsm::datRename(dbh->sedbh,
+					   str_convert((long)datid).c_str(),
+					   name);
+    return rpcStatusMake_se(s);
+  }
+
+  RPCStatus
+  IDB_createDataspace(DbHandle * dbh, const char * dspname, void *ydatids,
+		      unsigned int datafile_cnt, void *xdatids)
+  {
+    CHECK_WRITE((Database *)dbh->db);
+    lock_data((Data *)&ydatids, xdatids);
+
+    const char **datids;
+    if (xdatids)
+      datids = decode_datids((Data)ydatids, &datafile_cnt);
+    else
+      datids = (const char **)ydatids;
+
+    eyedbsm::Status s = eyedbsm::dspCreate(dbh->sedbh, dspname, datids, datafile_cnt);
+    if (xdatids)
+      free(datids);
+
+    unlock_data((Data)ydatids, xdatids);
+    return rpcStatusMake_se(s);
+  }
+
+  RPCStatus
+  IDB_updateDataspace(DbHandle * dbh, int dspid,  void *ydatids,
+		      unsigned int datafile_cnt, void *xdatids)
+  {
+    CHECK_WRITE((Database *)dbh->db);
+    lock_data((Data *)&ydatids, xdatids);
+
+    const char **datids;
+    if (xdatids)
+      datids = decode_datids((Data)ydatids, &datafile_cnt);
+    else
+      datids = (const char **)ydatids;
+
+    eyedbsm::Status s = eyedbsm::dspUpdate(dbh->sedbh,
+					   str_convert((long)dspid).c_str(),
+					   datids, datafile_cnt);
+    if (xdatids)
+      free(datids);
+
+    unlock_data((Data)ydatids, xdatids);
+    return rpcStatusMake_se(s);
+  }
+
+  RPCStatus
+  IDB_deleteDataspace(DbHandle * dbh, int dspid)
+  {
+    eyedbsm::Status s = eyedbsm::dspDelete(dbh->sedbh,
+					   str_convert((long)dspid).c_str());
+    return rpcStatusMake_se(s);
+  }
+
+  RPCStatus
+  IDB_renameDataspace(DbHandle * dbh, int dspid, const char * name)
+  {
+    eyedbsm::Status s = eyedbsm::dspRename(dbh->sedbh,
+					   str_convert((long)dspid).c_str(),
+					   name);
+    return rpcStatusMake_se(s);
+  }
+
+  static Status
+  IDB_makeDatabase(ConnHandle *ch, const char *dbmdb, const char *dbname,
+		   int dbid, int flags, DbHandle *ldbh,
+		   rpcDB_LocalDBContext *ldbctx,
+		   const eyedbsm::Oid *sch_oid, unsigned int version, Database *&db)
+  {
+    Status status;
+    db = new Database(dbname, dbmdb);
+
+    Oid _oid(sch_oid);
+
+    if ((status = db->set(ch, dbid, flags, ldbh, ldbctx, &_oid, version)) == Success)
+      return status;
+    else
+      {
+	db->release();
+	return status;
+      }
+  }
+
+  /*
+    const char *
+    time()
+    {
+    time_t t;
+    time(&t);
+    char *s = ctime(&t);
+    s[strlen(s)-1] = 0;
+    return s;
+    }
+  */
+
+  //#define EPITRACE
+
+  void object_epilogue(void *xdb, const eyedbsm::Oid *oid,
+		       Data inv_data, Bool creating)
+  {
+    // should cache Object.here
+    /*
+      if (creating)
+      db->cacheObject(oid);
+    */
+
+    if (!inv_data)
+      return;
+
+    Database *db = (Database *)xdb;
+
+    LinkedList inv_list;
+
+    InvOidContext::decode(inv_data, inv_list);
+
+    free(inv_data);
+
+    LinkedListCursor c(inv_list);
+    InvOidContext *ctx;
+
+#ifdef EPITRACE
+    if (inv_list.getCount())
+      printf("object_epilogue -> %d\n", inv_list.getCount());
+#endif
+
+    for (int i = 0; c.getNext((void *&)ctx); i++)
+      {
+#ifdef EPITRACE
+	printf("object_epilogue[%d] -> %s %d %d %s\n",
+	       i, ctx->objoid.toString(), ctx->attr_num, ctx->attr_offset,
+	       ctx->valoid.toString());
+#endif
+	Object *o = db->getCacheObject(ctx->objoid);
+	if (o)
+	  {
+#ifdef EPITRACE
+	    printf("object_epilogue: updating object %s\n",
+		   ctx->objoid.toString());
+#endif
+	    mcp(o->getIDR()+ctx->attr_offset, &ctx->valoid, sizeof(Oid));
+	  }
+
+	delete ctx;
+      }
+  }
+
+  eyedbsm::DbHandle *
+  IDB_get_se_DbHandle(Database *db)
+  {
+    return database_getDbHandle(db)->sedbh;
+  }
+
+  //
+  // coding and decoding functions
+  //
+
+  Data code_oids(const eyedbsm::Oid *oids, unsigned int oid_cnt, int *size)
+  {
+    Data idr = 0;
+    Size alloc_size = 0;
+    Offset offset = 0;
+    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&oid_cnt);
+
+    for (int i = 0; i < oid_cnt; i++)
+      oid_code(&idr, &offset, &alloc_size, &oids[i]);
+
+    *size = offset;
+    return idr;
+  }
+
+  static eyedbsm::Oid *
+  decode_oids(Data idr, unsigned int *poid_cnt)
+  {
+    *poid_cnt = 0;
+    Offset offset = 0;
+    int32_decode(idr, &offset, (eyedblib::int32 *)poid_cnt);
+    eyedbsm::Oid *oids = new eyedbsm::Oid[*poid_cnt];
+    for (int i = 0; i < *poid_cnt; i++) 
+      oid_decode(idr, &offset, &oids[i]);
+    return oids;
+  }
+
+  void
+  decode_locarr(Data idr, void *xlocarr)
+  {
+    Offset offset = 0;
+    eyedblib::int32 cnt;
+    int32_decode(idr, &offset, &cnt);
+
+    ObjectLocation *locs = new ObjectLocation[cnt];
+    for (int i = 0; i < cnt; i++) {
+      eyedbsm::Oid oid;
+      eyedblib::int16 dspid;
+      eyedblib::int16 datid;
+      ObjectLocation::Info info;
+
+      oid_decode(idr, &offset, &oid);
+      int16_decode(idr, &offset, &dspid);
+      int16_decode(idr, &offset, &datid);
+      int32_decode(idr, &offset, (eyedblib::int32 *)&info.size);
+      int32_decode(idr, &offset, (eyedblib::int32 *)&info.slot_start_num);
+      int32_decode(idr, &offset, (eyedblib::int32 *)&info.slot_end_num);
+      int32_decode(idr, &offset, (eyedblib::int32 *)&info.dat_start_pagenum);
+      int32_decode(idr, &offset, (eyedblib::int32 *)&info.dat_end_pagenum);
+      int32_decode(idr, &offset, (eyedblib::int32 *)&info.omp_start_pagenum);
+      int32_decode(idr, &offset, (eyedblib::int32 *)&info.omp_end_pagenum);
+      int32_decode(idr, &offset, (eyedblib::int32 *)&info.dmp_start_pagenum);
+      int32_decode(idr, &offset, (eyedblib::int32 *)&info.dmp_end_pagenum);
+
+      locs[i].set(oid, dspid, datid, info);
+    }
+
+    ((ObjectLocationArray *)xlocarr)->set(locs, cnt);
+  }
+
+  static Data
+  code_locarr(const eyedbsm::ObjectLocation *se_locarr, const eyedbsm::Oid *oids,
+	      unsigned int cnt, int *size)
+  {
+    Data idr = 0;
+    Size alloc_size = 0;
+    Offset offset = 0;
+
+    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&cnt);
+    for (int i = 0; i < cnt; i++) {
+      const eyedbsm::ObjectLocation *loc = &se_locarr[i];
+
+      oid_code(&idr, &offset, &alloc_size, &oids[i]);
+      int16_code(&idr, &offset, &alloc_size, &loc->dspid);
+      int16_code(&idr, &offset, &alloc_size, &loc->datid);
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&loc->size);
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&loc->slot_start_num);
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&loc->slot_end_num);
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&loc->dat_start_pagenum);
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&loc->dat_end_pagenum);
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&loc->omp_start_pagenum);
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&loc->omp_end_pagenum);
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&loc->dmp_start_pagenum);
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&loc->dmp_end_pagenum);
+    }
+
+    *size = offset;
+    return idr;
+  }
+
+  static void
+  make_locarr(const eyedbsm::ObjectLocation *se_locarr, const eyedbsm::Oid *oids,
+	      unsigned int cnt, void *xlocarr)
+  {
+    ObjectLocationArray *locarr = (ObjectLocationArray *)xlocarr;
+    ObjectLocation *locs = new ObjectLocation[cnt];
+    for (int i = 0; i < cnt; i++) {
+      const eyedbsm::ObjectLocation *loc = &se_locarr[i];
+
+      ObjectLocation::Info info;
+      info.size = loc->size;
+      info.slot_start_num = loc->slot_start_num;
+      info.slot_end_num = loc->slot_end_num;
+      info.dat_start_pagenum = loc->dat_start_pagenum;
+      info.dat_end_pagenum = loc->dat_end_pagenum;
+      info.omp_start_pagenum = loc->omp_start_pagenum;
+      info.omp_end_pagenum = loc->omp_end_pagenum;
+      info.dmp_start_pagenum = loc->dmp_start_pagenum;
+      info.dmp_end_pagenum = loc->dmp_end_pagenum;
+
+      locs[i].set(oids[i], loc->dspid, loc->datid, info);
+    }
+
+    locarr->set(locs, cnt);
+  }
+
+  Data
+  code_dbdescription(const DbCreateDescription *dbdesc, int *size)
+  {
+    Data idr = 0;
+    Size alloc_size = 0;
+    Offset offset = 0;
+    const eyedbsm::DbCreateDescription *d = &dbdesc->sedbdesc;
+    int i;
+
+    string_code(&idr, &offset, &alloc_size, dbdesc->dbfile);
+    //int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&d->sizeslot);
+    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&d->dbid);
+    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&d->nbobjs);
+    int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&d->dbsfilesize);
+    int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&d->dbsfileblksize);
+    int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&d->ompfilesize);
+    int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&d->ompfileblksize);
+    int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&d->shmfilesize);
+    int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&d->shmfileblksize);
+    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&d->ndat);
+    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&d->ndsp);
+    //int type = d->mtype;
+    //int32_code(&idr, &offset, &alloc_size, &type);
+
+    for (i = 0; i < d->ndat; i++)
+      {
+	const eyedbsm::Datafile *v = &d->dat[i];
+	string_code(&idr, &offset, &alloc_size, v->file);
+	string_code(&idr, &offset, &alloc_size, v->name);
+	int type = v->mtype;
+	int16_code(&idr, &offset, &alloc_size, &v->dspid);
+	int32_code(&idr, &offset, &alloc_size, &type);
+	int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&v->sizeslot);
+	int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&v->maxsize);
+	eyedblib::int32 dtype = v->dtype;
+	int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&dtype);
+	int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&v->extflags);
+      }
+
+    for (i = 0; i < d->ndsp; i++)
+      {
+	const eyedbsm::Dataspace *v = &d->dsp[i];
+	string_code(&idr, &offset, &alloc_size, v->name);
+	int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&v->ndat);
+	for (int j = 0; j < v->ndat; j++)
+	  int16_code(&idr, &offset, &alloc_size, &v->datid[j]);
+      }
+
+    *size = offset;
+    return idr;
+  }
+
+  static const char **
+  decode_datids(Data idr, unsigned int *oid_cnt)
+  {
+    Offset offset = 0;
+    eyedblib::int32 cnt;
+    int32_decode(idr, &offset, &cnt);
+    const char **datids = new const char *[cnt];
+
+    for (int i = 0; i < cnt; i++)
+      string_decode(idr, &offset, (char **)&datids[i]);
+
+    *oid_cnt = cnt;
+    return datids;
+  }
+
+  Data
+  code_datafiles(void *datafiles, unsigned int datafile_cnt, int *size)
+  {
+    char **s = (char **)datafiles;
+    Data idr = 0;
+    Size alloc_size = 0;
+    Offset offset = 0;
+    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&datafile_cnt);
+    for (int i = 0; i < datafile_cnt; i++)
+      string_code(&idr, &offset, &alloc_size, s[i]);
+    *size = offset;
+    return idr;
+  }
+
+  static Data
+  code_datinfo(const eyedbsm::DatafileInfo *info, int *size)
+  {
+    Data idr = 0;
+    Size alloc_size = 0;
+    Offset offset = 0;
+
+    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&info->objcnt);
+    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&info->slotcnt);
+    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&info->busyslotcnt);
+    int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&info->totalsize);
+    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&info->avgsize);
+    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&info->lastbusyslot);
+    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&info->lastslot);
+    int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&info->busyslotsize);
+    int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&info->datfilesize);
+    int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&info->datfileblksize);
+    int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&info->dmpfilesize);
+    int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&info->dmpfileblksize);
+    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&info->curslot);
+    int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&info->defragmentablesize);
+    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&info->slotfragcnt);
+    double_code(&idr, &offset, &alloc_size, &info->used);
+
+    *size = offset;
+    return idr;
+  }
+
+  void
+  decode_datinfo(Data idr, void *xinfo)
+  {
+    DatafileInfo::Info *info = (DatafileInfo::Info *)xinfo;
+    Offset offset = 0;
+
+    int32_decode(idr, &offset, (eyedblib::int32 *)&info->objcnt);
+    int32_decode(idr, &offset, (eyedblib::int32 *)&info->slotcnt);
+    int32_decode(idr, &offset, (eyedblib::int32 *)&info->busyslotcnt);
+    int64_decode(idr, &offset, (eyedblib::int64 *)&info->totalsize);
+    int32_decode(idr, &offset, (eyedblib::int32 *)&info->avgsize);
+    int32_decode(idr, &offset, (eyedblib::int32 *)&info->lastbusyslot);
+    int32_decode(idr, &offset, (eyedblib::int32 *)&info->lastslot);
+    int64_decode(idr, &offset, (eyedblib::int64 *)&info->busyslotsize);
+    int64_decode(idr, &offset, (eyedblib::int64 *)&info->datfilesize);
+    int64_decode(idr, &offset, (eyedblib::int64 *)&info->datfileblksize);
+    int64_decode(idr, &offset, (eyedblib::int64 *)&info->dmpfilesize);
+    int64_decode(idr, &offset, (eyedblib::int64 *)&info->dmpfileblksize);
+    int32_decode(idr, &offset, (eyedblib::int32 *)&info->curslot);
+    int64_decode(idr, &offset, (eyedblib::int64 *)&info->defragmentablesize);
+    int32_decode(idr, &offset, (eyedblib::int32 *)&info->slotfragcnt);
+    double_decode(idr, &offset, &info->used);
+  }
+
+  static void
+  make_datinfo(const eyedbsm::DatafileInfo *datinfo, Data *xinfo)
+  {
+    DatafileInfo::Info *info = (DatafileInfo::Info *)xinfo;
+
+    info->objcnt = datinfo->objcnt;
+    info->slotcnt = datinfo->slotcnt;
+    info->busyslotcnt = datinfo->busyslotcnt;
+    info->totalsize = datinfo->totalsize;
+    info->avgsize = datinfo->avgsize;
+    info->lastbusyslot = datinfo->lastbusyslot;
+    info->lastslot = datinfo->lastslot;
+    info->busyslotsize = datinfo->busyslotsize;
+    info->datfilesize = datinfo->datfilesize;
+    info->datfileblksize = datinfo->datfileblksize;
+    info->dmpfilesize = datinfo->dmpfilesize;
+    info->dmpfileblksize = datinfo->dmpfileblksize;
+    info->curslot = datinfo->curslot;
+    info->defragmentablesize = datinfo->defragmentablesize;
+    info->slotfragcnt = datinfo->slotfragcnt;
+    info->used = datinfo->used;
+  }
+
+
+  void
+  decode_dbdescription(Data idr, void *xdata, DbCreateDescription *dbdesc)
+  {
+    Offset offset = 0;
+    eyedbsm::DbCreateDescription *d = &dbdesc->sedbdesc;
+    int i;
+    char *s;
+
+    memset(dbdesc, 0, sizeof(*dbdesc));
+    lock_data(&idr, xdata);
+    string_decode(idr, &offset, &s);
+    strcpy(dbdesc->dbfile, s);
+    //  int32_decode(idr, &offset, (eyedblib::int32 *)&d->sizeslot);
+    int32_decode(idr, &offset, (eyedblib::int32 *)&d->dbid);
+    int32_decode(idr, &offset, (eyedblib::int32 *)&d->nbobjs);
+    int64_decode(idr, &offset, (eyedblib::int64 *)&d->dbsfilesize);
+    int64_decode(idr, &offset, (eyedblib::int64 *)&d->dbsfileblksize);
+    int64_decode(idr, &offset, (eyedblib::int64 *)&d->ompfilesize);
+    int64_decode(idr, &offset, (eyedblib::int64 *)&d->ompfileblksize);
+    int64_decode(idr, &offset, (eyedblib::int64 *)&d->shmfilesize);
+    int64_decode(idr, &offset, (eyedblib::int64 *)&d->shmfileblksize);
+    int32_decode(idr, &offset, (eyedblib::int32 *)&d->ndat);
+    int32_decode(idr, &offset, (eyedblib::int32 *)&d->ndsp);
+    //int mtype;
+    //int32_decode(idr, &offset, &mtype);
+    //d->mtype = (se_MapType)mtype;
+
+    for (i = 0; i < d->ndat; i++)
+      {
+	eyedbsm::Datafile *v = &d->dat[i];
+	string_decode(idr, &offset, &s);
+	strcpy(v->file, s);
+	string_decode(idr, &offset, &s);
+	strcpy(v->name, s);
+	eyedblib::int32 type;
+	int16_decode(idr, &offset, &v->dspid);
+	int32_decode(idr, &offset, &type);
+	v->mtype = (eyedbsm::MapType)type;
+	int32_decode(idr, &offset, (eyedblib::int32 *)&v->sizeslot);
+	int64_decode(idr, &offset, (eyedblib::int64 *)&v->maxsize);
+	eyedblib::int32 dtype;
+	int32_decode(idr, &offset, (eyedblib::int32 *)&dtype);
+	v->dtype = (DatType)dtype;
+	int32_decode(idr, &offset, (eyedblib::int32 *)&v->extflags);
+      }
+
+    for (i = 0; i < d->ndsp; i++)
+      {
+	eyedbsm::Dataspace *v = &d->dsp[i];
+	string_decode(idr, &offset, &s);
+	strcpy(v->name, s);
+	int32_decode(idr, &offset, (eyedblib::int32 *)&v->ndat);
+	for (int j = 0; j < v->ndat; j++)
+	  int16_decode(idr, &offset, &v->datid[j]);
+      }	
+
+    unlock_data(idr, xdata);
+  }
+
+  static void
+  decode_index_impl_r(Data data, void *ximpl, Offset &offset)
+  {
+    short type;
+    int16_decode(data, &offset, &type);
+
+    if (type == IndexImpl::Hash) {
+      int key_count;
+      /*
+	short dspid;
+	int16_decode(data, &offset, &dspid);
+      */
+      int32_decode(data, &offset, &key_count);
+      int impl_hints[eyedbsm::HIdxImplHintsCount];
+      for (int i = 0; i < eyedbsm::HIdxImplHintsCount; i++)
+	int32_decode(data, &offset, &impl_hints[i]);
+
+      *(IndexImpl **)ximpl = new IndexImpl(IndexImpl::Hash,
+					   0, // dspid ???
+					   key_count,
+					   0, // mth ???
+					   impl_hints,
+					   eyedbsm::HIdxImplHintsCount);
+    }
+    else {
+      int degree;
+      int32_decode(data, &offset, &degree);
+      int impl_hints[eyedbsm::HIdxImplHintsCount];
+      for (int i = 0; i < eyedbsm::HIdxImplHintsCount; i++)
+	int32_decode(data, &offset, &impl_hints[i]);
+
+      *(IndexImpl **)ximpl = new IndexImpl(IndexImpl::BTree,
+					   0,
+					   degree,
+					   0,
+					   impl_hints,
+					   eyedbsm::HIdxImplHintsCount);
+    }
+  }
+
+  void decode_index_impl(Data data, void *ximpl)
+  {
+    Offset offset = 0;
+    decode_index_impl_r(data, ximpl, offset);
+  }
+
+  void decode_index_stats(Data data, void *xstats)
+  {
+    Offset offset = 0;
+
+    short type;
+    int16_decode(data, &offset, &type);
+
+    if (type == IndexImpl::Hash) {
+      HashIndexStats *stats = new HashIndexStats();
+      decode_index_impl_r(data, &stats->idximpl, offset);
+
+      int32_decode(data, &offset, (eyedblib::int32 *)&stats->min_objects_per_entry);
+      int32_decode(data, &offset, (eyedblib::int32 *)&stats->max_objects_per_entry);
+      int32_decode(data, &offset, (eyedblib::int32 *)&stats->total_object_count);
+      int32_decode(data, &offset, (eyedblib::int32 *)&stats->total_hash_object_count);
+      int32_decode(data, &offset, (eyedblib::int32 *)&stats->total_hash_object_size);
+      int32_decode(data, &offset, (eyedblib::int32 *)&stats->total_hash_object_busy_size);
+      int32_decode(data, &offset, (eyedblib::int32 *)&stats->busy_key_count);
+      int32_decode(data, &offset, (eyedblib::int32 *)&stats->free_key_count);
+
+      int32_decode(data, &offset, (eyedblib::int32 *)&stats->key_count);
+      HashIndexStats::Entry *entry = stats->entries =
+	new HashIndexStats::Entry[stats->key_count];
+      for (int i = 0; i < stats->key_count; i++, entry++) {
+	int32_decode(data, &offset, (eyedblib::int32 *)&entry->object_count);
+	int32_decode(data, &offset, (eyedblib::int32 *)&entry->hash_object_count);
+	int32_decode(data, &offset, (eyedblib::int32 *)&entry->hash_object_size);
+	int32_decode(data, &offset, (eyedblib::int32 *)&entry->hash_object_busy_size);
+      }
+      *(HashIndexStats **)xstats = stats;
+    }
+    else {
+      BTreeIndexStats *stats = new BTreeIndexStats();
+      decode_index_impl_r(data, &stats->idximpl, offset);
+
+      int32_decode(data, &offset, (eyedblib::int32 *)&stats->degree);
+      int32_decode(data, &offset, (eyedblib::int32 *)&stats->dataSize);
+      int32_decode(data, &offset, (eyedblib::int32 *)&stats->keySize);
+      int32_decode(data, &offset, (eyedblib::int32 *)&stats->keyOffset);
+      int32_decode(data, &offset, (eyedblib::int32 *)&stats->keyType);
+
+      int32_decode(data, &offset, (eyedblib::int32 *)&stats->total_object_count);
+      int32_decode(data, &offset, (eyedblib::int32 *)&stats->total_btree_object_count);
+      int32_decode(data, &offset, (eyedblib::int32 *)&stats->btree_node_size);
+      int32_decode(data, &offset, (eyedblib::int32 *)&stats->total_btree_node_count);
+      int32_decode(data, &offset, (eyedblib::int32 *)&stats->btree_key_object_size);
+      int32_decode(data, &offset, (eyedblib::int32 *)&stats->btree_data_object_size);
+      int32_decode(data, &offset, (eyedblib::int32 *)&stats->total_btree_object_size);
+
+      *(BTreeIndexStats **)xstats = stats;
+    }
+  }
+
+  static void
+  make_index_stats(const eyedbsm::BIdx::Stats &stats, Data *xrstats)
+  {
+    BTreeIndexStats *rstats = new BTreeIndexStats();
+    rstats->degree = stats.idx->getDegree();
+    rstats->dataSize = stats.idx->getDataSize();
+    rstats->keySize = stats.idx->getKeySize();
+    rstats->keyOffset = stats.keyOffset;
+    rstats->keyType = stats.keyType;
+
+    rstats->total_object_count = stats.total_object_count;
+    rstats->total_btree_object_count = stats.total_btree_object_count;
+    rstats->btree_node_size = stats.btree_node_size;
+    rstats->total_btree_node_count = stats.total_btree_node_count;
+    rstats->btree_key_object_size = stats.btree_key_object_size;
+    rstats->btree_data_object_size = stats.btree_data_object_size;
+    rstats->total_btree_object_size = stats.total_btree_object_size;
+
+    rstats->idximpl = new IndexImpl(IndexImpl::BTree, 0,
+				    stats.idx->getDegree(),
+				    0, 0, 0);
+    *(BTreeIndexStats **)xrstats = rstats;
+  }
+
+  static void
+  make_index_stats(const eyedbsm::HIdx::Stats &stats, Data *xrstats)
+  {
+    HashIndexStats *rstats = new HashIndexStats();
+    rstats->min_objects_per_entry = stats.min_objects_per_entry;
+    rstats->max_objects_per_entry = stats.max_objects_per_entry;
+    rstats->total_object_count = stats.total_object_count;
+    rstats->total_hash_object_count = stats.total_hash_object_count;
+    rstats->total_hash_object_size = stats.total_hash_object_size;
+    rstats->total_hash_object_busy_size = stats.total_hash_object_busy_size;
+    rstats->busy_key_count = stats.busy_key_count;
+    rstats->free_key_count = stats.free_key_count;
+
+    rstats->key_count = stats.idx.key_count;
+    rstats->entries = new HashIndexStats::Entry[rstats->key_count];
+    for (int i = 0; i < rstats->key_count; i++) {
+      rstats->entries[i].object_count = stats.entries[i].object_count;
+      rstats->entries[i].hash_object_count = stats.entries[i].hash_object_count;
+      rstats->entries[i].hash_object_size = stats.entries[i].hash_object_size;
+      rstats->entries[i].hash_object_busy_size = stats.entries[i].hash_object_busy_size;
+    }
+
+    rstats->idximpl = new IndexImpl(IndexImpl::Hash, 0,
+				    stats.idx.key_count,
+				    0, stats.idx.impl_hints,
+				    eyedbsm::HIdxImplHintsCount);
+    *(HashIndexStats **)xrstats = rstats;
+  }
+
+
+  static Data
+  code_index_impl(const eyedbsm::BIdx &idx, int *size,
+		  Data &idr, Offset &offset, Size &alloc_size)
+  {
+
+    short xtype = IndexImpl::BTree;
+    int16_code(&idr, &offset, &alloc_size, &xtype);
+
+    //int16_code(&idr, &offset, &alloc_size, &idx.dspid);
+    unsigned int degree = idx.getDegree();
+    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&degree);
+    for (int i = 0; i < eyedbsm::HIdxImplHintsCount; i++) {
+      int zero = 0;
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&zero);
+    }
+    *size = offset;
+    return idr;
+  }
+
+  static Data
+  code_index_impl(const eyedbsm::BIdx &idx, int *size)
+  {
+    Data idr = 0;
+    Offset offset = 0;
+    Size alloc_size = 0;
+    return code_index_impl(idx, size, idr, offset, alloc_size);
+  }
+
+  static Data
+  code_index_impl(const eyedbsm::HIdx::_Idx &idx, int *size,
+		  Data &idr, Offset &offset, Size &alloc_size)
+  {
+
+    short xtype = IndexImpl::Hash;
+    int16_code(&idr, &offset, &alloc_size, &xtype);
+
+    //int16_code(&idr, &offset, &alloc_size, &idx.dspid);
+    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&idx.key_count);
+    for (int i = 0; i < eyedbsm::HIdxImplHintsCount; i++)
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&idx.impl_hints[i]);
+
+    *size = offset;
+    return idr;
+  }
+
+  static Data
+  code_index_impl(const eyedbsm::HIdx::_Idx &idx, int *size)
+  {
+    Data idr = 0;
+    Offset offset = 0;
+    Size alloc_size = 0;
+    return code_index_impl(idx, size, idr, offset, alloc_size);
+  }
+
+  static void
+  make_index_impl(const eyedbsm::BIdx &idx, Data *data)
+  {
+    *(IndexImpl **)data = new IndexImpl(IndexImpl::BTree,
+					0, idx.getDegree(), 0,
+					0, 0);
+  }
+
+  static void
+  make_index_impl(const eyedbsm::HIdx::_Idx &idx, Data *data)
+  {
+    *(IndexImpl **)data = new IndexImpl(IndexImpl::Hash,
+					0,
+					idx.key_count, 0,
+					idx.impl_hints,
+					eyedbsm::HIdxImplHintsCount);
+  }
+
+  static Data
+  code_index_stats(IndexImpl::Type type, const void *xstats,
+		   int *size)
+  {
+    Data idr = 0;
+    Offset offset = 0;
+    Size alloc_size = 0;
+    short xtype = type;
+    int16_code(&idr, &offset, &alloc_size, &xtype);
+
+    if (type == IndexImpl::Hash) {
+      const eyedbsm::HIdx::Stats *stats = (const eyedbsm::HIdx::Stats *)xstats;
+      int dummy;
+      code_index_impl(stats->idx, &dummy, idr, offset, alloc_size);
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->min_objects_per_entry);
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->max_objects_per_entry);
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->total_object_count);
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->total_hash_object_count);
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->total_hash_object_size);
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->total_hash_object_busy_size);
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->busy_key_count);
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->free_key_count);
+      const eyedbsm::HIdx::Stats::Entry *entry = stats->entries;
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->idx.key_count);
+      for (int i = 0; i < stats->idx.key_count; i++, entry++) {
+	int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&entry->object_count);
+	int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&entry->hash_object_count);
+	int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&entry->hash_object_size);
+	int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&entry->hash_object_busy_size);
+      }
+    }
+    else {
+      const eyedbsm::BIdx::Stats *stats = (const eyedbsm::BIdx::Stats *)xstats;
+      int dummy;
+      code_index_impl(*stats->idx, &dummy, idr, offset, alloc_size);
+
+      unsigned int x = stats->idx->getDegree();
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&x);
+      x = stats->idx->getDataSize();
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&x);
+      x = stats->idx->getKeySize();
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&x);
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->keyOffset);
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->keyType);
+
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->total_object_count);
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->total_btree_object_count);
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->btree_node_size);
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->total_btree_node_count);
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->btree_key_object_size);
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->btree_data_object_size);
+      int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&stats->total_btree_object_size);
+    }
+
+    *size = offset;
+    return idr;
+  }
+
+
+
+  static void
+  code_atom_array(rpc_ServerData *data, void *atom_array, int count,
+		  int nalloc)
+  {
+    Offset offset = 0;
+    Data idr;
+    Size alloc_size;
+    int c, size = sizeof(eyedblib::int32);
+    IteratorAtom *p = (IteratorAtom *)atom_array;
+
+    for (c = 0; c < count; c++, p++)
+      size += sizeof(eyedblib::int16) + p->getSize();
+
+    if (size <= data->buff_size)
+      data->status = rpc_BuffUsed;
+    else
+      {
+	data->status = rpc_TempDataUsed;
+	data->data = (unsigned char *)malloc(size);
+      }
+
+    alloc_size = size;
+    data->size = size;
+    idr = (Data)data->data;
+
+    p = (IteratorAtom *)atom_array;
+  
+    for (c = 0; c < count; c++, p++)
+      p->code(&idr, &offset, &alloc_size);
+
+    idbFreeVect((IteratorAtom *)atom_array, IteratorAtom, nalloc);
+  }
+
+  static void
+  code_value(rpc_ServerData *data, Value *value)
+  {
+    Offset offset = 0;
+    Size alloc_size = 0;
+    Data idr = 0;
+
+    value->code(idr, offset, alloc_size);
+
+    if (alloc_size <= data->buff_size)
+      {
+	data->status = rpc_BuffUsed;
+	memcpy(data->data, idr, alloc_size);
+	// MIND! ne faut-il pas détruire idr !?
+      }
+    else
+      {
+	data->status = rpc_TempDataUsed;
+	data->data = idr;
+      }
+
+    data->size = offset;
+    delete value;
+  }
+
+  //
+  // Server message management
+  //
+
+  struct ServerOutOfBandData {
+    ServerOutOfBandData(unsigned int _type, unsigned char *_data,
+			unsigned int _size) {
+      type = _type;
+      size = _size;
+      data = new unsigned char[size];
+      memcpy(data, _data, size);
+    }
+
+    ~ServerOutOfBandData() {delete [] data;}
+
+    unsigned int type;
+    unsigned char *data;
+    unsigned int size;
+  };
+
+  LinkedList server_data_list;
+  static unsigned max_server_data = 1024;
+  static eyedblib::Mutex server_data_mt;
+  static eyedblib::Condition server_data_cnd;
+
+  void
+  setServerOutOfBandData(unsigned int type, unsigned char *data,
+			 unsigned int len)
+  {
+    server_data_mt.lock();
+
+    while (server_data_list.getCount() >= max_server_data)
+      server_data_list.deleteObject(server_data_list.getFirstObject());
+    
+    server_data_list.insertObjectLast
+      (new ServerOutOfBandData(type, data, len));
+    server_data_mt.unlock();
+    server_data_cnd.signal();
+  }
+
+  void
+  setServerMessage(const char *msg)
+  {
+    setServerOutOfBandData(IDB_SERVER_MESSAGE, (unsigned char *)msg,
+			   strlen(msg)+1);
+  }
+
+  //
+  // should be executed in a parallel thread
+  //
+
+  RPCStatus
+  IDB_getServerOutOfBandData(ConnHandle *, int *type, Data *ldata,
+			     unsigned int *size, void *xdata)
+  {
+    rpc_ServerData *data = (rpc_ServerData *)xdata;
+
+    for (;;) {
+      server_data_cnd.wait();
+      server_data_mt.lock();
+      ServerOutOfBandData *srvdata = (ServerOutOfBandData *)server_data_list.getFirstObject();
+      if (srvdata) {
+	if ((*type) & srvdata->type) {
+	  *type = srvdata->type;
+	  if (data) {
+	    data->status = rpc_TempDataUsed;
+	    data->size = srvdata->size;
+	    data->data = new unsigned char[data->size];
+	    memcpy(data->data, srvdata->data, data->size);
+	  }
+	  else {
+	    *size = srvdata->size;
+	    *ldata = new unsigned char[*size];
+	    memcpy(*ldata, srvdata->data, *size);
+	  }
+	  server_data_list.deleteObject(srvdata);
+	  delete srvdata;
+	  server_data_mt.unlock();
+	  return RPCSuccess;
+	}
+
+	server_data_list.deleteObject(srvdata);
+	delete srvdata;
+      }
+      server_data_mt.unlock();
+    }
+  }
+
+  // moved from p.h
+  eyedbsm::DbHandle *get_eyedbsm_DbHandle(DbHandle *dbh)
+  {
+    return dbh->sedbh;
+  }
 }
