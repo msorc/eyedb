@@ -55,7 +55,7 @@ usage(const char *msg = 0, const char *etc = 0)
 
   fprintf(stderr, "%s[--output-dir=<dirname>] [--output-file-prefix=<prefix>]%s",
 	  sp, nl);
-  fprintf(stderr, "%s[--schema-name=<schname>] [--namespace=<namespace>}%s", sp, nl);
+  fprintf(stderr, "%s[--schema-name=<schname>] [--namespace=<namespace>]%s", sp, nl);
   fprintf(stderr, "%s[--class-prefix=<prefix>] [--db-class-prefix=<dbprefix>]%s", sp, nl);
   fprintf(stderr, "%s[--attr-style=implicit|explicit]%s", sp, nl);
   fprintf(stderr, "%s[--dynamic-attr]%s", sp, nl);
@@ -969,7 +969,7 @@ checkOpts(Bool dirname_set)
   if (odl_lang && !package)
     return usage("--package is a mandatory option when -gencode Java|C++ or -u is used");
 
-  if (odl_lang && dbname && odlfile)
+  if ((odl_lang || odl_gen) && dbname && odlfile)
     return usage("cannot specify both a database and an ODL file");
 
   if (!package)
@@ -994,7 +994,7 @@ checkOpts(Bool dirname_set)
   if (orbix_gen || orbacus_gen || idl_gen || odl_lang)
     {
       if (!odlfile && !dbname)
-	return usage("using --gencode %s : must specify an <odlfile> or a database (-d <dbname>|--database=<dbname>)", get_gen_opt());
+	return usage("using --gencode=%s : must specify an <odlfile> or a database (-d <dbname>|--database=<dbname>)", get_gen_opt());
 
       /*
 	if (odlfile && dbname)
@@ -1009,7 +1009,7 @@ checkOpts(Bool dirname_set)
   else if (update && (odl_sch_rm || odl_cls_rm.getCount() > 0)) {
     // nop
   }
-  else if (!odl_gen && !odlfile)
+  else if (!cplus_gen && !java_gen && !odl_gen && !odlfile)
     return usage("an <odlfile> must be specified; use '-' for standard input");
 
   if (diff) {

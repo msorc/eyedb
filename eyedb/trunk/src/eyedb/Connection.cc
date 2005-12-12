@@ -125,6 +125,7 @@ namespace eyedb {
 	if (!rpc_status && strlen(challenge) > 0) {
 	  char *file = tempnam("/tmp", ".eyedb");
 	  int fd = creat(file, 0664);
+	  //printf("CHALLENGE '%s'\n", challenge);
 	  if (fd > 0) {
 	    write(fd, challenge, strlen(challenge));
 	    rpc_status = checkAuth(connh, file);
