@@ -45,10 +45,7 @@ configure script takes the following useful options:
 --prefix=PREFIX           to specify EyeDB installation root directory (default is /usr)
 --enable-debug            to compile with debug (default is no)
 --enable-optimize=flag    to compile with given optimization flag, for instance --enable-optimize=-O2 (default is no optimization)
---enable-java             to compile java part (default is no). If yes, you need a Java compiler
 --enable-swig             to generate various languages bindings with SWIG (default is no)
---with-javac=JAVAC        to specify java javac compiler path
---with-jar=JAR            to specify java jar path
 
 Full description of configure options can be obtained with:
 ./configure --help
