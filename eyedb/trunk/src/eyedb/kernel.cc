@@ -70,7 +70,20 @@ namespace eyedbsm {
 
 namespace eyedb {
 
+  struct ConnContext {
+    SessionLog *sesslog;
+    ClientSessionLog *clinfo;
+
+    std::string challenge;
+    int uid;
+    time_t ctime;
+    rpc_ConnInfo *ci;
+  };
+
+  static ConnContext conn_ctx;
+
   static const char *edb_passwdfile;
+
   static void
   get_dbm_passwd(const char *passwdfile);
 
@@ -325,16 +338,21 @@ namespace eyedb {
       free(idr);
   }
 
-  static SessionLog *sesslog;
-  static ClientSessionLog *clinfo;
-
-  static std::string rpc_challenge;
-  static int rpc_uid;
-  static rpc_ConnInfo *rpc_ci;
-
   RPCStatus
   IDB_checkAuth(const char *file)
   {
+    // check file name
+    const char *p = strrchr(file, '/');
+    if (p)
+      p++;
+    else
+      p = file;
+
+    if (strcmp(p, strrchr(conn_ctx.challenge.c_str(), '.') + 1))
+      return rpcStatusMake
+	(Exception::make(IDB_ERROR, "invalid file name: "
+			 "%s", file));
+
     int fd = open(file, O_RDONLY);
     if (fd < 0)
       return rpcStatusMake
@@ -352,7 +370,8 @@ namespace eyedb {
 
     buf[n] = 0;
 
-    if (strcmp(buf, rpc_challenge.c_str())) {
+    // check challenge
+    if (strcmp(buf, conn_ctx.challenge.c_str())) {
       close(fd);
       return rpcStatusMake
 	(Exception::make(IDB_ERROR, "invalid challenge in authentification file: "
@@ -360,19 +379,34 @@ namespace eyedb {
     }
 
     struct stat rstat;
-    if (fstat(fd, &rstat) == 0) {
-      if (rpc_uid != rstat.st_uid) {
-	close(fd);
-	return rpcStatusMake
-	  (Exception::make(IDB_ERROR, "invalid uid authentification file: "
-			   "%s", file));
-      }
-
-      rpc_ci->auth.uid = rpc_uid;
-    }
-
+    int r = fstat(fd, &rstat);
     close(fd);
+
+    if (r)
+      return rpcStatusMake
+	(Exception::make(IDB_ERROR, "cannot stat authentification file: "
+			 "%s", file));
+
+    // check uid
+    if (conn_ctx.uid != rstat.st_uid)
+      return rpcStatusMake
+	(Exception::make(IDB_ERROR, "invalid uid authentification file: "
+			 "%s", file));
+
+    // check time
+    if (rstat.st_ctime < conn_ctx.ctime)
+      return rpcStatusMake
+	(Exception::make(IDB_ERROR, "invalid creation time for "
+			 "authentification file: "
+			 "%s", file));
+
+    // check mode
+    if (0664 != (rstat.st_mode & 0777))
+      return rpcStatusMake
+	(Exception::make(IDB_ERROR, "invalid mode 0%o for authentification file: "
+			 "%s", rstat.st_mode, file));
     
+    conn_ctx.ci->auth.uid = conn_ctx.uid;
     return RPCSuccess;
   }
 
@@ -387,7 +421,23 @@ namespace eyedb {
     srand(tv.tv_usec);
     r0 = rand();
     srand(tv.tv_usec + 2*tv.tv_sec);
-    r1 = rand();
+
+    // check for file name
+    bool found = false;
+    for (int n = 0 ; n < 100; n++) {
+      r1 = rand();
+      sprintf(buf, "/tmp/%d", r1);
+      int fd = open(buf, O_RDONLY);
+      if (fd < 0) {
+	found = true;
+	break;
+      }
+      close(fd);
+    }
+    
+    if (!found)
+      return "";
+
     sprintf(buf, "%d.%06d.%d.%d", tv.tv_sec, tv.tv_usec, r0, r1);
 
     return buf;
@@ -412,35 +462,40 @@ namespace eyedb {
 			 eyedb::convertVersionNumber(cli_version),
 			 eyedb::getVersion()));
 
-    if (rpc_ci && rpc_ci->mode == rpc_ConnInfo::UNIX)
-      rpc_challenge = gen_random();
-    else
-      rpc_challenge = "";
+    if (conn_ctx.ci && conn_ctx.ci->mode == rpc_ConnInfo::UNIX) {
+      conn_ctx.challenge = gen_random();
+      conn_ctx.ctime = time(0);
+      conn_ctx.uid = uid;
+    }
+    else {
+      conn_ctx.challenge = "";
+      conn_ctx.ctime = 0;
+      conn_ctx.uid = 0;
+    }
 
-    *challenge = (char *)rpc_challenge.c_str();
-    rpc_uid = uid;
+    *challenge = (char *)conn_ctx.challenge.c_str();
 
-    return rpcStatusMake(sesslog->add(hostname, username,
-				      progname, pid, clinfo));
+    return rpcStatusMake(conn_ctx.sesslog->add(hostname, username,
+					       progname, pid, conn_ctx.clinfo));
   }
 
   void
   IDB_releaseConn()
   {
     /*
-      if (clinfo)
-      fprintf(stderr, "release conn CLINFO is OK %d\n", getpid());
+      if (conn_ctx.clinfo)
+      fprintf(stderr, "release conn CONN_CTX.CLINFO is OK %d\n", getpid());
       else
-      fprintf(stderr, "release conn CLINFO is NULL %d\n", getpid());
+      fprintf(stderr, "release conn CONN_CTX.CLINFO is NULL %d\n", getpid());
     */
 
     SessionLog::release();
 
-    if (!clinfo)
+    if (!conn_ctx.clinfo)
       return;
 
-    sesslog->suppress(clinfo);
-    clinfo = 0;
+    conn_ctx.sesslog->suppress(conn_ctx.clinfo);
+    conn_ctx.clinfo = 0;
   }
 
   static RPCStatus
@@ -559,8 +614,8 @@ namespace eyedb {
 
 	  }
       
-	if (dbh && !IDB_dbClose(dbh) && clinfo)
-	  clinfo->suppressDatabase(dbname, userauth, xflags);
+	if (dbh && !IDB_dbClose(dbh) && conn_ctx.clinfo)
+	  conn_ctx.clinfo->suppressDatabase(dbname, userauth, xflags);
 
 	return rpc_status;
       }
@@ -920,8 +975,8 @@ namespace eyedb {
 
   void setConnInfo(rpc_ConnInfo *ci)
   {
-    rpc_ci = ci;
-    //rpc_print_tcpip(stdout, &rpc_ci->u.tcpip);
+    conn_ctx.ci = ci;
+    //rpc_print_tcpip(stdout, &conn_ctx.ci->u.tcpip);
   }
 
   //#define STUART_SUGGESTION
@@ -935,12 +990,12 @@ namespace eyedb {
     need_passwd = True;
     superuser = False;
 
-    if (!rpc_ci || rpc_ci->mode == rpc_ConnInfo::STREAM ||
-	rpc_ci->mode == rpc_ConnInfo::UNIX) {
+    if (!conn_ctx.ci || conn_ctx.ci->mode == rpc_ConnInfo::STREAM ||
+	conn_ctx.ci->mode == rpc_ConnInfo::UNIX) {
 #ifdef STUART_AUTH
-      int uid = (rpc_ci ? rpc_ci->auth.uid : getuid());
+      int uid = (conn_ctx.ci ? conn_ctx.ci->auth.uid : getuid());
 #else
-      int uid = (rpc_ci ? rpc_ci->u.stream.uid : getuid());
+      int uid = (conn_ctx.ci ? conn_ctx.ci->u.stream.uid : getuid());
 #endif
       const char *authusername = getpwuid(uid)->pw_name;
       if (!*username || !strcmp(username, authusername)) {
@@ -955,12 +1010,12 @@ namespace eyedb {
       return username;
     }
 
-    if (true) { //rpc_ci->mode == rpc_ConnInfo::TCPIP) {
+    if (true) { //conn_ctx.ci->mode == rpc_ConnInfo::TCPIP) {
       const char *chuser = 0;
 #ifdef STUART_AUTH
-      tcpip = &rpc_ci->tcpip;
+      tcpip = &conn_ctx.ci->tcpip;
 #else
-      tcpip = &rpc_ci->u.tcpip;
+      tcpip = &conn_ctx.ci->u.tcpip;
 #endif
 
       for (i = 0; i < tcpip->user_cnt; i++) {
@@ -1607,12 +1662,13 @@ namespace eyedb {
 	  }
 
 	db_list->insertObjectLast((*pdbh)->db);
-	if (clinfo)
-	  clinfo->addDatabase(dbname,
-			      /* was: ((Database *)(*pdbh)->db)->getName() */
-			      userauth,
-			      /* was: ((Database *)(*pdbh)->db)->getUserAuth() */
-			      flags_o);
+	if (conn_ctx.clinfo)
+	  conn_ctx.clinfo->addDatabase
+	    (dbname,
+	     /* was: ((Database *)(*pdbh)->db)->getName() */
+	     userauth,
+	     /* was: ((Database *)(*pdbh)->db)->getUserAuth() */
+	     flags_o);
       }
 
     //eyedblib::display_time("%s %s", dbname, "#8");
@@ -1631,8 +1687,8 @@ namespace eyedb {
       if (rpc_status == RPCSuccess)
       db_list->deleteObject(dbh->db);
 
-      if (clinfo)
-      clinfo->suppressDatabase(((Database *)dbh->db)->getName(),
+      if (conn_ctx.clinfo)
+      conn_ctx.clinfo->suppressDatabase(((Database *)dbh->db)->getName(),
       ((Database *)dbh->db)->getUserAuth(),
       ((Database *)dbh->db)->getOpenFlag());
     */
@@ -1646,10 +1702,10 @@ namespace eyedb {
     oqml_reinit((Database *)dbh->db);
     RPCStatus s = rpcStatusMake_se(eyedbsm::dbClose(dbh->sedbh));
     if (!s && dbh->db) {
-      if (clinfo)
-	clinfo->suppressDatabase(((Database *)dbh->db)->getName(),
-				 ((Database *)dbh->db)->getUser(),
-				 ((Database *)dbh->db)->getOpenFlag());
+      if (conn_ctx.clinfo)
+	conn_ctx.clinfo->suppressDatabase(((Database *)dbh->db)->getName(),
+					  ((Database *)dbh->db)->getUser(),
+					  ((Database *)dbh->db)->getOpenFlag());
       db_list->deleteObject(dbh->db);
       dbh->db = 0;
     }
@@ -6571,7 +6627,7 @@ do { \
   IDB_init(const char *voldir, const char *_passwdfile,
 	   void *xsesslog, int _timeout)
   {
-    sesslog = (SessionLog *)xsesslog;
+    conn_ctx.sesslog = (SessionLog *)xsesslog;
     set_new_handler(new_handler);
 
     edb_passwdfile = _passwdfile;

@@ -123,14 +123,17 @@ namespace eyedb {
 			&sv_pid, &sv_uid, getVersionNumber(),
 			&challenge);
 	if (!rpc_status && strlen(challenge) > 0) {
-	  char *file = tempnam("/tmp", ".eyedb");
-	  int fd = creat(file, 0664);
+	  //char *file = tempnam("/tmp", ".eyedb");
 	  //printf("CHALLENGE '%s'\n", challenge);
-	  if (fd > 0) {
+	  std::string file = std::string("/tmp/") +
+	    (strrchr(challenge, '.') + 1);
+	  int fd = creat(file.c_str(), 0664);
+	  if (fd >= 0) {
+	    fchmod(fd, 0664);
 	    write(fd, challenge, strlen(challenge));
-	    rpc_status = checkAuth(connh, file);
+	    rpc_status = checkAuth(connh, file.c_str());
 	    ::close(fd);
-	    unlink(file);
+	    unlink(file.c_str());
 	  }
 	}
 #else
