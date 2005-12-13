@@ -1,0 +1,46 @@
+CXX = @CXX@
+CXXFLAGS_COMMON = @CXXFLAGS_COMMON@
+CXXFLAGS_OTHER = @CXXFLAGS_OTHER@
+EYEDBNUMVERSION = @EYEDB_NUMVERSION@
+EYEDBVERSION = @EYEDB_VERSION@
+EYEDB_SYSLIBS = @EYEDB_SYSLIBS@
+SO_FLAGS=@SO_FLAGS@
+bindir = @bindir@
+exec_prefix = @exec_prefix@
+includedir = @includedir@
+libdir = @libdir@
+prefix = @prefix@
+
+CXXFLAGS = $(CXXFLAGS_COMMON) $(CXXFLAGS_OTHER) -I$(includedir) -DEYEDBNUMVERSION=$(EYEDBNUMVERSION) $(EXTRA_CXXFLAGS)
+EYEDBODL = $(bindir)/eyedbodl
+EYEDBLIB = -L$(libdir) \
+                      -leyedb \
+	              -leyedbrpcfe \
+	              -leyedbsm \
+	              -leyedbutils \
+		      $(EYEDB_SYSLIBS)
+LDXX = $(CXX)
+LDXXFLAGS=$(CXXFLAGS_COMMON) $(CXXFLAGS_OTHER) $(EXTRA_CXXFLAGS)
+LDXXLIBS = $(EYEDBLIB)
+
+ifndef CC_SUFFIX
+CC_SUFFIX = cc
+endif
+
+#
+# Implicit Rules
+#
+
+.PRECIOUS: %.$(CC_SUFFIX) %.h %.idl %.o %Impl.h %Impl.$(CC_SUFFIX) %Impl_x.$(CC_SUFFIX)
+
+%.$(CC_SUFFIX): %.odl
+	$(EYEDBODL) --gencode=C++ $(EYEDBODLCPLUSOPTS) --package=$* --schema-name=$* $<
+
+%.o: %.$(CC_SUFFIX)
+	$(CXX) $(CXXFLAGS) -c $<
+
+%.so: %.o
+	$(CXX) $(LDXXFLAGS) $(SO_FLAGS) -o $@ $< $(LDXXLIBS)
+
+%: %.o
+	$(LDXX) $(LDXXFLAGS) -o $@ $< $(LDXXLIBS)
