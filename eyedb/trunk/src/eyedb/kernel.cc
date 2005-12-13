@@ -410,6 +410,33 @@ namespace eyedb {
     return RPCSuccess;
   }
 
+  static int
+  get_rand()
+  {
+    //#define SUPPORT_DEV_RANDOM
+#ifdef SUPPORT_DEV_RANDOM
+    int fd = open("/dev/random", O_RDONLY);
+    if (fd >= 0) {
+      unsigned int i = 0;
+      time_t t0;
+      time(&t0);
+      printf("before read\n");
+      int r = read(fd, &i, sizeof(int));
+      printf("r = %d %d %d\n", r, i, time(0)-t0);
+      close(fd);
+      return i;
+    }
+    return 0;
+#else
+    static int n = 1;
+    struct timeval tv;
+    gettimeofday(&tv, 0);
+    srand(tv.tv_usec + (tv.tv_sec % n));
+    n++;
+    return rand();
+#endif
+  }
+
   static std::string
   gen_random()
   {
@@ -417,15 +444,12 @@ namespace eyedb {
     int r0, r1;
     char buf[512];
 
-    gettimeofday(&tv, 0);
-    srand(tv.tv_usec);
-    r0 = rand();
-    srand(tv.tv_usec + 2*tv.tv_sec);
+    r0 = get_rand();
 
     // check for file name
     bool found = false;
     for (int n = 0 ; n < 100; n++) {
-      r1 = rand();
+      r1 = get_rand();
       sprintf(buf, "/tmp/%d", r1);
       int fd = open(buf, O_RDONLY);
       if (fd < 0) {
@@ -438,6 +462,7 @@ namespace eyedb {
     if (!found)
       return "";
 
+    gettimeofday(&tv, 0);
     sprintf(buf, "%d.%06d.%d.%d", tv.tv_sec, tv.tv_usec, r0, r1);
 
     return buf;
@@ -960,7 +985,7 @@ namespace eyedb {
 	RPCSuccess)
       return rpc_status;
 
-    const char *ndbfile;
+   const char *ndbfile;
     s = dbm->getDbFile(&newdbname, 0, ndbfile);
     if (s) return rpcStatusMake(s);
 
