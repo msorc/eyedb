@@ -305,7 +305,6 @@ examples/JavaBinding/schema-oriented/store/Makefile.eyedb-examples
 examples/JavaBinding/schema-oriented/store/person/Makefile
 examples/Makefile
 examples/Makefile.eyedb-examples
-examples/Makefile.eyedb
 examples/oql/Makefile
 include/Makefile
 include/eyedb/Makefile
@@ -316,6 +315,8 @@ include/eyedbsm/Makefile
 install/Makefile
 install/etc/Makefile
 install/etc/eyedb.conf
+install/misc/Makefile
+install/misc/Makefile.eyedb
 scripts/Makefile
 scripts/eyedbenv.sh
 scripts/eyedb-postinstall.sh
