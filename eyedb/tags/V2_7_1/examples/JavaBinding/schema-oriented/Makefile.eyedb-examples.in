@@ -1,0 +1,15 @@
+#
+# Makefile, Eyedb Package
+#
+# examples/JavaBinding/scheme-oriented makefile
+#
+# Eric Viara Copyright (C) SYSRA 1998
+#
+
+SUBDIRS = store
+
+all:
+	@for dir in $(SUBDIRS); do $(MAKE) -C $${dir} $@; done
+
+%:
+	@for dir in $(SUBDIRS); do $(MAKE) -C $${dir} $@; done

@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+  "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+<!ENTITY eyedbdbmove "<command>eyedbdbmove</command>">
+]>
+
+<refentry id="eyedbdbmove">
+  <refentryinfo>
+    <date>14 November 2005</date>
+  </refentryinfo>
+
+  <refmeta>
+    <refentrytitle>eyedbdbmove</refentrytitle>
+    <manvolnum>1</manvolnum>
+    <refmiscinfo>eyedb database</refmiscinfo>
+  </refmeta>
+
+  <refnamediv>
+    <refname>&eyedbdbmove;</refname>
+    <refpurpose>command purpose</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <!-- eyedbdbmove <dbname> [- -dbfile=<dbfile>] [- -datafiles={<datafile>[:name[:<sizeMb>[:sizeslot[:phy|log]]]]}] [- -filedir=<filedir>] -->
+      eyedbdbmove 
+      <arg choice="req"><replaceable>dbname</replaceable></arg> 
+      <arg choice="opt">--dbfile=<replaceable>dbfile</replaceable></arg> 
+      <arg choice="opt">--datafiles={<replaceable>datafile</replaceable><arg choice="opt">:name<arg choice="opt">:<replaceable>sizeMb</replaceable><arg choice="opt">:sizeslot<arg choice="opt">:phy|log</arg></arg></arg></arg>}</arg> 
+      <arg choice="opt">--filedir=<replaceable>filedir</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbdbmove; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+      <varlistentry>
+	<term>--option</term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+
+  </refsect1>
+
+  <refsect1>
+    <title>Environment</title>
+    See eyedb-options
+  </refsect1>
+
+  <refsect1>
+    <title>Exit status</title>
+  </refsect1>
+
+  <refsect1>
+    <title>Examples</title>
+  </refsect1>
+
+  <refsect1>
+    <title>See also</title>
+  </refsect1>
+
+  <refsect1>
+    <title>Bugs</title>
+  </refsect1>
+
+  <refsect1>
+    <title>Authors</title>
+  </refsect1>
+
+</refentry>
+
