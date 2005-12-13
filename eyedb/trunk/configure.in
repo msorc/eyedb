@@ -349,6 +349,7 @@ tests/eyedb/collections/basic/Makefile
 tests/eyedb/collections/litcoll/Makefile
 tests/eyedb/dataspace/Makefile
 tests/eyedb/dataspace/dspsch/Makefile
+tests/eyedb/export/Makefile
 )
 
 # make symbolic links for ODL files
