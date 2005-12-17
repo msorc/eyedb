@@ -43,7 +43,6 @@ main(int argc, char *argv[])
   const char *dbname = argv[1];
   const char *name = argv[2];
   int age = atoi(argv[3]);
-  const char *spouse_name = argv[4];
 
   eyedb::Exception::setMode(eyedb::Exception::ExceptionMode);
 

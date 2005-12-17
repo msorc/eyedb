@@ -21,17 +21,20 @@
    Author: Eric Viara <viara@sysra.com>
 */
 
+#include <eyedbconfig.h>
 
 #include <stdlib.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <sys/stat.h>
+#include <sys/mman.h>
 #include "SessionLog.h"
 #include <time.h>
 #include <eyedbsm/smd.h>
 #include <eyedblib/rpc_lib.h>
 #include <eyedblib/strutils.h>
 #include "comp_time.h"
+#include <lib/m_mem_p.h>
 
 #define MAXPORTS 8
 #define PORTLEN 127

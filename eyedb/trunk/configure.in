@@ -44,8 +44,6 @@ AM_INIT_AUTOMAKE(${PACKAGE_NAME}, ${PACKAGE_VERSION})
 # Checks for command line flags
 #
 
-CXXFLAGS=""
-
 # debug
 AC_ARG_ENABLE(debug,
   AS_HELP_STRING([--enable-debug],[compile with debug (default is no)]),
@@ -75,7 +73,7 @@ AC_SUBST(eyedbsysconfdir)
 AC_SUBST(eyedbtopdir)
 
 # config header file
-AM_CONFIG_HEADER(config.h)
+AM_CONFIG_HEADER(eyedbconfig.h)
 
 # by default we install in /usr
 AC_PREFIX_DEFAULT(/usr)
@@ -83,79 +81,40 @@ AC_PREFIX_DEFAULT(/usr)
 # check for compilers
 AC_PROG_CXX
 
-# -D are taken verbatim for now. Later, may use autodetection and/or command line flags
-DEFINES="-DOPTOPEN -DMOZILLA -DNEW_COLL_XDR -DNEW_COLL_XDR2 -DSUPPORT_NON_BASIC_LITERAL_COLL -DSTUART_AUTH"
-# should add -DIDB_STREAM for named pipes (not supported on linux)
+AC_LANG(C++)
 
-# check for architecture (temporary, must be replaced by more generic tests)
-# we do that as soon as possible, i.e. after checking for the compiler, because
-# this will set the CXXFLAGS, which may impact on later tests (such as ctime_t number
-# of arguments...)
-# FIXME: rajouter -DDEBUG_LINUX_X86  si debug
-
+# check for architecture
 AC_CANONICAL_HOST
 
+# must disappear
 case "$host" in
 i*86-*-linux*)
-	CXXFLAGS_COMMON="-D_REENTRANT -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
-	CXXFLAGS_OTHER=-fPIC
-	SO_FLAGS=-shared
-	DEFINES="$DEFINES -DLINUX -DX86 -DLINUX_X86"
-	EYEDB_SYSLIBS="-lnsl -ldl -lpthread -lcrypt"
+#	CXXFLAGS_COMMON="-D_REENTRANT "
+	DEFINES="-DLINUX -DX86 -DLINUX_X86"
 	;;
 
 x86_64-*-linux*)
-	CXXFLAGS_COMMON="-D_REENTRANT -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
-	CXXFLAGS_OTHER=-fPIC
-	SO_FLAGS=-shared
-	DEFINES="$DEFINES -DLINUX -DLINUX_X86_64"
-	EYEDB_SYSLIBS="-lnsl -ldl -lpthread -lcrypt"
+#	CXXFLAGS_COMMON="-D_REENTRANT "
+	DEFINES="-DLINUX -DLINUX_X86_64"
 	;;
 
 sparc-sun-solaris2.9)
 	if test "$ac_cv_cxx_compiler_gnu" = "yes"
 	then
-		CXXFLAGS_COMMON="-D_REENTRANT -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
-		CXXFLAGS_OTHER=-fPIC
-		SO_FLAGS=-shared
-		DEFINES="$DEFINES -DIDB_STREAM -DSOLARIS -DSPARCV9 -DSOLARIS_SPARCV9_GCC"
-		EYEDB_SYSLIBS="-lnsl -ldl -lpthread -lcrypt -lsocket"
+#		CXXFLAGS_COMMON="-D_REENTRANT "
+		DEFINES="-DSOLARIS -DSPARCV9 -DSOLARIS_SPARCV9_GCC"
 	else
-#		CXXFLAGS_COMMON="-mt -xtarget=ultra -xarch=v9 -XCClinker -xtarget=ultra -XCClinker -xarch=v9"
-		CXXFLAGS_COMMON="-mt -xtarget=ultra -xarch=v9"
-		CXXFLAGS_OTHER=-KPIC
-		SO_FLAGS=-G
+		CFLAGS="-mt -xtarget=ultra -xarch=v9"
+		CXXFLAGS="$CXXFLAGS -mt -xtarget=ultra -xarch=v9"
 		LDFLAGS="-XCClinker -xtarget=ultra -XCClinker -xarch=v9"
-		DEFINES="$DEFINES -DIDB_STREAM -DSOLARIS -DSPARCV9 -DSOLARIS_SPARCV9_CC"
-		EYEDB_SYSLIBS="-lnsl -ldl -lpthread -lcrypt -lsocket"
+		DEFINES="-DSOLARIS -DSPARCV9 -DSOLARIS_SPARCV9_CC"
 	fi
 	;;
-
-*)
-	# should output some error?
-	;;
-
 esac
 
-CXXFLAGS="$CXXFLAGS $CXXFLAGS_COMMON $DEFINES"
-
-# check for libtool
-AC_PROG_LIBTOOL
-
-# Check for lex/flex and yacc/bison
-AM_PROG_LEX
-AC_PROG_YACC
-
-dnl check for flock structure
-AC_CHECK_TYPE(flock_t, AC_DEFINE([HAS_FLOCK_T], [], [Defined if flock_t is defined in fcntl.h]),,[#include <fcntl.h>])
-
-# check for headers
-AC_CHECK_HEADERS( sys/time.h unistd.h sys/types.h regex.h libgen.h)
-AC_HEADER_TIME
-
-dnl check for functions
-AC_CHECK_FUNC(ctime_r, AC_DEFINE([HAS_CTIME_R], [], [Defined if function ctime_r exists]),,[#include <sys/time.h>])
-AC_CHECK_FUNC(pthread_kill_other_threads_np, AC_DEFINE([HAS_PTHREAD_KILL_OTHER_THREADS_NP], [], [Defined if function pthread_kill_other_threads_np exists]),,[#include <pthread.h>])
+# -D are taken verbatim for now. Later, may use autodetection and/or command line flags
+DEFINES="$DEFINES -DOPTOPEN -DMOZILLA -DNEW_COLL_XDR -DNEW_COLL_XDR2 -DSUPPORT_NON_BASIC_LITERAL_COLL -DSTUART_AUTH"
+CXXFLAGS="$CXXFLAGS $DEFINES"
 
 # check for endianism
 AC_C_BIGENDIAN
@@ -166,37 +125,41 @@ EYEDB_CONFIG_BYTE_ORDER=EYEDBLIB_LITTLE_ENDIAN
 fi
 AC_SUBST(EYEDB_CONFIG_BYTE_ORDER)
 
+# check for libtool
+AC_PROG_LIBTOOL
+
+# Check for lex/flex and yacc/bison
+AM_PROG_LEX
+AC_PROG_YACC
+
+# check for headers
+AC_CHECK_HEADERS( sys/time.h unistd.h sys/types.h regex.h libgen.h)
+AC_HEADER_TIME
+
+# check for flock structure
+AC_CHECK_TYPE(flock_t, AC_DEFINE([HAS_FLOCK_T], 1, [Defined if flock_t is defined in fcntl.h]),,[#include <fcntl.h>])
+# check for union semun
+AC_CHECK_MEMBER( union semun.val, AC_DEFINE([HAS_UNION_SEMUN], 1, [Defined if union semun is defined]),, [#include <sys/sem.h>])
+
+# check for functions
+AC_CHECK_FUNC(pthread_kill_other_threads_np, AC_DEFINE([HAS_PTHREAD_KILL_OTHER_THREADS_NP], 1, [Defined if function pthread_kill_other_threads_np exists]),,[#include <pthread.h>])
+AC_CHECK_FUNC(fattach, AC_DEFINE([HAS_FATTACH], 1, [Defined if function fattach exists]))
+# check if function ctime_r exists and has 2 or 3 arguments
+AC_FUNC_CTIME_R_3_ARGS
+
 # check for X11
 AC_PATH_XTRA
 
-dnl check for union semun
-AC_CHECK_MEMBER( union semun.val, AC_DEFINE([HAS_UNION_SEMUN], [], [Defined if union semun is defined]),, [#include <sys/sem.h>])
+# check for large file
+AC_SYS_LARGEFILE
+AC_FUNC_FSEEKO
 
-dnl checking whether ctime_r has 2 or 3 arguments
-dnl we do that here because it needs the right CXXFLAGS
-if test $ac_cv_func_ctime_r = yes
-then
-   AC_MSG_CHECKING(number of arguments of ctime_r)
-   AC_LANG_PUSH(C++)
-   ctime_r3="yes"
-   AC_COMPILE_IFELSE(
-     [AC_LANG_PROGRAM([[#include <sys/time.h>]],[[char buf[26]; time_t t; ctime_r(&t,buf,26);]])],
-     [AC_DEFINE(HAS_CTIME_R_3, 1, [Define if you have ctime_r(time_t*,char *buf,size_t s)])],
-     [ctime_r3="no"]
-     )
-   AC_LANG_POP(C++)
-   if test "$ctime_r3" = "yes"
-   then
-	AC_MSG_RESULT(3)
-   else
-	AC_MSG_RESULT(2)
-   fi
-fi
-
-AC_SUBST(EYEDB_SYSLIBS)
-AC_SUBST(CXXFLAGS_COMMON)
-AC_SUBST(CXXFLAGS_OTHER)
-AC_SUBST(SO_FLAGS)
+# check for libraries
+dnl AC_CHECK_LIB( nsl, ??) # -lnsl is not necessary apparently
+AC_CHECK_LIB( dl, dlopen)
+AC_CHECK_LIB( pthread, pthread_create)
+AC_CHECK_LIB( crypt, crypt)
+AC_SEARCH_LIBS( socket, socket)
 
 # ========================================
 # JAVA compilation
@@ -244,16 +207,61 @@ AC_PATH_PROG(PS2PDF, ps2pdf)
 AM_CONDITIONAL(COND_LATEX, test x"$LATEX" != x -a x"$DVIPS" != x -a x"$PS2PDF" != x)
 
 
+# ========================================
+# Examples building
+#  is not architecture independant because of CXXFLAGS setting by hand
+#  must be replaced in order to have a configure.in that does not do 'case $host'
+# ========================================
+case "$host" in
+i*86-*-linux*)
+	CXXFLAGS_COMMON="-D_REENTRANT -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
+	CXXFLAGS_OTHER=-fPIC
+	SO_FLAGS=-shared
+	;;
+
+x86_64-*-linux*)
+	CXXFLAGS_COMMON="-D_REENTRANT -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
+	CXXFLAGS_OTHER=-fPIC
+	SO_FLAGS=-shared
+	;;
+
+sparc-sun-solaris2.9)
+	if test "$ac_cv_cxx_compiler_gnu" = "yes"
+	then
+		CXXFLAGS_COMMON="-D_REENTRANT -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
+		CXXFLAGS_OTHER=-fPIC
+		SO_FLAGS=-shared
+	else
+		CXXFLAGS_COMMON="-mt -xtarget=ultra -xarch=v9"
+		CXXFLAGS_OTHER=-KPIC
+		SO_FLAGS=-G
+	fi
+	;;
+
+*)
+	# should output some error?
+	;;
+
+esac
+
+AC_SUBST(CXXFLAGS_COMMON)
+AC_SUBST(CXXFLAGS_OTHER)
+AC_SUBST(SO_FLAGS)
+# ========================================
+# End of Examples building
+# ========================================
+
+
 
 AC_OUTPUT(
 Makefile 
 doc/Makefile
 doc/doxygen/Makefile
 doc/doxygen/eyedb-doxygen.cfg
-doc/manual/Makefile
-doc/manual/version.tex
-doc/manual/figures/Makefile
 doc/manpages/Makefile
+doc/manual/Makefile
+doc/manual/figures/Makefile
+doc/manual/version.tex
 examples/C++Binding/Makefile
 examples/C++Binding/Makefile.eyedb-examples
 examples/C++Binding/generic/Makefile
@@ -305,27 +313,27 @@ examples/JavaBinding/schema-oriented/store/Makefile.eyedb-examples
 examples/JavaBinding/schema-oriented/store/person/Makefile
 examples/Makefile
 examples/Makefile.eyedb-examples
+examples/Makefile.eyedb
 examples/oql/Makefile
 include/Makefile
 include/eyedb/Makefile
 include/eyedb/internals/Makefile
-include/eyedblib/endian.h
 include/eyedblib/Makefile
+include/eyedblib/endian.h
 include/eyedbsm/Makefile
 install/Makefile
 install/etc/Makefile
 install/etc/eyedb.conf
-install/misc/Makefile
-install/misc/Makefile.eyedb
 scripts/Makefile
-scripts/eyedbenv.sh
 scripts/eyedb-postinstall.sh
+scripts/eyedbenv.sh
 src/Makefile
 src/bindings/Makefile
 src/bindings/python/Makefile
 src/eyedb/Makefile
 src/eyedb/conf_defaults.h
 src/eyedb/eyedbversion.h
+src/eyedbsm/Makefile
 src/java/Makefile
 src/java/src/Makefile
 src/java/src/org/Makefile
@@ -335,14 +343,11 @@ src/java/src/org/eyedb/syscls/Makefile
 src/java/src/org/eyedb/utils/Makefile
 src/lib/Makefile
 src/oql/Makefile
-src/eyedbsm/Makefile
 src/www/Makefile
 src/www/eyedb.conf
 src/www/html/Makefile
 src/www/icons/Makefile
 tests/Makefile
-tests/eyedbsm/Makefile
-tests/eyedbsm/basic/Makefile
 tests/eyedb/Makefile
 tests/eyedb/collections/Makefile
 tests/eyedb/collections/basic/Makefile
@@ -350,6 +355,8 @@ tests/eyedb/collections/litcoll/Makefile
 tests/eyedb/dataspace/Makefile
 tests/eyedb/dataspace/dspsch/Makefile
 tests/eyedb/export/Makefile
+tests/eyedbsm/Makefile
+tests/eyedbsm/basic/Makefile
 )
 
 # make symbolic links for ODL files

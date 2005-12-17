@@ -34,6 +34,7 @@
 #include "eyedblib/filelib.h"
 #include "kern_p.h"
 #include <eyedbsm/smd.h>
+
 #include <iostream>
 
 #if defined(ALPHA)

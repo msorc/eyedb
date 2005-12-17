@@ -22,7 +22,7 @@
 */
 
 
-#include <config.h>
+#include <eyedbconfig.h>
 
 #include <pthread.h>
 #include <string.h>

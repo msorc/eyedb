@@ -33,12 +33,13 @@
 #include <errno.h>
 #include <sys/mman.h>
 #include <pthread.h>
+#include <lock.h>
 
 #include <eyedbsm_p.h>
 #include <eyedblib/iassert.h>
-#include <lock.h>
 #include <eyedblib/rpc_be.h>
 #include <eyedblib/log.h>
+#include <lib/m_mem_p.h>
 
 #define TRACE(X) /*(X, fflush(stdout))*/
 

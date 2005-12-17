@@ -38,6 +38,7 @@ INCLUDES=-I$(top_srcdir)/src -I$(top_srcdir)/include -I$(top_builddir)/include
 noinst_HEADERS= \
 ansi.h \
 gbxcyctx.h \
+m_mem_p.h \
 probe_p.h \
 rpc_beP.h \
 rpc_feP.h \

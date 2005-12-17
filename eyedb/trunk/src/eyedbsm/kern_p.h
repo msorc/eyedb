@@ -27,6 +27,8 @@
 
 #define NO_FILE_LOCK
 
+#include <eyedbconfig.h>
+
 #include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
@@ -54,6 +56,7 @@
 #include <eyedblib/semlib.h>
 #include <eyedblib/log.h>
 #include <pwd.h>
+#include <lib/m_mem_p.h>
 
 namespace eyedbsm {
 

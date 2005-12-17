@@ -6,7 +6,7 @@ DIST_SUBDIRS=doc examples include scripts src install tests
 EXTRA_DIST= AUTHORS COPYING ChangeLog README VERSION autogen.sh
 
 TAGS:
-	find $(top_srcdir)/src $(top_srcdir)/include \! \( -name '*~' -o \( -type d -name '*.old' -prune \) \) \( -name '*.c' -o -name '*.c.in' -o -name '*.h' -o -name '*.h.in' -o -name '*.cc' -o -name '*.java' -o -name '*.java.in' -o -name 'Makefile.am' \) -print | etags -t -
+	find $(top_srcdir) \! -name '*~' \( -name '*.c' -o -name '*.h' -o -name '*.cc' -o -name '*.java' -o -name 'Makefile.am' -o \( -name '*.in' -a \! -name Makefile.in \) \) -print | etags -t -
 .PHONY: TAGS
 
 doc:

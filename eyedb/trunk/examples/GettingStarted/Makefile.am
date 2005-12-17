@@ -4,7 +4,8 @@ eyedbexamples_DATA= Makefile.eyedb-examples
 
 noinst_PROGRAMS= persontest
 
-EYEDBSVLIBS=$(top_builddir)/src/eyedb/libeyedb.la $(top_builddir)/src/lib/libeyedbrpcbe.la $(top_builddir)/src/lib/libeyedbrpcfe.la $(top_builddir)/src/eyedbsm/libeyedbsm.la $(top_builddir)/src/lib/libeyedbutils.la @EYEDB_SYSLIBS@
+EYEDBSVLIBS=$(top_builddir)/src/eyedb/libeyedb.la $(top_builddir)/src/lib/libeyedbrpcbe.la $(top_builddir)/src/lib/libeyedbrpcfe.la $(top_builddir)/src/eyedbsm/libeyedbsm.la $(top_builddir)/src/lib/libeyedbutils.la 
+
 
 persontest_SOURCES= persontest.cc person.cc
 persontest_LDADD= $(EYEDBSVLIBS)

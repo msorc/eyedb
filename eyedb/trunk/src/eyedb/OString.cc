@@ -24,7 +24,7 @@
 
 #ifndef NOCONTRIB
 
-#include <config.h>
+#include <eyedbconfig.h>
 
 #if HAVE_LIBGEN_H
 #include <libgen.h>

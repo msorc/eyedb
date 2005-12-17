@@ -389,7 +389,7 @@ rpc_check_localhost()
   return rpc_check_addr(&addr);
 }
 
-#ifdef IDB_STREAM
+#ifdef HAS_FATTACH
 rpc_ConnInfo *
 rpc_make_stream_conninfo(int fd, struct strrecvfd *info)
 {

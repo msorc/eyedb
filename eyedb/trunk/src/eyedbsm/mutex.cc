@@ -31,7 +31,7 @@
 #include <errno.h>
 #include <eyedblib/performer.h>
 
-#include <config.h>
+#include <eyedbconfig.h>
 
 #if defined(SOLARIS) 
 #include <synch.h>

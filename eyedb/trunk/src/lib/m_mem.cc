@@ -21,17 +21,23 @@
    Author: Eric Viara <viara@sysra.com>
 */
 
+#include <eyedbconfig.h>
+
 #include <sys/time.h>
 #include <sys/resource.h>
-#include <eyedblib/m_mem.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
 #include <pthread.h>
-#include <eyedblib/log.h>
+#include <sys/mman.h>
+#include <stdarg.h>
 
+#include <eyedblib/m_mem.h>
+#include <eyedblib/log.h>
 #include <eyedblib/iassert.h>
+#include <lib/m_mem_p.h>
+
 /*@@@@ clash define*/
 #define min(x,y) ((x)<(y)?(x):(y))
 

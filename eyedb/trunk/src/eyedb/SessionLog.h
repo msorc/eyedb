@@ -29,6 +29,7 @@
 #include <eyedbsm/eyedbsm.h>
 #include "eyedbsm/transaction.h"
 #include "eyedbsm/mutex.h"
+#include <eyedblib/m_mem.h>
 
 namespace eyedb {
 
