@@ -22,6 +22,8 @@
 */
 
 
+#include <eyedbconfig.h>
+
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>
@@ -30,7 +32,6 @@
 #include <fcntl.h>
 #include <eyedblib/filelib.h>
 
-#include <config.h>
 
 /*
 14/02/05: was :

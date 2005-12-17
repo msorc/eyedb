@@ -27,6 +27,7 @@
 #include "eyedbsm_p.h"
 
 #include <eyedblib/rpc_lib.h>
+#include <lib/m_mem_p.h>
 
 #include "transaction.h"
 

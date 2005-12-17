@@ -1,8 +1,12 @@
-2005-09-20  FranÃ§ois  <francois@localhost.localdomain>
+2005-12-17  François  <francois@localhost.localdomain>
+
+	* Changed configure.in for better portability. Work in progress.
+
+2005-09-20  François  <francois@localhost.localdomain>
 
 	* Fixing compilation of src/www. Not complete yet.
 
-2005-09-09  FranÃ§ois  <francois@localhost.localdomain>
+2005-09-09  François  <francois@localhost.localdomain>
 
 	* Fixed compilation of a .tar.gz distribution ('make dist')
 

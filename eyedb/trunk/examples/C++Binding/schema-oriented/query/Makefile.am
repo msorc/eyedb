@@ -4,7 +4,8 @@ eyedbexamples_DATA=Makefile.eyedb-examples
 
 noinst_PROGRAMS= query
 
-EYEDBSVLIBS=$(top_builddir)/src/eyedb/libeyedb.la $(top_builddir)/src/lib/libeyedbrpcbe.la $(top_builddir)/src/lib/libeyedbrpcfe.la $(top_builddir)/src/eyedbsm/libeyedbsm.la $(top_builddir)/src/lib/libeyedbutils.la @EYEDB_SYSLIBS@
+EYEDBSVLIBS=$(top_builddir)/src/eyedb/libeyedb.la $(top_builddir)/src/lib/libeyedbrpcbe.la $(top_builddir)/src/lib/libeyedbrpcfe.la $(top_builddir)/src/eyedbsm/libeyedbsm.la $(top_builddir)/src/lib/libeyedbutils.la 
+
 
 query_SOURCES= query.cc 
 query_LDADD= $(EYEDBSVLIBS) $(top_builddir)/examples/C++Binding/schema-oriented/share/libperson.la

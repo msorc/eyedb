@@ -334,7 +334,7 @@ usage(const char *prog)
 	    "%sdspgetcurdat <dbname> <dspname> \n", str());
 
   if (!mode || mode == mUserAdd)
-#if 1 //def IDB_STREAM
+#if 1 //def HAS_FATTACH
     fprintf(pipe,
 	    "%suseradd [--unix|--strict-unix] <username> [<passwd>]\n", str());
 #else
@@ -3130,7 +3130,7 @@ get_admin_opts(int s, int argc, char *argv[], char **username,
     {
     case mUserAdd:
       check_argc_u(s+2, argc);
-#if 1 //def IDB_STREAM
+#if 1 //def HAS_FATTACH
       if (!strcmp(*username, "--unix"))
 	{
 	  user_type = UnixUser;

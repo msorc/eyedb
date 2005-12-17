@@ -35,7 +35,7 @@ xdr.cc						\
 smdcli.cc					\
 xm_alloc.cc
 
-SMLIBS=$(top_builddir)/src/lib/libeyedbrpcfe.la libeyedbsm.la $(top_builddir)/src/lib/libeyedbutils.la @EYEDB_SYSLIBS@
+SMLIBS=$(top_builddir)/src/lib/libeyedbrpcfe.la libeyedbsm.la $(top_builddir)/src/lib/libeyedbutils.la
 
 bin_PROGRAMS=					\
 eyedbsmd					\

@@ -129,19 +129,7 @@ INCLUDES=-I$(top_srcdir)/src -I$(top_srcdir)/include -I$(top_builddir)/include
 
 libeyedb_la_LINK= $(LTCXXCOMPILE) -c -o comp_time.lo $(srcdir)/comp_time.cc ; $(CXXLINK) comp_time.lo
 
-#ODL_OBJS=DBM.lo syscls.lo oqlctb.lo utils.lo
-#libeyedb_la_LIBADD= $(ODL_OBJS)
-
 CLEANFILES=oql.tab.cc odl.tab.cc oql.output odl.output $(BUILT_SOURCES)
-
-# Dependencies tracking for special files
-DEP_SUFFIX=@DEP_SUFFIX@
-# want to see if it works once I've put suffix rules.... ./$(DEPDIR)/odl.tab.$(DEP_SUFFIX)
-# ......................... ./$(DEPDIR)/oql.tab.$(DEP_SUFFIX)
-# include .deps/DBM.$(DEP_SUFFIX)
-# include .deps/utils.$(DEP_SUFFIX)
-# include .deps/syscls.$(DEP_SUFFIX)
-# include .deps/oqlctb.$(DEP_SUFFIX)
 
 %.tab.cc: $(srcdir)/%.y
 	$(YACC) -b $* -v $(srcdir)/$*.y
@@ -152,7 +140,6 @@ lex.%.c: $(srcdir)/%.l
 	USEFLEX=1 $(top_srcdir)/scripts/eyedb-lex $(srcdir)/$*
 
 # ODL->C++
-#EYEDBODL_exe=$(top_builddir)/src/eyedb/eyedbodl
 EYEDBODL_exe=$(bindir)/eyedbodl
 
 EYEDBODL = $(EYEDBODL_exe) --gencode=C++ --output-dir=$(top_srcdir)/src/eyedb
@@ -237,13 +224,9 @@ eyedbgetenv					\
 eyedbrc						\
 eyedbadmin
 
-#EYEDBLIBS=$(top_builddir)/src/eyedb/libeyedb.la $(top_builddir)/src/lib/libeyedbrpcbe.la $(top_builddir)/src/lib/libeyedbrpcfe.la $(top_builddir)/src/eyedbsm/libeyedbsm.la $(top_builddir)/src/lib/libeyedbutils.la @EYEDB_SYSLIBS@
+EYEDBSVLIBS=libeyedb.la $(top_builddir)/src/lib/libeyedbrpcbe.la $(top_builddir)/src/lib/libeyedbrpcfe.la $(top_builddir)/src/eyedbsm/libeyedbsm.la $(top_builddir)/src/lib/libeyedbutils.la
 
-#EYEDBLIBS=libeyedb.la $(top_builddir)/src/lib/libeyedbrpcbe.la $(top_builddir)/src/lib/libeyedbrpcfe.la $(top_builddir)/src/eyedbsm/libeyedbsm.la $(top_builddir)/src/lib/libeyedbutils.la @EYEDB_SYSLIBS@
-
-EYEDBSVLIBS=libeyedb.la $(top_builddir)/src/lib/libeyedbrpcbe.la $(top_builddir)/src/lib/libeyedbrpcfe.la $(top_builddir)/src/eyedbsm/libeyedbsm.la $(top_builddir)/src/lib/libeyedbutils.la @EYEDB_SYSLIBS@
-
-EYEDBCLLIBS=libeyedb.la $(top_builddir)/src/lib/libeyedbrpcfe.la $(top_builddir)/src/eyedbsm/libeyedbsm.la $(top_builddir)/src/lib/libeyedbutils.la @EYEDB_SYSLIBS@
+EYEDBCLLIBS=libeyedb.la $(top_builddir)/src/lib/libeyedbrpcfe.la $(top_builddir)/src/eyedbsm/libeyedbsm.la $(top_builddir)/src/lib/libeyedbutils.la
 
 eyedbd_SOURCES= eyedbd.cc serv.cc serv_lib.cc rpc_lib.cc misc.cc
 eyedbd_LDADD= $(EYEDBSVLIBS)
@@ -252,7 +235,7 @@ eyedbd_CXXFLAGS = $(AM_CXXFLAGS) # renaming trick
 
 eyedboql_SOURCES= eyedboql.cc OQLParser.cc # remote.c
 eyedboql_CFLAGS=$(AM_CFLAGS) $(X_CFLAGS)
-eyedboql_LDADD= $(EYEDBCLLIBS) # $(X_LIBS) -lX11 -lXmu
+eyedboql_LDADD= $(EYEDBCLLIBS)
 
 eyedbodl_SOURCES= eyedbodl.cc
 eyedbodl_LDADD= $(EYEDBCLLIBS)

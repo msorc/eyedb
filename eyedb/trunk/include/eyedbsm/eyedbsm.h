@@ -28,8 +28,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#include <eyedblib/m_mem.h>
-
 namespace eyedbsm {
 
   /**

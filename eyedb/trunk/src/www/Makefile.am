@@ -20,7 +20,7 @@ eyedbcgibindir=$(pkglibdir)/www/cgi-bin
 bin_PROGRAMS= eyedbwwwd eyedbwconf eyedbputimage
 eyedbcgibin_PROGRAMS= eyedbcgiclean eyedbcgife 
 
-EYEDBLIBS=$(top_builddir)/src/eyedb/libeyedb.la $(top_builddir)/src/lib/libeyedbrpcbe.la $(top_builddir)/src/lib/libeyedbrpcfe.la $(top_builddir)/src/eyedbsm/libeyedbsm.la $(top_builddir)/src/lib/libeyedbutils.la @EYEDB_SYSLIBS@
+EYEDBLIBS=$(top_builddir)/src/eyedb/libeyedb.la $(top_builddir)/src/lib/libeyedbrpcbe.la $(top_builddir)/src/lib/libeyedbrpcfe.la $(top_builddir)/src/eyedbsm/libeyedbsm.la $(top_builddir)/src/lib/libeyedbutils.la
 
 eyedbwwwd_SOURCES=eyedbwwwd.cc
 eyedbwwwd_LDADD=libeyedbcgi.la $(EYEDBLIBS)

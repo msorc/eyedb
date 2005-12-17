@@ -22,11 +22,11 @@
 */
 
 
-#include <config.h>
+#include <eyedbconfig.h>
 
 #if defined(LINUX) || defined(LINUX64) || defined(LINUX_IA64) || defined(LINUX_PPC64)
 /*@@@@ this is for exotic function strsignal */
-#define _GNU_SOURCE
+// #define _GNU_SOURCE
 #include <string.h>
 #endif
 
@@ -50,7 +50,7 @@ extern int RPC_MIN_SIZE;
 /* disconnected the 21/08/01 */
 /*#define RPC_TIMEOUT 7200*/
 
-#ifdef IDB_STREAM
+#ifdef HAS_FATTACH
 #include <stropts.h>
 #endif
 #include <grp.h>
@@ -568,7 +568,7 @@ rpc_portOpen(rpc_Server *server, const char *servname, const char *portname,
 
   if (port->domain == AF_UNIX)
     {
-#ifdef IDB_STREAM
+#ifdef HAS_FATTACH
       int pfd[2];
       int fd;
       int created = 0;
@@ -1083,7 +1083,7 @@ rpc_serverMainLoop(rpc_Server *server, rpc_PortHandle **ports, int nports)
 
   for (;;)
     {
-#ifdef IDB_STREAM
+#ifdef HAS_FATTACH
       struct strrecvfd info;
 #endif
       fds_ready_to_read = server->fds_used;
@@ -1142,7 +1142,7 @@ rpc_serverMainLoop(rpc_Server *server, rpc_PortHandle **ports, int nports)
 		    length = sizeof(port->u.un.sock_un_name);
 		  }
 
-#ifdef IDB_STREAM
+#ifdef HAS_FATTACH
 		if (port->domain == AF_UNIX)
 		  {
 		    if (ioctl(fd, I_RECVFD, &info) < 0)
@@ -1168,7 +1168,7 @@ rpc_serverMainLoop(rpc_Server *server, rpc_PortHandle **ports, int nports)
 		  {
 		    rpc_ConnInfo *ci;
 		    if (port->domain == AF_UNIX) {
-#ifdef IDB_STREAM
+#ifdef HAS_FATTACH
 		      ci = rpc_make_stream_conninfo(new_fd, &info);
 #else
 		      ci = rpc_make_unix_conninfo(new_fd);

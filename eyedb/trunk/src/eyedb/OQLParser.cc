@@ -24,7 +24,7 @@
 
 #undef MOZILLA
 
-#include <config.h>
+#include <eyedbconfig.h>
 #include <sstream>
 using namespace std;
 

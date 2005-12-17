@@ -162,8 +162,10 @@ namespace eyedb {
 	     const char *_file, const char *_name, int _maxsize,
 	     eyedbsm::MapType _mtype, int _slotsize, DatType _dtype) :
       db(_db), id(_id), dspid(_dspid), file(strdup(_file)), name(strdup(_name)),
-      maxsize(_maxsize), mtype(_mtype), slotsize(_slotsize),
-      dtype(_dtype) {dataspace = 0;}
+      mtype(_mtype), maxsize(_maxsize), slotsize(_slotsize), dtype(_dtype) 
+      {
+	dataspace = 0;
+      }
 
     void setDataspace(const Dataspace *_dataspace) {dataspace = _dataspace;}
 

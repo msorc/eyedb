@@ -51,7 +51,7 @@
 #include <eyedblib/rpc_lib.h>
 
 #include "eyedb/SessionLog.h"
-#include <new.h>
+#include <new>
 
 #define COLLBE_BTREE
 

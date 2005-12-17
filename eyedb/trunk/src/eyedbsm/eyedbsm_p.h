@@ -25,6 +25,9 @@
 #ifndef _EYEDBSM_EYEDBSM_P_H
 #define _EYEDBSM_EYEDBSM_P_H
 
+#include "eyedbconfig.h"
+
+#include <eyedblib/m_mem.h>
 #include <eyedbsm/smd.h>
 #include <eyedblib/machtypes.h>
 #include "eyedbsm/transaction.h"
