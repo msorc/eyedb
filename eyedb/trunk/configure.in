@@ -44,6 +44,12 @@ AM_INIT_AUTOMAKE(${PACKAGE_NAME}, ${PACKAGE_VERSION})
 # Checks for command line flags
 #
 
+# if CXXFLAGS are not already set, set them to an empty value
+if test x"$CXXFLAGS" = "x"
+then
+	CXXFLAGS=''
+fi
+
 # debug
 AC_ARG_ENABLE(debug,
   AS_HELP_STRING([--enable-debug],[compile with debug (default is no)]),
@@ -89,19 +95,16 @@ AC_CANONICAL_HOST
 # must disappear
 case "$host" in
 i*86-*-linux*)
-#	CXXFLAGS_COMMON="-D_REENTRANT "
 	DEFINES="-DLINUX -DX86 -DLINUX_X86"
 	;;
 
 x86_64-*-linux*)
-#	CXXFLAGS_COMMON="-D_REENTRANT "
 	DEFINES="-DLINUX -DLINUX_X86_64"
 	;;
 
 sparc-sun-solaris2.9)
 	if test "$ac_cv_cxx_compiler_gnu" = "yes"
 	then
-#		CXXFLAGS_COMMON="-D_REENTRANT "
 		DEFINES="-DSOLARIS -DSPARCV9 -DSOLARIS_SPARCV9_GCC"
 	else
 		CFLAGS="-mt -xtarget=ultra -xarch=v9"
@@ -157,9 +160,14 @@ AC_FUNC_FSEEKO
 # check for libraries
 dnl AC_CHECK_LIB( nsl, ??) # -lnsl is not necessary apparently
 AC_CHECK_LIB( dl, dlopen)
-AC_CHECK_LIB( pthread, pthread_create)
+dnl AC_CHECK_LIB( pthread, pthread_create)
 AC_CHECK_LIB( crypt, crypt)
 AC_SEARCH_LIBS( socket, socket)
+
+# check for pthread
+ACX_PTHREAD
+LIBS="$LIBS $PTHREAD_LIBS"
+CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
 
 # ========================================
 # JAVA compilation
