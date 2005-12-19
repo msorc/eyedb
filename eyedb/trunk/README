@@ -27,8 +27,8 @@ C++ compiler
 bison
 flex
 
-If you want to build the Java part, you need a java compiler (currently, EyeDB
-has been tested with Sun's JDK, but gcj should work as well).
+To build the Java part, you need a java compiler (gcj or javac from Sun's JDK)
+and an archive tool to build a .jar archive.
 
 If you want to build documentation, you will need the following additional tools:
 latex, dvips, ps2pdf (for manual)
@@ -50,14 +50,10 @@ configure script takes the following useful options:
 Full description of configure options can be obtained with:
 ./configure --help
 
-Note that doc and examples are not build from the top-level directory:
-- to build the documentation, you need to cd to the doc/ directory and run make:
-cd doc
+Note that examples and tests are not build from the top-level directory; you need 
+to cd to the right sub-directory and run make, as in:
+cd tests/
 make
-- to build the examples, you need to cd to the examples/ directory and run make: 
-cd examples
-make
-
 
 
 Installing EyeDB

@@ -31,6 +31,8 @@
  *  .dmp: data mapping file (allocator per datafile)
  */
 
+#include "eyedbconfig.h"
+
 #include "eyedblib/filelib.h"
 #include "kern_p.h"
 #include <eyedbsm/smd.h>
