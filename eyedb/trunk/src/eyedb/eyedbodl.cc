@@ -290,7 +290,7 @@ getOpts(int argc, char *argv[], Bool &dirname_set)
       hints->setDirName(value.c_str());
       dirname_set = True;
     }
-    else if (GetOpt::parseLongOpt(s, "output-file-dir", &value)) {
+    else if (GetOpt::parseLongOpt(s, "output-file-prefix", &value)) {
       hints->setFilePrefix(value.c_str());
     }
     else if (GetOpt::parseLongOpt(s, "package", &value)) {

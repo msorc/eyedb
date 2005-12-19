@@ -43,6 +43,8 @@
 //#define NO_DIRECT_SET // added the 22/09/98
 #define SET_COUNT_DIRECT // added the 27/10/98
 
+#define ODL_STD_STRING
+
 namespace eyedb {
 
   static void
@@ -1237,9 +1239,20 @@ do { \
       {
 	const char *sclass = SCLASS();
 	const char *sarg = SARGIN();
+#ifdef ODL_STD_STRING
+	if (is_string)
+	  fprintf(fd, "Status %s::%s(const std::string &_%s%s)\n{\n",
+		  className(own), ATTRNAME(name, SET, hints), name,
+		  sarg);
+	else
+	  fprintf(fd, "Status %s::%s(const %s *_%s%s)\n{\n",
+		  className(own), ATTRNAME(name, SET, hints), sclass, name,
+		  sarg);
+#else
 	fprintf(fd, "Status %s::%s(const %s *_%s%s)\n{\n",
 		className(own), ATTRNAME(name, SET, hints), sclass, name,
 		sarg);
+#endif
 
 	if (attr_cache)
 	  genAttrCacheSetPrologue(ctx, GenCodeHints::SET, True);
@@ -1253,8 +1266,14 @@ do { \
 	if (isVarDim())
 	  {
 	    fprintf(fd, "%sSize size;\n", ctx->get());
+
+#ifdef ODL_STD_STRING
+	    if (is_string)
+	      fprintf(fd, "%sSize len = _%s.size() + 1;\n\n", ctx->get(), name);
+#else
 	    if (is_string)
 	      fprintf(fd, "%sSize len = ::strlen(_%s) + 1;\n\n", ctx->get(), name);
+#endif
 	    if (odl_dynamic_attr)
 	      fprintf(fd, "%sstatus = %s->getSize(this, size);\n", ctx->get(),
 		      __agrdyn);
@@ -1274,12 +1293,32 @@ do { \
 	    ctx->pop();
 	    fprintf(fd, "%sif (status)\n%s  return status;\n\n", ctx->get(),
 		    ctx->get());
+
+#ifdef ODL_STD_STRING
+	    if (odl_dynamic_attr) {
+	      if (is_string)
+		fprintf(fd, "%sstatus = %s->setValue(this, (Data)_%s.c_str(), len, 0);\n",
+			ctx->get(), __agrdyn, name);
+	      else
+		fprintf(fd, "%sstatus = %s->setValue(this, (Data)_%s., len, 0);\n",
+			ctx->get(), __agrdyn, name);
+	    }
+	    else {
+	      if (is_string)
+		fprintf(fd, "%sstatus = %s[%d]->setValue(this, (Data)_%s.c_str(), len, 0);\n",
+			ctx->get(), __agritems, num, name);
+	      else
+		fprintf(fd, "%sstatus = %s[%d]->setValue(this, (Data)_%s, len, 0);\n",
+			ctx->get(), __agritems, num, name);
+	    }
+#else
 	    if (odl_dynamic_attr)
 	      fprintf(fd, "%sstatus = %s->setValue(this, (Data)_%s, len, 0);\n",
 		      ctx->get(), __agrdyn, name);
 	    else
 	      fprintf(fd, "%sstatus = %s[%d]->setValue(this, (Data)_%s, len, 0);\n",
 		      ctx->get(), __agritems, num, name);
+#endif
 
 	    if (attr_cache)
 	      genAttrCacheSetEpilogue(ctx, GenCodeHints::SET, True);
@@ -1287,35 +1326,74 @@ do { \
 	  }
 	else
 	  {
-	    if (is_string)
-	      {
-		fprintf(fd, "%sunsigned char data[%d];\n", ctx->get(), maxdims);
-		fprintf(fd, "%sSize len = ::strlen(_%s);\n", ctx->get(), name);
-	      }
+	    if (is_string) {
+	      fprintf(fd, "%sunsigned char data[%d];\n", ctx->get(), maxdims);
+#ifdef ODL_STD_STRING
+	      fprintf(fd, "%sSize len = _%s.size();\n", ctx->get(), name);
+#else
+	      fprintf(fd, "%sSize len = ::strlen(_%s);\n", ctx->get(), name);
+#endif
+	    }
 	    fprintf(fd, "%sif (len >= %d)\n", ctx->get(), maxdims);
+#ifdef ODL_STD_STRING
+	    if (is_string)
+	      fprintf(fd, "%s  return Exception::make(IDB_ERROR, "
+		      "\"string `%%s' [%%d] too long for attribute %s::%s, maximum "
+		      "is %d\\n\", _%s.c_str(), len);\n", ctx->get(),
+		      class_owner->getName(), name, maxdims, name);
+	    else
+	      fprintf(fd, "%s  return Exception::make(IDB_ERROR, "
+		      "\"string `%%s' [%%d] too long for attribute %s::%s, maximum "
+		      "is %d\\n\", _%s, len);\n", ctx->get(),
+		      class_owner->getName(), name, maxdims, name);
+#else
 	    fprintf(fd, "%s  return Exception::make(IDB_ERROR, "
 		    "\"string `%%s' [%%d] too long for attribute %s::%s, maximum "
 		    "is %d\\n\", _%s, len);\n", ctx->get(),
 		    class_owner->getName(), name, maxdims, name);
-	    if (is_string)
-	      {
-		fprintf(fd, "%smemset(data, 0, %d);\n", ctx->get(), maxdims);
-		fprintf(fd, "%sstrncpy((char *)data, _%s, min(%d, len));\n",
-			ctx->get(), name, maxdims-1);
-		if (odl_dynamic_attr)
-		  fprintf(fd, "%sstatus = %s->setValue(this, data, %d, 0);\n",
-			  ctx->get(), __agrdyn, maxdims);
-		else
-		  fprintf(fd, "%sstatus = %s[%d]->setValue(this, data, %d, 0);\n",
-			  ctx->get(), __agritems, num, maxdims);
-	      }
+#endif
+	    if (is_string) {
+	      fprintf(fd, "%smemset(data, 0, %d);\n", ctx->get(), maxdims);
+#ifdef ODL_STD_STRING
+	      fprintf(fd, "%sstrncpy((char *)data, _%s.c_str(), min(%d, len));\n",
+		      ctx->get(), name, maxdims-1);
+#else
+	      fprintf(fd, "%sstrncpy((char *)data, _%s, min(%d, len));\n",
+		      ctx->get(), name, maxdims-1);
+#endif
+	      if (odl_dynamic_attr)
+		fprintf(fd, "%sstatus = %s->setValue(this, data, %d, 0);\n",
+			ctx->get(), __agrdyn, maxdims);
+	      else
+		fprintf(fd, "%sstatus = %s[%d]->setValue(this, data, %d, 0);\n",
+			ctx->get(), __agritems, num, maxdims);
+	    }
 	    else {
+#ifdef ODL_STD_STRING
+	      if (odl_dynamic_attr) {
+		if (is_string)
+		  fprintf(fd, "%sstatus = %s->setValue(this, (Data)_%s.c_str(), len, 0);\n",
+			  ctx->get(), __agrdyn, name);
+		else
+		  fprintf(fd, "%sstatus = %s->setValue(this, (Data)_%s, len, 0);\n",
+			  ctx->get(), __agrdyn, name);
+	      }
+	      else {
+		if (is_string)
+		  fprintf(fd, "%sstatus = %s[%d]->setValue(this, (Data)_%s.c_str(), len, 0);\n",
+			  ctx->get(), __agritems, num, name);
+		else
+		  fprintf(fd, "%sstatus = %s[%d]->setValue(this, (Data)_%s, len, 0);\n",
+			  ctx->get(), __agritems, num, name);
+	      }
+#else
 	      if (odl_dynamic_attr)
 		fprintf(fd, "%sstatus = %s->setValue(this, (Data)_%s, len, 0);\n",
 			ctx->get(), __agrdyn, name);
 	      else
 		fprintf(fd, "%sstatus = %s[%d]->setValue(this, (Data)_%s, len, 0);\n",
 			ctx->get(), __agritems, num, name);
+#endif
 	    }
 
 	    if (attr_cache)
@@ -1408,9 +1486,21 @@ do { \
       {
 	const char *sclass = SCLASS();
 	const char *sarg = SARGOUT();
+	
+#ifdef ODL_STD_STRING
+	if (is_string)
+	  fprintf(fd, "std::string %s::%s(%sBool *isnull%s) const\n{\n", 
+		  className(own), ATTRNAME(name, GET, hints), sarg,
+		  stargcom);
+	else
+	  fprintf(fd, "const %s *%s::%s(%sBool *isnull%s) const\n{\n", 
+		  sclass, className(own), ATTRNAME(name, GET, hints), sarg,
+		  stargcom);
+#else
 	fprintf(fd, "const %s *%s::%s(%sBool *isnull%s) const\n{\n", 
 		sclass, className(own), ATTRNAME(name, GET, hints), sarg,
 		stargcom);
+#endif
 
 	if (attr_cache)
 	  genAttrCacheGetPrologue(ctx, GenCodeHints::GET, True);
@@ -1530,10 +1620,24 @@ do { \
 
     if (is_string || is_raw)
       {
+#ifdef ODL_STD_STRING
+#ifdef ATTR_CACHE_DIRECT
+	if (is_string)
+	  fprintf(fd, "%sstd::string %s;\n", ctx->get(), atc_name(name));
+	else
+	  fprintf(fd, "%sconst %s *%s;\n", ctx->get(), SCLASS(), atc_name(name));
+#else
+	if (is_string)
+	  fprintf(fd, "%sstd::string %s;\n", ctx->get(), atc_name(name));
+	else
+	  fprintf(fd, "%s%s *%s;\n", ctx->get(), SCLASS(), atc_name(name));
+#endif
+#else
 #ifdef ATTR_CACHE_DIRECT
 	fprintf(fd, "%sconst %s *%s;\n", ctx->get(), SCLASS(), atc_name(name));
 #else
 	fprintf(fd, "%s%s *%s;\n", ctx->get(), SCLASS(), atc_name(name));
+#endif
 #endif
 	return;
       }
@@ -1569,8 +1673,16 @@ do { \
     if (isVarDim() && !(is_string || is_raw)) return;
 #endif
 
-    if (!typmod.ndims || is_string || is_raw)
+    if (!typmod.ndims || is_string || is_raw) {
+#ifdef ODL_STD_STRING
+      if (is_string)
+	fprintf(fd, "%s%s = "";\n", ctx->get(), atc_set(name));
+      else
+	fprintf(fd, "%s%s = 0;\n", ctx->get(), atc_set(name));
+#else
       fprintf(fd, "%s%s = 0;\n", ctx->get(), atc_set(name));
+#endif
+    }
     else
       fprintf(fd, "%smemset(%s, 0, %d);\n", ctx->get(), atc_set(name),
 	      typmod.pdims);
@@ -1925,9 +2037,19 @@ do { \
 
     // set method
     fprintf(fdh, "\n");
-    if (is_string || is_raw)
+    if (is_string || is_raw) {
+#ifdef ODL_STD_STRING
+      if (is_string)
+	fprintf(fdh, "%sStatus %s(const std::string &%s);\n", ctxH->get(),
+		ATTRNAME(name, SET, hints), SARGIN());
+      else
+	fprintf(fdh, "%sStatus %s(const %s *%s);\n", ctxH->get(),
+		ATTRNAME(name, SET, hints), SCLASS(), SARGIN());
+#else
       fprintf(fdh, "%sStatus %s(const %s *%s);\n", ctxH->get(),
 	      ATTRNAME(name, SET, hints), SCLASS(), SARGIN());
+#endif
+    }
 
 #ifdef NO_DIRECT_SET
     if (isIndirect() || !not_basic) // added 22/09/98
@@ -1957,10 +2079,22 @@ do { \
 #endif
 
     // get methods
-    if (is_string || is_raw)
+    if (is_string || is_raw) {
+#ifdef ODL_STD_STRING
+      if (is_string)
+	fprintf(fdh, "%sstd::string %s(%sBool *isnull = 0%s) const;\n",
+		ctxH->get(), ATTRNAME(name, GET, hints), SARGOUT(),
+		stargcom);
+      else
+	fprintf(fdh, "%sconst %s *%s(%sBool *isnull = 0%s) const;\n",
+		ctxH->get(), SCLASS(), ATTRNAME(name, GET, hints), SARGOUT(),
+		stargcom);
+#else
       fprintf(fdh, "%sconst %s *%s(%sBool *isnull = 0%s) const;\n",
 	      ctxH->get(), SCLASS(), ATTRNAME(name, GET, hints), SARGOUT(),
 	      stargcom);
+#endif
+    }
 
     fprintf(fdh, "%s%s%s%s(", ctxH->get(), classname, ref2,
 	    ATTRNAME_1(name, ATTRGET(cls), hints));
