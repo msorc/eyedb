@@ -28,6 +28,8 @@
 /* #include <sys/mman.h> */
 /* #include <stdarg.h> */
 
+static int dummy_off_t_3 = (sizeof(off_t) != 8 ? (*(char *)0 = 0) : 1);
+
 extern m_Map *m_mmap(caddr_t addr, size_t len, int prot, int flags,
 		     int fildes, off_t off, caddr_t *p, const char *file,
 		     off_t startns, off_t endns);

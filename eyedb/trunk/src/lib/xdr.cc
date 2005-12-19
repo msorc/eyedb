@@ -21,6 +21,7 @@
    Author: Eric Viara <viara@sysra.com>
 */
 
+#include <eyedbconfig.h>
 
 #include <eyedblib/xdr.h>
 #include <eyedblib/rpc_lib.h>

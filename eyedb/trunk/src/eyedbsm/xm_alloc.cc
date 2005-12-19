@@ -31,6 +31,8 @@
 #define XM_ESM_MUTEX
 #define XM_FLOPT
 
+#include <eyedbconfig.h>
+
 #include <assert.h>
 #include <stdlib.h>
 #include <unistd.h>

@@ -220,6 +220,8 @@ struct DbHeader {
 #endif
 };
 
+static int dummy_off_t_1 = (sizeof(off_t) != 8 ? (*(char *)0 = 0) : 1);
+
 struct MmapDesc {
   Boolean ismapped, locked;
   off_t s_start, s_end, a_start, a_end;

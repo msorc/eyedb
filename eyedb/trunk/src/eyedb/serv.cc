@@ -22,6 +22,8 @@
 */
 
 
+#include <eyedbconfig.h>
+
 #include <assert.h>
 #if !defined(LINUX) && !defined(CYGWIN)
 #include <synch.h>

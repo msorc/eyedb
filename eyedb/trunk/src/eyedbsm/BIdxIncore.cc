@@ -22,6 +22,8 @@
             Eric Viara <viara@sysra.com>
 */
 
+#include <eyedbconfig.h>
+
 #include <eyedblib/thread.h>
 #include	<stdlib.h>
 #include	<string.h>

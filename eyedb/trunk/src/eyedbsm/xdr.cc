@@ -50,6 +50,7 @@
    x2h_mapHeader(&mh, xmh);
  */
 
+#include <eyedbconfig.h>
 
 #include "kern_p.h"
 

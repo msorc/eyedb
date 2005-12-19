@@ -21,6 +21,7 @@
    Author: Eric Viara <viara@sysra.com>
 */
 
+#include "eyedbconfig.h"
 
 #include <assert.h>
 #include <sys/select.h>
@@ -28,7 +29,6 @@
 #include <signal.h>
 #include <fcntl.h>
 #include <string.h>
-
 
 #include "rpc_feP.h"
 #include <eyedblib/rpc_lib.h>
