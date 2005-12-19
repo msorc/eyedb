@@ -33,6 +33,8 @@
 
 #include "eyedbconfig.h"
 
+#include <sys/types.h>
+
 #include "eyedblib/filelib.h"
 #include "kern_p.h"
 #include <eyedbsm/smd.h>

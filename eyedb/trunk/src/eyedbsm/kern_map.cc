@@ -23,6 +23,8 @@
 
 #include <eyedbconfig.h>
 
+#include <sys/types.h>
+
 #include "kern_p.h"
 
 //#define TRACE1

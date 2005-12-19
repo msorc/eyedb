@@ -25,6 +25,8 @@
 
 #include <eyedb/eyedb.h>
 #include "eyedb/DBM_Database.h"
+
+#include <sys/types.h>
 #include <signal.h>
 #include <errno.h>
 #include <fcntl.h>

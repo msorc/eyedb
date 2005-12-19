@@ -27,6 +27,8 @@
 
 #include "eyedbconfig.h"
 
+#include <sys/types.h>
+
 #include <eyedblib/m_mem.h>
 #include <eyedbsm/smd.h>
 #include <eyedblib/machtypes.h>
