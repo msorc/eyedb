@@ -132,6 +132,7 @@ namespace eyedb {
 	    fchmod(fd, 0664);
 	    write(fd, challenge, strlen(challenge));
 	    rpc_status = checkAuth(connh, file.c_str());
+	    ftruncate(fd, 0);
 	    ::close(fd);
 	    unlink(file.c_str());
 	  }
