@@ -21,12 +21,8 @@
    Author: Eric Viara <viara@sysra.com>
 */
 
-#include "eyedbconfig.h"
-
 #include <sys/types.h>
 #include <stdio.h>
-/* #include <sys/mman.h> */
-/* #include <stdarg.h> */
 
 static int dummy_off_t_3 = (sizeof(off_t) != 8 ? (*(char *)0 = 0) : 1);
 
