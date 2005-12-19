@@ -26,6 +26,8 @@
 
 #define _IDB_KERN_
 
+#include <eyedbconfig.h>
+
 #include <stdlib.h>
 #include <limits.h>
 #include <assert.h>

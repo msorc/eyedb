@@ -21,6 +21,7 @@
    Author: Eric Viara <viara@sysra.com>
 */
 
+#include <eyedbconfig.h>
 
 #include <sys/time.h>
 #include <sys/types.h>

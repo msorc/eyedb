@@ -21,6 +21,7 @@
    Author: Eric Viara <viara@sysra.com>
 */
 
+#include "eyedbconfig.h"
 
 #if defined(ULTRASOL7)
 #include <iostream>

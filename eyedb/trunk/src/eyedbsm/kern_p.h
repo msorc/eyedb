@@ -262,6 +262,8 @@ namespace eyedbsm {
   oid2objh(const Oid *oid, const DbHandle *dbh, ObjectHeader **objh,
 	   MmapH *hdl, Boolean *oid2addr_failed);
 
+  static int dummy_off_t_2 = (sizeof(off_t) != 8 ? (*(char *)0 = 0) : 1);
+
   /*
     extern off_t
     oid2lastslot(const Oid *oid, const DbHandle *dbh);

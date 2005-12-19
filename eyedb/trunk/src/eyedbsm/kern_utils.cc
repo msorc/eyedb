@@ -21,6 +21,7 @@
    Author: Eric Viara <viara@sysra.com>
 */
 
+#include <eyedbconfig.h>
 
 #include <eyedblib/filelib.h>
 #include <kern_p.h>

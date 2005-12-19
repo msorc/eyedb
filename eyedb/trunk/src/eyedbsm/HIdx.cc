@@ -21,6 +21,8 @@
    Author: Eric Viara <viara@sysra.com>
 */
 
+#include <eyedbconfig.h>
+
 //#define CACHE_FOR_LOCK
 
 //#define TRUSS1_GC
