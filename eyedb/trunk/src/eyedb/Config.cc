@@ -26,8 +26,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <eyedb/eyedb.h>
-#include <conf_defaults.h>
 #include "eyedblib/strutils.h"
+
+static struct {
+  const char *name, *value;
+} conf_defaults[] = {
+  { "bindir", BINDIR},
+  { "sysconfdir", SYSCONFDIR},
+  { "version", EYEDB_VERSION},
+  { "numversion", EYEDB_NUMVERSION}
+};
 
 #define MAXFILES 16
 

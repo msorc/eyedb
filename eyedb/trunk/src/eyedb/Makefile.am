@@ -29,7 +29,6 @@ CollectionIterator.cc				\
 CollectionPeer.cc				\
 CollList.cc					\
 CollSet.cc					\
-Config.cc					\
 Connection.cc					\
 ConnectionPeer.cc				\
 Database.cc					\
@@ -128,6 +127,7 @@ BUILT_SOURCES=lex.oql.c lex.odl.c
 INCLUDES=-I$(top_srcdir)/src -I$(top_srcdir)/include -I$(top_builddir)/include
 
 libeyedb_la_LINK= $(LTCXXCOMPILE) -c -o comp_time.lo $(srcdir)/comp_time.cc ; $(CXXLINK) comp_time.lo
+libeyedb_la_LIBADD=Config.lo
 
 CLEANFILES=oql.tab.cc odl.tab.cc oql.output odl.output $(BUILT_SOURCES)
 
@@ -138,6 +138,9 @@ CLEANFILES=oql.tab.cc odl.tab.cc oql.output odl.output $(BUILT_SOURCES)
 
 lex.%.c: $(srcdir)/%.l
 	USEFLEX=1 $(top_srcdir)/scripts/eyedb-lex $(srcdir)/$*
+
+Config.lo: $(srcdir)/Config.cc
+	$(LTCXXCOMPILE) -DBINDIR=\"@bindir@\" -DSYSCONFDIR=\"@sysconfdir@\" -DEYEDB_VERSION=\"@EYEDB_VERSION@\" -DEYEDB_NUMVERSION=\"@EYEDB_NUMVERSION@\" -c -o Config.lo $<
 
 # ODL->C++
 EYEDBODL_exe=$(bindir)/eyedbodl

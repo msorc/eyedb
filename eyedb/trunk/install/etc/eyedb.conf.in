@@ -5,7 +5,7 @@
 #
 
 # Top directory
-topdir = @eyedbtopdir@;
+topdir = @prefix@;
 
 # Hostname
 host = localhost;

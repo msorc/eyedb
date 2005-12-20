@@ -70,14 +70,6 @@ then
   CXXFLAGS="$CXXFLAGS $enable_optimize"
 fi
 
-# these are defined unquoted
-eyedbbindir="${prefix}/bin"
-eyedbsysconfdir="${prefix}/etc"
-eyedbtopdir="${prefix}"
-AC_SUBST(eyedbbindir)
-AC_SUBST(eyedbsysconfdir)
-AC_SUBST(eyedbtopdir)
-
 # config header file
 AM_CONFIG_HEADER(eyedbconfig.h)
 
@@ -339,7 +331,6 @@ src/Makefile
 src/bindings/Makefile
 src/bindings/python/Makefile
 src/eyedb/Makefile
-src/eyedb/conf_defaults.h
 src/eyedb/eyedbversion.h
 src/eyedbsm/Makefile
 src/java/Makefile
