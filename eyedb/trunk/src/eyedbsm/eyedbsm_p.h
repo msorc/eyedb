@@ -220,7 +220,9 @@ struct DbHeader {
 #endif
 };
 
-static int dummy_off_t_1 = (sizeof(off_t) != 8 ? (*(char *)0 = 0) : 1);
+ static char* msg_1 = __FILE__;
+#define TTT(S) (write( 1, S, strlen(S)))
+ static int dummy_off_t_1 = (sizeof(off_t) != 8 ? (TTT(msg_1), *(char *)0 = 0) : 1);
 
 struct MmapDesc {
   Boolean ismapped, locked;

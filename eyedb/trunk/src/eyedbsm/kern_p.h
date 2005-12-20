@@ -262,7 +262,9 @@ namespace eyedbsm {
   oid2objh(const Oid *oid, const DbHandle *dbh, ObjectHeader **objh,
 	   MmapH *hdl, Boolean *oid2addr_failed);
 
-  static int dummy_off_t_2 = (sizeof(off_t) != 8 ? (*(char *)0 = 0) : 1);
+  static char* msg_2 = __FILE__;
+#define TTT(S) (write( 1, S, strlen(S)))
+ static int dummy_off_t_2 = (sizeof(off_t) != 8 ? (TTT(msg_2), *(char *)0 = 0) : 1);
 
   /*
     extern off_t
