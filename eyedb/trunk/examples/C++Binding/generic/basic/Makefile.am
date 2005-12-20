@@ -2,7 +2,7 @@ eyedbexamplesdir=$(datadir)/doc/$(PACKAGE)-$(VERSION)/examples/C++Binding/generi
 dist_eyedbexamples_DATA=basic.cc
 eyedbexamples_DATA=Makefile.eyedb-examples
 
-noinst_PROGRAMS= basic
+check_PROGRAMS= basic
 
 basic_SOURCES= basic.cc
 basic_LDADD= $(EYEDBSVLIBS)

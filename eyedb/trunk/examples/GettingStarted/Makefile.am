@@ -2,7 +2,7 @@ eyedbexamplesdir=$(datadir)/doc/$(PACKAGE)-$(VERSION)/examples/GettingStarted
 dist_eyedbexamples_DATA= PersonTest.java README schema.odl persontest.cc 
 eyedbexamples_DATA= Makefile.eyedb-examples
 
-noinst_PROGRAMS= persontest
+check_PROGRAMS= persontest
 
 EYEDBSVLIBS=$(top_builddir)/src/eyedb/libeyedb.la $(top_builddir)/src/lib/libeyedbrpcbe.la $(top_builddir)/src/lib/libeyedbrpcfe.la $(top_builddir)/src/eyedbsm/libeyedbsm.la $(top_builddir)/src/lib/libeyedbutils.la 
 

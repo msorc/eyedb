@@ -2,7 +2,7 @@ eyedbexamplesdir=$(datadir)/doc/$(PACKAGE)-$(VERSION)/examples/C++Binding/generi
 dist_eyedbexamples_DATA=query.cc
 eyedbexamples_DATA= Makefile.eyedb-examples
 
-noinst_PROGRAMS= query
+check_PROGRAMS= query
 
 query_SOURCES= query.cc
 query_LDADD= $(EYEDBSVLIBS)

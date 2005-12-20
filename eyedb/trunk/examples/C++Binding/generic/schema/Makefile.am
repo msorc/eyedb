@@ -2,7 +2,7 @@ eyedbexamplesdir=$(datadir)/doc/$(PACKAGE)-$(VERSION)/examples/C++Binding/generi
 dist_eyedbexamples_DATA=object_dump.cc schema_dump.cc
 eyedbexamples_DATA=Makefile.eyedb-examples
 
-noinst_PROGRAMS= schema_dump object_dump
+check_PROGRAMS= schema_dump object_dump
 
 schema_dump_SOURCES= schema_dump.cc
 schema_dump_LDADD= $(EYEDBSVLIBS)

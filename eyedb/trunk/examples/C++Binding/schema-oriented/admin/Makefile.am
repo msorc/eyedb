@@ -2,7 +2,7 @@ eyedbexamplesdir=$(datadir)/doc/$(PACKAGE)-$(VERSION)/examples/C++Binding/schema
 dist_eyedbexamples_DATA=admin.cc
 eyedbexamples_DATA=Makefile.eyedb-examples
 
-noinst_PROGRAMS= admin
+check_PROGRAMS= admin
 
 admin_SOURCES= admin.cc
 admin_LDADD= $(EYEDBSVLIBS)

@@ -50,11 +50,12 @@ configure script takes the following useful options:
 Full description of configure options can be obtained with:
 ./configure --help
 
-Note that examples and tests are not build from the top-level directory; you need 
+Note that tests are not build from the top-level directory; you need 
 to cd to the right sub-directory and run make, as in:
 cd tests/
 make
 
+Examples are not compiled by 'make' or 'make all' but by 'make check'.
 
 Installing EyeDB
 ----------------
