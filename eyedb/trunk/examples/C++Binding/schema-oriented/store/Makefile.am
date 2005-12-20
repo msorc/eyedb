@@ -2,7 +2,7 @@ eyedbexamplesdir=$(datadir)/doc/$(PACKAGE)-$(VERSION)/examples/C++Binding/schema
 dist_eyedbexamples_DATA=store.cc
 eyedbexamples_DATA=Makefile.eyedb-examples
 
-noinst_PROGRAMS= store
+check_PROGRAMS= store
 
 EYEDBSVLIBS=$(top_builddir)/src/eyedb/libeyedb.la $(top_builddir)/src/lib/libeyedbrpcbe.la $(top_builddir)/src/lib/libeyedbrpcfe.la $(top_builddir)/src/eyedbsm/libeyedbsm.la $(top_builddir)/src/lib/libeyedbutils.la 
 
