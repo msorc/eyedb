@@ -1,11 +1,11 @@
 if COND_DOXYGEN
-DOXYGEN_DIR= doxygen
+DOXYGEN_DIR= #doxygen # for now, we don't compile and install doxygen doc
 else
 DOXYGEN_DIR= 
 endif
 
 if COND_XSLTPROC
-MANPAGES_DIR= manpages
+MANPAGES_DIR= #manpages # for now, we don't compile and install man pages
 else
 MANPAGES_DIR= 
 endif

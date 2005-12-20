@@ -1,7 +1,11 @@
 eyedbconfdir=$(sysconfdir)/$(PACKAGE)
-dist_eyedbconf_DATA=eyedb.conf Access 
 
-#install-data-hook:
-#	-rm -f $(DESTDIR)$(eyedbconfdir)/Password
-#	$(DESTDIR)$(bindir)/eyedbcrypt $(DESTDIR)$(eyedbconfdir)/Password eyedbroot
+EXTRA_DIST=eyedb.conf Access
+
+install-data-local:
+	( \
+		test ! -f $(eyedbconfdir)/eyedb.conf && $(INSTALL_DATA) eyedb.conf $(DESTDIR)$(eyedbconfdir)/eyedb.conf ; \
+		test ! -f $(eyedbconfdir)/Access && $(INSTALL_DATA) $(srcdir)/Access $(DESTDIR)$(eyedbconfdir)/Access ; \
+		exit 0 \
+	)
 
