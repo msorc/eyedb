@@ -14,7 +14,7 @@ install-data-hook:
 	test -z "$(noinst_htmldir)" || $(mkdir_p) "$(DESTDIR)$(noinst_htmldir)"
 	( cd html ; \
 	  for f in *.html *.css *.png ; do \
-	    $(INSTALL_DATA) $$f "$(DESTDIR)$(noinst_htmldir)/$$p" ; \
+	    $(INSTALL_DATA) $$f "$(DESTDIR)$(noinst_htmldir)/$$f" ; \
 	  done)
 
 EXTRA_DIST=eyedb-doxygen.cfg
