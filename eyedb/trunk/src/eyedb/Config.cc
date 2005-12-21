@@ -28,14 +28,9 @@
 #include <eyedb/eyedb.h>
 #include "eyedblib/strutils.h"
 
-static struct {
+extern struct config_default {
   const char *name, *value;
-} conf_defaults[] = {
-  { "bindir", BINDIR},
-  { "sysconfdir", SYSCONFDIR},
-  { "version", EYEDB_VERSION},
-  { "numversion", EYEDB_NUMVERSION}
-};
+} config_defaults[];
 
 #define MAXFILES 16
 
@@ -424,10 +419,9 @@ namespace eyedb {
     if (eyedbconf)
       return eyedbconf;
 
-    for (unsigned int n = 0;
-	 n < sizeof(conf_defaults)/sizeof(conf_defaults[0]); n++)
-      if (!strcmp(conf_defaults[n].name, "sysconfdir"))
-	return std::string(conf_defaults[n].value) + "/eyedb/eyedb.conf";
+    for (unsigned int n = 0; config_defaults[n].name; n++)
+      if (!strcmp(config_defaults[n].name, "sysconfdir"))
+	return std::string(config_defaults[n].value) + "/eyedb/eyedb.conf";
     return "";
   }
 
@@ -480,9 +474,8 @@ namespace eyedb {
     if (!the_config)
       the_config = this;
 
-    for (unsigned int n = 0;
-	 n < sizeof(conf_defaults)/sizeof(conf_defaults[0]); n++)
-      add(conf_defaults[n].name, conf_defaults[n].value);
+    for (unsigned int n = 0; config_defaults[n].name; n++)
+      add(config_defaults[n].name, config_defaults[n].value);
 
     if (file) {
       add(file);
@@ -531,20 +524,6 @@ namespace eyedb {
 #endif
     Item *item = new Item(name, value);
     list.insertObjectFirst(item);
-
-#define HACK_TO_TEST_AUTOCONF_AUTOMAKE_BRANCH
-#ifndef HACK_TO_TEST_AUTOCONF_AUTOMAKE_BRANCH
-    if (!strcmp(name, "archdir"))
-      {
-	archdir = value;
-	if (!init_done)
-	  {
-	    init_done = 1;
-	    std::string s = std::string(archdir) + "/etc/ArchConfig";
-	    add(s);
-	  }
-      }
-#endif
   }
 
   void Config::setValue(const char *name, const char *value)
