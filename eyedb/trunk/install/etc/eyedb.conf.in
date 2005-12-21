@@ -10,16 +10,16 @@ topdir = @prefix@;
 # Hostname
 host = localhost;
 
-sv_datdir = %topdir%/var/lib/eyedb/db; 
+sv_datdir = %topdir%/var/lib/eyedb/db; # $(localstatedir)/lib/eyedb/db
 
 # pipes:
-sv_pipedir = %topdir%/var/lib/eyedb/pipes; 
+sv_pipedir = %topdir%/var/lib/eyedb/pipes; # $(localstatedir)/lib/eyedb/pipes
 
 # tmpdir
-sv_tmpdir = %topdir%/var/lib/eyedb/tmp; 
+sv_tmpdir = %topdir%/var/lib/eyedb/tmp; # $(localstatedir)/lib/eyedb/tmp
 
 # sopath
-sopath = %topdir%/lib/eyedb ; 
+sopath = %topdir%/lib/eyedb ; # $(libdir)/eyedb
 
 # EYEDBDBM Database
 
@@ -32,8 +32,8 @@ dbm = %sv_datdir%/dbmdb.dbs;
 
 # Server Parameters
 
-sv_access_file = %topdir%/etc/eyedb/Access;
-sv_passwd_file = %topdir%/etc/eyedb/Password;
+sv_access_file = %topdir%/etc/eyedb/Access;  # $(sysconfdir)/eyedb/Access
+sv_passwd_file = %topdir%/etc/eyedb/Password;  # $(sysconfdir)/eyedb/Password
 sv_smdport = %sv_pipedir%/eyedbsmd;
 
 # Version Number
@@ -55,7 +55,7 @@ sv_port = %port%;
 
 # OQL path
 
-oqlpath = %topdir%/var/lib/eyedb/oql;
+oqlpath = %topdir%/var/lib/eyedb/oql; # $(localstatedir)/lib/eyedb/oql
 
 # Java Class Path
 
