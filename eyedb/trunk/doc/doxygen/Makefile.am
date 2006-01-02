@@ -1,4 +1,4 @@
-noinst_htmldir=$(datadir)/doc/$(PACKAGE)-$(VERSION)/api
+noinst_htmldir=$(datadir)/doc/$(PACKAGE)/api
 noinst_html_DATA= html/index.html
 
 DOXYGEN=@DOXYGEN@
