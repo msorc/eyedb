@@ -1,6 +1,6 @@
 SUBDIRS=figures
 
-manualdir=$(datadir)/doc/$(PACKAGE)-$(VERSION)/manual
+manualdir=$(datadir)/doc/$(PACKAGE)/manual
 
 PDF_PREFIX=EyeDB
 
