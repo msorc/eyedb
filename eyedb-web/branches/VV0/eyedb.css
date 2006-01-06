@@ -1,0 +1,33 @@
+body {
+  font-family:Verdana, Arial, Helvetica, sans-serif;
+  font-size: 0.8em;
+  margin: 0;
+  padding: 0;
+}
+
+#NavBlock {
+  float:left;
+  width: 150px;
+}
+
+#CenterBlock {
+  background-color:#9999CC;
+  margin-left: 150px;
+  margin-right: 150px;
+}
+
+#NavBlock ul {
+  list-style-type: none;
+  margin: 0;
+  padding:0;
+}
+
+#Nav li {
+  margin-bottom: 5px;
+}
+
+#Nav a {
+  margin: 0 2px;
+  color: #000000;
+}
+
