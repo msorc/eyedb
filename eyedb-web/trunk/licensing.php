@@ -2,6 +2,7 @@
 <? include( 'nav.php'); ?>
 
 <div id="CenterBlock">
+<h1 id="PageTitle">Licensing</h1>
 <p>
 bla bla bla
 </p>
