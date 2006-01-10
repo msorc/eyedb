@@ -90,7 +90,7 @@ help()
 #ifdef RPC_TIMEOUT
 	  "-sv_timeout <timeout>          timeout in seconds [default is 7200 sec]\n"
 #endif
-	  "-sv_passwd_file <passwdfile>   password file\n"
+	  //	  "-sv_passwd_file <passwdfile>   password file\n"
 	  "-sv_nod                        no daemon: keep stdin, stdout, stderr opened\n"
 	  "-eyedbroot <root>              eyedb root directory\n"
 	  "-eyedbconf <conffile>          configuration file\n"
@@ -108,7 +108,7 @@ static int
 get_opts(int argc, char *argv[],
 	 const char **accessfile,
 	 const char **datdir,
-	 const char **passwdfile, 
+	 //const char **passwdfile, 
 	 const char **sesslogdev,
 	 int *sessloglevel,
 	 int *nofork)
@@ -116,7 +116,7 @@ get_opts(int argc, char *argv[],
   int i;
   const char *s;
 
-  *passwdfile = 0;
+  //*passwdfile = 0;
   *accessfile = eyedb::getConfigValue("sv_access_file");
   *nofork = 0;
   *sesslogdev = 0;
@@ -132,7 +132,7 @@ get_opts(int argc, char *argv[],
   //static const std::string sv_smdport = "sv_smdport";
     static const std::string access_file_opt = "access_file";
     static const std::string datdir_opt = "datdir";
-    static const std::string passwd_file_opt = "passwd_file";
+    //static const std::string passwd_file_opt = "passwd_file";
     static const std::string nod_opt = "nod";
     static const std::string sesslogdev_opt = "sesslogdev";
     static const std::string sessloglevel_opt = "sessloglevel";
@@ -151,8 +151,10 @@ get_opts(int argc, char *argv[],
 	     Option::MandatoryValue, OptionDesc("Access file", "<access file>")),
       Option(datdir_opt, OptionStringType(),
 	     Option::MandatoryValue, OptionDesc("Default datafile directory", "<datdir>")),
+      /*
       Option(passwd_file_opt, OptionStringType(),
 	     Option::MandatoryValue, OptionDesc("Password file", "<passwd file>")),
+      */
       Option(nod_opt, OptionBoolType(),
 	     0, OptionDesc("No daemon: does not close fd 0, 1 & 2")),
       Option('h', help_opt, OptionBoolType(),
@@ -175,8 +177,10 @@ get_opts(int argc, char *argv[],
       return 1;
     }
 
+    /*
     if (map.find(passwd_file_opt) != map.end())
       *passwdfile = strdup(map[passwd_file_opt].value.c_str());
+      */
 
     if (map.find(access_file_opt) != map.end())
       *accessfile = strdup(map[access_file_opt].value.c_str());
@@ -221,12 +225,14 @@ get_opts(int argc, char *argv[],
 	      *smdport = argv[++i];
 	      ++i;
 	    }
+	  /*
 	  else if (!strcmp(s, "-sv_passwd_file"))
 	    {
 	      check("-sv_passwdfile", i, argc);
 	      *passwdfile = argv[++i];
 	      ++i;
 	    }
+	  */
 	  else if (!strcmp(s, "-sv_nod"))
 	    {
 	      nod = True;
@@ -331,16 +337,30 @@ notice(int status)
   return status;
 }
 
+static unsigned int get_ports(const char *idbsvport[], const char *_sv_port)
+{
+  char *sv_port = strdup(_sv_port);
+  unsigned int nports = 0;
+  for (;;) {
+    idbsvport[nports++] = sv_port;
+    sv_port = strchr(sv_port, ',');
+    if (!sv_port)
+      break;
+    *sv_port++ = 0;
+  }
+
+  return nports;
+}
+
 int
 main(int argc, char *argv[])
 {
   rpc_Server *server;
   rpc_PortHandle *port[32];
-  int nports;
   const char *idbsvport[32];
   eyedbsm::Status status;
   const char *hostname;
-  const char *accessfile, *datdir, *passwdfile;
+  const char *accessfile, *datdir; // , *passwdfile;
   const char *sesslogdev;
   int sessloglevel;
 
@@ -350,21 +370,36 @@ main(int argc, char *argv[])
 
   eyedb::init(argc, argv, &sv_host, &sv_port, true);
 
-  nports = 0;
+  const char *sv_port2 = 0;
 
   if (sv_port.length()) {
     // TBD : should parse comma separated port
-    idbsvport[nports++] = sv_port.c_str();
+    sv_port2 = sv_port.c_str();
   }
   else {
-    const char *s;
-    if (s = eyedb::getConfigValue("sv_port"))
-      idbsvport[nports++] = strdup(s);
+    if (eyedb::getConfigValue("sv_port"))
+      sv_port2 = eyedb::getConfigValue("sv_port");
     else
-      idbsvport[nports++] = Connection::DefaultIDBPortValue;
+      sv_port2 = Connection::DefaultIDBPortValue;
   }
 
-  hostname = sv_host.c_str();
+  unsigned int nports = get_ports(idbsvport, sv_port2);
+
+  // 21/12/05
+  if (sv_host.length())
+    hostname = sv_host.c_str();
+  else {
+    const char *s =  eyedb::getConfigValue("sv_host");
+    if (!s) // to disapear soon
+      s = eyedb::getConfigValue("host");
+
+    if (!s) {
+      fprintf(stderr, "eyedbd: sv_host is not set\n");
+      return notice(1);
+    }
+
+    hostname = strdup(s);
+  }
 
   server = rpcBeInit();
 
@@ -375,7 +410,7 @@ main(int argc, char *argv[])
 
   eyedbsm::backend = eyedbsm::True;
 
-  if (get_opts(argc, argv, &accessfile, &datdir, &passwdfile, &sesslogdev,
+  if (get_opts(argc, argv, &accessfile, &datdir /*, &passwdfile*/ , &sesslogdev,
 	       &sessloglevel, &nofork))
     return notice(1);
 
@@ -414,7 +449,7 @@ main(int argc, char *argv[])
 			      nports, idbsvport,
 			      datdir, sesslogdev, sessloglevel);
 
-  IDB_init(datdir, passwdfile, sesslog, 0 /*timeout*/);
+  IDB_init(datdir, 0 /* passwdfile */, sesslog, 0 /*timeout*/);
 
   if (sesslog->getStatus())
     {

@@ -66,10 +66,10 @@ main(int argc, char *argv[])
 	    cout << "name:    " << p->getName() << endl;
 	    cout << "age:     " << p->getAge() << endl;
 
-	    if (*p->getAddr()->getStreet())
+	    if (p->getAddr()->getStreet().size())
 	      cout << "street:  " << p->getAddr()->getStreet() << endl;
 
-	    if (*p->getAddr()->getTown())
+	    if (p->getAddr()->getTown().size())
 	      cout << "town:    " << p->getAddr()->getTown() << endl;
 
 	    if (p->getSpouse())

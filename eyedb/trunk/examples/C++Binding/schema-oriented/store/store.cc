@@ -19,7 +19,7 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
+  Author: Eric Viara <viara@sysra.com>
 */
 
 #include "person.h"
@@ -67,11 +67,10 @@ main(int argc, char *argv[])
     q.execute(arr);
 
     // if not found, returns an error
-    if (!arr.getCount())
-      {
-	fprintf(stderr, "cannot find spouse '%s'\n", spouse_name);
-	return 1;
-      }
+    if (!arr.getCount()) {
+      fprintf(stderr, "cannot find spouse '%s'\n", spouse_name);
+      return 1;
+    }
 
     // (safe!) casting returned object
     Person *spouse = Person_c(arr[0]);
@@ -109,17 +108,16 @@ main(int argc, char *argv[])
     car2->release();
 
     // creating ten children
-    for (int i = 0; i < 10; i++)
-      {
-	Person *c = new Person(&db);
-	char tmp[64];
+    for (int i = 0; i < 10; i++) {
+      Person *c = new Person(&db);
+      char tmp[64];
 
-	c->setAge(i);
-	sprintf( tmp, "%d", i);
-	c->setName( (std::string(name) + std::string("_") + std::string(tmp)).c_str() );
-	p->setInChildrenCollAt(i, c);
-	c->release();
-      }
+      c->setAge(i);
+      sprintf( tmp, "%d", i);
+      c->setName( (std::string(name) + std::string("_") + std::string(tmp)).c_str() );
+      p->setInChildrenCollAt(i, c);
+      c->release();
+    }
 
     // storing all in database
     p->store(eyedb::RecMode::FullRecurs);

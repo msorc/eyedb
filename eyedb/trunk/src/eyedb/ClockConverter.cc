@@ -72,8 +72,8 @@ namespace eyedb {
 
   ClockConverter::~ClockConverter()
   {
-    delete this->string_clock;
-    delete this->string_zone;
+    delete [] this->string_clock;
+    delete [] this->string_zone;
   }
 
 

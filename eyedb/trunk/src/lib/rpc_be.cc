@@ -165,7 +165,7 @@ close_files(void)
     if (FD_ISSET(fd, &rpc_mainServer->fds_used))
       {
 	if (close(fd) < 0)
-	  PERROR (msg_make("error closing file"));
+	  PERROR (msg_make("error closing file %d", fd));
       }
 }
 
@@ -488,6 +488,24 @@ rpc_serverOptionsGet(int argc, char *argv[], char **portname, char **unixname)
 /*extern int gethostname(const char *, int);*/
 
 static void
+bind_error(const char *portname, bool tcpip)
+{
+  fprintf(stderr, "\nPerharps another eyedbd is running on ");
+  if (tcpip)
+    fprintf(stderr, "TCP/IP port %s\n", portname);
+  else
+    fprintf(stderr, "named pipe port:\n%s\n", portname);
+
+  fprintf(stderr, "\nYou may check this by launching:\n");
+  fprintf(stderr, "eyedbrc status --port=%s\n", portname);
+  if (!tcpip) {
+    fprintf(stderr, "\nIf no, unlink this port as follows:\n");
+    fprintf(stderr, "rm -f %s\n", portname);
+    fprintf(stderr, "and relaunch the server.\n");
+  }
+}
+
+static void
 rpc_socket_reuse_addr(int s)
 {
   int val;
@@ -555,6 +573,7 @@ rpc_portOpen(rpc_Server *server, const char *servname, const char *portname,
 	       sizeof(port->u.in.sock_in_name)) < 0 )
 	{
 	  PERROR(msg_make("eyedb fatal error: bind (naming the socket) failed port '%s'", port->portname));
+	  bind_error(port->portname, true);
 	  return rpc_Error;
 	}
 
@@ -628,6 +647,8 @@ rpc_portOpen(rpc_Server *server, const char *servname, const char *portname,
 	       sizeof(port->u.un.sock_un_name)) < 0 )
 	{
 	  PERROR(msg_make("eyedb fatal error: bind (naming the socket) failed port '%s'", port->portname));
+	  bind_error(port->portname, false);
+	  /*
 	  fprintf(stderr, "\nPerharps another eyedbd is running on port:\n%s\n",
 		  port->portname);
 	  fprintf(stderr, "\nYou may check this by launching:\n");
@@ -635,6 +656,7 @@ rpc_portOpen(rpc_Server *server, const char *servname, const char *portname,
 	  fprintf(stderr, "\nIf no, unlink this port as follows:\n");
 	  fprintf(stderr, "rm -f %s\n", port->portname);
 	  fprintf(stderr, "and relaunch the server.\n");
+	  */
 	  return rpc_Error;
 	}
 

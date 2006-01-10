@@ -22,7 +22,7 @@
 */
 
 
-#include <eyedbconfig.h>
+//#include <eyedbconfig.h>
 #include <fcntl.h>
 
 #include "eyedb_p.h"
