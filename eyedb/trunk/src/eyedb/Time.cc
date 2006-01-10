@@ -124,8 +124,8 @@ namespace eyedb {
     strcat(this->string_time, " ");
     strcat(this->string_time, s_zone);
 
-    delete s_clock;
-    delete s_zone;
+    delete [] s_clock;
+    delete [] s_zone;
   }
 
 

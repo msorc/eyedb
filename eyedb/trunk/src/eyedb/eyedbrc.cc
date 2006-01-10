@@ -328,14 +328,12 @@ main(int argc, char *argv[])
   if (cmd == Start) {
     int st = force ? 1 : 0;
 
-    //    string passwd_file = string(eyedbroot) + "/etc/eyedb/Password";
-    string passwd_file = eyedb::getConfigValue("sv_passwd_file");
-    if (access(passwd_file.c_str(), R_OK)) {
-      fprintf(stderr, "\nPassword file '%s' is not accessible\n",
-	      passwd_file.c_str());
-      fprintf(stderr, "Did you run the post install script as follows:\n");
-      fprintf(stderr, "sh %s/share/eyedb/tools/eyedb-postinstall.sh\n\n",
-	      eyedbroot);
+    const char *dbm = eyedb::getConfigValue("dbm");
+    if (!dbm || access(dbm, R_OK)) {
+      fprintf(stderr, "\nThe EYEDBDBM database file '%s' is not accessible\n",
+	      dbm);
+      fprintf(stderr, "Did you run the post install script 'eyedb-postinstall.sh' ?\n");
+      fprintf(stderr, "If yes, check file eyedb.conf.\n");
       return 1;
     }
 
@@ -343,6 +341,12 @@ main(int argc, char *argv[])
     av = &argv[st+1];
   }
 
+  if (strchr(idbport, ',')) {
+    char *x = strdup(idbport);
+    *strchr(x, ',') = 0;
+    idbport = x;
+  }
+	    
   SessionLog sesslog(idbport, eyedb::getConfigValue("sv_tmpdir"));
 
   if (sesslog.getStatus()) {

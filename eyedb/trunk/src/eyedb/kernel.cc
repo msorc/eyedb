@@ -22,6 +22,8 @@
 */
 
 
+//#define PASSWD_FILE
+
 #define NEW_COLLBE_MAN
 
 #define _IDB_KERN_
@@ -86,8 +88,10 @@ namespace eyedb {
 
   static const char *edb_passwdfile;
 
+#ifdef PASSWD_FILE
   static void
   get_dbm_passwd(const char *passwdfile);
+#endif
 
   /*
     static char *
@@ -102,7 +106,10 @@ namespace eyedb {
   // introduced the 17/12/99
 #define LOAD_RM_BUG
 
+#ifdef PASSWD_FILE
   static char dbm_passwd[14];
+#endif
+
   static const char salt[] = "r8";
 
   static LinkedList st_inv_oid_ctx;
@@ -396,11 +403,12 @@ namespace eyedb {
 			 "%s", file));
 
     // check time
-    if (rstat.st_ctime < conn_ctx.ctime)
+    if (rstat.st_ctime < conn_ctx.ctime-1)
       return rpcStatusMake
 	(Exception::make(IDB_ERROR, "invalid creation time for "
 			 "authentification file: "
-			 "%s", file));
+			 "%s (%u >= %u)", file, rstat.st_ctime,
+			 conn_ctx.ctime));
 
     // check mode
     if (0664 != (rstat.st_mode & 0777))
@@ -679,11 +687,17 @@ namespace eyedb {
       }
     */
 
+    RPCStatus rpc_status;
+#ifdef PASSWD_FILE
     if (strcmp(crypt(passwdauth, salt), dbm_passwd))
       return rpcStatusMake(Exception::make(IDB_AUTHENTICATION_FAILED,
 					   "not a valid password to create a DBM database"));
+#else
+    rpc_status = IDB_checkAuthDbm(dbmdb);
+    if (rpc_status)
+      return rpc_status;
+#endif
 
-    RPCStatus rpc_status;
     rpc_status = IDB_dbCreate_realize(ch, 0, DBM_Database::getDbid(), dbmdb,
 				      (char *)0, (char *)0, DBM_Database::getDbName(), dbmdb, False, &dbdesc->sedbdesc);
 
@@ -6560,6 +6574,7 @@ do { \
     //  return rpcStatusMake_se(eyedbsm::objectProtectionGet(dbh->sedbh, obj_oid, prot_oid));
   }
 
+#ifdef PASSWD_FILE
   static void
   get_dbm_passwd(const char *passwdfile)
   {
@@ -6581,6 +6596,7 @@ do { \
 
     close(fd);
   }
+#endif
 
   //extern void idbInit_();
 
@@ -6607,8 +6623,9 @@ do { \
   {
     Config::init();
 
-    const char *passwdfile;
     const char *s;
+#ifdef PASSWD_FILE
+    const char *passwdfile;
 
     if (edb_passwdfile)
       passwdfile = strdup(edb_passwdfile);
@@ -6619,6 +6636,7 @@ do { \
 	fprintf(stderr, "eyedbd: EyeDB passwd file is not set, check your 'sv_passwd_file' configuration variable or the '-passwdfile' command line option\n");
 	exit(1);
       }
+#endif
 
     if (settimeout)
       {
@@ -6632,7 +6650,9 @@ do { \
 	  }
       }
 
+#ifdef PASSWD_FILE
     get_dbm_passwd(passwdfile);
+#endif
 
     // kludge
     s = eyedb::getConfigValue("coll_hidx_oid");
@@ -6651,13 +6671,16 @@ do { \
   }
 
   void
-  IDB_init(const char *voldir, const char *_passwdfile,
+  IDB_init(const char *voldir,
+	   const char *dummy, // was  _passwdfile,
 	   void *xsesslog, int _timeout)
   {
     conn_ctx.sesslog = (SessionLog *)xsesslog;
     set_new_handler(new_handler);
 
+#ifdef PASSWD_FILE
     edb_passwdfile = _passwdfile;
+#endif
     timeout = _timeout;
 
     Database::setDefaultVolumeDirectory(voldir);
