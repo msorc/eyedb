@@ -1,4 +1,4 @@
-eyedbexamplesdir=$(datadir)/doc/$(PACKAGE)-$(VERSION)/examples/GettingStarted
+eyedbexamplesdir=$(datadir)/doc/$(PACKAGE)/examples/GettingStarted
 dist_eyedbexamples_DATA= PersonTest.java README schema.odl persontest.cc 
 eyedbexamples_DATA= Makefile.eyedb-examples
 

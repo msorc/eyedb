@@ -1,4 +1,4 @@
-eyedbexamplesdir=$(datadir)/doc/$(PACKAGE)-$(VERSION)/examples/C++Binding/generic/basic
+eyedbexamplesdir=$(datadir)/doc/$(PACKAGE)/examples/C++Binding/generic/basic
 dist_eyedbexamples_DATA=basic.cc
 eyedbexamples_DATA=Makefile.eyedb-examples
 

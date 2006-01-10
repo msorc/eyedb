@@ -1,4 +1,4 @@
-eyedbexamplesdir=$(datadir)/doc/$(PACKAGE)-$(VERSION)/examples/JavaBinding/generic/appli/query
+eyedbexamplesdir=$(datadir)/doc/$(PACKAGE)/examples/JavaBinding/generic/appli/query
 dist_eyedbexamples_DATA=Query.java Makefile.eyedb-examples
 
 JAVAROOT=$(top_builddir)/examples/JavaBinding/generic/appli/query
