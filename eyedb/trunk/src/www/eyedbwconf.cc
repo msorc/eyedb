@@ -352,7 +352,7 @@ getall_realize(Database *db)
     {
       WConfig *config = (WConfig *)obj_arr[i];
       printf("\nName: '%s'\nUser: '%s'\n",
-	     config->getName(), config->getUser());
+	     config->getName().c_str(), config->getUser().c_str());
     }
 
   return 0;
@@ -366,7 +366,7 @@ get_realize(Database *db)
   if (!config)
     return 1;
 
-  printf("%s\n", config->getConf());
+  printf("%s\n", config->getConf().c_str());
 }
 
 static int

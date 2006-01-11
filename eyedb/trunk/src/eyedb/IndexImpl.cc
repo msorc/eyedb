@@ -183,7 +183,7 @@ namespace eyedb {
     if (mthlist) {
       LinkedListCursor c(mthlist);
       while (c.getNext((void *&)mth)) {
-	if (!strcmp(mth->getEx()->getExname(), mthname) &&
+	if (!strcmp(mth->getEx()->getExname().c_str(), mthname) &&
 	    *sign == *mth->getEx()->getSign())
 	  return Success;
       }

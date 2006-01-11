@@ -1182,7 +1182,7 @@ init(WConfig *w_config)
 					"writing", tmpfile));
 
   w_config->getDatabase()->transactionBegin();
-  const char *conf = w_config->getConf();
+  const char *conf = w_config->getConf().c_str();
   write(fd, conf, strlen(conf));
   close(fd);
   w_config->getDatabase()->transactionAbort();
@@ -1697,9 +1697,9 @@ idbWDumpConfRealize(idbWProcess *p, int fd)
   std::string s;
   if (idbW_dbctx->w_config)
     {
-      if (*idbW_dbctx->w_config->getName())
+      if (*idbW_dbctx->w_config->getName().c_str())
 	s = std::string("'") + idbW_dbctx->w_config->getName() + "'";
-      else if (*idbW_dbctx->w_config->getUser())
+      else if (*idbW_dbctx->w_config->getUser().c_str())
 	s = std::string("(default for user '") + idbW_dbctx->w_config->getUser() + "')";
     }
   else
@@ -1709,7 +1709,7 @@ idbWDumpConfRealize(idbWProcess *p, int fd)
 		   "</h1><pre>", s.c_str());
 
   if (idbW_dbctx->w_config)
-    idbW_dest->cflush(str_to_html(idbW_dbctx->w_config->getConf(), False),
+    idbW_dest->cflush(str_to_html(idbW_dbctx->w_config->getConf().c_str(), False),
 		      True);
   else
     idbWDisplayConf(idbW_ctx->db, idbW_dest);

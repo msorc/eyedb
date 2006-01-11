@@ -32,6 +32,7 @@
 #define XBOOL "bool"
 
 #define DEF_PREFIX "eyedb::"
+#define DEF_PREFIX1 "eyedb::"
 
 //#define COMP_TRACE
 
@@ -403,94 +404,94 @@ namespace eyedb {
       return "AttributeComponentSet";
 
     if (!strcmp(name, "index"))
-      return DEF_PREFIX "Index";
+      return DEF_PREFIX1 "Index";
 
     if (!strcmp(name, "multi_index"))
-      return DEF_PREFIX "MultiIndex";
+      return DEF_PREFIX1 "MultiIndex";
 
     if (!strcmp(name, "hashindex"))
-      return DEF_PREFIX "HashIndex";
+      return DEF_PREFIX1 "HashIndex";
 
     if (!strcmp(name, "btreeindex"))
-      return DEF_PREFIX "BTreeIndex";
+      return DEF_PREFIX1 "BTreeIndex";
 
     if (!strcmp(name, "executable_lang"))
-      return DEF_PREFIX "ExecutableLang";
+      return DEF_PREFIX1 "ExecutableLang";
 
     if (!strcmp(name, "argtype_type"))
-      return DEF_PREFIX "ArgType_Type";
+      return DEF_PREFIX1 "ArgType_Type";
 
     if (!strcmp(name, "argtype"))
-      return DEF_PREFIX "ArgType";
+      return DEF_PREFIX1 "ArgType";
 
     if (!strcmp(name, "executable_localisation"))
-      return DEF_PREFIX "ExecutableLocalisation";
+      return DEF_PREFIX1 "ExecutableLocalisation";
 
     if (!strcmp(name, "executable_type"))
-      return DEF_PREFIX "ExecutableType";
+      return DEF_PREFIX1 "ExecutableType";
 
     if (!strcmp(name, "trigger_type"))
-      return DEF_PREFIX "TriggerType";
+      return DEF_PREFIX1 "TriggerType";
 
     if (!strcmp(name, "signature"))
-      return DEF_PREFIX "Signature";
+      return DEF_PREFIX1 "Signature";
 
     if (!strcmp(name, "executable"))
-      return DEF_PREFIX "Executable";
+      return DEF_PREFIX1 "Executable";
 
     if (!strcmp(name, "agregat_class_executable"))
       return "AgregatClassExecutable";
 
     if (!strcmp(name, "method"))
-      return DEF_PREFIX "Method";
+      return DEF_PREFIX1 "Method";
 
     if (!strcmp(name, "fe_method"))
-      return DEF_PREFIX "FEMethod";
+      return DEF_PREFIX1 "FEMethod";
 
     if (!strcmp(name, "fe_method_C"))
-      return DEF_PREFIX "FEMethod_C";
+      return DEF_PREFIX1 "FEMethod_C";
 
     if (!strcmp(name, "be_method"))
-      return DEF_PREFIX "BEMethod";
+      return DEF_PREFIX1 "BEMethod";
 
     if (!strcmp(name, "be_method_C"))
-      return DEF_PREFIX "BEMethod_C";
+      return DEF_PREFIX1 "BEMethod_C";
 
     if (!strcmp(name, "be_method_OQL"))
-      return DEF_PREFIX "BEMethod_OQL";
+      return DEF_PREFIX1 "BEMethod_OQL";
 
     if (!strcmp(name, "trigger"))
-      return DEF_PREFIX "Trigger";
+      return DEF_PREFIX1 "Trigger";
 
     if (!strcmp(name, "check_constraint"))
-      return DEF_PREFIX "CheckConstraint";
+      return DEF_PREFIX1 "CheckConstraint";
 
     if (!strcmp(name, "unique_constraint"))
-      return DEF_PREFIX "UniqueConstraint";
+      return DEF_PREFIX1 "UniqueConstraint";
 
     if (!strcmp(name, "notnull_constraint"))
-      return DEF_PREFIX "NotNullConstraint";
+      return DEF_PREFIX1 "NotNullConstraint";
 
     if (!strcmp(name, "cardinality_description"))
-      return DEF_PREFIX "CardinalityDescription";
+      return DEF_PREFIX1 "CardinalityDescription";
 
     if (!strcmp(name, "cardinality_constraint"))
-      return DEF_PREFIX "CardinalityConstraint";
+      return DEF_PREFIX1 "CardinalityConstraint";
 
     if (!strcmp(name, "inverse"))
-      return DEF_PREFIX "Inverse";
+      return DEF_PREFIX1 "Inverse";
 
     if (!strcmp(name, "protection_mode"))
-      return DEF_PREFIX "ProtectionMode";
+      return DEF_PREFIX1 "ProtectionMode";
 
     if (!strcmp(name, "protection_user"))
-      return DEF_PREFIX "ProtectionUser";
+      return DEF_PREFIX1 "ProtectionUser";
 
     if (!strcmp(name, "protection"))
-      return DEF_PREFIX "Protection";
+      return DEF_PREFIX1 "Protection";
 
     if (!strcmp(name, "unreadable_object"))
-      return DEF_PREFIX "UnreadableObject";
+      return DEF_PREFIX1 "UnreadableObject";
 
     if (!strcmp(name, "class_update_type"))
       return "ClassUpdateType";
@@ -502,13 +503,13 @@ namespace eyedb {
       return "ClassConversion";
 
     if (!strcmp(name, XBOOL))
-      return DEF_PREFIX "Bool";
+      return DEF_PREFIX1 "Bool";
 
     if (!strcmp(name, "database_open_mode"))
       return "OqlCtbDatabaseOpenMode";
 
     if (!strcmp(name, "lock_mode"))
-      return DEF_PREFIX "OqlCtbLockMode";
+      return DEF_PREFIX1 "OqlCtbLockMode";
 
     if (!strcmp(name, "transaction_mode"))
       return "OqlCtbTransactionMode";
@@ -517,10 +518,10 @@ namespace eyedb {
       return "OqlCtbTransactionLockMode";
 
     if (!strcmp(name, "recovery_mode"))
-      return DEF_PREFIX "OqlCtbRecoveryMode";
+      return DEF_PREFIX1 "OqlCtbRecoveryMode";
 
     if (!strcmp(name, "tostring_flags"))
-      return DEF_PREFIX "OqlCtbToStringFlags";
+      return DEF_PREFIX1 "OqlCtbToStringFlags";
 
     if (!strcmp(name, "eyedb"))
       return "OqlCtbeyedb";
@@ -532,46 +533,46 @@ namespace eyedb {
       return "OqlCtbDatabase";
 
     if (!strcmp(name, "math"))
-      return DEF_PREFIX "OqlCtbMath";
+      return DEF_PREFIX1 "OqlCtbMath";
 
     if (!strcmp(name, "image_type"))
-      return DEF_PREFIX "ImageType";
+      return DEF_PREFIX1 "ImageType";
 
     if (!strcmp(name, "image"))
-      return DEF_PREFIX "Image";
+      return DEF_PREFIX1 "Image";
 
     if (!strcmp(name, "datafile"))
       return "OqlCtbDatafile";
 
     if (!strcmp(name, "URL"))
-      return DEF_PREFIX "URL";
+      return DEF_PREFIX1 "URL";
 
     if (!strcmp(name, "w_config"))
-      return DEF_PREFIX "WConfig";
+      return DEF_PREFIX1 "WConfig";
 
     if (!strcmp(name, "cstring"))
-      return DEF_PREFIX "CString";
+      return DEF_PREFIX1 "CString";
 
     if (!strcmp(name, "month"))
-      return DEF_PREFIX "Month";
+      return DEF_PREFIX1 "Month";
 
     if (!strcmp(name, "weekday"))
-      return DEF_PREFIX "Weekday";
+      return DEF_PREFIX1 "Weekday";
 
     if (!strcmp(name, "date"))
-      return DEF_PREFIX "Date";
+      return DEF_PREFIX1 "Date";
 
     if (!strcmp(name, "time"))
-      return DEF_PREFIX "Time";
+      return DEF_PREFIX1 "Time";
 
     if (!strcmp(name, "time_stamp"))
-      return DEF_PREFIX "TimeStamp";
+      return DEF_PREFIX1 "TimeStamp";
 
     if (!strcmp(name, "time_interval"))
-      return DEF_PREFIX "TimeInterval";
+      return DEF_PREFIX1 "TimeInterval";
 
     if (!strcmp(name, "ostring"))
-      return DEF_PREFIX "OString";
+      return DEF_PREFIX1 "OString";
 
     return 0;
   }
@@ -1202,7 +1203,7 @@ namespace eyedb {
 
     while (c.getNext((void *&)comp))
       if (comp->asCardinalityConstraint()) {
-	if (!strcmp(comp->asCardinalityConstraint()->getAttrname(),
+	if (!strcmp(comp->asCardinalityConstraint()->getAttrname().c_str(),
 		    attr->getName())) {
 	  ATTR_PR();
 	  CardinalityConstraint *card = comp->asCardinalityConstraint();
@@ -1321,7 +1322,7 @@ namespace eyedb {
       fprintf(fd, "\t");
       const Class *xcls;
       const Attribute *xattr;
-      Status s = Attribute::checkAttrPath(m, xcls, xattr, attr_comp->getAttrpath());
+      Status s = Attribute::checkAttrPath(m, xcls, xattr, attr_comp->getAttrpath().c_str());
       if (s) return 0;
       s = attr_comp->m_trace(fd, 0,
 			     (AttrCompDetailTrace
@@ -1496,7 +1497,7 @@ namespace eyedb {
 	    while (c.getNext((void *&)comp))
 	      if (comp->asCardinalityConstraint())
 		{
-		  if (!strcmp(comp->asCardinalityConstraint()->getAttrname(),
+		  if (!strcmp(comp->asCardinalityConstraint()->getAttrname().c_str(),
 			      attr->getName()))
 		    {
 		      ATTR_PR();
@@ -2030,7 +2031,7 @@ namespace eyedb {
       {
 	Bool isnull;
 	Status s = Success;
-	const char *compname = comp->getName(&isnull, &s);
+	const char *compname = comp->getName(&isnull, &s).c_str();
 	if (s) return s;
 	if (!strcmp(compname, mcname))
 	  {
@@ -2097,7 +2098,7 @@ namespace eyedb {
       {
 	Bool isnull;
 	Status s = Success;
-	const char *exname = mth->getEx()->getExname(&isnull, &s);
+	const char *exname = mth->getEx()->getExname(&isnull, &s).c_str();
 	if (s) return s;
 	if (!strcmp(exname, _name) &&
 	    (!sign || (*sign == *mth->getEx()->getSign())))
@@ -2132,10 +2133,10 @@ namespace eyedb {
       {
 	Status s = Success;
 	Bool isnull;
-	const char *mthname = mth->getEx()->getExname(&isnull, &s);
+	const char *mthname = mth->getEx()->getExname(&isnull, &s).c_str();
 	if (s) return s;
 
-	if (!strcmp(mth->getEx()->getExname(), _name))
+	if (!strcmp(mth->getEx()->getExname().c_str(), _name))
 	  cnt++;
       }
 
@@ -2197,7 +2198,7 @@ namespace eyedb {
       {
 	Status s = Success;
 	Bool isnull;
-	const char *vname = var->getVname(&isnull, &s);
+	const char *vname = var->getVname(&isnull, &s).c_str();
 	if (s) return s;
 	if (!strcmp(vname, _name))
 	  {
@@ -2615,7 +2616,7 @@ namespace eyedb {
     AttributeComponent *comp;
     while (c.getNext((void *&)comp)) {
       // 31/08/05: added !comp->isRemoved()
-      if (!comp->isRemoved() && !strcmp(comp->getName(), mcname)) {
+      if (!comp->isRemoved() && !strcmp(comp->getName().c_str(), mcname)) {
 	rcomp = comp;
 	return Success;
       }

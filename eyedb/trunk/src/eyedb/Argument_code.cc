@@ -638,8 +638,8 @@ code_signature(void *xdata, const void *xsign)
       p += sizeof(int);
       if (type == OBJ_TYPE)
 	{
-	  const char *s = sign->getTypes(i)->getClname();
-	  int len = strlen(sign->getTypes(i)->getClname());
+	  const char *s = sign->getTypes(i)->getClname().c_str();
+	  int len = strlen(sign->getTypes(i)->getClname().c_str());
 	  mcp(p, &len, sizeof(int));
 	  p += sizeof(int);
 	  mcp(p, s, len);

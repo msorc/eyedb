@@ -285,7 +285,7 @@ ClassConversion::convert(Database *_db, Data in_idr, Size &in_size)
 
       IDB_LOG(IDB_LOG_SCHEMA_EVOLVE, ("\t\tadd attribute %s::%s offsetN=%d sizeN=%d "
 	     "in_size=%d sizemoved=%d\n",
-	     getClsname(), getAttrname(), offset, size,
+	     getClsname().c_str(), getAttrname().c_str(), offset, size,
 	     in_size, in_size - size - offset));
 
       // changed the 6/6/01
@@ -302,7 +302,7 @@ ClassConversion::convert(Database *_db, Data in_idr, Size &in_size)
       Size size = getSizeN();
       IDB_LOG(IDB_LOG_SCHEMA_EVOLVE, ("\t\trmv attribute %s::%s offsetN=%d sizeN=%d "
 	     "in_size=%d sizemoved=%d\n",
-	     getClsname(), getAttrname(), offset, size,
+	     getClsname().c_str(), getAttrname().c_str(), offset, size,
 	     in_size, in_size - size - offset));
 
       memmove(start, start + size, in_size - size - offset);
@@ -315,7 +315,7 @@ ClassConversion::convert(Database *_db, Data in_idr, Size &in_size)
       Size size = getSizeN();
       IDB_LOG(IDB_LOG_SCHEMA_EVOLVE, ("\t\tcnv attribute %s::%s offsetN=%d sizeN=%d "
 	     "in_size=%d, srcdim=%d, destdim=%d\n",
-	     getClsname(), getAttrname(), offset, size,
+	     getClsname().c_str(), getAttrname().c_str(), offset, size,
 	     in_size, getSrcDim(), getDestDim()));
       return cnv_convert[getCnvtype()](_db, this, in_idr, in_size);
       //return Exception::make(IDB_ERROR, "converting attribute is not yet implemented");

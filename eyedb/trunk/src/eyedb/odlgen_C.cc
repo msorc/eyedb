@@ -50,7 +50,7 @@ namespace eyedb {
   static void
   gbx_suspend(GenContext *ctx)
   {
-    fprintf(ctx->getFile(), "%sgbxAutoGarbSuspender _gbxsusp_;\n",
+    fprintf(ctx->getFile(), "%seyedb::gbxAutoGarbSuspender _gbxsusp_;\n",
 	    ctx->get());
   }
 
@@ -236,7 +236,7 @@ do { \
 	return "eyedblib::int16";
     
       if (!strcmp(name, "oid"))
-	return "Oid";
+	return "eyedb::Oid";
     
       if (!strcmp(name, "byte"))
 	return "unsigned char";
@@ -338,7 +338,7 @@ do { \
     if (set == op_GET && !isoid)
       fprintf(fd, "%sif (isnull) *isnull = eyedb::True;\n", ctx->get());
     fprintf(fd, "%sif (dyn%s_error_policy) {\n", ctx->get(), (set ? "set" : "get"));
-    fprintf(fd, "%s  eyedb::Status s = eyedb::Exception::make(IDB_ATTRIBUTE_ERROR, "
+    fprintf(fd, "%s  eyedb::Status s = eyedb::Exception::make(eyedb::IDB_ATTRIBUTE_ERROR, "
 	    "\"object %%s: attribute %%s::%%s not found\", oid.toString(), getClass()->getName(), \"%s\");\n",
 	    ctx->get(), attr->getName());
     if (set == op_SET) {
@@ -393,22 +393,22 @@ do { \
     CollectionClass *mcoll = (CollectionClass *)cls;
     if (mcoll->asCollSetClass())
       {
-	classname = "CollSet";
+	classname = "eyedb::CollSet";
 	ordered = False;
       }
     else if (mcoll->asCollBagClass())
       {
-	classname = "CollBag";
+	classname = "eyedb::CollBag";
 	ordered = False;
       }
     else if (mcoll->asCollArrayClass())
       {
-	classname = "CollArray";
+	classname = "eyedb::CollArray";
 	ordered = True;
       }
     else if (mcoll->asCollListClass())
       {
-	classname = "CollList";
+	classname = "eyedb::CollList";
 	ordered = True;
       }
 
@@ -529,7 +529,7 @@ do { \
 	fprintf(fd, "%s   }\n", ctx->get());
       }
     else
-      fprintf(fd, "%s    return eyedb::Exception::make(IDB_ERROR, \"no valid collection in attribute %s::%s\");\n\n", ctx->get(), class_owner->getName(), name);
+      fprintf(fd, "%s    return eyedb::Exception::make(eyedb::IDB_ERROR, \"no valid collection in attribute %s::%s\");\n\n", ctx->get(), class_owner->getName(), name);
 
     ctx->pop();
     fprintf(fd, "%s  }\n", ctx->get());
@@ -1337,17 +1337,17 @@ do { \
 	    fprintf(fd, "%sif (len >= %d)\n", ctx->get(), maxdims);
 #ifdef ODL_STD_STRING
 	    if (is_string)
-	      fprintf(fd, "%s  return eyedb::Exception::make(IDB_ERROR, "
+	      fprintf(fd, "%s  return eyedb::Exception::make(eyedb::IDB_ERROR, "
 		      "\"string `%%s' [%%d] too long for attribute %s::%s, maximum "
 		      "is %d\\n\", _%s.c_str(), len);\n", ctx->get(),
 		      class_owner->getName(), name, maxdims, name);
 	    else
-	      fprintf(fd, "%s  return eyedb::Exception::make(IDB_ERROR, "
+	      fprintf(fd, "%s  return eyedb::Exception::make(eyedb::IDB_ERROR, "
 		      "\"string `%%s' [%%d] too long for attribute %s::%s, maximum "
 		      "is %d\\n\", _%s, len);\n", ctx->get(),
 		      class_owner->getName(), name, maxdims, name);
 #else
-	    fprintf(fd, "%s  return eyedb::Exception::make(IDB_ERROR, "
+	    fprintf(fd, "%s  return eyedb::Exception::make(eyedb::IDB_ERROR, "
 		    "\"string `%%s' [%%d] too long for attribute %s::%s, maximum "
 		    "is %d\\n\", _%s, len);\n", ctx->get(),
 		    class_owner->getName(), name, maxdims, name);
@@ -2588,14 +2588,14 @@ do { \
     fprintf(fd, "%sargtype = new eyedb::ArgType();\n", ctx->get());
 #endif
 
-    fprintf(fd, "%sargtype->setType((ArgType_Type)%d, eyedb::False);\n",
+    fprintf(fd, "%sargtype->setType((eyedb::ArgType_Type)%d, eyedb::False);\n",
 	    ctx->get(), argtype->getType());
 
     /*
       if ((argtype->getType() & ~(INOUT_ARG_TYPE|ARRAY_TYPE)) == OBJ_TYPE)
     */
     fprintf(fd, "%sargtype->setClname(\"%s\");\n", ctx->get(),
-	    argtype->getClname());
+	    argtype->getClname().c_str());
   }
 
   static void
@@ -2689,13 +2689,13 @@ do { \
       if (comp->asNotNullConstraint()) {
 	NotNullConstraint *notnull = comp->asNotNullConstraint();
 	fprintf(fd, "%scomp = new eyedb::NotNullConstraint(db, cls, \"%s\", %s);\n",
-		ctx->get(), notnull->getAttrpath(),
+		ctx->get(), notnull->getAttrpath().c_str(),
 		IDBBOOL_STR(notnull->getPropagate()));
       }
       else if (comp->asUniqueConstraint()) {
 	UniqueConstraint *unique = comp->asUniqueConstraint();
 	fprintf(fd, "%scomp = new eyedb::UniqueConstraint(db, cls, \"%s\", %s);\n",
-		ctx->get(), unique->getAttrpath(),
+		ctx->get(), unique->getAttrpath().c_str(),
 		IDBBOOL_STR(unique->getPropagate()));
       }
       /*
@@ -2713,7 +2713,7 @@ do { \
 	hints_prologue(ctx, fd, idx);
 	dataspace_prologue(ctx, fd, idx);
 	fprintf(fd, "%scomp = new eyedb::BTreeIndex(db, cls, \"%s\", %s, %s, dataspace, %d",
-		ctx->get(), idx->getAttrpath(),
+		ctx->get(), idx->getAttrpath().c_str(),
 		IDBBOOL_STR(idx->getPropagate()),
 		IDBBOOL_STR(idx->getIsString()),
 		idx->getDegree());
@@ -2728,13 +2728,13 @@ do { \
 	    setup_done = True;
 	  }
 	  fprintf(fd, "%sstatus = getClass()->getComp(\"%s\", clcomp);\n",
-		  ctx->get(), idx->getHashMethod()->getName());
+		  ctx->get(), idx->getHashMethod()->getName().c_str());
 	  fprintf(fd, "%sif (status) return status;\n", ctx->get());
 	}
 	hints_prologue(ctx, fd, idx);
 	dataspace_prologue(ctx, fd, idx);
 	fprintf(fd, "%scomp = new eyedb::HashIndex(db, cls, \"%s\", %s, %s, dataspace, %d",
-		ctx->get(), idx->getAttrpath(),
+		ctx->get(), idx->getAttrpath().c_str(),
 		IDBBOOL_STR(idx->getPropagate()),
 		IDBBOOL_STR(idx->getIsString()),
 		idx->getKeyCount());
@@ -2754,13 +2754,13 @@ do { \
 	    setup_done = True;
 	  }
 	  fprintf(fd, "%sstatus = getClass()->getComp(\"%s\", clcomp);\n",
-		  ctx->get(), collimpl->getHashMethod()->getName());
+		  ctx->get(), collimpl->getHashMethod()->getName().c_str());
 	  fprintf(fd, "%sif (status) return status;\n", ctx->get());
 	}
 	hints_prologue(ctx, fd, collimpl);
 	dataspace_prologue(ctx, fd, collimpl);
 	fprintf(fd, "%scomp = new eyedb::CollAttrImpl(db, cls, \"%s\", %s, dataspace, %s, %d",
-		ctx->get(), collimpl->getAttrpath(),
+		ctx->get(), collimpl->getAttrpath().c_str(),
 		IDBBOOL_STR(collimpl->getPropagate()),
 		(collimpl->getIdxtype() == IndexImpl::Hash ?
 		 "eyedb::IndexImpl::Hash" : "eyedb::IndexImpl::BTree"),
@@ -2821,19 +2821,19 @@ do { \
 	    CardinalityConstraint *card = comp->asCardinalityConstraint();
 	    CardinalityDescription *card_desc = card->getCardDesc();
 	    fprintf(fd, "%scomp = new eyedb::CardinalityConstraint(db, cls, \"%s\", %d, %d, %d, %d);\n",
-		    ctx->get(), card->getAttrname(), card_desc->getBottom(),
+		    ctx->get(), card->getAttrname().c_str(), card_desc->getBottom(),
 		    card_desc->getBottomExcl(),
 		    card_desc->getTop(), card_desc->getTopExcl());
 	  }
 	else if (comp->asTrigger())
 	  {
 	    Trigger *trig = comp->asTrigger();
-	    char *x = purge(trig->getEx()->getExtrefBody());
+	    char *x = purge(trig->getEx()->getExtrefBody().c_str());
 	    fprintf(fd, "%scomp = new eyedb::Trigger(db, cls, (eyedb::TriggerType)%d, (eyedb::ExecutableLang)%d, %s, \"%s\", %s, \"%s\");\n",
 		    ctx->get(), trig->getType(),
 		    (trig->getEx()->getLang() & ~SYSTEM_EXEC),
 		    STRBOOL(trig->getEx()->getLang() & SYSTEM_EXEC),
-		    trig->getSuffix(),
+		    trig->getSuffix().c_str(),
 		    trig->getLight() ? "eyedb::True" : "eyedb::False",
 		    x);
 	    free(x);
@@ -2858,7 +2858,7 @@ do { \
 	    Signature *sign = ex->getSign();
 	    const char *prefix = ((ex->getLoc()&~STATIC_EXEC) == FRONTEND ? "FE" : "BE");
 	    const char *lang = ((ex->getLang() & C_LANG) ? "C"  : "OQL");
-	    char *extref = purge(ex->getExtrefBody());
+	    char *extref = purge(ex->getExtrefBody().c_str());
 
 #ifdef NEW_ARGTYPE
 	    argTypeDump(ctx, sign->getRettype(), "sign->getRettype()");
@@ -2888,7 +2888,7 @@ do { \
 
 	    fprintf(fd,
 		    "%scomp = new eyedb::%sMethod_%s(db, cls, \"%s\", sign, %s, %s, \"%s\");\n",
-		    ctx->get(), prefix, lang, ex->getExname(),
+		    ctx->get(), prefix, lang, ex->getExname().c_str(),
 		    STRBOOL(ex->isStaticExec()),
 		    STRBOOL(ex->getLang() & SYSTEM_EXEC),
 		    extref);
@@ -2971,12 +2971,12 @@ do { \
 
 	  if (ex->isStaticExec()) {
 	    fprintf(fd, "%sstatic eyedb::Status %s(eyedb::Database *db", ctx->get(),
-		    ex->getExname());
+		    ex->getExname().c_str());
 	    if (sign->getNargs() || !Signature::isVoid(sign->getRettype()))
 	      fprintf(fd, ", ");
 	  }
 	  else
-	    fprintf(fd, "%svirtual eyedb::Status %s(", ctx->get(), ex->getExname());
+	    fprintf(fd, "%svirtual eyedb::Status %s(", ctx->get(), ex->getExname().c_str());
 
 	  sign->declArgs(fd, m);
 	  fprintf(fd, ");\n\n");
@@ -3001,7 +3001,7 @@ do { \
     fprintf(fd, "%sif (status) return status;\n", ctx->get());
 
     fprintf(fd, "%sif (!mth)\n", ctx->get());
-    fprintf(fd, "%s  return eyedb::Exception::make(IDB_ERROR, "
+    fprintf(fd, "%s  return eyedb::Exception::make(eyedb::IDB_ERROR, "
 	    "\"method '%s' not found\");\n", ctx->get(), mth->getPrototype());
     ctx->pop();
     fprintf(fd, "%s}\n\n", ctx->get());
@@ -3017,7 +3017,7 @@ do { \
     Executable *ex = mth->getEx();
     Signature *sign = ex->getSign();
 
-    fprintf(fd, "eyedb::Status %s::%s(", name, ex->getExname());
+    fprintf(fd, "eyedb::Status %s::%s(", name, ex->getExname().c_str());
     if (ex->isStaticExec()) {
       fprintf(fd, "eyedb::Database *db");
       if (sign->getNargs() || !Signature::isVoid(sign->getRettype()))
@@ -3085,7 +3085,7 @@ do { \
 
     Signature *sign = ex->getSign();
     const char *intname =
-      Executable::makeInternalName(ex->getExname(),
+      Executable::makeInternalName(ex->getExname().c_str(),
 				   sign,
 				   (mth->getEx()->isStaticExec() ? True:
 				    False),
@@ -3097,7 +3097,7 @@ do { \
     const char *lang = ((ex->getLang() & C_LANG) ? "C"  : "OQL");
 
     fprintf(fdmth, "//\n// %s [%s.cc]\n//\n\n", mth->getPrototype(),
-	    mth->getEx()->getExtrefBody());
+	    mth->getEx()->getExtrefBody().c_str());
     fprintf(fdmth, "Status\n");
     fprintf(fdmth, "__%s(eyedb::Database *_db, eyedb::%sMethod_%s *_m%s",
 	    intname,

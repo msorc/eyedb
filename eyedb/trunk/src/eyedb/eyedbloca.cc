@@ -618,7 +618,7 @@ getdefidxdsp_realize(int argc, char *argv[])
     Status s = idx->getDefaultDataspace(dataspace);
     CHECK(s);
     if (i) printf("\n");
-    printf("Default dataspace for index '%s':\n", idx->getAttrpath());
+    printf("Default dataspace for index '%s':\n", idx->getAttrpath().c_str());
     print(dataspace);
   }
 

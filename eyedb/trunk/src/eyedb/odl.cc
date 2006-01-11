@@ -833,9 +833,9 @@ namespace eyedb {
       }
 
     // a hash table should be better!!
-    const char *idxname = idx_obj->getName();
+    const char *idxname = idx_obj->getName().c_str();
     for (int i = 0; i < index_arr_cnt; i++)
-      if (!strcmp(idxname, ((Index *)(*index_arr)[i])->getName()))
+      if (!strcmp(idxname, ((Index *)(*index_arr)[i])->getName().c_str()))
 	{
 	  idx_obj->release();
 	  idx_obj = (Index *)(*index_arr)[i];
@@ -1322,7 +1322,7 @@ namespace eyedb {
 	}
 
 	AttributeComponent *oattr_comp = 0;
-	s = ocls->getAttrComp(attr_comp->getName(), oattr_comp);
+	s = ocls->getAttrComp(attr_comp->getName().c_str(), oattr_comp);
 
 	if (s) {
 	  odl_add_error(s);
@@ -1336,7 +1336,7 @@ namespace eyedb {
 		odl_add_error("index on %s has not the same implementation type "
 			      "in database : use idxupdate to change manually "
 			      "its implementation type\n",
-			      attr_comp->getAttrpath());
+			      attr_comp->getAttrpath().c_str());
 	    }
 	    else
 	      odl_add_error("internal error in "
@@ -2515,7 +2515,7 @@ namespace eyedb {
 		     Bool strictCheck, ClassComponent *&fclcomp)
   {
     //printf("LOOKING for component '%s'\n", comp->getName());
-    if (strchr(comp->getName(), '.')) {
+    if (strchr(comp->getName().c_str(), '.')) {
       fclcomp = comp;
       return True;
     }
@@ -2525,7 +2525,7 @@ namespace eyedb {
     ClassComponent *tmpcomp;
     while (c.getNext((void *&)tmpcomp))
       {
-	if (!strcmp(comp->getName(), tmpcomp->getName()))
+	if (!strcmp(comp->getName().c_str(), tmpcomp->getName().c_str()))
 	  {
 	    if (!comp->asAgregatClassExecutable()) {
 	      fclcomp = tmpcomp;
@@ -2536,13 +2536,13 @@ namespace eyedb {
 	    Executable *tmpex = tmpcomp->asAgregatClassExecutable()->getEx();
 
 	    if (strictCheck &&
-		strcmp(ex->getExtrefBody(), tmpex->getExtrefBody()))
+		strcmp(ex->getExtrefBody().c_str(), tmpex->getExtrefBody().c_str()))
 	      {
 		tmpex->setExtrefBody(ex->getExtrefBody());
 		if ((ex->getLang() & SYSTEM_EXEC) && !odl_system_class)
 		  {
 		    odl_add_error("cannot modify system method "
-				  "'%s'\n", comp->getName());
+				  "'%s'\n", comp->getName().c_str());
 		    fclcomp = tmpcomp;
 		    return True;
 		  }
@@ -2642,7 +2642,7 @@ namespace eyedb {
     LinkedListCursor c(complist);
     AttributeComponent *tmpcomp;
     while (c.getNext((void *&)tmpcomp)) {
-      if (!strcmp(comp->getName(), tmpcomp->getName())) {
+      if (!strcmp(comp->getName().c_str(), tmpcomp->getName().c_str())) {
 	fattr_comp = tmpcomp;
 	if (strictCheck) {
 	  if (comp->asIndex()) {
@@ -2883,7 +2883,7 @@ namespace eyedb {
   const Attribute *
   odl_getattr(const Class *cls, const AttributeComponent *attr_comp)
   {
-    char *s = strdup(attr_comp->getAttrpath());
+    char *s = strdup(attr_comp->getAttrpath().c_str());
     char *q = strchr(s, '.');
 
     if (!q) {

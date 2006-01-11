@@ -596,7 +596,7 @@ oqmlMethodCall::typeMismatch(ArgType *type, Object *o, int n)
 {
   return new oqmlStatus(this, "method '%s::%s', argument #%d: %s expected, "
 		       "got %s", cls->getName(), mthname, n+1,
-			type->getClname(), o->getClass()->getName());
+			type->getClname().c_str(), o->getClass()->getName());
 }
 
 // -----------------------------------------------------------------------
@@ -997,7 +997,7 @@ oqmlStatus *oqmlMethodCall::resolveMethod(Database *db, oqmlContext *ctx,
 	   ex->getExname(),
 	   mx->getClassOwner()->getName());
 #endif
-    if (!strcmp(ex->getExname(), rmthname) &&
+    if (!strcmp(ex->getExname().c_str(), rmthname) &&
 	((ex->isStaticExec() && isStatic) ||
 	 (!ex->isStaticExec() && !isStatic) ||
 	 (isStatic && isParent(mx->getClassOwner(), o)))) {
@@ -1120,7 +1120,7 @@ oqmlStatus *oqmlMethodCall::atomToArg(Database *db, oqmlContext *ctx,
 	  if (oid_o.isValid()) {
 	    Status is = db->loadObject(oid_o, o);
 	    if (is) return new oqmlStatus(this, is);
-	    if (strcmp(type->getClname(), o->getClass()->getName()))
+	    if (strcmp(type->getClname().c_str(), o->getClass()->getName()))
 	      return typeMismatch(type, o, i);
 	  }
 	  else
@@ -1139,7 +1139,7 @@ oqmlStatus *oqmlMethodCall::atomToArg(Database *db, oqmlContext *ctx,
 	  Object *o = OQML_ATOM_OBJVAL(a);
 	  if (o) {
 	    o->incrRefCount();
-	    if (strcmp(type->getClname(), o->getClass()->getName()))
+	    if (strcmp(type->getClname().c_str(), o->getClass()->getName()))
 	      return typeMismatch(type, o, i);
 	    arg->set(o);
 	  }

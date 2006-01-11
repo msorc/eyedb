@@ -567,7 +567,7 @@ cons_print(int &n, LinkedList &conslist)
       fprintf(stdout, "\n");
     fprintf(stdout, "%s constraint on %s:\n",
 	    (attr_comp->asNotNullConstraint() ? "Notnull" : "Unique"),
-	    attr_comp->getAttrpath());
+	    attr_comp->getAttrpath().c_str());
     fprintf(stdout, "  Propagation: %s\n", attr_comp->getPropagate() ? "on" : "off");
   }
 }

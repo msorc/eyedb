@@ -1163,7 +1163,7 @@ namespace eyedb {
 				 userauth);
 	  }
 
-	const char *pwd = sysaccess->user()->passwd();
+	const char *pwd = sysaccess->user()->passwd().c_str();
 	if (pwd && strcmp(pwd, crypt(passwdauth, salt)))
 	  {
 	    if (justCheck)
@@ -1297,8 +1297,8 @@ namespace eyedb {
 				 userauth);
 	  }
 
-	if (user->passwd() &&
-	    strcmp(user->passwd(), crypt(passwdauth, salt)))
+	if (user->passwd().c_str() &&
+	    strcmp(user->passwd().c_str(), crypt(passwdauth, salt)))
 	  {
 	    if (dbaccess)
 	      dbaccess->release();
@@ -1456,7 +1456,7 @@ namespace eyedb {
 					   "user '%s' not found",
 					   username));
 
-    if (user->passwd() && strcmp(user->passwd(), crypt(passwd, salt)))
+    if (user->passwd().c_str() && strcmp(user->passwd().c_str(), crypt(passwd, salt)))
       {
 	user->release();
 	s = Exception::make(IDB_AUTHENTICATION_FAILED,
@@ -3084,7 +3084,7 @@ namespace eyedb {
 			   oid.toString());
 
     s = Attribute::checkAttrPath(db->getSchema(), cls, attr,
-				 attr_comp->getAttrpath(), idx_ctx);
+				 attr_comp->getAttrpath().c_str(), idx_ctx);
     if (s) return rpcStatusMake(s);
 
     if (!attr->isIndirect() && !attr->isBasicOrEnum() &&
@@ -3092,7 +3092,7 @@ namespace eyedb {
       return rpcStatusMake(Exception::make
 			   (IDB_ERROR,
 			    "attribute path '%s' is not indirect neither "
-			    "basic literal", attr_comp->getAttrpath()));
+			    "basic literal", attr_comp->getAttrpath().c_str()));
 
     /*
       if (!check || !attr_comp->getPropagate())
@@ -3122,7 +3122,7 @@ namespace eyedb {
 			 "of propagation property: "
 			 "must delete component "
 			 "of parent class first",
-			 attr_comp->getName()));
+			 attr_comp->getName().c_str()));
     }
 
     return RPCSuccess;
@@ -3133,7 +3133,7 @@ namespace eyedb {
 			   Bool &found)
   {
     AttributeComponent *xcomp;
-    Status s = cls->getAttrComp(comp->getName(), xcomp);
+    Status s = cls->getAttrComp(comp->getName().c_str(), xcomp);
     if (s) return rpcStatusMake(s);
 
     if (xcomp) {
@@ -3185,7 +3185,7 @@ namespace eyedb {
 	    (Exception::make(IDB_ERROR, "attribute component propagation "
 			     "removing internal error: component %s does "
 			     "not exist in class %s",
-			     attr_comp->getName(),
+			     attr_comp->getName().c_str(),
 			     subclasses[i]->getName()));
 
 	assert(cattr_comp);
@@ -3399,7 +3399,7 @@ namespace eyedb {
 			     "attribute path %s: "
 			     "a collection implementation can be tied "
 			     "only to a literal collection attribute",
-			     attr_comp->getAttrpath());
+			     attr_comp->getAttrpath().c_str());
     }
 
     Status s = attr->addComponent(db, attr_comp);
@@ -6373,7 +6373,7 @@ do { \
     pdesc = (eyedbsm::ProtectionDescription *)
       calloc(eyedbsm::protectionDescriptionSize(pusers_cnt), 1);
 
-    strcpy(pdesc->name, prot->getName());
+    strcpy(pdesc->name, prot->getName().c_str());
     pdesc->nprot = pusers_cnt;
 
     for (int i = 0; i < pusers_cnt; i++)

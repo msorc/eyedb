@@ -62,12 +62,12 @@ using namespace eyedb;
  \
   if (!(DB)->xdb) \
     { \
-      const char *dbname = (DB)->getDbname(); \
+      const char *dbname = (DB)->getDbname().c_str(); \
       int dbid = (DB)->getDbid(); \
       if ((!dbname || !*dbname) && !dbid) \
 	return Exception::make(MSG ": database name or dbid must not set"); \
  \
-      const char *dbmdb = (DB)->getDbmdb(); \
+      const char *dbmdb = (DB)->getDbmdb().c_str(); \
       if (!dbname || !*dbname) \
         (DB)->xdb = new Database(dbid, (*dbmdb ? dbmdb : 0)); \
       else \
