@@ -69,7 +69,7 @@ literalCollUpdate(Database *db, Object *o, Attribute *attr,
 
       IDB_LOG(IDB_LOG_IDX_INSERT,
 	      (Attribute::log_item_entry_fmt,
-	       idx->getAttrpath(),
+	       idx->getAttrpath().c_str(),
 	       oid.toString(), attr->dumpData((Data)&elem_oid), from,
 	       (isnull ? "null data" : "not null data")));
       
@@ -205,7 +205,7 @@ Attribute::createEntries_realize(Database *db,
 
     IDB_LOG(IDB_LOG_IDX_INSERT,
 	    (Attribute::log_comp_entry_fmt,
-	     idx->getAttrpath(),
+	     idx->getAttrpath().c_str(),
 	     oid.toString(), &entry[1],
 	     (isnull ? "null data" : "not null data")));
 
@@ -254,7 +254,7 @@ Attribute::createEntries_realize(Database *db,
 
 	IDB_LOG(IDB_LOG_IDX_INSERT,
 		(Attribute::log_item_entry_fmt,
-		 idx->getAttrpath(),
+		 idx->getAttrpath().c_str(),
 		 oid.toString(), attr->dumpData(&entry[5]), from,
 		 (isnull ? "null data" : "not null data")));
       

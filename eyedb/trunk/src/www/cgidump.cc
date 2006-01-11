@@ -728,7 +728,7 @@ idbWGetTagMethod(const Class *cls, Object *o,
 	  (m->asFEMethod_C() ? "frontend" : "backend"),
 	  Argument::getArgTypeStr(sign->getRettype()),
 	  m->getClassOwner()->getName(),
-	  ex->getExname());
+	  ex->getExname().c_str());
 
   char tok[64];
 
@@ -768,7 +768,7 @@ idbWGetTagUniqueConstraint(const Class *cls, Object *o,
 
   sprintf(str_tag, "unique(%s::%s)",
 	  //(u->getIscomp() ? "[]" : ""),
-	  u->getClassOwner()->getName(), u->getName());
+	  u->getClassOwner()->getName(), u->getName().c_str());
 
   str_tag = idbWMakeTag(o->getOid(), str_tag, textmod, len);
 
@@ -791,7 +791,7 @@ idbWGetTagIndex(const Class *cls, Object *o,
   char *str = idbWNewTagBuf();
   char *str_tag = idbWNewTagBuf();
 
-  strcpy(str_tag, u->getName());
+  strcpy(str_tag, u->getName().c_str());
 
   str_tag = idbWMakeTag(o->getOid(), str_tag, textmod, len);
 
@@ -816,7 +816,7 @@ idbWGetTagNotNullConstraint(const Class *cls, Object *o,
 
   sprintf(str_tag, "notnull(%s::%s)",
 	  //(u->getIscomp() ? "[]" : ""),
-	  u->getClassOwner()->getName(), u->getName());
+	  u->getClassOwner()->getName(), u->getName().c_str());
   
   str_tag = idbWMakeTag(o->getOid(), str_tag, textmod, len);
 
@@ -840,7 +840,7 @@ idbWGetTagCardinalityConstraint(const Class *cls, Object *o,
   char *str_tag = idbWNewTagBuf();
 
   sprintf(str_tag, "card (%s::%s) %s",
-	  card->getClassOwner()->getName(), card->getName(),
+	  card->getClassOwner()->getName(), card->getName().c_str(),
 	  card->getCardDesc()->getString(False));
   
   str_tag = idbWMakeTag(o->getOid(), str_tag, textmod, len);
@@ -867,7 +867,7 @@ idbWGetTagClassVariable(const Class *cls, Object *o,
 
   sprintf(str_tag, "%s::%s",
 	  (v->getClassOwner() ? v->getClassOwner()->getName() :
-	   "??"), v->getVname());
+	   "??"), v->getVname().c_str());
 
   str_tag = idbWMakeTag(o->getOid(), str_tag, textmod, len);
 

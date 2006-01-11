@@ -580,7 +580,7 @@ oqmlMakeIter_idx_comp(oqmlNode *node,
       IDB_LOG(IDB_LOG_IDX_SEARCH,
 	      ("[%d] Using Comp Index #%d '%s' between '%s' and '%s' "
 	       "[%s check value]%s\n", n,
-	       nidx, (d->idxs[nidx] ? d->idxs[nidx]->getAttrpath() : ""),
+	       nidx, (d->idxs[nidx] ? d->idxs[nidx]->getAttrpath().c_str() : ""),
 	       (start ? start->getString() : "null"),
 	       (end ? end->getString() : "null"),
 	       (mustCheck ? "must" : "does not"),
@@ -901,7 +901,7 @@ oqmlMakeIter_idx_item(oqmlNode *node, Database *db, oqmlContext *ctx,
 	  IDB_LOG(IDB_LOG_IDX_SEARCH,
 		  ("[%d] Using Item Index #%d '%s' between '%s' and '%s' "
 		   "[%d, %d] [%s check value]%s\n", n,
-		   nidx, (d->idxs[nidx] ? d->idxs[nidx]->getAttrpath() : ""),
+		   nidx, (d->idxs[nidx] ? d->idxs[nidx]->getAttrpath().c_str() : ""),
 		   (start ? start->getString() : "null"),
 		   (end ? end->getString() : "null"),
 		   s_ind, e_ind,
@@ -1379,7 +1379,7 @@ oqmlIndexIter(Database *db, oqmlContext *ctx, oqmlNode *node,
 
       IDB_LOG(IDB_LOG_IDX_SEARCH,
 	      ("Using Index #%d '%s' for full search%s\n",
-	       n, (d->idxs[n] ? d->idxs[n]->getAttrpath() : ""),
+	       n, (d->idxs[n] ? d->idxs[n]->getAttrpath().c_str() : ""),
 	       (!idx ? " SE index is null" : "")));
 
       if (!idx)

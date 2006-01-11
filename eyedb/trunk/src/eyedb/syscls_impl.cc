@@ -78,7 +78,7 @@ namespace eyedb {
   comp_exists(ClassComponent *comp, Bool &exists, Oid *comp_oid = 0)
   {
     OQL oql(comp->getDatabase(), "select class_component.name = \"%s\"",
-	    comp->getName());
+	    comp->getName().c_str());
     OidArray oid_arr;
     Status status = oql.execute(oid_arr);
     if (status) return status;
@@ -255,10 +255,10 @@ namespace eyedb {
     if (v)
       fprintf(fd, "variable %s *%s::%s = ",
 	      v->getClass()->getName(),
-	      getClassOwner()->getName(), getVname());
+	      getClassOwner()->getName(), getVname().c_str());
     else
       fprintf(fd, "variable %s::%s = ",
-	      getClassOwner()->getName(), getVname());
+	      getClassOwner()->getName(), getVname().c_str());
 
     Bool tr = False;
     if (v)
@@ -378,7 +378,7 @@ namespace eyedb {
 	  return Exception::make(IDB_EXECUTABLE_ERROR,
 				 "cannot apply OQL 'trigger<%s> %s::%s'",
 				 getTriggerName(getType()),
-				 getClassOwner()->getName(), getName());
+				 getClassOwner()->getName(), getName().c_str());
 
 	o->setApplyingTrigger(True);
 	oqmlStatus *s = oqmlMethodCall::applyTrigger(db, this, o, &_oid);
@@ -387,7 +387,7 @@ namespace eyedb {
 	if (s)
 	  return Exception::make("applying OQL 'trigger<%s> %s::%s', got: %s",
 				 getTriggerName(getType()),
-				 getClassOwner()->getName(), getName(),
+				 getClassOwner()->getName(), getName().c_str(),
 				 s->msg);
 	return Success;
       }
@@ -397,7 +397,7 @@ namespace eyedb {
 			     "cannot apply C++ 'trigger<%s> %s::%s: "
 			     "runtime pointer function is null",
 			     getTriggerName(getType()),
-			     getClassOwner()->getName(), getName());
+			     getClassOwner()->getName(), getName().c_str());
 
     o->setApplyingTrigger(True);
     Status s = csym(getType(), db, _oid, o);
@@ -419,7 +419,7 @@ namespace eyedb {
 	    (getClassOwner()->getAliasName() ? getClassOwner()->getAliasName() : 
 	     getClassOwner()->getName()),
 	    getStrTriggerType(getType()),
-	    getSuffix());
+	    getSuffix().c_str());
 
     if (db)
       db->transactionCommit();
@@ -455,7 +455,7 @@ namespace eyedb {
     sprintf(s, "%strigger<%s> %s::%s()",
 	    (getLight() ? "light" : ""),
 	    getStrTriggerType(getType()),
-	    getClassOwner()->getName(), getSuffix());
+	    getClassOwner()->getName(), getSuffix().c_str());
     return s;
   }
 
@@ -503,13 +503,13 @@ namespace eyedb {
     if (!(flags & NoScope))
       fprintf(fd, "%s::", getClassOwner()->getName());
 
-    fprintf(fd, "%s()", getSuffix());
+    fprintf(fd, "%s()", getSuffix().c_str());
 
     if (flags & ExecBodyTrace)
       {
 	const Executable *ex = getEx();
 	if (ex->getLang() & C_LANG)
-	  fprintf(fd, " C++(\"%s\")", ex->getExtrefBody());
+	  fprintf(fd, " C++(\"%s\")", ex->getExtrefBody().c_str());
 	else
 	  {
 	    ((Trigger *)this)->runtimeInit();
@@ -537,7 +537,7 @@ namespace eyedb {
     if (!db)
       return Exception::make(IDB_ERROR, "no database associated with object");
 
-    if (!getSuffix() || !*getSuffix())
+    if (!getSuffix().c_str() || !*getSuffix().c_str())
       return Exception::make(IDB_ERROR, "cannot realize unamed trigger");
 
     if (!oid.isValid())
@@ -556,7 +556,7 @@ namespace eyedb {
 				   "in database '%s'",
 				   Trigger::getStrTriggerType(getType()),
 				   getClassOwner()->getName(),
-				   getName(),
+				   getName().c_str(),
 				   db->getName());
 	  }
       }
@@ -591,7 +591,7 @@ namespace eyedb {
     if (isRTInitialized)
       return Success;
 
-    const char *s = getEx()->getExtrefBody();
+    const char *s = getEx()->getExtrefBody().c_str();
 
     tmpbuf = strdup(s);
     char *q = strchr(tmpbuf, ':');
@@ -689,7 +689,7 @@ namespace eyedb {
     const CardinalityDescription *card = getCardDesc();
     sprintf(str, "card_%s::%s%s%d,%d%s", 
 	    get_class_name(getClassOwner()),
-	    getAttrname(),
+	    getAttrname().c_str(),
 	    (card->getBottomExcl() ? "]" : "["),
 	    card->getBottom(),
 	    card->getTop(),
@@ -701,10 +701,10 @@ namespace eyedb {
   {
     Attribute *item;
 
-    if (!(item = (Attribute *)cl->getAttribute(getAttrname())))
+    if (!(item = (Attribute *)cl->getAttribute(getAttrname().c_str())))
       return Exception::make(IDB_ERROR, "cardinality constraint: attribute '%s'"
 			     " does not exist in class '%s'",
-			     getAttrname(), cl->getName());
+			     getAttrname().c_str(), cl->getName());
 
     // disconnected the 15/02/99
 #if 0
@@ -720,7 +720,7 @@ namespace eyedb {
 
   Status CardinalityConstraint::check(Class *cl) const
   {
-    const char *atname = getAttrname();
+    const char *atname = getAttrname().c_str();
     if (!atname || !*atname)
       return Exception::make(IDB_ERROR, "attribute name is not set for"
 			     " cardinality constraint in class '%s'",
@@ -759,7 +759,7 @@ namespace eyedb {
 	tr = True;
       }
     else
-      fprintf(fd, "%s::%s", getClassOwner()->getName(), getAttrname());
+      fprintf(fd, "%s::%s", getClassOwner()->getName(), getAttrname().c_str());
   
     if (db)
       db->transactionCommit();
@@ -841,20 +841,20 @@ namespace eyedb {
   Status
   AttributeComponent::checkUnique(const char *clsname, const char *msg)
   {
-    OQL oql(db, "select %s.attrpath = \"%s\"", clsname, getAttrpath());
+    OQL oql(db, "select %s.attrpath = \"%s\"", clsname, getAttrpath().c_str());
     OidArray oid_arr;
     Status s = oql.execute(oid_arr);  
     if (s) return s;
     if (oid_arr.getCount())
       return Exception::make(IDB_ERROR, "%s '%s' already "
-			     "exist", msg, getAttrpath());
+			     "exist", msg, getAttrpath().c_str());
     return Success;
   }
 
   std::string
   AttributeComponent::makeAttrpath(const Class *cls)
   {
-    const char *p = strchr(getAttrpath(), '.');
+    const char *p = strchr(getAttrpath().c_str(), '.');
     assert(p);
     return std::string(cls->getName()) + "." + std::string(p+1);
   }
@@ -864,7 +864,7 @@ namespace eyedb {
 			   AttributeComponent *&cattr_comp)
   {
     std::string attrpath = makeAttrpath(cls);
-    char *name = strdup(getName());
+    char *name = strdup(getName().c_str());
     char *p = strchr(name, ':');
     assert(p);
     *p = 0;
@@ -917,7 +917,7 @@ namespace eyedb {
     char *indent_str = make_indent(indent);
     Bool tr = False;
   
-    fprintf(fd, "constraint<notnull%s> on %s", getPropagString(this), getAttrpath());
+    fprintf(fd, "constraint<notnull%s> on %s", getPropagString(this), getAttrpath().c_str());
 
     if (rcm->getType() == RecMode_FullRecurs)
       {
@@ -1011,7 +1011,7 @@ namespace eyedb {
 
     if (db)
       db->transactionBegin();
-    fprintf(fd, "constraint<unique%s> on %s", getPropagString(this), getAttrpath());
+    fprintf(fd, "constraint<unique%s> on %s", getPropagString(this), getAttrpath().c_str());
     if (rcm->getType() == RecMode_FullRecurs)
       {
 	fprintf(fd, " ");
@@ -1521,14 +1521,14 @@ namespace eyedb {
     Class *clsown = getClassOwner();
     if (idxtype == IndexImpl::Hash) {
       BEMethod_C *mth = idximpl.getHashMethod();
-      idx = new HashIndex(db, clsown, getAttrpath(),
+      idx = new HashIndex(db, clsown, getAttrpath().c_str(),
 			  getPropagate(), getIsString(),
 			  idximpl.getDataspace(),
 			  idximpl.getKeycount(), mth,
 			  impl_hints, impl_hints_cnt);
     }
     else
-      idx = new BTreeIndex(db, clsown, getAttrpath(),
+      idx = new BTreeIndex(db, clsown, getAttrpath().c_str(),
 			   getPropagate(), getIsString(),
 			   idximpl.getDataspace(),
 			   idximpl.getDegree(),
@@ -1682,7 +1682,7 @@ namespace eyedb {
   Status HashIndex::s_trace(FILE *fd, Bool is_string, unsigned int flags) const
   {
     if (!(flags & AttrCompDetailTrace)) {
-      fprintf(fd, "index<hash> on %s", getAttrpath());
+      fprintf(fd, "index<hash> on %s", getAttrpath().c_str());
       return Success;
     }
 
@@ -1701,7 +1701,7 @@ namespace eyedb {
     if (mth) {
       PREF(fd, hints);
       fprintf(fd, "key_function = %s::%s;", mth->getClassOwner()->getName(),
-	      mth->getEx()->getExname());
+	      mth->getEx()->getExname().c_str());
     }
 
     if (getKeyCount()) {
@@ -1730,7 +1730,7 @@ namespace eyedb {
     }
 
     fprintf(fd, "%s%s> on %s", (hints ? "\"" : ""), getPropagString(this),
-	    getAttrpath());
+	    getAttrpath().c_str());
 
     return Success;
   }
@@ -1981,7 +1981,7 @@ namespace eyedb {
   Status BTreeIndex::s_trace(FILE *fd, Bool is_string, unsigned int flags) const
   {
     if (!(flags & AttrCompDetailTrace)) {
-      fprintf(fd, "index<btree> on %s", getAttrpath());
+      fprintf(fd, "index<btree> on %s", getAttrpath().c_str());
       return Success;
     }
 
@@ -2003,7 +2003,7 @@ namespace eyedb {
     }
 
     fprintf(fd, "%s%s> on %s", (hints ? "\"" : ""), getPropagString(this),
-	    getAttrpath());
+	    getAttrpath().c_str());
 
     return Success;
   }
@@ -2273,7 +2273,7 @@ namespace eyedb {
     if (mth) {
       PREF(fd, hints);
       fprintf(fd, "key_function = %s::%s;", mth->getClassOwner()->getName(),
-	      mth->getEx()->getExname());
+	      mth->getEx()->getExname().c_str());
     }
 
     if (getKeyCountOrDegree()) {
@@ -2297,7 +2297,7 @@ namespace eyedb {
     }
 
     fprintf(fd, "%s%s> on %s", (hints ? "\"" : ""), getPropagString(this),
-	    getAttrpath());
+	    getAttrpath().c_str());
 
     return Success;
   }

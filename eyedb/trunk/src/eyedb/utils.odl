@@ -57,11 +57,11 @@ class image [Image] {
 //
 // ---------------------------------------------------------------------------
 
-class URL [URL] {
+class URL [CURL] {
   string proto;
   string url;
   %C++{
-  URL(const char *proto, const char *url);
+  CURL(const char *proto, const char *url);
   %}
 };
 

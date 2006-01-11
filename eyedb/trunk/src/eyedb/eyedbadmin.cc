@@ -1179,7 +1179,7 @@ methods_manage(Database &db, DBMethod*& mths, unsigned int& nmths)
       Method *m = (Method *)obj_arr[i];
       if (m->asBEMethod_OQL())
 	continue;
-      const char *extref = m->getEx()->getExtrefBody();
+      const char *extref = m->getEx()->getExtrefBody().c_str();
       if (is_system_method(extref))
 	continue;
 
@@ -3483,26 +3483,26 @@ get_db_access_db(DBM_Database *dbm, const char *dbname,
 static void
 print_user(DBM_Database *dbm, UserEntry *user)
 {
-  printf("name      : \"%s\"", user->name());
+  printf("name      : \"%s\"", user->name().c_str());
   if (user->type() == UnixUser)
     printf(" [unix user]");
   else if (user->type() == StrictUnixUser)
     printf(" [strict unix user]");
   printf("\n");
-  printf("sysaccess : %s\n", str_sys_mode(get_sys_access(dbm, user->name())));
+  printf("sysaccess : %s\n", str_sys_mode(get_sys_access(dbm, user->name().c_str())));
   DBUserAccess *dbaccess[128];
-  int cnt = get_db_access_user(dbm, user->name(), dbaccess);
+  int cnt = get_db_access_user(dbm, user->name().c_str(), dbaccess);
   if (cnt > 0)
     {
       printf("dbaccess  : ");
       for (int i = 0, n = 0; i < cnt; i++)
 	{
-	  if (dbaccess[i]->dbentry() && dbaccess[i]->dbentry()->dbname())
+	  if (dbaccess[i]->dbentry() && dbaccess[i]->dbentry()->dbname().c_str())
 	    {
 	      if (n)
 		printf("            ");
 	      printf("(dbname : \"%s\", access : %s)\n",
-		     dbaccess[i]->dbentry()->dbname(),
+		     dbaccess[i]->dbentry()->dbname().c_str(),
 		     str_user_mode(dbaccess[i]->mode()));
 	      n++;
 	    }
@@ -3565,7 +3565,7 @@ static char list_indent[] = "  ";
 static DbInfoDescription *
 get_dbinfo(DBEntry *dbentry, Database *&db)
 {
-  db = new Database(dbentry->dbname(), dbmdb);
+  db = new Database(dbentry->dbname().c_str(), dbmdb);
 
   DbInfoDescription *dbdesc = new DbInfoDescription();
   Status status = db->getInfo(conn, 0, 0, dbdesc);
@@ -3659,21 +3659,21 @@ print_dbentry(DBEntry *dbentry, DBM_Database *dbm, unsigned int options)
 
   if (options & ALL)
     {
-      printf("Database Name\n%s%s\n", list_indent, dbentry->dbname());
+      printf("Database Name\n%s%s\n", list_indent, dbentry->dbname().c_str());
       printf("Database Identifier\n%s%d\n", list_indent, dbentry->dbid());
-      printf("Database File\n%s%s\n", list_indent, dbentry->dbfile());
+      printf("Database File\n%s%s\n", list_indent, dbentry->dbfile().c_str());
       printf("Max Object Count\n%s%d\n", list_indent, dbdesc->sedbdesc.nbobjs);
     }
   else
     {
       if (options & DBNAME)
-	printf("%s\n", dbentry->dbname());
+	printf("%s\n", dbentry->dbname().c_str());
 
       if (options & DBID)
 	printf("%d\n", dbentry->dbid());
 
       if (options & DBFILE)
-	printf("%s\n", dbentry->dbfile());
+	printf("%s\n", dbentry->dbfile().c_str());
 
       if (options & OBJCNT)
 	printf("%llu\n", dbdesc->sedbdesc.nbobjs);
@@ -3688,7 +3688,7 @@ print_dbentry(DBEntry *dbentry, DBM_Database *dbm, unsigned int options)
     printf("Default Access\n%s%s\n", list_indent, str_user_mode(dbentry->default_access()));
 
   DBUserAccess *dbaccess[128];
-  int cnt = get_db_access_db(dbm, dbentry->dbname(), dbaccess);
+  int cnt = get_db_access_db(dbm, dbentry->dbname().c_str(), dbaccess);
   if (cnt > 0)
     {
       if (options & ALL)
@@ -3696,12 +3696,12 @@ print_dbentry(DBEntry *dbentry, DBM_Database *dbm, unsigned int options)
       for (int i = 0; i < cnt; i++)
 	if (options & USERDBACCESS)
 	  printf("%s %s\n",
-		 dbaccess[i]->user()->name(),
+		 dbaccess[i]->user()->name().c_str(),
 		 str_user_mode(dbaccess[i]->mode()));
 	else if (options & ALL)
 	  printf("%sUser Name  %s\n%sAccess Mode %s\n",
 		 list_indent,
-		 dbaccess[i]->user()->name(),
+		 dbaccess[i]->user()->name().c_str(),
 		 list_indent,
 		 str_user_mode(dbaccess[i]->mode()));
     }

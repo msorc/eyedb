@@ -628,7 +628,7 @@ collimpl_getdef_realize(int argc, char *argv[])
       for (; c.getNext((void *&)collimpl); nn++) {
 	if (nn) fprintf(stdout, "\n");
 	fprintf(stdout, "Default implementation on %s:\n",
-		collimpl->getAttrpath());
+		collimpl->getAttrpath().c_str());
 	const IndexImpl *idximpl;
 	Status s = collimpl->getImplementation(db, idximpl);
 	CHECK(s);

@@ -1293,7 +1293,7 @@ namespace eyedb {
   
     if (argtype->getType() == OBJ_TYPE)
       fprintf(fd, "%sargtype->setClname(\"%s\");\n", ctx->get(),
-	      argtype->getClname());
+	      argtype->getClname().c_str());
   }
 
   Status AgregatClass::generateClassComponent_Java(GenContext *ctx,
@@ -1324,7 +1324,7 @@ namespace eyedb {
 	  {
 	    Trigger *trig = comp->asTrigger();
 	    fprintf(fd, "%scomp = new Trigger(db, cls, %d, \"%s\", %s);\n",
-		    ctx->get(), trig->getType(), trig->getSuffix(),
+		    ctx->get(), trig->getType(), trig->getSuffix().c_str(),
 		    trig->getLight() ? "true" : "false");
 	    fprintf(fdtrg, "extern \"C\"\n");
 	    fprintf(fdtrg, "Status %s(ArgType type, Database *db, "
@@ -1340,7 +1340,7 @@ namespace eyedb {
 	    Executable *ex = mth->getEx();
 	    Signature *sign = ex->getSign();
 	    const char *prefix;
-	    const char *extref = ex->getExtrefBody();
+	    const char *extref = ex->getExtrefBody().c_str();
 	  
 	    if (mth->asFEMethod_C())
 	      prefix = "FE";
@@ -1363,11 +1363,11 @@ namespace eyedb {
 	  
 	    fprintf(fd,
 		    "%scomp = new %sMethod_Java(db, cls, \"%s\", sign, \"%s\");\n",
-		    ctx->get(), prefix, ex->getExname(), extref);
+		    ctx->get(), prefix, ex->getExname().c_str(), extref);
 	    fprintf(fdmth, "extern \"C\"\n");
 	    fprintf(fdmth, "Status %s(Database *db, %sMethod_C *m, "
 		    "Object *o, ArgArray &array, Argument &retarg)\n{\n",
-		    Executable::makeInternalName(ex->getExname(),
+		    Executable::makeInternalName(ex->getExname().c_str(),
 						 sign, False,
 						 getClass()->getName()),
 		    prefix);

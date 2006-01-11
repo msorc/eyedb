@@ -375,8 +375,8 @@ LinkedList *Database::dbopen_list;
 	if (curtrs)
 	  {
 	    RPCStatus rpc_status;
-	    if ((rpc_status = (commit ? ::transactionCommit(dbh, 0 ) :
-			       ::transactionAbort(dbh, 0))) != RPCSuccess)
+	    if ((rpc_status = (commit ? eyedb::transactionCommit(dbh, 0 ) :
+			       eyedb::transactionAbort(dbh, 0))) != RPCSuccess)
 	      delete curtrs;
 	  }
 
@@ -1786,7 +1786,7 @@ if ((mode) !=  NoDBAccessMode && \
   {
     RPCStatus rpc_status;
     int alockmode;
-    if ((rpc_status = ::setObjectLock(dbh, _oid.getOid(), lockmode, &alockmode))
+    if ((rpc_status = eyedb::setObjectLock(dbh, _oid.getOid(), lockmode, &alockmode))
 	!= RPCSuccess)
       return StatusMake(rpc_status);
     
@@ -1799,7 +1799,7 @@ if ((mode) !=  NoDBAccessMode && \
   {
     RPCStatus rpc_status;
     int _alockmode;
-    if ((rpc_status = ::setObjectLock(dbh, _oid.getOid(), lockmode, &_alockmode))
+    if ((rpc_status = eyedb::setObjectLock(dbh, _oid.getOid(), lockmode, &_alockmode))
 	!= RPCSuccess)
       return StatusMake(rpc_status);
 
@@ -1812,7 +1812,7 @@ if ((mode) !=  NoDBAccessMode && \
   {
     RPCStatus rpc_status;
     int _alockmode;
-    if ((rpc_status = ::getObjectLock(dbh, _oid.getOid(), &_alockmode))
+    if ((rpc_status = eyedb::getObjectLock(dbh, _oid.getOid(), &_alockmode))
 	!= RPCSuccess)
       return StatusMake(rpc_status);
 
@@ -2585,7 +2585,7 @@ if ((mode) !=  NoDBAccessMode && \
   Database::getDefaultDataspace(const Dataspace *&dataspace)
   {
     int dspid;
-    RPCStatus rpc_status = ::getDefaultDataspace(dbh, &dspid);
+    RPCStatus rpc_status = eyedb::getDefaultDataspace(dbh, &dspid);
     if (rpc_status)
       return StatusMake(rpc_status);
 
@@ -2595,7 +2595,7 @@ if ((mode) !=  NoDBAccessMode && \
   Status
   Database::setDefaultDataspace(const Dataspace *dataspace)
   {
-    RPCStatus rpc_status = ::setDefaultDataspace(dbh, dataspace->getId());
+    RPCStatus rpc_status = eyedb::setDefaultDataspace(dbh, dataspace->getId());
     if (rpc_status)
       return StatusMake(rpc_status);
 
@@ -2635,7 +2635,7 @@ if ((mode) !=  NoDBAccessMode && \
     unsigned int cnt;
     eyedbsm::Oid *oids = oidArrayToOids(oid_arr, cnt);
     if (!cnt) return Success;
-    RPCStatus rpc_status = ::moveObjects(dbh, oids, cnt, dataspace->getId());
+    RPCStatus rpc_status = eyedb::moveObjects(dbh, oids, cnt, dataspace->getId());
     delete [] oids;
     return StatusMake(rpc_status);
   }
@@ -2646,7 +2646,7 @@ if ((mode) !=  NoDBAccessMode && \
     unsigned int cnt;
     eyedbsm::Oid *oids = objArrayToOids(obj_arr, cnt);
     if (!cnt) return Success;
-    RPCStatus rpc_status = ::moveObjects(dbh, oids, cnt, dataspace->getId());
+    RPCStatus rpc_status = eyedb::moveObjects(dbh, oids, cnt, dataspace->getId());
     delete [] oids;
     return StatusMake(rpc_status);
   }
@@ -2683,7 +2683,7 @@ if ((mode) !=  NoDBAccessMode && \
     else s = filename;
 
     RPCStatus rpc_status =
-      ::createDatafile(dbh, s.c_str(), name, maxsize, slotsize, dtype);
+      eyedb::createDatafile(dbh, s.c_str(), name, maxsize, slotsize, dtype);
 
     return StatusMake(rpc_status);
   }
@@ -2694,7 +2694,7 @@ if ((mode) !=  NoDBAccessMode && \
 			    unsigned int datafile_cnt)
   {
     char **datids = Dataspace::makeDatid(datafiles, datafile_cnt);
-    RPCStatus rpc_status = ::createDataspace(dbh, dspname,
+    RPCStatus rpc_status = eyedb::createDataspace(dbh, dspname,
 					       datids, datafile_cnt);
     Dataspace::freeDatid(datids, datafile_cnt);
     return StatusMake(rpc_status);

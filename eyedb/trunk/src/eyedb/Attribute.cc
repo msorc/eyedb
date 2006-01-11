@@ -161,7 +161,7 @@ const char *Attribute::log_comp_entry_fmt =
      (const char *)(std::string(class_owner->getName()) + "::" + name))
 */
 
-#define ATTRPATH(IDX) ((IDX) ? (IDX)->getAttrpath() : \
+#define ATTRPATH(IDX) ((IDX) ? (IDX)->getAttrpath().c_str() : \
      (std::string(class_owner->getName()) + "::" + name).c_str())
 
 static int inline iniSize(int sz)
@@ -1840,7 +1840,7 @@ hash_key(const void *key, unsigned int len, void *hash_data, int &x)
 
   if (s)
     return eyedbsm::statusMake(eyedbsm::ERROR, "while applying hash function %s: %s",
-			 mth->getName(), s->getString());
+			 mth->getName().c_str(), s->getString());
   x = retarg.getInteger();
   return eyedbsm::Success;
 }
@@ -1876,7 +1876,7 @@ Attribute::openMultiIndexRealize(Database *db, Index *idx)
       if (se_idx->status() != eyedbsm::Success)
 	return Exception::make(IDB_INDEX_ERROR, fmt_error,
 				  eyedbsm::statusGet(se_idx->status()),
-				  idx->getAttrpath(),
+				  idx->getAttrpath().c_str(),
 				  idx->getClassOwner()->getName());
     }
 
@@ -1888,7 +1888,7 @@ Attribute::openMultiIndexRealize(Database *db, Index *idx)
       if (se_idx->status() != eyedbsm::Success)
 	return Exception::make(IDB_INDEX_ERROR, fmt_error,
 				  eyedbsm::statusGet(se_idx->status()),
-				  idx->getAttrpath(),
+				  idx->getAttrpath().c_str(),
 				  idx->getClassOwner()->getName());
     }
 
@@ -1899,7 +1899,7 @@ Attribute::openMultiIndexRealize(Database *db, Index *idx)
       if (se_idx->status() != eyedbsm::Success)
 	return Exception::make(IDB_INDEX_ERROR, fmt_error,
 				  eyedbsm::statusGet(se_idx->status()),
-				  idx->getAttrpath(),
+				  idx->getAttrpath().c_str(),
 				  idx->getClassOwner()->getName());
     }
 
@@ -1910,7 +1910,7 @@ Attribute::openMultiIndexRealize(Database *db, Index *idx)
       if (se_idx->status() != eyedbsm::Success)
 	return Exception::make(IDB_INDEX_ERROR, fmt_error,
 				  eyedbsm::statusGet(se_idx->status()),
-				  idx->getAttrpath(),
+				  idx->getAttrpath().c_str(),
 				  idx->getClassOwner()->getName());
     }
 
@@ -2189,7 +2189,7 @@ Attribute::createDeferredIndex_realize(Database *db,
 
   IDB_LOG(IDB_LOG_IDX_CREATE,
 	  ("Attribute::createDeferredIndex_realize(%s)\n",
-	   idx->getAttrpath()));
+	   idx->getAttrpath().c_str()));
 
 #ifdef TRACE_IDX
   printf("creating deferred index this=%p, name=%s, attrname=%s\n",
@@ -3812,7 +3812,7 @@ Attribute::add(Database *db, ClassConversion *conv,
   printf("add %s::%s idr_poff=%d offsetN=%d idr_psize=%d sizeN=%d "
 	 "in_size=%d sizemoved=%d %s==%s?\n",
 	 class_owner->getName(), name, idr_poff, offset, idr_psize, size,
-	 in_size, in_size - size - offset, name, conv->getAttrname());
+	 in_size, in_size - size - offset, name, conv->getAttrname().c_str());
   assert(idr_poff == offset);
   assert(idr_psize == size);
 
@@ -7774,7 +7774,7 @@ AttrIdxContext::realizeIdxOP(Bool ok)
       if (xop->op == IdxInsert) {
 	s = xop->idx->insert(xop->data, xop->data_oid);
 	if (eyedbsm::hidx_gccnt > 20) {
-	  fprintf(stdout, "index %s getcell -> %d\n", xop->idx_t->getAttrpath(), eyedbsm::hidx_gccnt);
+	  fprintf(stdout, "index %s getcell -> %d\n", xop->idx_t->getAttrpath().c_str(), eyedbsm::hidx_gccnt);
 	  fflush(stdout);
 	}
 	eyedbsm::hidx_gccnt = 0;
@@ -7785,7 +7785,7 @@ AttrIdxContext::realizeIdxOP(Bool ok)
 	if (!s && !found)
 	  return Exception::make(IDB_INDEX_ERROR, fmt_error,
 				    "index entry not found",
-				    xop->idx_t->getAttrpath(),
+				    xop->idx_t->getAttrpath().c_str(),
 				    xop->attr->getClassOwner()->getName());
       }
 
@@ -7793,7 +7793,7 @@ AttrIdxContext::realizeIdxOP(Bool ok)
 	return Exception::make(IDB_INDEX_ERROR, fmt_error,
 				  eyedbsm::statusGet(s),
 				  //xop->attr->getName(),
-				  xop->idx_t->getAttrpath(),
+				  xop->idx_t->getAttrpath().c_str(),
 				  xop->attr->getClassOwner()->getName());
     }
 
@@ -8074,7 +8074,7 @@ AttributeComponentSet::Cache::add(AttributeComponent *comp)
     comps = (Comp *)realloc(comps, comp_alloc * sizeof(Comp));
   }
 
-  comps[comp_count].attrpath = strdup(comp->getAttrpath());
+  comps[comp_count].attrpath = strdup(comp->getAttrpath().c_str());
   comps[comp_count].comp = comp;
   comp_count++;
 }
@@ -8089,7 +8089,7 @@ AttributeComponentSet::Cache::getComponents(const char *prefix,
 					       int len, LinkedList &list)
 {
   for (int i = 0; i < comp_count; i++) {
-    if (!strncmp(comps[i].comp->getAttrpath(), prefix, len)) {
+    if (!strncmp(comps[i].comp->getAttrpath().c_str(), prefix, len)) {
       if (list.getPos(comps[i].comp) < 0)
 	list.insertObject(comps[i].comp);
     }
@@ -8265,7 +8265,7 @@ Attribute::destroyIndex(Database *db, Index *idx) const
 	  ("Remove Index (%s::%s, "
 	   "index=%s)\n",
 	   (class_owner ? class_owner->getName() : "<unknown>"),
-	   name, idx->getAttrpath()));
+	   name, idx->getAttrpath().c_str()));
 	  
   /*
   printf("destroying index idx=%p %s\n", idx->idx,

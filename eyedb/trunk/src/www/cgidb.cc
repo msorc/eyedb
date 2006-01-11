@@ -775,8 +775,8 @@ idbWDumpConfig(Database *db)
 static int
 sort_realize(const void *xdb1, const void *xdb2)
 {
-  return strcmp((*(DBEntry **)xdb1)->dbname(),
-		(*(DBEntry **)xdb2)->dbname());
+  return strcmp((*(DBEntry **)xdb1)->dbname().c_str(),
+		(*(DBEntry **)xdb2)->dbname().c_str());
 }
 
 static inline int
@@ -923,7 +923,7 @@ idbWDBList(idbWProcess *p, int fd)
       DBUserAccess *dbaccess = 0;
       DBAccessMode defaccess;
       UserEntry *user = 0;
-      dbm->get_db_user_access(dbentry->dbname(), idbW_ctx->user, &user,
+      dbm->get_db_user_access(dbentry->dbname().c_str(), idbW_ctx->user, &user,
 			      &dbaccess, &defaccess);
 			
       if (user) user->release();
@@ -946,7 +946,7 @@ idbWDBList(idbWProcess *p, int fd)
 			    "-u" idbWSPACE "%s" idbWSPACE
 			    "-p" idbWSPACE "%s" idbWSPACE,
 			    idbW_ctx->cgidir, idbW_progname,
-			    dbentry->dbname(),
+			    dbentry->dbname().c_str(),
 			    idbW_ctx->user, idbW_ctx->passwd);
 	  
 	  idbW_dest->cflush
@@ -962,15 +962,15 @@ idbWDBList(idbWProcess *p, int fd)
 	    idbW_dest->cflush
 	      ("-conf" idbWSPACE "%s" idbWSPACE, idbW_ctx->confname);
 	  
-	  idbW_dest->cflush("-dbdlggen\">%s</a>", dbentry->dbname());
+	  idbW_dest->cflush("-dbdlggen\">%s</a>", dbentry->dbname().c_str());
 	}
       else
-	idbW_dest->cflush(dbentry->dbname());
+	idbW_dest->cflush(dbentry->dbname().c_str());
 
       idbW_dest->cflush("</strong></th><th>");
       
-      if (dbentry->comment() && *dbentry->comment())
-	idbW_dest->cflush("%s", dbentry->comment());
+      if (dbentry->comment().c_str() && *dbentry->comment().c_str())
+	idbW_dest->cflush("%s", dbentry->comment().c_str());
       else
 	idbW_dest->cflush("-");
       

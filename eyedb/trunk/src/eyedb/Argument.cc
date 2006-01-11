@@ -819,7 +819,7 @@ Argument::getArgTypeStr(const ArgType *argtype, Bool printref)
 
   if (type == INT32_TYPE)
     {
-      const char *clname = argtype->getClname();
+      const char *clname = argtype->getClname().c_str();
       if (clname && *clname)
 	return strcat(strcat(rettype, clname), array);
 
@@ -850,7 +850,7 @@ Argument::getArgTypeStr(const ArgType *argtype, Bool printref)
   if (type == OBJ_TYPE)
     {
       static char s[1024];
-      sprintf(s, "%s%s", (*argtype->getClname() ? argtype->getClname() :
+      sprintf(s, "%s%s", (*argtype->getClname().c_str() ? argtype->getClname().c_str() :
 			  "<unknown class>"), (printref ? "*" : "_REF_"));
       return strcat(strcat(rettype, s), array);
     }
@@ -911,7 +911,7 @@ const char *Argument::toString() const
   
   if (t == OBJ_TYPE)
     {
-      sprintf(buf, "%p:%s", o, type->getClname());
+      sprintf(buf, "%p:%s", o, type->getClname().c_str());
       return (((Argument *)this)->str = strdup(buf));
     }
   
@@ -1259,7 +1259,7 @@ Bool ArgType::operator==(const ArgType &argtype) const
   if (_type != OBJ_TYPE)
     return True;
 
-  return !strcmp(getClname(), argtype.getClname()) ? True : False;
+  return !strcmp(getClname().c_str(), argtype.getClname().c_str()) ? True : False;
 }
 
 Bool ArgType::operator!=(const ArgType &argtype) const
@@ -1382,7 +1382,7 @@ ArgType::getCType(Schema *m) const
   if (_type == OBJ_TYPE)
     {
       static char tok[512];
-      sprintf(tok, "%s *", m->getClass(getClname())->getCName(True));
+      sprintf(tok, "%s *", m->getClass(getClname().c_str())->getCName(True));
       return tok;
     }
   if (_type == ANY_TYPE)
@@ -1391,11 +1391,11 @@ ArgType::getCType(Schema *m) const
     return Int16_Class->getCName();
   if (_type == INT32_TYPE)
     {
-      const char *clname = getClname();
+      const char *clname = getClname().c_str();
       if (clname && *clname)
 	{
 	  static char tok[512];
-	  const char *clsname = getClname();
+	  const char *clsname = getClname().c_str();
 	  sprintf(tok, "%s", m->getClass(clsname)->getCName(True));
 	  if (odl_class_enums && !Class::isBoolClass(clsname))
 	    strcat(tok, "::Type");
@@ -1463,7 +1463,7 @@ ArgType::getCPrefix(FILE *fd, Schema *m, const char *prefix,
 	fprintf(fd, "(%s%s *%s)%sgetObject%s(", 
 		//(*s ? "const " : ""),
 		CONST(_type),
-		m->getClass(getClname())->getCName(True),
+		m->getClass(getClname().c_str())->getCName(True),
 		(*s ? " *" : ""), prefix, s);
       else
 	fprintf(fd, "%sgetObject%s(", 
@@ -1539,8 +1539,8 @@ void ArgType::init(FILE *fd, Schema *m, const char *prefix,
 	fprintf(fd, "(%sunsigned char *)", _const);
     }
 
-  if (PURGE(_type) == INT32_TYPE && *getClname()) {
-    const char *clsname = getClname();
+  if (PURGE(_type) == INT32_TYPE && *getClname().c_str()) {
+    const char *clsname = getClname().c_str();
     fprintf(fd, "(%s%s%s)",  m->getClass(clsname)->getCName(True),
 	    (odl_class_enums && !Class::isBoolClass(clsname) ? "::Type" : ""),
 	    (_type & ARRAY_TYPE) ? " *" : "");
@@ -1568,7 +1568,7 @@ void ArgType::ret(FILE *fd, Schema *m, const char *prefix, const char *name)
       fprintf(fd, ";\n");
       if (PURGE(getType()) == OBJ_TYPE)
 	{
-	  const char *clname = getClname();
+	  const char *clname = getClname().c_str();
 	  if (clname && *clname)
 	    fprintf(fd, "  %s = (%s **)Argument::dup((Object **)%s, "
 		    "%s_cnt)", name, clname, name, name);
@@ -1576,9 +1576,9 @@ void ArgType::ret(FILE *fd, Schema *m, const char *prefix, const char *name)
 	    fprintf(fd, "  %s = Argument::dup((Object **)%s, %s_cnt)",
 		    name, name, name);
 	}
-      else if (PURGE(getType()) == INT32_TYPE && *getClname())
+      else if (PURGE(getType()) == INT32_TYPE && *getClname().c_str())
 	fprintf(fd, "  %s = (%s *)Argument::dup((eyedblib::int32 *)%s, %s_cnt)",
-		name, getClname(), name, name);
+		name, getClname().c_str(), name, name);
       else
 	fprintf(fd, "  %s = Argument::dup(%s, %s_cnt)", name, name, name);
     }
@@ -1740,7 +1740,7 @@ void Signature::setArgs(FILE *fd, Schema *m, int _type,
       if ((arg->getType() & _type) == _type)
 	{
 	  fprintf(fd, "%s%sset(%s%s", indent, getPrefix(prefix, i),
-		  getCast(arg->getType(), arg->getClname(), (arg->getType() & OUT_ARG_TYPE)),
+		  getCast(arg->getType(), arg->getClname().c_str(), (arg->getType() & OUT_ARG_TYPE)),
 		  getArg(i));
 	  if (arg->getType() & ARRAY_TYPE)
 	    fprintf(fd, ", %s_cnt%s", getArg(i),
@@ -1763,7 +1763,7 @@ void Signature::setArgs(FILE *fd, Schema *m, int _type,
     {
       ArgType *rettype = getRettype();
       fprintf(fd, "%s%sset(%s%s", indent, preret,
-	      getCast(rettype->getType(), rettype->getClname(), 1), ppretarg);
+	      getCast(rettype->getType(), rettype->getClname().c_str(), 1), ppretarg);
       if (rettype->getType() & ARRAY_TYPE)
 	fprintf(fd, ", %s_cnt%s", ppretarg, polstr);
       else if (PURGE(rettype->getType()) == RAW_TYPE)

@@ -333,7 +333,7 @@ namespace eyedb {
   OString &
   OString::insert(int offset, const char * s, int offset2, int len)
   {
-    const char * this_s = getS();
+    const char * this_s = getS().c_str();
 
     // check arguments
     if( offset < 0 
@@ -385,7 +385,7 @@ namespace eyedb {
   int
   OString::find(const char * s, int offset) const
   {
-    const char * this_s = getS();
+    const char * this_s = getS().c_str();
   
     if (offset > strlen(this_s) || offset < 0 || !*s)
       {
@@ -407,7 +407,7 @@ namespace eyedb {
   OString *
   OString::substr(int offset, int len) const
   {
-    OString * os = OString::ostring(0, getS(), offset, len);
+    OString * os = OString::ostring(0, getS().c_str(), offset, len);
 
     return os;
   }
@@ -417,7 +417,7 @@ namespace eyedb {
   OString::substr(const char * regexp, int offset) const
   {
     // check argument
-    const char * regexp_subject = getS();
+    const char * regexp_subject = getS().c_str();
 
     if( offset > strlen(regexp_subject) 
 	|| offset < 0)
@@ -481,7 +481,7 @@ namespace eyedb {
   OString::erase(int offset, int len)
   {
     // check arguments
-    const char * this_s = getS();
+    const char * this_s = getS().c_str();
 
     int this_len = strlen(this_s);
     if( offset > this_len
@@ -526,7 +526,7 @@ namespace eyedb {
   OString::replace(int offset, int len, const char * s, int offset2, int len2)
   {
     // check arguments
-    const char * this_s = getS();
+    const char * this_s = getS().c_str();
 
     int this_len = strlen(this_s);
     int s_len = strlen(s);
@@ -567,7 +567,7 @@ namespace eyedb {
   OString &
   OString::replace(const char * s1, const char * s2)
   {
-    const char * this_s = getS();
+    const char * this_s = getS().c_str();
     int s1_len = strlen(s1);
   
 
@@ -652,7 +652,7 @@ namespace eyedb {
   OString &
   OString::toLower()
   {
-    char * s2 = toLower(getS());
+    char * s2 = toLower(getS().c_str());
     setS(s2);
     delete s2;
 
@@ -662,7 +662,7 @@ namespace eyedb {
   OString &
   OString::toUpper()
   {
-    char * s2 = toUpper(getS());
+    char * s2 = toUpper(getS().c_str());
     setS(s2);
     delete s2;
 
@@ -672,7 +672,7 @@ namespace eyedb {
   OString &
   OString::rtrim()
   {  
-    char * s2 = rtrim(getS());
+    char * s2 = rtrim(getS().c_str());
     setS(s2);
     delete s2;
  
@@ -682,7 +682,7 @@ namespace eyedb {
   OString & 
   OString::ltrim()
   {
-    char * s2 = ltrim(getS());
+    char * s2 = ltrim(getS().c_str());
     setS(s2);
     delete s2;
 
@@ -692,19 +692,19 @@ namespace eyedb {
   int
   OString::compare(const char * s) const
   {
-    return strcmp(getS(), s);
+    return strcmp(getS().c_str(), s);
   }
 
   int
   OString::compare(const char * s, int to) const
   {
-    return strncmp(getS(), s, to);
+    return strncmp(getS().c_str(), s, to);
   }
 
   int
   OString::compare(const char * s, int from, int to) const
   {  
-    const char * this_s = getS();
+    const char * this_s = getS().c_str();
 
     if(from >= strlen(s)
        || from >= strlen(this_s) )
@@ -725,7 +725,7 @@ namespace eyedb {
   Bool
   OString::match(const char * regexp) const
   {
-    const char * regexp_subject = getS();
+    const char * regexp_subject = getS().c_str();
 #ifdef SOLARIS
     char * compiled_regexp = regcmp(regexp, (char *)0);
 
@@ -776,14 +776,14 @@ namespace eyedb {
   int
   OString::length() const
   {  
-    return strlen(getS());
+    return strlen(getS().c_str());
   }
 
   char **
   OString::split(const char * separator, int & nb_pieces) const
   {
     //get a copy of the string
-    char * s_copy = strdup(getS());
+    char * s_copy = strdup(getS().c_str());
 
     // break the copy into tokens
     nb_pieces = 1;
@@ -827,7 +827,7 @@ namespace eyedb {
   OString::regexp_split(const char * regexp_separator, int & nb_pieces) const
   {
     //get a copy of the string
-    char * s_copy = strdup(getS());
+    char * s_copy = strdup(getS().c_str());
 
     // prepare the regular expression
 #ifdef SOLARIS

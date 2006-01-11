@@ -2435,7 +2435,7 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
 
 	fprintf(fdc, "%sif (!%s_class->compare(m->getClass(\"%s\")))\n",
 		ctx.get(), cl->getCName(), cl->getAliasName());
-	fprintf(fdc, "%s  return eyedb::Exception::make(IDB_ERROR, \"'%s' %%s\", differ_msg);\n", ctx.get(), cl->getName());
+	fprintf(fdc, "%s  return eyedb::Exception::make(eyedb::IDB_ERROR, \"'%s' %%s\", differ_msg);\n", ctx.get(), cl->getName());
       }
 
     _class->endScan(curs);
@@ -2602,7 +2602,7 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
       fprintf(fdc, "eyedb::Bool %sDatabase::getDynamicGetErrorPolicy() {\n", package);
 #ifdef UNIFIED_API    
       if (!odl_dynamic_attr)
-	fprintf(fdc, "   throw *eyedb::Exception::make(IDB_ERROR, \"getDynamicGetErrorPolicy() %s\");\n}\n\n", dyn_call_error);
+	fprintf(fdc, "   throw *eyedb::Exception::make(eyedb::IDB_ERROR, \"getDynamicGetErrorPolicy() %s\");\n}\n\n", dyn_call_error);
       else
 #endif
 	fprintf(fdc, "   return dynget_error_policy;\n}\n\n");
@@ -2612,7 +2612,7 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
 
 #ifdef UNIFIED_API
       if (!odl_dynamic_attr)
-	fprintf(fdc, "   throw *eyedb::Exception::make(IDB_ERROR, \"getDynamicSetErrorPolicy() %s\");\n}\n\n", dyn_call_error);
+	fprintf(fdc, "   throw *eyedb::Exception::make(eyedb::IDB_ERROR, \"getDynamicSetErrorPolicy() %s\");\n}\n\n", dyn_call_error);
       else
 #endif
 	fprintf(fdc, "   return dynget_error_policy;\n}\n\n");
@@ -2621,7 +2621,7 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
 	      package);
 #ifdef UNIFIED_API
       if (!odl_dynamic_attr)
-	fprintf(fdc, "   throw *eyedb::Exception::make(IDB_ERROR, \"setDynamicGetErrorPolicy() %s\");\n}\n\n", dyn_call_error);
+	fprintf(fdc, "   throw *eyedb::Exception::make(eyedb::IDB_ERROR, \"setDynamicGetErrorPolicy() %s\");\n}\n\n", dyn_call_error);
       else
 #endif
 	fprintf(fdc, "   dynget_error_policy = policy;\n}\n\n");
@@ -2629,7 +2629,7 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
 	      package);
 #ifdef UNIFIED_API
       if (!odl_dynamic_attr)
-	fprintf(fdc, "   throw *eyedb::Exception::make(IDB_ERROR, \"setDynamicSetErrorPolicy() %s\");\n}\n\n", dyn_call_error);
+	fprintf(fdc, "   throw *eyedb::Exception::make(eyedb::IDB_ERROR, \"setDynamicSetErrorPolicy() %s\");\n}\n\n", dyn_call_error);
       else
 #endif
 	fprintf(fdc, "   dynset_error_policy = policy;\n}\n\n");

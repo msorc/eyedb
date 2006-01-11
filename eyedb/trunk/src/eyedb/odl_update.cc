@@ -781,9 +781,9 @@ odl_components_manage(const Class *cls, const Class *ocls)
       // cls->getCompList()->deleteObject(comp);
       LinkedListCursor oc(ocls->getCompList());
       ClassComponent *ocls_comp;
-      const char *cname = cls_comp->getName();
+      const char *cname = cls_comp->getName().c_str();
       while (oc.getNext((void *&)ocls_comp)) {
-	if (!strcmp(cname, ocls_comp->getName())) {
+	if (!strcmp(cname, ocls_comp->getName().c_str())) {
 	  ObjectPeer::setOid(cls_comp, ocls_comp->getOid());
 #ifdef TRACE
 	  printf("\tsetting %p %s to %s [%s vs. %s %p %p]\n", comp, ocls_comp->getOid().toString(), cls_comp->getName(), cls_comp->getClassOwner()->getOid().toString(),

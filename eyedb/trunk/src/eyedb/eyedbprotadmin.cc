@@ -360,7 +360,7 @@ traceProtection(Protection *prot, Bool head)
     
   printf("%s :\n", (head ? "protection" : ""));
   printf("\toid     : %s\n", prot->getOid().getString());
-  printf("\tname    : \"%s\"\n", prot->getName());
+  printf("\tname    : \"%s\"\n", prot->getName().c_str());
 
   int cnt = prot->getPusersCount();
 
@@ -378,7 +378,7 @@ traceProtection(Protection *prot, Bool head)
 	mode_str = "no";
 
       printf("\tuser[%d] : %s (mode : %s)\n", i,
-	     ((UserEntry *)puser->getUser())->name(), mode_str);
+	     ((UserEntry *)puser->getUser())->name().c_str(), mode_str);
     }
 
   if (!cnt)

@@ -176,11 +176,11 @@ DBM_Database::getDbFile(const char **dbname, int *_dbid, const char *&dbfile)
       DBEntry *dbmentry = (DBEntry *)obj_arr[0];
       
       if (!(*dbname)[0])
-	*dbname = strdup(dbmentry->dbname());
+	*dbname = strdup(dbmentry->dbname().c_str());
       else if (_dbid)
 	*_dbid = dbmentry->dbid();
 
-      dbfile = dbmentry->dbfile();
+      dbfile = dbmentry->dbfile().c_str();
     }
 
   delete q;
@@ -208,8 +208,8 @@ DBM_Database::getDatabases(LinkedList *list)
   for (int i = 0; i < obj_arr.getCount(); i++)
     {
       DBEntry *dbmentry = (DBEntry *)obj_arr[i];
-      Database *_db = new Database(dbmentry->dbname(),
-					 dbmentry->dbid());
+      Database *_db = new Database(dbmentry->dbname().c_str(),
+				   dbmentry->dbid());
       list->insertObjectLast(_db);
     }
 

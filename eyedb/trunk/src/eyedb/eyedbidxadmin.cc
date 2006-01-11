@@ -374,11 +374,11 @@ index_trace(Index *idx, Bool full)
 {
   if (!full) {
     printf("%sindex on %s\n", idx->asHashIndex() ? "hash" : "btree",
-	   idx->getAttrpath());
+	   idx->getAttrpath().c_str());
     return;
   }
 
-  printf("Index on %s:\n", idx->getAttrpath());
+  printf("Index on %s:\n", idx->getAttrpath().c_str());
   printf("  Propagation: %s\n", idx->getPropagate() ? "on" : "off");
   Bool isnull;
   const Dataspace *dataspace = 0;
@@ -393,7 +393,7 @@ index_trace(Index *idx, Bool full)
     if (hidx->getHashMethod())
       printf("  Hash method: %s::%s;",
 	     hidx->getHashMethod()->getClassOwner()->getName(),
-	     hidx->getHashMethod()->getEx()->getExname());
+	     hidx->getHashMethod()->getEx()->getExname().c_str());
     int cnt = idx->getImplHintsCount();
     for (int n = 0; n < cnt; n++)
       if (idx->getImplHints(n))
@@ -665,7 +665,7 @@ index_simulate_realize(int argc, char *argv[])
       std::string stats;
       s = idx->simulate(*idximpl, stats, True, full, "  ");
       CHECK(s);
-      printf("Index on %s:\n", idx->getAttrpath());
+      printf("Index on %s:\n", idx->getAttrpath().c_str());
       fprintf(stdout, stats.c_str());
     }
 
@@ -768,7 +768,7 @@ index_delete_realize(int argc, char *argv[])
       return 1;
     }
 
-    printf("Deleting index %s\n", idx->getAttrpath());
+    printf("Deleting index %s\n", idx->getAttrpath().c_str());
     s = idx->remove();
     CHECK(s);
     

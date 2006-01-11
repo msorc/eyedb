@@ -116,8 +116,8 @@ namespace eyedb {
 	  if (!arg.o) // means nil objects
 	    return Success;
 	  const Class *m1, *m2;
-	  m1 = db->getSchema()->getClass(t1.getClname());
-	  m2 = db->getSchema()->getClass(t2.getClname());
+	  m1 = db->getSchema()->getClass(t1.getClname().c_str());
+	  m2 = db->getSchema()->getClass(t2.getClname().c_str());
 	  /*
 	    printf("check obj argument: m1 '%s' m2 '%s'\n",
 	    t1.getClname(), t2.getClname());
@@ -396,7 +396,7 @@ namespace eyedb {
 				  void **pcsym)
   {
     const char *intname = makeInternalName
-      (getExname(), getSign(),
+      (getExname().c_str(), getSign(),
        ((getLoc()&STATIC_EXEC) ? True : False), mcname);
 
     return checkRealize(extref, intname, &dl, pcsym);
@@ -425,7 +425,7 @@ namespace eyedb {
 
     if (!oid.isValid())
       {
-	OQL q(db, "select method.ex.intname = \"%s\"", getEx()->getIntname());
+	OQL q(db, "select method.ex.intname = \"%s\"", getEx()->getIntname().c_str());
 
 	ObjectArray obj_arr;
 	Status s = q.execute(obj_arr);
@@ -437,7 +437,7 @@ namespace eyedb {
 				   "method '%s::%s' already exists in"
 				   " database '%s'",
 				   getClassOwner()->getName(),
-				   getEx()->getIntname(),
+				   getEx()->getIntname().c_str(),
 				   db->getName());
 	  }
       }
@@ -499,9 +499,9 @@ namespace eyedb {
 
     char tok[256];
     if (_class && scope)
-      sprintf(tok, " %s::%s(", _class->getName(), getExname());
+      sprintf(tok, " %s::%s(", _class->getName(), getExname().c_str());
     else
-      sprintf(tok, " %s(", getExname());
+      sprintf(tok, " %s(", getExname().c_str());
 
     //  proto.append(tok);
     proto += tok;
@@ -552,10 +552,10 @@ namespace eyedb {
 	    Argument::getArgTypeStr(&t));
 
     if (flags & NoScope)
-      fprintf(fd, "%s(", ex->getExname());
+      fprintf(fd, "%s(", ex->getExname().c_str());
     else
       fprintf(fd, "%s::%s(", (_class ? _class->getName() : "??"),
-	      ex->getExname());
+	      ex->getExname().c_str());
 
     int is_clang = (ex->getLang() & C_LANG);
     int n = sign->getNargs();
@@ -572,7 +572,7 @@ namespace eyedb {
     if (flags & ExecBodyTrace)
       {
 	if (is_clang)
-	  fprintf(fd, " C++(\"%s\")", ex->getExtrefBody());
+	  fprintf(fd, " C++(\"%s\")", ex->getExtrefBody().c_str());
 	else
 	  {
 	    ((Method *)this)->asBEMethod_OQL()->runtimeInit();
@@ -629,7 +629,7 @@ namespace eyedb {
     while (mth_list->getNextObject(c, (void *&)tmth))
       {
 	Executable *ex = tmth->getEx();
-	if (!strcmp(ex->getExname(), exname) && *ex->getSign() == *sign)
+	if (!strcmp(ex->getExname().c_str(), exname) && *ex->getSign() == *sign)
 	  pmth[mth_cnt++] = tmth;
       }
 
@@ -921,8 +921,8 @@ namespace eyedb {
       t->setDatabase(db);
       t->setType((ArgType_Type)(type->getType() | OUT_ARG_TYPE),
 		 False);
-      if (type->getClname())
-	t->setClname(type->getClname());
+      if (type->getClname().c_str())
+	t->setClname(type->getClname().c_str());
       type->release();
     }
     else
@@ -938,8 +938,8 @@ namespace eyedb {
 	t->setDatabase(db);
 	t->setType((ArgType_Type)(type->getType() | args[i].inout),
 		   False);
-	if (type->getClname())
-	  t->setClname(type->getClname());
+	if (type->getClname().c_str())
+	  t->setClname(type->getClname().c_str());
 	type->release();
       }
       else
@@ -1013,7 +1013,7 @@ namespace eyedb {
 
     if (checkArgs) {
       s = eyedb_CHECKArguments(db, ex->getSign(), array, "method",
-			       ex->getExname(), IN_ARG_TYPE);
+			       ex->getExname().c_str(), IN_ARG_TYPE);
       if (s) return s;
     }
 
@@ -1025,7 +1025,7 @@ namespace eyedb {
 	const char *mcname = getClassOwner()->getName();
 	if (!isTrs)
 	  _db->transactionCommit();
-	Status s = ex->checkRealize(ex->getExtrefBody(), mcname,
+	Status s = ex->checkRealize(ex->getExtrefBody().c_str(), mcname,
 				    (void **)&csym);
 	if (s) return s;
       }
@@ -1036,7 +1036,7 @@ namespace eyedb {
   Status FEMethod_C::execCheck()
   {
     Executable *ex = getEx();
-    return ex->checkRealize(ex->getExtrefBody(), NULL, (void **)&csym);
+    return ex->checkRealize(ex->getExtrefBody().c_str(), NULL, (void **)&csym);
   }
 
   // ---------------------------------------------------------------------------
@@ -1072,13 +1072,13 @@ namespace eyedb {
     Executable *ex = getEx();
 
     if (db->isBackEnd())
-      return ex->checkRealize(ex->getExtrefBody(), NULL, (void **)&csym);
+      return ex->checkRealize(ex->getExtrefBody().c_str(), NULL, (void **)&csym);
 
     RPCStatus rpc_status;
 
-    rpc_status = ::execCheck(db->getDbHandle(),
-			     ex->getIntname(), oid.getOid(),
-			     ex->getExtrefBody());
+    rpc_status = eyedb::execCheck(db->getDbHandle(),
+				  ex->getIntname().c_str(), oid.getOid(),
+				  ex->getExtrefBody().c_str());
 
     return StatusMake(rpc_status);
   }
@@ -1112,7 +1112,7 @@ namespace eyedb {
 
     if (checkArgs) {
       s = eyedb_CHECKArguments(db, ex->getSign(), array, "method",
-			       ex->getExname(), IN_ARG_TYPE);
+			       ex->getExname().c_str(), IN_ARG_TYPE);
       if (s) return s;
     }
 
@@ -1122,12 +1122,12 @@ namespace eyedb {
     rpc_status = execExecute(_db->getDbHandle(), 
 				 _db->getUser(),
 				 _db->getPassword(),
-				 ex->getIntname(),
-				 ex->getExname(),
+				 ex->getIntname().c_str(),
+				 ex->getExname().c_str(),
 				 METHOD_C_TYPE |
 				 (getEx()->isStaticExec() ? STATIC_EXEC : 0),
 				 getClassOwner()->getOid().getOid(),
-				 ex->getExtrefBody(),
+				 ex->getExtrefBody().c_str(),
 				 ex->getSign(),
 				 _oid,
 				 objoid,
@@ -1235,7 +1235,7 @@ namespace eyedb {
       return Success;
 
     char *r;
-    const char *s = getEx()->getExtrefBody();
+    const char *s = getEx()->getExtrefBody().c_str();
 
     tmpbuf = strdup(s);
     char *q = strchr(tmpbuf, ':');
