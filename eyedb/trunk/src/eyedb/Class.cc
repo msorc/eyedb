@@ -31,7 +31,7 @@
 
 #define XBOOL "bool"
 
-#define DEF_PREFIX ""
+#define DEF_PREFIX "eyedb::"
 
 //#define COMP_TRACE
 

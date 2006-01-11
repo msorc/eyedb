@@ -2081,7 +2081,7 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
     fprintf(fdh, "#define _eyedb_%s_\n\n", package);
 
     // 6/09/05: should be replaced by correct naming for classes
-    fprintf(fdh, "using namespace eyedb;\n\n");
+    //fprintf(fdh, "using namespace eyedb;\n\n");
 
     if (c_namespace)
       fprintf(fdh, "namespace %s {\n\n", c_namespace);
@@ -2123,37 +2123,37 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
 #ifndef UNIFIED_API
     if (odl_dynamic_attr) {
 #endif
-      fprintf(fdc, "static Bool dynget_error_policy = False;\n");
-      fprintf(fdc, "static Bool dynset_error_policy = True;\n");
+      fprintf(fdc, "static eyedb::Bool dynget_error_policy = eyedb::False;\n");
+      fprintf(fdc, "static eyedb::Bool dynset_error_policy = eyedb::True;\n");
 #ifndef UNIFIED_API
     }
 #endif
 
-    fprintf(fdc, "static Oid nulloid;\n");
+    fprintf(fdc, "static eyedb::Oid nulloid;\n");
     fprintf(fdc, "static unsigned char nulldata[1];\n");
-    fprintf(fdc, "static Bool oid_check = True;\n");
+    fprintf(fdc, "static eyedb::Bool oid_check = eyedb::True;\n");
     fprintf(fdc, "static int class_ind;\n");
 
-    fprintf(fdc, "static Database::consapp_t *constructors_x = new Database::consapp_t[%d];\n", _class->getCount());
+    fprintf(fdc, "static eyedb::Database::consapp_t *constructors_x = new eyedb::Database::consapp_t[%d];\n", _class->getCount());
 
-    fprintf(fdc, "static Object *(*constructors[%d])(const Object *, Bool);\n", _class->getCount());
-    fprintf(fdc, "static GenHashTable *hash;\n");
+    fprintf(fdc, "static eyedb::Object *(*constructors[%d])(const eyedb::Object *, eyedb::Bool);\n", _class->getCount());
+    fprintf(fdc, "static eyedb::GenHashTable *hash;\n");
     //fprintf(fdc, "extern StructClass *OString_Class;\n");
     fprintf(fdc, "#define make_object %sMakeObject\n", package);
 
     fprintf(fdc, "extern void %sInit(void);\n", package);
     fprintf(fdc, "extern void %sRelease(void);\n", package);
-    fprintf(fdc, "extern Status %sSchemaUpdate(Database *);\n", package);
-    fprintf(fdc, "extern Status %sSchemaUpdate(Schema *);\n\n", package);
+    fprintf(fdc, "extern eyedb::Status %sSchemaUpdate(eyedb::Database *);\n", package);
+    fprintf(fdc, "extern eyedb::Status %sSchemaUpdate(eyedb::Schema *);\n\n", package);
 
     // kludge
-    fprintf(fdc, "static Class *index_Class = new Class(\"index\");\n\n");
+    fprintf(fdc, "static eyedb::Class *index_Class = new eyedb::Class(\"index\");\n\n");
 
     fprintf(fdc, "void %s::init()\n{\n  %sInit();\n}\n\n", package, package);
     fprintf(fdc, "void %s::release()\n{\n  %sRelease();\n}\n\n", package, package);
-    fprintf(fdc, "Status %s::updateSchema(Database *db)\n{\n  return %sSchemaUpdate(db);\n}\n\n", package, package);
+    fprintf(fdc, "eyedb::Status %s::updateSchema(eyedb::Database *db)\n{\n  return %sSchemaUpdate(db);\n}\n\n", package, package);
 
-    fprintf(fdc, "Status %s::updateSchema(Schema *m)\n{\n  return %sSchemaUpdate(m);\n}\n\n", package, package);
+    fprintf(fdc, "eyedb::Status %s::updateSchema(eyedb::Schema *m)\n{\n  return %sSchemaUpdate(m);\n}\n\n", package, package);
 
     /*
       head_gen_C(fdinit, hints.fileprefix, "init", package, False,
@@ -2217,12 +2217,15 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
       if (check_class(cl, False))
 	{
 	  const char *suffix;
+	  string s;
 	  if (cl->asEnumClass())
-	    suffix = "Enum";
+	    suffix = "eyedb::Enum";
 	  else if (cl->asAgregatClass())
-	    suffix = cl->asStructClass() ? "Struct" : "Union";
-	  else if (cl->asCollectionClass())
-	    suffix = cl->asCollectionClass()->getCSuffix();
+	    suffix = cl->asStructClass() ? "eyedb::Struct" : "eyedb::Union";
+	  else if (cl->asCollectionClass()) {
+	    s = string("eyedb::") + cl->asCollectionClass()->getCSuffix();
+	    suffix = s.c_str();
+	  }
 	  else
 	    suffix = "";
 
@@ -2251,11 +2254,11 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
     fprintf(fdh, "%s public:\n", ctxH.get());
     fprintf(fdh, "%s  static void init();\n", ctxH.get());
     fprintf(fdh, "%s  static void release();\n", ctxH.get());
-    fprintf(fdh, "%s  static Status updateSchema(Database *db);\n", ctxH.get());
-    fprintf(fdh, "%s  static Status updateSchema(Schema *m);\n", ctxH.get());
+    fprintf(fdh, "%s  static eyedb::Status updateSchema(eyedb::Database *db);\n", ctxH.get());
+    fprintf(fdh, "%s  static eyedb::Status updateSchema(eyedb::Schema *m);\n", ctxH.get());
     fprintf(fdh, "%s};\n", ctxH.get());
 
-    fprintf(fdh, "%s\nclass %sDatabase : public Database {\n", ctxH.get(), package);
+    fprintf(fdh, "%s\nclass %sDatabase : public eyedb::Database {\n", ctxH.get(), package);
 
 #define NO_COMMENTS
 
@@ -2268,34 +2271,34 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
 #endif
     fprintf(fdh, "%s public:\n", ctxH.get());
 
-    fprintf(fdh, "%s  %sDatabase(const char *s, const char *_dbmdb_str = 0) : Database(s, _dbmdb_str) {}\n", ctxH.get(), package);
-    fprintf(fdh, "%s  %sDatabase(const char *s, int _dbid, const char *_dbmdb_str = 0) : Database(s, _dbid, _dbmdb_str) {}\n", ctxH.get(), package);
-    fprintf(fdh, "%s  %sDatabase(int _dbid, const char *_dbmdb_str = 0) : Database(_dbid, _dbmdb_str) {}\n", ctxH.get(), package);
-    fprintf(fdh, "%s  Status open(Connection *, Database::OpenFlag, const char * = 0, const char * = 0);\n", ctxH.get());
-    fprintf(fdh, "%s  Status open(Connection *, Database::OpenFlag, const OpenHints *hints, const char * = 0, const char * = 0);\n", ctxH.get());
+    fprintf(fdh, "%s  %sDatabase(const char *s, const char *_dbmdb_str = 0) : eyedb::Database(s, _dbmdb_str) {}\n", ctxH.get(), package);
+    fprintf(fdh, "%s  %sDatabase(const char *s, int _dbid, const char *_dbmdb_str = 0) : eyedb::Database(s, _dbid, _dbmdb_str) {}\n", ctxH.get(), package);
+    fprintf(fdh, "%s  %sDatabase(int _dbid, const char *_dbmdb_str = 0) : eyedb::Database(_dbid, _dbmdb_str) {}\n", ctxH.get(), package);
+    fprintf(fdh, "%s  eyedb::Status open(eyedb::Connection *, eyedb::Database::OpenFlag, const char * = 0, const char * = 0);\n", ctxH.get());
+    fprintf(fdh, "%s  eyedb::Status open(eyedb::Connection *, eyedb::Database::OpenFlag, const eyedb::OpenHints *hints, const char * = 0, const char * = 0);\n", ctxH.get());
 
-    fprintf(fdh, "%s  static void setConsApp(Database *);\n", ctxH.get());
+    fprintf(fdh, "%s  static void setConsApp(eyedb::Database *);\n", ctxH.get());
 
     if (superclass)
       {
 	const char *sname = superclass->getName();
-	fprintf(fdh, "%s\n  static %s *as%s(Object *);\n", ctxH.get(), sname,
+	fprintf(fdh, "%s\n  static %s *as%s(eyedb::Object *);\n", ctxH.get(), sname,
 		superclass->getCanonicalName());
-	fprintf(fdh, "%s  static const %s *as%s(const Object *);\n", ctxH.get(), sname,
+	fprintf(fdh, "%s  static const %s *as%s(const eyedb::Object *);\n", ctxH.get(), sname,
 		superclass->getCanonicalName());
       }
 
-    fprintf(fdh, "%s  static Status checkSchema(Schema *);\n", ctxH.get());
+    fprintf(fdh, "%s  static eyedb::Status checkSchema(eyedb::Schema *);\n", ctxH.get());
 #ifndef UNIFIED_API
     if (odl_dynamic_attr) {
 #endif
-      fprintf(fdh, "%s  static Bool getDynamicGetErrorPolicy();\n",
+      fprintf(fdh, "%s  static eyedb::Bool getDynamicGetErrorPolicy();\n",
 	      ctxH.get());
-      fprintf(fdh, "%s  static Bool getDynamicSetErrorPolicy();\n",
+      fprintf(fdh, "%s  static eyedb::Bool getDynamicSetErrorPolicy();\n",
 	      ctxH.get());
-      fprintf(fdh, "%s  static void setDynamicGetErrorPolicy(Bool policy);\n",
+      fprintf(fdh, "%s  static void setDynamicGetErrorPolicy(eyedb::Bool policy);\n",
 	      ctxH.get());
-      fprintf(fdh, "%s  static void setDynamicSetErrorPolicy(Bool policy);\n",
+      fprintf(fdh, "%s  static void setDynamicSetErrorPolicy(eyedb::Bool policy);\n",
 	      ctxH.get());
 #ifndef UNIFIED_API
     }
@@ -2331,7 +2334,7 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
     curs = _class->startScan();
 
     fprintf(fdc, "%sif (hash) return;\n\n", ctx.get());
-    fprintf(fdc, "%shash = new GenHashTable(%d, %d);\n\n", ctx.get(),
+    fprintf(fdc, "%shash = new eyedb::GenHashTable(%d, %d);\n\n", ctx.get(),
 	    strlen(db_prefix), _class->getCount());
 
     while (_class->getNextObject(curs, (void *&)cl))
@@ -2368,24 +2371,27 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
 
     fprintf(fdc, "}\n\n");
 
-    fprintf(fdc, "static Status\n%sSchemaUpdate(Schema *m, Database *db)\n{\n", package);
+    fprintf(fdc, "static eyedb::Status\n%sSchemaUpdate(eyedb::Schema *m, eyedb::Database *db)\n{\n", package);
 
     ctx.push();
     fprintf(fdc, "%sm->setName(\"%s\");\n", ctx.get(),
 	    (schname ? schname : package));
-    fprintf(fdc, "%sStatus status;\n", ctx.get());
+    fprintf(fdc, "%seyedb::Status status;\n", ctx.get());
 
     curs = _class->startScan();
     while (_class->getNextObject(curs, (void *&)cl))
       if (check_class(cl, False))
 	{
 	  const char *suffix;
+	  string s;
 	  if (cl->asEnumClass())
-	    suffix = "Enum";
+	    suffix = "eyedb::Enum";
 	  else if (cl->asAgregatClass())
-	    suffix = cl->asStructClass() ? "Struct" : "Union";
-	  else if (cl->asCollectionClass())
-	    suffix = cl->asCollectionClass()->getCSuffix();
+	    suffix = cl->asStructClass() ? "eyedb::Struct" : "eyedb::Union";
+	  else if (cl->asCollectionClass()) {
+	    s = string("eyedb::") + cl->asCollectionClass()->getCSuffix();
+	    suffix = s.c_str();
+	  }
 	  else
 	    suffix = "";
 
@@ -2419,7 +2425,7 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
 	fprintf(fdc, "%s%s_make(%s_class, m);\n", ctx.get(), cl->getCName(), cl->getName());
     _class->endScan(curs);
 
-    fprintf(fdc, "\n%sif (!db) return Success;\n\n", ctx.get());
+    fprintf(fdc, "\n%sif (!db) return eyedb::Success;\n\n", ctx.get());
 
     curs = _class->startScan();
     while (_class->getNextObject(curs, (void *&)cl))
@@ -2429,7 +2435,7 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
 
 	fprintf(fdc, "%sif (!%s_class->compare(m->getClass(\"%s\")))\n",
 		ctx.get(), cl->getCName(), cl->getAliasName());
-	fprintf(fdc, "%s  return Exception::make(IDB_ERROR, \"'%s' %%s\", differ_msg);\n", ctx.get(), cl->getName());
+	fprintf(fdc, "%s  return eyedb::Exception::make(IDB_ERROR, \"'%s' %%s\", differ_msg);\n", ctx.get(), cl->getName());
       }
 
     _class->endScan(curs);
@@ -2471,11 +2477,11 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
     fprintf(fdc, "%sif (status) return status;\n", ctx.get());
 #endif
     fprintf(fdc, "%sdb->transactionCommit();\n", ctx.get());
-    fprintf(fdc, "%sreturn Success;\n", ctx.get());
+    fprintf(fdc, "%sreturn eyedb::Success;\n", ctx.get());
 
     fprintf(fdc, "}\n\n");
 
-    fprintf(fdc, "Status %sSchemaUpdate(Database *db)\n{\n",
+    fprintf(fdc, "eyedb::Status %sSchemaUpdate(eyedb::Database *db)\n{\n",
 	    package);
 
     fprintf(fdc, "%sreturn %sSchemaUpdate(db->getSchema(), db);\n",
@@ -2483,15 +2489,15 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
 
     fprintf(fdc, "}\n\n");
 
-    fprintf(fdc, "Status %sSchemaUpdate(Schema *m)\n{\n",
+    fprintf(fdc, "eyedb::Status %sSchemaUpdate(eyedb::Schema *m)\n{\n",
 	    package);
     fprintf(fdc, "%sreturn %sSchemaUpdate(m, NULL);\n", ctx.get(), package);
     fprintf(fdc, "}\n\n");
 
-    fprintf(fdc, "Object *%sMakeObject(Object *o, Bool remove)\n{\n", package);
-    fprintf(fdc, "  if (!o->getClass()) return (Object *)0;\n");
+    fprintf(fdc, "eyedb::Object *%sMakeObject(eyedb::Object *o, eyedb::Bool remove)\n{\n", package);
+    fprintf(fdc, "  if (!o->getClass()) return (eyedb::Object *)0;\n");
     // these 2 lines: REALLY?
-    fprintf(fdc, "%sif (ObjectPeer::isGRTObject(o))\n", ctx.get());
+    fprintf(fdc, "%sif (eyedb::ObjectPeer::isGRTObject(o))\n", ctx.get());
     fprintf(fdc, "%s  return o;\n", ctx.get());
     fprintf(fdc, "%sint ind = hash->get(o->getClass()->getName());\n", ctx.get());
     // BUG_ETC_UPDATE
@@ -2500,8 +2506,8 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
     // by:
     fprintf(fdc, "%sif (ind < 0 && (!o->getClass()->getStrictAliasName() || (ind = hash->get(o->getClass()->getStrictAliasName())) < 0)) return 0;\n", ctx.get());
 
-    fprintf(fdc, "%sObject *co = constructors[ind](o, (remove ? True : False));\n", ctx.get());
-    fprintf(fdc, "%sObjectPeer::setClass(co, o->getClass());\n", ctx.get());
+    fprintf(fdc, "%seyedb::Object *co = constructors[ind](o, (remove ? eyedb::True : eyedb::False));\n", ctx.get());
+    fprintf(fdc, "%seyedb::ObjectPeer::setClass(co, o->getClass());\n", ctx.get());
     fprintf(fdc, "%sif (remove) o->release();\n", ctx.get());
     fprintf(fdc, "%sif (co->getDatabase())\n", ctx.get());
     fprintf(fdc, "%s  co->getDatabase()->cacheObject(co);\n", ctx.get());
@@ -2510,13 +2516,13 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
 
     ctx.pop();
 
-    fprintf(fdc, "Status %sDatabase::open(Connection *ch, Database::OpenFlag flag, const char *userauth, const char *passwdauth)\n{\n", package);
+    fprintf(fdc, "eyedb::Status %sDatabase::open(eyedb::Connection *ch, eyedb::Database::OpenFlag flag, const char *userauth, const char *passwdauth)\n{\n", package);
     fprintf(fdc, "    return open(ch, flag, 0, userauth, passwdauth);\n");
     fprintf(fdc, "}\n\n");
 
-    fprintf(fdc, "Status %sDatabase::open(Connection *ch, Database::OpenFlag flag, const OpenHints *hints, const char *userauth, const char *passwdauth)\n{\n", package);
+    fprintf(fdc, "eyedb::Status %sDatabase::open(eyedb::Connection *ch, eyedb::Database::OpenFlag flag, const eyedb::OpenHints *hints, const char *userauth, const char *passwdauth)\n{\n", package);
 
-    fprintf(fdc, "  Status status = Database::open(ch, flag, hints, userauth, passwdauth);\n");
+    fprintf(fdc, "  eyedb::Status status = eyedb::Database::open(ch, flag, hints, userauth, passwdauth);\n");
 
     fprintf(fdc, "  if (status) return status;\n");
     if (!odl_dynamic_attr) {
@@ -2530,7 +2536,7 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
     fprintf(fdc, "\n  return status;\n");
     fprintf(fdc, "}\n\n");
 
-    fprintf(fdc, "void %sDatabase::setConsApp(Database *_db)\n{\n", package);
+    fprintf(fdc, "void %sDatabase::setConsApp(eyedb::Database *_db)\n{\n", package);
 
     /*
       fprintf(fdc, "  if (!_db->getUserData(\"eyedb:%s\") {\n", package);
@@ -2544,7 +2550,7 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
     if (superclass)
       {
 	const char *sname = superclass->getName();
-	fprintf(fdc, "%s *%sDatabase::as%s(Object *o)\n{\n", sname,
+	fprintf(fdc, "%s *%sDatabase::as%s(eyedb::Object *o)\n{\n", sname,
 		package, superclass->getCanonicalName());
 #if 0
 	fprintf(fdc, "  Bool is;\n");
@@ -2552,8 +2558,8 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
 	fprintf(fdc, "     return (%s *)o;\n", sname);
 	fprintf(fdc, "  return (%s *)0;\n", sname);
 #else
-	fprintf(fdc, "  if (!ObjectPeer::isGRTObject(o))\n");
-	fprintf(fdc, "     return (%s *)make_object(o, False);\n\n",
+	fprintf(fdc, "  if (!eyedb::ObjectPeer::isGRTObject(o))\n");
+	fprintf(fdc, "     return (%s *)make_object(o, eyedb::False);\n\n",
 		sname);
 	fprintf(fdc, "  if (hash->get(o->getClass()->getName()) < 0)\n");
 	fprintf(fdc, "     return (%s *)0;\n\n", sname);
@@ -2562,16 +2568,16 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
 #endif
 	fprintf(fdc, "}\n\n");
 
-	fprintf(fdc, "const %s *%sDatabase::as%s(const Object *o)\n{\n", sname,
+	fprintf(fdc, "const %s *%sDatabase::as%s(const eyedb::Object *o)\n{\n", sname,
 		package,  superclass->getCanonicalName());
 #if 0
-	fprintf(fdc, "  Bool is;\n");
+	fprintf(fdc, "  eyedb::Bool is;\n");
 	fprintf(fdc, "  if (o && !%s_Class->isSuperClassOf(o->getClass(), &is) && is)\n", sname);
 	fprintf(fdc, "    return (const %s *)o;\n", sname);
 	fprintf(fdc, "  return (const %s *)0;\n", sname);
 #else
-	fprintf(fdc, "  if (!ObjectPeer::isGRTObject((Object *)o))\n");
-	fprintf(fdc, "    return (const %s *)make_object((Object *)o, False);\n\n",
+	fprintf(fdc, "  if (!eyedb::ObjectPeer::isGRTObject((eyedb::Object *)o))\n");
+	fprintf(fdc, "    return (const %s *)make_object((eyedb::Object *)o, eyedb::False);\n\n",
 		sname);
 	fprintf(fdc, "  if (hash->get(o->getClass()->getName()) < 0)\n");
 	fprintf(fdc, "    return (const %s *)0;\n\n", sname);
@@ -2593,37 +2599,37 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
 #ifndef UNIFIED_API
     if (odl_dynamic_attr) {
 #endif
-      fprintf(fdc, "Bool %sDatabase::getDynamicGetErrorPolicy() {\n", package);
+      fprintf(fdc, "eyedb::Bool %sDatabase::getDynamicGetErrorPolicy() {\n", package);
 #ifdef UNIFIED_API    
       if (!odl_dynamic_attr)
-	fprintf(fdc, "   throw *Exception::make(IDB_ERROR, \"getDynamicGetErrorPolicy() %s\");\n}\n\n", dyn_call_error);
+	fprintf(fdc, "   throw *eyedb::Exception::make(IDB_ERROR, \"getDynamicGetErrorPolicy() %s\");\n}\n\n", dyn_call_error);
       else
 #endif
 	fprintf(fdc, "   return dynget_error_policy;\n}\n\n");
 
-      fprintf(fdc, "Bool %sDatabase::getDynamicSetErrorPolicy() {\n",
+      fprintf(fdc, "eyedb::Bool %sDatabase::getDynamicSetErrorPolicy() {\n",
 	      package);
 
 #ifdef UNIFIED_API
       if (!odl_dynamic_attr)
-	fprintf(fdc, "   throw *Exception::make(IDB_ERROR, \"getDynamicSetErrorPolicy() %s\");\n}\n\n", dyn_call_error);
+	fprintf(fdc, "   throw *eyedb::Exception::make(IDB_ERROR, \"getDynamicSetErrorPolicy() %s\");\n}\n\n", dyn_call_error);
       else
 #endif
 	fprintf(fdc, "   return dynget_error_policy;\n}\n\n");
 
-      fprintf(fdc, "void %sDatabase::setDynamicGetErrorPolicy(Bool policy) {\n",
+      fprintf(fdc, "void %sDatabase::setDynamicGetErrorPolicy(eyedb::Bool policy) {\n",
 	      package);
 #ifdef UNIFIED_API
       if (!odl_dynamic_attr)
-	fprintf(fdc, "   throw *Exception::make(IDB_ERROR, \"setDynamicGetErrorPolicy() %s\");\n}\n\n", dyn_call_error);
+	fprintf(fdc, "   throw *eyedb::Exception::make(IDB_ERROR, \"setDynamicGetErrorPolicy() %s\");\n}\n\n", dyn_call_error);
       else
 #endif
 	fprintf(fdc, "   dynget_error_policy = policy;\n}\n\n");
-      fprintf(fdc, "void %sDatabase::setDynamicSetErrorPolicy(Bool policy) {\n",
+      fprintf(fdc, "void %sDatabase::setDynamicSetErrorPolicy(eyedb::Bool policy) {\n",
 	      package);
 #ifdef UNIFIED_API
       if (!odl_dynamic_attr)
-	fprintf(fdc, "   throw *Exception::make(IDB_ERROR, \"setDynamicSetErrorPolicy() %s\");\n}\n\n", dyn_call_error);
+	fprintf(fdc, "   throw *eyedb::Exception::make(IDB_ERROR, \"setDynamicSetErrorPolicy() %s\");\n}\n\n", dyn_call_error);
       else
 #endif
 	fprintf(fdc, "   dynset_error_policy = policy;\n}\n\n");
@@ -2631,9 +2637,9 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
     }
 #endif
 
-    fprintf(fdc, "Status %sDatabase::checkSchema(Schema *m)\n{\n", package);
+    fprintf(fdc, "eyedb::Status %sDatabase::checkSchema(eyedb::Schema *m)\n{\n", package);
     //  fprintf(fdc, "  Schema *m = getSchema();\n");
-    fprintf(fdc, "  Class *cl;\n");
+    fprintf(fdc, "  eyedb::Class *cl;\n");
     fprintf(fdc, "  char *s = 0;\n\n");
 
     curs = _class->startScan();
@@ -2653,18 +2659,18 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
 
     _class->endScan(curs);
 
-    fprintf(fdc, "  if (s) {Status status = Exception::make(s); free(s); return status;}\n");
-    fprintf(fdc, "  return Success;\n}\n\n");
+    fprintf(fdc, "  if (s) {eyedb::Status status = eyedb::Exception::make(s); free(s); return status;}\n");
+    fprintf(fdc, "  return eyedb::Success;\n}\n\n");
 
 
-    fprintf(fdc, "Bool %s_set_oid_check(Bool _oid_check)\n", package);
+    fprintf(fdc, "eyedb::Bool %s_set_oid_check(eyedb::Bool _oid_check)\n", package);
     fprintf(fdc, "{\n");
-    fprintf(fdc, "  Bool old = oid_check;\n");
+    fprintf(fdc, "  eyedb::Bool old = oid_check;\n");
     fprintf(fdc, "  oid_check = _oid_check;\n");
     fprintf(fdc, "  return old;\n");
     fprintf(fdc, "}\n\n");
 
-    fprintf(fdc, "Bool %s_get_oid_check()\n", package);
+    fprintf(fdc, "eyedb::Bool %s_get_oid_check()\n", package);
     fprintf(fdc, "{\n");
     fprintf(fdc, "  return oid_check;\n");
     fprintf(fdc, "}\n");
@@ -2692,7 +2698,7 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
 	      if (!hints.gen_down_casting || !superclass)
 		continue;
 
-	      fprintf(fdh, "inline %s *%s(Object *o)\n{\n",
+	      fprintf(fdh, "inline %s *%s(eyedb::Object *o)\n{\n",
 		      cl->getName(),
 		      hints.style->getString(GenCodeHints::SAFE_CAST,
 					     cl->getCanonicalName(), prefix));
@@ -2704,7 +2710,7 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
 	      fprintf(fdh, "  return x->as%s();\n", cl->getCanonicalName());
 	      fprintf(fdh, "}\n\n");
 
-	      fprintf(fdh, "inline const %s *%s(const Object *o)\n{\n",
+	      fprintf(fdh, "inline const %s *%s(const eyedb::Object *o)\n{\n",
 		      cl->getName(),
 		      hints.style->getString(GenCodeHints::SAFE_CAST,
 					     cl->getCanonicalName(), prefix));
@@ -2718,10 +2724,10 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
 	    }
       }
 
-    fprintf(fdh, "%sextern Object *%sMakeObject(Object *, Bool=True);\n", ctxH.get(), package);
+    fprintf(fdh, "%sextern eyedb::Object *%sMakeObject(eyedb::Object *, eyedb::Bool=eyedb::True);\n", ctxH.get(), package);
 
-    fprintf(fdh, "%sextern Bool %s_set_oid_check(Bool);\n", ctxH.get(), package);
-    fprintf(fdh, "%sextern Bool %s_get_oid_check();\n", ctxH.get(), package);
+    fprintf(fdh, "%sextern eyedb::Bool %s_set_oid_check(eyedb::Bool);\n", ctxH.get(), package);
+    fprintf(fdh, "%sextern eyedb::Bool %s_get_oid_check();\n", ctxH.get(), package);
 
     // added the 30/05/01
     if (_export) {
@@ -2734,9 +2740,9 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
 	    if (cl->asCollectionClass()) continue;
 	    const char *suffix;
 	    if (cl->asEnumClass())
-	      suffix = "Enum";
+	      suffix = "eyedb::Enum";
 	    else if (cl->asAgregatClass())
-	      suffix = cl->asStructClass() ? "Struct" : "Union";
+	      suffix = cl->asStructClass() ? "eyedb::Struct" : "eyedb::Union";
 	    else if (cl->asCollectionClass())
 	      suffix = cl->asCollectionClass()->getCSuffix();
 	    else

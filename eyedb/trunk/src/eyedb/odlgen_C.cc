@@ -36,7 +36,7 @@
 #define NEW_ARGARR // 8/02/03
 #define NO_COMMENTS
 #define NEW_COMP_POLICY
-#define IDBBOOL_STR(X) ((X) ? "True" : "False")
+#define IDBBOOL_STR(X) ((X) ? "eyedb::True" : "eyedb::False")
 
 #define ATTR_CACHE_DIRECT
 
@@ -62,7 +62,7 @@ namespace eyedb {
   static Bool attr_cache;
   static const char enum_type[] = "Type";
 
-#define STRBOOL(X) ((X) ? "True" : "False")
+#define STRBOOL(X) ((X) ? "eyedb::True" : "eyedb::False")
 
 #define IS_STRING() (typmod.ndims == 1 && \
                      !strcmp(cls->getName(), char_class_name) && \
@@ -188,16 +188,16 @@ do { \
     const char *name = (makeAlias ? cls->getAliasName() : cls->getName());
 
     if (!strncmp(name, "set<", 4))
-      return "CollSet";
+      return "eyedb::CollSet";
   
     if (!strncmp(name, "bag<", 4))
-      return "CollBag";
+      return "eyedb::CollBag";
   
     if (!strncmp(name, "array<", 6))
-      return "CollArray";
+      return "eyedb::CollArray";
   
     if (!strncmp(name, "list<", 5))
-      return "CollList";
+      return "eyedb::CollList";
 
     for (int i = 0; i < idbLAST_Type; i++)
       if (!strcmp(name, class_info[i].name))
@@ -205,25 +205,25 @@ do { \
 
     if (makeC) {
       if (!strcmp(name, char_class_name))
-	return "Char";
+	return "eyedb::Char";
 
       if (!strcmp(name, int32_class_name))
-	return "Int32";
+	return "eyedb::Int32";
     
       if (!strcmp(name, int64_class_name))
-	return "Int64";
+	return "eyedb::Int64";
       
       if (!strcmp(name, int16_class_name))
-	return "Int16";
+	return "eyedb::Int16";
       
       if (!strcmp(name, "float"))
-	return "Float";
+	return "eyedb::Float";
 
       if (!strcmp(name, "oid"))
-	return "OidP";
+	return "eyedb::OidP";
 
       if (!strcmp(name, "byte"))
-	return "Byte";
+	return "eyedb::Byte";
     }
     else {
       if (!strcmp(name, int32_class_name))
@@ -285,7 +285,7 @@ do { \
     else
       fprintf(fd, "%sdims = 0;\n", ctx->get());
 
-    fprintf(fd, "%sattr[%d] = new Attribute(", ctx->get(), num);
+    fprintf(fd, "%sattr[%d] = new eyedb::Attribute(", ctx->get(), num);
 
     if (cls->asCollectionClass())
       fprintf(fd, "(m ? m->getClass(\"%s\") : %s%s), \"%s\", ",
@@ -297,7 +297,7 @@ do { \
       fprintf(fd, "(m ? m->getClass(\"%s\") : %s%s), \"%s\", ",
 	      cls->getAliasName(), className(cls), classSuffix, name);
 
-    fprintf(fd, "%s, %d, dims);\n", (isIndirect() ? "True" : "False"), ndims);
+    fprintf(fd, "%s, %d, dims);\n", (isIndirect() ? "eyedb::True" : "eyedb::False"), ndims);
 
     /*
       fprintf(fd, "%sattr[%d]->setMagOrder(%d);\n", ctx->get(), num,
@@ -331,20 +331,20 @@ do { \
 		   Bool is_string = False,
 		   const char *cast = 0)
   {
-    fprintf(fd, "%sconst Attribute *%s = getClass()->getAttribute(\"%s\");\n",
+    fprintf(fd, "%sconst eyedb::Attribute *%s = getClass()->getAttribute(\"%s\");\n",
 	    ctx->get(), __agrdyn, attr->getName());
     fprintf(fd, "%sif (!%s) {\n", ctx->get(), __agrdyn);
     ctx->push();
     if (set == op_GET && !isoid)
-      fprintf(fd, "%sif (isnull) *isnull = True;\n", ctx->get());
+      fprintf(fd, "%sif (isnull) *isnull = eyedb::True;\n", ctx->get());
     fprintf(fd, "%sif (dyn%s_error_policy) {\n", ctx->get(), (set ? "set" : "get"));
-    fprintf(fd, "%s  Status s = Exception::make(IDB_ATTRIBUTE_ERROR, "
+    fprintf(fd, "%s  eyedb::Status s = eyedb::Exception::make(IDB_ATTRIBUTE_ERROR, "
 	    "\"object %%s: attribute %%s::%%s not found\", oid.toString(), getClass()->getName(), \"%s\");\n",
 	    ctx->get(), attr->getName());
     if (set == op_SET) {
       fprintf(fd, "%s  return s;\n", ctx->get());
       fprintf(fd, "%s}\n", ctx->get());
-      fprintf(fd, "%sreturn Success;\n", ctx->get());
+      fprintf(fd, "%sreturn eyedb::Success;\n", ctx->get());
     }
     else {
       fprintf(fd, "%s  if (rs) *rs = s;\n", ctx->get());
@@ -378,7 +378,7 @@ do { \
       ((CollectionClass *)cls)->getCollClass(&_isref, &_dim);
     GenCodeHints::OpType acctype = (GenCodeHints::OpType)xacctype;
     const char *etc = (acctype == GenCodeHints::ADD_ITEM_TO_COLL ?
-		       ", const IndexImpl *idximpl" : "");
+		       ", const eyedb::IndexImpl *idximpl" : "");
     const char *accmth = (acctype == GenCodeHints::ADD_ITEM_TO_COLL ? "insert" : "suppress");
     const char *oclassname = _isref ?
       className(cl, True) : className(cl, False);
@@ -386,7 +386,7 @@ do { \
     if (isoid && cl->asBasicClass())
       return Success;
 
-    const char *cast = (cl->asBasicClass() ? "(Value)" : "");
+    const char *cast = (cl->asBasicClass() ? "(eyedb::Value)" : "");
 
     const char *classname;
     Bool ordered;
@@ -436,19 +436,19 @@ do { \
       {
 	if (acctype == GenCodeHints::ADD_ITEM_TO_COLL)
 	  {
-	    etc1 = ", Bool noDup";
+	    etc1 = ", eyedb::Bool noDup";
 	    etc2 = ", noDup";
 	  }
 	else if (acctype == GenCodeHints::RMV_ITEM_FROM_COLL)
 	  {
-	    etc1 = ", Bool checkFirst";
+	    etc1 = ", eyedb::Bool checkFirst";
 	    etc2 = ", checkFirst";
 	  }
       }
 
     if (_dim == 1)
       {
-	fprintf(fd, "Status %s::%s(%s%s", className(own),
+	fprintf(fd, "eyedb::Status %s::%s(%s%s", className(own),
 		ATTRNAME_1(name, nacctype, hints),
 		(*At ? "int where" : ""),
 		(*At && (!rmv_from_array || ndims >= 1) ? ", " : ""));
@@ -456,7 +456,7 @@ do { \
 	if (rmv_from_array)
 	  fprintf(fd, ")\n{\n");
 	else if (isoid)
-	  fprintf(fd, "%sconst Oid &_oid%s)\n{\n", comma, etc);
+	  fprintf(fd, "%sconst eyedb::Oid &_oid%s)\n{\n", comma, etc);
 	else
 	  fprintf(fd, "%s%s %s_%s%s%s)\n{\n", comma, oclassname,
 		  (_isref || !cl->asBasicClass() ? "*" : ""), name,
@@ -464,7 +464,7 @@ do { \
       }
     else if (!strcmp(cl->getName(), char_class_name) && _dim > 1)
       {
-	fprintf(fd, "Status %s::%s(%s", className(own),
+	fprintf(fd, "eyedb::Status %s::%s(%s", className(own),
 		ATTRNAME_1(name, nacctype, hints),
 		(*At ? "int where, " : ""));
 	dimArgsGen(fd, ndims);
@@ -475,33 +475,33 @@ do { \
 
     gbx_suspend(ctx);
 
-    fprintf(fd, "%sStatus status;\n", ctx->get());
+    fprintf(fd, "%seyedb::Status status;\n", ctx->get());
 
     fprintf(fd, "%s%s *_coll;\n", ctx->get(), classname);
-    fprintf(fd, "%sBool _not_set = False;\n", ctx->get());
+    fprintf(fd, "%seyedb::Bool _not_set = eyedb::False;\n", ctx->get());
     if (ndims > 1)
       {
-	fprintf(fd, "%sSize from = a%d;\n", ctx->get(), ndims-1);
+	fprintf(fd, "%seyedb::Size from = a%d;\n", ctx->get(), ndims-1);
 	for (int i = ndims - 2 ; i >= 0; i--)
 	  fprintf(fd, "%sfrom += a%d * %d;\n", ctx->get(), i, typmod.dims[i]);
       }
     else
-      fprintf(fd, "%sSize from = 0;\n", ctx->get());
+      fprintf(fd, "%seyedb::Size from = 0;\n", ctx->get());
   
     if (odl_dynamic_attr) {
       dynamic_attr_gen(fd, ctx, this, op_SET, isoid);
-      fprintf(fd, "\n%sstatus = %s->getValue(this, (Data *)&_coll, 1, from);\n",
+      fprintf(fd, "\n%sstatus = %s->getValue(this, (eyedb::Data *)&_coll, 1, from);\n",
 	      ctx->get(), __agrdyn, name);
     }
     else
-      fprintf(fd, "\n%sstatus = %s[%d]->getValue(this, (Data *)&_coll, 1, from);\n",
+      fprintf(fd, "\n%sstatus = %s[%d]->getValue(this, (eyedb::Data *)&_coll, 1, from);\n",
 	      ctx->get(), __agritems, num, name);
     fprintf(fd, "%sif (status)\n%s  return status;\n\n", ctx->get(), ctx->get());
     fprintf(fd, "%sif (!_coll)\n", ctx->get());
     fprintf(fd, "%s  {\n", ctx->get());
     ctx->push();
-    fprintf(fd, "%s _not_set = True;\n", ctx->get());
-    fprintf(fd, "%s Oid _coll_oid;\n", ctx->get());
+    fprintf(fd, "%s _not_set = eyedb::True;\n", ctx->get());
+    fprintf(fd, "%s eyedb::Oid _coll_oid;\n", ctx->get());
     if (odl_dynamic_attr)
       fprintf(fd, "%s status = %s->getOid(this, &_coll_oid, 1, from);\n",
 	      ctx->get(), __agrdyn, name);
@@ -512,7 +512,7 @@ do { \
     fprintf(fd, "%s if (_coll_oid.isValid())\n", ctx->get());
     fprintf(fd, "%s   {\n", ctx->get());
     ctx->push();
-    fprintf(fd, "%s status = db->loadObject(&_coll_oid, (Object **)&_coll);\n",
+    fprintf(fd, "%s status = db->loadObject(&_coll_oid, (eyedb::Object **)&_coll);\n",
 	    ctx->get());
     fprintf(fd, "%s if (status)\n%s  return status;\n", ctx->get(), ctx->get());
     ctx->pop();
@@ -524,12 +524,12 @@ do { \
 	fprintf(fd, "%s     _coll = new %s(db, \"\", "
 		"db->getSchema()->getClass(\"%s\"), %s, idximpl);\n",
 		ctx->get(), classname,
-		cl->getAliasName(), (_isref ? "True" : make_int(_dim)));
+		cl->getAliasName(), (_isref ? "eyedb::True" : make_int(_dim)));
 	//fprintf(fd, "%s     _coll->setMagOrder(mag_order);\n", ctx->get());
 	fprintf(fd, "%s   }\n", ctx->get());
       }
     else
-      fprintf(fd, "%s    return Exception::make(IDB_ERROR, \"no valid collection in attribute %s::%s\");\n\n", ctx->get(), class_owner->getName(), name);
+      fprintf(fd, "%s    return eyedb::Exception::make(IDB_ERROR, \"no valid collection in attribute %s::%s\");\n\n", ctx->get(), class_owner->getName(), name);
 
     ctx->pop();
     fprintf(fd, "%s  }\n", ctx->get());
@@ -544,10 +544,10 @@ do { \
 	      etc2);
     fprintf(fd, "%sif (status || !_not_set)\n%s  return status;\n\n", ctx->get(), ctx->get());
     if (odl_dynamic_attr)
-      fprintf(fd, "\n%sstatus = %s->setValue(this, (Data)&_coll, 1, from);\n",
+      fprintf(fd, "\n%sstatus = %s->setValue(this, (eyedb::Data)&_coll, 1, from);\n",
 	      ctx->get(), __agrdyn);
     else
-      fprintf(fd, "\n%sstatus = %s[%d]->setValue(this, (Data)&_coll, 1, from);\n",
+      fprintf(fd, "\n%sstatus = %s[%d]->setValue(this, (eyedb::Data)&_coll, 1, from);\n",
 	      ctx->get(), __agritems, num);
 
     fprintf(fd, "%s   _coll->release();\n", ctx->get());
@@ -610,18 +610,18 @@ do { \
       className(cls, True) : className(cls, False);
 
     if (isoid)
-      fprintf(fd, "Status %s::%s(", className(own),
+      fprintf(fd, "eyedb::Status %s::%s(", className(own),
 	      ATTRNAME(name, SETOID, hints));
     else
-      fprintf(fd, "Status %s::%s(", className(own),
+      fprintf(fd, "eyedb::Status %s::%s(", className(own),
 	      ATTRNAME_1(name, ATTRSET(cls), hints));
 
     dimArgsGen(fd, ndims, True);
 
     if (isoid)
-      fprintf(fd, "%sconst Oid &_oid)\n{\n", comma);
+      fprintf(fd, "%sconst eyedb::Oid &_oid)\n{\n", comma);
     else if (cls->asEnumClass())
-      fprintf(fd, "%s%s %s_%s, Bool _check_value)\n{\n",
+      fprintf(fd, "%s%s %s_%s, eyedb::Bool _check_value)\n{\n",
 	      comma, classname, ref, name);
     else
       fprintf(fd, "%s%s %s_%s)\n{\n", comma, classname, ref, name);
@@ -637,17 +637,17 @@ do { \
 
     gbx_suspend(ctx);
 
-    fprintf(fd, "%sStatus status;\n", ctx->get());
+    fprintf(fd, "%seyedb::Status status;\n", ctx->get());
 
     if (ndims)
       {
-	fprintf(fd, "%sSize from = a%d;\n", ctx->get(), ndims-1);
+	fprintf(fd, "%seyedb::Size from = a%d;\n", ctx->get(), ndims-1);
 	for (int i = ndims - 2 ; i >= 0; i--)
 	  fprintf(fd, "%sfrom += a%d * %d;\n", ctx->get(), i, typmod.dims[i]);
 
 	if (isVarDim())
 	  {
-	    fprintf(fd, "\n%sSize size;\n", ctx->get());
+	    fprintf(fd, "\n%seyedb::Size size;\n", ctx->get());
 	    if (odl_dynamic_attr)
 	      fprintf(fd, "%sstatus = %s->getSize(this, size);\n",
 		      ctx->get(), __agrdyn);
@@ -686,10 +686,10 @@ do { \
 	  {
 	    fprintf(fd, "%seyedblib::int32 __tmp = _%s;\n", ctx->get(), name);
 	    if (odl_dynamic_attr)
-	      fprintf(fd, "\n%sstatus = %s->setValue(this, (Data)&__tmp, 1, from, _check_value);\n",
+	      fprintf(fd, "\n%sstatus = %s->setValue(this, (eyedb::Data)&__tmp, 1, from, _check_value);\n",
 		      ctx->get(), __agrdyn, name);
 	    else
-	      fprintf(fd, "\n%sstatus = %s[%d]->setValue(this, (Data)&__tmp, 1, from, _check_value);\n",
+	      fprintf(fd, "\n%sstatus = %s[%d]->setValue(this, (eyedb::Data)&__tmp, 1, from, _check_value);\n",
 		      ctx->get(), __agritems, num, name);
 	    if (attr_cache)
 	      genAttrCacheSetEpilogue(ctx, optype);
@@ -698,10 +698,10 @@ do { \
 	else
 	  {
 	    if (odl_dynamic_attr)
-	      fprintf(fd, "\n%sstatus = %s->setValue(this, (Data)&_%s, 1, from);\n",
+	      fprintf(fd, "\n%sstatus = %s->setValue(this, (eyedb::Data)&_%s, 1, from);\n",
 		      ctx->get(), __agrdyn, name);
 	    else
-	      fprintf(fd, "\n%sstatus = %s[%d]->setValue(this, (Data)&_%s, 1, from);\n",
+	      fprintf(fd, "\n%sstatus = %s[%d]->setValue(this, (eyedb::Data)&_%s, 1, from);\n",
 		      ctx->get(), __agritems, num, name);
 	    if (attr_cache)
 	      genAttrCacheSetEpilogue(ctx, optype);
@@ -724,10 +724,10 @@ do { \
       {
 	fprintf(fd, "%seyedblib::int32 __tmp = _%s;\n", ctx->get(), name);
 	if (odl_dynamic_attr)
-	  fprintf(fd, "\n%sstatus = %s->setValue(this, (Data)&__tmp, 1, 0, _check_value);\n",
+	  fprintf(fd, "\n%sstatus = %s->setValue(this, (eyedb::Data)&__tmp, 1, 0, _check_value);\n",
 		  ctx->get(), __agrdyn, name);
 	else
-	  fprintf(fd, "\n%sstatus = %s[%d]->setValue(this, (Data)&__tmp, 1, 0, _check_value);\n",
+	  fprintf(fd, "\n%sstatus = %s[%d]->setValue(this, (eyedb::Data)&__tmp, 1, 0, _check_value);\n",
 		  ctx->get(), __agritems, num, name);
 	if (attr_cache)
 	  genAttrCacheSetEpilogue(ctx, optype);
@@ -736,10 +736,10 @@ do { \
     else
       {
 	if (odl_dynamic_attr)
-	  fprintf(fd, "\n%sstatus = %s->setValue(this, (Data)&_%s, 1, 0);\n",
+	  fprintf(fd, "\n%sstatus = %s->setValue(this, (eyedb::Data)&_%s, 1, 0);\n",
 		  ctx->get(), __agrdyn, name);
 	else
-	  fprintf(fd, "\n%sstatus = %s[%d]->setValue(this, (Data)&_%s, 1, 0);\n",
+	  fprintf(fd, "\n%sstatus = %s[%d]->setValue(this, (eyedb::Data)&_%s, 1, 0);\n",
 		  ctx->get(), __agritems, num, name);
 	if (attr_cache)
 	  genAttrCacheSetEpilogue(ctx, optype);
@@ -754,11 +754,11 @@ do { \
 
 #define STATUS_ARG(HINTS, COMMA) \
 (((HINTS).error_policy == GenCodeHints::StatusErrorPolicy) ? \
- ((COMMA) ? ", Status *rs" : "Status *rs") : "")
+ ((COMMA) ? ", eyedb::Status *rs" : "eyedb::Status *rs") : "")
 
 #define STATUS_PROTO(HINTS, COMMA) \
 (((HINTS).error_policy == GenCodeHints::StatusErrorPolicy) ? \
- ((COMMA) ? ", Status * = 0" : "Status * = 0") : "")
+ ((COMMA) ? ", eyedb::Status * = 0" : "eyedb::Status * = 0") : "")
 
   Status
   Attribute::generateCollGetMethod_C(Class *own, GenContext *ctx,
@@ -787,27 +787,27 @@ do { \
 	return Success;
 
       if (ordered) { // 24/09/05
-	fprintf(fd, "Oid %s::%s(unsigned int ind, ",
+	fprintf(fd, "eyedb::Oid %s::%s(unsigned int ind, ",
 		own->getName(),
 		ATTRNAME_1(name, (ordered ? GenCodeHints::RETRIEVEOID_ITEM_AT : GenCodeHints::GETOID_ITEM_AT), hints));
 	dimArgsGen(fd, ndims, True);
-	fprintf(fd, "%sStatus *rs) const\n", comma);
+	fprintf(fd, "%seyedb::Status *rs) const\n", comma);
 	fprintf(fd, "{\n");
 
-	fprintf(fd, "%sOid tmp;;\n", ctx->get());
+	fprintf(fd, "%seyedb::Oid tmp;;\n", ctx->get());
 	/*
-	  fprintf(fd, "%sStatus s, *ps;\n", ctx->get());
+	  fprintf(fd, "%seyedb::Status s, *ps;\n", ctx->get());
 	  fprintf(fd, "%sps = (rs ? rs : &s);\n\n", ctx->get());
 	*/
-	fprintf(fd, "%sStatus s;\n", ctx->get());
+	fprintf(fd, "%seyedb::Status s;\n", ctx->get());
       
-	fprintf(fd, "%sconst Collection *coll = %s(", ctx->get(),
+	fprintf(fd, "%sconst eyedb::Collection *coll = %s(", ctx->get(),
 		ATTRNAME(name, GETCOLL, hints));
 
 	for (i = 0; i < ndims; i++)
 	  fprintf(fd, "a%d, ", i);
 
-	fprintf(fd, "(Bool *)0, rs);\n\n", ctx->get());
+	fprintf(fd, "(eyedb::Bool *)0, rs);\n\n", ctx->get());
 	fprintf(fd, "%sif (!coll || (rs && *rs))\n", ctx->get());
 	fprintf(fd, "%s  return tmp;\n\n", ctx->get());
       
@@ -844,16 +844,16 @@ do { \
     }
 
     dimArgsGen(fd, ndims, True);
-    fprintf(fd, "%sBool *isnull, Status *rs) %s\n", comma, _const);
+    fprintf(fd, "%seyedb::Bool *isnull, eyedb::Status *rs) %s\n", comma, _const);
     fprintf(fd, "{\n");
 
     /*
-      fprintf(fd, "%sStatus s, *ps;\n", ctx->get());
+      fprintf(fd, "%seyedb::Status s, *ps;\n", ctx->get());
       fprintf(fd, "%sps = (rs ? rs : &s);\n\n", ctx->get());
     */
-    fprintf(fd, "%sStatus s;\n", ctx->get());
+    fprintf(fd, "%seyedb::Status s;\n", ctx->get());
 
-    fprintf(fd, "%sconst Collection *coll = %s(", ctx->get(),
+    fprintf(fd, "%sconst eyedb::Collection *coll = %s(", ctx->get(),
 	    ATTRNAME(name, GETCOLL, hints));
 
     for (i = 0; i < ndims; i++)
@@ -866,14 +866,14 @@ do { \
 	fprintf(fd, "%s  return (%s *)0;\n\n", ctx->get(), oclassname);
 	fprintf(fd, "%s%s *tmp = 0;\n", ctx->get(), oclassname);
 	if (cls->asCollArrayClass() || cls->asCollListClass())
-	  fprintf(fd, "%ss = coll->asCollArray()->retrieveAt(ind, (Object*&)tmp);\n", ctx->get());
+	  fprintf(fd, "%ss = coll->asCollArray()->retrieveAt(ind, (eyedb::Object*&)tmp);\n", ctx->get());
 	else
-	  fprintf(fd, "%ss = coll->getObjectAt(ind, (Object*&)tmp);\n", ctx->get());
+	  fprintf(fd, "%ss = coll->getObjectAt(ind, (eyedb::Object*&)tmp);\n", ctx->get());
       }
     else
       {
 	fprintf(fd, "%s  return 0;\n\n", ctx->get(), oclassname);
-	fprintf(fd, "%sValue tmp;\n", ctx->get());
+	fprintf(fd, "%seyedb::Value tmp;\n", ctx->get());
 	if (cls->asCollArrayClass() || cls->asCollListClass())
 	  fprintf(fd, "%ss = coll->asCollArray()->retrieveAt(ind, tmp);\n", ctx->get());
 	else
@@ -913,7 +913,7 @@ do { \
       className(cls, True) : className(cls, False);
 
     if (isoid)
-      fprintf(fd, "Oid %s::%s(", className(own),
+      fprintf(fd, "eyedb::Oid %s::%s(", className(own),
 	      ATTRNAME(name, GETOID, hints));
     else
       fprintf(fd, "%s%s %s%s::%s(", _const, classname, ref,
@@ -924,7 +924,7 @@ do { \
     if (isoid)
       fprintf(fd, "%s) %s\n{\n", (ndims ? stargcom : starg), _const);
     else
-      fprintf(fd, "%sBool *isnull%s) %s\n{\n", (ndims ? ", " : ""),
+      fprintf(fd, "%seyedb::Bool *isnull%s) %s\n{\n", (ndims ? ", " : ""),
 	      stargcom, (!not_basic ? "const" : _const));
 
     int const_obj = (!isoid && not_basic);
@@ -942,11 +942,11 @@ do { \
     gbx_suspend(ctx);
 
     if (isoid)
-      fprintf(fd, "%sOid __tmp;\n", ctx->get());
+      fprintf(fd, "%seyedb::Oid __tmp;\n", ctx->get());
     else
       {
 	if (const_obj)
-	  fprintf(fd, "%sObject *__o = 0, *__go;\n", ctx->get());
+	  fprintf(fd, "%seyedb::Object *__o = 0, *__go;\n", ctx->get());
 	else if (cls->asEnumClass())
 	  fprintf(fd, "%seyedblib::int32 %s__tmp%s;\n", ctx->get(),
 		  ref,
@@ -961,17 +961,17 @@ do { \
     if (hints.error_policy == GenCodeHints::StatusErrorPolicy)
       {
 	/*
-	  fprintf(fd, "%sStatus s, *ps;\n", ctx->get());
+	  fprintf(fd, "%seyedb::Status s, *ps;\n", ctx->get());
 	  fprintf(fd, "%sps = (rs ? rs : &s);\n", ctx->get());
 	  psret = "*ps = ";
 	*/
-	fprintf(fd, "%sStatus s;\n", ctx->get());
+	fprintf(fd, "%seyedb::Status s;\n", ctx->get());
 	psret = "s = ";
       }
 
     if (ndims)
       {
-	fprintf(fd, "%sSize from = a%d;\n", ctx->get(), ndims-1);
+	fprintf(fd, "%seyedb::Size from = a%d;\n", ctx->get(), ndims-1);
 	for (int i = ndims - 2 ; i >= 0; i--)
 	  fprintf(fd, "%sfrom += a%d * %d;\n", ctx->get(), i, typmod.dims[i]);
 
@@ -980,7 +980,7 @@ do { \
 	    fprintf(fd, "\n%s%s%s->getOid(this, &__tmp, 1, from);\n",
 		    ctx->get(), psret, __agrdyn);
 	  else
-	    fprintf(fd, "\n%s%s%s->getValue(this, (Data *)&%s, 1, from, isnull);\n",
+	    fprintf(fd, "\n%s%s%s->getValue(this, (eyedb::Data *)&%s, 1, from, isnull);\n",
 		    ctx->get(), psret, __agrdyn, (const_obj ? "__o" : "__tmp"));
 	}
 	else {
@@ -988,7 +988,7 @@ do { \
 	    fprintf(fd, "\n%s%s%s[%d]->getOid(this, &__tmp, 1, from);\n",
 		    ctx->get(), psret, __agritems, num);
 	  else
-	    fprintf(fd, "\n%s%s%s[%d]->getValue(this, (Data *)&%s, 1, from, isnull);\n",
+	    fprintf(fd, "\n%s%s%s[%d]->getValue(this, (eyedb::Data *)&%s, 1, from, isnull);\n",
 		    ctx->get(), psret, __agritems, num, (const_obj ? "__o" : "__tmp"));
 	}
       }
@@ -1002,10 +1002,10 @@ do { \
     }
     else {
       if (odl_dynamic_attr)
-	fprintf(fd, "\n%s%s%s->getValue(this, (Data *)&%s, 1, 0, isnull);\n",
+	fprintf(fd, "\n%s%s%s->getValue(this, (eyedb::Data *)&%s, 1, 0, isnull);\n",
 		ctx->get(), psret, __agrdyn, (const_obj ? "__o" : "__tmp"));
       else
-	fprintf(fd, "\n%s%s%s[%d]->getValue(this, (Data *)&%s, 1, 0, isnull);\n",
+	fprintf(fd, "\n%s%s%s[%d]->getValue(this, (eyedb::Data *)&%s, 1, 0, isnull);\n",
 		ctx->get(), psret, __agritems, num, (const_obj ? "__o" : "__tmp"));
     }
 
@@ -1026,7 +1026,7 @@ do { \
 	    fprintf(fd, "%s  {\n", ctx->get());
 	    if (!cls->asCollectionClass()) // added the 23/08/99
 	      {
-		fprintf(fd, "   %sif (ObjectPeer::isGRTObject(__o)) {\n", ctx->get());
+		fprintf(fd, "   %sif (eyedb::ObjectPeer::isGRTObject(__o)) {\n", ctx->get());
 		if (attr_cache)
 		  {
 		    ctx->push();
@@ -1039,19 +1039,19 @@ do { \
 		fprintf(fd, "     %sreturn (%s *)__o;\n", ctx->get(),
 			classname);
 		fprintf(fd, "   %s}\n", ctx->get());
-		fprintf(fd, "   %s__go = (%s *)make_object(__o, False);\n", ctx->get(), classname);
+		fprintf(fd, "   %s__go = (%s *)make_object(__o, eyedb::False);\n", ctx->get(), classname);
 		fprintf(fd, "   %sif (__go)\n", ctx->get());
 		fprintf(fd, "   %s {\n", ctx->get());
 		ctx->push();
 		fprintf(fd, "   %s__o = __go;\n", ctx->get());
 		if (odl_dynamic_attr)
-		  fprintf(fd, "   %s%s%s->setValue((Agregat *)this, (Data)&__o, 1, %s);\n",
+		  fprintf(fd, "   %s%s%s->setValue((Agregat *)this, (eyedb::Data)&__o, 1, %s);\n",
 			  ctx->get(), psret, __agrdyn, (ndims ? "from" : "0"));
 		else
-		  fprintf(fd, "   %s%s%s[%d]->setValue((Agregat *)this, (Data)&__o, 1, %s);\n",
+		  fprintf(fd, "   %s%s%s[%d]->setValue((Agregat *)this, (eyedb::Data)&__o, 1, %s);\n",
 			  ctx->get(), psret, __agritems, num, (ndims ? "from" : "0"));
 
-		fprintf(fd, "   %sObjectPeer::decrRefCount(__o);\n", ctx->get());
+		fprintf(fd, "   %seyedb::ObjectPeer::decrRefCount(__o);\n", ctx->get());
 	  
 		if (hints.error_policy == GenCodeHints::StatusErrorPolicy)
 		  RETURN_ERROR(fd, ctx, cls, "   ");
@@ -1071,10 +1071,10 @@ do { \
 		    classname, ref);
 	    fprintf(fd, "%s  }\n\n", ctx->get());
 
-	    fprintf(fd, "%sBool wasnull = (!__o ? True : False);\n", ctx->get());
+	    fprintf(fd, "%seyedb::Bool wasnull = (!__o ? eyedb::True : eyedb::False);\n", ctx->get());
 	    fprintf(fd, "%sif (!__o && db)\n", ctx->get());
 	    fprintf(fd, "%s  {\n", ctx->get());
-	    fprintf(fd, "%s    Oid toid;\n", ctx->get());
+	    fprintf(fd, "%s    eyedb::Oid toid;\n", ctx->get());
 	    if (odl_dynamic_attr)
 	      fprintf(fd, "%s    %s%s->getOid(this, &toid, 1, %s);\n",
 		      ctx->get(), psret, __agrdyn, (ndims ? "from" : "0"));
@@ -1094,11 +1094,11 @@ do { \
 	    // ---- added the 4/05/99
 	    if (!cls->asCollectionClass()) // added the 23/08/99
 	      {
-		fprintf(fd, "%s        if (!ObjectPeer::isGRTObject(__o))\n",
+		fprintf(fd, "%s        if (!eyedb::ObjectPeer::isGRTObject(__o))\n",
 			ctx->get());
 		fprintf(fd, "%s         {\n", ctx->get());
 		fprintf(fd, "%s           __go = (%s *)make_object"
-			"(__o, False);\n", ctx->get(), classname);
+			"(__o, eyedb::False);\n", ctx->get(), classname);
 		fprintf(fd, "%s           if (__go) __o = __go;\n", ctx->get());
 		fprintf(fd, "%s         }\n", ctx->get());
 	      }
@@ -1109,10 +1109,10 @@ do { \
 	    fprintf(fd, "\n%sif (__o && wasnull)\n", ctx->get());
 	    fprintf(fd, "%s  {\n", ctx->get());
 	    if (odl_dynamic_attr)
-	      fprintf(fd, "   %s%s%s->setValue((Agregat *)this, (Data)&__o, 1, %s);\n",
+	      fprintf(fd, "   %s%s%s->setValue((eyedb::Agregat *)this, (eyedb::Data)&__o, 1, %s);\n",
 		      ctx->get(), psret, __agrdyn, (ndims ? "from" : "0"));
 	    else
-	      fprintf(fd, "   %s%s%s[%d]->setValue((Agregat *)this, (Data)&__o, 1, %s);\n",
+	      fprintf(fd, "   %s%s%s[%d]->setValue((eyedb::Agregat *)this, (eyedb::Data)&__o, 1, %s);\n",
 		      ctx->get(), psret, __agritems, num, (ndims ? "from" : "0"));
 	    if (hints.error_policy == GenCodeHints::StatusErrorPolicy)
 	      RETURN_ERROR(fd, ctx, cls, "   ");
@@ -1125,7 +1125,7 @@ do { \
 	  {
 	    fprintf(fd, "\n%sif (__o)\n", ctx->get());
 	    fprintf(fd, "%s  {\n", ctx->get());
-	    fprintf(fd, "   %sif (ObjectPeer::isGRTObject(__o)) {\n", ctx->get());
+	    fprintf(fd, "   %sif (eyedb::ObjectPeer::isGRTObject(__o)) {\n", ctx->get());
 	    if (attr_cache)
 	      {
 		ctx->push();
@@ -1138,18 +1138,18 @@ do { \
 	    fprintf(fd, "     %sreturn (%s *)__o;\n", ctx->get(),
 		    classname);
 	    fprintf(fd, "   %s}\n", ctx->get());
-	    fprintf(fd, "   %s__go = (%s *)make_object(__o, False);\n", ctx->get(), classname);
+	    fprintf(fd, "   %s__go = (%s *)make_object(__o, eyedb::False);\n", ctx->get(), classname);
 	    fprintf(fd, "   %sif (__go)\n", ctx->get());
 	    fprintf(fd, "   %s {\n", ctx->get());
 	    ctx->push();
 	    fprintf(fd, "   %s__o = __go;;\n", ctx->get());
 	    if (odl_dynamic_attr)
-	      fprintf(fd, "   %s%s%s->setValue((Agregat *)this, (Data)&__o, 1, %s);\n",
+	      fprintf(fd, "   %s%s%s->setValue((eyedb::Agregat *)this, (eyedb::Data)&__o, 1, %s);\n",
 		      ctx->get(), psret, __agrdyn, (ndims ? "from" : "0"));
 	    else
-	      fprintf(fd, "   %s%s%s[%d]->setValue((Agregat *)this, (Data)&__o, 1, %s);\n",
+	      fprintf(fd, "   %s%s%s[%d]->setValue((Agregat *)this, (eyedb::Data)&__o, 1, %s);\n",
 		      ctx->get(), psret, __agritems, num, (ndims ? "from" : "0"));
-	    fprintf(fd, "   %sObjectPeer::decrRefCount(__o);\n", ctx->get());
+	    fprintf(fd, "   %seyedb::ObjectPeer::decrRefCount(__o);\n", ctx->get());
 	  
 	    if (hints.error_policy == GenCodeHints::StatusErrorPolicy)
 	      RETURN_ERROR(fd, ctx, cls, "   ");
@@ -1188,14 +1188,14 @@ do { \
 
 	gbx_suspend(ctx);
 
-	fprintf(fd, "%sSize size;\n", ctx->get());
+	fprintf(fd, "%seyedb::Size size;\n", ctx->get());
 	if (hints.error_policy == GenCodeHints::StatusErrorPolicy)
 	  {
 	    /*
-	      fprintf(fd, "%sStatus s, *ps;\n", ctx->get());
+	      fprintf(fd, "%seyedb::Status s, *ps;\n", ctx->get());
 	      fprintf(fd, "%sps = (rs ? rs : &s);\n", ctx->get());
 	    */
-	    fprintf(fd, "%sStatus s;\n", ctx->get());
+	    fprintf(fd, "%seyedb::Status s;\n", ctx->get());
 	  }
 	if (odl_dynamic_attr)
 	  fprintf(fd, "%s%s%s->getSize(this, size);\n", ctx->get(), psret,
@@ -1241,15 +1241,15 @@ do { \
 	const char *sarg = SARGIN();
 #ifdef ODL_STD_STRING
 	if (is_string)
-	  fprintf(fd, "Status %s::%s(const std::string &_%s%s)\n{\n",
+	  fprintf(fd, "eyedb::Status %s::%s(const std::string &_%s%s)\n{\n",
 		  className(own), ATTRNAME(name, SET, hints), name,
 		  sarg);
 	else
-	  fprintf(fd, "Status %s::%s(const %s *_%s%s)\n{\n",
+	  fprintf(fd, "eyedb::Status %s::%s(const %s *_%s%s)\n{\n",
 		  className(own), ATTRNAME(name, SET, hints), sclass, name,
 		  sarg);
 #else
-	fprintf(fd, "Status %s::%s(const %s *_%s%s)\n{\n",
+	fprintf(fd, "eyedb::Status %s::%s(const %s *_%s%s)\n{\n",
 		className(own), ATTRNAME(name, SET, hints), sclass, name,
 		sarg);
 #endif
@@ -1261,18 +1261,18 @@ do { \
 	  dynamic_attr_gen(fd, ctx, this, op_SET);
 
 	gbx_suspend(ctx);
-	fprintf(fd, "%sStatus status;\n", ctx->get());
+	fprintf(fd, "%seyedb::Status status;\n", ctx->get());
       
 	if (isVarDim())
 	  {
-	    fprintf(fd, "%sSize size;\n", ctx->get());
+	    fprintf(fd, "%seyedb::Size size;\n", ctx->get());
 
 #ifdef ODL_STD_STRING
 	    if (is_string)
-	      fprintf(fd, "%sSize len = _%s.size() + 1;\n\n", ctx->get(), name);
+	      fprintf(fd, "%seyedb::Size len = _%s.size() + 1;\n\n", ctx->get(), name);
 #else
 	    if (is_string)
-	      fprintf(fd, "%sSize len = ::strlen(_%s) + 1;\n\n", ctx->get(), name);
+	      fprintf(fd, "%seyedb::Size len = ::strlen(_%s) + 1;\n\n", ctx->get(), name);
 #endif
 	    if (odl_dynamic_attr)
 	      fprintf(fd, "%sstatus = %s->getSize(this, size);\n", ctx->get(),
@@ -1297,26 +1297,26 @@ do { \
 #ifdef ODL_STD_STRING
 	    if (odl_dynamic_attr) {
 	      if (is_string)
-		fprintf(fd, "%sstatus = %s->setValue(this, (Data)_%s.c_str(), len, 0);\n",
+		fprintf(fd, "%sstatus = %s->setValue(this, (eyedb::Data)_%s.c_str(), len, 0);\n",
 			ctx->get(), __agrdyn, name);
 	      else
-		fprintf(fd, "%sstatus = %s->setValue(this, (Data)_%s., len, 0);\n",
+		fprintf(fd, "%sstatus = %s->setValue(this, (eyedb::Data)_%s., len, 0);\n",
 			ctx->get(), __agrdyn, name);
 	    }
 	    else {
 	      if (is_string)
-		fprintf(fd, "%sstatus = %s[%d]->setValue(this, (Data)_%s.c_str(), len, 0);\n",
+		fprintf(fd, "%sstatus = %s[%d]->setValue(this, (eyedb::Data)_%s.c_str(), len, 0);\n",
 			ctx->get(), __agritems, num, name);
 	      else
-		fprintf(fd, "%sstatus = %s[%d]->setValue(this, (Data)_%s, len, 0);\n",
+		fprintf(fd, "%sstatus = %s[%d]->setValue(this, (eyedb::Data)_%s, len, 0);\n",
 			ctx->get(), __agritems, num, name);
 	    }
 #else
 	    if (odl_dynamic_attr)
-	      fprintf(fd, "%sstatus = %s->setValue(this, (Data)_%s, len, 0);\n",
+	      fprintf(fd, "%sstatus = %s->setValue(this, (eyedb::Data)_%s, len, 0);\n",
 		      ctx->get(), __agrdyn, name);
 	    else
-	      fprintf(fd, "%sstatus = %s[%d]->setValue(this, (Data)_%s, len, 0);\n",
+	      fprintf(fd, "%sstatus = %s[%d]->setValue(this, (eyedb::Data)_%s, len, 0);\n",
 		      ctx->get(), __agritems, num, name);
 #endif
 
@@ -1329,25 +1329,25 @@ do { \
 	    if (is_string) {
 	      fprintf(fd, "%sunsigned char data[%d];\n", ctx->get(), maxdims);
 #ifdef ODL_STD_STRING
-	      fprintf(fd, "%sSize len = _%s.size();\n", ctx->get(), name);
+	      fprintf(fd, "%seyedb::Size len = _%s.size();\n", ctx->get(), name);
 #else
-	      fprintf(fd, "%sSize len = ::strlen(_%s);\n", ctx->get(), name);
+	      fprintf(fd, "%seyedb::Size len = ::strlen(_%s);\n", ctx->get(), name);
 #endif
 	    }
 	    fprintf(fd, "%sif (len >= %d)\n", ctx->get(), maxdims);
 #ifdef ODL_STD_STRING
 	    if (is_string)
-	      fprintf(fd, "%s  return Exception::make(IDB_ERROR, "
+	      fprintf(fd, "%s  return eyedb::Exception::make(IDB_ERROR, "
 		      "\"string `%%s' [%%d] too long for attribute %s::%s, maximum "
 		      "is %d\\n\", _%s.c_str(), len);\n", ctx->get(),
 		      class_owner->getName(), name, maxdims, name);
 	    else
-	      fprintf(fd, "%s  return Exception::make(IDB_ERROR, "
+	      fprintf(fd, "%s  return eyedb::Exception::make(IDB_ERROR, "
 		      "\"string `%%s' [%%d] too long for attribute %s::%s, maximum "
 		      "is %d\\n\", _%s, len);\n", ctx->get(),
 		      class_owner->getName(), name, maxdims, name);
 #else
-	    fprintf(fd, "%s  return Exception::make(IDB_ERROR, "
+	    fprintf(fd, "%s  return eyedb::Exception::make(IDB_ERROR, "
 		    "\"string `%%s' [%%d] too long for attribute %s::%s, maximum "
 		    "is %d\\n\", _%s, len);\n", ctx->get(),
 		    class_owner->getName(), name, maxdims, name);
@@ -1372,26 +1372,26 @@ do { \
 #ifdef ODL_STD_STRING
 	      if (odl_dynamic_attr) {
 		if (is_string)
-		  fprintf(fd, "%sstatus = %s->setValue(this, (Data)_%s.c_str(), len, 0);\n",
+		  fprintf(fd, "%sstatus = %s->setValue(this, (eyedb::Data)_%s.c_str(), len, 0);\n",
 			  ctx->get(), __agrdyn, name);
 		else
-		  fprintf(fd, "%sstatus = %s->setValue(this, (Data)_%s, len, 0);\n",
+		  fprintf(fd, "%sstatus = %s->setValue(this, (eyedb::Data)_%s, len, 0);\n",
 			  ctx->get(), __agrdyn, name);
 	      }
 	      else {
 		if (is_string)
-		  fprintf(fd, "%sstatus = %s[%d]->setValue(this, (Data)_%s.c_str(), len, 0);\n",
+		  fprintf(fd, "%sstatus = %s[%d]->setValue(this, (eyedb::Data)_%s.c_str(), len, 0);\n",
 			  ctx->get(), __agritems, num, name);
 		else
-		  fprintf(fd, "%sstatus = %s[%d]->setValue(this, (Data)_%s, len, 0);\n",
+		  fprintf(fd, "%sstatus = %s[%d]->setValue(this, (eyedb::Data)_%s, len, 0);\n",
 			  ctx->get(), __agritems, num, name);
 	      }
 #else
 	      if (odl_dynamic_attr)
-		fprintf(fd, "%sstatus = %s->setValue(this, (Data)_%s, len, 0);\n",
+		fprintf(fd, "%sstatus = %s->setValue(this, (eyedb::Data)_%s, len, 0);\n",
 			ctx->get(), __agrdyn, name);
 	      else
-		fprintf(fd, "%sstatus = %s[%d]->setValue(this, (Data)_%s, len, 0);\n",
+		fprintf(fd, "%sstatus = %s[%d]->setValue(this, (eyedb::Data)_%s, len, 0);\n",
 			ctx->get(), __agritems, num, name);
 #endif
 	    }
@@ -1423,7 +1423,7 @@ do { \
 #if defined(SET_COUNT_DIRECT) || defined(NO_DIRECT_SET)
       if (isVarDim() && !isIndirect() && !is_string) /*&& not_basic*/
 	{
-	  fprintf(fd, "Status %s::%s(", className(own),
+	  fprintf(fd, "eyedb::Status %s::%s(", className(own),
 		  ATTRNAME(name, SETCOUNT, hints));
       
 	  dimArgsGen(fd, ndims, True);
@@ -1438,16 +1438,16 @@ do { \
 
 	  gbx_suspend(ctx);
 
-	  fprintf(fd, "%sStatus status;\n", ctx->get());
+	  fprintf(fd, "%seyedb::Status status;\n", ctx->get());
 
-	  fprintf(fd, "%sSize from = a%d;\n", ctx->get(), ndims-1);
+	  fprintf(fd, "%seyedb::Size from = a%d;\n", ctx->get(), ndims-1);
 	  for (int i = ndims - 2 ; i >= 0; i--)
 	    fprintf(fd, "%sfrom += a%d * %d;\n", ctx->get(), i, typmod.dims[i]);
 
 	  // disconnected the 3/09/01: it is not useful to forbid to
 	  // decrement count!
 #if 0
-	  fprintf(fd, "\n%sSize size;\n", ctx->get());
+	  fprintf(fd, "\n%seyedb::Size size;\n", ctx->get());
 	  if (odl_dynamic_attr)
 	    fprintf(fd, "%sstatus = %s->getSize(this, size);\n",
 		    ctx->get(), __agrdyn);
@@ -1489,15 +1489,15 @@ do { \
 	
 #ifdef ODL_STD_STRING
 	if (is_string)
-	  fprintf(fd, "std::string %s::%s(%sBool *isnull%s) const\n{\n", 
+	  fprintf(fd, "std::string %s::%s(%seyedb::Bool *isnull%s) const\n{\n", 
 		  className(own), ATTRNAME(name, GET, hints), sarg,
 		  stargcom);
 	else
-	  fprintf(fd, "const %s *%s::%s(%sBool *isnull%s) const\n{\n", 
+	  fprintf(fd, "const %s *%s::%s(%seyedb::Bool *isnull%s) const\n{\n", 
 		  sclass, className(own), ATTRNAME(name, GET, hints), sarg,
 		  stargcom);
 #else
-	fprintf(fd, "const %s *%s::%s(%sBool *isnull%s) const\n{\n", 
+	fprintf(fd, "const %s *%s::%s(%seyedb::Bool *isnull%s) const\n{\n", 
 		sclass, className(own), ATTRNAME(name, GET, hints), sarg,
 		stargcom);
 #endif
@@ -1510,22 +1510,22 @@ do { \
 
 	gbx_suspend(ctx);
 
-	fprintf(fd, "%sData data;\n", ctx->get());
+	fprintf(fd, "%seyedb::Data data;\n", ctx->get());
 	if (hints.error_policy == GenCodeHints::StatusErrorPolicy)
 	  {
 	    /*
-	      fprintf(fd, "%sStatus s, *ps;\n", ctx->get());
+	      fprintf(fd, "%seyedb::Status s, *ps;\n", ctx->get());
 	      fprintf(fd, "%sps = (rs ? rs : &s);\n", ctx->get());
 	      psret = "*ps = ";
 	    */
-	    fprintf(fd, "%sStatus s;\n", ctx->get());
+	    fprintf(fd, "%seyedb::Status s;\n", ctx->get());
 	    psret = "s = ";
 	  }
 	if (odl_dynamic_attr)
-	  fprintf(fd, "\n%s%s%s->getValue(this, (Data *)&data, Attribute::directAccess, 0, isnull);\n",
+	  fprintf(fd, "\n%s%s%s->getValue(this, (eyedb::Data *)&data, eyedb::Attribute::directAccess, 0, isnull);\n",
 		  ctx->get(), psret, __agrdyn);
 	else
-	  fprintf(fd, "\n%s%s%s[%d]->getValue(this, (Data *)&data, Attribute::directAccess, 0, isnull);\n",
+	  fprintf(fd, "\n%s%s%s[%d]->getValue(this, (eyedb::Data *)&data, eyedb::Attribute::directAccess, 0, isnull);\n",
 		  ctx->get(), psret, __agritems, num);
 
 	if (hints.error_policy == GenCodeHints::StatusErrorPolicy)
@@ -2040,13 +2040,13 @@ do { \
     if (is_string || is_raw) {
 #ifdef ODL_STD_STRING
       if (is_string)
-	fprintf(fdh, "%sStatus %s(const std::string &%s);\n", ctxH->get(),
+	fprintf(fdh, "%seyedb::Status %s(const std::string &%s);\n", ctxH->get(),
 		ATTRNAME(name, SET, hints), SARGIN());
       else
-	fprintf(fdh, "%sStatus %s(const %s *%s);\n", ctxH->get(),
+	fprintf(fdh, "%seyedb::Status %s(const %s *%s);\n", ctxH->get(),
 		ATTRNAME(name, SET, hints), SCLASS(), SARGIN());
 #else
-      fprintf(fdh, "%sStatus %s(const %s *%s);\n", ctxH->get(),
+      fprintf(fdh, "%seyedb::Status %s(const %s *%s);\n", ctxH->get(),
 	      ATTRNAME(name, SET, hints), SCLASS(), SARGIN());
 #endif
     }
@@ -2055,11 +2055,11 @@ do { \
     if (isIndirect() || !not_basic) // added 22/09/98
 #endif
       {
-	fprintf(fdh, "%sStatus %s(", ctxH->get(),
+	fprintf(fdh, "%seyedb::Status %s(", ctxH->get(),
 		ATTRNAME_1(name, ATTRSET(cls), hints));
 	dimArgsGen(fdh, ndims);
 	if (cls->asEnumClass())
-	  fprintf(fdh, "%s%s%s, Bool _check_value = True);\n",
+	  fprintf(fdh, "%s%s%s, eyedb::Bool _check_value = eyedb::True);\n",
 		  comma, classname, ref1);
 	else
 	  fprintf(fdh, "%s%s%s);\n", comma, classname, ref1);
@@ -2070,7 +2070,7 @@ do { \
 #if defined(SET_COUNT_DIRECT) || defined(NO_DIRECT_SET)
       if (isVarDim() && !isIndirect() && !is_string) /*&& not_basic*/
 	{
-	  fprintf(fdh, "%sStatus %s(",
+	  fprintf(fdh, "%seyedb::Status %s(",
 		  ctxH->get(), ATTRNAME(name, SETCOUNT, hints));
 
 	  dimArgsGen(fdh, ndims);
@@ -2082,15 +2082,15 @@ do { \
     if (is_string || is_raw) {
 #ifdef ODL_STD_STRING
       if (is_string)
-	fprintf(fdh, "%sstd::string %s(%sBool *isnull = 0%s) const;\n",
+	fprintf(fdh, "%sstd::string %s(%seyedb::Bool *isnull = 0%s) const;\n",
 		ctxH->get(), ATTRNAME(name, GET, hints), SARGOUT(),
 		stargcom);
       else
-	fprintf(fdh, "%sconst %s *%s(%sBool *isnull = 0%s) const;\n",
+	fprintf(fdh, "%sconst %s *%s(%seyedb::Bool *isnull = 0%s) const;\n",
 		ctxH->get(), SCLASS(), ATTRNAME(name, GET, hints), SARGOUT(),
 		stargcom);
 #else
-      fprintf(fdh, "%sconst %s *%s(%sBool *isnull = 0%s) const;\n",
+      fprintf(fdh, "%sconst %s *%s(%seyedb::Bool *isnull = 0%s) const;\n",
 	      ctxH->get(), SCLASS(), ATTRNAME(name, GET, hints), SARGOUT(),
 	      stargcom);
 #endif
@@ -2099,15 +2099,15 @@ do { \
     fprintf(fdh, "%s%s%s%s(", ctxH->get(), classname, ref2,
 	    ATTRNAME_1(name, ATTRGET(cls), hints));
     dimArgsGen(fdh, ndims);
-    fprintf(fdh, "%sBool *isnull = 0%s) %s;\n", comma,
+    fprintf(fdh, "%seyedb::Bool *isnull = 0%s) %s;\n", comma,
 	    stargcom, (!not_basic ? " const" : ""));
 
     if (cls->asCollectionClass()) {
       fprintf(fdh, "%sunsigned int %s(", ctxH->get(),
 	      ATTRNAME(name, GETCOUNT, hints));
       dimArgsGen(fdh, ndims);
-      fprintf(fdh, "%sBool *isnull = 0, Status *rs = 0) const "
-	      "{const Collection *_coll = %s(", comma, ATTRNAME(name, GETCOLL, hints));
+      fprintf(fdh, "%seyedb::Bool *isnull = 0, eyedb::Status *rs = 0) const "
+	      "{const eyedb::Collection *_coll = %s(", comma, ATTRNAME(name, GETCOLL, hints));
       for (i = 0; i < ndims; i++)
 	fprintf(fdh, "a%d, ", i);
       fprintf(fdh, "isnull, rs); ");
@@ -2119,19 +2119,19 @@ do { \
 	      ATTRNAME_1(name, ATTRGET(cls), hints));
   
       dimArgsGen(fdh, ndims);
-      fprintf(fdh, "%sBool *isnull = 0%s) const;\n", comma,
+      fprintf(fdh, "%seyedb::Bool *isnull = 0%s) const;\n", comma,
 	      stargcom);
     }
 
     if (isIndirect()) {
-      fprintf(fdh, "%sOid %s(",
+      fprintf(fdh, "%seyedb::Oid %s(",
 	      ctxH->get(), ATTRNAME(name, GETOID, hints));
       dimArgsGen(fdh, ndims);
       fprintf(fdh, "%s);\n", (ndims ? stargcom : starg));
-      fprintf(fdh, "%sStatus %s(",
+      fprintf(fdh, "%seyedb::Status %s(",
 	      ctxH->get(), ATTRNAME(name, SETOID, hints));
       dimArgsGen(fdh, ndims);
-      fprintf(fdh, "%sconst Oid &);\n", comma);
+      fprintf(fdh, "%sconst eyedb::Oid &);\n", comma);
     }
 
     if (cls->asCollectionClass()) {
@@ -2151,15 +2151,15 @@ do { \
       const char *where = (ordered ? "int where, " : "");
 
       if (_dim == 1) {
-	fprintf(fdh, "%sStatus %s(%s", ctxH->get(),
+	fprintf(fdh, "%seyedb::Status %s(%s", ctxH->get(),
 		ATTRNAME_1(name, (ordered ? GenCodeHints::SET_ITEM_IN_COLL : GenCodeHints::ADD_ITEM_TO_COLL), hints), where);
 	dimArgsGen(fdh, ndims);
-	fprintf(fdh, "%s%s%s%s, const IndexImpl * = 0);\n", comma,
+	fprintf(fdh, "%s%s%s%s, const eyedb::IndexImpl * = 0);\n", comma,
 		oclassname, (_isref || !cl->asBasicClass() ? "*" : ""),
-		(!*where ? ", Bool noDup = False" : ""));
+		(!*where ? ", eyedb::Bool noDup = eyedb::False" : ""));
 
 	if (ordered) {
-	  fprintf(fdh, "%sStatus %s(int where%s", ctxH->get(),
+	  fprintf(fdh, "%seyedb::Status %s(int where%s", ctxH->get(),
 		  ATTRNAME(name, UNSET_ITEM_IN_COLL, hints),
 		  (ndims >= 1 ? ", " : ""));
 	  dimArgsGen(fdh, ndims);
@@ -2167,44 +2167,44 @@ do { \
 	}
 	else
 	  {
-	    fprintf(fdh, "%sStatus %s(%s", ctxH->get(),
+	    fprintf(fdh, "%seyedb::Status %s(%s", ctxH->get(),
 		    ATTRNAME(name, RMV_ITEM_FROM_COLL, hints), where);
 	    dimArgsGen(fdh, ndims);
 	    fprintf(fdh, "%s%s%s%s);\n", comma, oclassname,
 		    (_isref || !cl->asBasicClass() ? "*" : ""),
-		    (!*where ? ", Bool checkFirst = False" : ""));
+		    (!*where ? ", eyedb::Bool checkFirst = eyedb::False" : ""));
 	  }
       }
       else if (!strcmp(cl->getName(), char_class_name) && _dim > 1) {
-	fprintf(fdh, "%sStatus %s(%s", ctxH->get(),
+	fprintf(fdh, "%seyedb::Status %s(%s", ctxH->get(),
 		ATTRNAME_1(name, (ordered ? GenCodeHints::SET_ITEM_IN_COLL : GenCodeHints::ADD_ITEM_TO_COLL), hints), where);
 
 	dimArgsGen(fdh, ndims);
-	fprintf(fdh, "%sconst char *%s, const IndexImpl * = 0);\n",
+	fprintf(fdh, "%sconst char *%s, const eyedb::IndexImpl * = 0);\n",
 		comma,
-		(!*where ? ", Bool noDup = False" : ""));
+		(!*where ? ", eyedb::Bool noDup = eyedb::False" : ""));
 	if (ordered)
-	  fprintf(fdh, "%sStatus %s(", ctxH->get(),
+	  fprintf(fdh, "%seyedb::Status %s(", ctxH->get(),
 		  ATTRNAME(name, UNSET_ITEM_IN_COLL, hints));
 	else
-	  fprintf(fdh, "%sStatus %s(", ctxH->get(),
+	  fprintf(fdh, "%seyedb::Status %s(", ctxH->get(),
 		  ATTRNAME(name, RMV_ITEM_FROM_COLL, hints));
 
 	dimArgsGen(fdh, ndims);
 	fprintf(fdh, "%sconst char *%s);\n", comma,
-		(!*where ? ", Bool checkFirst = False" : ""));
+		(!*where ? ", eyedb::Bool checkFirst = eyedb::False" : ""));
       }
 
       if (!cl->asBasicClass()) {
-	fprintf(fdh, "%sStatus %s(%s", ctxH->get(),
+	fprintf(fdh, "%seyedb::Status %s(%s", ctxH->get(),
 		ATTRNAME_1(name, (ordered ? GenCodeHints::SET_ITEM_IN_COLL : GenCodeHints::ADD_ITEM_TO_COLL), hints), where);
 	dimArgsGen(fdh, ndims);
-	fprintf(fdh, "%sconst Oid &, const IndexImpl * = 0);\n",
+	fprintf(fdh, "%sconst eyedb::Oid &, const eyedb::IndexImpl * = 0);\n",
 		comma);
-	fprintf(fdh, "%sStatus %s(", ctxH->get(),
+	fprintf(fdh, "%seyedb::Status %s(", ctxH->get(),
 		ATTRNAME_1(name, (ordered ? GenCodeHints::UNSET_ITEM_IN_COLL : GenCodeHints::RMV_ITEM_FROM_COLL), hints));
 	dimArgsGen(fdh, ndims);
-	fprintf(fdh, "%sconst Oid &);\n", comma);
+	fprintf(fdh, "%sconst eyedb::Oid &);\n", comma);
       }
 
       if (ordered) { // 24/09/05
@@ -2213,7 +2213,7 @@ do { \
 		  ctxH->get(),
 		  ATTRNAME_1(name, (ordered ? GenCodeHints::RETRIEVE_ITEM_AT : GenCodeHints::GET_ITEM_AT), hints));
 	  dimArgsGen(fdh, ndims);
-	  fprintf(fdh, "%sBool *isnull = 0, Status *rs = 0) const;\n", comma);
+	  fprintf(fdh, "%seyedb::Bool *isnull = 0, eyedb::Status *rs = 0) const;\n", comma);
 	}
 	else if (_dim == 1) {
 	  fprintf(fdh, "%sconst %s %s%s(unsigned int ind, ",
@@ -2221,7 +2221,7 @@ do { \
 		  oclassname, (_isref || !cl->asBasicClass() ? "*" : ""), 
 		  ATTRNAME_1(name, (ordered ? GenCodeHints::RETRIEVE_ITEM_AT : GenCodeHints::GET_ITEM_AT), hints));
 	  dimArgsGen(fdh, ndims);
-	  fprintf(fdh, "%sBool *isnull = 0, Status *rs = 0) const;\n", comma);
+	  fprintf(fdh, "%seyedb::Bool *isnull = 0, eyedb::Status *rs = 0) const;\n", comma);
 	  
 	  if (!cl->asBasicClass()) {
 	    fprintf(fdh, "%s%s %s%s(unsigned int ind, ",
@@ -2229,16 +2229,16 @@ do { \
 		    oclassname, (_isref || !cl->asBasicClass() ? "*" : ""),
 		    ATTRNAME_1(name, (ordered ? GenCodeHints::RETRIEVE_ITEM_AT : GenCodeHints::GET_ITEM_AT), hints));
 	    dimArgsGen(fdh, ndims);
-	    fprintf(fdh, "%sBool *isnull = 0, Status *rs = 0);\n", comma);
+	    fprintf(fdh, "%seyedb::Bool *isnull = 0, eyedb::Status *rs = 0);\n", comma);
 	  }
 	}
       
 	if (_isref) {
-	  fprintf(fdh, "%sOid %s(unsigned int ind, ",
+	  fprintf(fdh, "%seyedb::Oid %s(unsigned int ind, ",
 		  ctxH->get(),
 		  ATTRNAME_1(name, (ordered ? GenCodeHints::RETRIEVEOID_ITEM_AT : GenCodeHints::GETOID_ITEM_AT) , hints));
 	  dimArgsGen(fdh, ndims);
-	  fprintf(fdh, "%sStatus *rs = 0) const;\n", comma);
+	  fprintf(fdh, "%seyedb::Status *rs = 0) const;\n", comma);
 	}
       }
     }
@@ -2256,9 +2256,9 @@ do { \
 		       Bool fill = False)
   {
     if (!strcmp(parent->getName(), "struct"))
-      fprintf(fd, "Struct(%s)", var);
+      fprintf(fd, "eyedb::Struct(%s)", var);
     else if (!strcmp(parent->getName(), "union"))
-      fprintf(fd, "Union(%s)", var);
+      fprintf(fd, "eyedb::Union(%s)", var);
     else
       fprintf(fd, "%s(%s, 1)", className(parent), var);
 
@@ -2270,9 +2270,9 @@ do { \
 			Bool fill = False)
   {
     if (!strcmp(parent->getName(), "struct"))
-      fprintf(fd, "Struct(%s, share)", var);
+      fprintf(fd, "eyedb::Struct(%s, share)", var);
     else if (!strcmp(parent->getName(), "union"))
-      fprintf(fd, "Union(%s, share)", var);
+      fprintf(fd, "eyedb::Union(%s, share)", var);
     else
       fprintf(fd, "%s(%s, share, 1)", className(parent), var);
 
@@ -2285,23 +2285,23 @@ do { \
     if (share)
       fprintf(fd, "%sif (!share)\n%s  {\n", ctx->get(), ctx->get());
 
-    fprintf(fd, "%s%sheaderCode(_Struct_Type, idr_psize, IDB_XINFO_LOCAL_OBJ);\n",
+    fprintf(fd, "%s%sheaderCode(eyedb::_Struct_Type, idr_psize, IDB_XINFO_LOCAL_OBJ);\n",
 	    ctx->get(), (share ? "    " : ""), name);
 
-    fprintf(fd, "%s%sClassPeer::newObjRealize(getClass(), this);\n", ctx->get(), (share ? "    " : ""));
+    fprintf(fd, "%s%seyedb::ClassPeer::newObjRealize(getClass(), this);\n", ctx->get(), (share ? "    " : ""));
     if (share)
       fprintf(fd, "%s  }\n\n", ctx->get());
 
-    fprintf(fd, "%sObjectPeer::setGRTObject(this, True);\n", ctx->get());
+    fprintf(fd, "%seyedb::ObjectPeer::setGRTObject(this, eyedb::True);\n", ctx->get());
   }
 
   Status AgregatClass::generateConstructors_C(GenContext *ctx)
   {
     FILE *fd = ctx->getFile();
 
-    fprintf(fd, "%s::%s(Database *_db, const Dataspace *_dataspace) : ", name, name);
+    fprintf(fd, "%s::%s(eyedb::Database *_db, const eyedb::Dataspace *_dataspace) : ", name, name);
 
-    const_f0(fd, parent, "_db, _dataspace", True);
+    const_f0(fd, parent, "_db, _dataspace", eyedb::True);
 
     if (attr_cache && !isRootClass())
       fprintf(fd, "%sattrCacheEmpty();\n", ctx->get());
@@ -2335,14 +2335,14 @@ do { \
       fprintf(fd, "%s::%s(const Class *_cls, Data _idr)\n{\n",
       name, name);
     */
-    fprintf(fd, "%s::%s(const Class *_cls, Data _idr)", name, name);
+    fprintf(fd, "%s::%s(const eyedb::Class *_cls, eyedb::Data _idr)", name, name);
     if (strcmp(parent->getName(), "struct"))
-      fprintf(fd, ": %s((Database *)0, (const Dataspace *)0, 1)", className(parent));
+      fprintf(fd, ": %s((eyedb::Database *)0, (const eyedb::Dataspace *)0, 1)", className(parent));
     fprintf(fd, "\n{\n");
-    fprintf(fd, "%ssetClass((Class *)_cls);\n\n", ctx->get());
+    fprintf(fd, "%ssetClass((eyedb::Class *)_cls);\n\n", ctx->get());
 
-    fprintf(fd, "%sSize idr_psize;\n", ctx->get());
-    fprintf(fd, "%sSize idr_tsize = getClass()->getIDRObjectSize(&idr_psize);\n", ctx->get(), name);
+    fprintf(fd, "%seyedb::Size idr_psize;\n", ctx->get());
+    fprintf(fd, "%seyedb::Size idr_tsize = getClass()->getIDRObjectSize(&idr_psize);\n", ctx->get(), name);
     fprintf(fd, "%sif (_idr)\n", ctx->get());
     fprintf(fd, "%s  idr->setIDR(idr_tsize, _idr);\n", ctx->get());
     fprintf(fd, "%selse\n", ctx->get());
@@ -2353,16 +2353,16 @@ do { \
     fprintf(fd, "%s    memset(idr->getIDR() + IDB_OBJ_HEAD_SIZE, 0, idr->getSize() - IDB_OBJ_HEAD_SIZE);\n", ctx->get());
     fprintf(fd, "%s  }\n", ctx->get());
 
-    fprintf(fd, "%sheaderCode(_Struct_Type, idr_psize, IDB_XINFO_LOCAL_OBJ);\n", ctx->get(), name);
-    fprintf(fd, "%sClassPeer::newObjRealize(getClass(), this);\n", ctx->get());
-    fprintf(fd, "%sObjectPeer::setGRTObject(this, True);\n", ctx->get());
+    fprintf(fd, "%sheaderCode(eyedb::_Struct_Type, idr_psize, IDB_XINFO_LOCAL_OBJ);\n", ctx->get(), name);
+    fprintf(fd, "%seyedb::ClassPeer::newObjRealize(getClass(), this);\n", ctx->get());
+    fprintf(fd, "%seyedb::ObjectPeer::setGRTObject(this, eyedb::True);\n", ctx->get());
     fprintf(fd, "%suserInitialize();\n", ctx->get());
     fprintf(fd, "}\n\n");
 
-    fprintf(fd, "void %s::initialize(Database *_db)\n{\n",
+    fprintf(fd, "void %s::initialize(eyedb::Database *_db)\n{\n",
 	    name);
     fprintf(fd, "%ssetClass((_db ? _db->getSchema()->getClass(\"%s\") : %s%s));\n\n", ctx->get(), getAliasName(), name, classSuffix);
-    fprintf(fd, "%sSize idr_psize;\n", ctx->get());
+    fprintf(fd, "%seyedb::Size idr_psize;\n", ctx->get());
     //fprintf(fd, "%sidr->idr_sz = getClass()->getIDRObjectSize(&idr_psize);\n", ctx->get(), name);
     fprintf(fd, "%sidr->setIDR(getClass()->getIDRObjectSize(&idr_psize));\n",
 	    ctx->get(), name);
@@ -2392,13 +2392,13 @@ do { \
     fprintf(fd, "%sreturn *this;\n", ctx->get());
     fprintf(fd, "}\n\n", ctx->get());
 
-    fprintf(fd, "%s::%s(const Struct *x, Bool share) : ",
+    fprintf(fd, "%s::%s(const eyedb::Struct *x, eyedb::Bool share) : ",
 	    name, name, className(parent));
 
     const_f01(fd, parent, "x", True);
 
     fprintf(fd, "%ssetClass((db ? db->getSchema()->getClass(\"%s\") : %s%s));\n\n", ctx->get(), getAliasName(), name, classSuffix);
-    fprintf(fd, "%sSize idr_psize;\n", ctx->get());
+    fprintf(fd, "%seyedb::Size idr_psize;\n", ctx->get());
     fprintf(fd, "%sgetClass()->getIDRObjectSize(&idr_psize);\n", ctx->get(), name);
 
     const_f1(fd, ctx, name, True);
@@ -2407,14 +2407,14 @@ do { \
     fprintf(fd, "%suserCopy(*x);\n", ctx->get());
     fprintf(fd, "}\n\n");
 
-    fprintf(fd, "%s::%s(const %s *x, Bool share) : ", name, name,
+    fprintf(fd, "%s::%s(const %s *x, eyedb::Bool share) : ", name, name,
 	    name, className(parent));
 
     const_f01(fd, parent, "x", True);
 
     fprintf(fd, "%ssetClass((db ? db->getSchema()->getClass(\"%s\") : %s%s));\n\n", ctx->get(), getAliasName(), name, classSuffix);
 
-    fprintf(fd, "%sSize idr_psize;\n", ctx->get());
+    fprintf(fd, "%seyedb::Size idr_psize;\n", ctx->get());
     fprintf(fd, "%sgetClass()->getIDRObjectSize(&idr_psize);\n", ctx->get(), name);
     const_f1(fd, ctx, name, True);
     if (attr_cache && !isRootClass())
@@ -2482,15 +2482,15 @@ do { \
     Status status;
     const char *_type = (asStructClass() ? "Struct" : "Union");
 
-    fprintf(fd, "static const Attribute **%s_agritems;\n", name);
-    fprintf(fd, "static Size %s_idr_objsz, %s_idr_psize;\n\n", name, name);
+    fprintf(fd, "static const eyedb::Attribute **%s_agritems;\n", name);
+    fprintf(fd, "static eyedb::Size %s_idr_objsz, %s_idr_psize;\n\n", name, name);
 
-    fprintf(fd, "static " DEF_PREFIX "%sClass *%s_make(" DEF_PREFIX "%sClass *%s_class = 0, Schema *m = 0)\n{\n", _type, name, _type, name);
+    fprintf(fd, "static eyedb::%sClass *%s_make(eyedb::%sClass *%s_class = 0, eyedb::Schema *m = 0)\n{\n", _type, name, _type, name);
     ctx->push();
 
     fprintf(fd, "%sif (!%s_class)\n", ctx->get(), name);
     Class *parent_cl = parent->isRootClass() ? parent->getParent() : parent;
-    fprintf(fd,"%s  return new " DEF_PREFIX "%sClass(\"%s\", (m ? m->getClass(\"%s\") : %s%s));\n", ctx->get(), _type, getAliasName(),
+    fprintf(fd,"%s  return new eyedb::%sClass(\"%s\", (m ? m->getClass(\"%s\") : %s%s));\n", ctx->get(), _type, getAliasName(),
 	    (parent_cl->getAliasName() ?  parent_cl->getAliasName() : parent_cl->getName()),
 	    className(parent_cl), classSuffix);
     // changed the 30/05/01: was:
@@ -2498,7 +2498,7 @@ do { \
 
     if (items_cnt)
       {
-	fprintf(fd, "%sAttribute *attr[%d];\n", ctx->get(), items_cnt);
+	fprintf(fd, "%seyedb::Attribute *attr[%d];\n", ctx->get(), items_cnt);
 	int dims_declare = 0;
       
 	int i;
@@ -2537,18 +2537,18 @@ do { \
     */
 
     if (isSystem() || odl_system_class)
-      fprintf(fd, "%sClassPeer::setMType(%s_class, Class::System);\n",
+      fprintf(fd, "%seyedb::ClassPeer::setMType(%s_class, eyedb::Class::System);\n",
 	      ctx->get(), name);
 
     fprintf(fd, "\n%sreturn %s_class;\n}\n\n", ctx->get(),
 	    name);
 
-    fprintf(fd, "Object *%s_construct_x(const Class *cls, Data idr)\n{\n", name);
+    fprintf(fd, "eyedb::Object *%s_construct_x(const eyedb::Class *cls, eyedb::Data idr)\n{\n", name);
     fprintf(fd, "%sreturn new %s(cls, idr);\n", ctx->get(), name);
     fprintf(fd, "}\n\n");
 
-    fprintf(fd, "Object *%s_construct(const Object *o, Bool share)\n{\n", name);
-    fprintf(fd, "%sreturn new %s((const Struct *)o, share);\n", ctx->get(), name);
+    fprintf(fd, "eyedb::Object *%s_construct(const eyedb::Object *o, eyedb::Bool share)\n{\n", name);
+    fprintf(fd, "%sreturn new %s((const eyedb::Struct *)o, share);\n", ctx->get(), name);
     fprintf(fd, "}\n\n");
 
     fprintf(fd, "static void %s_init_p()\n{\n", name);
@@ -2568,7 +2568,7 @@ do { \
     fprintf(fd, "%s%s_idr_objsz = %s%s->getIDRObjectSize(&%s_idr_psize, 0);\n\n",
 	    ctx->get(), name, name, classSuffix, name);
 
-    fprintf(fd, "%sObjectPeer::setUnrealizable(%s%s, True);\n",
+    fprintf(fd, "%seyedb::ObjectPeer::setUnrealizable(%s%s, eyedb::True);\n",
 	    ctx->get(), name, classSuffix);
     fprintf(fd, "}\n\n");
     ctx->pop();
@@ -2585,10 +2585,10 @@ do { \
 #ifdef NEW_ARGTYPE
     fprintf(fd, "%sargtype = %s;\n", ctx->get(), str);
 #else
-    fprintf(fd, "%sargtype = new ArgType();\n", ctx->get());
+    fprintf(fd, "%sargtype = new eyedb::ArgType();\n", ctx->get());
 #endif
 
-    fprintf(fd, "%sargtype->setType((ArgType_Type)%d, False);\n",
+    fprintf(fd, "%sargtype->setType((ArgType_Type)%d, eyedb::False);\n",
 	    ctx->get(), argtype->getType());
 
     /*
@@ -2601,8 +2601,8 @@ do { \
   static void
   sign_declare_realize(FILE *fd, GenContext *ctx)
   {
-    fprintf(fd, "%sSignature *sign;\n", ctx->get());
-    fprintf(fd, "%sArgType *argtype;\n\n", ctx->get());
+    fprintf(fd, "%seyedb::Signature *sign;\n", ctx->get());
+    fprintf(fd, "%seyedb::ArgType *argtype;\n\n", ctx->get());
   }
 
 #define dataspace_prologue(ctx, fd, x) \
@@ -2670,14 +2670,14 @@ do { \
 
     FILE *fd = ctx->getFile();
 
-    fprintf(fd, "static Status %s_attrcomp_realize(Database *db, Class *cls)\n{\n", name);
+    fprintf(fd, "static eyedb::Status %s_attrcomp_realize(eyedb::Database *db, eyedb::Class *cls)\n{\n", name);
 
     ctx->push();
     if (list->getCount()) {
-      fprintf(fd, "%sAttributeComponent *comp;\n", ctx->get());
-      fprintf(fd, "%sconst Dataspace *dataspace;\n", ctx->get());
-      fprintf(fd, "%sClassComponent *clcomp;\n", ctx->get());
-      fprintf(fd, "%sStatus status;\n", ctx->get());
+      fprintf(fd, "%seyedb::AttributeComponent *comp;\n", ctx->get());
+      fprintf(fd, "%sconst eyedb::Dataspace *dataspace;\n", ctx->get());
+      fprintf(fd, "%seyedb::ClassComponent *clcomp;\n", ctx->get());
+      fprintf(fd, "%seyedb::Status status;\n", ctx->get());
       fprintf(fd, "%sint *impl_hints;\n", ctx->get());
     }
 
@@ -2688,13 +2688,13 @@ do { \
     while (c.getNext((void *&)comp)){
       if (comp->asNotNullConstraint()) {
 	NotNullConstraint *notnull = comp->asNotNullConstraint();
-	fprintf(fd, "%scomp = new NotNullConstraint(db, cls, \"%s\", %s);\n",
+	fprintf(fd, "%scomp = new eyedb::NotNullConstraint(db, cls, \"%s\", %s);\n",
 		ctx->get(), notnull->getAttrpath(),
 		IDBBOOL_STR(notnull->getPropagate()));
       }
       else if (comp->asUniqueConstraint()) {
 	UniqueConstraint *unique = comp->asUniqueConstraint();
-	fprintf(fd, "%scomp = new UniqueConstraint(db, cls, \"%s\", %s);\n",
+	fprintf(fd, "%scomp = new eyedb::UniqueConstraint(db, cls, \"%s\", %s);\n",
 		ctx->get(), unique->getAttrpath(),
 		IDBBOOL_STR(unique->getPropagate()));
       }
@@ -2712,7 +2712,7 @@ do { \
 	BTreeIndex *idx = comp->asBTreeIndex();
 	hints_prologue(ctx, fd, idx);
 	dataspace_prologue(ctx, fd, idx);
-	fprintf(fd, "%scomp = new BTreeIndex(db, cls, \"%s\", %s, %s, dataspace, %d",
+	fprintf(fd, "%scomp = new eyedb::BTreeIndex(db, cls, \"%s\", %s, %s, dataspace, %d",
 		ctx->get(), idx->getAttrpath(),
 		IDBBOOL_STR(idx->getPropagate()),
 		IDBBOOL_STR(idx->getIsString()),
@@ -2724,7 +2724,7 @@ do { \
 	if (idx->getHashMethod()) {
 	  // hack
 	  if (!setup_done) {
-	    fprintf(fd, "%sgetClass()->setSetupComplete(True);\n", ctx->get());
+	    fprintf(fd, "%sgetClass()->setSetupComplete(eyedb::True);\n", ctx->get());
 	    setup_done = True;
 	  }
 	  fprintf(fd, "%sstatus = getClass()->getComp(\"%s\", clcomp);\n",
@@ -2733,7 +2733,7 @@ do { \
 	}
 	hints_prologue(ctx, fd, idx);
 	dataspace_prologue(ctx, fd, idx);
-	fprintf(fd, "%scomp = new HashIndex(db, cls, \"%s\", %s, %s, dataspace, %d",
+	fprintf(fd, "%scomp = new eyedb::HashIndex(db, cls, \"%s\", %s, %s, dataspace, %d",
 		ctx->get(), idx->getAttrpath(),
 		IDBBOOL_STR(idx->getPropagate()),
 		IDBBOOL_STR(idx->getIsString()),
@@ -2750,7 +2750,7 @@ do { \
 	if (collimpl->getHashMethod()) {
 	  // hack
 	  if (!setup_done) {
-	    fprintf(fd, "%sgetClass()->setSetupComplete(True);\n", ctx->get());
+	    fprintf(fd, "%sgetClass()->setSetupComplete(eyedb::True);\n", ctx->get());
 	    setup_done = True;
 	  }
 	  fprintf(fd, "%sstatus = getClass()->getComp(\"%s\", clcomp);\n",
@@ -2759,11 +2759,11 @@ do { \
 	}
 	hints_prologue(ctx, fd, collimpl);
 	dataspace_prologue(ctx, fd, collimpl);
-	fprintf(fd, "%scomp = new CollAttrImpl(db, cls, \"%s\", %s, dataspace, %s, %d",
+	fprintf(fd, "%scomp = new eyedb::CollAttrImpl(db, cls, \"%s\", %s, dataspace, %s, %d",
 		ctx->get(), collimpl->getAttrpath(),
 		IDBBOOL_STR(collimpl->getPropagate()),
 		(collimpl->getIdxtype() == IndexImpl::Hash ?
-		 "IndexImpl::Hash" : "IndexImpl::BTree"),
+		 "eyedb::IndexImpl::Hash" : "eyedb::IndexImpl::BTree"),
 		collimpl->getKeyCountOrDegree());
       
 	if (collimpl->getHashMethod())
@@ -2778,7 +2778,7 @@ do { \
       compAddGenerate(ctx, fd);
     }
 
-    fprintf(fd, "%sreturn Success;\n", ctx->get());
+    fprintf(fd, "%sreturn eyedb::Success;\n", ctx->get());
 
     ctx->pop();
     fprintf(fd, "}\n\n");
@@ -2800,13 +2800,13 @@ do { \
     Status status;
     //const char *_type = (asStructClass() ? "Struct" : "Union");
 
-    fprintf(fd, "static Status %s_comp_realize(Database *db, Class *cls)\n{\n", name);
+    fprintf(fd, "static eyedb::Status %s_comp_realize(eyedb::Database *db, eyedb::Class *cls)\n{\n", name);
 
     ctx->push();
     if (complist->getCount())
       {
-	fprintf(fd, "%sClassComponent *comp;\n", ctx->get());
-	fprintf(fd, "%sStatus status;\n", ctx->get());
+	fprintf(fd, "%seyedb::ClassComponent *comp;\n", ctx->get());
+	fprintf(fd, "%seyedb::Status status;\n", ctx->get());
       }
 
     int sign_declare = 0;
@@ -2820,7 +2820,7 @@ do { \
 	  {
 	    CardinalityConstraint *card = comp->asCardinalityConstraint();
 	    CardinalityDescription *card_desc = card->getCardDesc();
-	    fprintf(fd, "%scomp = new CardinalityConstraint(db, cls, \"%s\", %d, %d, %d, %d);\n",
+	    fprintf(fd, "%scomp = new eyedb::CardinalityConstraint(db, cls, \"%s\", %d, %d, %d, %d);\n",
 		    ctx->get(), card->getAttrname(), card_desc->getBottom(),
 		    card_desc->getBottomExcl(),
 		    card_desc->getTop(), card_desc->getTopExcl());
@@ -2829,12 +2829,12 @@ do { \
 	  {
 	    Trigger *trig = comp->asTrigger();
 	    char *x = purge(trig->getEx()->getExtrefBody());
-	    fprintf(fd, "%scomp = new Trigger(db, cls, (TriggerType)%d, (ExecutableLang)%d, %s, \"%s\", %s, \"%s\");\n",
+	    fprintf(fd, "%scomp = new eyedb::Trigger(db, cls, (eyedb::TriggerType)%d, (eyedb::ExecutableLang)%d, %s, \"%s\", %s, \"%s\");\n",
 		    ctx->get(), trig->getType(),
 		    (trig->getEx()->getLang() & ~SYSTEM_EXEC),
 		    STRBOOL(trig->getEx()->getLang() & SYSTEM_EXEC),
 		    trig->getSuffix(),
-		    trig->getLight() ? "True" : "False",
+		    trig->getLight() ? "eyedb::True" : "eyedb::False",
 		    x);
 	    free(x);
 	  }
@@ -2853,7 +2853,7 @@ do { \
 		sign_declare_realize(fd, ctx);
 	      }
 
-	    fprintf(fd, "%ssign = new Signature();\n",
+	    fprintf(fd, "%ssign = new eyedb::Signature();\n",
 		    ctx->get());
 	    Signature *sign = ex->getSign();
 	    const char *prefix = ((ex->getLoc()&~STATIC_EXEC) == FRONTEND ? "FE" : "BE");
@@ -2887,7 +2887,7 @@ do { \
 	      }
 
 	    fprintf(fd,
-		    "%scomp = new " DEF_PREFIX2 "%sMethod_%s(db, cls, \"%s\", sign, %s, %s, \"%s\");\n",
+		    "%scomp = new eyedb::%sMethod_%s(db, cls, \"%s\", sign, %s, %s, \"%s\");\n",
 		    ctx->get(), prefix, lang, ex->getExname(),
 		    STRBOOL(ex->isStaticExec()),
 		    STRBOOL(ex->getLang() & SYSTEM_EXEC),
@@ -2903,7 +2903,7 @@ do { \
 	  fprintf(fd, "%ssign->release();\n\n", ctx->get());
       }
 
-    fprintf(fd, "%sreturn Success;\n", ctx->get());
+    fprintf(fd, "%sreturn eyedb::Success;\n", ctx->get());
 
     ctx->pop();
     fprintf(fd, "}\n\n");
@@ -2915,7 +2915,7 @@ do { \
   {
     FILE *fdh = ctxH->getFile();
 
-    fprintf(fdh, "%s%s(Database * = 0, const Dataspace * = 0);\n", ctxH->get(), name);
+    fprintf(fdh, "%s%s(eyedb::Database * = 0, const eyedb::Dataspace * = 0);\n", ctxH->get(), name);
 
     /*
       fprintf(fdh, "%s%s(const %s& x) : %s(x) {attrCacheEmpty();}\n",
@@ -2930,7 +2930,7 @@ do { \
     */
 
     fprintf(fdh, "%s%s(const %s& x);\n\n", ctxH->get(), name, name);
-    fprintf(fdh, "%svirtual Object *clone() const "
+    fprintf(fdh, "%svirtual eyedb::Object *clone() const "
 	    "{return new %s(*this);};\n\n", ctxH->get(), name);
 
     fprintf(fdh, "%s%s& operator=(const %s& x);\n\n", ctxH->get(), name, name);
@@ -2970,13 +2970,13 @@ do { \
 	  }
 
 	  if (ex->isStaticExec()) {
-	    fprintf(fd, "%sstatic Status %s(Database *db", ctx->get(),
+	    fprintf(fd, "%sstatic eyedb::Status %s(eyedb::Database *db", ctx->get(),
 		    ex->getExname());
 	    if (sign->getNargs() || !Signature::isVoid(sign->getRettype()))
 	      fprintf(fd, ", ");
 	  }
 	  else
-	    fprintf(fd, "%svirtual Status %s(", ctx->get(), ex->getExname());
+	    fprintf(fd, "%svirtual eyedb::Status %s(", ctx->get(), ex->getExname());
 
 	  sign->declArgs(fd, m);
 	  fprintf(fd, ");\n\n");
@@ -2992,7 +2992,7 @@ do { \
     fprintf(fd, "%sif (!mth)\n", ctx->get());
     fprintf(fd, "%s{\n", ctx->get());
     ctx->push();
-    fprintf(fd, "%sstatus = Method::get(db, "
+    fprintf(fd, "%sstatus = eyedb::Method::get(db, "
 	    "db->getSchema()->getClass(\"%s\"), \"%s\", %s, mth);\n",
 	    ctx->get(), (getAliasName() ? getAliasName() : getName()),
 	    mth->getPrototype(False),
@@ -3001,7 +3001,7 @@ do { \
     fprintf(fd, "%sif (status) return status;\n", ctx->get());
 
     fprintf(fd, "%sif (!mth)\n", ctx->get());
-    fprintf(fd, "%s  return Exception::make(IDB_ERROR, "
+    fprintf(fd, "%s  return eyedb::Exception::make(IDB_ERROR, "
 	    "\"method '%s' not found\");\n", ctx->get(), mth->getPrototype());
     ctx->pop();
     fprintf(fd, "%s}\n\n", ctx->get());
@@ -3017,9 +3017,9 @@ do { \
     Executable *ex = mth->getEx();
     Signature *sign = ex->getSign();
 
-    fprintf(fd, "Status %s::%s(", name, ex->getExname());
+    fprintf(fd, "eyedb::Status %s::%s(", name, ex->getExname());
     if (ex->isStaticExec()) {
-      fprintf(fd, "Database *db");
+      fprintf(fd, "eyedb::Database *db");
       if (sign->getNargs() || !Signature::isVoid(sign->getRettype()))
 	fprintf(fd, ", ");
     }
@@ -3027,32 +3027,32 @@ do { \
     fprintf(fd, ")\n{\n");
     ctx->push();
 
-    fprintf(fd, "%sstatic Method *mth;\n", ctx->get());
-    fprintf(fd, "%sStatus status;\n", ctx->get());
+    fprintf(fd, "%sstatic eyedb::Method *mth;\n", ctx->get());
+    fprintf(fd, "%seyedb::Status status;\n", ctx->get());
 
     generateMethodFetch_C(ctx, mth);
 
 #ifdef NEW_ARGARR
-    fprintf(fd, "%sstatic ArgArray *argarr = new ArgArray(%d, Argument::AutoFullGarbage);\n\n",
+    fprintf(fd, "%sstatic eyedb::ArgArray *argarr = new eyedb::ArgArray(%d, Argument::AutoFullGarbage);\n\n",
 	    ctx->get(), sign->getNargs());
     sign->setArgs(fd, m, IN_ARG_TYPE, "(*argarr)[%d]->", "retarg.", ctx->get());
-    fprintf(fd, "\n%sArgument __retarg;\n", ctx->get());
-    fprintf(fd, "%sstatus = mth->applyTo(db, %s, *argarr, __retarg, False);\n\n",
+    fprintf(fd, "\n%seyedb::Argument __retarg;\n", ctx->get());
+    fprintf(fd, "%sstatus = mth->applyTo(db, %s, *argarr, __retarg, eyedb::False);\n\n",
 	    ctx->get(), (mth->getEx()->isStaticExec() ? "0" : "this"));
     fprintf(fd, "%sif (status) return status;\n\n", ctx->get());
     sign->retArgs(fd, m, "(*argarr)[%d]->", "__retarg.", ctx->get());
 #else
-    fprintf(fd, "%sArgArray argarr(%d, Argument::AutoFullGarbage);\n\n",
+    fprintf(fd, "%seyedb::ArgArray argarr(%d, eyedb::Argument::AutoFullGarbage);\n\n",
 	    ctx->get(), sign->getNargs());
     sign->setArgs(fd, m, IN_ARG_TYPE, "argarr[%d]->", "retarg.", ctx->get());
-    fprintf(fd, "\n%sArgument __retarg;\n", ctx->get());
-    fprintf(fd, "%sstatus = mth->applyTo(db, %s, argarr, __retarg, False);\n\n",
+    fprintf(fd, "\n%seyedb::Argument __retarg;\n", ctx->get());
+    fprintf(fd, "%sstatus = mth->applyTo(db, %s, argarr, __retarg, eyedb::False);\n\n",
 	    ctx->get(), (mth->getEx()->isStaticExec() ? "0" : "this"));
     fprintf(fd, "%sif (status) return status;\n\n", ctx->get());
     sign->retArgs(fd, m, "argarr[%d]->", "__retarg.", ctx->get());
 #endif
 
-    fprintf(fd, "%sreturn Success;\n}\n\n", ctx->get());
+    fprintf(fd, "%sreturn eyedb::Success;\n}\n\n", ctx->get());
     ctx->pop();
 
     return Success;
@@ -3063,7 +3063,7 @@ do { \
   {
     fprintf(fd, "  _packageInit(_db);\n");
     fprintf(fd, "\n  //\n  // User Implementation\n  //\n\n");
-    fprintf(fd, "  return Success;\n");
+    fprintf(fd, "  return eyedb::Success;\n");
   }
 
   Status
@@ -3099,10 +3099,10 @@ do { \
     fprintf(fdmth, "//\n// %s [%s.cc]\n//\n\n", mth->getPrototype(),
 	    mth->getEx()->getExtrefBody());
     fprintf(fdmth, "Status\n");
-    fprintf(fdmth, "__%s(Database *_db, " DEF_PREFIX2 "%sMethod_%s *_m%s",
+    fprintf(fdmth, "__%s(eyedb::Database *_db, eyedb::%sMethod_%s *_m%s",
 	    intname,
 	    prefix, lang,
-	    (ex->isStaticExec() ? "" : ", Object *_o"));
+	    (ex->isStaticExec() ? "" : ", eyedb::Object *_o"));
     
     if (sign->getNargs() || !Signature::isVoid(sign->getRettype()))
       fprintf(fdmth, ", ");
@@ -3113,11 +3113,11 @@ do { \
     userImpl(fdmth);
     fprintf(fdmth, "}\n\n");
 
-    fprintf(fdstubs, "extern Status __%s(Database *_db, "
-	    DEF_PREFIX2 "%sMethod_%s *_m%s",
+    fprintf(fdstubs, "extern eyedb::Status __%s(eyedb::Database *_db, "
+	    "eyedb::%sMethod_%s *_m%s",
 	    intname,
 	    prefix, lang,
-	    (ex->isStaticExec() ? "" : ", Object *_o"));
+	    (ex->isStaticExec() ? "" : ", eyedb::Object *_o"));
 
     if (sign->getNargs() || !Signature::isVoid(sign->getRettype()))
       fprintf(fdstubs, ", ");
@@ -3125,14 +3125,14 @@ do { \
     sign->declArgs(fdstubs, m);
     fprintf(fdstubs, ");\n\n");
   
-    fprintf(fdstubs, "extern \"C\" Status\n");
-    fprintf(fdstubs, "%s(Database *_db, " DEF_PREFIX2 "%sMethod_%s *_m, "
-	    "Object *_o, ArgArray &_array, Argument &__retarg)\n{\n",
+    fprintf(fdstubs, "extern \"C\" eyedb::Status\n");
+    fprintf(fdstubs, "%s(eyedb::Database *_db, eyedb::%sMethod_%s *_m, "
+	    "eyedb::Object *_o, eyedb::ArgArray &_array, eyedb::Argument &__retarg)\n{\n",
 	    intname,
 	    prefix, lang);
 
     ctxStubs->push();
-    fprintf(fdstubs, "%sStatus status;\n\n", ctxStubs->get());
+    fprintf(fdstubs, "%seyedb::Status status;\n\n", ctxStubs->get());
 
     sign->initArgs(fdstubs, m, "_array[%d]->", "_retarg", ctxStubs->get());
 
@@ -3151,7 +3151,7 @@ do { \
     sign->setArgs(fdstubs, m, OUT_ARG_TYPE, "_array[%d]->", "__retarg.",
 		  ctxStubs->get());
 
-    fprintf(fdstubs, "%sreturn Success;\n}\n\n", ctxStubs->get());
+    fprintf(fdstubs, "%sreturn eyedb::Success;\n}\n\n", ctxStubs->get());
     ctxStubs->pop();
 
     return Success;
@@ -3166,8 +3166,8 @@ do { \
 
     fprintf(fdmth, "//\n// %s\n//\n\n", trig->getPrototype());
     fprintf(fdmth, "extern \"C\"\n");
-    fprintf(fdmth, "Status %s(TriggerType type, Database *_db, "
-	    "const Oid &oid, Object *o)\n{\n",
+    fprintf(fdmth, "eyedb::Status %s(eyedb::TriggerType type, eyedb::Database *_db, "
+	    "const eyedb::Oid &oid, eyedb::Object *o)\n{\n",
 	    trig->getCSym());
     userImpl(fdmth);
     fprintf(fdmth, "}\n\n");
@@ -3347,17 +3347,17 @@ do { \
       fprintf(fdh, "%svirtual void garbage();\n", ctxH.get());
 
     //  fprintf(fdh, "%s%s(Database *_db, int) : ", ctxH.get(), name);
-    fprintf(fdh, "%s%s(Database *_db, const Dataspace *_dataspace, int) : ", ctxH.get(), name);
+    fprintf(fdh, "%s%s(eyedb::Database *_db, const eyedb::Dataspace *_dataspace, int) : ", ctxH.get(), name);
 
     const_f0(fdh, parent, "_db, _dataspace");
 
     fprintf(fdh, " {}\n");
-    fprintf(fdh, "%s%s(const Struct *x, Bool share, int) : ",
+    fprintf(fdh, "%s%s(const eyedb::Struct *x, eyedb::Bool share, int) : ",
 	    ctxH.get(), name);
     const_f01(fdh, parent, "x");
     fprintf(fdh, " {}\n");
 
-    fprintf(fdh, "%s%s(const %s *x, Bool share, int) : ", ctxH.get(), name, name);
+    fprintf(fdh, "%s%s(const %s *x, eyedb::Bool share, int) : ", ctxH.get(), name, name);
     const_f01(fdh, parent, "x");
 
     fprintf(fdh, " {}\n");
@@ -3372,7 +3372,7 @@ do { \
 
     fprintf(fdh, " private:\n", ctxH.get());
   
-    fprintf(fdh, "%svoid initialize(Database *_db);\n", ctxH.get());
+    fprintf(fdh, "%svoid initialize(eyedb::Database *_db);\n", ctxH.get());
 
     if (attr_cache)
       {
@@ -3384,11 +3384,11 @@ do { \
       }
 
     fprintf(fdh, "\n public: /* restricted */\n", ctxH.get());
-    fprintf(fdh, "%s%s(const Struct *, Bool = False);\n",
+    fprintf(fdh, "%s%s(const eyedb::Struct *, eyedb::Bool = eyedb::False);\n",
 	    ctxH.get(), name);
-    fprintf(fdh, "%s%s(const %s *, Bool = False);\n",
+    fprintf(fdh, "%s%s(const %s *, eyedb::Bool = eyedb::False);\n",
 	    ctxH.get(), name, name);
-    fprintf(fdh, "%s%s(const Class *, Data);\n", ctxH.get(), name);
+    fprintf(fdh, "%s%s(const eyedb::Class *, eyedb::Data);\n", ctxH.get(), name);
 
     fprintf(fdh, "};\n\n");
 
@@ -3403,19 +3403,19 @@ do { \
     FILE *fd = ctx->getFile();
     Status status;
 
-    fprintf(fd, "static Size %s_idr_objsz, %s_idr_psize;\n\n", name, name);
+    fprintf(fd, "static eyedb::Size %s_idr_objsz, %s_idr_psize;\n\n", name, name);
 
-    fprintf(fd, "static EnumClass *%s_make(EnumClass *%s_class = 0, Schema *m = 0)\n{\n", name, name);
+    fprintf(fd, "static eyedb::EnumClass *%s_make(eyedb::EnumClass *%s_class = 0, eyedb::Schema *m = 0)\n{\n", name, name);
 
     ctx->push();
     fprintf(fd, "%sif (!%s_class)\n", ctx->get(), name);
-    fprintf(fd, "%s  return new EnumClass(\"%s\");\n", ctx->get(), getAliasName());
+    fprintf(fd, "%s  return new eyedb::EnumClass(\"%s\");\n", ctx->get(), getAliasName());
 
-    fprintf(fd, "%sEnumItem *en[%d];\n", ctx->get(), items_cnt);
+    fprintf(fd, "%seyedb::EnumItem *en[%d];\n", ctx->get(), items_cnt);
 
     int i;
     for (i = 0; i < items_cnt; i++)
-      fprintf(fd, "%sen[%d] = new EnumItem(\"%s\", \"%s\", (unsigned int)%d);\n",
+      fprintf(fd, "%sen[%d] = new eyedb::EnumItem(\"%s\", \"%s\", (unsigned int)%d);\n",
 	      ctx->get(),
 	      i, items[i]->getName(), items[i]->getAliasName(),
 	      items[i]->getValue());
@@ -3429,7 +3429,7 @@ do { \
     fprintf(fd, "\n");
 
     if (isSystem() || odl_system_class)
-      fprintf(fd, "%sClassPeer::setMType(%s_class, Class::System);\n",
+      fprintf(fd, "%seyedb::ClassPeer::setMType(%s_class, eyedb::Class::System);\n",
 	      ctx->get(), name);
 
     fprintf(fd, "\n%sreturn %s_class;\n}\n\n", ctx->get(), name);
@@ -3444,7 +3444,7 @@ do { \
     fprintf(fd, "%s%s_idr_objsz = %s%s->getIDRObjectSize(&%s_idr_psize, 0);\n\n",
 	    ctx->get(), name, name, classSuffix, name);
 
-    fprintf(fd, "%sObjectPeer::setUnrealizable(%s%s, True);\n",
+    fprintf(fd, "%seyedb::ObjectPeer::setUnrealizable(%s%s, eyedb::True);\n",
 	    ctx->get(), name, classSuffix);
     fprintf(fd, "}\n\n");
     ctx->pop();
@@ -3525,12 +3525,12 @@ do { \
     class_enums = hints.class_enums;
     attr_cache  = hints.attr_cache;
 
-    fprintf(fdc, "static " DEF_PREFIX "%sClass *%s_make(" DEF_PREFIX "%sClass *cls = 0, Schema *m = 0)\n{\n", _type, c_name, _type);
+    fprintf(fdc, "static eyedb::%sClass *%s_make(eyedb::%sClass *cls = 0, eyedb::Schema *m = 0)\n{\n", _type, c_name, _type);
     ctxC.push();
 
     fprintf(fdc, "%sif (!cls)\n%s  {\n", ctxC.get(), ctxC.get());
 
-    fprintf(fdc, "%s    cls = new " DEF_PREFIX "%sClass((m ? m->getClass(\"%s\") : %s%s), ",
+    fprintf(fdc, "%s    cls = new eyedb::%sClass((m ? m->getClass(\"%s\") : %s%s), ",
 	    ctxC.get(), _type, coll_class->getAliasName(), // changed 27/04/00
 	    (coll_class->asCollectionClass() ? coll_class->getCName() :
 	     className(coll_class)), classSuffix);
@@ -3538,9 +3538,9 @@ do { \
     if (dim > 1)
       fprintf(fdc, "%d);\n", dim);
     else
-      fprintf(fdc, "%s);\n", (isref ? "True" : "False"));
+      fprintf(fdc, "%s);\n", (isref ? "eyedb::True" : "eyedb::False"));
 
-    fprintf(fdc, "%s    ClassPeer::setMType(cls, Class::System);\n",
+    fprintf(fdc, "%s    eyedb::ClassPeer::setMType(cls, eyedb::Class::System);\n",
 	    ctxC.get());
     fprintf(fdc, "%s  }\n", ctxC.get());
 
