@@ -37,25 +37,12 @@
 using namespace eyedb;
 using namespace std;
 
-namespace eyedb {
-  extern void init(int &argc, char *argv[], string *sv_port, string *sv_host,
-		   bool purgeargv);
-}
-
 static int
 usage(const char *prog)
 {
-#if 1
   cerr << "usage: " << prog << " ";
   print_common_usage(cerr);
   cerr << " start|stop|status [-f] [--creating-dbm] [-h|--help]\n";
-#else
-  static const char etc[] = "{eyedbd options}";
-  fprintf(stderr, "usage: %s start [-f] %s\n", prog, etc);
-  fprintf(stderr, "       %s stop [-f] %s\n", prog, etc);
-  fprintf(stderr, "       %s status %s\n", prog, etc);
-  fprintf(stderr, "\nwhere %s is as follows:\n%s\n", etc, eyedb::getSrvOptionsUsage());
-#endif
 
   return 1;
 }
@@ -219,26 +206,54 @@ startServer(int argc, char *argv[], const char *smdport)
   return status;
 }
 
+static void make_host_port(const char *_listen, const char *&host,
+			   const char *&port)
+{
+  char *listen = strdup(_listen);
+
+  char *p;
+  if (p = strchr(listen, ','))
+    *p = 0;
+
+  if (p = strchr(listen, ':')) {
+    *p = 0;
+    host = listen;
+    port = p+1;
+  }
+  else {
+    host = "localhost";
+    port = listen;
+  }
+}
+
+static int checkPostInstall(Bool creatingDbm)
+{
+  if (!creatingDbm) {
+    const char *dbm = eyedb::getConfigValue("sv_dbm");
+    if (!dbm || access(dbm, R_OK)) {
+      fprintf(stderr, "\nThe EYEDBDBM database file '%s' is not accessible\n",
+	      dbm);
+      fprintf(stderr, "Did you run the post install script 'eyedb-postinstall.sh' ?\n");
+      fprintf(stderr, "If yes, check file eyedb.conf.\n");
+      return 1;
+    }
+  }
+  return 0;
+}
+
 int
 main(int argc, char *argv[])
 {
-  const char *idbport, *smdport, *logdir, *s, *idbserv;
+  const char *listen, *smdport, *s;
   eyedbsm::Status status;
   Bool force = False;
   Bool creatingDbm = False;
   string sv_host, sv_port;
 
-  eyedb::init(argc, argv, &sv_host, &sv_port, false);
+  string sv_listen;
+  eyedb::init(argc, argv, &sv_listen, false);
 
-  idbport = 0;
-  logdir = 0;
-  idbserv = 0;
-
-  if (sv_port.length())
-    idbport = sv_port.c_str();
-
-  if (sv_host.length())
-    idbserv = sv_port.c_str();
+  listen = sv_listen.c_str();
 
   if (argc < 2)
     return usage(argv[0]);
@@ -269,13 +284,8 @@ main(int argc, char *argv[])
       return 0;
     }
   }
-
-  if (!idbport) {
-    if (s = eyedb::getConfigValue("sv_port"))
-      idbport = s;
-    else
-      idbport = Connection::DefaultIDBPortValue;
-  }
+  if (!*listen && (s = eyedb::getConfigValue("listen")))
+    listen = s;
 
   smdport = smd_get_port();
 
@@ -288,28 +298,17 @@ main(int argc, char *argv[])
   if (cmd == Start) {
     int st = force + creatingDbm;
 
-    if (!creatingDbm) {
-      const char *dbm = eyedb::getConfigValue("sv_dbm");
-      if (!dbm || access(dbm, R_OK)) {
-	fprintf(stderr, "\nThe EYEDBDBM database file '%s' is not accessible\n",
-		dbm);
-	fprintf(stderr, "Did you run the post install script 'eyedb-postinstall.sh' ?\n");
-	fprintf(stderr, "If yes, check file eyedb.conf.\n");
-	return 1;
-      }
-    }
+    if (checkPostInstall(creatingDbm))
+      return 1;
 
     ac = argc - st;
     av = &argv[st+1];
   }
 
-  if (strchr(idbport, ',')) {
-    char *x = strdup(idbport);
-    *strchr(x, ',') = 0;
-    idbport = x;
-  }
-	    
-  SessionLog sesslog(idbport, eyedb::getConfigValue("sv_tmpdir"));
+  const char *host, *port;
+  make_host_port(listen, host, port);
+    
+  SessionLog sesslog(host, port, eyedb::getConfigValue("sv_tmpdir"));
 
   if (sesslog.getStatus()) {
     if (cmd == Start)

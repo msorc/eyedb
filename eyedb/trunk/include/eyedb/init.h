@@ -34,6 +34,7 @@ namespace eyedb {
 
   void init();
   void init(int &argc, char *argv[]);
+  void init(int &argc, char *argv[], std::string *listen, bool purgeargv);
   void release();
 
   /**

@@ -68,8 +68,12 @@ usage()
   fprintf(stderr, "   -cgi            : cgi to use for the 'show' command\n");
   fprintf(stderr, "   -wid            : window identifier to use with the 'show' command\n");
 #endif
-  fprintf(stderr, "\neyedb standard options :\n");
-  fprintf(stderr, "   %s\n", eyedb::getStdOptionsUsage());
+
+  fflush(stderr);
+
+  cerr << "\nCommon Options:\n";
+  print_common_help(cerr);
+  cerr << "\n";
   return 1;
 }
 

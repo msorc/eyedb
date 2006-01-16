@@ -26,6 +26,7 @@
 #define _EYEDB_OPTS_H
 
 class GetOpt;
+
 #include <vector>
 
 namespace eyedb {
@@ -35,9 +36,11 @@ namespace eyedb {
      @{
   */
 
+  /*
   const char *getStdOptionsUsage(void);
   const char *getStdOptionsHelp(const char *indent = "\t");
   const char *getSrvOptionsUsage(void);
+  */
 
   void print_standard_usage(GetOpt &getopt, const std::string &append = "",
 			    std::ostream &os = std::cerr);

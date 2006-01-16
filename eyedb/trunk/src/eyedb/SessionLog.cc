@@ -18,7 +18,7 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
+  Author: Eric Viara <viara@sysra.com>
 */
 
 #include <eyedbconfig.h>
@@ -59,6 +59,7 @@ namespace eyedb {
     time_t start;
     char smdport[PORTLEN+1];
     int nports;
+    char hosts[MAXPORTS][PORTLEN+1];
     char ports[MAXPORTS][PORTLEN+1];
     int uid;
     int pid;
@@ -78,6 +79,7 @@ namespace eyedb {
   struct ClientInfo {
     time_t start;
     char hostname[64];
+    char portname[64];
     char username[64];
     char progname[128];
     int n_dbs;
@@ -108,11 +110,11 @@ namespace eyedb {
   //#define CONNLOG_SIZE 0x10000
 #define CONNLOG_SIZE (sizeof(SessionHead) + 128 * sizeof(ClientInfo))
 
-  SessionLog::SessionLog(const char *port, const char *logdir)
+  SessionLog::SessionLog(const char *host, const char *port, const char *logdir)
   {
     islocked = False;
     addr_connlog = 0;
-    status = openRealize(port, logdir, False);
+    status = openRealize(host, port, logdir, False);
     if (!status) {
       sesslog = this;
       eyedbsm::mutexLightInit(0, &mp, (connhead ? &connhead->mp : 0));
@@ -121,7 +123,7 @@ namespace eyedb {
 
   // create constructor
   SessionLog::SessionLog(const char *logdir, const char *version,
-			 int nports, const char *ports[],
+			 int nports, const char *hosts[], const char *ports[],
 			 const char *datdir,
 			 const char *logdev, int loglevel)
   {
@@ -129,22 +131,20 @@ namespace eyedb {
 
     islocked = False;
     addr_connlog = 0;
-    status = openRealize(ports[0], logdir, True);
+    status = openRealize(hosts[0], ports[0], logdir, True);
 
     if (status)
       return;
 
     file_cnt = nports;
-    if (file_cnt > 1)
-      {
-	files = (char **)realloc(files, file_cnt * sizeof(char *));
+    if (file_cnt > 1) {
+      files = (char **)realloc(files, file_cnt * sizeof(char *));
 
-	for (i = 1; i < file_cnt; i++)
-	  {
-	    files[i] = makeFile(ports[i], logdir);
-	    symlink(files[0], files[i]);
-	  }
+      for (i = 1; i < file_cnt; i++) {
+	files[i] = makeFile(hosts[i], ports[i], logdir);
+	symlink(files[0], files[i]);
       }
+    }
 
     sesslog = this;
 
@@ -156,22 +156,22 @@ namespace eyedb {
     strncpy(connhead->smdport, smd_get_port(), PORTLEN);
     connhead->smdport[PORTLEN] = 0;
     connhead->nports = nports;
-    for (i = 0; i < nports; i++)
-      {
-	strncpy(connhead->ports[i], ports[i], PORTLEN);
-	connhead->ports[i][PORTLEN] = 0;
-      }
+    for (i = 0; i < nports; i++) {
+      strncpy(connhead->hosts[i], hosts[i], PORTLEN);
+      connhead->hosts[i][PORTLEN] = 0;
+      strncpy(connhead->ports[i], ports[i], PORTLEN);
+      connhead->ports[i][PORTLEN] = 0;
+    }
 
     strncpy(connhead->datdir, datdir, DATDIRLEN);
     connhead->datdir[DATDIRLEN] = 0;
     connhead->pid = getpid();
     connhead->uid = getuid();
 
-    if (logdev)
-      {
-	strncpy(connhead->logdev, logdev, LOGDEVLEN);
-	connhead->logdev[LOGDEVLEN] = 0;
-      }
+    if (logdev) {
+      strncpy(connhead->logdev, logdev, LOGDEVLEN);
+      connhead->logdev[LOGDEVLEN] = 0;
+    }
 
     connhead->loglevel = loglevel;
     connhead->conn_first = XM_NULLOFFSET;
@@ -183,15 +183,14 @@ namespace eyedb {
   {
     if (rpc_portIsAddress(rs)) return strdup(rs);
     char *s, *os;
-    if (*rs != '/')
-      {
-	char path[512];
-	getcwd(path, (sizeof path)-1);
-	s = (char *)malloc(strlen(path)+strlen(rs)+2);
-	strcpy(s, path);
-	strcat(s, "/");
-	strcat(s, rs);
-      }
+    if (*rs != '/') {
+      char path[512];
+      getcwd(path, (sizeof path)-1);
+      s = (char *)malloc(strlen(path)+strlen(rs)+2);
+      strcpy(s, path);
+      strcat(s, "/");
+      strcat(s, rs);
+    }
     else
       s = strdup(rs);
 
@@ -208,47 +207,41 @@ namespace eyedb {
     if (*s == '/')
       s++;
 
-    for (;;)
-      {
-	int stopafter = 0;
-	if (!(p = strchr(s, '/')))
-	  {
-	    p = s + strlen(s);
-	    stopafter = 1;
-	  }
-
-	char *q = (char *)malloc(p-s+1);
-	strncpy(q, s, p-s);
-	q[p-s] = 0;
-	if (!strcmp(q, ".."))
-	  {
-	    sx_cnt--;
-	    free(sx[sx_cnt]);
-	    free(q);
-	  }
-	else
-	  {
-	    if (sx_cnt >= sx_alloc)
-	      {
-		sx_alloc++;
-		sx = (char **)realloc(sx, sx_alloc*sizeof(char *));
-	      }
-	    sx[sx_cnt] = q;
-	    sx_cnt++;
-	  }
-
-	if (stopafter)
-	  break;
-	s = p+1;
+    for (;;) {
+      int stopafter = 0;
+      if (!(p = strchr(s, '/'))) {
+	p = s + strlen(s);
+	stopafter = 1;
       }
+
+      char *q = (char *)malloc(p-s+1);
+      strncpy(q, s, p-s);
+      q[p-s] = 0;
+      if (!strcmp(q, "..")) {
+	sx_cnt--;
+	free(sx[sx_cnt]);
+	free(q);
+      }
+      else {
+	if (sx_cnt >= sx_alloc) {
+	  sx_alloc++;
+	  sx = (char **)realloc(sx, sx_alloc*sizeof(char *));
+	}
+	sx[sx_cnt] = q;
+	sx_cnt++;
+      }
+
+      if (stopafter)
+	break;
+      s = p+1;
+    }
 
     *r = 0;
-    for (int i = 0; i < sx_cnt; i++)
-      {
-	strcat(r, "/");
-	strcat(r, sx[i]);
-	free(sx[i]);
-      }
+    for (int i = 0; i < sx_cnt; i++) {
+      strcat(r, "/");
+      strcat(r, sx[i]);
+      free(sx[i]);
+    }
 
     free(sx);
     free(os);
@@ -256,7 +249,7 @@ namespace eyedb {
   }
 
   char *
-  SessionLog::makeFile(const char *_idbport, const char *_logdir)
+  SessionLog::makeFile(const char *_host, const char *_port, const char *_logdir)
   {
     static const char conn_prefix[] = ".eyedb_";
     static const char conn_suffix[] = ".con";
@@ -264,51 +257,15 @@ namespace eyedb {
     char *logdir;
     char *file;
 
-    //printf("idbSessionsLog::makeFile(%s, %s)\n", _idbport, (_logdir ? _logdir : "null"));
-  
-    if (!_logdir || !_idbport)
+    if (!_logdir || !_port)
       return 0;
 
-    idbport = strdup(_idbport);
-    // the following code has been replaced by the truedir fonction:
-#if 0
-    char *idbport_file = strdup(_idbport);
+    port = strdup(_port);
+    host = strdup(_host);
 
-    char *p = idbport_file;
-    int n;
-    for (n = 0; ;n++)
-      {
-	if (*p != '.' || *(p+1) != '.')
-	  break;
-
-	char *q = strchr(p+1, '/');
-	if (!q)
-	  break;
-	p = q+1;
-      }
-
-    if (n)
-      {
-	char path[512];
-	getcwd(path, (sizeof path)-1);
-	char *q = path;
-	while (n--)
-	  {
-	    q = strrchr(path, '/');
-	    if (!q)
-	      break;
-	    *q = 0;
-	  }
-	q = (char *)malloc(strlen(path)+strlen(p)+2);
-	sprintf(q, "%s/%s", path, p);
-	free(idbport_file);
-	idbport_file = q;
-      }
-#endif
-
-    char *idbport_file = truedir(_idbport);
+    char *port_file = truedir((std::string(host) + ":" + _port).c_str());
       
-    char *p = idbport_file;
+    char *p = port_file;
     while (p = strchr(p, '/'))
       *p = '_';
 
@@ -319,21 +276,20 @@ namespace eyedb {
     file = (char *)malloc(strlen(logdir) +
 			  1 + /* / */
 			  strlen(conn_prefix) +
-			  strlen(idbport_file) +
+			  strlen(port_file) +
 			  1 + /* : */
 			  strlen(hostname) +
 			  strlen(conn_suffix) +
 			  1);
   
-    sprintf(file, "%s/%s%s_%s%s", logdir, conn_prefix, idbport_file, hostname,
+    sprintf(file, "%s/%s%s_%s%s", logdir, conn_prefix, port_file, hostname,
 	    conn_suffix);
 
-    //printf("idbSessionsLog::makeFile() returns '%s'\n", file);
     return file;
   }
 
   Status
-  SessionLog::openRealize(const char *port, const char *logdir,
+  SessionLog::openRealize(const char *host, const char *port, const char *logdir,
 			  Bool create)
   {
     Error err = (create ? IDB_SESSION_LOG_CREATION_ERROR :
@@ -341,7 +297,7 @@ namespace eyedb {
     int fd;
     file_cnt = 1;
     files = (char **)malloc(file_cnt * sizeof(char *));
-    files[0] = makeFile(port, logdir);
+    files[0] = makeFile(host, port, logdir);
 
     xm_connlog = 0;
 
@@ -351,26 +307,18 @@ namespace eyedb {
     if (create)
       fd = open(files[0], O_CREAT | O_TRUNC | O_RDWR,
 		0600 /*SE_DEFAULT_CREATION_MODE*/);
-    else
-      {
-	if (access(files[0], F_OK) < 0)
-	  return Exception::make(IDB_ERROR,
-				 "cannot access connection log file '%s'",
-				 files[0]);
-	/*
-	  {
-	  connhead = 0;
-	  return Success;
-	  }
-	*/
-
-	if (access(files[0], R_OK) < 0)
-	  return Exception::make(IDB_ERROR,
-				 "cannot open connection log file '%s' "
-				 "for reading", files[0]);
-	fd = open(files[0], O_RDWR);
-      }
-
+    else {
+      if (access(files[0], F_OK) < 0)
+	return Exception::make(IDB_ERROR,
+			       "cannot access connection log file '%s'",
+			       files[0]);
+      if (access(files[0], R_OK) < 0)
+	return Exception::make(IDB_ERROR,
+			       "cannot open connection log file '%s' "
+			       "for reading", files[0]);
+      fd = open(files[0], O_RDWR);
+    }
+    
     if (fd < 0 && create)
       return Exception::make(err,
 			     "cannot %s connection log file '%s'",
@@ -380,41 +328,36 @@ namespace eyedb {
       return Success;
 
 
-    if (create && ftruncate(fd, CONNLOG_SIZE) < 0)
-      {
-	close(fd);
-	return Exception::make(err,
-			       "cannot create connection log file '%s'", files[0]);
-      }
+    if (create && ftruncate(fd, CONNLOG_SIZE) < 0) {
+      close(fd);
+      return Exception::make(err,
+			     "cannot create connection log file '%s'", files[0]);
+    }
 
     if (!(m_connlog = m_mmap(0, CONNLOG_SIZE, PROT_READ|PROT_WRITE,
 			     MAP_SHARED, fd, 0, (char **)&addr_connlog,
-			     files[0], 0, 0)))
-      {
+			     files[0], 0, 0))) {
+      close(fd);
+      return Exception::make(err,
+			     "cannot map connection log file '%s' for size %d",
+			     files[0], CONNLOG_SIZE);
+    }
+    
+    if (!create) {
+      struct stat st;
+      if (fstat(fd, &st) < 0) {
+	close(fd);
+	return Exception::make(err, "cannot stat connection "
+			       "log file '%s'", files[0]);
+      }
+
+      if (st.st_size < CONNLOG_SIZE && ftruncate(fd, CONNLOG_SIZE) < 0) {
 	close(fd);
 	return Exception::make(err,
-			       "cannot map connection log file '%s' for size %d",
-			       files[0], CONNLOG_SIZE);
+			       "cannot create connection "
+			       "log file '%s'", files[0]);
       }
-
-    if (!create)
-      {
-	struct stat st;
-	if (fstat(fd, &st) < 0)
-	  {
-	    close(fd);
-	    return Exception::make(err, "cannot stat connection "
-				   "log file '%s'", files[0]);
-	  }
-
-	if (st.st_size < CONNLOG_SIZE && ftruncate(fd, CONNLOG_SIZE) < 0)
-	  {
-	    close(fd);
-	    return Exception::make(err,
-				   "cannot create connection "
-				   "log file '%s'", files[0]);
-	  }
-      }
+    }
 
     close(fd);
     m_lock(m_connlog);
@@ -435,7 +378,8 @@ namespace eyedb {
   }
 
   Status
-  SessionLog::add(const char *hostname, const char *username,
+  SessionLog::add(const char *hostname, const char *portname,
+		  const char *username,
 		  const char *progname, int pid,
 		  ClientSessionLog*& clientLog)
   {
@@ -450,6 +394,7 @@ namespace eyedb {
 
     time(&conninfo->start);
     strncpy(conninfo->hostname, hostname, sizeof(conninfo->hostname)-1);
+    strncpy(conninfo->portname, portname, sizeof(conninfo->portname)-1);
     strncpy(conninfo->username, username, sizeof(conninfo->username)-1);
     strncpy(conninfo->progname, progname, sizeof(conninfo->progname)-1);
 
@@ -468,12 +413,11 @@ namespace eyedb {
     conninfo->conn_next = connhead->conn_first;
     conninfo->conn_prev = XM_NULLOFFSET;
 
-    if (connhead->conn_first)
-      {
-	ClientInfo *first = (ClientInfo *)
-	  XM_ADDR(xm_connlog, connhead->conn_first);
-	first->conn_prev = XM_OFFSET(xm_connlog, conninfo);
-      }
+    if (connhead->conn_first) {
+      ClientInfo *first = (ClientInfo *)
+	XM_ADDR(xm_connlog, connhead->conn_first);
+      first->conn_prev = XM_OFFSET(xm_connlog, conninfo);
+    }
 
     connhead->conn_first = XM_OFFSET(xm_connlog, conninfo);
     connhead->nconns++;
@@ -538,7 +482,8 @@ namespace eyedb {
   check_server(ClientInfo *conninfo)
   {
     // solaris only?
-    if (access((std::string("/proc/") + str_convert((long)conninfo->backend_pid)).
+    if (access((std::string("/proc/") +
+		str_convert((long)conninfo->backend_pid)).
 	       c_str(), F_OK) >= 0)
       return True;
     return False;
@@ -547,11 +492,6 @@ namespace eyedb {
   int
   SessionLog::get_nb_clients()
   {
-    /*
-      if (!xm_connlog)
-      return 0;
-    */
-
     ClientInfo *conninfo =
       (ClientInfo *)XM_ADDR(xm_connlog, connhead->conn_first);
 
@@ -559,13 +499,12 @@ namespace eyedb {
     for (int n = connhead->nconns-1; n >= 1; n--)
       conninfo = (ClientInfo *)XM_ADDR(xm_connlog, conninfo->conn_next);
 
-    while(conninfo)
-      {
-	if (check_server(conninfo))
-	  nb_clients++;
+    while(conninfo) {
+      if (check_server(conninfo))
+	nb_clients++;
 
-	conninfo = (ClientInfo *)XM_ADDR(xm_connlog, conninfo->conn_prev);
-      }
+      conninfo = (ClientInfo *)XM_ADDR(xm_connlog, conninfo->conn_prev);
+    }
 
     return nb_clients;
   }
@@ -577,43 +516,39 @@ namespace eyedb {
 
     if (!connhead)
       {
-	fprintf(fd, "EyeDB server port %s is down\n", idbport);
+	fprintf(fd, "EyeDB Server %s:%s is down\n", host, port);
 	return;
       }
 
-    if (!nolock)
-      {
+    if (!nolock) {
 #ifdef TRACE
-	fprintf(stderr, "SessionLog %d tries to locked\n", getpid());
+      fprintf(stderr, "SessionLog %d tries to locked\n", getpid());
 #endif
-	eyedbsm_mutexLock(&mp, 0);
+      eyedbsm_mutexLock(&mp, 0);
 #ifdef TRACE
-	fprintf(stderr, "SessionLog %d is locked\n", getpid());
+      fprintf(stderr, "SessionLog %d is locked\n", getpid());
 #endif
-	islocked = True;
-      }
-    else if (sesslog && sesslog->islocked)
-      {
+      islocked = True;
+    }
+    else if (sesslog && sesslog->islocked) {
 #ifdef TRACE
-	fprintf(stderr, "Warning SessionLog is locked by %d\n",
-		sesslog->connhead->pid);
+      fprintf(stderr, "Warning SessionLog is locked by %d\n",
+	      sesslog->connhead->pid);
 #endif
-      }
+    }
 
-    if (!connhead->up)
-      {
-	fprintf(fd, "EyeDB server port %s is down from %s", idbport,
-		ctime(&connhead->start));
-	if (!nolock)
-	  {
-	    eyedbsm_mutexUnlock(&mp, 0);
+    if (!connhead->up) {
+      fprintf(fd, "EyeDB Server %s:%s is down from %s", host, port,
+	      ctime(&connhead->start));
+      if (!nolock) {
+	eyedbsm_mutexUnlock(&mp, 0);
 #ifdef TRACE
-	    fprintf(stderr, "SessionLog %d is UNlocked\n", getpid());
+	fprintf(stderr, "SessionLog %d is UNlocked\n", getpid());
 #endif
-	    islocked = False;
-	  }
-	return;
+	islocked = False;
       }
+      return;
+    }
 
     fprintf(fd, "EyeDB Server is up from %s\n",
 	    ctime(&connhead->start));
@@ -625,35 +560,43 @@ namespace eyedb {
     fprintf(fd, "  Running Under %s\n\n", getUserName(connhead->uid));
 
     fprintf(fd, "  SMD Port      %s\n", connhead->smdport);
-    fprintf(fd, "  Listening Port%s ", (connhead->nports > 1 ? "s" : ""));
-    for (n = 0; n < connhead->nports; n++)
-      fprintf(fd, "%s%s", (n ? ", " : ""), connhead->ports[n]);
+    
+    fprintf(fd, "  Listening on  ");
+
+    const char *indent;
+    if (connhead->nports > 1) {
+      indent =  "\n                ";
+    }
+    else
+      indent = "";
+
+    for (n = 0; n < connhead->nports; n++) {
+      fprintf(fd, "%s%s:%s", (n ? indent : ""), connhead->hosts[n],
+	      connhead->ports[n]);
+    }
 
     fprintf(fd, "\n  Datafile Directory %s\n", connhead->datdir);
 
-    if (*connhead->logdev)
-      {
-	fprintf(fd, "  Log Device '%s'\n", connhead->logdev);
-	if (connhead->loglevel)
-	  fprintf(fd, "  Log Level %d\n", connhead->loglevel);
-      }
+    if (*connhead->logdev) {
+      fprintf(fd, "  Log Device '%s'\n", connhead->logdev);
+      if (connhead->loglevel)
+	fprintf(fd, "  Log Level %d\n", connhead->loglevel);
+    }
 
     fprintf(fd, "\n");
 
     int nb_clients = get_nb_clients();
-    if (!nb_clients)
-      {
-	fprintf(fd, "  No Clients connected.\n");
-	if (!nolock)
-	  {
-	    eyedbsm_mutexUnlock(&mp, 0);
+    if (!nb_clients) {
+      fprintf(fd, "  No Clients connected.\n");
+      if (!nolock) {
+	eyedbsm_mutexUnlock(&mp, 0);
 #ifdef TRACE
-	    fprintf(stderr, "SessionLog %d is UNlocked\n", getpid());
+	fprintf(stderr, "SessionLog %d is UNlocked\n", getpid());
 #endif
-	    islocked = False;
-	  }
-	return;
+	islocked = False;
       }
+      return;
+    }
 
     fprintf(fd, "  %d Client%s connected\n\n", 
 	    nb_clients, nb_clients > 1 ? "s" : "");
@@ -664,50 +607,50 @@ namespace eyedb {
       conninfo = (ClientInfo *)XM_ADDR(xm_connlog, conninfo->conn_next);
 
     for (n = 0; conninfo;
-	 conninfo = (ClientInfo *)XM_ADDR(xm_connlog, conninfo->conn_prev))
-      {
-	// solaris only?
-	if (!check_server(conninfo))
-	  continue;
+	 conninfo = (ClientInfo *)XM_ADDR(xm_connlog, conninfo->conn_prev)) {
 
-	fprintf(fd, "%sClient #%d\n", (n ? "\n" : ""), n);
-	fprintf(fd, "  Connected from %s", ctime(&conninfo->start));
-	if (*conninfo->hostname)
-	  fprintf(fd, "  Host Name '%s'\n", conninfo->hostname);
-	if (*conninfo->username)
-	  fprintf(fd, "  User Name '%s'\n", conninfo->username);
-	if (*conninfo->progname)
-	  fprintf(fd, "  Program Name '%s'\n", conninfo->progname);
-	if (conninfo->prog_pid)
-	  fprintf(fd, "  Client Pid %d\n",   conninfo->prog_pid);
-	if (conninfo->backend_pid)
-	  fprintf(fd, "  EyeDB Server Pid %d\n",   conninfo->backend_pid);
+      // solaris only?
+      if (!check_server(conninfo))
+	continue;
 
-	if (conninfo->n_dbs) {
-	  fprintf(fd, "  Opened Database%s ", conninfo->n_dbs > 1 ? "s" : "");
-	  for (int j = 0; j < conninfo->n_dbs; j++) {
-	    fprintf(fd, "%s'%s' [mode='%s']", (j?"\n                   ":""),
-		    conninfo->dbs[j].dbname,
-		    Database::getStringFlag((Database::OpenFlag)conninfo->dbs[j].flags));
-	    if (*conninfo->dbs[j].userauth)
-	      fprintf(fd, " [userauth='%s']", conninfo->dbs[j].userauth);
-	  }
-	  fprintf(fd, "\n");
+      fprintf(fd, "%sClient #%d\n", (n ? "\n" : ""), n);
+      fprintf(fd, "  Connected from %s", ctime(&conninfo->start));
+      if (*conninfo->hostname && *conninfo->portname)
+	fprintf(fd, "  Host:Port    %s:%s\n", conninfo->hostname,
+		conninfo->portname);
+      if (*conninfo->username)
+	fprintf(fd, "  User Name    %s\n", conninfo->username);
+      if (*conninfo->progname)
+	fprintf(fd, "  Program Name %s\n", conninfo->progname);
+      if (conninfo->prog_pid)
+	fprintf(fd, "  Client Pid   %d\n",   conninfo->prog_pid);
+      if (conninfo->backend_pid)
+	fprintf(fd, "  EyeDB Server Pid %d\n",   conninfo->backend_pid);
+
+      if (conninfo->n_dbs) {
+	fprintf(fd, "  Opened Database%s ", conninfo->n_dbs > 1 ? "s" : "");
+	for (int j = 0; j < conninfo->n_dbs; j++) {
+	  fprintf(fd, "%s'%s' [mode='%s']", (j?"\n                   ":""),
+		  conninfo->dbs[j].dbname,
+		  Database::getStringFlag((Database::OpenFlag)conninfo->dbs[j].flags));
+	  if (*conninfo->dbs[j].userauth)
+	    fprintf(fd, " [userauth='%s']", conninfo->dbs[j].userauth);
 	}
-	else
-	  fprintf(fd, "  No Opened Databases\n");
-
-	n++;
+	fprintf(fd, "\n");
       }
+      else
+	fprintf(fd, "  No Opened Databases\n");
 
-    if (!nolock)
-      {
-	eyedbsm_mutexUnlock(&mp, 0);
+      n++;
+    }
+
+    if (!nolock) {
+      eyedbsm_mutexUnlock(&mp, 0);
 #ifdef TRACE
-	fprintf(stderr, "SessionLog %d is UNlocked\n", getpid());
+      fprintf(stderr, "SessionLog %d is UNlocked\n", getpid());
 #endif
-	islocked = False;
-      }
+      islocked = False;
+    }
   }
 
   void SessionLog::remove()
@@ -728,24 +671,11 @@ namespace eyedb {
   SessionLog::stopServers(Bool force)
   {
     if (!connhead || !xm_connlog)
-      {
-	/*
-	  fprintf(stdout, "EyeDB server port %s is already down\n", idbport);
-	  return Success;
-	*/
-	return Exception::make("EyeDB server port %s is down", idbport);
-      }
+      return Exception::make("EyeDB Server %s:%s is down", host, port);
 
     if (!connhead || !connhead->up)
-      {
-	/*
-	  fprintf(stdout, "EyeDB server port %s is down from %s", idbport,
-	  ctime(&connhead->start));
-	  return Success;
-	*/
-	return Exception::make("EyeDB server port %s is already down from %s", idbport,
-			       ctime(&connhead->start));
-      }
+      return Exception::make("EyeDB Server %s:%s is already down from %s",
+			     host, port, ctime(&connhead->start));
 
     int nb_clients = get_nb_clients();
     if (nb_clients && !force) {
@@ -757,26 +687,24 @@ namespace eyedb {
 	 (nb_clients > 1 ? "are" : "is"));
     }
 
-    //  eyedbsm_mutexLock(&mp, 0);
+    // eyedbsm_mutexLock(&mp, 0);
 
     ClientInfo *conninfo =
       (ClientInfo *)XM_ADDR(xm_connlog, connhead->conn_first);
 
-    while (conninfo)
-      {
-	if (check_server(conninfo))
-	  {
-	    fprintf(stderr, "Killing Client Backend Pid %d\n",
-		    conninfo->backend_pid);
-	    kill(conninfo->backend_pid, SIGTERM);
-	  }
-	conninfo = (ClientInfo *)XM_ADDR(xm_connlog, conninfo->conn_next);
+    while (conninfo) {
+      if (check_server(conninfo)) {
+	fprintf(stderr, "Killing Client Backend Pid %d\n",
+		conninfo->backend_pid);
+	kill(conninfo->backend_pid, SIGTERM);
       }
+      conninfo = (ClientInfo *)XM_ADDR(xm_connlog, conninfo->conn_next);
+    }
 
     fprintf(stderr, "Killing EyeDB Server Pid %d\n", connhead->pid);
     kill(connhead->pid, SIGTERM);
 
-    //  eyedbsm_mutexUnlock(&mp, 0);
+    // eyedbsm_mutexUnlock(&mp, 0);
     return Success;
   }
 
@@ -800,16 +728,15 @@ namespace eyedb {
   ClientSessionLog::addDatabase(const char *name, const char *userauth,
 				int flags)
   {
-    if (clinfo->n_dbs < MAXDBS)
-      { 
-	if (!userauth)
-	  userauth = "";
+    if (clinfo->n_dbs < MAXDBS) { 
+      if (!userauth)
+	userauth = "";
 
-	strcpy(clinfo->dbs[clinfo->n_dbs].dbname, name);
-	strcpy(clinfo->dbs[clinfo->n_dbs].userauth, userauth);
-	clinfo->dbs[clinfo->n_dbs].flags = flags;
-	clinfo->n_dbs++;
-      }
+      strcpy(clinfo->dbs[clinfo->n_dbs].dbname, name);
+      strcpy(clinfo->dbs[clinfo->n_dbs].userauth, userauth);
+      clinfo->dbs[clinfo->n_dbs].flags = flags;
+      clinfo->n_dbs++;
+    }
   }
 
   void
@@ -822,18 +749,16 @@ namespace eyedb {
     for (int i = 0; i < clinfo->n_dbs; i++)
       if (!strcmp(clinfo->dbs[i].dbname, name) &&
 	  !strcmp(clinfo->dbs[i].userauth, userauth) &&
-	  clinfo->dbs[i].flags == flags)
-	{
-	  for (int j = i; j < clinfo->n_dbs-1; j++)
-	    {
-	      strcpy(clinfo->dbs[j].dbname, clinfo->dbs[j+1].dbname);
-	      strcpy(clinfo->dbs[j].userauth, clinfo->dbs[j+1].userauth);
-	      clinfo->dbs[j].flags = clinfo->dbs[j+1].flags;
-	    }
-
-	  clinfo->n_dbs--;
-	  return;
+	  clinfo->dbs[i].flags == flags) {
+	for (int j = i; j < clinfo->n_dbs-1; j++) {
+	  strcpy(clinfo->dbs[j].dbname, clinfo->dbs[j+1].dbname);
+	  strcpy(clinfo->dbs[j].userauth, clinfo->dbs[j+1].userauth);
+	  clinfo->dbs[j].flags = clinfo->dbs[j+1].flags;
 	}
+
+	clinfo->n_dbs--;
+	return;
+      }
   }
 }
 

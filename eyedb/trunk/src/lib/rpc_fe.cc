@@ -169,7 +169,7 @@ rpc_connOpen(rpc_Client *client, const char *hostname, const char *portname,
     sock_in_name.sin_family = domain;
     sock_in_name.sin_port = htons(atoi(portname));
 
-    if (hostname && strcmp(hostname, "localhost"))
+    if (hostname) // && strcmp(hostname, "localhost"))
       strcpy(hname, hostname);
     else
       gethostname(hname, sizeof(hname)-1);
@@ -203,7 +203,6 @@ rpc_connOpen(rpc_Client *client, const char *hostname, const char *portname,
 #endif
       if ((sock_fd = socket(domain, type, 0))  < 0)
 	goto failure;
-
 #if 0
       if (domain == AF_INET)
 	rpc_socket_nodelay(sock_fd);

@@ -68,11 +68,6 @@ static int port_open(int port);
 static void main_child_loop(idbWProcess *p);
 
 
-namespace eyedb {
-  extern void init(int &argc, char *argv[], string *sv_port, string *sv_host,
-		   bool purgeargv);
-}
-
 static const char *
 spaces(char *buf, int size)
 {
@@ -146,7 +141,6 @@ load_file(const char *file)
 static int
 getopts(int argc, char *argv[])
 {
-#if 1
   for (int n = 1; n < argc; n++) {
     char *s = argv[n];
     string value;
@@ -185,79 +179,7 @@ getopts(int argc, char *argv[])
     else
       return usage(argv[0]);
   }
-#else
-  for (int i = 1; i < argc; i++) {
-    char *s = argv[i];
-    if (*s == '-') {
-      if (!strcmp(s, "-sv_port"))
-	{
-	  if (i >= argc - 1)
-	    return usage(argv[0]);
-	  sv_port = atoi(argv[++i]);
-	}
-      else if (!strcmp(s, "-sv_timeout"))
-	{
-	  if (i >= argc - 1)
-	    return usage(argv[0]);
-	  sv_timeout = atoi(argv[++i]);
-	  if (!sv_timeout)
-	    return usage(argv[0]);
-	}
-      else if (!strcmp(s, "-ck_timeout"))
-	{
-	  if (i >= argc - 1)
-	    return usage(argv[0]);
-	  ck_timeout = atoi(argv[++i]);
-	  if (!ck_timeout)
-	    return usage(argv[0]);
-	}
-      else if (!strcmp(s, "-cgidir"))
-	{
-	  if (i >= argc - 1)
-	    return usage(argv[0]);
-	  idbW_cgidir = argv[++i];
-	}
-      else if (!strcmp(s, "-alias"))
-	{
-	  if (i >= argc - 1)
-	    return usage(argv[0]);
-	  idbW_alias = argv[++i];
-	}
-      else if (!strcmp(s, "-wdir"))
-	{
-	  if (i >= argc - 1)
-	    return usage(argv[0]);
-	  idbW_wdir = argv[++i];
-	}
-      else if (!strcmp(s, "-maxservers"))
-	{
-	  if (i >= argc - 1)
-	    return usage(argv[0]);
-	  maxservers = atoi(argv[++i]);
-	  if (maxservers <= 0)
-	    return usage(argv[0]);
-	}
-      else if (!strcmp(s, "-sv_access"))
-	{
-	  if (i >= argc - 1)
-	    return usage(argv[0]);
-	  idbW_accessfile = argv[++i];
-	}
-      else if (!strcmp(s, "-sv_nod"))
-	nod = True;
-      else
-	return usage(argv[0]);
-    }
-    else
-      return usage(argv[0]);
-  }
-#endif
 
-  /*
-  if (!sv_port)
-    return usage(argv[0], "z3");
-  */
-  
   if (!idbW_cgidir)
     idbW_cgidir = "cgi-bin";
 
@@ -917,10 +839,10 @@ realize(int argc, char *argv[])
   idbWProcess *p;
   int n;
 
-  string host, port;
-  eyedb::init(argc, argv, &host, &port, true);
+  std::string listen;
+  eyedb::init(argc, argv, &listen, true);
 
-  sv_port = atoi(port.c_str());
+  sv_port = atoi(listen.c_str());
 
   if (!sv_port)
     return 1;

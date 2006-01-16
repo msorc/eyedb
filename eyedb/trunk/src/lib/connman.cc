@@ -44,62 +44,7 @@
 #include <time.h>
 #include <eyedblib/connman.h>
 #include <eyedblib/log.h>
-
-
-#if defined(SOLARIS) || defined(ULTRASOL7)
-#define BYTE1(addr) (addr->_S_un._S_un_b.s_b1)
-#define BYTE2(addr) (addr->_S_un._S_un_b.s_b2)
-#define BYTE3(addr) (addr->_S_un._S_un_b.s_b3)
-#define BYTE4(addr) (addr->_S_un._S_un_b.s_b4)
-#else
-#define BYTE1(addr) (addr->s_addr >> 24)
-#define BYTE2(addr) ((addr->s_addr >> 16) & 0xff)
-#define BYTE3(addr) ((addr->s_addr >> 8) & 0xff)
-#define BYTE4(addr) (addr->s_addr & 0xff)
-#endif
-
-static void
-print_addr(FILE *fd, struct in_addr *addr)
-{
-  if (!BYTE1(addr))
-    fprintf(fd, "+");
-  else
-    fprintf(fd, "%d.%d.%d.%d", BYTE1(addr), BYTE2(addr), BYTE3(addr), BYTE4(addr));
-}
-
-static int
-cmp_addr(const struct in_addr *a1, const struct in_addr *a2)
-{
-  if (BYTE1(a1) && BYTE1(a1) != BYTE1(a2))
-    return 0;
-
-  if (BYTE2(a1) && BYTE2(a1) != BYTE2(a2))
-    return 0;
-  
-  if (BYTE3(a1) && BYTE3(a1) != BYTE3(a2))
-    return 0;
-  
-  if (BYTE4(a1) && BYTE4(a1) != BYTE4(a2))
-    return 0;
-
-  return 1;
-}
-
-static int
-hostname2addr(const char *name, struct in_addr *addr)
-
-{
-  struct hostent *hp;
-
-  memset(addr, 0, sizeof(*addr));
-
-  if (!(hp = gethostbyname(name)))
-    return 1;
-
-  memcpy((char *)addr, (char *)hp->h_addr, hp->h_length);
-
-  return 0;
-}
+#include <eyedblib/rpc_lib.h>
 
 static const char *rpc_access_file;
 
@@ -355,7 +300,7 @@ rpc_check_addr(struct in_addr *addr)
   }
 
   IDB_LOG(IDB_LOG_CONN,
-	  ("connection refused to %d.%d.%d.%d\n", BYTE1(addr), BYTE2(addr), BYTE3(addr), BYTE4(addr)));
+	  ("connection refused to %d.%d.%d.%d\n", RPC_BYTE1(addr), RPC_BYTE2(addr), RPC_BYTE3(addr), RPC_BYTE4(addr)));
 
   return 0;
 }
