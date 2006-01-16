@@ -11,33 +11,24 @@ bindir=@bindir@
 sysconfdir=@sysconfdir@
 
 port=/tmp/eyedb-port.$$
-root=eyedbroot
-passwd=eyedbroot
-
-crypt_passwd()
-{
-    rm -f $sysconfdir/$PACKAGE/Password
-    $bindir/eyedbcrypt $sysconfdir/$PACKAGE/Password eyedbroot
-}
 
 start_server()
 {
-    $bindir/eyedbrc start --port=$port --nod > /dev/null 2>&1 
+    $bindir/eyedbrc start --creating-dbm --listen=$port --nod > /dev/null 2>&1 
 }
 
 create_dbm()
 {
-    $bindir/eyedbdbmcreate $root $passwd --passwd=$passwd --port=$port
-    $bindir/eyedbdbaccess EYEDBDBM r --user=$root --passwd=$passwd --port=$port
+    $bindir/eyedbdbmcreate --strict-unix=@ --port=$port
+    $bindir/eyedbdbaccess EYEDBDBM r --user=@ --port=$port
 }
 
 stop_server()
 {
-    $bindir/eyedbrc stop --port=$port > /dev/null 2>&1
+    $bindir/eyedbrc stop --listen=$port > /dev/null 2>&1
     rm -f $port
 }
 
-crypt_passwd
 start_server
 sleep 4
 create_dbm
