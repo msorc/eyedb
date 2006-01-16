@@ -143,8 +143,8 @@ do { \
 
   static void
   make_options(int &argc, char *argv[], ostream *usage_ostr,
-	       std::ostream *help_ostr, string *sv_host = 0,
-	       string *sv_port = 0, bool purgeargv = true)
+	       std::ostream *help_ostr, string *listen = 0,
+	       bool purgeargv = true)
   {
     int n = 1;
 
@@ -162,8 +162,6 @@ do { \
       printf("RPC_MIN_SIZE %u\n", RPC_MIN_SIZE);
     }
 
-
-#ifdef USE_GETOPT
     const std::string prefix = "";
     std::vector<string> error_v;
     error_v.push_back("status");
@@ -176,6 +174,7 @@ do { \
     static const std::string user_opt = "user";
     static const std::string passwd_opt = "passwd";
     static const std::string auth_opt = "auth";
+    static const std::string listen_opt = "listen";
     static const std::string host_opt = "host";
     static const std::string port_opt = "port";
     static const std::string smd_port_opt = "smd-port";
@@ -193,48 +192,91 @@ do { \
     static const std::string version_opt = "version";
     static const std::string help_eyedb_options_opt = "help-eyedb-options";
 
-    Option opts[] = {
+    Option opts[32];
+
+    unsigned int opt_cnt = 0;
+
+    opts[opt_cnt++] = 
       Option('U', prefix + user_opt, OptionStringType(),
-	     Option::MandatoryValue, OptionDesc("User name", "<user>")),
+	     Option::MandatoryValue, OptionDesc("User name", "<user>"));
+
+    opts[opt_cnt++] = 
       Option('P', prefix + passwd_opt, OptionStringType(),
-	     Option::OptionalValue,  OptionDesc("Password", "<passwd>")),
-      Option(prefix + host_opt, OptionStringType(), Option::MandatoryValue,
-	     OptionDesc("eyedbd host", "<host>")),
-      Option(prefix + port_opt, OptionStringType(), Option::MandatoryValue,
-	     OptionDesc("eyedbd port", "<port>")),
+	     Option::OptionalValue,  OptionDesc("Password", "<passwd>"));
+
+    if (listen)
+      opts[opt_cnt++] = 
+	Option(listen_opt, OptionStringType(),
+	       Option::MandatoryValue,
+	       OptionDesc("listen host and ports", "[<host>:]<port>"));
+    else {
+      opts[opt_cnt++] = 
+	Option(prefix + host_opt, OptionStringType(), Option::MandatoryValue,
+	       OptionDesc("eyedbd host", "<host>"));
+
+      opts[opt_cnt++] = 
+	Option(prefix + port_opt, OptionStringType(), Option::MandatoryValue,
+	       OptionDesc("eyedbd port", "<port>"));
+    }
+
+    opts[opt_cnt++] = 
       Option(prefix + smd_port_opt, OptionStringType(), Option::MandatoryValue,
-	     OptionDesc("eyedbsmd port", "<port>")),
+	     OptionDesc("eyedbsmd port", "<port>"));
+
+    opts[opt_cnt++] = 
       Option(prefix + dbm_opt, OptionStringType(), Option::MandatoryValue,
-	     OptionDesc("EYEDBDBM database file", "<dbmfile>")),
+	     OptionDesc("EYEDBDBM database file", "<dbmfile>"));
+
+    opts[opt_cnt++] = 
       Option(prefix + conf_opt, OptionStringType(), Option::MandatoryValue,
-	     OptionDesc("Configuration file", "<conffile>")),
+	     OptionDesc("Configuration file", "<conffile>"));
+
+    opts[opt_cnt++] = 
       Option(prefix + logdev_opt, OptionStringType(), Option::MandatoryValue,
-	     OptionDesc("Output log file", "<logfile>")),
+	     OptionDesc("Output log file", "<logfile>"));
+
+    opts[opt_cnt++] = 
       Option(prefix + logmask_opt, OptionStringType(), Option::MandatoryValue,
-	     OptionDesc("Output log mask", "<mask>")),
+	     OptionDesc("Output log mask", "<mask>"));
+
+    opts[opt_cnt++] = 
       Option(prefix + logdate_opt, OptionBoolType(), Option::MandatoryValue,
-	     OptionDesc("Control date display in output log", "on|off")),
+	     OptionDesc("Control date display in output log", "on|off"));
+
+    opts[opt_cnt++] = 
       Option(prefix + logtimer_opt, OptionBoolType(), Option::MandatoryValue,
-	     OptionDesc("Control timer display in output log", "on|off")),
+	     OptionDesc("Control timer display in output log", "on|off"));
+
+    opts[opt_cnt++] = 
       Option(prefix + logpid_opt, OptionBoolType(), Option::MandatoryValue,
-	     OptionDesc("Control pid display in output log", "on|off")),
+	     OptionDesc("Control pid display in output log", "on|off"));
+
+    opts[opt_cnt++] = 
       Option(prefix + logprog_opt, OptionBoolType(), Option::MandatoryValue,
-	     OptionDesc("Control progname display in output log", "on|off")),
+	     OptionDesc("Control progname display in output log", "on|off"));
+
+    opts[opt_cnt++] = 
       Option(prefix + error_policy_opt, errorChoice, Option::MandatoryValue,
 	     OptionDesc("Control error policy: status|exception|abort|stop|echo",
-			"<value>")),
+			"<value>"));
+    opts[opt_cnt++] = 
       Option(prefix + trans_def_mag_opt, OptionIntType(), Option::MandatoryValue,
 	     OptionDesc("Default transaction magnitude order",
-			"<magorder>")),
-      Option(prefix + arch_opt, OptionBoolType(), 0,
-	     OptionDesc("Display the client architecture")),
-      Option('v', prefix + version_opt, OptionBoolType(), 0,
-	     OptionDesc("Display the version")),
-      Option(prefix + help_eyedb_options_opt, OptionBoolType(), 0,
-	     OptionDesc("Display this message"))
-    };
+			"<magorder>"));
 
-    GetOpt getopt(argv[0], opts, sizeof(opts)/sizeof(opts[0]),
+    opts[opt_cnt++] = 
+      Option(prefix + arch_opt, OptionBoolType(), 0,
+	     OptionDesc("Display the client architecture"));
+
+    opts[opt_cnt++] = 
+      Option('v', prefix + version_opt, OptionBoolType(), 0,
+	     OptionDesc("Display the version"));
+
+    opts[opt_cnt++] = 
+      Option(prefix + help_eyedb_options_opt, OptionBoolType(), 0,
+	     OptionDesc("Display this message"));
+
+    GetOpt getopt(argv[0], opts, opt_cnt,
 		  GetOpt::SkipUnknownOption|(purgeargv ? GetOpt::PurgeArgv : 0));
 
     if (usage_ostr) {
@@ -261,28 +303,27 @@ do { \
       exit(0);
     }
 
-    if (map.find(port_opt) != map.end()) {
-      if (sv_port)
-	*sv_port = map[port_opt].value;
-      else
-	Connection::setDefaultIDBPort(map[port_opt].value.c_str());
-    }
+    if (map.find(port_opt) != map.end())
+      Connection::setDefaultIDBPort(map[port_opt].value.c_str());
 
-    if (map.find(host_opt) != map.end()) {
-      if (sv_host)
-	*sv_host = map[host_opt].value;
+    if (map.find(host_opt) != map.end())
+      Connection::setDefaultHost(map[host_opt].value.c_str());
+
+    if (map.find(listen_opt) != map.end()) {
+      assert(listen);
+      if (listen)
+	*listen = map[listen_opt].value;
       else
-	Connection::setDefaultHost(map[host_opt].value.c_str());
+	getopt.usage("\n");
     }
 
     if (map.find(smd_port_opt) != map.end())
       smd_set_port(map[smd_port_opt].value.c_str());
 
     if (map.find(dbm_opt) != map.end()) {
-      if (sv_port) {
-	//printf("%d: setting sv_dbm\n", getpid());
-	Config::getDefaultConfig()->setValue("sv_dbm", map[dbm_opt].value.c_str());
-      }
+      if (listen)
+	Config::getDefaultConfig()->setValue("sv_dbm",
+					     map[dbm_opt].value.c_str());
       else
 	Database::setDefaultDBMDB(map[dbm_opt].value.c_str());
     }
@@ -379,200 +420,6 @@ do { \
     }
   }
 
-#else
-
-    for (int i = 1; i < argc; )
-      {
-	char *s = argv[i];
-	if (!strcmp(s, "-eyedbhost"))
-	  {
-	    check(argv[0], "-eyedbhost", i, argc, argv);
-	    Connection::setDefaultHost(argv[++i]);
-	    i++;
-	  }
-	else if (!strcmp(s, "-eyedbsmdport"))
-	  {
-	    check(argv[0], "-eyedbsmdport", i, argc, argv);
-	    smd_set_port(argv[++i]);
-	    i++;
-	  }
-	else if (!strcmp(s, "-eyedbport"))
-	  {
-	    check(argv[0], "-eyedbport", i, argc, argv);
-	    Connection::setDefaultIDBPort(argv[++i]);
-	    i++;
-	  }
-	else if (!strcmp(s, "-eyedbdbm"))
-	  {
-	    check(argv[0], "-eyedbdbm", i, argc, argv);
-	    Database::setDefaultDBMDB(argv[++i]);
-	    i++;
-	  }
-	else if (!strcmp(s, "-eyedbuser"))
-	  {
-	    check(argv[0], "-eyedbuser", i, argc, argv);
-	    Connection::setDefaultUser(argv[++i]);
-	    i++;
-	  }
-	else if (!strcmp(s, "-eyedbuser?"))
-	  {
-	    ask_for_user();
-	    i++;
-	  }
-	else if (!strcmp(s, "-eyedbpasswd"))
-	  {
-	    check(argv[0], "-eyedbpasswd", i, argc, argv);
-	    Connection::setDefaultPasswd(argv[++i]);
-	    i++;
-	  }
-	else if (!strcmp(s, "-eyedbpasswd?"))
-	  {
-	    ask_for_passwd();
-	    i++;
-	  }
-	else if (!strcmp(s, "-eyedbauth?"))
-	  {
-	    ask_for_user();
-	    ask_for_passwd();
-	    i++;
-	  }
-	else if (!strcmp(s, "-eyedbversion"))
-	  printVersion();
-	else if (!strcmp(s, "-eyedbarch"))
-	  {
-	    printf("%s\n", Architecture::getArchitecture()->getArch());
-	    exit(0);
-	    i++;
-	  }
-	else if (!strcmp(s, "-eyedblog"))
-	  {
-	    check(argv[0], "-eyedblog", i, argc, argv);
-	    LogName = strdup(argv[++i]);
-	    i++;
-	  }
-	else if (!strcmp(s, "-eyedblogpid"))
-	  ON_OFF("eyedblogpid", setLogPid);
-	else if (!strcmp(s, "-eyedblogdate"))
-	  ON_OFF("eyedblogdate", setLogDate);
-	else if (!strcmp(s, "-eyedblogtimer"))
-	  ON_OFF("eyedblogtimer", setLogTimer);
-	else if (!strcmp(s, "-eyedblogprog"))
-	  ON_OFF("eyedblogprog", setLogProgName);
-	else if (!strcmp(s, "-eyedblogmask"))
-	  {
-	    check(argv[0], "-eyedblogmask", i, argc, argv);
-	    LogMask mask;
-	    char *sx = argv[++i];
-	    Status s = Log::setLogMask(sx);
-	    if (s)
-	      {
-		s->print(stderr);
-		exit(1);
-	      }
-	    i++;
-	  }
-	else if (!strcmp(s, "-eyedb-trace-idx"))
-	  {
-	    check(argv[0], "-eyedb-trace-idx", i, argc, argv);
-
-	    eyedbsm::trace_idx = eyedbsm::True;
-	    const char *dev = argv[++i];
-
-	    if (!strcmp(dev, "stdout"))
-	      eyedbsm::trace_idx_fd = stdout;
-	    else if (!strcmp(dev, "stderr"))
-	      eyedbsm::trace_idx_fd = stderr;
-	    else
-	      {
-		eyedbsm::trace_idx_fd = fopen(dev, "w");
-		if (!eyedbsm::trace_idx_fd)
-		  {
-		    fprintf(stderr, "%s: cannot open file '%s' for writing.\n",
-			    argv[0], dev);
-		    exit(1);
-		  }
-	      }
-	    i++;
-
-	  }
-	else if (!strcmp(s, "-eyedb-trace-idx-sync"))
-	  {
-	    eyedbsm::trace_idx_sync = (eyedbsm::Boolean)True;
-	    i++;
-	  }
-	else if (!strcmp(s, "-eyedbconf"))
-	  {
-	    check(argv[0], "-eyedbconf", i, argc, argv);
-	    Config::getDefaultConfig()->add(argv[++i]);
-	    i++;
-	  }
-	/*
-	  else if (!strcmp(s, "-eyedbtransless"))
-	  {
-	  Database::setGlobalDefaultTransactionParams
-	  (TransactionLessTRMode, idbWriteImmediate, 0);
-	  i++;
-	  }
-	*/
-	else if (!strcmp(s, "-eyedbhelp"))
-	  {
-	    fprintf(stderr, getStdOptionsHelp());
-	    exit(0);
-	  }
-	else if (!strcmp(s, "-eyedbloglevel"))
-	  {
-	    check(argv[0], "-eyedbloglevel", i, argc, argv);
-	    LogLevel = atoi(argv[++i]);
-	    i++;
-	  }
-	else if (!strcmp(s, "-eyedbtransdefmgo"))
-	  {
-	    check(argv[0], "-eyedbtransdefmgo", i, argc, argv);
-	    Database::setGlobalDefaultMagOrder(atoi(argv[++i]));
-	    i++;
-	  }
-	else if (!strcmp(s, "-eyedb-error-policy"))
-	  {
-	    check(argv[0], "-eyedb-error-policy", i, argc, argv);
-
-	    const char *policy = argv[++i];
-
-	    if (!strcmp(policy, "status"))
-	      Exception::setMode(Exception::StatusMode);
-	    else if (!strcmp(policy, "exception"))
-	      Exception::setMode(Exception::ExceptionMode);
-	    else if (!strcmp(policy, "abort"))
-	      Exception::setHandler(abort_on_error);
-	    else if (!strcmp(policy, "stop"))
-	      Exception::setHandler(stop_on_error);
-	    else if (!strcmp(policy, "echo"))
-	      Exception::setHandler(echo_on_error);
-	    else
-	      {
-		fprintf(stderr, 
-			"%s: unrecognized option after '%s'\n"
-			"%s\n", argv[0], s,
-			getStdOptionsHelp());
-		exit(1);
-	      }
-	    i++;
-	  }
-	else if (!strncmp(s, opt_prefix, len_opt_prefix) &&
-		 strncmp(s, opt_sv_prefix, len_opt_sv_prefix))
-	  {
-	    fprintf(stderr, "%s: unknown eyedb option: '%s'\n%s\n",
-		    argv[0], s, getStdOptionsHelp());
-	    exit(1);
-	  }
-	else
-	  argv[n++] = argv[i++];
-      }
-
-    argc = n;
-    argv[argc] = 0;
-}
-#endif
-
    void print_standard_usage(GetOpt &getopt, const std::string &append,
 			     ostream &os)
   {
@@ -611,6 +458,7 @@ do { \
     make_options(argc, argv, 0, &os);
    }
 
+#if 0
   const char *
   getStdOptionsUsage()
   {
@@ -664,6 +512,7 @@ do { \
 
     return buf;
   }
+#endif
 
 #include <pthread.h>
 
@@ -877,12 +726,11 @@ do { \
 #endif
   }
 
-  void init(int &argc, char *argv[], string *sv_host, string *sv_port,
-	    bool purgeargv) {
+  void init(int &argc, char *argv[], string *listen, bool purgeargv) {
 
     init();
 
-    make_options(argc, argv, 0, 0, sv_host, sv_port, purgeargv); 
+    make_options(argc, argv, 0, 0, listen, purgeargv); 
 
     Connection::init();
 
@@ -898,7 +746,7 @@ do { \
 
   void init(int &argc, char *argv[])
   {
-    init(argc, argv, 0, 0, true);
+    init(argc, argv, 0, true);
   }
 
   void idbRelease(void)

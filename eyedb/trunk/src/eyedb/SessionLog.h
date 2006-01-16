@@ -56,16 +56,17 @@ namespace eyedb {
 
   public:
     // open constructor
-    SessionLog(const char *port, const char *logdir);
+    SessionLog(const char *host, const char *port, const char *logdir);
 
     // create constructor
     SessionLog(const char *logdir, const char *version,
-	       int nports, const char *ports[], const char *voldir,
+	       int nports, const char *hosts[], const char *ports[],
+	       const char *voldir,
 	       const char *logdev, int loglevel);
 
-    Status add(const char *hostname, const char *username,
-	       const char *progname, int pid,
-	       ClientSessionLog*&);
+    Status add(const char *hostname, const char *portname,
+	       const char *username, const char *progname, int pid,
+	       ClientSessionLog *&);
 
     Bool isUp() const;
 
@@ -84,7 +85,8 @@ namespace eyedb {
     ~SessionLog();
 
   private:
-    char *idbport;
+    char *host;
+    char *port;
     eyedbsm::XMHandle *xm_connlog;
     m_Map *m_connlog;
     char *addr_connlog;
@@ -96,9 +98,9 @@ namespace eyedb {
     char **files;
     eyedbsm::Mutex mp;
 
-    Status openRealize(const char *idbport, const char *logdir,
+    Status openRealize(const char *host, const char *port, const char *logdir,
 		       Bool create);
-    char *makeFile(const char *_idbport, const char *_logdir);
+    char *makeFile(const char *host, const char *port, const char *_logdir);
     int get_nb_clients();
   };
 

@@ -55,6 +55,33 @@
 
 int RPC_MIN_SIZE = 256;
 
+void
+print_addr(FILE *fd, struct in_addr *addr)
+{
+  if (!RPC_BYTE1(addr))
+    fprintf(fd, "+");
+  else
+    fprintf(fd, "%d.%d.%d.%d", RPC_BYTE1(addr), RPC_BYTE2(addr), RPC_BYTE3(addr), RPC_BYTE4(addr));
+}
+
+int
+cmp_addr(const struct in_addr *a1, const struct in_addr *a2)
+{
+  if (RPC_BYTE1(a1) && RPC_BYTE1(a1) != RPC_BYTE1(a2))
+    return 0;
+
+  if (RPC_BYTE2(a1) && RPC_BYTE2(a1) != RPC_BYTE2(a2))
+    return 0;
+  
+  if (RPC_BYTE3(a1) && RPC_BYTE3(a1) != RPC_BYTE3(a2))
+    return 0;
+  
+  if (RPC_BYTE4(a1) && RPC_BYTE4(a1) != RPC_BYTE4(a2))
+    return 0;
+
+  return 1;
+}
+
 int
 rpc_hostNameToAddr(const char *name, struct in_addr *address)
 {
@@ -65,6 +92,24 @@ rpc_hostNameToAddr(const char *name, struct in_addr *address)
 
   memcpy((char *)address, (char *)hp->h_addr, hp->h_length);
   return 1;
+}
+
+int
+hostname2addr(const char *name, struct in_addr *addr)
+{
+  return !rpc_hostNameToAddr(name, addr);
+  /*
+  struct hostent *hp;
+
+  memset(addr, 0, sizeof(*addr));
+
+  if (!(hp = gethostbyname(name)))
+    return 1;
+
+  memcpy((char *)addr, (char *)hp->h_addr, hp->h_length);
+
+  return 0;
+  */
 }
 
 typedef int (*perform_func)(int, void *, size_t, int ud);

@@ -107,7 +107,7 @@ namespace eyedb {
 
     if ((connOpen(_host, _port, &connh, 0)) == RPCSuccess)
       {
-	if (host)
+	if (_host)
 	  host = strdup(_host);
 	else
 	  host = strdup("localhost");
@@ -119,7 +119,8 @@ namespace eyedb {
 #ifdef STUART_AUTH
 	char *challenge;
 	RPCStatus rpc_status = 
-	  set_conn_info(connh, hostname, getuid(), getUserName(), prog_name,
+	  set_conn_info(connh, (std::string(host) + ":" + port).c_str(),
+			getuid(), getUserName(), prog_name,
 			&sv_pid, &sv_uid, getVersionNumber(),
 			&challenge);
 	if (!rpc_status && strlen(challenge) > 0) {
@@ -139,7 +140,8 @@ namespace eyedb {
 	}
 #else
 	RPCStatus rpc_status = 
-	  set_conn_info(connh, hostname, getUserName(), prog_name,
+	  set_conn_info(connh, (std::string(host) + ":" + port).c_str(),
+			getUserName(), prog_name,
 			&sv_pid, &sv_uid, getVersionNumber());
 #endif
 	if (rpc_status)

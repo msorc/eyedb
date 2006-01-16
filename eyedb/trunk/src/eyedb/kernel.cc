@@ -481,13 +481,18 @@ namespace eyedb {
   }
 
   RPCStatus
-  IDB_setConnInfo(const char *hostname, int uid, const char *username,
+  IDB_setConnInfo(const char *_hostname, int uid, const char *username,
 		  const char *progname, int pid, int *sv_pid,
 		  int *sv_uid, int cli_version, char **challenge)
   {
+    char *host = strdup(_hostname);
+    char *p = strchr(host, ':');
+    *p = 0;
+    char *port = p + 1;
+
     IDB_LOG(IDB_LOG_CONN,
-	    ("connected hostname='%s', username='%s', progname='%s', pid=%d\n",
-	     hostname, username, progname, pid));
+	    ("connected host='%s:%s', username='%s', progname='%s', pid=%d\n",
+	     host, port, username, progname, pid));
 
     *sv_pid = getpid();
     *sv_uid = getuid();
@@ -512,7 +517,7 @@ namespace eyedb {
 
     *challenge = (char *)conn_ctx.challenge.c_str();
 
-    return rpcStatusMake(conn_ctx.sesslog->add(hostname, username,
+    return rpcStatusMake(conn_ctx.sesslog->add(host, port, username,
 					       progname, pid, conn_ctx.clinfo));
   }
 
