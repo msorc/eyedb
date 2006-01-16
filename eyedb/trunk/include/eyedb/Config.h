@@ -135,6 +135,7 @@ namespace eyedb {
 
     LinkedList list;
     void add(const char *name, const char *value);
+    void addDefaults();
     friend class Object;
     void garbage();
   };

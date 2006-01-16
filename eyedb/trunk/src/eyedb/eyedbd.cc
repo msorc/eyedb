@@ -94,7 +94,6 @@ help()
 #endif
 	  //	  "-sv_passwd_file <passwdfile>   password file\n"
 	  "-sv_nod                        no daemon: keep stdin, stdout, stderr opened\n"
-	  "-eyedbroot <root>              eyedb root directory\n"
 	  "-eyedbconf <conffile>          configuration file\n"
 	  "-eyedblog <logfile>            output log file\n"
 	  "-eyedbdbm <dbmfile>            default EYEDBDBM database file\n"

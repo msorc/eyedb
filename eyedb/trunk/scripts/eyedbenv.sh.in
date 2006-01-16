@@ -1,6 +1,0 @@
-# must be automatically generated
-
-EYEDBROOT=@prefix@; export EYEDBROOT
-PATH=$EYEDBROOT/bin:$EYEDBROOT/xbin:$PATH; export PATH
-
-EYEDBCLASSPATH=$EYEDBROOT/lib/eyedb/java/eyedb.jar; export EYEDBCLASSPATH

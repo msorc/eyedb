@@ -27,16 +27,13 @@
 #include <string.h>
 #include <eyedb/eyedb.h>
 #include "eyedblib/strutils.h"
+#include "lib/compile_builtin.h"
 
 extern struct config_default {
   const char *name, *value;
 } config_defaults[];
 
 #define MAXFILES 16
-
-// EV 25/08/03 : try to fix a problem detected with purify
-// It seems that it is a purify bug...
-//#define PURIFY_PB
 
 namespace eyedb {
 
@@ -51,11 +48,6 @@ namespace eyedb {
   static FILE *fd_sp[MAXFILES];
   static int line[MAXFILES];
   static char *file_sp[MAXFILES];
-  static const char *archdir = 
-#include "../../scripts/eyedb-tagroot"
-  ;
-
-  static const char archdir_prefix[] = "/eyedb/eyedb/eyedb/eyedb";
 
 #define USE_ENV
   //#define IDEM_PREFIX
@@ -333,43 +325,22 @@ namespace eyedb {
 	  }
 
 	*p++ = c;
-#ifdef PURIFY_PB
-	printf("assigning %c %d\n", c, c);
-#endif
       }
 
     *p = 0;
 
-    // corrected the 6/6/99 because: 'xx = "";' did not work
-    // return *tok ? tok : nexttoken_realize();
-#ifdef PURIFY_PB
-    if ((p != tok || force || hasvar) && *tok)
-      printf("nexttoken(%s)\n", tok);
-#endif
     return (p != tok || force || hasvar) ? tok : nexttoken_realize(config);
   }
 
   static void
   push_file(const char *file)
   {
-    if (strlen(file) > 2 && file[0] == '/' && file[1] == '/')
-      {
-	file += 2;
-	if (archdir)
-	  {
-	    std::string s = std::string(archdir) + "/" + file;
-	    if (fd = fopen(s.c_str(), "r"))
-	      goto ok;
-	  }
-      }
-    else
-      fd = fopen(file, "r");
+    fd = fopen(file, "r");
 
     if (!fd)
       error("%scannot open file '%s' for reading",
 	    line_str(), file);
 
-  ok:
     pline = &line[fd_w];
     fd_sp[fd_w] = fd;
     file_sp[fd_w] = strdup(file);
@@ -419,10 +390,7 @@ namespace eyedb {
     if (eyedbconf)
       return eyedbconf;
 
-    for (unsigned int n = 0; config_defaults[n].name; n++)
-      if (!strcmp(config_defaults[n].name, "sysconfdir"))
-	return std::string(config_defaults[n].value) + "/eyedb/eyedb.conf";
-    return "";
+    return std::string(eyedblib::CompileBuiltin::getSysconfdir()) + "/eyedb/eyedb.conf";
   }
 
   void
@@ -432,16 +400,6 @@ namespace eyedb {
 
     std::string eyedbconf = get_conf().c_str();
 
-    /*
-      if (getenv("EYEDBROOT") && getenv("EYEDBARCH"))
-      {
-      std::string s = std::string(getenv("EYEDBROOT")) + "/" + getenv("EYEDBARCH");
-      archdir = strdup(s);
-      }
-      else if (!strncmp(archdir, archdir_prefix, strlen(archdir_prefix)))
-      archdir = NULL;
-    */
-
     if (eyedbconf.length() > 0)
       {
 	new Config(eyedbconf.c_str());
@@ -449,17 +407,8 @@ namespace eyedb {
 	return;
       }
 
-    /*
-      if (archdir)
-      {
-      std::string s = std::string(archdir) + "/etc/ArchConfig";
-      new Config(s);
-      initialized = True;
-      return;
-      }
-    */
-
     new Config();
+
     initialized = True;
   }
 
@@ -469,13 +418,54 @@ namespace eyedb {
     delete the_config;
   }
 
+  void
+  Config::addDefaults()
+  {
+    std::string libdir = eyedblib::CompileBuiltin::getLibdir();
+    std::string localstatedir = eyedblib::CompileBuiltin::getLocalstatedir();
+    std::string sysconfdir = eyedblib::CompileBuiltin::getSysconfdir();
+
+    // Executables directory
+    add( "bindir", eyedblib::CompileBuiltin::getBindir());
+
+    // Bases directory
+    add( "sv_datdir", (localstatedir + "/lib/eyedb/db").c_str());
+
+    // pipes:
+    add( "sv_pipedir", (localstatedir + "/lib/eyedb/pipes").c_str());
+
+    // tmpdir
+    add( "sv_tmpdir", (localstatedir + "/lib/eyedb/tmp").c_str());
+
+    // sopath
+    add( "sopath", (libdir + "/eyedb").c_str());
+
+    // EYEDBDBM Database
+    add( "sv_dbm", (localstatedir + "/lib/eyedb/db/dbmdb.dbs").c_str());
+
+    // Server Parameters
+    add( "sv_access_file", (sysconfdir + "/eyedb/Access").c_str());
+    add( "sv_smdport", (localstatedir + "/lib/eyedb/pipes/eyedbsmd").c_str());
+
+    // Port
+    add( "port", (localstatedir + "/lib/eyedb/pipes/eyedbd").c_str());
+
+    // Server Parameters
+    add( "sv_port", (localstatedir + "/lib/eyedb/pipes/eyedbd").c_str());
+
+    // OQL path
+    add( "oqlpath", (libdir + "/eyedb/oql").c_str());
+
+    // Hostname
+    add( "host", "localhost");
+  }
+
   Config::Config(const char *file)
   {
     if (!the_config)
       the_config = this;
 
-    for (unsigned int n = 0; config_defaults[n].name; n++)
-      add(config_defaults[n].name, config_defaults[n].value);
+    addDefaults();
 
     if (file) {
       add(file);
@@ -507,9 +497,7 @@ namespace eyedb {
   {
     if (this == &item)
       return *this;
-#ifdef PURIFY_PB
-    printf("Assigning %p to %p\n", &item, this);
-#endif
+
     free(name);
     free(value);
     name = strdup(item.name);
@@ -519,9 +507,6 @@ namespace eyedb {
 
   void Config::add(const char *name, const char *value)
   {
-#ifdef PURIFY_PB
-    printf("Config::add(%s, %s)\n", name, value);
-#endif
     Item *item = new Item(name, value);
     list.insertObjectFirst(item);
   }
@@ -600,10 +585,6 @@ namespace eyedb {
 
     while (c.getNext((void *&)item))
       if (!strcasecmp(item->name, name)) {
-#ifdef PURIFY_PB
-	printf("%p::getValue(%s [%p], %s [%p])\n", item, item->name, item->name,
-	       item->value, item->value); 
-#endif
 	return item->value;
       }
 
@@ -667,16 +648,10 @@ namespace eyedb {
   {
     name = strdup(_name);
     value = strdup(_value);
-#ifdef PURIFY_PB
-    printf("%p::Item(%s [%p], %s [%p])\n", this, name, name, value, value); 
-#endif
   }
 
   Config::Item::Item(const Item &item)
   {
-#ifdef PURIFY_PB
-    printf("Copying %p to %p\n", &item, this);
-#endif
     name = strdup(item.name);
     value = strdup(item.value);
   }

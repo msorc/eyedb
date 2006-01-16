@@ -326,7 +326,6 @@ install/etc/Makefile
 install/etc/eyedb.conf
 scripts/Makefile
 scripts/eyedb-postinstall.sh
-scripts/eyedbenv.sh
 src/Makefile
 src/bindings/Makefile
 src/bindings/python/Makefile

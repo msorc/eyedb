@@ -514,12 +514,6 @@ do { \
 	  i++;
 	  }
 	*/
-	else if (!strcmp(s, "-eyedbroot"))
-	  {
-	    check(argv[0], "-eyedbroot", i, argc, argv);
-	    Config::getDefaultConfig()->setValue("root", argv[++i]);
-	    i++;
-	  }
 	else if (!strcmp(s, "-eyedbhelp"))
 	  {
 	    fprintf(stderr, getStdOptionsHelp());
@@ -620,13 +614,13 @@ do { \
   const char *
   getStdOptionsUsage()
   {
-    return "[-eyedbroot <root>] [-eyedbhost <host>] [-eyedbport <portname>] [-eyedbsmdport <smdport>] [-eyedbdbm <dbmfile>] [-eyedbuser <user>] [-eyedbuser?] [-eyedbpasswd <passwd>] [-eyedbpasswd?] [-eyedbauth?] [-eyedbconf <conffile>] [-eyedblog <logfile>] [-eyedblogmask <mask>] [-eyedblogpid on|off] [-eyedblogdate on|off] [-eyedblogtimer on|off] [-eyedblogprog on|off ] [-eyedb-error-policy status|exception|abort|stop|echo] [-eyedbarch] [-eyedbtransless] [-eyedbtransdefmgo <magorder>] [-eyedbversion]";
+    return "[-eyedbhost <host>] [-eyedbport <portname>] [-eyedbsmdport <smdport>] [-eyedbdbm <dbmfile>] [-eyedbuser <user>] [-eyedbuser?] [-eyedbpasswd <passwd>] [-eyedbpasswd?] [-eyedbauth?] [-eyedbconf <conffile>] [-eyedblog <logfile>] [-eyedblogmask <mask>] [-eyedblogpid on|off] [-eyedblogdate on|off] [-eyedblogtimer on|off] [-eyedblogprog on|off ] [-eyedb-error-policy status|exception|abort|stop|echo] [-eyedbarch] [-eyedbtransless] [-eyedbtransdefmgo <magorder>] [-eyedbversion]";
   }
 
   const char *
   getSrvOptionsUsage()
   {
-    return "[-sv_port <ports>] [-sv_host <hostname>] [-sv_access_file <accessfile>] [-sv_timeout <timeout>] [-sv_datdir <datdir>] [-sv_passwd_file <passwdfile>] [-sv_nod] [-eyedbroot <root>] [-eyedbdbm <dbmfile>] [-eyedbconf <conffile>] [-eyedblog <logfile>] [-eyedblogmask <mask>] [-eyedblogpid on|off] [-eyedblogdate on|off] [-eyedblogtimer on|off] [-eyedblogprog on|off ] [-eyedbarch] [-eyedbtransless] [-eyedbtransdefmgo <magorder>] [-eyedbversion] [-help]";
+    return "[-sv_port <ports>] [-sv_host <hostname>] [-sv_access_file <accessfile>] [-sv_timeout <timeout>] [-sv_datdir <datdir>] [-sv_passwd_file <passwdfile>] [-sv_nod] [-eyedbdbm <dbmfile>] [-eyedbconf <conffile>] [-eyedblog <logfile>] [-eyedblogmask <mask>] [-eyedblogpid on|off] [-eyedblogdate on|off] [-eyedblogtimer on|off] [-eyedblogprog on|off ] [-eyedbarch] [-eyedbtransless] [-eyedbtransdefmgo <magorder>] [-eyedbversion] [-help]";
   }
 
 
@@ -636,7 +630,6 @@ do { \
     static char buf[2048];
     sprintf(buf,
 	    "\neyedb standard options:\n"
-	    "%s-eyedbroot <root>             eyedb root directory\n"
 	    "%s-eyedbhost <host>             eyedb host server\n"
 	    "%s-eyedbport <port>             eyedb port name or number\n"
 	    "%s-eyedbsmdport <port>          smd port name [default is %s]\n"
