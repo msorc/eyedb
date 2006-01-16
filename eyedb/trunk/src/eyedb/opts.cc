@@ -278,8 +278,14 @@ do { \
     if (map.find(smd_port_opt) != map.end())
       smd_set_port(map[smd_port_opt].value.c_str());
 
-    if (map.find(dbm_opt) != map.end())
-      Database::setDefaultDBMDB(map[dbm_opt].value.c_str());
+    if (map.find(dbm_opt) != map.end()) {
+      if (sv_port) {
+	//printf("%d: setting sv_dbm\n", getpid());
+	Config::getDefaultConfig()->setValue("sv_dbm", map[dbm_opt].value.c_str());
+      }
+      else
+	Database::setDefaultDBMDB(map[dbm_opt].value.c_str());
+    }
 
     if (map.find(user_opt) != map.end()) {
       if (map[user_opt].value.length() == 0)

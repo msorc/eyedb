@@ -2507,11 +2507,11 @@ DbMutexesRelease(DbDescription *vd, DbShmHeader *shmh, unsigned int xid)
   Mutex *mp;
   int i, lockX;
 
-  IDB_LOG(IDB_LOG_TRANSACTION, ("seserver: DbMutexesRelease\n"));
+  IDB_LOG(IDB_LOG_TRANSACTION, ("eyedbsm: DbMutexesRelease\n"));
 
   while (findXid(vd, &shmh->lock, xid, &lockX, True))
     {
-      IDB_LOG(IDB_LOG_TRANSACTION, ("seserver: main db mutex is kept by CURRENT xid = %d lockX = %d\n", xid, lockX));
+      IDB_LOG(IDB_LOG_TRANSACTION, ("eyedbsm: main db mutex is kept by CURRENT xid = %d lockX = %d\n", xid, lockX));
 
       /* MIND: if XID has several lockS on dblock, one
 	 must do S -= n */

@@ -538,6 +538,10 @@ namespace eyedb {
   static RPCStatus
   IDB_checkAuthDbm(const char *dbmdb)
   {
+#if 0
+    dbmdb = Database::getDefaultDBMDB();
+    return RPCSuccess;
+#else
     if (!strcmp(dbmdb, Database::getDefaultDBMDB()))
       return RPCSuccess;
 
@@ -546,6 +550,7 @@ namespace eyedb {
     return rpcStatusMake(IDB_ERROR,
 			 "security violation: cannot use "
 			 "'%s' EYEDBDBM database.", dbmdb);
+#endif
   }
 
   static RPCStatus
@@ -731,8 +736,15 @@ namespace eyedb {
     if (status)
       return rpcStatusMake(status);
 
+    int user_type;
+    if (!strcmp(passwd, strict_unix_user)) {
+      passwd = "";
+      user_type = StrictUnixUser;
+    } else
+      user_type = EyeDBUser;
+    
     rpc_status = IDB_userAdd(ch, dbmdb, (char *)0, (char *)0, username, passwd,
-			     EyeDBUser);
+			     user_type);
 
     if (rpc_status != RPCSuccess)
       return rpc_status;
@@ -881,18 +893,30 @@ namespace eyedb {
 				   "cannot open database dbid #%d", *dbid);
 	  }
       }
-    else
-      {
+    else {
 	if (!strcmp(dbmdb, DBM_Database::defaultDBMDB))
 	  dbmdb = Database::getDefaultDBMDB();
+
+
+	RPCStatus rpc_status = IDB_checkAuthDbm(dbmdb);
+	if (rpc_status)
+	  return rpc_status;
 
 	*dbfile = dbmdb;
 
 	if (dbid)
 	  *dbid = DBM_Database::getDbid();
 
-	if (pdbm)
-	  *pdbm = 0;
+	if (pdbm) {
+	  // added 16/01/06
+	  RPCStatus rpc_status;
+	  DBM_Database *dbm;
+
+	  rpc_status = IDB_dbmOpen(ch, dbmdb, rw_mode, &dbm);
+	  if (rpc_status != RPCSuccess)
+	    return rpc_status;
+	  *pdbm = dbm;
+	}
       }
 
     return RPCSuccess;
@@ -1349,7 +1373,7 @@ namespace eyedb {
   checkUserName(const char *username, int user_type)
   {
     if (!*username)
-      return Exception::make(IDB_ERROR, "an username cannot be the empty string");
+      return Exception::make(IDB_ERROR, "a username cannot be the empty string");
 
     char c;
     const char *p = username;
@@ -1359,7 +1383,7 @@ namespace eyedb {
 	    (c >= '0' && c <= '9') ||
 	    c == '_' || c == '.' || c == '-'))
 	return Exception::make(IDB_ERROR,
-			       "an username must be under the form: "
+			       "a username must be under the form: "
 			       "[a-zA-Z0-9_\\.\\-]+");
 
     if ((user_type == UnixUser || user_type == StrictUnixUser) &&
@@ -1547,6 +1571,13 @@ namespace eyedb {
     Database *db;
     Connection *conn = ConnectionPeer::newIdbConnection(ch);
     Status status;
+    RPCStatus rpc_status;
+
+    /*
+    rpc_status = IDB_checkAuthDbm(dbmdb);
+    if (rpc_status)
+      return rpc_status;
+    */
 
     OpenHints hints;
     hints.maph = (MapHints)oh_maph;
@@ -1591,6 +1622,12 @@ namespace eyedb {
     int se_flags;
     RPCStatus rpc_status;
     int flags_o = flags;
+
+    /*
+    rpc_status = IDB_checkAuthDbm(dbmdb);
+    if (rpc_status)
+      return rpc_status;
+    */
 
     //eyedblib::display_time("%s %s", dbname, "#1");
     *rname = "";
@@ -6428,7 +6465,8 @@ do { \
     //  printf(create ? "IDB_protectionCreate()\n" : "IDB_protectionMofidy\n");
 
     DBM_Database *dbm;
-    rpc_status = IDB_dbmOpen(dbh->ch, db->getDBMDB(), True, &dbm);
+    const char *dbmdb = db->getDBMDB();
+    rpc_status = IDB_dbmOpen(dbh->ch, dbmdb, True, &dbm);
 
     if (rpc_status)
       {

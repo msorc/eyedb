@@ -1027,8 +1027,8 @@ Status DBM_Database::setUserSysAccess(Connection *ch,
 #define dbmupdate_str "*I*D*B*D*B*M*"
 
 Status DBM_Database::create(Connection *ch, const char *passwdauth,
-				 const char *username, const char *passwd,
-				 DbCreateDescription *pdbdesc)
+			    const char *username, const char *passwd,
+			    DbCreateDescription *pdbdesc)
 {
   RPCStatus rpc_status;
   DbCreateDescription dbdesc;
@@ -1046,7 +1046,7 @@ Status DBM_Database::create(Connection *ch, const char *passwdauth,
   create_prologue(dbdesc, &pdbdesc);
 
   rpc_status = dbmCreate(ConnectionPeer::getConnH(ch), dbmdb_str,
-			     passwdauth, pdbdesc);
+			 passwdauth, pdbdesc);
 
   if (rpc_status == RPCSuccess)
     {
@@ -1066,7 +1066,7 @@ Status DBM_Database::create(Connection *ch, const char *passwdauth,
       _user = strdup(username);
 
       rpc_status = dbmUpdate(ConnectionPeer::getConnH(ch), dbmdb_str,
-				 username, passwd);
+			     username, passwd);
       
       return StatusMake(rpc_status);
     }

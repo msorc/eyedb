@@ -222,6 +222,8 @@ const char *convertVersionNumber(int version);
 
 eyedbsm::DbHandle *get_eyedbsm_DbHandle(DbHandle *);
 
+const char strict_unix_user[] = "**||STRICT||UNIX||USER||**";
+
 }
 
 #endif

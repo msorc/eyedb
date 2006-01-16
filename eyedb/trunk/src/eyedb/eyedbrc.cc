@@ -48,7 +48,7 @@ usage(const char *prog)
 #if 1
   cerr << "usage: " << prog << " ";
   print_common_usage(cerr);
-  cerr << " start|stop|status [-f] [-h|--help]\n";
+  cerr << " start|stop|status [-f] [--creating-dbm] [-h|--help]\n";
 #else
   static const char etc[] = "{eyedbd options}";
   fprintf(stderr, "usage: %s start [-f] %s\n", prog, etc);
@@ -228,6 +228,7 @@ main(int argc, char *argv[])
   const char *idbport, *smdport, *logdir, *s, *idbserv;
   eyedbsm::Status status;
   Bool force = False;
+  Bool creatingDbm = False;
 
   string sv_host, sv_port;
   eyedb::init(argc, argv, &sv_host, &sv_port, false);
@@ -265,6 +266,8 @@ main(int argc, char *argv[])
     char *s = argv[i];
     if (!strcmp(s, "-f"))
       force = True;
+    else if (!strcmp(s, "--creating-dbm"))
+      creatingDbm = True;
     else if (!strcmp(s, "-h") || !strcmp(s, "--help")) {
       help(argv[0]);
       return 0;
@@ -327,15 +330,17 @@ main(int argc, char *argv[])
   char **av;
 
   if (cmd == Start) {
-    int st = force ? 1 : 0;
+    int st = force + creatingDbm;
 
-    const char *dbm = eyedb::getConfigValue("dbm");
-    if (!dbm || access(dbm, R_OK)) {
-      fprintf(stderr, "\nThe EYEDBDBM database file '%s' is not accessible\n",
-	      dbm);
-      fprintf(stderr, "Did you run the post install script 'eyedb-postinstall.sh' ?\n");
-      fprintf(stderr, "If yes, check file eyedb.conf.\n");
-      return 1;
+    if (!creatingDbm) {
+      const char *dbm = eyedb::getConfigValue("sv_dbm");
+      if (!dbm || access(dbm, R_OK)) {
+	fprintf(stderr, "\nThe EYEDBDBM database file '%s' is not accessible\n",
+		dbm);
+	fprintf(stderr, "Did you run the post install script 'eyedb-postinstall.sh' ?\n");
+	fprintf(stderr, "If yes, check file eyedb.conf.\n");
+	return 1;
+      }
     }
 
     ac = argc - st;

@@ -28,7 +28,7 @@
 //#include <sys/stat.h>
 
 #define ACCESS_FILE_FMT \
- "seserver [pid = %d] running under user %s [uid = %d] : "
+ "eyedbsm [pid = %d] running under user %s [uid = %d] : "
 
 namespace eyedbsm {
 const char *
