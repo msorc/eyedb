@@ -63,8 +63,8 @@ Installing EyeDB
 After compiling EyeDB, you can install it with the usual:
 make install
 
-This will install EyeDB under the root directory that you have given
-when running the configure script (--prefix=PREFIX option).
+This will install EyeDB in the directories that you have given
+when running the configure script.
 
 After installing EyeDB, you need to run the post-install script, as:
 PREFIX/share/eyedb/tools/eyedb-postinstall.sh 
@@ -79,13 +79,6 @@ installation will not work.
 
 Running EyeDB
 -------------
-
-Before running EyeDB tools, you need to source the eyedbenv.sh located in 
-PREFIX/etc/profile.d/eyedbenv.sh
-by:
-. PREFIX/etc/profile.d/eyedbenv.sh
-On most systems, this will be done automatically when starting a shell.
-
 
 To run EyeDB, you need first to start the server by:
 eyedbrc start

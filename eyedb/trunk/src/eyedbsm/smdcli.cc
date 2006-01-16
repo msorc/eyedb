@@ -46,6 +46,7 @@
 #include <string.h>
 #include "eyedbsm_p.h"
 #include <eyedbsm/smd.h>
+#include "lib/compile_builtin.h"
 
 smdcli_conn_t *
 smdcli_open(const char *port)
@@ -224,7 +225,7 @@ smdcli_init(smdcli_conn_t *conn, const char *dbfile)
 }
 
 #define SMD_PORT_ENV "EYEDBSV_SMDPORT"
-#define SMD_PORT "/tmp/.eyedb-smd"
+#define SMD_PORT "/lib/eyedb/pipes/eyedbsmd"
 
 static std::string smd_port;
 
@@ -234,19 +235,12 @@ const char *smd_get_port()
     return smd_port.c_str();
 
   const char *s = getenv(SMD_PORT_ENV);
-  if (s) return s;
+  if (s)
+    return s;
 
-  s = getenv("EYEDBROOT");
-  if (!s)
-    return SMD_PORT;
-
-  static std::string path;
-
-  if (!path.length()) {
-    path = s;
-    path += "/var/lib/eyedb/pipes/eyedbsmd";
-  }
-
+  std::string path = eyedblib::CompileBuiltin::getLocalstatedir();
+  path += SMD_PORT;
+    
   return path.c_str();
 }
 

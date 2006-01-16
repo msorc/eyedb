@@ -11,10 +11,17 @@ semlib.cc \
 thread.cc \
 xdr.cc
 
-#m_malloc.cc
-#probelib.cc
-#std_alloc.cc
-#
+libeyedbutils_la_LIBADD=compile_builtin.lo
+
+compile_builtin.lo: $(srcdir)/compile_builtin.cc
+	$(LTCXXCOMPILE) \
+		-DARCH=\"$(host)\" \
+		-DBINDIR=\"$(bindir)\" \
+		-DDATADIR=\"$(datadir)\" \
+		-DLIBDIR=\"$(libdir)\" \
+		-DLOCALSTATEDIR=\"$(localstatedir)\" \
+		-DSYSCONFDIR=\"$(sysconfdir)\" \
+		-c -o $@ $<
 
 libeyedbrpcbe_la_SOURCES= \
 connman.cc \

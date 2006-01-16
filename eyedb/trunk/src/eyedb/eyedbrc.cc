@@ -99,7 +99,7 @@ ld_libpath_manage()
   putenv(strdup(env));
 }
 
-static const char *eyedbroot;
+static const char *bindir;
 #define PIPE_SYNC
 
 extern char **environ;
@@ -118,8 +118,9 @@ execute(const char *prog, const char *arg, Bool pipes)
 #endif
 
   if ((pid = fork()) == 0) {
-    std::string cmd = std::string(eyedbroot) + "/bin/" + prog;
+    std::string cmd = std::string(bindir) + "/" + prog;
     char *argv[3];
+
     argv[0] = (char *)prog;
     argv[1] = (char *)arg;
     argv[2] = 0;
@@ -153,11 +154,6 @@ execute(const char *prog, const char *arg, Bool pipes)
 static int
 startServer(int argc, char *argv[], const char *smdport)
 {
-  if (!eyedbroot) {
-    fprintf(stderr, "The configuration variable root or the -eyedbroot command line option must be set.\n");
-    return 1;
-  }
-
   smdcli_conn_t *conn = smdcli_open(smd_get_port());
   if (conn) {
     if (smdcli_declare(conn) < 0)
@@ -180,8 +176,9 @@ startServer(int argc, char *argv[], const char *smdport)
 
   if ((pid = fork()) == 0) {
     ld_libpath_manage();
-    std::string cmd = std::string(eyedbroot) + "/bin/eyedbd";
+    std::string cmd = std::string(bindir) + "/eyedbd";
     std::string s = std::string("eyedbd");
+
     argv[0] = (char *)s.c_str();
 #ifdef PIPE_SYNC
     close(pfd[0]);
@@ -229,8 +226,8 @@ main(int argc, char *argv[])
   eyedbsm::Status status;
   Bool force = False;
   Bool creatingDbm = False;
-
   string sv_host, sv_port;
+
   eyedb::init(argc, argv, &sv_host, &sv_port, false);
 
   idbport = 0;
@@ -261,7 +258,6 @@ main(int argc, char *argv[])
   else
     return usage(argv[0]);
 
-#if 1
   for (int i = 2; i < argc; i++) {
     char *s = argv[i];
     if (!strcmp(s, "-f"))
@@ -273,35 +269,6 @@ main(int argc, char *argv[])
       return 0;
     }
   }
-#else
-  for (int i = 2; i < argc; i++) {
-    char *s = argv[i];
-    if (s[0] == '-') {
-      if (!strcmp(s, "-f"))
-	force = True;
-      else if (!strcmp(s, "-sv_port")) {
-	check("-sv_port", i, argc);
-	idbport = argv[++i];
-      }
-      else if (!strcmp(s, "-sv_smdport")) {
-	check("-sv_smdport", i, argc);
-	smdport = argv[++i];
-      }
-      else if (!strcmp(s, "-sv_host")) {
-	check("-sv_host", i, argc);
-	idbserv = argv[++i];
-      }
-      else if (!strcmp(s, "-eyedbroot")) {
-	check("-eyedbroot", i, argc);
-	eyedbroot = argv[++i];
-      }
-      else if (!strcmp(s, "-eyedbconf")) {
-	check("-eyedbconf", i, argc);
-	Config::getDefaultConfig()->add(argv[++i]);
-      }
-    }
-  }
-#endif
 
   if (!idbport) {
     if (s = eyedb::getConfigValue("sv_port"))
@@ -310,21 +277,10 @@ main(int argc, char *argv[])
       idbport = Connection::DefaultIDBPortValue;
   }
 
-  /*
-  if (!smdport)
-    smdport = eyedb::getConfigValue("sv_smdport");
-
-  if (smdport)
-    smd_set_port(smdport);
-  */
-
   smdport = smd_get_port();
 
-  // 14/02/05
-  // @@@@@ should be bindir = eyedb::getConfigValue("bindir");
-  if (!eyedbroot)
-    eyedbroot = eyedb::getConfigValue("topdir");
-  //eyedbroot = eyedb::getConfigValue("archdir");
+  if (!bindir)
+    bindir = eyedb::getConfigValue("bindir");
 
   int ac;
   char **av;
