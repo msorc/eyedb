@@ -332,7 +332,7 @@ do { \
       if (map[user_opt].value.length() == 0)
 	ask_for_user();
       else
-	Connection::setDefaultUser(map[user_opt].value.c_str());
+	  Connection::setDefaultUser(map[user_opt].value.c_str());
     }
 
     if (map.find(passwd_opt) != map.end()) {

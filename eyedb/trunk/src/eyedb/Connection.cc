@@ -210,11 +210,11 @@ namespace eyedb {
     if (!set_auth_required)
       {
 	if (!default_user)
-	  default_user = ((s = Config::getClientValue("user")) ?
-			  strdup(s) : strdup(""));
+	  setDefaultUser(((s = Config::getClientValue("user")) ?
+			  strdup(s) : strdup("")));
 	if (!default_passwd)
-	  default_passwd = ((s = Config::getClientValue("passwd")) ?
-			    strdup(s) : strdup(""));
+	  setDefaultPasswd(((s = Config::getClientValue("passwd")) ?
+			    strdup(s) : strdup("")));
       }
   }
 
@@ -256,6 +256,10 @@ namespace eyedb {
 
   void Connection::setDefaultUser(const char *_user)
   {
+    if (!strcmp(_user, "@")) {
+      struct passwd *pwd = getpwuid(getuid());
+      _user = pwd->pw_name;
+    }
     free(default_user);
     default_user = strdup(_user);
   }
