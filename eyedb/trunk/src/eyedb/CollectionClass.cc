@@ -27,6 +27,8 @@
 #include "AttrNative.h"
 #include "CollectionBE.h"
 
+using namespace std;
+
 //
 // collection_class
 //

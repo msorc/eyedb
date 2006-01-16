@@ -26,6 +26,7 @@
 #define _eyedb_eyedbcgi_
 
 using namespace eyedb;
+using namespace std;
 
 /* #include <eyedb/log.h> */
 

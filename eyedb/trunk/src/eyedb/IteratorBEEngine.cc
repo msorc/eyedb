@@ -135,8 +135,8 @@ namespace eyedb {
 	  break;
 	}
 
-	cerr << "IteratorBEEngineAttribute::scanNext: oid must be swapped"
-	     << endl;
+	std::cerr << "IteratorBEEngineAttribute::scanNext: oid must be swapped"
+		  << std::endl;
 
 	atom_array[n].type = IteratorAtom_OID;
 	atom_array[n].oid = *oid.getOid();

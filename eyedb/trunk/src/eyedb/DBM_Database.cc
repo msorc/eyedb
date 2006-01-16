@@ -180,7 +180,7 @@ DBM_Database::getDbFile(const char **dbname, int *_dbid, const char *&dbfile)
       else if (_dbid)
 	*_dbid = dbmentry->dbid();
 
-      dbfile = dbmentry->dbfile().c_str();
+      dbfile = strdup(dbmentry->dbfile().c_str());
     }
 
   delete q;

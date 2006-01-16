@@ -395,7 +395,7 @@ namespace eyedb {
     os = 0;
   }
 
-  StdServerMessageDisplayer::StdServerMessageDisplayer(ostream &_os)
+  StdServerMessageDisplayer::StdServerMessageDisplayer(std::ostream &_os)
   {
     fd = 0;
     os = &_os;
@@ -411,6 +411,6 @@ namespace eyedb {
       write(fileno(fd), msg, strlen(msg));
       return;
     }
-    (*os) << msg << flush;
+    (*os) << msg << std::flush;
   }
 }

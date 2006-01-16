@@ -34,6 +34,8 @@
 #define DEF_PREFIX "eyedb::"
 #define DEF_PREFIX1 "eyedb::"
 
+using namespace std;
+
 //#define COMP_TRACE
 
 namespace eyedb {

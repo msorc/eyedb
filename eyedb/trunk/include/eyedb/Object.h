@@ -1076,8 +1076,8 @@ namespace eyedb {
     void setXInfo(int _xinfo) {xinfo = _xinfo;}
   };
 
-  ostream& operator<<(ostream&, const Object &);
-  ostream& operator<<(ostream&, const Object *);
+  std::ostream& operator<<(std::ostream&, const Object &);
+  std::ostream& operator<<(std::ostream&, const Object *);
 
   enum TraceFlag {
     MTimeTrace    = 0x001,

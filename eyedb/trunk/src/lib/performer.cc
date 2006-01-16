@@ -41,6 +41,8 @@
 
 #include <iomanip>
 
+using namespace std;
+
 //#define TRACE
 
 //

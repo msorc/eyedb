@@ -29,6 +29,8 @@
 
 using std::ostringstream;
 
+using namespace std;
+
 namespace eyedb {
 
 #define IDR_TRACE(MSG) printf("IDR: " MSG " %d => %p\n", idr_sz, idr) 

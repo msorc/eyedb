@@ -25,6 +25,7 @@
 #include <eyedb/eyedb.h>
 
 using namespace eyedb;
+using namespace std;
 
 #define mWRITE 0x1000
 #define mREAD  0x2000

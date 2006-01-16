@@ -141,7 +141,7 @@ public:
 #ifdef USE_STL_LIST
       bool r = std_list_erase(sem_list, this);
       if (!r)
-	cerr << "Warning: semaphore::release " << key << "not found\n";
+	std::cerr << "Warning: semaphore::release " << key << "not found\n";
 #else
       sem_list.deleteObject(this);
 #endif
@@ -281,7 +281,7 @@ public:
       bool r = std_list_erase(dbfile_list, this);
 #ifdef TRACE
       if (!r)
-	cerr << "Warning: DbFile::release " << dbfile << "not found\n";
+	std::cerr << "Warning: DbFile::release " << dbfile << "not found\n";
 #endif
 #else
       dbfile_list.deleteObject(this);
@@ -425,7 +425,7 @@ public:
 	bool r = std_list_erase(dbfile_list, dbf);
 #ifdef TRACE
 	if (!r)
-	  cerr << "Warning: rmDbFile not found\n";
+	  std::cerr << "Warning: rmDbFile not found\n";
 #endif
 	return;
       }
@@ -462,7 +462,7 @@ public:
     bool r = std_list_erase(client_list, this);
 #ifdef TRACE
     if (!r)
-      cerr << "Warning: Client not found\n";
+      std::cerr << "Warning: Client not found\n";
 #endif
 #else
     LinkedListCursor c(dbfile_list);

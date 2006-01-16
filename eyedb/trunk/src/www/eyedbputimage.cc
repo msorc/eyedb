@@ -27,6 +27,8 @@
 #include <sys/stat.h>
 
 using namespace eyedb;
+using namespace std;
+
 static const char *db_str;
 static const char *classname;
 static const char *attrname;

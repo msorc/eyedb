@@ -24,6 +24,8 @@
 
 //#define PASSWD_FILE
 
+using namespace std;
+
 #define NEW_COLLBE_MAN
 
 #define _IDB_KERN_

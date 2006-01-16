@@ -27,12 +27,6 @@
 
 #include <iostream>
 
-using std::ostream;
-using std::istream;
-using std::cout;
-using std::cerr;
-using std::endl;
-
 namespace eyedb {
 
   /**
@@ -42,8 +36,8 @@ namespace eyedb {
 
   class Oid;
 
-  ostream& operator<<(ostream&, const Oid &);
-  ostream& operator<<(ostream&, const Oid *);
+  std::ostream& operator<<(std::ostream&, const Oid &);
+  std::ostream& operator<<(std::ostream&, const Oid *);
 
   /**
      Not yet documented.

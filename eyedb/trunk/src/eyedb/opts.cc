@@ -38,6 +38,8 @@
 
 #define USE_GETOPT
 
+using namespace std;
+
 extern int RPC_MIN_SIZE;
 
 /*
@@ -141,7 +143,7 @@ do { \
 
   static void
   make_options(int &argc, char *argv[], ostream *usage_ostr,
-	       ostream *help_ostr, string *sv_host = 0,
+	       std::ostream *help_ostr, string *sv_host = 0,
 	       string *sv_port = 0, bool purgeargv = true)
   {
     int n = 1;
@@ -163,7 +165,7 @@ do { \
 
 #ifdef USE_GETOPT
     const std::string prefix = "";
-    vector<string> error_v;
+    std::vector<string> error_v;
     error_v.push_back("status");
     error_v.push_back("exception");
     error_v.push_back("abort");

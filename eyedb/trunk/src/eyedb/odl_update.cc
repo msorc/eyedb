@@ -35,6 +35,8 @@ using std::ostringstream;
 
 //#define TRACE
 
+using namespace std;
+
 namespace eyedb {
 
 extern FILE *odl_fd;

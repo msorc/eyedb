@@ -37,6 +37,8 @@
 #include "kernel.h"
 #include "oqlctb.h"
 
+using namespace std;
+
 namespace eyedb {
 
   // 22/08/01: defined if one wants the same API when using dynamic-attr

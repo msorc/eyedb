@@ -38,8 +38,6 @@
 #endif
 
 
-using namespace std;
-
 namespace eyedblib {
 
   class Mutex {
@@ -76,8 +74,8 @@ namespace eyedblib {
     ProfileStats();
     void set(struct timeval &, struct timeval &);
     void reset();
-    static void display_time(ostream &os, double usec);
-    void display(ostream &os, unsigned int run_cnt) const;
+    static void display_time(std::ostream &os, double usec);
+    void display(std::ostream &os, unsigned int run_cnt) const;
   };
 
   class Condition {
@@ -218,11 +216,11 @@ namespace eyedblib {
   public:
     class Initializer;
     friend class Initializer;
-    friend ostream &operator<<(ostream &, const Thread::Profile &);
+    friend std::ostream &operator<<(std::ostream &, const Thread::Profile &);
   };
 
-  ostream &operator<<(ostream &, const Condition::Profile &);
-  ostream &operator<<(ostream &, const Thread::Profile &);
+  std::ostream &operator<<(std::ostream &, const Condition::Profile &);
+  std::ostream &operator<<(std::ostream &, const Thread::Profile &);
 
   class MutexLocker {
 

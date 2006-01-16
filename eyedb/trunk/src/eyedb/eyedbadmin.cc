@@ -36,6 +36,7 @@
 #include "GetOpt.h"
 
 using namespace eyedb;
+using namespace std;
 
 #ifdef LINUX
 #define  _sys_siglistp  _sys_siglist
@@ -3543,8 +3544,10 @@ userlist_realize(int n, char *str[], DBM_Database *dbm)
       Status s = dbm->getUser(str[i], user);
       CHECK(s);
 
-      if (!user)
-	printf("user '%s' not found\n", str[i]);
+      if (!user) {
+	print_prog();
+	fprintf(stderr, "user '%s' not found\n", str[i]);
+      }
       else
 	{
 	  if (i)
@@ -3828,7 +3831,8 @@ dblist_realize(int n, char *str[], DBM_Database *dbm)
 
       if (!cnt)
 	{
-	  printf("database '%s' not found\n", str[i]);
+	  print_prog();
+	  fprintf(stderr, "database '%s' not found\n", str[i]);
 	  error++;
 	}
       else

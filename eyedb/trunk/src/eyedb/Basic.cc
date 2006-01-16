@@ -806,7 +806,7 @@ Int16Class::decode(void * hdata, // to
 		      unsigned int nb) const
 {
 #ifdef E_XDR_TRACE
-  cout << "Int16Class::decode " << name << endl;
+  std::cout << "Int16Class::decode " << name << std::endl;
 #endif
   CHECK_INCSIZE("decode", incsize, sizeof(eyedblib::int16));
 
@@ -827,7 +827,7 @@ Int16Class::encode(void * xdata, // to
 		      unsigned int nb) const
 {
 #ifdef E_XDR_TRACE
-  cout << "Int16Class::encode " << name << endl;
+  std::cout << "Int16Class::encode " << name << std::endl;
 #endif
   CHECK_INCSIZE("encode", incsize, sizeof(eyedblib::int16));
 
@@ -847,7 +847,7 @@ Int16Class::cmp(const void * xdata,
 		   unsigned int nb) const
 {
 #ifdef E_XDR_TRACE
-  cout << "Int16Class::cmp " << name;
+  std::cout << "Int16Class::cmp " << name;
 #endif
   CHECK_INCSIZE("cmp", incsize, sizeof(eyedblib::int16));
 
@@ -856,7 +856,7 @@ Int16Class::cmp(const void * xdata,
     x2h_16_cpy(&l, xdata);
     int r = memcmp(&l, hdata, sizeof(eyedblib::int16));
 #ifdef E_XDR_TRACE
-    cout << " -> " << r << endl;
+    std::cout << " -> " << r << std::endl;
 #endif
     return r;
   }
@@ -971,7 +971,7 @@ Int32Class::decode(void * hdata, // to
 		      unsigned int nb) const
 {
 #ifdef E_XDR_TRACE
-  cout << "Int32Class::decode " << name << endl;
+  std::cout << "Int32Class::decode " << name << std::endl;
 #endif
   CHECK_INCSIZE("decode", incsize, sizeof(eyedblib::int32));
 
@@ -992,7 +992,7 @@ Int32Class::encode(void * xdata, // to
 		      unsigned int nb) const
 {
 #ifdef E_XDR_TRACE
-  cout << "Int32Class::encode " << name << endl;
+  std::cout << "Int32Class::encode " << name << std::endl;
 #endif
   CHECK_INCSIZE("encode", incsize, sizeof(eyedblib::int32));
 
@@ -1012,7 +1012,7 @@ Int32Class::cmp(const void * xdata,
 		   unsigned int nb) const
 {
 #ifdef E_XDR_TRACE
-  cout << "Int32Class::cmp " << name;
+  std::cout << "Int32Class::cmp " << name;
 #endif
   CHECK_INCSIZE("cmp", incsize, sizeof(eyedblib::int32));
 
@@ -1021,7 +1021,7 @@ Int32Class::cmp(const void * xdata,
     x2h_32_cpy(&l, xdata);
     int r = memcmp(&l, hdata, sizeof(eyedblib::int32));
 #ifdef E_XDR_TRACE
-    cout << " -> " << r << endl;
+    std::cout << " -> " << r << std::endl;
 #endif
     return r;
   }
@@ -1139,7 +1139,7 @@ Int64Class::decode(void * hdata, // to
 		      unsigned int nb) const
 {
 #ifdef E_XDR_TRACE
-  cout << "Int64Class::decode " << name << endl;
+  std::cout << "Int64Class::decode " << name << std::endl;
 #endif
   CHECK_INCSIZE("decode", incsize, sizeof(eyedblib::int64));
 
@@ -1160,7 +1160,7 @@ Int64Class::encode(void * xdata, // to
 		      unsigned int nb) const
 {
 #ifdef E_XDR_TRACE
-  cout << "Int64Class::encode " << name << endl;
+  std::cout << "Int64Class::encode " << name << std::endl;
 #endif
   CHECK_INCSIZE("encode", incsize, sizeof(eyedblib::int64));
 
@@ -1180,7 +1180,7 @@ Int64Class::cmp(const void * xdata,
 		   unsigned int nb) const
 {
 #ifdef E_XDR_TRACE
-  cout << "Int64Class::cmp " << name;
+  std::cout << "Int64Class::cmp " << name;
 #endif
   CHECK_INCSIZE("cmp", incsize, sizeof(eyedblib::int64));
 
@@ -1189,7 +1189,7 @@ Int64Class::cmp(const void * xdata,
     x2h_64_cpy(&l, xdata);
     int r = memcmp(&l, hdata, sizeof(eyedblib::int64));
 #ifdef E_XDR_TRACE
-    cout << " -> " << r << endl;
+    std::cout << " -> " << r << std::endl;
 #endif
     return r;
   }
@@ -1409,7 +1409,7 @@ FloatClass::decode(void * hdata, // to
 		      unsigned int nb) const
 {
 #ifdef E_XDR_TRACE
-  cout << "FloatClass::decode " << name << endl;
+  std::cout << "FloatClass::decode " << name << std::endl;
 #endif
   CHECK_INCSIZE("decode", incsize, sizeof(eyedblib::float64));
 
@@ -1430,7 +1430,7 @@ FloatClass::encode(void * xdata, // to
 		      unsigned int nb) const
 {
 #ifdef E_XDR_TRACE
-  cout << "FloatClass::encode " << name << endl;
+  std::cout << "FloatClass::encode " << name << std::endl;
 #endif
   CHECK_INCSIZE("encode", incsize, sizeof(eyedblib::float64));
 
@@ -1450,7 +1450,7 @@ FloatClass::cmp(const void * xdata,
 		   unsigned int nb) const
 {
 #ifdef E_XDR_TRACE
-  cout << "FloatClass::cmp " << name;
+  std::cout << "FloatClass::cmp " << name;
 #endif
   CHECK_INCSIZE("cmp", incsize, sizeof(eyedblib::float64));
 
@@ -1459,7 +1459,7 @@ FloatClass::cmp(const void * xdata,
     x2h_f64_cpy(&l, xdata);
     int r = memcmp(&l, hdata, sizeof(eyedblib::float64));
 #ifdef E_XDR_TRACE
-    cout << " -> " << r << endl;
+    std::cout << " -> " << r << std::endl;
 #endif
     return r;
   }
@@ -1575,7 +1575,7 @@ OidClass::decode(void * hdata, // to
 		    unsigned int nb) const
 {
 #ifdef E_XDR_TRACE
-  cout << "OidClass::decode " << name << endl;
+  std::cout << "OidClass::decode " << name << std::endl;
 #endif
   CHECK_INCSIZE("decode", incsize, sizeof(Oid));
 
@@ -1601,7 +1601,7 @@ OidClass::encode(void * xdata, // to
 		      unsigned int nb) const
 {
 #ifdef E_XDR_TRACE
-  cout << "OidClass::encode " << name << endl;
+  std::cout << "OidClass::encode " << name << std::endl;
 #endif
   CHECK_INCSIZE("encode", incsize, sizeof(Oid));
 
@@ -1626,7 +1626,7 @@ OidClass::cmp(const void * xdata,
 		 unsigned int nb) const
 {
 #ifdef E_XDR_TRACE
-  cout << "OidClass::cmp " << name;
+  std::cout << "OidClass::cmp " << name;
 #endif
   CHECK_INCSIZE("cmp", incsize, sizeof(Oid));
 
@@ -1635,7 +1635,7 @@ OidClass::cmp(const void * xdata,
     eyedbsm::x2h_oid(&xoid, xdata);
     int r = memcmp(&xoid, hdata, sizeof(xoid));
 #ifdef E_XDR_TRACE
-    cout << " -> " << r << endl;
+    std::cout << " -> " << r << std::endl;
 #endif
     return r;
   }

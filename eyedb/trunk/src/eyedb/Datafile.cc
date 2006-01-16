@@ -25,6 +25,8 @@
 #include <assert.h>
 #include <eyedb_p.h>
 
+using namespace std;
+
 namespace eyedb {
 
   Status
@@ -84,7 +86,7 @@ namespace eyedb {
 #define ONE_G (ONE_M*ONE_K)
 
   void
-  display_datsize(ostream &os, unsigned long long _sz)
+  display_datsize(std::ostream &os, unsigned long long _sz)
   {
     unsigned long long sz1, sz2;
     unsigned long long sz;
@@ -125,7 +127,7 @@ namespace eyedb {
     os << '\n';
   }
 
-  ostream& operator<<(ostream &os, const Datafile &dat)
+  std::ostream& operator<<(std::ostream &os, const Datafile &dat)
   {
     os << "Datafile #" << dat.getId() << '\n';
 
@@ -160,7 +162,7 @@ namespace eyedb {
     info = _info;
   }
 
-  ostream& operator<<(ostream& os, const DatafileInfo &datinfo)
+  std::ostream& operator<<(std::ostream& os, const DatafileInfo &datinfo)
   {
     if (!datinfo.getDatafile()) {
       os << "Null Datafile";

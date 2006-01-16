@@ -27,6 +27,8 @@
 
 //#define TRACE
 
+using namespace std;
+
 #define MAXDEPTH 256
 const int idbW_member = -1;
 

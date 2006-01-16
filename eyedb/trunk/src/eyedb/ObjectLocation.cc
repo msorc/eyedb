@@ -27,6 +27,8 @@
 #include <assert.h>
 #include "eyedbsm/eyedbsm_p.h"
 
+using namespace std;
+
 namespace eyedbsm {
   extern int power2(int);
 }

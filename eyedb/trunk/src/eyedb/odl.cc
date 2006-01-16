@@ -3716,11 +3716,11 @@ namespace eyedb {
   static int
   check_odlfile(const char *file, const char *cpp_cmd, const char *cpp_flags)
   {
+    odl_decl_list = new LinkedList();
+
     if (file) {
       FILE *fd;
       
-      odl_decl_list = new LinkedList();
-
       if (!strcmp(file, "-"))
 	odlin = stdin;
       else {
