@@ -270,9 +270,10 @@ LinkedList *Database::dbopen_list;
     if (!defaultDBMDB)
       {
 	static char buff[256];
-	const char *path = getConfigValue("dbm");
+	const char *path = getConfigValue("sv_dbm");
 	if (!path)
 	  return DBM_Database::defaultDBMDB;
+	//	printf("%d: getDefaultDBMDB: %s\n", getpid(), path);
 	strcpy(buff, path);
 #ifdef NEW_DBMDB
 	return buff;
@@ -838,7 +839,7 @@ if ((mode) !=  NoDBAccessMode && \
 	int pid;
 	DbHandle *ldbh;
 
-	rpc_status = IDB_dbOpen(ConnectionPeer::getConnH(ch), dbmdb_str,
+	rpc_status = IDB_dbOpen(ConnectionPeer::getConnH(ch), (const char *&)dbmdb_str,
 				user, passwd,
 				pname, dbid, flag, (oh ? oh->maph : 0),
 				(oh ? oh->mapwide : 0),

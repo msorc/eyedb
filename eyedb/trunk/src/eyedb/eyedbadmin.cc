@@ -340,7 +340,7 @@ usage(const char *prog)
   if (!mode || mode == mUserAdd)
 #if 1 //def HAS_FATTACH
     fprintf(pipe,
-	    "%suseradd [--unix|--strict-unix] <username> [<passwd>]\n", str());
+	    "%suseradd [--unix|--strict-unix=]<username> [<passwd>]\n", str());
 #else
     fprintf(pipe,
 	    "%suseradd <username> [<passwd>]\n", str());
@@ -1969,9 +1969,10 @@ get_db_opts(int s, int argc, char *argv[],
 	    Bool *newdbid, char **dbname, char **newdbname,
 	    Bool etc)
 {
+  string value;
+
   for (int i = s; i < argc; i++) {
     char *s = argv[i];
-#if 1
     string value;
     if (GetOpt::parseLongOpt(s, "dbfile", &value))
       dbfile = value;
@@ -2000,6 +2001,11 @@ get_db_opts(int s, int argc, char *argv[],
     }
     else if (GetOpt::parseLongOpt(s, "new-dbid", &value))
       *newdbid = True;
+    // for dbmcreate
+    else if (GetOpt::parseLongOpt(s, "strict-unix", &value)) {
+      *dbname = strdup(value.c_str());
+      *newdbname = (char *)strict_unix_user;
+    }
     else if (*s == '-')
       return usage(prog);
     else if (!*dbname)
@@ -2008,73 +2014,6 @@ get_db_opts(int s, int argc, char *argv[],
       *newdbname = argv[i];
     else if (!etc)
       return usage(prog);
-#else
-
-    if (!strcmp(s, "-dbfile"))
-      {
-	if (i+1 >= argc)
-	  return usage(prog);
-
-	*dbfile = argv[i+1];
-	i += 2;
-      }
-    else if (!strcmp(s, "-objcnt"))
-      {
-	if (i+1 >= argc)
-	  return usage(prog);
-
-	*nbobjs = atoi(argv[i+1]);
-	i += 2;
-      }
-    else if (!strcmp(s, "-filedir"))
-      {
-	if (i+1 >= argc)
-	  return usage(prog);
-
-	*filedir = argv[i+1];
-	i += 2;
-      }
-    else if (!strcmp(s, "-datafiles"))
-      {
-	if (i+1 >= argc)
-	  return usage(prog);
-
-	for (++i; i < argc; i++)
-	  if (argv[i][0] == '-')
-	    break;
-	  else
-	    {
-	      if (dbcreate)
-		{
-		  if (get_datafile_opts(argv[i], datafiles, datafiles_cnt))
-		    return 1;
-		}
-	      else
-		datafiles[(*datafiles_cnt)++] = argv[i];
-	    }
-      }
-    else if (!strcmp(s, "-newdbid"))
-      {
-	*newdbid = True;
-	i++;
-      }
-    else if (*s == '-')
-      return usage(prog);
-    else if (!*dbname)
-      {
-	*dbname = argv[i];
-	i++;
-      }
-    else if (!*newdbname)
-      {
-	*newdbname = argv[i];
-	i++;
-      }
-    else if (!etc)
-      return usage(prog);
-    else
-      i++;
-#endif
   }
 
   return 0;
@@ -2400,12 +2339,19 @@ db_realize(int start, int argc, char *argv[])
       if (!dbname)
 	return usage(prog);
 
-      if (!newdbname)
-	{
-	  char buf[64];
-	  sprintf(buf, "%s password", dbname);
-	  passwd_realize(buf, &newdbname);
+      if (!newdbname) {
+	char buf[64];
+	sprintf(buf, "%s password", dbname);
+	passwd_realize(buf, &newdbname);
+      }
+      else if (!strcmp(newdbname, strict_unix_user)) {
+	if (!strcmp(dbname, "@")) {
+	  struct passwd *pwd = getpwuid(getuid());
+	  if (!pwd)
+	    return usage(prog);
+	  dbname = strdup(pwd->pw_name);
 	}
+      }
 
       auth_realize();
       return dbmcreate_realize(dbname, newdbname, dbfile, datafiles, datafiles_cnt);
@@ -3130,27 +3076,20 @@ get_admin_opts(int s, int argc, char *argv[], char **username,
   if (!*username)
     return usage(prog);
 
+  string value;
   switch(mode)
     {
     case mUserAdd:
-      check_argc_u(s+2, argc);
-#if 1 //def HAS_FATTACH
-      if (!strcmp(*username, "--unix"))
-	{
-	  user_type = UnixUser;
-	  *username = argv[s++];
-	  if (!*username)
-	    return usage(prog);
-	}
-      else if (!strcmp(*username, "--strict-unix"))
-	{
-	  user_type = StrictUnixUser;
-	  *username = argv[s++];
-	  if (!*username)
-	    return usage(prog);
-	}
+      check_argc_u(s+1, argc);
+      if (GetOpt::parseLongOpt(*username, "unix", &value)) {
+	user_type = UnixUser;
+	*username = strdup(value.c_str());
+      }
+      else if (GetOpt::parseLongOpt(*username, "strict-unix", &value)) {
+	user_type = StrictUnixUser;
+	*username = strdup(value.c_str());
+      }
       else
-#endif
 	user_type = EyeDBUser;
 
       if (user_type == StrictUnixUser)
@@ -3294,20 +3233,28 @@ admin_realize(int start, int argc, char *argv[])
 		     &dbname, &accessmode, user_type))
     return 1;
 
-  if (*username == '-')
-    return usage(prog);
+  if (!strcmp(username, "@")) {
+    struct passwd *pwd = getpwuid(getuid());
+    if (!pwd)
+      return usage(prog);
+    username = strdup(pwd->pw_name);
+  }
+
+  if (!*username) {
+    fprintf(stderr, "%s: a username cannot be the empty string", argv[0]);
+    return 1;
+  }
 
   dbmdatabase = new DBM_Database();
 
   switch(mode)
     {
     case mUserAdd:
-      if (!passwd && user_type != StrictUnixUser)
-	{
-	  char buf[128];
-	  sprintf(buf, "%s password", username);
-	  passwd_realize(buf, &passwd);
-	}
+      if (!passwd && user_type != StrictUnixUser) {
+	char buf[128];
+	sprintf(buf, "%s password", username);
+	passwd_realize(buf, &passwd);
+      }
       auth_realize();
       return useradd_realize(username, passwd, user_type);
 
