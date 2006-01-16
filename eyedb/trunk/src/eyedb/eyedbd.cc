@@ -72,7 +72,7 @@ get_opts(int argc, char *argv[],
   int i;
   const char *s;
 
-  *accessfile = eyedb::getConfigValue("sv_access_file");
+  *accessfile = eyedb::Config::getServerValue("sv_access_file");
   *nofork = 0;
   *sesslogdev = 0;
   *sessloglevel = 0;
@@ -130,7 +130,7 @@ get_opts(int argc, char *argv[],
       getIntValue(map[sessloglevel_opt].value);
 
   if (!*datdir) {
-    if (s = eyedb::getConfigValue("sv_datdir"))
+    if (s = eyedb::Config::getServerValue("sv_datdir"))
       *datdir = strdup(s);
     else {
       fprintf(stderr, "configuration variable sv_datdir is not set\n");
@@ -247,7 +247,7 @@ main(int argc, char *argv[])
   rpc_setProgName(argv[0]);
 
   if (!*listen)
-    listen = eyedb::getConfigValue("listen");
+    listen = eyedb::Config::getServerValue("listen");
 
   nlisten = get_ports(ports, hosts, listen);
 
@@ -275,7 +275,7 @@ main(int argc, char *argv[])
   *pid = getpid();
   rpc_setQuitHandler(_quit_handler, pid);
 
-  const char *sv_tmpdir = eyedb::getConfigValue("sv_tmpdir");
+  const char *sv_tmpdir = eyedb::Config::getServerValue("sv_tmpdir");
 
   if (!sv_tmpdir)
     sv_tmpdir = "/tmp";

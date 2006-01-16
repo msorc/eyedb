@@ -104,7 +104,7 @@ using namespace eyedb;
   Status
   __method_static_OUT_string_getConfigValue_eyedb__IN_string(Database *_db, FEMethod_C *_m, const char * name, char * &retarg)
   {
-    const char *x = eyedb::getConfigValue(name);
+    const char *x = eyedb::Config::getClientValue(name);
     retarg = Argument::dup(x ? x : "");
     return Success;
   }

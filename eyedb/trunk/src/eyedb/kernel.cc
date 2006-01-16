@@ -6689,7 +6689,7 @@ do { \
 	  settimeout(timeout);
 	else
 	  {
-	    const char *x = eyedb::getConfigValue("sv_timeout");
+	    const char *x = eyedb::Config::getServerValue("sv_timeout");
 	    if (x)
 	      settimeout(atoi(x));
 	  }
@@ -6700,7 +6700,7 @@ do { \
 #endif
 
     // kludge
-    s = eyedb::getConfigValue("coll_hidx_oid");
+    s = eyedb::Config::getServerValue("coll_hidx_oid");
     if (s) {
       if (!strcasecmp(s, "no")) {
 	coll_hidx_oid = False;

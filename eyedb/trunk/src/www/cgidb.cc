@@ -173,7 +173,7 @@ open_database(const char *dbname, Database *&db,
 #endif
       status =
 	Database::open(idbW_conn, dbname,
-		       eyedb::getConfigValue("dbm"), user, passwd, flag, 0, &db);
+		       eyedb::Config::getClientValue("dbm"), user, passwd, flag, 0, &db);
 
       if (status)
 	{
@@ -799,7 +799,7 @@ static DBM_Database *dbm;
 static int
 idbWOpenDBM()
 {
-  dbm = new DBM_Database(eyedb::getConfigValue("dbm"));
+  dbm = new DBM_Database(eyedb::Config::getClientValue("dbm"));
   Status status = 
     dbm->open(idbW_conn, Database::DBSRead, idbW_ctx->user, idbW_ctx->passwd);
   if (status)

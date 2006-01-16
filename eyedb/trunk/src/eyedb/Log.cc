@@ -57,7 +57,7 @@ static Bool log_progname;
 Status Log::init(const char *_progName, const char *_logName)
 {
   progName = _progName;
-  logName = (_logName ? _logName : eyedb::getConfigValue("log"));
+  logName = (_logName ? _logName : eyedb::Config::getClientValue("log"));
 
   utlogInit(progName, logName);
 
@@ -69,7 +69,7 @@ Status Log::init(const char *_progName, const char *_logName)
   if (getLogMask())
     return Success;
 
-  const char *s = eyedb::getConfigValue("logmask");
+  const char *s = eyedb::Config::getClientValue("logmask");
   if (s) {
     /*
     LogMask mask;

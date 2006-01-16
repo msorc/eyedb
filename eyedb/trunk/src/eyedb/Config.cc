@@ -29,16 +29,18 @@
 #include "eyedblib/strutils.h"
 #include "lib/compile_builtin.h"
 
-extern struct config_default {
-  const char *name, *value;
-} config_defaults[];
-
 #define MAXFILES 16
 
 namespace eyedb {
 
-  static int init_done;
-  static Config *the_config;
+  Config *Config::theClientConfig = 0;
+  Config *Config::theServerConfig = 0;
+
+  static Bool initialized = False;
+
+  /*
+   * Config file parser
+   */
 
   static int fd_w;
   static FILE *fd;
@@ -49,10 +51,6 @@ namespace eyedb {
   static int line[MAXFILES];
   static char *file_sp[MAXFILES];
 
-#define USE_ENV
-  //#define IDEM_PREFIX
-
-#ifdef USE_ENV
   static const char *
   uppercase(const char *s)
   {
@@ -66,7 +64,6 @@ namespace eyedb {
     *p = 0;
     return buf;
   }
-#endif
 
   static int
   skip_spaces()
@@ -152,8 +149,6 @@ namespace eyedb {
     return str.c_str();
   }
 
-  static Bool initialized = False;
-
   static void
   error(const char *msg)
   {
@@ -192,6 +187,37 @@ namespace eyedb {
     fprintf(stderr, fmt, x1, x2, x3);
     fprintf(stderr, "\n");
     exit(1);
+  }
+
+  static int
+  push_file(const char *file, int quietFileNotFoundError)
+  {
+    if (strlen(file) > 2 && file[0] == '/' && file[1] == '/')
+      {
+	file += 2;
+	std::string s =  std::string( eyedblib::CompileBuiltin::getSysconfdir()) + "/" + file;
+	fd = fopen( s.c_str(), "r");
+      }
+    else
+      fd = fopen(file, "r");
+
+    if (!fd)
+      {
+	if (quietFileNotFoundError)
+	  return 0;
+	else
+	  error("%scannot open file '%s' for reading",
+	        line_str(), file);
+      }
+
+    pline = &line[fd_w];
+    fd_sp[fd_w] = fd;
+    file_sp[fd_w] = strdup(file);
+    pfile = file;
+    *pline = 1;
+    fd_w++;
+
+    return 1;
   }
 
   static const char *
@@ -284,7 +310,7 @@ namespace eyedb {
 	if (c == '\n')
 	  {
 	    (*pline)++;
-	    if (!force) // added the 10/10/99
+	    if (!force)
 	      break;
 	  }
 	else if (!force)
@@ -332,23 +358,6 @@ namespace eyedb {
     return (p != tok || force || hasvar) ? tok : nexttoken_realize(config);
   }
 
-  static void
-  push_file(const char *file)
-  {
-    fd = fopen(file, "r");
-
-    if (!fd)
-      error("%scannot open file '%s' for reading",
-	    line_str(), file);
-
-    pline = &line[fd_w];
-    fd_sp[fd_w] = fd;
-    file_sp[fd_w] = strdup(file);
-    pfile = file;
-    *pline = 1;
-    fd_w++;
-  }
-
   static const char *
   nexttoken(Config *config)
   {
@@ -376,149 +385,17 @@ namespace eyedb {
 	    return 0;
 	  }
 
-	push_file(file);
+	push_file(file, 0);
 	return nexttoken(config);
       }
 
     return p;
   }
 
-  static std::string
-  get_conf()
+  void Config::add(const char *file, int quietFileNotFoundError)
   {
-    const char *eyedbconf = getenv("EYEDBCONF");
-    if (eyedbconf)
-      return eyedbconf;
-
-    return std::string(eyedblib::CompileBuiltin::getSysconfdir()) + "/eyedb/eyedb.conf";
-  }
-
-  void
-  Config::init()
-  {
-    if (initialized) return;
-
-    std::string eyedbconf = get_conf().c_str();
-
-    if (eyedbconf.length() > 0)
-      {
-	new Config(eyedbconf.c_str());
-	initialized = True;
-	return;
-      }
-
-    new Config();
-
-    initialized = True;
-  }
-
-  void
-  Config::_release()
-  {
-    delete the_config;
-  }
-
-  void
-  Config::addDefaults()
-  {
-    std::string libdir = eyedblib::CompileBuiltin::getLibdir();
-    std::string localstatedir = eyedblib::CompileBuiltin::getLocalstatedir();
-    std::string sysconfdir = eyedblib::CompileBuiltin::getSysconfdir();
-
-    // Executables directory
-    add( "bindir", eyedblib::CompileBuiltin::getBindir());
-
-    // Bases directory
-    add( "sv_datdir", (localstatedir + "/lib/eyedb/db").c_str());
-
-    // pipes:
-    add( "sv_pipedir", (localstatedir + "/lib/eyedb/pipes").c_str());
-
-    // tmpdir
-    add( "sv_tmpdir", (localstatedir + "/lib/eyedb/tmp").c_str());
-
-    // sopath
-    add( "sopath", (libdir + "/eyedb").c_str());
-
-    // EYEDBDBM Database
-    add( "sv_dbm", (localstatedir + "/lib/eyedb/db/dbmdb.dbs").c_str());
-
-    // Server Parameters
-    add( "sv_access_file", (sysconfdir + "/eyedb/Access").c_str());
-    add( "sv_smdport", (localstatedir + "/lib/eyedb/pipes/eyedbsmd").c_str());
-
-    // Port
-    add( "port", (localstatedir + "/lib/eyedb/pipes/eyedbd").c_str());
-
-    // Server Parameters
-    add( "sv_port", (localstatedir + "/lib/eyedb/pipes/eyedbd").c_str());
-
-    // OQL path
-    add( "oqlpath", (libdir + "/eyedb/oql").c_str());
-
-    // Hostname
-    add( "host", "localhost");
-  }
-
-  Config::Config(const char *file)
-  {
-    if (!the_config)
-      the_config = this;
-
-    addDefaults();
-
-    if (file) {
-      add(file);
-      init_done = 1;
+    if (!push_file(file, quietFileNotFoundError))
       return;
-    }
-
-    init_done = 0;
-  }
-
-  Config::Config(const Config &config)
-  {
-    *this = config;
-  }
-
-  Config& Config::operator=(const Config &config)
-  {
-    garbage();
-
-    LinkedListCursor c(config.list);
-    Item *item;
-    while(c.getNext((void *&)item))
-      list.insertObjectFirst(new Item(*item));
-
-    return *this;
-  }
-
-  Config::Item& Config::Item::operator=(const Item &item)
-  {
-    if (this == &item)
-      return *this;
-
-    free(name);
-    free(value);
-    name = strdup(item.name);
-    value = strdup(item.value);
-    return *this;
-  }
-
-  void Config::add(const char *name, const char *value)
-  {
-    Item *item = new Item(name, value);
-    list.insertObjectFirst(item);
-  }
-
-  void Config::setValue(const char *name, const char *value)
-  {
-    add((char *)name, (char *)value);
-  }
-
-  void Config::add(const char *file)
-  {
-    push_file(file);
 
     int state = 0;
     char *name = 0, *value = 0;
@@ -555,7 +432,7 @@ namespace eyedb {
 	  case 3:
 	    if (strcmp(p, term))
 	      error(std::string("'") + term + "' expected, got '" + p + "'");
-	    add(name, value);
+	    setValue( name, value);
 	    free(name);
 	    free(value);
 	    name = 0;
@@ -566,19 +443,159 @@ namespace eyedb {
       }
   }
 
+
+  /*
+   * Config init static method
+   * Is there mainly so that error() functions work... but probably it is no longer needed
+   */
+  void
+  Config::init()
+  {
+    if (initialized) 
+      return;
+
+    initialized = True;
+  }
+
+  /*
+   * Config and Config::Item constructors, destructor and operator=
+   */
+
+  Config::Config()
+    : list()
+  {
+  }
+
+  // @@@ FIXME: this constructor does not set the defaults
+  Config::Config(const char *file)
+  {
+    add(file);
+  }
+
+  Config::Config(const Config &config)
+  {
+    *this = config;
+  }
+
+  void
+  Config::garbage()
+  {
+    LinkedListCursor c(list);
+    Item *item;
+
+    while (c.getNext((void *&)item))
+      delete item;
+
+    list.empty();
+  }
+
+  Config& Config::operator=(const Config &config)
+  {
+    garbage();
+
+    LinkedListCursor c(config.list);
+    Item *item;
+    while(c.getNext((void *&)item))
+      list.insertObjectFirst(new Item(*item));
+
+    return *this;
+  }
+
+  Config::~Config()
+  {
+    garbage();
+  }
+
+  Config::Item& Config::Item::operator=(const Item &item)
+  {
+    if (this == &item)
+      return *this;
+
+    free(name);
+    free(value);
+    name = strdup(item.name);
+    value = strdup(item.value);
+    return *this;
+  }
+
+  Config::Item::Item()
+  {
+    name = 0;
+    value = 0;
+  }
+
+  Config::Item::Item(const char *_name, const char *_value)
+  {
+    name = strdup(_name);
+    value = strdup(_value);
+  }
+
+  Config::Item::Item(const Item &item)
+  {
+    name = strdup(item.name);
+    value = strdup(item.value);
+  }
+
+  Config::Item::~Item()
+  {
+    free(name);
+    free(value);
+  }
+
+
+  /*
+   * Config operator<<
+   */
+
+  std::ostream& operator<<( std::ostream& os, const Config& config)
+  {
+    LinkedListCursor c(config.list);
+    Config::Item *item;
+
+    while (c.getNext((void *&)item))
+      {
+	os << "name= " << item->name << " value= " << item->value << std::endl;
+      }
+
+    return os;
+  }
+
+
+  /*
+   * Config static _release method
+   */
+
+  void
+  Config::_release()
+  {
+    if (theClientConfig)
+      delete theClientConfig;
+
+    if (theServerConfig)
+      delete theServerConfig;
+
+    theClientConfig = 0;
+    theServerConfig = 0;
+  }
+
+
+  /*
+   * Config variable set and get
+   */
+
+  void 
+  Config::setValue(const char *name, const char *value)
+  {
+    Item *item = new Item(name, value);
+    list.insertObjectFirst(item);
+  }
+
   const char *
   Config::getValue(const char *name)
   {
-#ifdef IDEM_PREFIX
-    static const char prefix[] = "eyedb";
-    static const int prefix_len = strlen(prefix);
-#endif
-
-#ifdef USE_ENV
     const char *s = getenv((std::string("EYEDB") + uppercase(name)).c_str());
     if (s)
       return s;
-#endif
 
     LinkedListCursor c(list);
     Item *item;
@@ -587,11 +604,6 @@ namespace eyedb {
       if (!strcasecmp(item->name, name)) {
 	return item->value;
       }
-
-#ifdef IDEM_PREFIX
-    if (!strncasecmp(name, prefix, prefix_len))
-      return getValue(&name[prefix_len]);
-#endif
 
     return (const char *)0;
   }
@@ -628,73 +640,119 @@ namespace eyedb {
     return items;
   }
 
-  Config *Config::getDefaultConfig()
-  {
-    return the_config;
-  }
 
-  void Config::setDefaultConfig(Config *config)
-  {
-    the_config = config;
-  }
+  /*
+   * Client and server config management
+   */
 
-  Config::Item::Item()
+  static std::string
+  getConfigFile( const char* environmentVariable, const char* configFilename)
   {
-    name = 0;
-    value = 0;
-  }
+    const char* realname;
 
-  Config::Item::Item(const char *_name, const char *_value)
-  {
-    name = strdup(_name);
-    value = strdup(_value);
-  }
+    realname = getenv( environmentVariable);
+    if (realname)
+      return realname;
 
-  Config::Item::Item(const Item &item)
-  {
-    name = strdup(item.name);
-    value = strdup(item.value);
-  }
-
-  Config::Item::~Item()
-  {
-    free(name);
-    free(value);
+    return std::string(eyedblib::CompileBuiltin::getSysconfdir()) + "/eyedb/" + configFilename;
   }
 
   void
-  Config::garbage()
+  Config::setClientDefaults()
   {
-    LinkedListCursor c(list);
-    Item *item;
+    std::string localstatedir = eyedblib::CompileBuiltin::getLocalstatedir();
 
-    while (c.getNext((void *&)item))
-      delete item;
+    // Port
+    setValue( "port", (localstatedir + "/lib/eyedb/pipes/eyedbd").c_str());
 
-    list.empty();
+    // Hostname
+    setValue( "host", "localhost");
   }
 
-  Config::~Config()
+  void
+  Config::setServerDefaults()
   {
-    garbage();
+    std::string libdir = eyedblib::CompileBuiltin::getLibdir();
+    std::string localstatedir = eyedblib::CompileBuiltin::getLocalstatedir();
+    std::string sysconfdir = eyedblib::CompileBuiltin::getSysconfdir();
+
+    // Executables directory
+    setValue( "bindir", eyedblib::CompileBuiltin::getBindir());
+
+    // Bases directory
+    setValue( "sv_datdir", (localstatedir + "/lib/eyedb/db").c_str());
+
+    // pipes:
+    setValue( "sv_pipedir", (localstatedir + "/lib/eyedb/pipes").c_str());
+
+    // tmpdir
+    setValue( "sv_tmpdir", (localstatedir + "/lib/eyedb/tmp").c_str());
+
+    // sopath
+    setValue( "sopath", (libdir + "/eyedb").c_str());
+
+    // EYEDBDBM Database
+    setValue( "sv_dbm", (localstatedir + "/lib/eyedb/db/dbmdb.dbs").c_str());
+
+    // Server Parameters
+    setValue( "sv_access_file", (sysconfdir + "/eyedb/Access").c_str());
+    setValue( "sv_smdport", (localstatedir + "/lib/eyedb/pipes/eyedbsmd").c_str());
+
+    // Server Parameters
+    setValue( "listen", (localstatedir + "/lib/eyedb/pipes/eyedbd").c_str());
+
+    // OQL path
+    setValue( "oqlpath", (libdir + "/eyedb/oql").c_str());
   }
 
-  std::ostream& operator<<( std::ostream& os, const Config& config)
+  Config* 
+  Config::getClientConfig()
   {
-    LinkedListCursor c(config.list);
-    Config::Item *item;
+    if (theClientConfig)
+      return theClientConfig;
 
-    while (c.getNext((void *&)item))
-      {
-	os << "name= " << item->name << " value= " << item->value << std::endl;
-      }
+    theClientConfig = new Config();
 
-    return os;
+    theClientConfig->setClientDefaults();
+
+    std::string configFile = getConfigFile( "EYEDBDCONF", "eyedbd.conf");
+
+    theClientConfig->add( configFile.c_str(), 1);
+
+    return theClientConfig;
+  }
+  
+  Config* 
+  Config::getServerConfig()
+  {
+    if (theServerConfig)
+      return theServerConfig;
+
+    theServerConfig = new Config();
+    
+    theServerConfig->setServerDefaults();
+
+    std::string configFile = getConfigFile( "EYEDBCONF", "eyedb.conf");
+
+    theServerConfig->add( configFile.c_str(), 1);
+
+    return theServerConfig;
+  }
+
+
+  /*
+   * Config public static methods
+   */
+
+  const char *
+  Config::getServerValue(const char *name)
+  {
+    return Config::getServerConfig()->getValue(name);
   }
 
   const char *
-  getConfigValue(const char *name)
+  Config::getClientValue(const char *name)
   {
-    return Config::getDefaultConfig()->getValue(name);
+    return Config::getClientConfig()->getValue(name);
   }
 }

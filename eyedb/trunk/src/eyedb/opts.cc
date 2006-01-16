@@ -153,7 +153,7 @@ do { \
     static const char *opt_sv_prefix = "-eyedbsv";
     static int len_opt_sv_prefix = strlen(opt_sv_prefix);
 
-    const char *smdport = getConfigValue("sv_smdport");
+    const char *smdport = Config::getServerValue("sv_smdport");
     if (smdport)
       smd_set_port(smdport);
 
@@ -322,7 +322,7 @@ do { \
 
     if (map.find(dbm_opt) != map.end()) {
       if (listen)
-	Config::getDefaultConfig()->setValue("sv_dbm",
+	Config::getServerConfig()->setValue("sv_dbm",
 					     map[dbm_opt].value.c_str());
       else
 	Database::setDefaultDBMDB(map[dbm_opt].value.c_str());
@@ -397,7 +397,7 @@ do { \
     }
 
     if (map.find(conf_opt) != map.end())
-      Config::getDefaultConfig()->add(map[conf_opt].value.c_str());
+      Config::getServerConfig()->add(map[conf_opt].value.c_str());
 
     if (map.find(trans_def_mag_opt) != map.end())
       Database::setGlobalDefaultMagOrder(atoi(map[trans_def_mag_opt].value.c_str()));
@@ -543,7 +543,7 @@ do { \
     if (fd_stream)
       return;
 
-    const char *tmpdir = getConfigValue("tmpdir");
+    const char *tmpdir = Config::getServerValue("tmpdir");
     if (!tmpdir)
       tmpdir = "/tmp";
     char *s = tempnam(tmpdir, "eyedb_");

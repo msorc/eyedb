@@ -33,7 +33,7 @@ namespace eyedb {
   */
 
   /**
-     Not yet documented.
+     A class storing the configuration variables values for the client and the server.
   */
   class Config {
 
@@ -41,106 +41,69 @@ namespace eyedb {
 
   public:
     /**
-       Not yet documented
-       @param file
+       Get a client configuration variable value.
+
+       @param name the variable name
+       @return the variable value, or null if not mapped
     */
-    Config(const char *file = 0);
+    static const char* getClientValue( const char *name);
 
     /**
-       Not yet documented
-       @param config
+       Get a server configuration variable value.
+
+       @param name the variable name
+       @return the variable value, or null if not mapped
     */
+    static const char* getServerValue( const char *name);
+
+  public: // package level
+
     Config(const Config &config);
 
-    /**
-       Not yet documented
-       @param config
-       @return
-    */
-    Config& operator=(const Config &config);
-
-    /**
-       Not yet documented
-       @param name
-       @return
-    */
-    const char *getValue(const char *name);
-
-    /**
-       Not yet documented
-       @param name
-       @param value
-    */
-    void setValue(const char *name, const char *value);
-
-    /**
-       Not yet documented
-       @param file
-    */
-    void add(const char *file);
-
-    /**
-       Not yet documented
-       @return
-    */
-    static Config *getDefaultConfig();
-
-    /**
-       Not yet documented
-       @param config
-    */
-    static void setDefaultConfig(Config *config);
+    Config::Config(const char *file);
 
     struct Item {
       char *name;
       char *value;
 
-      /**
-	 Not yet documented
-      */
       Item();
-
-      /**
-	 Not yet documented
-	 @param name
-	 @param value
-      */
       Item(const char *name, const char *value);
-
-      /**
-	 Not yet documented
-	 @param item
-      */
       Item(const Item &item);
-
-      /**
-	 Not yet documented
-	 @param item
-	 @return
-      */
       Item& operator=(const Item &item);
-
       ~Item();
     };
 
+    static Config* getClientConfig();
+    static Config* getServerConfig();
+
+    void add(const char *file, int quietFileNotFoundError = 0);
+
+    const char *getValue(const char *name);
+    void setValue(const char *name, const char *value);
+
     Item *getValues(int &item_cnt) const;
 
-  public: // package level
     static void init();
     static void _release();
 
     ~Config();
 
   private:
+    friend class Object;
+
+    Config();
+    Config& operator=(const Config &config);
+
+    void setClientDefaults();
+    void setServerDefaults();
+
+    void garbage();
+
+    static Config *theClientConfig;
+    static Config *theServerConfig;
 
     LinkedList list;
-    void add(const char *name, const char *value);
-    void addDefaults();
-    friend class Object;
-    void garbage();
   };
-
-  const char *getConfigValue(const char *name);
 
   /**
      @}

@@ -1066,10 +1066,10 @@ realize(int argc, char *argv[])
 
   const char *x;
 
-  x = eyedb::getConfigValue("cpp_cmd");
-  if (x) cpp_cmd = eyedb::getConfigValue("cpp_cmd");
+  x = eyedb::Config::getClientValue("cpp_cmd");
+  if (x) cpp_cmd = eyedb::Config::getClientValue("cpp_cmd");
 
-  x = eyedb::getConfigValue("cpp_flags");
+  x = eyedb::Config::getClientValue("cpp_flags");
   if (x) cpp_flags = x;
 
   hints = new GenCodeHints();

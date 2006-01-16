@@ -1736,7 +1736,7 @@ oqmlStatus *oqmlImport::eval(Database *db, oqmlContext *ctx,
   if (al->cnt == 1 && al->first->as_string())
     {
       char *file = OQML_ATOM_STRVAL(al->first);
-      const char *oqmlpath = eyedb::getConfigValue("oqlpath");
+      const char *oqmlpath = eyedb::Config::getServerValue("oqlpath");
 
       oqmlBool check;
       if (!oqmlpath || file[0] == '/')
