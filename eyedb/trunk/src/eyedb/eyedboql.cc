@@ -29,6 +29,7 @@
 #include "GetOpt.h"
 
 using namespace eyedb;
+using namespace std;
 
 #undef MOZILLA
 #ifdef MOZILLA

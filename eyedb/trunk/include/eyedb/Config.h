@@ -37,7 +37,7 @@ namespace eyedb {
   */
   class Config {
 
-    friend ostream& operator<<( ostream&, const Config&);
+    friend std::ostream& operator<<( std::ostream&, const Config&);
 
   public:
     /**

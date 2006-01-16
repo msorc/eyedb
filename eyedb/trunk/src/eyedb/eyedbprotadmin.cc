@@ -26,6 +26,7 @@
 #include "DBM_Database.h"
 
 using namespace eyedb;
+using namespace std;
 
 #define HPROG "eyedbprotadmin"
 #define PROG HPROG ": "

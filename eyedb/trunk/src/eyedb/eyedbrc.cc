@@ -35,6 +35,7 @@
 #include "comp_time.h"
 
 using namespace eyedb;
+using namespace std;
 
 namespace eyedb {
   extern void init(int &argc, char *argv[], string *sv_port, string *sv_host,

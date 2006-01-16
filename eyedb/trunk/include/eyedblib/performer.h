@@ -141,7 +141,7 @@ namespace eyedblib {
     void beforeStart(ThreadPerformer *perf, Thread *thr);
   };
 
-  ostream &operator<<(ostream &, Thread::Profile **);
+  std::ostream &operator<<(std::ostream &, Thread::Profile **);
 
 }
 

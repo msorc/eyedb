@@ -25,7 +25,8 @@
 #include <eyedb/eyedb_p.h>
 #include <sstream>
 
-using std::ostringstream;
+using namespace std;
+//using std::ostringstream;
 
 namespace eyedb {
 

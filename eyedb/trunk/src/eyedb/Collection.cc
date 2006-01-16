@@ -33,6 +33,8 @@
 #include "AttrNative.h"
 #include "Attribute_p.h"
 
+using namespace std;
+
 namespace eyedb {
 
   extern int

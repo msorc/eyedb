@@ -289,8 +289,8 @@ namespace eyedb {
     static void _release(void);
   };
 
-  ostream& operator<<(ostream&, Exception &);
-  ostream& operator<<(ostream&, Status);
+  std::ostream& operator<<(std::ostream&, Exception &);
+  std::ostream& operator<<(std::ostream&, Status);
 
   // ----------------------------------------------------------------------
   // Status CPP Macros

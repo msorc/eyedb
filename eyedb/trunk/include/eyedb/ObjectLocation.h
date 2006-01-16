@@ -178,10 +178,10 @@ namespace eyedb {
     unsigned short dspid;
     unsigned short datid;
     Info info;
-    friend ostream &operator<<(ostream &, const ObjectLocation &);
+    friend std::ostream &operator<<(std::ostream &, const ObjectLocation &);
   };
 
-  ostream &operator<<(ostream &, const ObjectLocation &);
+  std::ostream &operator<<(std::ostream &, const ObjectLocation &);
 
   class PageStats;
 
@@ -206,7 +206,7 @@ namespace eyedb {
     unsigned int cnt;
     ObjectLocation *locs;
     Database *db;
-    friend ostream &operator<<(ostream &, const ObjectLocationArray &);
+    friend std::ostream &operator<<(std::ostream &, const ObjectLocationArray &);
   };
 
   class PageStats
@@ -247,11 +247,11 @@ namespace eyedb {
     PGS *pgs;
     const Datafile **datafiles;
     unsigned int datafile_cnt;
-    friend ostream &operator<<(ostream &os, const PageStats &pgs);
+    friend std::ostream &operator<<(std::ostream &os, const PageStats &pgs);
   };
 
-  ostream &operator<<(ostream &, const ObjectLocationArray &);
-  ostream &operator<<(ostream &os, const PageStats &pgs);
+  std::ostream &operator<<(std::ostream &, const ObjectLocationArray &);
+  std::ostream &operator<<(std::ostream &os, const PageStats &pgs);
 
   /**
      @}

@@ -129,7 +129,7 @@ namespace eyedb {
     friend class Database;
   };
 
-  ostream& operator<<(ostream&, const Dataspace &);
+  std::ostream& operator<<(std::ostream&, const Dataspace &);
 
   /**
      @}

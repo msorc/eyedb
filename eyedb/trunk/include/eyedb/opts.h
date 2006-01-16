@@ -40,14 +40,14 @@ namespace eyedb {
   const char *getSrvOptionsUsage(void);
 
   void print_standard_usage(GetOpt &getopt, const std::string &append = "",
-			    ostream &os = std::cerr);
+			    std::ostream &os = std::cerr);
 
   void print_standard_help(GetOpt &getopt,
 			   const std::vector<std::string> &options,
-			   ostream &os = std::cerr);
+			   std::ostream &os = std::cerr);
 
-  void print_common_help(ostream &os);
-  void print_common_usage(ostream &os);
+  void print_common_help(std::ostream &os);
+  void print_common_usage(std::ostream &os);
 
   /**
      @}

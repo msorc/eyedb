@@ -704,14 +704,14 @@ namespace eyedb {
     garbage();
   }
 
-  ostream& operator<<( ostream& os, const Config& config)
+  std::ostream& operator<<( std::ostream& os, const Config& config)
   {
     LinkedListCursor c(config.list);
     Config::Item *item;
 
     while (c.getNext((void *&)item))
       {
-	os << "name= " << item->name << " value= " << item->value << endl;
+	os << "name= " << item->name << " value= " << item->value << std::endl;
       }
 
     return os;

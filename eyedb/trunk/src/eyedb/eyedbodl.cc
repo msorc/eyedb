@@ -27,6 +27,7 @@
 #include <eyedb/odlgen_utils.h>
 
 using namespace eyedb;
+using namespace std;
 
 #include "GetOpt.h"
 

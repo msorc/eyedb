@@ -185,7 +185,7 @@ namespace eyedb {
     friend class Database;
   };
 
-  ostream& operator<<(ostream&, const Datafile &);
+  std::ostream& operator<<(std::ostream&, const Datafile &);
 
   class DatafileInfo {
 
@@ -220,7 +220,7 @@ namespace eyedb {
     friend class Datafile;
   };
 
-  ostream& operator<<(ostream&, const DatafileInfo &);
+  std::ostream& operator<<(std::ostream&, const DatafileInfo &);
 
   /**
      @}

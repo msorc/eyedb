@@ -39,6 +39,8 @@
 #include <eyedb/syscls.h>
 #include <eyedblib/strutils.h>
 
+using namespace std;
+
 //
 // Constants
 //

@@ -233,7 +233,7 @@ namespace eyedb {
 
     ConnHandle *connh;
 
-    Status echoServerMessages(unsigned int mask, FILE *fd, ostream *os) const;
+    Status echoServerMessages(unsigned int mask, FILE *fd, std::ostream *os) const;
 
     // ----------------------------------------------------------------------
     // Connection Restricted Access (conceptually private)
@@ -255,13 +255,13 @@ namespace eyedb {
 
   public:
     StdServerMessageDisplayer(FILE *fd = stdout);
-    StdServerMessageDisplayer(ostream &);
+    StdServerMessageDisplayer(std::ostream &);
 
     virtual void display(const char *msg) const;
 
   private:
     FILE *fd;
-    ostream *os;
+    std::ostream *os;
   };
 
   /**

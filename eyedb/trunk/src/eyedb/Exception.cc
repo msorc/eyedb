@@ -25,6 +25,8 @@
 #include "eyedb_p.h"
 #include "eyedblib/butils.h"
 
+using namespace std;
+
 namespace eyedb {
 
 Status _status_;

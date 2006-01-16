@@ -660,8 +660,8 @@ namespace eyedb {
     }
   };
 
-  ostream& operator<<(ostream&, const Value &);
-  ostream& operator<<(ostream&, const Value *);
+  std::ostream& operator<<(std::ostream&, const Value &);
+  std::ostream& operator<<(std::ostream&, const Value *);
 
   class ValueList;
 

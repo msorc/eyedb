@@ -42,6 +42,8 @@
 
 //#define RPC_TIMEOUT
 
+using namespace std;
+
 namespace eyedb {
   extern void (*garbage_handler)(void);
   extern void init(int &argc, char *argv[], string *sv_port, string *sv_host,

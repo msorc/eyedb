@@ -84,9 +84,9 @@ namespace eyedb {
     return Success;
   }
 
-  extern void display_datsize(ostream &, unsigned long long);
+  extern void display_datsize(std::ostream &, unsigned long long);
 
-  ostream& operator<<(ostream& os, const Dataspace &dsp)
+  std::ostream& operator<<(std::ostream& os, const Dataspace &dsp)
   {
     os << "Dataspace #" << dsp.getId() << '\n';
     os << "Name " << dsp.getName() << '\n';

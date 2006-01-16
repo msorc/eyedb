@@ -152,7 +152,7 @@ extern const char *eyedb_time();
 #define IDB_NAME_IN_PLACE  ((char)2)
 
 extern FILE *get_file(Bool init = True);
-extern ostream& convert_to_stream(ostream &);
+extern std::ostream& convert_to_stream(std::ostream &);
 
 #define IDB_LOCAL_CALL ((void *)0xff125341)
 
@@ -214,7 +214,7 @@ if ((O)->getDamaged()) \
 
 #define CHECK_INCSIZE(MTHNAME, INCSIZE, SZ)  \
   if ((INCSIZE) != (SZ)) { \
-    cerr << name << "::" << MTHNAME << " size: " << INCSIZE << " vs. " << SZ << endl; \
+    std::cerr << name << "::" << MTHNAME << " size: " << INCSIZE << " vs. " << SZ << std::endl; \
     assert(0); \
   }
 
