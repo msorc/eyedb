@@ -230,7 +230,7 @@ namespace eyedb {
   Executable::_dlopen(const char *extref)
   {
     const char *s = makeExtRef(extref);
-    const char *sopath = getConfigValue("sopath");
+    const char *sopath = Config::getServerValue("sopath");
 
     if (!sopath)
       return (void *)0;
@@ -253,7 +253,7 @@ namespace eyedb {
     static std::string file;
     //  const char *s = makeExtRef(extref, comp);
     const char *s = makeExtRef(extref);
-    const char *sopath = getConfigValue("sopath");
+    const char *sopath = Config::getServerValue("sopath");
 
     if (!sopath)
       return (const char *)0;

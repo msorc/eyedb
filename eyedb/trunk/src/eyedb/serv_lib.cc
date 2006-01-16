@@ -199,12 +199,9 @@ namespace eyedb {
   b_init(int *fd, int fd_cnt, rpc_ConnInfo *ci)
   {
     extern void config_init();
-    /*  extern int check_license(); */
 
     config_init();
-    /*  check_license(); */
 
-    /*printf("initializing server %d\n", getpid());*/
     setConnInfo(ci);
     eyedbsm::mutexes_init();
   }
@@ -212,7 +209,6 @@ namespace eyedb {
   static void
   b_release(rpc_ConnInfo *ci)
   {
-    /*printf("releasing server %d\n", getpid());*/
     eyedbsm::mutexes_release();
   }
 

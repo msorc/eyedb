@@ -89,7 +89,7 @@ LinkedList *Database::dbopen_list;
 	const char *voldir = default_voldir;
 
 	if (!voldir)
-	  voldir = getConfigValue("sv_datdir");
+	  voldir = Config::getServerValue("sv_datdir");
 
 	if (voldir)
 	  strcpy(dirname, voldir);
@@ -270,7 +270,7 @@ LinkedList *Database::dbopen_list;
     if (!defaultDBMDB)
       {
 	static char buff[256];
-	const char *path = getConfigValue("sv_dbm");
+	const char *path = Config::getServerValue("sv_dbm");
 	if (!path)
 	  return DBM_Database::defaultDBMDB;
 	//	printf("%d: getDefaultDBMDB: %s\n", getpid(), path);

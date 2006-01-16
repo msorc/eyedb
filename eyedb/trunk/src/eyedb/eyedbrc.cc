@@ -80,7 +80,7 @@ ld_libpath_manage()
   char *ld_library_path = getenv(ld_libpath_env);
   char env[2048];
   sprintf(env, "%s=%s%s%s", ld_libpath_env,
-	  eyedb::getConfigValue("sopath"),
+	  eyedb::Config::getServerValue("sopath"),
 	  (ld_library_path ? ":" : ""),
 	  (ld_library_path ? ld_library_path : ""));
   putenv(strdup(env));
@@ -229,7 +229,7 @@ static void make_host_port(const char *_listen, const char *&host,
 static int checkPostInstall(Bool creatingDbm)
 {
   if (!creatingDbm) {
-    const char *dbm = eyedb::getConfigValue("sv_dbm");
+    const char *dbm = eyedb::Config::getServerValue("sv_dbm");
     if (!dbm || access(dbm, R_OK)) {
       fprintf(stderr, "\nThe EYEDBDBM database file '%s' is not accessible\n",
 	      dbm);
@@ -284,13 +284,13 @@ main(int argc, char *argv[])
       return 0;
     }
   }
-  if (!*listen && (s = eyedb::getConfigValue("listen")))
+  if (!*listen && (s = eyedb::Config::getServerValue("listen")))
     listen = s;
 
   smdport = smd_get_port();
 
   if (!bindir)
-    bindir = eyedb::getConfigValue("bindir");
+    bindir = eyedb::Config::getServerValue("bindir");
 
   int ac;
   char **av;
@@ -308,7 +308,7 @@ main(int argc, char *argv[])
   const char *host, *port;
   make_host_port(listen, host, port);
     
-  SessionLog sesslog(host, port, eyedb::getConfigValue("sv_tmpdir"));
+  SessionLog sesslog(host, port, eyedb::Config::getServerValue("sv_tmpdir"));
 
   if (sesslog.getStatus()) {
     if (cmd == Start)

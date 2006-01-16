@@ -243,10 +243,10 @@ namespace eyedb {
 	  const char *file)
   {
     if (!cpp_cmd)
-      cpp_cmd = eyedb::getConfigValue("cpp_cmd");
+      cpp_cmd = eyedb::Config::getClientValue("cpp_cmd");
 
     if (!cpp_flags || !*cpp_flags)
-      cpp_flags = eyedb::getConfigValue("cpp_flags");
+      cpp_flags = eyedb::Config::getClientValue("cpp_flags");
 
     if (!cpp_flags)
       cpp_flags = "";

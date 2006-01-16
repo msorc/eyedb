@@ -94,14 +94,14 @@ main(int argc, char *argv[])
   Config::Item *items;
 
   if (!list.getCount())
-    items = Config::getDefaultConfig()->getValues(item_cnt);
+    items = Config::getClientConfig()->getValues(item_cnt);
   else  {
     item_cnt = list.getCount();
     items = new Config::Item[list.getCount()];
     LinkedListCursor c(list);
     const char *s;
     for (n = 0; c.getNext((void *&)s); n++) {
-      const char *v = eyedb::getConfigValue(s);
+      const char *v = eyedb::Config::getClientValue(s);
       items[n] = Config::Item(strdup(s), strdup(v ? v : ""));
     }
   }
