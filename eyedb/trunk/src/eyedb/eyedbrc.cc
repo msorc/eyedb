@@ -234,7 +234,7 @@ static int checkPostInstall(Bool creatingDbm)
       fprintf(stderr, "\nThe EYEDBDBM database file '%s' is not accessible\n",
 	      dbm);
       fprintf(stderr, "Did you run the post install script 'eyedb-postinstall.sh' ?\n");
-      fprintf(stderr, "If yes, check file eyedb.conf.\n");
+      fprintf(stderr, "If yes, check your configuration or launch eyedbrc with option --creating-dbm\n");
       return 1;
     }
   }

@@ -541,9 +541,12 @@ namespace eyedb {
   }
 
   static RPCStatus
-  IDB_checkAuthDbm(const char *dbmdb)
+  IDB_checkAuthDbm(const char *&dbmdb)
   {
 #if 1
+    if (!strcmp(dbmdb, DBM_Database::defaultDBMDB))
+      dbmdb = Database::getDefaultServerDBMDB();
+
     const std::vector<string> &granted_dbm = Database::getGrantedDBMDB();
     int size = granted_dbm.size();
     for (int n = 0; n < size; n++) {
@@ -566,6 +569,9 @@ namespace eyedb {
   IDB_dbmOpen(ConnHandle *ch, const char *dbmdb,
 	      Bool rw_mode, DBM_Database **dbm)
   {
+    /*
+    printf("IDB_dbmOpen(%s) #1\n", dbmdb);
+
 #if 1
     if (!strcmp(dbmdb, DBM_Database::defaultDBMDB))
       dbmdb = Database::getDefaultServerDBMDB();
@@ -573,6 +579,9 @@ namespace eyedb {
     if (!strcmp(dbmdb, DBM_Database::defaultDBMDB))
       dbmdb = Database::getDefaultDBMDB();
 #endif
+
+    printf("IDB_dbmOpen(%s) #2\n", dbmdb);
+    */
 
     if (*dbm = DBM_Database::getDBM_Database(dbmdb))
       {
@@ -878,9 +887,12 @@ namespace eyedb {
 		const char **dbfile, int *dbid, Bool rw_mode,
 		DBM_Database **pdbm = 0)
   {
+    RPCStatus rpc_status = IDB_checkAuthDbm(dbmdb);
+    if (rpc_status)
+      return rpc_status;
+
     if (strcmp(*pdbname, DBM_Database::getDbName())) {
       DBM_Database *dbm;
-      RPCStatus rpc_status;
 
       rpc_status = IDB_dbmOpen(ch, dbmdb, rw_mode, &dbm);
   
@@ -906,6 +918,7 @@ namespace eyedb {
       }
     }
     else {
+      /*
 #if 1
 	if (!strcmp(dbmdb, DBM_Database::defaultDBMDB))
 	  dbmdb = Database::getDefaultServerDBMDB();
@@ -913,10 +926,13 @@ namespace eyedb {
 	if (!strcmp(dbmdb, DBM_Database::defaultDBMDB))
 	  dbmdb = Database::getDefaultDBMDB();
 #endif
+      */
 
+	/*
 	RPCStatus rpc_status = IDB_checkAuthDbm(dbmdb);
 	if (rpc_status)
 	  return rpc_status;
+	*/
 
 	*dbfile = dbmdb;
 
