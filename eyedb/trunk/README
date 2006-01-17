@@ -55,7 +55,8 @@ to cd to the right sub-directory and run make, as in:
 cd tests/
 make
 
-Examples are not compiled by 'make' or 'make all' but by 'make check'.
+Examples and tests programs, located in sub-directories examples/ and tests/, are not compiled by 'make' 
+or 'make all' but by 'make check'.
 
 Installing EyeDB
 ----------------

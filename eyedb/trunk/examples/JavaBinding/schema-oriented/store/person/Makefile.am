@@ -11,6 +11,9 @@ class.stamp: $(JAVA_FILES)
 clean-local:
 	-rm -f class.stamp *.class
 
+#
+# ODL to Java translation
+#
 EYEDBODL_exe=$(bindir)/eyedbodl
 EYEDBODL = $(EYEDBODL_exe) --gencode=java
 EYEDBODLFLAGS= --no-rootclass --package=person --output-dir=$(top_builddir)/examples/JavaBinding/schema-oriented/store/person
