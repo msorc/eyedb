@@ -543,27 +543,36 @@ namespace eyedb {
   static RPCStatus
   IDB_checkAuthDbm(const char *dbmdb)
   {
-#if 0
-    dbmdb = Database::getDefaultDBMDB();
-    return RPCSuccess;
+#if 1
+    const std::vector<string> &granted_dbm = Database::getGrantedDBMDB();
+    int size = granted_dbm.size();
+    for (int n = 0; n < size; n++) {
+      if (!strcmp(granted_dbm[n].c_str(), dbmdb))
+	return RPCSuccess;
+    }
 #else
     if (!strcmp(dbmdb, Database::getDefaultDBMDB()))
       return RPCSuccess;
+#endif
 
     // TBD: should improved that!
     // should check whether `dbmdb' belongs to an authoritative list!
     return rpcStatusMake(IDB_ERROR,
 			 "security violation: cannot use "
 			 "'%s' EYEDBDBM database.", dbmdb);
-#endif
   }
 
   static RPCStatus
   IDB_dbmOpen(ConnHandle *ch, const char *dbmdb,
 	      Bool rw_mode, DBM_Database **dbm)
   {
+#if 1
+    if (!strcmp(dbmdb, DBM_Database::defaultDBMDB))
+      dbmdb = Database::getDefaultServerDBMDB();
+#else
     if (!strcmp(dbmdb, DBM_Database::defaultDBMDB))
       dbmdb = Database::getDefaultDBMDB();
+#endif
 
     if (*dbm = DBM_Database::getDBM_Database(dbmdb))
       {
@@ -688,7 +697,7 @@ namespace eyedb {
       const char *s;
       if (passwdfile)
       passwdfile = strdup(passwdfile);
-      else if (s = eyedb::getConfigValue("sv_passwd_file"))
+      else if (s = eyedb::getConfigValue("passwd_file"))
       passwdfile = strdup(s);
       else {
       fprintf(stderr, "eyedbd: EyeDB passwd file is not set, check your 'sv_passwd_file' configuration variable or the '-passwdfile' command line option\n");
@@ -869,39 +878,41 @@ namespace eyedb {
 		const char **dbfile, int *dbid, Bool rw_mode,
 		DBM_Database **pdbm = 0)
   {
-    if (strcmp(*pdbname, DBM_Database::getDbName()))
-      {
-	DBM_Database *dbm;
-	RPCStatus rpc_status;
+    if (strcmp(*pdbname, DBM_Database::getDbName())) {
+      DBM_Database *dbm;
+      RPCStatus rpc_status;
 
-	rpc_status = IDB_dbmOpen(ch, dbmdb, rw_mode, &dbm);
+      rpc_status = IDB_dbmOpen(ch, dbmdb, rw_mode, &dbm);
   
-	if (rpc_status != RPCSuccess)
-	  return rpc_status;
+      if (rpc_status != RPCSuccess)
+	return rpc_status;
 
-	if (pdbm)
-	  *pdbm = dbm;
+      if (pdbm)
+	*pdbm = dbm;
 
-	//eyedblib::display_time("#9");
-	Status s = dbm->getDbFile(pdbname, dbid, *dbfile);
-	//eyedblib::display_time("#10");
-	if (s)
-	  return rpcStatusMake(s);
+      //eyedblib::display_time("#9");
+      Status s = dbm->getDbFile(pdbname, dbid, *dbfile);
+      //eyedblib::display_time("#10");
+      if (s)
+	return rpcStatusMake(s);
 
-	if (!*dbfile)
-	  {
-	    if ((*pdbname)[0])
-	      return rpcStatusMake(IDB_ERROR,
-				   "cannot open database '%s'", *pdbname);
-	    else
-	      return rpcStatusMake(IDB_ERROR,
-				   "cannot open database dbid #%d", *dbid);
-	  }
+      if (!*dbfile) {
+	if ((*pdbname)[0])
+	  return rpcStatusMake(IDB_ERROR,
+			       "cannot open database '%s'", *pdbname);
+	else
+	  return rpcStatusMake(IDB_ERROR,
+			       "cannot open database dbid #%d", *dbid);
       }
+    }
     else {
+#if 1
+	if (!strcmp(dbmdb, DBM_Database::defaultDBMDB))
+	  dbmdb = Database::getDefaultServerDBMDB();
+#else
 	if (!strcmp(dbmdb, DBM_Database::defaultDBMDB))
 	  dbmdb = Database::getDefaultDBMDB();
-
+#endif
 
 	RPCStatus rpc_status = IDB_checkAuthDbm(dbmdb);
 	if (rpc_status)
@@ -6674,7 +6685,7 @@ do { \
 
     if (edb_passwdfile)
       passwdfile = strdup(edb_passwdfile);
-    else if (s = eyedb::getConfigValue("sv_passwd_file"))
+    else if (s = eyedb::getConfigValue("passwd_file"))
       passwdfile = strdup(s);
     else
       {
@@ -6689,7 +6700,7 @@ do { \
 	  settimeout(timeout);
 	else
 	  {
-	    const char *x = eyedb::Config::getServerValue("sv_timeout");
+	    const char *x = eyedb::Config::getServerValue("timeout");
 	    if (x)
 	      settimeout(atoi(x));
 	  }
@@ -6699,6 +6710,7 @@ do { \
     get_dbm_passwd(passwdfile);
 #endif
 
+    /*
     // kludge
     s = eyedb::Config::getServerValue("coll_hidx_oid");
     if (s) {
@@ -6713,6 +6725,7 @@ do { \
 	exit(1);
       }
     }
+    */
   }
 
   void
@@ -6728,7 +6741,8 @@ do { \
 #endif
     timeout = _timeout;
 
-    Database::setDefaultVolumeDirectory(voldir);
+    if (voldir)
+      Database::setDefaultVolumeDirectory(voldir);
 
     eyedb::init();
     config_init();

@@ -26,6 +26,7 @@
 #define _EYEDB_DATABASE_H
 
 #include <eyedb/ObjCache.h>
+#include <vector>
 
 namespace eyedb {
 
@@ -683,6 +684,18 @@ namespace eyedb {
        @return
     */
     static const char *getDefaultDBMDB();
+
+    /**
+       Not yet documented
+       @return
+    */
+    static const char *getDefaultServerDBMDB();
+
+    /**
+       Not yet documented
+       @return
+    */
+    static const std::vector<std::string> &getGrantedDBMDB();
 
     /**
        Not yet documented

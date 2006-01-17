@@ -181,8 +181,11 @@ namespace eyedb {
 
   static char *truedir(const char *rs)
   {
-    if (rpc_portIsAddress(rs)) return strdup(rs);
     char *s, *os;
+    /*
+    if (rpc_portIsAddress(rs))
+      return strdup(rs);
+
     if (*rs != '/') {
       char path[512];
       getcwd(path, (sizeof path)-1);
@@ -192,7 +195,8 @@ namespace eyedb {
       strcat(s, rs);
     }
     else
-      s = strdup(rs);
+    */
+    s = strdup(rs);
 
     os = s;
     if (!strchr(s, '.'))
@@ -263,6 +267,7 @@ namespace eyedb {
     port = strdup(_port);
     host = strdup(_host);
 
+    //    char *port_file = truedir((_port + std::string("@") + host).c_str());
     char *port_file = truedir((std::string(host) + ":" + _port).c_str());
       
     char *p = port_file;
