@@ -16,10 +16,20 @@ SUBDIRS=dspsch
 #
 # Java classes
 #
-packagedir=$(pkglibdir)/tests/eyedb/dataspace
-dist_package_JAVA= TestDataspace.java
+JAVA_FILES= TestDataspace.java
+
 JAVAROOT=$(top_builddir)/tests/eyedb/dataspace
 CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_srcdir)/tests/eyedb/dataspace:$(top_builddir)/src/java/eyedb.jar
+
+EXTRA_DIST=$(JAVA_FILES)
+
+check-local: class.stamp
+class.stamp: $(JAVA_FILES)
+	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(AM_JAVACFLAGS) $(JAVACFLAGS) $?
+	touch class.stamp
+
+clean-local:
+	-rm -f class.stamp *.class
 
 #
 # Scripts to be copied to build directory
