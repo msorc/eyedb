@@ -201,7 +201,7 @@ do { \
 
     opts[opt_cnt++] = 
       Option('U', prefix + user_opt, OptionStringType(),
-	     Option::MandatoryValue, OptionDesc("User name", "<user>"));
+	     Option::MandatoryValue, OptionDesc("User name", "<user>|@"));
 
     opts[opt_cnt++] = 
       Option('P', prefix + passwd_opt, OptionStringType(),
@@ -219,7 +219,7 @@ do { \
       opts[opt_cnt++] = 
 	Option(prefix + granted_dbm_opt, OptionStringType(),
 	       Option::MandatoryValue,
-	       OptionDesc("Granted EYEDBDBM database files", "<dbmfile>"));
+	       OptionDesc("Granted EYEDBDBM database files", "<dbmfiles>"));
     }
     else {
       opts[opt_cnt++] = 

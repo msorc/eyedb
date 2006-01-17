@@ -238,7 +238,7 @@ usage(const char *prog)
 
   if (!mode || mode == mDbmCreate)
     fprintf(pipe,
-	    "%sdbmcreate <username> [<passwd>] [--datafiles=%s]\n", str(),
+	    "%sdbmcreate [--strict-unix=<user>|@] [<user> [<passwd>]] [--datafiles=%s]\n", str(),
 	    datafiles_opts);
 
   if (!mode || mode == mDbCreate)
@@ -340,23 +340,23 @@ usage(const char *prog)
   if (!mode || mode == mUserAdd)
 #if 1 //def HAS_FATTACH
     fprintf(pipe,
-	    "%suseradd [--unix|--strict-unix=]<username> [<passwd>]\n", str());
+	    "%suseradd [--unix|--strict-unix=]<user>|@ [<passwd>]\n", str());
 #else
     fprintf(pipe,
-	    "%suseradd <username> [<passwd>]\n", str());
+	    "%suseradd <user> [<passwd>]\n", str());
 #endif
 
   if (!mode || mode == mUserDelete)
     fprintf(pipe,
-	    "%suserdelete <username>\n", str());
+	    "%suserdelete <user>\n", str());
 
   if (!mode || mode == mUserPasswdSet)
     fprintf(pipe,
-	    "%suserpasswd <username> [<new passwd>]\n", str());
+	    "%suserpasswd <user> [<new passwd>]\n", str());
 
   if (!mode || mode == mPasswdSet)
     fprintf(pipe,
-	    "%spasswd <username> [<passwd>] [<new passwd>] (primary authentication not required)\n", str());
+	    "%spasswd <user> [<passwd>] [<new passwd>] (primary authentication not required)\n", str());
 
   if (!mode || mode == mDbAccessSet)
     fprintf(pipe,
@@ -364,11 +364,11 @@ usage(const char *prog)
 
   if (!mode || mode == mUserDbAccessSet)
     fprintf(pipe,
-	    "%suserdbaccess <username> <dbname> r|rw|rx|rwx|admin|no\n", str());
+	    "%suserdbaccess <user> <dbname> r|rw|rx|rwx|admin|no\n", str());
 
   if (!mode || mode == mUserSysAccessSet)
     fprintf(pipe,
-	    "%ssysaccess <username> ['+' combination of] dbcreate|adduser|deleteuser|setuserpasswd|admin|superuser|no\n", str());
+	    "%ssysaccess <user> ['+' combination of] dbcreate|adduser|deleteuser|setuserpasswd|admin|superuser|no\n", str());
 
   if (!mode || mode == mUserList)
     fprintf(pipe,
