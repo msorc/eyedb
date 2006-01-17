@@ -2,6 +2,9 @@
 #include "schema.h"
 #include <assert.h>
 
+using namespace eyedb;
+using namespace std;
+
 static void
 test_leaks(Database &db)
 {

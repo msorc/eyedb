@@ -289,6 +289,8 @@ main(int argc, char *argv[])
 
   std::string logdir = sv_tmpdir;
 
+  eyedb::Exception::setMode(eyedb::Exception::StatusMode);
+
   sesslog = new SessionLog(logdir.c_str(), eyedb::getVersion(),
 			   nlisten, hosts, ports,
 			   datdir, sesslogdev, sessloglevel);
