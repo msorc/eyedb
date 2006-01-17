@@ -24,16 +24,17 @@
 
 #include <eyedb/eyedb.h>
 
+using namespace std;
+
 int
 main(int argc, char *argv[])
 {
   eyedb::init(argc, argv);
 
-  if (argc != 3)
-    {
-      fprintf(stderr, "usage: %s <dbname> <query>\n", argv[0]);
-      return 1;
-    }
+  if (argc != 3) {
+    fprintf(stderr, "usage: %s <dbname> <query>\n", argv[0]);
+    return 1;
+  }
 
   eyedb::Exception::setMode(eyedb::Exception::ExceptionMode);
 
@@ -42,10 +43,10 @@ main(int argc, char *argv[])
     // connecting to the eyedb server
     conn.open();
 
-    Database db(argv[1]);
+    eyedb::Database db(argv[1]);
 
     // opening database argv[1]
-    db.open(&conn, Database::DBRW);
+    db.open(&conn, eyedb::Database::DBRW);
 
     // beginning a transaction
     db.transactionBegin();
@@ -60,8 +61,7 @@ main(int argc, char *argv[])
       " using the eyedb::OQL interface" << endl;
 
     // for each value returned in the query, display it:
-    for (int i = 0; i < arr.getCount(); i++)
-      {
+    for (int i = 0; i < arr.getCount(); i++) {
 	// in case of the returned value is an oid, load it first:
 	if (arr[i].type == eyedb::Value::OID)
 	  {
@@ -83,11 +83,9 @@ main(int argc, char *argv[])
     eyedb::OQLIterator iter(&db, argv[2]);
     eyedb::Value val;
 
-    while (iter.next(val))
-      {
+    while (iter.next(val)) {
 	// in case of the returned value is an oid, load it first:
-	if (val.getType() == eyedb::Value::OID)
-	  {
+	if (val.getType() == eyedb::Value::OID) {
 	    eyedb::Object *o;
 	    db.loadObject(val.oid, &o);
 	    cout << o;
@@ -108,8 +106,7 @@ main(int argc, char *argv[])
 	      }
 	    // in case of the returned object is a class, display its
 	    // extent
-	    else if (o->asClass())
-	      {
+	    else if (o->asClass()) {
 		eyedb::ClassIterator citer(o->asClass());
 		cout << "extent BEGIN\n";
 		eyedb::Object *co;
@@ -135,8 +132,7 @@ main(int argc, char *argv[])
     eyedb::OQLIterator iter2(&db, argv[2]);
     eyedb::Object *o;
 
-    while (iter2.next(o))
-      {
+    while (iter2.next(o)) {
 	cout << o;
 	o->release();
       }

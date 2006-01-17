@@ -23,6 +23,7 @@
 */
 
 #include <eyedb/eyedb.h>
+using namespace std;
 
 static const char *
 get_string_mode(eyedb::DBAccessMode mode)
@@ -62,8 +63,8 @@ main(int argc, char *argv[])
     conn.open();
 
     // opening the database EYEDBDBM using 'dbmDataBase' class
-    DBMDatabase db("EYEDBDBM");
-    db.open(&conn, Database::DBRead);
+    eyedb::DBMDatabase db("EYEDBDBM");
+    db.open(&conn, eyedb::Database::DBRead);
 
     // beginning a transaction
     db.transactionBegin();
@@ -101,7 +102,7 @@ main(int argc, char *argv[])
 	// database
 	eyedb::OQL q_useraccess(&db,
                             "select eyedb::DBUserAccess->dbentry->dbname = \"%s\"",
-			    dbentry->dbname());
+			    dbentry->dbname().c_str());
 	eyedb::ObjectArray useraccess_arr;
 	q_useraccess.execute(useraccess_arr);
 	if (useraccess_arr.getCount())

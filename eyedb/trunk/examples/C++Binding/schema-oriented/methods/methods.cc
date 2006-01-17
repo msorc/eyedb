@@ -23,6 +23,7 @@
 */
 
 #include "person.h"
+using namespace std;
 
 int
 main(int argc, char *argv[])
@@ -54,10 +55,10 @@ main(int argc, char *argv[])
 
     // opening database dbname using 'personDatabase' class
     //    personDatabase db(dbname);
-    Database db(dbname);
+    eyedb::Database db(dbname);
     db.open(&conn, (getenv("EYEDBLOCAL") ?
-		    Database::DBRWLocal :
-		    Database::DBRW));
+		    eyedb::Database::DBRWLocal :
+		    eyedb::Database::DBRW));
     
     // beginning a transaction
     db.transactionBegin();

@@ -16,7 +16,7 @@ class Person {
 class Test {
   ostring str;
   class *cls;
-  URL url;
+  //  URL url;
 };
 
 #ifdef UPDATE

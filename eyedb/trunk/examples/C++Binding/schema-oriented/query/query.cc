@@ -19,10 +19,12 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
+  Author: Eric Viara <viara@sysra.com>
 */
 
 #include "person.h"
+
+using namespace std;
 
 int
 main(int argc, char *argv[])
@@ -30,11 +32,10 @@ main(int argc, char *argv[])
   eyedb::init(argc, argv);
   person::init();
 
-  if (argc != 3)
-    {
-      fprintf(stderr, "usage: %s <dbname> <query>\n", argv[0]);
-      return 1;
-    }
+  if (argc != 3) {
+    fprintf(stderr, "usage: %s <dbname> <query>\n", argv[0]);
+    return 1;
+  }
 
   eyedb::Exception::setMode(eyedb::Exception::ExceptionMode);
 
@@ -45,7 +46,7 @@ main(int argc, char *argv[])
 
     // opening database argv[1] using 'personDatabase' class
     personDatabase db(argv[1]);
-    db.open(&conn, Database::DBRW);
+    db.open(&conn, eyedb::Database::DBRW);
 
     // beginning a transaction
     db.transactionBegin();
@@ -58,34 +59,32 @@ main(int argc, char *argv[])
 
     // for each Person returned in the query, display its name and age,
     // its address, its spouse name and age and its cars
-    for (int i = 0; i < arr.getCount(); i++)
-      {
-	Person *p = Person_c(arr[i]);
-	if (p)
-	  {
-	    cout << "name:    " << p->getName() << endl;
-	    cout << "age:     " << p->getAge() << endl;
+    for (int i = 0; i < arr.getCount(); i++) {
+      Person *p = Person_c(arr[i]);
+      if (p) {
+	cout << "name:    " << p->getName() << endl;
+	cout << "age:     " << p->getAge() << endl;
 
-	    if (p->getAddr()->getStreet().size())
-	      cout << "street:  " << p->getAddr()->getStreet() << endl;
+	if (p->getAddr()->getStreet().size())
+	  cout << "street:  " << p->getAddr()->getStreet() << endl;
 
-	    if (p->getAddr()->getTown().size())
-	      cout << "town:    " << p->getAddr()->getTown() << endl;
+	if (p->getAddr()->getTown().size())
+	  cout << "town:    " << p->getAddr()->getTown() << endl;
 
-	    if (p->getSpouse())
-	      {
-		cout << "spouse_name: " << p->getSpouse()->getName() << endl;
-		cout << "spouse_age:  " << p->getSpouse()->getAge() << endl;
-	      }
+	if (p->getSpouse()) {
+	  cout << "spouse_name: " << p->getSpouse()->getName() << endl;
+	  cout << "spouse_age:  " << p->getSpouse()->getAge() << endl;
+	}
 
-#if 0
-	    for (int i = 0; i < p->getCarsCount(); i++)
-	      cout << "car: #" << i << ": " <<
-		p->getCarsAt(i)->getMark() << ";" <<
-		p->getCarsAt(i)->getNum() << endl;
-#endif
-	  }
+	eyedb::CollectionIterator iter(p->getCarsColl());
+	Car *car;
+	while (iter.next((eyedb::Object *&)car)) {
+	  cout << "car: #" << i << ": " <<
+	    car->getBrand() << ";" <<
+	    car->getNum() << endl;
+	}
       }
+    }
 
     // committing the transaction
     db.transactionCommit();

@@ -19,13 +19,14 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
+  Author: Eric Viara <viara@sysra.com>
 */
 
 #include <eyedb/eyedb.h>
+using namespace std;
 
 static void
-  object_dump(FILE *fd, eyedb::Object *),
+object_dump(FILE *fd, eyedb::Object *),
   collection_dump(FILE *fd, eyedb::Collection *),
   attr_dump(FILE *fd, const eyedb::Attribute *attr, int offset, eyedb::Object *o);
 
@@ -34,11 +35,10 @@ main(int argc, char *argv[])
 {
   eyedb::init(argc, argv);
 
-  if (argc != 3)
-    {
-      fprintf(stderr, "usage: %s <dbname> <query>\n", argv[0]);
-      return 1;
-    }
+  if (argc != 3) {
+    fprintf(stderr, "usage: %s <dbname> <query>\n", argv[0]);
+    return 1;
+  }
 
   eyedb::Exception::setMode(eyedb::Exception::ExceptionMode);
 
@@ -47,10 +47,10 @@ main(int argc, char *argv[])
     // connecting to the eyedb server
     conn.open();
 
-    Database db(argv[1]);
+    eyedb::Database db(argv[1]);
 
     // opening database argv[1]
-    db.open(&conn, Database::DBRW);
+    db.open(&conn, eyedb::Database::DBRW);
 
     // beginning a transaction
     db.transactionBegin();
@@ -62,11 +62,10 @@ main(int argc, char *argv[])
     q.execute(obj_arr);
 
     // for each value returned in the query, display it:
-    for (int i = 0; i < obj_arr.getCount(); i++)
-      {
-	object_dump(stdout, obj_arr[i]);
-	fprintf(stdout, ";\n\n");
-      }
+    for (int i = 0; i < obj_arr.getCount(); i++) {
+      object_dump(stdout, obj_arr[i]);
+      fprintf(stdout, ";\n\n");
+    }
     // committing the transaction
     db.transactionCommit();
   }
@@ -100,42 +99,38 @@ object_dump(FILE *fd, eyedb::Object *o)
   fprintf(fd, "object %s of class %s {\n", o->getOid().toString(),
 	  cls->getName());
 
-  for (int i = 0; i < attr_cnt; i++)
-    {
-      const eyedb::Attribute *attr = attrs[i];
+  for (int i = 0; i < attr_cnt; i++) {
+    const eyedb::Attribute *attr = attrs[i];
 
-      if (attr->isNative())
-	continue;
+    if (attr->isNative())
+      continue;
       
-      fprintf(fd, "\t%s = ", attr->getName());
-      eyedb::Bool isnull;
-      if (attr->isString())
-	{
-	  Data s;
-	  attr->getValue(o, &s, eyedb::Attribute::directAccess, 0, &isnull);
-	  if (isnull) fprintf(fd, "NULL");
-	  else fprintf(fd, "\"%s\"", s);
+    fprintf(fd, "\t%s = ", attr->getName());
+    eyedb::Bool isnull;
+    if (attr->isString()) {
+      eyedb::Data s;
+      attr->getValue(o, &s, eyedb::Attribute::directAccess, 0, &isnull);
+      if (isnull) fprintf(fd, "NULL");
+      else fprintf(fd, "\"%s\"", s);
+    }
+    else {
+      eyedb::TypeModifier typmod = attr->getTypeModifier();
+      eyedb::Size sz = 1;
+      if (attr->isVarDim())
+	attr->getSize(o, sz);
+      int rsz = typmod.pdims * sz;
+
+      if (rsz)
+	for (int i = 0; i < rsz; i++) {
+	  if (i) fprintf(fd, ", ");
+	  attr_dump(fd, attr, i, o);
 	}
       else
-	{
-	  TypeModifier typmod = attr->getTypeModifier();
-	  Size sz = 1;
-	  if (attr->isVarDim())
-	    attr->getSize(o, sz);
-	  int rsz = typmod.pdims * sz;
-
-	  if (rsz)
-	    for (int i = 0; i < rsz; i++)
-	      {
-		if (i) fprintf(fd, ", ");
-		attr_dump(fd, attr, i, o);
-	      }
-	  else
-	    fprintf(fd, "NULL");
-	}
-
-      fprintf(fd, ";\n");
+	fprintf(fd, "NULL");
     }
+
+    fprintf(fd, ";\n");
+  }
 
   fprintf(fd, "}", cls->getName());
   o->setUserData((void *)0);
@@ -151,11 +146,10 @@ collection_dump(FILE *fd, eyedb::Collection *o)
 
   eyedb::ObjectArray obj_arr;
   o->getElements(obj_arr);
-  for (int i = 0; i < obj_arr.getCount(); i++)
-    {
-      object_dump(fd, obj_arr[i]);
-      fprintf(fd, ";\n");
-    }
+  for (int i = 0; i < obj_arr.getCount(); i++) {
+    object_dump(fd, obj_arr[i]);
+    fprintf(fd, ";\n");
+  }
 
   fprintf(fd, "\t\t}\n");
   fprintf(fd, "\t}");
@@ -165,57 +159,50 @@ static void
 attr_dump(FILE *fd, const eyedb::Attribute *attr, int offset, eyedb::Object *o)
 {
   eyedb::Bool isnull;
-  if (attr->isIndirect())
-    {
-      eyedb::Oid oid;
-      attr->getOid(o, &oid, 1, 0);
-      fprintf(fd, "%s", oid.toString());
-    }
-  else if (attr->getClass()->asAgregatClass())
-    {
-      eyedb::Object *oo;
-      attr->getValue(o, (Data *)&oo, 1, offset, &isnull);
-      object_dump(fd, oo);
-    }
-  else if (attr->getClass()->asInt16Class())
-    {
-      eyedblib::int16 v;
-      attr->getValue(o, (Data *)&v, 1, offset, &isnull);
-      if (isnull) fprintf(fd, "NULL");
-      else fprintf(fd, "%d", v);
-    }
-  else if (attr->getClass()->asInt32Class())
-    {
-      eyedblib::int32 v;
-      attr->getValue(o, (Data *)&v, 1, offset, &isnull);
-      if (isnull) fprintf(fd, "NULL");
-      else fprintf(fd, "%d", v);
-    }
-  else if (attr->getClass()->asInt64Class())
-    {
-      eyedblib::int64 v;
-      attr->getValue(o, (Data *)&v, 1, offset, &isnull);
-      if (isnull) fprintf(fd, "NULL");
-      else fprintf(fd, "%d", v);
-    }
-  else if (attr->getClass()->asFloatClass())
-    {
-      double v;
-      attr->getValue(o, (Data *)&v, 1, offset, &isnull);
-      if (isnull) fprintf(fd, "NULL");
-      else fprintf(fd, "%f", v);
-    }
-  else if (attr->getClass()->asCharClass())
-    {
-      char v;
-      attr->getValue(o, (Data *)&v, 1, offset, &isnull);
-      if (isnull) fprintf(fd, "NULL");
-      else fprintf(fd, "'%c'", v);
-    }
-  else if (attr->getClass()->asCollectionClass())
-    {
-      eyedb::Object *oo;
-      attr->getValue(o, (Data *)&oo, 1, offset);
-      collection_dump(fd, oo->asCollection());
-    }
+
+  if (attr->isIndirect()) {
+    eyedb::Oid oid;
+    attr->getOid(o, &oid, 1, 0);
+    fprintf(fd, "%s", oid.toString());
+  }
+  else if (attr->getClass()->asAgregatClass()) {
+    eyedb::Object *oo;
+    attr->getValue(o, (eyedb::Data *)&oo, 1, offset, &isnull);
+    object_dump(fd, oo);
+  }
+  else if (attr->getClass()->asInt16Class()) {
+    eyedblib::int16 v;
+    attr->getValue(o, (eyedb::Data *)&v, 1, offset, &isnull);
+    if (isnull) fprintf(fd, "NULL");
+    else fprintf(fd, "%d", v);
+  }
+  else if (attr->getClass()->asInt32Class()) {
+    eyedblib::int32 v;
+    attr->getValue(o, (eyedb::Data *)&v, 1, offset, &isnull);
+    if (isnull) fprintf(fd, "NULL");
+    else fprintf(fd, "%d", v);
+  }
+  else if (attr->getClass()->asInt64Class()) {
+    eyedblib::int64 v;
+    attr->getValue(o, (eyedb::Data *)&v, 1, offset, &isnull);
+    if (isnull) fprintf(fd, "NULL");
+    else fprintf(fd, "%d", v);
+  }
+  else if (attr->getClass()->asFloatClass()) {
+    double v;
+    attr->getValue(o, (eyedb::Data *)&v, 1, offset, &isnull);
+    if (isnull) fprintf(fd, "NULL");
+    else fprintf(fd, "%f", v);
+  }
+  else if (attr->getClass()->asCharClass()) {
+    char v;
+    attr->getValue(o, (eyedb::Data *)&v, 1, offset, &isnull);
+    if (isnull) fprintf(fd, "NULL");
+    else fprintf(fd, "'%c'", v);
+  }
+  else if (attr->getClass()->asCollectionClass()) {
+    eyedb::Object *oo;
+    attr->getValue(o, (eyedb::Data *)&oo, 1, offset);
+    collection_dump(fd, oo->asCollection());
+  }
 }

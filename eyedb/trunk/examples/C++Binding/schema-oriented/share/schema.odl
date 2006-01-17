@@ -36,7 +36,7 @@ class Person {
 };
 
 class Car {
-  attribute string mark;
+  attribute string brand;
   attribute int num;
   Person *owner inverse cars;
 };

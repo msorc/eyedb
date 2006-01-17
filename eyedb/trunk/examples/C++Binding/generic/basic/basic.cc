@@ -42,15 +42,15 @@ main(int argc, char *argv[])
     // connecting to the EyeDB server
     conn.open();
 
-    Database db(argv[1]);
+    eyedb::Database db(argv[1]);
 
     // opening database argv[1]
-    Status s = db.open(&conn, Database::DBRead);
-    if (s) cerr << s << endl;
+    eyedb::Status s = db.open(&conn, eyedb::Database::DBRead);
+    if (s) std::cerr << s << std::endl;
   }
 
   catch(eyedb::Exception &e) {
-    cerr << e;
+    std::cerr << e;
     eyedb::release();
     return 1;
   }
