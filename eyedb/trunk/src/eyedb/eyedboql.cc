@@ -18,7 +18,7 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
+  Author: Eric Viara <viara@sysra.com>
 */
 
 
@@ -106,26 +106,23 @@ void oql_sig_h(int sig)
   else
     printf("Interrupted!\n");
 
-  if (operation == idbOqlLocal)
-    {
-      oql_interrupt = True;
-      return;
-    }
+  if (operation == idbOqlLocal) {
+    oql_interrupt = True;
+    return;
+  }
 
   if (!sig)
     return;
 
-  if (operation == idbOqlScanning)
-    {
-      oql_interrupt = True;
-      return;
-    }
+  if (operation == idbOqlScanning) {
+    oql_interrupt = True;
+    return;
+  }
 
-  if (operation == idbOqlQuerying)
-    {
-      conn->sendInterrupt();
-      oql_interrupt = True;
-    }
+  if (operation == idbOqlQuerying) {
+    conn->sendInterrupt();
+    oql_interrupt = True;
+  }
 }
 
 static void (*user_handler)(Status s, void *);
@@ -136,12 +133,11 @@ check_status(Status s, void *)
   if (user_handler)
     user_handler(s, (void *)0);
 
-  if (s->getStatus() == IDB_SERVER_FAILURE)
-    {
-      s->print();
-      fprintf(stderr, "eyedboql exiting...\n");
-      exit(1);
-    }
+  if (s->getStatus() == IDB_SERVER_FAILURE) {
+    s->print();
+    fprintf(stderr, "eyedboql exiting...\n");
+    exit(1);
+  }
 }
 
 #include "CollectionBE.h"
@@ -191,12 +187,11 @@ main(int argc, char *argv[])
   char *dbname = 0, *dbmfile = 0;
   unsigned int mode = 0;
   Bool printmode = False, recmode = False, echo = False,
-  interact = False, commit = False;
+    interact = False, commit = False;
   const char *display = NULL;
 
   dbmfile = (char *)Database::getDefaultDBMDB();
 
-#if 1
   static const std::string database_opt = "database";
   static const std::string read_opt = "read";
   static const std::string read_write_opt = "read-write";
@@ -302,105 +297,6 @@ main(int argc, char *argv[])
   if (map.find(echo_opt) != map.end())
     echo = True;
 
-#else
-  int i;
-  for (i = 1; i < argc; )
-    {
-      char *s = argv[i];
-      if (!strcmp(s, "-db") || !strcmp(s, "-d") || !strcmp(s, "-database"))
-	{
-	  dbname = argv[++i];
-	  ++i;
-	}
-      else if (!strcmp(s, "-rw") || !strcmp(s, "-w"))
-	{
-	  mode |= _DBRW;
-	  ++i;
-	}
-      else if (!strcmp(s, "-r"))
-	{
-	  mode |= _DBRead;
-	  ++i;
-	}
-      else if (!strcmp(s, "-sr"))
-	{
-	  mode |= _DBSRead;
-	  ++i;
-	}
-      else if (!strcmp(s, "-admin"))
-	{
-	  mode |= _DBAdmin;
-	  ++i;
-	}
-      else if (!strcmp(s, "-local") || !strcmp(s, "-l"))
-	{
-	  mode |= _DBOpenLocal;
-	  ++i;
-	}
-      else if (!strcmp(s, "-c"))
-	{
-	  CFItem *item = new CFItem(CFCommand, argv[++i]);
-	  clist->insertObjectLast(item);
-	  ++i;
-	}
-      else if (!strcmp(s, "-help") || !strcmp(s, "-h"))
-	{
-	  usage();
-	  return 0;
-	}
-#ifdef MOZILLA
-      else if (!strcmp(s, "-cgi"))
-	{
-	  cgi = argv[++i];
-	  ++i;
-	}
-      else if (!strcmp(s, "-wid"))
-	{
-	  sscanf(argv[++i], "0x%x", &wid);
-	  ++i;
-	}
-      else if (!strcmp(s, "-display"))
-	{
-	  display = argv[++i];
-	  ++i;
-	}
-#endif
-      else if (!strcmp(s, "-print") || !strcmp(s, "-p"))
-	{
-	  printmode = True;
-	  ++i;
-	}
-      else if (!strcmp(s, "-commit") || !strcmp(s, "-c"))
-	{
-	  commit = True;
-	  ++i;
-	}
-      else if (!strcmp(s, "-i"))
-	{
-	  interact = True;
-	  ++i;
-	}
-      else if (!strcmp(s, "-full") || !strcmp(s, "-full"))
-	{
-	  recmode = True;
-	  ++i;
-	}
-      else if (!strcmp(s, "-echo"))
-	{
-	  echo = True;
-	  ++i;
-	}
-      else if (s[0] == '-')
-	return usage();
-      else
-	{
-	  CFItem *item = new CFItem(CFFile, argv[i]);
-	  clist->insertObjectLast(item);
-	  ++i;
-	}
-    }
-#endif
-
   for (int i = 1; i < argc; i++) {
     CFItem *item = new CFItem(CFFile, argv[i]);
     clist->insertObjectLast(item);
@@ -423,13 +319,12 @@ main(int argc, char *argv[])
   conn->echoServerMessages(*new StdServerMessageDisplayer());
   parser = new OQLParser(conn, argc, argv);
 
-  if (printmode)
-    {
-      if (recmode)
-	parser->setPrintMode(OQLParser::fullRecurs);
-      else
-	parser->setPrintMode(OQLParser::noRecurs);
-    }
+  if (printmode) {
+    if (recmode)
+      parser->setPrintMode(OQLParser::fullRecurs);
+    else
+      parser->setPrintMode(OQLParser::noRecurs);
+  }
 
   if (echo)
     parser->setEchoMode(echo);
@@ -443,53 +338,46 @@ main(int argc, char *argv[])
   if (dbname && parser->setDatabase(dbname, (Database::OpenFlag)mode, 0))
     return 1;
 
-  if (clist->getCount())
-    {
-      LinkedListCursor *c = clist->startScan();
+  if (clist->getCount()) {
+    LinkedListCursor *c = clist->startScan();
 
-      CFItem *item;
-      while (clist->getNextObject(c, (void *&)item))
-	{
-	  if (item->type == CFCommand)
-	    {
-	      if (!parser->parse((std::string(item->str) + ";").c_str(), echo) ||
-		  parser->getExitMode() ||
-		  parser->getInterrupt())
-		break;
-	    }
-	  else
-	    {
-	      if (!parser->parse_file(item->str))
-		{
-		  fprintf(stderr, "eyedboql: cannot read file '%s'\n",
-			  item->str);
-		  continue;
-		}
-
-	      if (parser->getExitMode() || parser->getInterrupt())
-		break;
-	    }
+    CFItem *item;
+    while (clist->getNextObject(c, (void *&)item)) {
+      if (item->type == CFCommand) {
+	if (!parser->parse((std::string(item->str) + ";").c_str(), echo) ||
+	    parser->getExitMode() ||
+	    parser->getInterrupt())
+	  break;
+      }
+      else  {
+	if (!parser->parse_file(item->str)) {
+	  fprintf(stderr, "eyedboql: cannot read file '%s'\n",
+		  item->str);
+	  continue;
 	}
 
-      clist->endScan(c);
-
-      if (parser->getExitMode() || !interact)
-	{
-	  parser->quit();
-	  return 0;
-	}
+	if (parser->getExitMode() || parser->getInterrupt())
+	  break;
+      }
     }
+
+    clist->endScan(c);
+
+    if (parser->getExitMode() || !interact) {
+      parser->quit();
+      return 0;
+    }
+  }
 
   fprintf(stdout, "Welcome to eyedboql.\n  Type `%chelp' to display the command list.\n", parser->getEscapeChar());
   fprintf(stdout, "  Type `%ccopyright' to display the copyright.\n", parser->getEscapeChar());
   parser->setInterrupt(False);
   signal(SIGINT, oql_sig_h);
   parser->clear_oql_buffer();
-  while (!parser->getExitMode())
-    {
-      parser->prompt();
-      parser->parse(stdin, False);
-    }
+  while (!parser->getExitMode()) {
+    parser->prompt();
+    parser->parse(stdin, False);
+  }
 
   delete parser;
   return 0;

@@ -36,8 +36,6 @@
 #include "oqlctb.h"
 #include <eyedb/GenHashTable.h>
 
-#define NEW_DBMDB
-
 #define FULL_CACHE_OBJECTS
 #define CACHE_OBJECTS
 
@@ -89,7 +87,7 @@ LinkedList *Database::dbopen_list;
 	const char *voldir = default_voldir;
 
 	if (!voldir)
-	  voldir = Config::getServerValue("sv_datdir");
+	  voldir = Config::getClientValue("data_dir");
 
 	if (voldir)
 	  strcpy(dirname, voldir);
@@ -121,19 +119,14 @@ LinkedList *Database::dbopen_list;
   {
     //  printf("Database::Database(this=%p)\n", this);
     if (_dbmdb_str)
-#ifdef NEW_DBMDB
       dbmdb_str = strdup(_dbmdb_str);
-#else
-    dbmdb_str = getPath(strdup(_dbmdb_str));
-#endif
-    else
-      {
-	const char *str = getDefaultDBMDB();
-	if (str)
-	  dbmdb_str = strdup(str);
-	else
-	  dbmdb_str = 0;
-      }
+    else {
+      const char *str = getDefaultDBMDB();
+      if (str)
+	dbmdb_str = strdup(str);
+      else
+	dbmdb_str = 0;
+    }
 
     name = 0;
     dbid = 0;
@@ -265,22 +258,52 @@ LinkedList *Database::dbopen_list;
 
   char *Database::defaultDBMDB;
 
+  const std::vector<std::string> & Database::getGrantedDBMDB()
+  {
+    static std::vector<std::string> granted_dbm;
+
+    if (granted_dbm.size())
+      return granted_dbm;
+
+    const char *path = Config::getServerValue("granted_dbm");
+    if (!path)
+      return granted_dbm;
+
+    char *p = strdup(path);
+    char *sp = p;
+
+    for (;;) {
+      char *q = strchr(p, ',');
+      if (q)
+	*q = 0;
+      granted_dbm.push_back(p);
+      if (!q)
+	break;
+      p = q + 1;
+    }
+
+    free(sp);
+    return granted_dbm;
+  }
+
+  const char *Database::getDefaultServerDBMDB()
+  {
+    const std::vector<std::string> & granted_dbm = getGrantedDBMDB();
+    if (granted_dbm.size())
+      return granted_dbm[0].c_str();
+    return "";
+  }
+
   const char *Database::getDefaultDBMDB()
   {
-    if (!defaultDBMDB)
-      {
-	static char buff[256];
-	const char *path = Config::getServerValue("sv_dbm");
-	if (!path)
-	  return DBM_Database::defaultDBMDB;
-	//	printf("%d: getDefaultDBMDB: %s\n", getpid(), path);
-	strcpy(buff, path);
-#ifdef NEW_DBMDB
-	return buff;
-#else
-	return getPath(buff, True);
-#endif
-      }
+    if (!defaultDBMDB) {
+      static char buff[256];
+      const char *path = Config::getClientValue("dbm");
+      if (!path)
+	return DBM_Database::defaultDBMDB;
+      strcpy(buff, path);
+      return buff;
+    }
 
     return defaultDBMDB;
   }
@@ -288,11 +311,7 @@ LinkedList *Database::dbopen_list;
   void Database::setDefaultDBMDB(const char *dbmdb_str)
   {
     free(defaultDBMDB);
-#ifdef NEW_DBMDB
     defaultDBMDB = strdup(dbmdb_str);
-#else
-    defaultDBMDB = getPath(strdup(dbmdb_str));
-#endif
   }
 
   void Database::garbage()

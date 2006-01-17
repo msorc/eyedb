@@ -496,7 +496,7 @@ dbcreate_prologue(Database *db, const char *dbname,
 		  eyedbsm::Oid::NX nbobjs = DEF_NBOBJS, int dbid = 0)
 {
   std::string dirname = (deffiledir ? deffiledir :
-			 eyedb::Config::getServerValue("sv_datdir"));
+			 eyedb::Config::getClientValue("data_dir"));
 
   if (!dbfile)
     {
@@ -571,7 +571,7 @@ dbmove_prologue(Database *db, const char *dbname,
 		const char *deffiledir, DbCreateDescription *dbdesc)
 {
   std::string dirname = (deffiledir ? deffiledir :
-			 eyedb::Config::getServerValue("sv_datdir"));
+			 eyedb::Config::getClientValue("data_dir"));
 
   if (!dbfile)
     {
@@ -640,7 +640,7 @@ dbcopy_prologue(Database *db, const char *dbname, const char *newdbname,
 		const char *deffiledir, DbCreateDescription *dbdesc)
 {
   std::string dirname = (deffiledir ? deffiledir :
-			 eyedb::Config::getServerValue("sv_datdir"));
+			 eyedb::Config::getClientValue("data_dir"));
 
   if (!dbfile)
     dbfile = strdup((dirname + "/" + newdbname + ".dbs").c_str());
@@ -1256,12 +1256,12 @@ static int
 dbexport_realize(const char *dbname, const char *file)
 {
   if (!*userauth) {
-    const char *env = eyedb::Config::getServerValue("user");
+    const char *env = eyedb::Config::getClientValue("user");
     if (env) strcpy(userauth, env);
   }
 
   if (!*passwdauth) {
-    const char *env = eyedb::Config::getServerValue("passwd");
+    const char *env = eyedb::Config::getClientValue("passwd");
     if (env) strcpy(passwdauth, env);
   }
 
@@ -1608,7 +1608,7 @@ dbimport_realize(int fd, const char *file, const char *dbname,
   int i;
   if (lseek_ok && !_filedir) {
     getansw("Directory for Database File",
-	    dbdir, eyedb::Config::getServerValue("sv_datdir"));
+	    dbdir, eyedb::Config::getClientValue("data_dir"));
 
     for (i = 0; i < info.ndat; i++) {
       if (!*info.datafiles[i].file)
@@ -1623,7 +1623,7 @@ dbimport_realize(int fd, const char *file, const char *dbname,
   }
   else {
     if (!_filedir)
-      _filedir = eyedb::Config::getServerValue("sv_datdir");
+      _filedir = eyedb::Config::getClientValue("data_dir");
 
     /*
       for (i = 0; i < info.ndat; i++)

@@ -36,21 +36,18 @@ namespace eyedb {
      @{
   */
 
-  /*
-  const char *getStdOptionsUsage(void);
-  const char *getStdOptionsHelp(const char *indent = "\t");
-  const char *getSrvOptionsUsage(void);
-  */
-
   void print_standard_usage(GetOpt &getopt, const std::string &append = "",
-			    std::ostream &os = std::cerr);
+			    std::ostream &os = std::cerr,
+			    bool server = false);
 
   void print_standard_help(GetOpt &getopt,
 			   const std::vector<std::string> &options,
-			   std::ostream &os = std::cerr);
+			   std::ostream &os = std::cerr,
+			   bool server = false);
 
-  void print_common_help(std::ostream &os);
-  void print_common_usage(std::ostream &os);
+  void print_common_help(std::ostream &os, bool server = false);
+
+  void print_common_usage(std::ostream &os, bool server = false);
 
   /**
      @}

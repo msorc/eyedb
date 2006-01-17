@@ -34,7 +34,7 @@ using namespace eyedb;
 static int
 usage(const char *prog)
 {
-  fprintf(stderr, "usage: %s [--server] [--sh|--csh [--export]] [<variables>]\n", prog);
+  fprintf(stderr, "usage: %s [--server] [--config|--csh|--sh [--export]] [<variables>]\n", prog);
   return 1;
 }
 
@@ -61,9 +61,9 @@ main(int argc, char *argv[])
     return usage(argv[0]);
 
   LinkedList list;
-  Bool shell, C_shell, _export, _server;
+  Bool shell, C_shell, _export, _server, conf;
 
-  shell = C_shell =  _export = _server = False;
+  shell = C_shell =  _export = _server = False, conf = False;
 
   int n;
   for (n = 1; n < argc; n++) {
@@ -83,6 +83,8 @@ main(int argc, char *argv[])
       _export = True;
     else if (!strcmp(s, "--server"))
       _server = True;
+    else if (!strcmp(s, "--config"))
+      conf = True;
     else if (*s == '-')
       return usage(argv[0]);
     else
@@ -92,7 +94,10 @@ main(int argc, char *argv[])
   if (_export && !shell && !C_shell)
     return usage(argv[0]);
 
-  if (!list.getCount() && !shell && !C_shell)
+  if (!list.getCount() && !shell && !C_shell && !conf)
+    return usage(argv[0]);
+
+  if (shell + C_shell + conf > 1)
     return usage(argv[0]);
 
   int item_cnt;
@@ -145,6 +150,19 @@ main(int argc, char *argv[])
 	else
 	  fprintf(stdout, "set %s=%s\n", var.c_str(), items[n].value);
       }
+
+    delete [] items;
+    return 0;
+  }
+
+  if (conf) {
+    fprintf(stdout, "#\n");
+    fprintf(stdout, "# EyeDB %s Configuration File\n",
+	    _server ? "Server" : "Client");
+    fprintf(stdout, "#\n\n");
+
+    for (n = 0; n < item_cnt; n++)
+      fprintf(stdout, "%s = %s;\n", items[n].name, items[n].value);
 
     delete [] items;
     return 0;

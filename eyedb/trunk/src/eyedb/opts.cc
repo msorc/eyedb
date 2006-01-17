@@ -153,9 +153,11 @@ do { \
     static const char *opt_sv_prefix = "-eyedbsv";
     static int len_opt_sv_prefix = strlen(opt_sv_prefix);
 
-    const char *smdport = Config::getServerValue("sv_smdport");
-    if (smdport)
-      smd_set_port(smdport);
+    if (listen) { // means : server mode
+      const char *smdport = Config::getServerValue("smdport");
+      if (smdport)
+	smd_set_port(smdport);
+    }
 
     if (getenv("RPC_MIN_SIZE")) {
       RPC_MIN_SIZE = atoi(getenv("RPC_MIN_SIZE"));
@@ -179,6 +181,7 @@ do { \
     static const std::string port_opt = "port";
     static const std::string smd_port_opt = "smd-port";
     static const std::string dbm_opt = "dbm";
+    static const std::string granted_dbm_opt = "granted-dbm";
     static const std::string conf_opt = "conf";
     static const std::string logdev_opt = "logdev";
     static const std::string logmask_opt = "logmask";
@@ -204,11 +207,20 @@ do { \
       Option('P', prefix + passwd_opt, OptionStringType(),
 	     Option::OptionalValue,  OptionDesc("Password", "<passwd>"));
 
-    if (listen)
+    if (listen) {
       opts[opt_cnt++] = 
 	Option(listen_opt, OptionStringType(),
 	       Option::MandatoryValue,
 	       OptionDesc("listen host and ports", "[<host>:]<port>"));
+      opts[opt_cnt++] = 
+	Option(prefix + smd_port_opt, OptionStringType(), Option::MandatoryValue,
+	       OptionDesc("eyedbsmd port", "<port>"));
+
+      opts[opt_cnt++] = 
+	Option(prefix + granted_dbm_opt, OptionStringType(),
+	       Option::MandatoryValue,
+	       OptionDesc("Granted EYEDBDBM database files", "<dbmfile>"));
+    }
     else {
       opts[opt_cnt++] = 
 	Option(prefix + host_opt, OptionStringType(), Option::MandatoryValue,
@@ -217,15 +229,11 @@ do { \
       opts[opt_cnt++] = 
 	Option(prefix + port_opt, OptionStringType(), Option::MandatoryValue,
 	       OptionDesc("eyedbd port", "<port>"));
+
+      opts[opt_cnt++] = 
+	Option(prefix + dbm_opt, OptionStringType(), Option::MandatoryValue,
+	       OptionDesc("EYEDBDBM database file", "<dbmfile>"));
     }
-
-    opts[opt_cnt++] = 
-      Option(prefix + smd_port_opt, OptionStringType(), Option::MandatoryValue,
-	     OptionDesc("eyedbsmd port", "<port>"));
-
-    opts[opt_cnt++] = 
-      Option(prefix + dbm_opt, OptionStringType(), Option::MandatoryValue,
-	     OptionDesc("EYEDBDBM database file", "<dbmfile>"));
 
     opts[opt_cnt++] = 
       Option(prefix + conf_opt, OptionStringType(), Option::MandatoryValue,
@@ -320,13 +328,12 @@ do { \
     if (map.find(smd_port_opt) != map.end())
       smd_set_port(map[smd_port_opt].value.c_str());
 
-    if (map.find(dbm_opt) != map.end()) {
-      if (listen)
-	Config::getServerConfig()->setValue("sv_dbm",
-					     map[dbm_opt].value.c_str());
-      else
-	Database::setDefaultDBMDB(map[dbm_opt].value.c_str());
-    }
+    if (map.find(granted_dbm_opt) != map.end())
+      Config::getServerConfig()->setValue("granted_dbm",
+					  map[granted_dbm_opt].value.c_str());
+
+    if (map.find(dbm_opt) != map.end())
+      Database::setDefaultDBMDB(map[dbm_opt].value.c_str());
 
     if (map.find(user_opt) != map.end()) {
       if (map[user_opt].value.length() == 0)
@@ -421,18 +428,18 @@ do { \
   }
 
    void print_standard_usage(GetOpt &getopt, const std::string &append,
-			     ostream &os)
+			     ostream &os, bool server)
   {
     getopt.usage(" " + append, "usage: ", os);
     os << "\n\nCommon Options:\n";
-    print_common_usage(os);
+    print_common_usage(os, server);
     os << '\n';
   }
 
 
   void print_standard_help(GetOpt &getopt,
 			   const std::vector<std::string> &options,
-			   ostream &os)
+			   ostream &os, bool server)
   {
     os << "Program Options:\n";
     getopt.help(os, "  ");
@@ -440,23 +447,25 @@ do { \
     for (unsigned int n = 0; n < size; n += 2)
       getopt.helpLine(options[n], options[n+1], os);
     os << "\nCommon Options:\n";
-    print_common_help(os);
+    print_common_help(os, server);
   }
 
 
-   void print_common_usage(ostream &os)
-   {
+  void print_common_usage(ostream &os, bool server)
+  {
     int argc = 1;
     char *argv[] = {""};
-    make_options(argc, argv, &os, 0);
-   }
+    string listen;
+    make_options(argc, argv, &os, 0, server ? &listen : 0);
+  }
 
-   void print_common_help(ostream &os)
-   {
+  void print_common_help(ostream &os, bool server)
+  {
     int argc = 1;
     char *argv[] = {""};
-    make_options(argc, argv, 0, &os);
-   }
+    string listen;
+    make_options(argc, argv, 0, &os, server ? &listen : 0);
+  }
 
 #if 0
   const char *

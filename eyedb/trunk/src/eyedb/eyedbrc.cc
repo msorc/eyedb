@@ -41,7 +41,7 @@ static int
 usage(const char *prog)
 {
   cerr << "usage: " << prog << " ";
-  print_common_usage(cerr);
+  print_common_usage(cerr, true);
   cerr << " start|stop|status [-f] [--creating-dbm] [-h|--help]\n";
 
   return 1;
@@ -55,7 +55,7 @@ static void help(const char *prog)
   cerr << "  stop [-f]  Stop the server. Set -f to force stop\n";
   cerr << "  status     Display status on the running server\n";
   cerr << "\nCommon Options:\n";
-  print_common_help(cerr);
+  print_common_help(cerr, true);
 }
 
 static void
@@ -229,7 +229,7 @@ static void make_host_port(const char *_listen, const char *&host,
 static int checkPostInstall(Bool creatingDbm)
 {
   if (!creatingDbm) {
-    const char *dbm = eyedb::Config::getServerValue("sv_dbm");
+    const char *dbm = Database::getDefaultServerDBMDB();
     if (!dbm || access(dbm, R_OK)) {
       fprintf(stderr, "\nThe EYEDBDBM database file '%s' is not accessible\n",
 	      dbm);
@@ -284,6 +284,7 @@ main(int argc, char *argv[])
       return 0;
     }
   }
+
   if (!*listen && (s = eyedb::Config::getServerValue("listen")))
     listen = s;
 
@@ -308,7 +309,7 @@ main(int argc, char *argv[])
   const char *host, *port;
   make_host_port(listen, host, port);
     
-  SessionLog sesslog(host, port, eyedb::Config::getServerValue("sv_tmpdir"));
+  SessionLog sesslog(host, port, eyedb::Config::getServerValue("tmpdir"));
 
   if (sesslog.getStatus()) {
     if (cmd == Start)

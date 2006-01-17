@@ -61,6 +61,8 @@ using namespace eyedb;
 
 static Bool nod;
 
+#define NO_DATDIR
+
 static int
 get_opts(int argc, char *argv[],
 	 const char **accessfile,
@@ -72,12 +74,16 @@ get_opts(int argc, char *argv[],
   int i;
   const char *s;
 
-  *accessfile = eyedb::Config::getServerValue("sv_access_file");
+  *accessfile = eyedb::Config::getServerValue("access_file");
   *nofork = 0;
   *sesslogdev = 0;
   *sessloglevel = 0;
 
+#ifndef NO_DATDIR
   *datdir = 0;
+#else
+  *datdir = "";
+#endif
 
   static const std::string access_file_opt = "access_file";
   static const std::string datdir_opt = "datdir";
@@ -89,8 +95,10 @@ get_opts(int argc, char *argv[],
   Option opts[] = {
     Option(access_file_opt, OptionStringType(),
 	   Option::MandatoryValue, OptionDesc("Access file", "<access file>")),
+#ifndef NO_DATDIR
     Option(datdir_opt, OptionStringType(),
 	   Option::MandatoryValue, OptionDesc("Default datafile directory", "<datdir>")),
+#endif
     Option(nod_opt, OptionBoolType(),
 	   0, OptionDesc("No daemon: does not close fd 0, 1 & 2")),
     Option('h', help_opt, OptionBoolType(),
@@ -100,7 +108,7 @@ get_opts(int argc, char *argv[],
   GetOpt getopt(argv[0], opts, sizeof(opts)/sizeof(opts[0]));
 
   if (!getopt.parse(argc, argv)) {
-    print_standard_usage(getopt);
+    print_standard_usage(getopt, "", std::cerr, true);
     //getopt.usage("\n");
     return 1;
   }
@@ -108,7 +116,7 @@ get_opts(int argc, char *argv[],
   GetOpt::Map &map = getopt.getMap();
 
   if (map.find(help_opt) != map.end()) {
-    print_standard_help(getopt, vector<string>());
+    print_standard_help(getopt, vector<string>(), std::cerr, true);
     //getopt.help(cerr, "  ");
     return 1;
   }
@@ -116,8 +124,10 @@ get_opts(int argc, char *argv[],
   if (map.find(access_file_opt) != map.end())
     *accessfile = strdup(map[access_file_opt].value.c_str());
 
+#ifndef NO_DATDIR
   if (map.find(datdir_opt) != map.end())
     *datdir = strdup(map[datdir_opt].value.c_str());
+#endif
 
   if (map.find(nod_opt) != map.end())
     nod = True;
@@ -129,14 +139,16 @@ get_opts(int argc, char *argv[],
     *sessloglevel = ((OptionIntType *)map[sessloglevel_opt].type)->
       getIntValue(map[sessloglevel_opt].value);
 
+#ifndef NO_DATDIR
   if (!*datdir) {
-    if (s = eyedb::Config::getServerValue("sv_datdir"))
+    if (s = eyedb::Config::getClientValue("data_dir"))
       *datdir = strdup(s);
     else {
       fprintf(stderr, "configuration variable sv_datdir is not set\n");
       exit(1);
     }
   }
+#endif
 
   return 0;
 }
@@ -239,11 +251,6 @@ main(int argc, char *argv[])
 	       &sessloglevel, &nofork))
     return notice(1);
 
-  /*
-    if (smdport)
-    smd_set_port(smdport);
-  */
-
   rpc_setProgName(argv[0]);
 
   if (!*listen)
@@ -275,7 +282,7 @@ main(int argc, char *argv[])
   *pid = getpid();
   rpc_setQuitHandler(_quit_handler, pid);
 
-  const char *sv_tmpdir = eyedb::Config::getServerValue("sv_tmpdir");
+  const char *sv_tmpdir = eyedb::Config::getServerValue("tmpdir");
 
   if (!sv_tmpdir)
     sv_tmpdir = "/tmp";
@@ -286,7 +293,11 @@ main(int argc, char *argv[])
 			   nlisten, hosts, ports,
 			   datdir, sesslogdev, sessloglevel);
 
+#ifndef NO_DATDIR
+  IDB_init(0, 0 /* passwdfile */, sesslog, 0 /*timeout*/);
+#else
   IDB_init(datdir, 0 /* passwdfile */, sesslog, 0 /*timeout*/);
+#endif
 
   if (sesslog->getStatus()) {
     sesslog->getStatus()->print();

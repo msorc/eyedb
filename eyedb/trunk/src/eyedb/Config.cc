@@ -670,6 +670,13 @@ namespace eyedb {
 
     // User
     setValue( "user", "@");
+
+    // EYEDBDBM Database
+    //setValue( "dbm", (localstatedir + "/lib/eyedb/db/dbmdb.dbs").c_str());
+    setValue( "dbm", "default");
+
+    // Bases directory
+    setValue( "data_dir", (localstatedir + "/lib/eyedb/db").c_str());
   }
 
   void
@@ -682,24 +689,21 @@ namespace eyedb {
     // Executables directory
     setValue( "bindir", eyedblib::CompileBuiltin::getBindir());
 
-    // Bases directory
-    setValue( "sv_datdir", (localstatedir + "/lib/eyedb/db").c_str());
-
     // pipes:
-    setValue( "sv_pipedir", (localstatedir + "/lib/eyedb/pipes").c_str());
+    setValue( "pipedir", (localstatedir + "/lib/eyedb/pipes").c_str());
 
     // tmpdir
-    setValue( "sv_tmpdir", (localstatedir + "/lib/eyedb/tmp").c_str());
+    setValue( "tmpdir", (localstatedir + "/lib/eyedb/tmp").c_str());
 
     // sopath
     setValue( "sopath", (libdir + "/eyedb").c_str());
 
-    // EYEDBDBM Database
-    setValue( "sv_dbm", (localstatedir + "/lib/eyedb/db/dbmdb.dbs").c_str());
+    // Granted EYEDBDBM Databases
+    setValue( "granted_dbm", (localstatedir + "/lib/eyedb/db/dbmdb.dbs").c_str());
 
     // Server Parameters
-    setValue( "sv_access_file", (sysconfdir + "/eyedb/Access").c_str());
-    setValue( "sv_smdport", (localstatedir + "/lib/eyedb/pipes/eyedbsmd").c_str());
+    setValue( "access_file", (sysconfdir + "/eyedb/Access").c_str());
+    setValue( "smdport", (localstatedir + "/lib/eyedb/pipes/eyedbsmd").c_str());
 
     // Server Parameters
     //    setValue( "listen", ("localhost:8432," + localstatedir + "/lib/eyedb/pipes/eyedbd").c_str());
@@ -751,12 +755,14 @@ namespace eyedb {
   const char *
   Config::getServerValue(const char *name)
   {
+    //printf("%d: getServerValue(%s)\n", getpid(), name);
     return Config::getServerConfig()->getValue(name);
   }
 
   const char *
   Config::getClientValue(const char *name)
   {
+    //printf("%d: getClientValue(%s)\n", getpid(), name);
     return Config::getClientConfig()->getValue(name);
   }
 }
