@@ -4,6 +4,9 @@
 
 #define TRY_STORE
 
+using namespace eyedb;
+using namespace std;
+
 static void
 bug_coll_elements(Database &db)
 {

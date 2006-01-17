@@ -258,6 +258,8 @@ main(int argc, char *argv[])
   if (argc < 2)
     return usage(argv[0]);
 
+  eyedb::Exception::setMode(eyedb::Exception::StatusMode);
+
   Command cmd;
 
   if (!strcmp(argv[1], "start"))
