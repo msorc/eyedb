@@ -34,7 +34,7 @@ using namespace eyedb;
 static int
 usage(const char *prog)
 {
-  fprintf(stderr, "usage: %s [ --sh|--csh [--export] ] [<variables>]\n", prog);
+  fprintf(stderr, "usage: %s [--server] [--sh|--csh [--export]] [<variables>]\n", prog);
   return 1;
 }
 
@@ -61,9 +61,9 @@ main(int argc, char *argv[])
     return usage(argv[0]);
 
   LinkedList list;
-  Bool shell, C_shell, _export;
+  Bool shell, C_shell, _export, _server;
 
-  shell =  C_shell =  _export = False;
+  shell = C_shell =  _export = _server = False;
 
   int n;
   for (n = 1; n < argc; n++) {
@@ -81,6 +81,8 @@ main(int argc, char *argv[])
     }
     else if (!strcmp(s, "--export"))
       _export = True;
+    else if (!strcmp(s, "--server"))
+      _server = True;
     else if (*s == '-')
       return usage(argv[0]);
     else
@@ -90,18 +92,23 @@ main(int argc, char *argv[])
   if (_export && !shell && !C_shell)
     return usage(argv[0]);
 
+  if (!list.getCount() && !shell && !C_shell)
+    return usage(argv[0]);
+
   int item_cnt;
   Config::Item *items;
 
+  Config *cfg = (_server ? Config::getServerConfig() : Config::getClientConfig());
+
   if (!list.getCount())
-    items = Config::getClientConfig()->getValues(item_cnt);
+    items = cfg->getValues(item_cnt);
   else  {
     item_cnt = list.getCount();
     items = new Config::Item[list.getCount()];
     LinkedListCursor c(list);
     const char *s;
     for (n = 0; c.getNext((void *&)s); n++) {
-      const char *v = eyedb::Config::getClientValue(s);
+      const char *v = cfg->getValue(s);
       items[n] = Config::Item(strdup(s), strdup(v ? v : ""));
     }
   }
