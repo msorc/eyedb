@@ -294,7 +294,7 @@ oqmlStatus::oqmlStatus(Status s)
 static inline std::string
 nodePrefix(oqmlNode *node)
 {
-  std::string s = node->getOperationName() + " <<" + node->toString() + ">> : ";
+  std::string s = node->getOperationName() + " '" + node->toString() + "' : ";
   return s;
 }
 
