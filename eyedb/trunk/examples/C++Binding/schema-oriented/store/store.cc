@@ -24,6 +24,40 @@
 
 #include "person.h"
 
+using namespace eyedb;
+
+template <class T>
+class ObjectReleaser
+{
+  typedef T *type;
+  type _o;
+  bool _dont_release;
+
+public:
+  ObjectReleaser(type o) : _o(o), _dont_release(false) {}
+  ObjectReleaser(Database *db) : _o(new T(db)), _dont_release(false) {}
+
+  operator const type() const {return _o;}
+  operator type() {return _o;}
+  type operator->() {return _o;}
+
+  type dontRelease() {_dont_release = true; return _o;}
+
+  ~ObjectReleaser() {if (!_dont_release) _o->release();}
+};
+
+class AutoReleaser {
+  Object *_o;
+  bool _dont_release;
+
+public:
+  AutoReleaser(Object *o) : _o(o), _dont_release(false) {}
+
+  Object *dontRelease() {_dont_release = true; return _o;}
+
+  ~AutoReleaser() {if (!_dont_release) _o->release();}
+};
+
 int
 main(int argc, char *argv[])
 {
@@ -33,12 +67,11 @@ main(int argc, char *argv[])
   // initializing the person package
   person::init();
 
-  if (argc != 5)
-    {
-      fprintf(stderr, "usage: %s <dbname> <person name> <person age> "
-	      "<spouse name>\n", argv[0]);
-      return 1;
-    }
+  if (argc != 5) {
+    fprintf(stderr, "usage: %s <dbname> <person name> <person age> "
+	    "<spouse name>\n", argv[0]);
+    return 1;
+  }
 
   const char *dbname = argv[1];
   const char *name = argv[2];
@@ -92,11 +125,11 @@ main(int argc, char *argv[])
 
     // creating two cars
     Car *car1 = new Car(&db);
-    car1->setMark("renault");
+    car1->setBrand("renault");
     car1->setNum(18374);
 
     Car *car2 = new Car(&db);
-    car2->setMark("ford");
+    car2->setBrand("ford");
     car2->setNum(233491);
 
     // adding the cars to the created person
@@ -130,7 +163,7 @@ main(int argc, char *argv[])
   }
 
   catch(eyedb::Exception &e) {
-    cerr << argv[0] << ": " << e;
+    std::cerr << argv[0] << ": " << e;
     eyedb::release();
     return 1;
   }

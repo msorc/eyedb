@@ -1,4 +1,4 @@
-
+ 
 /* 
    EyeDB Object Database Management System
    Copyright (C) 1994-1999,2004,2005 SYSRA
@@ -19,13 +19,15 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
+  Author: Eric Viara <viara@sysra.com>
 */
 
 #include <eyedb/eyedb.h>
 
+using namespace std;
+
 static void
-  schema_dump(FILE *fd, const eyedb::Schema *),
+schema_dump(FILE *fd, const eyedb::Schema *),
   class_dump(FILE *fd, const eyedb::Class *),
   enum_class_dump(FILE *fd, const eyedb::EnumClass *),
   struct_class_dump(FILE *fd, const eyedb::StructClass *);
@@ -48,10 +50,10 @@ main(int argc, char *argv[])
     // connecting to the eyedb server
     conn.open();
 
-    Database db(argv[1]);
+    eyedb::Database db(argv[1]);
 
     // opening database argv[1]
-    db.open(&conn, Database::DBRW);
+    db.open(&conn, eyedb::Database::DBRW);
 
     // beginning a transaction
     db.transactionBegin();
@@ -78,14 +80,9 @@ static void
 schema_dump(FILE *fd, const eyedb::Schema *sch)
 {
   // getting class list
-#if EYEDBNUMVERSION < 205000
-  const LinkedList *list = const_cast<eyedb::Schema *>(sch)->getClassList();
-#else
-  const LinkedList *list = sch->getClassList();
-#endif
-
+  const eyedb::LinkedList *list = const_cast<eyedb::Schema *>(sch)->getClassList();
   // foreach class in list, dump the class
-  LinkedListCursor c(list);
+  eyedb::LinkedListCursor c(list);
   const eyedb::Class *cls;
   while (c.getNext((void *&)cls))
     class_dump(fd, cls);
@@ -152,32 +149,29 @@ struct_class_dump(FILE *fd, const eyedb::StructClass *cls)
 	continue;
       
       eyedb::Bool upClassAttr =
-	strcmp(attr->getClassOwner()->getName(), cls->getName()) ? True : False;
+	strcmp(attr->getClassOwner()->getName(), cls->getName()) ? eyedb::True :
+	eyedb::False;
 
       fprintf(fd, "\t");
       if (upClassAttr)
 	fprintf(fd, "// ");
-#if EYEDBNUMVERSION < 205000
-      eyedb::Bool strdim = attr->isString() ? True : False;
-#else
-      eyedb::Bool strdim = attr->isString();
-#endif
-      if (strdim)
-	{
-	  fprintf(fd, "attribute string");
-	  if (attr->getTypeModifier().ndims == 1 &&
-	      attr->getTypeModifier().dims[0] > 0)
-	    fprintf(fd, "<%d>", attr->getTypeModifier().dims[0]);
-	}
-      else
-	{
-	  fprintf(fd, "%s %s",
-		  (attr->hasInverse() ? "relationship" : "attribute"),
-		  attr->getClass()->getName());
 
-	  if (attr->isIndirect())
-	    fprintf(fd, "*");
-	}
+      eyedb::Bool strdim = attr->isString() ? eyedb::True : eyedb::False;
+
+      if (strdim) {
+	fprintf(fd, "attribute string");
+	if (attr->getTypeModifier().ndims == 1 &&
+	    attr->getTypeModifier().dims[0] > 0)
+	  fprintf(fd, "<%d>", attr->getTypeModifier().dims[0]);
+      }
+      else {
+	fprintf(fd, "%s %s",
+		(attr->hasInverse() ? "relationship" : "attribute"),
+		attr->getClass()->getName());
+
+	if (attr->isIndirect())
+	  fprintf(fd, "*");
+      }
 
       if (upClassAttr)
 	fprintf(fd, " %s::%s", attr->getClassOwner()->getName(),
@@ -186,13 +180,12 @@ struct_class_dump(FILE *fd, const eyedb::StructClass *cls)
 	fprintf(fd, " %s", attr->getName());
 
       if (!strdim)
-	for (int j = 0; j < attr->getTypeModifier().ndims; j++)
-	  {
-	    if (attr->getTypeModifier().dims[j] < 0)
-	      fprintf(fd, "[]");
-	    else
-	      fprintf(fd, "[%d]", attr->getTypeModifier().dims[j]);
-	  }
+	for (int j = 0; j < attr->getTypeModifier().ndims; j++) {
+	  if (attr->getTypeModifier().dims[j] < 0)
+	    fprintf(fd, "[]");
+	  else
+	    fprintf(fd, "[%d]", attr->getTypeModifier().dims[j]);
+	}
       fprintf(fd, ";\n");
     }
 

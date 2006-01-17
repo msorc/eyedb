@@ -3033,7 +3033,7 @@ do { \
     generateMethodFetch_C(ctx, mth);
 
 #ifdef NEW_ARGARR
-    fprintf(fd, "%sstatic eyedb::ArgArray *argarr = new eyedb::ArgArray(%d, Argument::AutoFullGarbage);\n\n",
+    fprintf(fd, "%sstatic eyedb::ArgArray *argarr = new eyedb::ArgArray(%d, eyedb::Argument::AutoFullGarbage);\n\n",
 	    ctx->get(), sign->getNargs());
     sign->setArgs(fd, m, IN_ARG_TYPE, "(*argarr)[%d]->", "retarg.", ctx->get());
     fprintf(fd, "\n%seyedb::Argument __retarg;\n", ctx->get());

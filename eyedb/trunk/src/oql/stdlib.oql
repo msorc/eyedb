@@ -96,13 +96,14 @@ function min(l) {
 
   m := oql$maxint;
 
-  for (x in l)
-    {
+  for (x in l) {
+    if (x != null) {
       if (!is_num(x))
 	throw (msg + "numeric expected");
       if (x < m) 
 	m := x;
     }
+  }
 
   return m;
 }
@@ -116,13 +117,14 @@ function max(l) {
   if (!is_coll(l))
     throw msg + "collection expected";
   m := oql$minint;
-  for (x in l)
-    {
+  for (x in l) {
+    if (x != null) {
       if (!is_num(x))
 	throw (msg + "numeric expected");
       if (x > m)
 	m := x;
     }
+  }
   return m;
 }
 

@@ -1,4 +1,4 @@
-
+ 
 /* 
    EyeDB Object Database Management System
    Copyright (C) 1994-1999,2004,2005 SYSRA
@@ -19,22 +19,23 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
+  Author: Eric Viara <viara@sysra.com>
 */
 
 #include <eyedb/eyedb.h>
+
+using namespace std;
 
 int
 main(int argc, char *argv[])
 {
   eyedb::init(argc, argv);
 
-  if (argc != 4)
-    {
-      fprintf(stderr, "usage: %s <dbname> <person_name> <person_age>\n",
-	      argv[0]);
-      return 1;
-    }
+  if (argc != 4) {
+    fprintf(stderr, "usage: %s <dbname> <person_name> <person_age>\n",
+	    argv[0]);
+    return 1;
+  }
 
   eyedb::Exception::setMode(eyedb::Exception::ExceptionMode);
 
@@ -43,10 +44,10 @@ main(int argc, char *argv[])
     // connecting to the eyedb server
     conn.open();
 
-    Database db(argv[1]);
+    eyedb::Database db(argv[1]);
 
     // opening database argv[1]
-    db.open(&conn, Database::DBRW);
+    db.open(&conn, eyedb::Database::DBRW);
 
     // beginning a transaction
     db.transactionBegin();
@@ -73,11 +74,11 @@ main(int argc, char *argv[])
 
     // setting the name argv[2] to the new Person instance
     name_attr->setSize(p, strlen(argv[2])+1);
-    name_attr->setValue(p, (Data)argv[2], strlen(argv[2])+1, 0);
+    name_attr->setValue(p, (eyedb::Data)argv[2], strlen(argv[2])+1, 0);
 
     // setting the age argv[3] to the new Person instance
     int age = atoi(argv[3]);
-    age_attr->setValue(p, (Data)&age, 1, 0);
+    age_attr->setValue(p, (eyedb::Data)&age, 1, 0);
     p->store();
 
     // committing the transaction
