@@ -26,7 +26,7 @@
 #include <eyedblib/strutils.h>
 
 static void
-create(Database *db)
+create(eyedb::Database *db)
 {
   db->transactionBegin();
 
@@ -58,7 +58,7 @@ create(Database *db)
     child->release();
   }
 
-  john->store(FullRecurs);
+  john->store(eyedb::FullRecurs);
 
   mary->release();
   john->release();
@@ -67,7 +67,7 @@ create(Database *db)
 }
 
 static void
-read(Database *db)
+read(eyedb::Database *db)
 {
   db->transactionBegin();
 
@@ -101,7 +101,7 @@ main(int argc, char *argv[])
     eyedb::Connection conn;
     conn.open();
     personDatabase db(argv[1]);
-    db.open(&conn, Database::DBRW);
+    db.open(&conn, eyedb::Database::DBRW);
 
     create(&db);
 
