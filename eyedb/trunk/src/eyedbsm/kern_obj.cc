@@ -831,7 +831,7 @@ namespace eyedbsm {
 		return Success;
 	      }
 #endif
-#if 1
+#if 0
 	    Oid xoid;
 	    x2h_oid(&xoid, oid);
 	    printf("INVALID: %s\n", getOidString(&xoid));

@@ -927,7 +927,11 @@ main(int argc, char *argv[])
     //perform_leaks(db);
     perform_cache(db);
     perform_obj(db);
-#if 1
+
+    // EV : 18/01/06
+    // when opening database in local mode, exit() cause server freeze
+#if 0
+    //sleep(1000);
     exit(1);
 #endif
     perform_oid(db);

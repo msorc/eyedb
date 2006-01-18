@@ -82,6 +82,7 @@ else if (NS < 0) \
     } \
 } \
 else if (NS > 0) \
+  perror("lock"); \
   return statusMake(INTERNAL_ERROR, FMT, MSG); \
 } \
 while(0)
@@ -349,7 +350,7 @@ pobjLock(DbHandle const *dbh, XMHandle *xmh,
 	}
 
       if (!timeout)
-	WAIT_CHECK(maxtime, 0, 0, "object %s", getOidString(&po->oid));
+	WAIT_CHECK(maxtime, 1, 0, "locking object %s", getOidString(&po->oid));
       else
 	{
 	  CondWait cond;
@@ -382,7 +383,7 @@ pobjLock(DbHandle const *dbh, XMHandle *xmh,
 	  trs->lock_wait = (LockMode)0;
 	  po->wait_cnt--;
 
-	  WAIT_CHECK(maxtime, ns, 0, "object %s", getOidString(&po->oid));
+	  WAIT_CHECK(maxtime, ns, 0, "locking object %s", getOidString(&po->oid));
 	}
     }
   return Success;
