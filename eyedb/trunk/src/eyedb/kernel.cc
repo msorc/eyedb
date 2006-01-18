@@ -504,10 +504,13 @@ namespace eyedb {
 			 eyedb::convertVersionNumber(cli_version),
 			 eyedb::getVersion()));
 
-    if (conn_ctx.ci && conn_ctx.ci->mode == rpc_ConnInfo::UNIX) {
+    struct passwd *pwd = 0;
+    // if (conn_ctx.ci && conn_ctx.ci->mode == rpc_ConnInfo::UNIX) {
+    if (conn_ctx.ci && conn_ctx.ci->is_localhost &&
+	(pwd = getpwnam(username))) {
       conn_ctx.challenge = gen_random();
       conn_ctx.ctime = time(0);
-      conn_ctx.uid = uid;
+      conn_ctx.uid = pwd->pw_uid;
     }
     else {
       conn_ctx.challenge = "";

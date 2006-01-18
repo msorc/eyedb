@@ -1325,10 +1325,8 @@ rpc_garbClientInfo(rpc_Server *server, int which, int fd)
 			   ci->refcnt, ci->fd_cnt));
 #endif
 
-  if (!which && server->connh) {
-    printf("%d: server->connh %p\n", pthread_self(), server->connh);
+  if (!which && server->connh)
     (*server->connh)(server, (rpc_ClientId)fd, rpc_False);
-  }
 
   /*@@@@ #if !defined(LINUX) && !defined(CYGWIN)*/
 
@@ -1337,7 +1335,7 @@ rpc_garbClientInfo(rpc_Server *server, int which, int fd)
     int i;
     for (i = 0; i < ci->fd_cnt; i++) {
       if (ci->tid[i] != pthread_self()) {
-	printf("killing thread %d\n", ci->tid[i]);
+	//printf("killing thread %d\n", ci->tid[i]);
 	pthread_kill(ci->tid[i], SIGTERM);
       }
     }

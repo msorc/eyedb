@@ -280,6 +280,16 @@ rpc_connman_init(const char *access_file)
   return read_access_file();
 }
 
+static bool
+rpc_is_localhost(const struct in_addr *peer_addr)
+{
+  struct in_addr addr;
+  if (hostname2addr("localhost", &addr))
+    return false;
+
+  return cmp_addr(peer_addr, &addr);
+}
+
 rpc_ConnInfo *
 rpc_check_addr(struct in_addr *addr)
 {
@@ -295,6 +305,8 @@ rpc_check_addr(struct in_addr *addr)
 #else
       ci->u.tcpip = rpc_access[i].tcpip;
 #endif
+      ci->peer_addr = *addr;
+      ci->is_localhost = rpc_is_localhost(&ci->peer_addr);;
       return ci;
     }
   }
@@ -325,21 +337,20 @@ rpc_make_tcpip_conninfo(int fd)
 }
 
 static rpc_ConnInfo *
-rpc_check_localhost()
+rpc_check_localhost(struct in_addr *addr)
 {
-  struct in_addr addr;
-
-  if (hostname2addr("localhost", &addr))
+  if (hostname2addr("localhost", addr))
     return 0;
 
-  return rpc_check_addr(&addr);
+  return rpc_check_addr(addr);
 }
 
 #ifdef HAS_FATTACH
 rpc_ConnInfo *
 rpc_make_stream_conninfo(int fd, struct strrecvfd *info)
 {
-  rpc_ConnInfo *ci = rpc_check_localhost();
+  struct in_addr addr;
+  rpc_ConnInfo *ci = rpc_check_localhost(&addr);
 
   if (ci) {
     ci->mode = rpc_ConnInfo::STREAM;
@@ -350,6 +361,8 @@ rpc_make_stream_conninfo(int fd, struct strrecvfd *info)
     ci->u.stream.uid = info->uid;
     ci->u.stream.gid = info->gid;
 #endif
+    ci->peer_addr = addr;
+    ci->is_localhost = rpc_is_localhost(&ci->peer_addr);;
   }
 
   return ci;
@@ -360,10 +373,14 @@ rpc_make_stream_conninfo(int fd, struct strrecvfd *info)
 rpc_ConnInfo *
 rpc_make_unix_conninfo(int fd)
 {
-  rpc_ConnInfo *ci = rpc_check_localhost();
+  struct in_addr addr;
+  rpc_ConnInfo *ci = rpc_check_localhost(&addr);
 
-  if (ci)
+  if (ci) {
     ci->mode = rpc_ConnInfo::UNIX;
+    ci->peer_addr = addr;
+    ci->is_localhost = rpc_is_localhost(&ci->peer_addr);;
+  }
 
   return ci;
 }
