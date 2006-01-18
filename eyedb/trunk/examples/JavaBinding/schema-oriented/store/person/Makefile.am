@@ -19,8 +19,8 @@ EYEDBODL = $(EYEDBODL_exe) --gencode=java
 EYEDBODLFLAGS= --no-rootclass --package=person --output-dir=$(top_builddir)/examples/JavaBinding/schema-oriented/store/person
 
 $(JAVA_FILES) : ../schema.odl
-	if test -x $(EYEDBODL_exe) ; then \
-		$(EYEDBODL) $(EYEDBODLFLAGS) $< ; \
+	@if test -x $(EYEDBODL_exe) ; then \
+		echo $(EYEDBODL) $(EYEDBODLFLAGS) $< ; $(EYEDBODL) $(EYEDBODLFLAGS) $< ; \
 	else \
 		echo Warning: $(EYEDBODL) not found ; \
 	fi

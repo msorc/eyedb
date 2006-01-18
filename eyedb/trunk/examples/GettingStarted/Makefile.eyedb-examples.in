@@ -26,10 +26,10 @@ person/Database.java: schema.odl
 PersonTest.class: PersonTest.java person/Database.java
 	CLASSPATH=$(EYEDBCLASSPATH):. javac *.java person/*.java
 
+init:
+	sh init.sh schema.odl
 .PHONY: init
 
-init:
-	sh init.sh
 
 clean::
 	rm -f *.o person.h person.cc person*-skel* person*stubs* \

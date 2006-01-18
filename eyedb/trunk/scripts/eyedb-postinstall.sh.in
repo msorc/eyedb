@@ -19,7 +19,7 @@ start_server()
 
 create_dbm()
 {
-    $bindir/eyedbdbmcreate --strict-unix=@ --port=$port
+    $bindir/eyedbdbmcreate --unix=@ --port=$port ""
     $bindir/eyedbdbaccess EYEDBDBM r --user=@ --port=$port
 }
 

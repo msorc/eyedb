@@ -706,8 +706,7 @@ namespace eyedb {
     setValue( "smdport", (localstatedir + "/lib/eyedb/pipes/eyedbsmd").c_str());
 
     // Server Parameters
-    //    setValue( "listen", ("localhost:8432," + localstatedir + "/lib/eyedb/pipes/eyedbd").c_str());
-    setValue( "listen", (localstatedir + "/lib/eyedb/pipes/eyedbd").c_str());
+    setValue( "listen", ("localhost:6240," + localstatedir + "/lib/eyedb/pipes/eyedbd").c_str());
 
     // OQL path
     setValue( "oqlpath", (libdir + "/eyedb/oql").c_str());
