@@ -755,7 +755,7 @@ public class Database extends Struct {
 		dat.mtype = (short)coder.decodeInt();
 
 		dat.sizeslot = coder.decodeInt();
-		dat.maxsize = coder.decodeInt();
+		dat.maxsize = coder.decodeLong();
 		dat.dtype = (short)coder.decodeInt();
 		dat.extflags = coder.decodeInt();
 	    }

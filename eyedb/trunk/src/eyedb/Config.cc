@@ -657,6 +657,8 @@ namespace eyedb {
     return std::string(eyedblib::CompileBuiltin::getSysconfdir()) + "/eyedb/" + configFilename;
   }
 
+  static const std::string tcp_port = "6240";
+
   void
   Config::setClientDefaults()
   {
@@ -664,6 +666,9 @@ namespace eyedb {
 
     // Port
     setValue( "port", (localstatedir + "/lib/eyedb/pipes/eyedbd").c_str());
+
+    // TCP Port
+    setValue( "tcp_port", tcp_port.c_str());
 
     // Hostname
     setValue( "host", "localhost");
@@ -706,7 +711,7 @@ namespace eyedb {
     setValue( "smdport", (localstatedir + "/lib/eyedb/pipes/eyedbsmd").c_str());
 
     // Server Parameters
-    setValue( "listen", ("localhost:6240," + localstatedir + "/lib/eyedb/pipes/eyedbd").c_str());
+    setValue( "listen", ("localhost:" + tcp_port + "," + localstatedir + "/lib/eyedb/pipes/eyedbd").c_str());
 
     // OQL path
     setValue( "oqlpath", (libdir + "/eyedb/oql").c_str());

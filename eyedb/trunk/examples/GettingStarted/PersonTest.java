@@ -61,11 +61,13 @@ class PersonTest {
       mary.setLastname("stuart");
       mary.setAge(22);
      
-      // Mary them :-)
+      // Mary them ;-)
       john.setSpouse(mary);
 
       // Store john and mary in the database
       john.store(org.eyedb.RecMode.FullRecurs);
+
+      john.trace();
 
       db.transactionCommit();
     }

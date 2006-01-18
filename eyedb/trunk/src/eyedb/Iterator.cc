@@ -174,8 +174,8 @@ Iterator::Iterator(const Collection *coll, Bool index)
   if (coll->isRemoved())
     {
       status = Exception::make(IDB_OBJECT_REMOVE_ERROR,
-				  "object '%s' is removed.",
-				  coll->getOid().toString());
+			       "object '%s' is removed.",
+			       coll->getOid().toString());
       return;
     }
 

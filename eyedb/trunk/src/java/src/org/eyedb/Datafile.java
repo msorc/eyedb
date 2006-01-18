@@ -47,11 +47,11 @@ public class Datafile {
     // DatType
     private int dtype;
 
-    private int maxsize;
+    private long maxsize;
     private int slotsize;
 
     public Datafile(Database db, short id, short dspid, String file,
-		    String name, int maxsize, int mtype, int slotsize,
+		    String name, long maxsize, int mtype, int slotsize,
 		    int dtype) {
 	this.db = db;
 	this.id = id;
@@ -77,7 +77,7 @@ public class Datafile {
     public boolean isPhysical() {return dtype == PHYSICAL_OID_DTYPE;}
     public boolean isValid() {return file.length() > 0;}
 
-    public int getMaxsize() {return maxsize;}
+    public long getMaxsize() {return maxsize;}
     public int getSlotsize() {return slotsize;}
 
     void setDataspace(Dataspace dataspace) {

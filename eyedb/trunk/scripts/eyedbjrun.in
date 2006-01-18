@@ -19,7 +19,7 @@ shift
 OPTIONS=""
 EYEDB_HOST=`eyedbgetenv host`
 if [ "x$EYEDB_HOST" != "x" ] ; then OPTIONS="$OPTIONS --host $EYEDB_HOST" ; fi
-EYEDB_PORT=`eyedbgetenv port`
+EYEDB_PORT=`eyedbgetenv tcp_port`
 if [ "x$EYEDB_PORT" != "x" ] ; then OPTIONS="$OPTIONS --port $EYEDB_PORT" ; fi
 EYEDB_DBM=`eyedbgetenv dbm`
 if [ "x$EYEDB_DBM" != "x" ] ; then OPTIONS="$OPTIONS --dbm $EYEDB_DBM" ; fi

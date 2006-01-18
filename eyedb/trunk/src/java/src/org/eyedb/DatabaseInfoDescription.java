@@ -34,7 +34,7 @@ public class DatabaseInfoDescription {
     public static class DatafileInfo {
 	public String file; // char file[L_FILENAME];
 	public String name; // char name[L_NAME+1];
-	public int maxsize;
+	public long maxsize;
 	public short mtype;
 	public int sizeslot;
 	public short dspid;
