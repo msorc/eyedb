@@ -1,6 +1,6 @@
 
-#define protected public
-#define private public
+//#define protected public
+//#define private public
 #include <iostream>
 #include <vector>
 #include <eyedb/eyedb.h>
@@ -136,7 +136,7 @@ perform_leaks(Database &db)
     db.transactionCommit();
   }
 
-    db.transactionBegin();
+  db.transactionBegin();
 }
 
 static void
@@ -150,7 +150,7 @@ perform_list(Database &db)
 	 psize - IDB_OBJ_HEAD_SIZE);
   CollList *coll = new CollList(&db, "", cls, True);
 
-  printf("ITEM_SIZE %d\n", coll->item_size);
+  //printf("ITEM_SIZE %d\n", coll->item_size);
   if (coll->getStatus())
     cerr << "oups 1: " << coll->getStatus() << endl;
   
@@ -657,7 +657,7 @@ perform_obj(Database &db)
 	 psize - IDB_OBJ_HEAD_SIZE);
   COLLECTION *coll = new COLLECTION(&db, "", cls, 1 /*cls->getIDRObjectSize()*/);
 
-  printf("ITEM_SIZE %d\n", coll->item_size);
+  //printf("ITEM_SIZE %d\n", coll->item_size);
   if (coll->getStatus())
     cerr << "oups 1: " << coll->getStatus() << endl;
   
@@ -921,20 +921,21 @@ main(int argc, char *argv[])
     
     db.transactionBegin();
     
-    //perform_list(db);
-    //perform_gbx(db);
+    perform_list(db);
+    perform_gbx(db);
 
-    perform_leaks(db);
-    /*
+    //perform_leaks(db);
     perform_cache(db);
     perform_obj(db);
+#if 1
+    exit(1);
+#endif
     perform_oid(db);
     perform_lit(db);
     perform_char(db);
     perform_str(db);
 
     perform_odl(db);
-    */
 
     //perform_err(db);
     db.transactionCommit();
