@@ -43,6 +43,8 @@ public class Connection {
   InputStream  outband_is;
   private RandomAccessFile outband_pipe;
 
+    private String host, port;
+
   static private final int rpc_NewConnection        = 0x76;
   static private final int rpc_AssociatedConnection = 0x77;
   static private final int msg_size = 12;
@@ -64,6 +66,8 @@ public class Connection {
   }
 
   public Connection(String host, String port) throws Exception {
+      this.host = host;
+      this.port = port;
     try {
       int offset;
 
@@ -136,16 +140,47 @@ public class Connection {
 
       RPClib.read(outband_is, in, msg_size);
 
+      StringBuffer challenge = new StringBuffer();;
+
       Status status = RPC.rpc_SET_CONN_INFO
 	(this,
 	 InetAddress.getLocalHost().getHostName(),
 	 Root.user, Root.progname, 0,
-	 Root.Version);
+	 Version.getNumVersion(),
+	 challenge);
 
       if (!status.isSuccess())
 	throw new Exception(status, "connection");
-    }
 
+      if (challenge.length() > 0) {
+	String filename = "/tmp/" + challenge.substring( challenge.lastIndexOf( ".")+1);
+	File file = new File( filename);
+
+	byte[] b = (new String( challenge)).getBytes();
+	FileOutputStream out = new FileOutputStream( file);
+	out.write( b);
+	out.close();
+
+	try {
+	  Process p = Runtime.getRuntime().exec( "chmod 0664 " + filename);
+	  p.waitFor();
+	}
+	catch( InterruptedException e) {
+	  throw new Exception( "InterruptedException", e.getMessage());
+	}
+
+	status = RPC.rpc_check_auth( this, filename);
+
+	if (!status.isSuccess())
+	  throw new Exception(status, "connection");
+
+	// truncate the file to 0
+	out = new FileOutputStream( file);
+	out.write( b, 0, 0);
+	out.close();
+	file.delete();
+      }
+    }
     catch(IOException e) {
 	e.printStackTrace();
       throw new Exception
@@ -154,6 +189,16 @@ public class Connection {
 	 ", port " + port);
     }
   }
+
+    public String getHost()
+    {
+	return host;
+    }
+
+    public String getPort()
+    {
+	return port;
+    }
 
   public void close()
   {

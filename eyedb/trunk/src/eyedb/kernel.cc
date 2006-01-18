@@ -416,7 +416,7 @@ namespace eyedb {
     if (0664 != (rstat.st_mode & 0777))
       return rpcStatusMake
 	(Exception::make(IDB_ERROR, "invalid mode 0%o for authentification file: "
-			 "%s", rstat.st_mode, file));
+			 "%s", rstat.st_mode & 0777, file));
     
     conn_ctx.ci->auth.uid = conn_ctx.uid;
     return RPCSuccess;
@@ -514,6 +514,7 @@ namespace eyedb {
 			 eyedb::getVersion()));
 
     struct passwd *pwd = 0;
+
     // if (conn_ctx.ci && conn_ctx.ci->mode == rpc_ConnInfo::UNIX) {
     if (conn_ctx.ci && conn_ctx.ci->is_localhost &&
 	(pwd = getpwnam(username))) {

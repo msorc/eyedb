@@ -124,7 +124,8 @@ Union.java \
 ValueArray.java \
 Value.java \
 ValueStructAttr.java \
-ValueStruct.java 
+ValueStruct.java \
+Version.java
 
 JAVAROOT=$(top_builddir)/src/java/src
 CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_srcdir)/src/java/src

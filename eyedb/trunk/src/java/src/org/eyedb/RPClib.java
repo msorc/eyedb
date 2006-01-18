@@ -34,7 +34,7 @@ class RPClib {
   static final int rpc_Magic   = 0x43f2e341;
   static final int rpc_MMMagic = 0x43f2e341 + 0x11111111;
   static final int COMM_SZ = 2048;
-  static final int RPC_MIN_SIZE = 128;
+  static final int RPC_MIN_SIZE = 256;
   static final long ANY = 0x10000;
 
   static private int serial = 1000;
