@@ -6,18 +6,31 @@ PDF_PREFIX=EyeDB
 
 manual_DATA=\
 $(PDF_PREFIX)Administration.pdf \
-$(PDF_PREFIX)C++Binding.pdf \
+$(PDF_PREFIX)CplusplusBinding.pdf \
 $(PDF_PREFIX)GettingStarted.pdf \
 $(PDF_PREFIX)JavaBinding.pdf \
 $(PDF_PREFIX)ODL.pdf \
 $(PDF_PREFIX)OQL.pdf \
 $(PDF_PREFIX)Overview.pdf
 
-LATEX= TEXINPUTS=.:$(top_srcdir)/doc/manual: @LATEX@
-DVIPS= TEXPICTS=$(top_srcdir)/doc/manual @DVIPS@
+LATEX= TEXINPUTS=.:$(srcdir): @LATEX@
+DVIPS= TEXPICTS=$(srcdir) @DVIPS@
 DVIPSFLAGS= -f -Ppdf -G0
 PS2PDF=@PS2PDF@
 PS2PDFFLAGS= -dPDFsettings=/prepress 
+
+noinst_htmldir=$(datadir)/doc/$(PACKAGE)/manual/html
+noinst_html_DATA= \
+html/Administration.html \
+html/CplusplusBinding.html \
+html/GettingStarted.html \
+html/JavaBinding.html \
+html/ODL.html \
+html/OQL.html \
+html/Overview.html
+
+LATEX2HTML=latex2html
+LATEX2HTMLFLAGS=-split +2 -toc_depth 6 -top_navigation -verbosity 0 -no_images -dir html -init_file latex2html-init
 
 %.dvi: %.tex
 	$(LATEX) $<
@@ -31,16 +44,28 @@ PS2PDFFLAGS= -dPDFsettings=/prepress
 $(PDF_PREFIX)%.pdf: %.ps
 	$(PS2PDF) $(PS2PDFFLAGS) $< $@
 
+GettingStarted.dvi: start.tex version.tex title.tex
+
+html/%.html: %.tex
+	-test ! -d html && mkdir html
+	$(LATEX2HTML) $(LATEX2HTMLFLAGS) -prefix $* $*.tex
+
 clean-local:
 	rm -f *.pdf *.ps *.dvi *.aux *.idx *.log *.toc
+	rm -f html/*
 
-GettingStarted.dvi: start.tex version.tex title.tex
+install-data-hook:
+	test -z "$(noinst_htmldir)" || $(mkdir_p) "$(DESTDIR)$(noinst_htmldir)"
+	( cd html ; \
+	  for f in *.html *.css *.png ; do \
+	    $(INSTALL_DATA) $$f "$(DESTDIR)$(noinst_htmldir)/$$f" ; \
+	  done)
 
 EXTRA_DIST=\
 start.tex \
 title.tex \
 Administration.tex \
-C++Binding.tex \
+CplusplusBinding.tex \
 GettingStarted.tex \
 JavaBinding.tex \
 ODL.tex \
