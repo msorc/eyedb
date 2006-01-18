@@ -161,6 +161,12 @@ namespace eyedb {
     */
     static const char *getDefaultPasswd();
 
+    /**
+       Not yet documented
+       @return
+    */
+    static std::string makeUser(const char *_ser);
+
     static const char
       LocalHost[],
       DefaultHost[],

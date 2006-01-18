@@ -759,14 +759,12 @@ namespace eyedb {
   const char *
   Config::getServerValue(const char *name)
   {
-    //printf("%d: getServerValue(%s)\n", getpid(), name);
     return Config::getServerConfig()->getValue(name);
   }
 
   const char *
   Config::getClientValue(const char *name)
   {
-    //printf("%d: getClientValue(%s)\n", getpid(), name);
     return Config::getClientConfig()->getValue(name);
   }
 }

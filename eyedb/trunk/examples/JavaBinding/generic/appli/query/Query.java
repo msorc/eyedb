@@ -94,7 +94,9 @@ class Query {
 	for (int n = 0; (v = iter.nextValue()) != null; n++) {
 	    System.out.println("#### Result #" + n + ": " + v.toString());
 	    if (v.getType() == org.eyedb.Value.OID)  {
+		System.out.println("sgetOid: " + v.sgetOid());
 		org.eyedb.Object o = db.loadObject(v.sgetOid());
+		System.out.println("sgetOid 2: " + v.sgetOid());
 		o.trace(System.out);
 		if (o instanceof org.eyedb.Collection)  {
 		    System.out.println("#### Contents BEGIN");

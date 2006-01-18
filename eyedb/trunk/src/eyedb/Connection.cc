@@ -254,14 +254,21 @@ namespace eyedb {
     return default_port;
   }
 
+  std::string Connection::makeUser(const char *user)
+  {
+    if (!strcmp(user, "@")) {
+      struct passwd *pwd = getpwuid(getuid());
+      if (pwd)
+	return pwd->pw_name;
+    }
+    return user;
+  }
+
   void Connection::setDefaultUser(const char *_user)
   {
-    if (!strcmp(_user, "@")) {
-      struct passwd *pwd = getpwuid(getuid());
-      _user = pwd->pw_name;
-    }
+    std::string u = makeUser(_user);
     free(default_user);
-    default_user = strdup(_user);
+    default_user = strdup(u.c_str());
   }
 
   const char *Connection::getDefaultUser()

@@ -18,7 +18,7 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
+  Author: Eric Viara <viara@sysra.com>
 */
 
 
@@ -34,7 +34,7 @@ using namespace eyedb;
 static int
 usage(const char *prog)
 {
-  fprintf(stderr, "usage: %s [--server] [--config|--csh|--sh [--export]] [<variables>]\n", prog);
+  fprintf(stderr, "usage: %s [--server] [--config|--csh|--sh [--export]] [--expand-user] [<variables>]\n", prog);
   return 1;
 }
 
@@ -61,9 +61,9 @@ main(int argc, char *argv[])
     return usage(argv[0]);
 
   LinkedList list;
-  Bool shell, C_shell, _export, _server, conf;
+  Bool shell, C_shell, _export, _server, conf, expand_user;
 
-  shell = C_shell =  _export = _server = False, conf = False;
+  shell = C_shell =  _export = _server = False, conf = False, expand_user = False;
 
   int n;
   for (n = 1; n < argc; n++) {
@@ -85,6 +85,8 @@ main(int argc, char *argv[])
       _server = True;
     else if (!strcmp(s, "--config"))
       conf = True;
+    else if (!strcmp(s, "--expand-user"))
+      expand_user = True;
     else if (*s == '-')
       return usage(argv[0]);
     else
@@ -118,19 +120,27 @@ main(int argc, char *argv[])
     }
   }
 
+  if (expand_user) {
+    for (n = 0; n < item_cnt; n++) {
+      if (!strcmp(items[n].name, "user")) {
+	items[n].value = strdup(Connection::makeUser(items[n].value).c_str());
+	break;
+      }
+    }
+  }
+
   if (shell) {
     fprintf(stdout, "#\n");
     fprintf(stdout, "# Bourne Shell EyeDB Environment\n");
     fprintf(stdout, "#\n\n");
 
-    for (n = 0; n < item_cnt; n++)
-      {
-	std::string var = std::string("EYEDB") + capstring(items[n].name);
-	fprintf(stdout, "%s=%s", var.c_str(), items[n].value);
-	if (_export)
-	  fprintf(stdout, "; export %s", var.c_str());
-	fprintf(stdout, "\n");
-      }
+    for (n = 0; n < item_cnt; n++) {
+      std::string var = std::string("EYEDB") + capstring(items[n].name);
+      fprintf(stdout, "%s=%s", var.c_str(), items[n].value);
+      if (_export)
+	fprintf(stdout, "; export %s", var.c_str());
+      fprintf(stdout, "\n");
+    }
 
     delete [] items;
     return 0;
@@ -141,15 +151,14 @@ main(int argc, char *argv[])
     fprintf(stdout, "# C-Shell EyeDB Environment\n");
     fprintf(stdout, "#\n\n");
 
-    for (n = 0; n < item_cnt; n++)
-      {
-	std::string var = std::string("EYEDB") + capstring(items[n].name);
-	if (_export)
-	  fprintf(stdout, "setenv %s %s\n", var.c_str(),
-		  items[n].value);
-	else
-	  fprintf(stdout, "set %s=%s\n", var.c_str(), items[n].value);
-      }
+    for (n = 0; n < item_cnt; n++) {
+      std::string var = std::string("EYEDB") + capstring(items[n].name);
+      if (_export)
+	fprintf(stdout, "setenv %s %s\n", var.c_str(),
+		items[n].value);
+      else
+	fprintf(stdout, "set %s=%s\n", var.c_str(), items[n].value);
+    }
 
     delete [] items;
     return 0;
