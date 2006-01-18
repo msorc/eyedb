@@ -33,19 +33,25 @@
 #include <signal.h>
 #include <errno.h>
 #include <stdio.h>
+#include <pthread.h>
 #include <eyedblib/semlib.h>
 
 /* WARNING!!!!!!!!!!!!!!!! */
 /*#define SEM_UNDO 0*/
 
-/*  #define TRACE */
+//#define SECURE_LOCK
+
+/*#define TRACE*/
 
 #ifdef TRACE
+int semlib_trace;
+
 #define RETURN(R) \
-  printf("semlib: returning %d\n", R); \
+  if (semlib_trace) \
+    printf("%d: semlib: returning %d\n", pthread_self(), R); \
   return r
 
-#define PTRACE(X) printf X
+#define PTRACE(X) if (semlib_trace) printf X
 #else
 #define RETURN(R) \
   return r
@@ -55,7 +61,7 @@
 int ut_sem_create(int key)
 {
   int r;
-  PTRACE(("ut_sem_create(%d)\n", key));
+  PTRACE(("%d: ut_sem_create(%d)\n", pthread_self(), key));
 
   if (ut_sem_open(key) >= 0)
     r = -1;
@@ -69,7 +75,7 @@ int ut_sem_create(int key)
 int ut_sem_open(int key)
 {
   int r;
-  PTRACE(("ut_sem_open(%d)\n", key));
+  PTRACE(("%d: ut_sem_open(%d)\n", pthread_self(), key));
   if (!key)
     r = -1;
   else
@@ -80,7 +86,7 @@ int ut_sem_open(int key)
 int ut_sem_rm(int id)
 {
   int r;
-  PTRACE(("ut_sem_rm(%d)\n", id));
+  PTRACE(("%d: ut_sem_rm(%d)\n", pthread_self(), id));
   r = semctl(id, 0, IPC_RMID, 0);
   RETURN(r);
 }
@@ -94,7 +100,7 @@ int ut_sem_wait(int id)
 {
   static struct sembuf op = {0, -1, SEM_UNDO};
   int r;
-  PTRACE(("ut_sem_wait(%d)\n", id));
+  PTRACE(("%d: ut_sem_wait(%d)\n", pthread_self(), id));
   r = semop(id, &op, 1);
   RETURN(r);
 }
@@ -102,7 +108,7 @@ int ut_sem_wait(int id)
 int ut_sem_condwait(int id1, int id2)
 {
   int r;
-  PTRACE(("ut_sem_condwait(%d, %d)\n", id1, id2));
+  PTRACE(("%d: ut_sem_condwait(%d, %d)\n", pthread_self(), id1, id2));
   r = ut_sem_unlock(id1);
   if (r < 0) return r;
   r = ut_sem_wait(id2);
@@ -155,7 +161,7 @@ int ut_sem_timedwait(int id, int msecs)
   static struct sembuf op = {0, -1, SEM_UNDO};
   int r;
 
-  PTRACE(("ut_sem_timedwait(%d, msecs=%d)\n", id, msecs));
+  PTRACE(("%d: ut_sem_timedwait(%d, msecs=%d)\n", pthread_self(), id, msecs));
   if (ut_setitimer(msecs))
     return -1;
 
@@ -174,7 +180,7 @@ int ut_sem_timedcondwait(int id1, int id2, int msecs)
 {
   int tr = 0;
   int r;
-  PTRACE(("ut_sem_timedcondwait(%d, %d, msecs=%d)\n", id1, id2, msecs));
+  PTRACE(("%d: ut_sem_timedcondwait(%d, %d, msecs=%d)\n", pthread_self(), id1, id2, msecs));
   r = ut_sem_unlock(id1);
   if (r < 0) return r;
   r = ut_sem_timedwait(id2, msecs);
@@ -193,21 +199,25 @@ int ut_sem_signal(int id)
 {
   static struct sembuf op = {0, 1, SEM_UNDO};
   int r;
-  PTRACE(("ut_sem_condsignal(%d)\n", id));
+  PTRACE(("%d: ut_sem_condsignal(%d)\n", pthread_self(), id));
   r = semop(id, &op, 1);
   RETURN(r);
 }
 
 int ut_sem_lock(int id)
 {
+#ifdef SECURE_LOCK
+  return ut_sem_timedlock(id, 4000);
+#else
   static struct sembuf op[2] = {
     0, 0, 0,
     0, 1, SEM_UNDO
   };
   int r;
-  PTRACE(("ut_sem_lock(%d)\n", id));
+  PTRACE(("%d: ut_sem_lock(%d)\n", pthread_self(), id));
   r = semop(id, op, 2);
   RETURN(r);
+#endif
 }
 
 int ut_sem_timedlock(int id, int msecs)
@@ -218,15 +228,19 @@ int ut_sem_timedlock(int id, int msecs)
     0, 1, SEM_UNDO
   };
 
-  PTRACE(("ut_sem_timedlock(%d, msecs=%d)\n", id, msecs));
+  PTRACE(("%d: ut_sem_timedlock(%d, msecs=%d)\n", pthread_self(), id, msecs));
 
   if (ut_setitimer(msecs))
     return -1;
 
   r = semop(id, op, 2);
 
-  if (r < 0 && errno == EINTR)
+  if (r < 0 && errno == EINTR) {
+#ifdef SECURE_LOCK
+    printf("%d: timeout on sem %d\n", id);
+#endif
     r = ETIMEDOUT;
+  }
 
   if (ut_unsetitimer())
     return -1;
@@ -238,7 +252,7 @@ int ut_sem_unlock(int id)
 {
   static struct sembuf op = {0, -1, SEM_UNDO};
   int r;
-  PTRACE(("ut_sem_unlock(%d)\n", id));
+  PTRACE(("%d: ut_sem_unlock(%d)\n", pthread_self(), id));
   r = semop(id, &op, 1);
   RETURN(r);
 }
@@ -246,7 +260,7 @@ int ut_sem_unlock(int id)
 int ut_sem_createSX(int key)
 {
   int r;
-  PTRACE(("ut_sem_createSX(%d)\n", key));
+  PTRACE(("%d: ut_sem_createSX(%d)\n", pthread_self(), key));
   if (ut_sem_open(key) >= 0)
     r = -1;
   else
@@ -258,7 +272,7 @@ int ut_sem_createSX(int key)
 int ut_sem_openSX(int key)
 {
   int r;
-  PTRACE(("ut_sem_openSX(%d)\n", key));
+  PTRACE(("%d: ut_sem_openSX(%d)\n", pthread_self(), key));
   if (!key)
     r = -1;
   else
@@ -274,7 +288,7 @@ int ut_sem_lockX(int id)
     0, 1, SEM_UNDO
   };
   int r;
-  PTRACE(("ut_sem_lockX(%d)\n", id));
+  PTRACE(("%d: ut_sem_lockX(%d)\n", pthread_self(), id));
   r = semop(id, op, 3);
   RETURN(r);
 }
@@ -286,7 +300,7 @@ int ut_sem_lockS(int id)
     1, 1, SEM_UNDO
   };
   int r;
-  PTRACE(("ut_sem_lockS(%d)\n", id));
+  PTRACE(("%d: ut_sem_lockS(%d)\n", pthread_self(), id));
   r = semop(id, op, 2);
   RETURN(r);
 }
@@ -295,7 +309,7 @@ int ut_sem_unlockX(int id)
 {
   static struct sembuf op = {0, -1, SEM_UNDO};
   int r;
-  PTRACE(("ut_sem_unlockX(%d)\n", id));
+  PTRACE(("%d: ut_sem_unlockX(%d)\n", pthread_self(), id));
   r = semop(id, &op, 1);
   RETURN(r);
 }
@@ -304,7 +318,7 @@ int ut_sem_unlockS(int id)
 {
   static struct sembuf op = {1, -1, SEM_UNDO};
   int r;
-  PTRACE(("ut_sem_unlockS(%d)\n", id));
+  PTRACE(("%d: ut_sem_unlockS(%d)\n", pthread_self(), id));
   r = semop(id, &op, 1);
   RETURN(r);
 }
