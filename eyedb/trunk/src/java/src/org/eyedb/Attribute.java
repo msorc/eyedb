@@ -27,6 +27,13 @@ public class Attribute {
 
   public boolean compare(Attribute item)
   {
+    /*
+    System.out.println("attribute: " +
+		       item.num + " vs. " + num + " " +
+		       item.name + " vs. " + name + " " +
+		       item.cls.getName() + " vs. " + cls.getName());
+    */
+
     if (item.num != num)
       return false;
 

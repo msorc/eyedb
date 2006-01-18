@@ -179,6 +179,7 @@ do { \
     static const std::string listen_opt = "listen";
     static const std::string host_opt = "host";
     static const std::string port_opt = "port";
+    static const std::string inet_opt = "inet";
     static const std::string smd_port_opt = "smd-port";
     static const std::string dbm_opt = "dbm";
     static const std::string granted_dbm_opt = "granted-dbm";
@@ -229,6 +230,10 @@ do { \
       opts[opt_cnt++] = 
 	Option(prefix + port_opt, OptionStringType(), Option::MandatoryValue,
 	       OptionDesc("eyedbd port", "<port>"));
+
+      opts[opt_cnt++] = 
+	Option(prefix + inet_opt, OptionStringType(), 0,
+	       OptionDesc("Use the tcp_port variable if port is not set"));
 
       opts[opt_cnt++] = 
 	Option(prefix + dbm_opt, OptionStringType(), Option::MandatoryValue,
@@ -313,6 +318,8 @@ do { \
 
     if (map.find(port_opt) != map.end())
       Connection::setDefaultIDBPort(map[port_opt].value.c_str());
+    else if (map.find(inet_opt) != map.end())
+      Connection::setDefaultIDBPort(Config::getClientValue("tcp_port"));
 
     if (map.find(host_opt) != map.end())
       Connection::setDefaultHost(map[host_opt].value.c_str());

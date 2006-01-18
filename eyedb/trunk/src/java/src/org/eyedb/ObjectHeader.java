@@ -113,8 +113,8 @@ public class ObjectHeader {
     public static final int IDB_OBJ_HEAD_MAGIC_SIZE    = 4;
     public static final int IDB_OBJ_HEAD_TYPE_SIZE     = 4;
     public static final int IDB_OBJ_HEAD_SIZE_SIZE     = 4;
-    public static final int IDB_OBJ_HEAD_CTIME_SIZE    = 4;
-    public static final int IDB_OBJ_HEAD_MTIME_SIZE    = 4;
+    public static final int IDB_OBJ_HEAD_CTIME_SIZE    = 8;
+    public static final int IDB_OBJ_HEAD_MTIME_SIZE    = 8;
     public static final int IDB_OBJ_HEAD_XINFO_SIZE    = 4;
     public static final int IDB_OBJ_HEAD_OID_MCL_SIZE  = 8;
     public static final int IDB_OBJ_HEAD_OID_PROT_SIZE = 8;

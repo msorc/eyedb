@@ -314,10 +314,10 @@ namespace eyedb {
   
     if (cls->asCollectionClass())
       fprintf(fd, "((m != null) ? m.getClass(\"%s\") : %s.idbclass), idbclass, \"%s\", ",
-	      cls->getAliasName(), getJavaName(cls), className(cls)); // 10/12/05
+	      cls->getAliasName(), getJavaName(cls), name); // 10/12/05: className(cls) instead of name : disconnected 18/01/06
     else
       fprintf(fd, "((m != null) ? m.getClass(\"%s\") : %s.idbclass), idbclass, \"%s\", ",
-	      cls->getAliasName(), className(cls), className(cls)); //10/12/05
+	      cls->getAliasName(), className(cls), name); //10/12/05: className(cls) instead of name : disconnected 18/01/06
   
     fprintf(fd, "%d, %s, %d, dims);\n",
 	    num, (isIndirect() ? "true" : "false"), ndims);
