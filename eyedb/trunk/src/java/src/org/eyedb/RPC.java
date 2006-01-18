@@ -964,6 +964,7 @@ class RPC extends RPClib {
 	start(SET_CONN_INFO);
 
 	addArg(hostname);
+	addArg(0); // uid
 	addArg(username);
 	addArg(progname);
 	addArg(pid);
@@ -973,6 +974,7 @@ class RPC extends RPClib {
 	if (realize(conn, status)) {
 	    int xid = getIntArg(); // server pid
 	    int uid = getIntArg(); // server uid
+	    String challenge = getStringArg(); // challenge
 	    getStatusArg(conn, status);
 	}
 
