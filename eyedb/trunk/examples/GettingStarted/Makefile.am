@@ -46,7 +46,7 @@ $(JAVA_ODL_FILES): schema.odl
 BUILT_SOURCES = person.h
 
 clean-local:
-	rm -f person.cc person.h personmthbe-skel.cc personmthfe-skel.cc personstubsbe.cc personstubsfe.cc
+	rm -f person.cc person.h personmthbe-skel.cc personmthfe-skel.cc personstubsbe.cc personstubsfe.cc $(JAVA_ODL_FILES)
 	-rm -f class.stamp *.class
 
 
