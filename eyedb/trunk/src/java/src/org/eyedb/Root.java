@@ -152,27 +152,27 @@ public static void init(String prg) {
 		    continue;
 		}
 
-	    if (s.equals("-eyedbhost"))
+	    if (s.equals("--host"))
 		{
 		    host = args_in[++i];
 		    i++;
 		}
-	    else if (s.equals("-eyedbport"))
+	    else if (s.equals("--port"))
 		{
 		    port = args_in[++i];
 		    i++;
 		}
-	    else if (s.equals("-eyedbdbm"))
+	    else if (s.equals("--dbm"))
 		{
 		    dbm = args_in[++i];
 		    i++;
 		}
-	    else if (s.equals("-eyedbuser"))
+	    else if (s.equals("--user"))
 		{
 		    user = args_in[++i];
 		    i++;
 		}
-	    else if (s.equals("-eyedbpasswd"))
+	    else if (s.equals("--passwd"))
 		{
 		    passwd = args_in[++i];
 		    i++;
