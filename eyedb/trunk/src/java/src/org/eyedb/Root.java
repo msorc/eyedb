@@ -141,46 +141,47 @@ public static void init(String prg) {
 
 	String args_out[] = args_in;
 
-	for (i = 0, j = 0; i < args_in.length; )
-	{
+	for (i = 0, j = 0; i < args_in.length; ) {
 	    String s = args_in[i];
 
-	    if (s == null)
-		{
-		    i++;
-		    continue;
-		}
+	    if (s == null) {
+		i++;
+		continue;
+	    }
 
-	    if (s.equals("--host"))
-		{
-		    host = args_in[++i];
+	    int idx = s.indexOf("=");
+	    if (s.charAt(0) == '-' && s.charAt(1) == '-' &&
+		(idx = s.indexOf("=")) > 0) {
+		String opt = s.substring(0, idx);
+		if (opt.equals("--host")) {
+		    host = s.substring(idx+1);
 		    i++;
 		}
-	    else if (s.equals("--port"))
-		{
-		    port = args_in[++i];
+		else if (opt.equals("--port")) {
+		    port = s.substring(idx+1);
 		    i++;
 		}
-	    else if (s.equals("--dbm"))
-		{
-		    dbm = args_in[++i];
+		else if (opt.equals("--dbm")) 	{
+		    dbm = s.substring(idx+1);
 		    i++;
 		}
-	    else if (s.equals("--user"))
-		{
-		    user = args_in[++i];
+		else if (opt.equals("--user")) {
+		    user = s.substring(idx+1);
 		    i++;
 		}
-	    else if (s.equals("--passwd"))
-		{
-		    passwd = args_in[++i];
+		else if (opt.equals("--passwd")) {
+		    passwd = s.substring(idx+1);
 		    i++;
 		}
-	    else
-		{
+		else {
 		    args_out[j++] = s;
 		    i++;
 		}
+	    }
+	    else {
+		args_out[j++] = s;
+		i++;
+	    }
 	}
 
 	//checkConfig("Command line option `-eyedb", "'");

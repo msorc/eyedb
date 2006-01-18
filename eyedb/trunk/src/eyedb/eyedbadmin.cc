@@ -2345,12 +2345,16 @@ db_realize(int start, int argc, char *argv[])
 	passwd_realize(buf, &newdbname);
       }
       else if (!strcmp(newdbname, strict_unix_user)) {
+	std::string user = Connection::makeUser(dbname);
+	dbname = strdup(user.c_str());
+	/*
 	if (!strcmp(dbname, "@")) {
 	  struct passwd *pwd = getpwuid(getuid());
 	  if (!pwd)
 	    return usage(prog);
 	  dbname = strdup(pwd->pw_name);
 	}
+	*/
       }
 
       auth_realize();
@@ -3233,12 +3237,16 @@ admin_realize(int start, int argc, char *argv[])
 		     &dbname, &accessmode, user_type))
     return 1;
 
+  std::string user = Connection::makeUser(username);
+  username = strdup(user.c_str());
+  /*
   if (!strcmp(username, "@")) {
     struct passwd *pwd = getpwuid(getuid());
     if (!pwd)
       return usage(prog);
     username = strdup(pwd->pw_name);
   }
+  */
 
   if (!*username) {
     fprintf(stderr, "%s: a username cannot be the empty string", argv[0]);
