@@ -20,6 +20,8 @@ PS2PDF=@PS2PDF@
 PS2PDFFLAGS= -dPDFsettings=/prepress 
 
 noinst_htmldir=$(datadir)/doc/$(PACKAGE)/manual/html
+
+if COND_LATEX2HTML
 noinst_html_DATA= \
 html/Administration.html \
 html/CplusplusBinding.html \
@@ -28,8 +30,9 @@ html/JavaBinding.html \
 html/ODL.html \
 html/OQL.html \
 html/Overview.html
+endif
 
-LATEX2HTML=latex2html
+LATEX2HTML=@LATEX2HTML@
 LATEX2HTMLFLAGS=-split +2 -toc_depth 6 -top_navigation -verbosity 0 -no_images -dir html -init_file latex2html-init
 
 %.dvi: %.tex
@@ -56,7 +59,7 @@ clean-local:
 
 install-data-hook:
 	test -z "$(noinst_htmldir)" || $(mkdir_p) "$(DESTDIR)$(noinst_htmldir)"
-	( cd html ; \
+	-test -d html && ( cd html ; \
 	  for f in *.html *.css *.png ; do \
 	    $(INSTALL_DATA) $$f "$(DESTDIR)$(noinst_htmldir)/$$f" ; \
 	  done)
