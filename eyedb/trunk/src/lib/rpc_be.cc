@@ -238,6 +238,9 @@ signal_handler(int sig)
   /*@@@@ M_strsignal*/
   //fprintf(stderr, msg_make("Got %s [#%d]\n", M_strsignal(sig), sig));
 
+  if (getenv("EYEDBDEBUG_"))
+    sleep(1000);
+
   if (sig == SIGBUS || sig == SIGSEGV || sig == SIGABRT)
     {
       IDB_LOG(IDB_LOG_CONN, ("backend fatal signal...\n"));
