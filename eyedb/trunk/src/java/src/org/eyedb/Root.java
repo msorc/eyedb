@@ -36,7 +36,6 @@ public class Root {
     public static final int ReadWriteSharedTRMode = 0x10;
     public static final int WriteExclusiveTRMode = 0x20;
     public static final int ReadWriteExclusiveTRMode = 0x80;
-    public static final int Version = 207000;
 
     private static final String defHost = "localhost";
     private static final String defPort = "6240";

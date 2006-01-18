@@ -336,6 +336,7 @@ src/java/Makefile
 src/java/src/Makefile
 src/java/src/org/Makefile
 src/java/src/org/eyedb/Makefile
+src/java/src/org/eyedb/Version.java
 src/java/src/org/eyedb/dbm/Makefile
 src/java/src/org/eyedb/syscls/Makefile
 src/java/src/org/eyedb/utils/Makefile

@@ -961,28 +961,34 @@ class RPC extends RPClib {
 
     static Status rpc_SET_CONN_INFO(Connection conn, String hostname,
 				    String username, String progname,
-				    int pid, int version) {
+				    int pid, int version, StringBuffer challenge) {
 	start(SET_CONN_INFO);
 
-	addArg(hostname);
+	addArg(conn.getHost() + ":" + conn.getPort());
 	addArg((int)0); // uid
 	addArg(username);
 	addArg(progname);
 	addArg(pid);
 	addArg(version);
 
-	System.out.println( "before realize");
 	Status status = new Status();
 	if (realize(conn, status)) {
-	    System.out.println( "after realize");
 	    int xid = getIntArg(); // server pid
-	    System.out.println( "xid" + xid);
 	    int uid = getIntArg(); // server uid
-	    System.out.println( "uid" + uid);
-	    String challenge = getStringArg(); // challenge
-	    System.out.println( "challenge" + challenge);
+	    challenge.append( getStringArg()); // challenge
 	    getStatusArg(conn, status);
-	    System.out.println( "status" + status);
+	}
+
+	return status;
+    }
+
+    static Status rpc_check_auth(Connection conn, String filename) {
+	start(CHECK_AUTH);
+	addArg( filename);
+
+	Status status = new Status();
+	if (realize(conn, status)) {
+	    getStatusArg(conn, status);
 	}
 
 	return status;
