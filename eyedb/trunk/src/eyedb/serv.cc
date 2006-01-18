@@ -1427,6 +1427,7 @@ namespace eyedb {
 			     ua[7].a_int, &ua[8].a_string);
     if (status)
       forbidden = 1;
+
     RPC_STATUS_MAKE(status, ua, 9);
 #else
     status = IDB_setConnInfo(ua[0].a_string, ua[1].a_string, ua[2].a_string,

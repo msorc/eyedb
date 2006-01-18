@@ -487,6 +487,15 @@ namespace eyedb {
   {
     char *host = strdup(_hostname);
     char *p = strchr(host, ':');
+    *challenge = "";
+    if (!p) {
+      free(host);
+      return rpcStatusMake
+	(Exception::make(IDB_ERROR, "invalid hostname, got '%s' "
+			 "expected host:port",
+			 _hostname));
+    }
+
     *p = 0;
     char *port = p + 1;
 
