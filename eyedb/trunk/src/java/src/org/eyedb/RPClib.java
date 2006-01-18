@@ -18,7 +18,7 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
+  Author: Eric Viara <viara@sysra.com>
 */
 
 package org.eyedb;
@@ -54,22 +54,22 @@ class RPClib {
   // start method
   //
 
-  protected static void start(int code) {
-      //System.out.println("code : " + Integer.toHexString(code));
-    coder_data_cnt = 0;
-    coder_out.reset();
-    coder_in.reset();
+protected static void start(int code) {
+  //System.out.println("code : " + Integer.toHexString(code));
+  coder_data_cnt = 0;
+  coder_out.reset();
+  coder_in.reset();
 
-    addArg(rpc_Magic);
-    addArg(++serial);
-    addArg(code);
+  addArg(rpc_Magic);
+  addArg(++serial);
+  addArg(code);
 
-    addArg(0);
-    addArg(0);
-    addArg(0);
+  addArg(0);
+  addArg(0);
+  addArg(0);
 
-    //System.out.println("RPC start -> " + code);
-  }
+  //System.out.println("RPC start -> " + code);
+}
 
   //
   // utility methods
@@ -81,12 +81,12 @@ class RPClib {
 
       //System.out.println("Reading : " + len);
       while (n < len) {
-	  int p = is.read(b, n, len - n);
-	  if (p < 0)
-	    return p;
-	  if (p == 0)
-	    break;
-	  n += p;
+	int p = is.read(b, n, len - n);
+	if (p < 0)
+	  return p;
+	if (p == 0)
+	  break;
+	n += p;
       }
       
       //System.out.println("returns " + n);
@@ -94,8 +94,8 @@ class RPClib {
     }
 
     catch(IOException e) {
-	System.err.println(e);
-	return 0;
+      System.err.println(e);
+      return 0;
     }
   }
 		     
@@ -268,7 +268,7 @@ class RPClib {
     }
 
     catch(IOException e) {
-	//System.out.println("here in ASyncData!");
+      //System.out.println("here in ASyncData!");
       System.out.println(e);
     }
   }
@@ -290,8 +290,8 @@ class RPClib {
     }
 
     catch(IOException e) {
-	System.err.println("RPClib.realize " + e.toString());
-	return false;
+      System.err.println("RPClib.realize " + e.toString());
+      return false;
     }
 
     int stat = 0;
@@ -302,8 +302,8 @@ class RPClib {
     
     //System.out.println("has read: " + n);
     if (n != RPC_MIN_SIZE) {
-	status.set(1, "rpc failure: n=" + n + " vs. " + RPC_MIN_SIZE);
-	return false;
+      status.set(1, "rpc failure: n=" + n + " vs. " + RPC_MIN_SIZE);
+      return false;
     }
 
     int magic  = getIntArg();
@@ -323,12 +323,12 @@ class RPClib {
       status.set(1, "rpc failure: stat=" + stat);
 
     /*
-    System.out.println("magic  = " + magic);
-    System.out.println("serial = " + serial);
-    System.out.println("code   = " + code);
-    System.out.println("size   = " + size);
-    System.out.println("ndata  = " + ndata);
-    System.out.println("stat   = " + stat);
+      System.out.println("magic  = " + magic);
+      System.out.println("serial = " + serial);
+      System.out.println("code   = " + code);
+      System.out.println("size   = " + size);
+      System.out.println("ndata  = " + ndata);
+      System.out.println("stat   = " + stat);
     */
 
     int rsize = size - RPC_MIN_SIZE;
@@ -339,7 +339,7 @@ class RPClib {
 	n = read(is, b, rsize);
 
 	if (n != rsize)
-	    return false;
+	  return false;
 
 	coder_in.adapt(size);
 	System.arraycopy(b, 0, coder_in.getData(), RPC_MIN_SIZE, rsize);
