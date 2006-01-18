@@ -1458,7 +1458,7 @@ namespace eyedb {
     rd->args[n].type = rpc_StringType; /* hostname */
     rd->args[n++].send_rcv = rpc_Send; 
 #ifdef STUART_AUTH
-    rd->args[n].type = rpc_Int32Type; /* uid */
+    rd->args[n].type = rpc_Int32Type; /* uid */ // no more useful
     rd->args[n++].send_rcv = rpc_Send; 
 #endif
     rd->args[n].type = rpc_StringType; /* username */

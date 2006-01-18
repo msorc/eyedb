@@ -29,6 +29,8 @@
 #include <stropts.h>
 #endif
 
+#include <netinet/in.h>
+
 #ifdef STUART_AUTH
 struct rpc_Auth {
   int uid;
@@ -66,6 +68,9 @@ struct rpc_ConnInfo {
     UNIX,
     TCPIP
   } mode;
+
+  struct in_addr peer_addr;
+  bool is_localhost;
 
   rpc_TcpIp tcpip;
 };

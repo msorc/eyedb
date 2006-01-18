@@ -120,7 +120,7 @@ namespace eyedb {
 	char *challenge;
 	RPCStatus rpc_status = 
 	  set_conn_info(connh, (std::string(host) + ":" + port).c_str(),
-			getuid(), getUserName(), prog_name,
+			0 /*getuid()*/, getUserName(), prog_name,
 			&sv_pid, &sv_uid, getVersionNumber(),
 			&challenge);
 	if (!rpc_status && strlen(challenge) > 0) {
