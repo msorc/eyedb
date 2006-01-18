@@ -262,6 +262,7 @@ doc/manpages/Makefile
 doc/manual/Makefile
 doc/manual/figures/Makefile
 doc/manual/version.tex
+doc/manual/latex2html-init
 examples/C++Binding/Makefile
 examples/C++Binding/Makefile.eyedb-examples
 examples/C++Binding/generic/Makefile
