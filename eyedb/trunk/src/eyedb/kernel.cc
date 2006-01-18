@@ -1101,8 +1101,11 @@ namespace eyedb {
     need_passwd = True;
     superuser = False;
 
+    /*
     if (!conn_ctx.ci || conn_ctx.ci->mode == rpc_ConnInfo::STREAM ||
 	conn_ctx.ci->mode == rpc_ConnInfo::UNIX) {
+    */
+    if (conn_ctx.ci && conn_ctx.ci->auth.uid) {
 #ifdef STUART_AUTH
       int uid = (conn_ctx.ci ? conn_ctx.ci->auth.uid : getuid());
 #else
@@ -5869,16 +5872,30 @@ namespace eyedb {
 
     RPCStatus rpc_status;
 
+    printf("removing class %s\n", cl->getName());
     if (flags == Class::RemoveInstances) {
       rpc_status = IDB_removeInstances(dbh, db, cl);
       if (rpc_status) return rpc_status;
 
       // remove components collection
       Collection *components;
+      printf("lookup for components...\n");
       Status s = cl->getComponents(components, True);
-      if (s) return rpcStatusMake(s);
-      s = components->remove();
-      if (s) return rpcStatusMake(s);
+      if (s)
+	return rpcStatusMake(s);
+      printf("deleting components %s\n", components->getOid().toString());
+      Bool isremoved;
+      s = db->isRemoved(components->getOid(), isremoved);
+      if (s)
+	return rpcStatusMake(s);
+      if (!isremoved && !components->isRemoved()) {
+	s = components->remove();
+	if (s)
+	  return rpcStatusMake(s);
+      }
+      else
+	printf("oups %s is removed\n", components->getOid().toString());
+      printf("done\n");
     }
 
     rpc_status = IDB_removeAttrCompSet(db, cl);
