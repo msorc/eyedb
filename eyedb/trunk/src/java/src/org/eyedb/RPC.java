@@ -964,18 +964,24 @@ class RPC extends RPClib {
 	start(SET_CONN_INFO);
 
 	addArg(hostname);
-	addArg(0); // uid
+	addArg((int)0); // uid
 	addArg(username);
 	addArg(progname);
 	addArg(pid);
 	addArg(version);
 
+	System.out.println( "before realize");
 	Status status = new Status();
 	if (realize(conn, status)) {
+	    System.out.println( "after realize");
 	    int xid = getIntArg(); // server pid
+	    System.out.println( "xid" + xid);
 	    int uid = getIntArg(); // server uid
+	    System.out.println( "uid" + uid);
 	    String challenge = getStringArg(); // challenge
+	    System.out.println( "challenge" + challenge);
 	    getStatusArg(conn, status);
+	    System.out.println( "status" + status);
 	}
 
 	return status;

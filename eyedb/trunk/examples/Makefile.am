@@ -9,7 +9,7 @@ SUBDIRS=GettingStarted C++Binding $(JAVA_SRC_DIR) oql
 pkgdata_DATA=Makefile.eyedb
 
 eyedbexamplesdir=$(datadir)/doc/$(PACKAGE)/examples
-dist_eyedbexamples_DATA=Makefile.eyedb-examples
+dist_eyedbexamples_DATA=Makefile.eyedb-examples README
 
 install-data-hook:
 	cd $(DESTDIR)/$(eyedbexamplesdir) ; \
