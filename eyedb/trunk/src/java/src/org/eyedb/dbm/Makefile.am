@@ -19,7 +19,7 @@ EYEDBODL_exe=$(bindir)/eyedbodl
 
 EYEDBODL = $(EYEDBODL_exe) --gencode=java --output-dir=$(top_srcdir)/src/java/src/org/eyedb/dbm
 
-EYEDBODLFLAGS_utils = --export --package=org.eyedb.dbm \
+EYEDBODLFLAGS_dbm = --export --package=org.eyedb.dbm \
         --schema-name=eyedb --attr-style=explicit --down-casting=yes \
         --class-enums=yes --system-class \
         --error-policy=exception
@@ -28,4 +28,9 @@ JAVA_ODL_FILES= \
 $(top_srcdir)/src/java/src/org/eyedb/dbm/Database.java 
 
 $(JAVA_ODL_FILES): DBM.odl
-	$(EYEDBODL) $(EYEDBODLFLAGS_utils) $<
+	@if test -x $(EYEDBODL_exe) ; then \
+		echo $(EYEDBODL) $(EYEDBODLFLAGS_dbm) $< ; $(EYEDBODL) $(EYEDBODLFLAGS_utils) $< ; \
+	else \
+		echo Warning: $(EYEDBODL) not found, using existing $@; touch $@ ; \
+	fi
+

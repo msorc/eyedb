@@ -148,7 +148,7 @@ EYEDBODL = $(EYEDBODL_exe) --gencode=C++ --output-dir=$(top_srcdir)/src/eyedb
 EYEDBODLFLAGS_DBM = --package=DBM --schema-name=eyedbdbm --attr-style=implicit --no-rootclass --namespace=eyedb
 
 $(top_srcdir)/src/eyedb/DBM.cc : DBM.odl
-	if test -x $(EYEDBODL_exe) ; then \
+	@if test -x $(EYEDBODL_exe) ; then \
 		$(EYEDBODL) $(EYEDBODLFLAGS_DBM) $< ; \
 	else \
 		echo Warning: $(EYEDBODL) not found, using $*.cc old C++ code; touch $*.cc ; \

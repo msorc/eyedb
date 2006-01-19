@@ -58,6 +58,10 @@ JAVA_ODL_FILES= \
 $(top_srcdir)/src/java/src/org/eyedb/syscls/Database.java 
 
 $(JAVA_ODL_FILES): syscls.odl
-	$(EYEDBODL) $(EYEDBODLFLAGS_syscls) $<
+	@if test -x $(EYEDBODL_exe) ; then \
+		echo $(EYEDBODL) $(EYEDBODLFLAGS_syscls) $< ; $(EYEDBODL) $(EYEDBODLFLAGS_utils) $< ; \
+	else \
+		echo Warning: $(EYEDBODL) not found, using existing $@; touch $@ ; \
+	fi
 
 

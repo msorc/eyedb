@@ -43,13 +43,13 @@ $(JAVA_ODL_FILES): schema.odl
 		echo Warning: $(EYEDBODL) not found ; \
 	fi
 
-BUILT_SOURCES = person.h
-
 clean-local:
 	rm -f person.cc person.h personmthbe-skel.cc personmthfe-skel.cc personstubsbe.cc personstubsfe.cc $(JAVA_ODL_FILES)
 	-rm -f class.stamp *.class
 
-
 init:
 	sh $(srcdir)/init.sh $(srcdir)/schema.odl
 .PHONY: init
+
+# Dependencies
+persontest.$(OBJEXT): person.h

@@ -153,7 +153,7 @@ public class Connection {
 	throw new Exception(status, "connection");
 
       if (challenge.length() > 0) {
-	String filename = "/tmp/" + challenge.substring( challenge.lastIndexOf( ".")+1);
+	String filename = "/tmp/" + challenge.substring( (new String(challenge)).lastIndexOf( ".")+1);
 	File file = new File( filename);
 
 	byte[] b = (new String( challenge)).getBytes();

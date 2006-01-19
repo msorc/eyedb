@@ -19,4 +19,5 @@ person.cc person.h : schema.odl
 		echo Warning: $(EYEDBODL) not found ; \
 	fi
 
-BUILT_SOURCES = person.h
+# Dependencies
+person.$(OBJEXT): person.h
