@@ -30,10 +30,10 @@ the C++ API: there is a one for one mapping between the object model and
 the C++ API.
 \\
 This mapping follows a very simple naming schema: each C++ class mapped from
-a type has the name of this type prefixed by \texttt{idb}.
+a type has the name of this type prefixed by the namespace \texttt{eyedb}.
 \\
 For instance, the \texttt{object} type in the \eyedb object model is
-mapped on the \texttt{idbObject} C++ class.
+mapped on the \texttt{eyedb::Object} C++ class.
 \\
 \\
 We are going to introduce the main classes and methods through some simple
@@ -48,9 +48,9 @@ The minimal \eyedb C++ program is as follows:
 int
 main(int argc, char *argv[])
 {
-  EyeDB::init(argc, argv);
+  eyedb::init(argc, argv);
   // ...
-  EyeDB::release();
+  eyedb::release();
   return 0;
 }
 \end{verbatim}
@@ -61,10 +61,10 @@ A few remarks about this code:
 for some specific administration or hacker tasks, it is not necessary
 to include any other eyedb files.
 \item the \eyedb C++ layer must be initialized using one of the static method
-\texttt{init} of the class \texttt{EyeDB}:
+\texttt{init} of the namespace \texttt{eyedb}:
 \be
-\item static void EyeDB::init()
-\item static void EyeDB::init(int \&argc, char *argv[])
+\item static void eyedb::init()
+\item static void eyedb::init(int \&argc, char *argv[])
 \ee
 The first method only initializes the \eyedb layer while the second
 one performs also some command line option processing: each command line option
@@ -111,13 +111,13 @@ The option \texttt{-eyedbhelp} displays a brief usage for each standard options:
 \normalsize
 Note that all the standard command line options recognized in the
 \texttt{argc/argv} array are suppressed from this array by
-\texttt{EyeDB::init(int \&argc, char *argv[])}.
-\item the class \texttt{EyeDB} (which can be found in the \texttt{eyedbclass.h}
+\texttt{eyedb::init(int \&argc, char *argv[])}.
+\item the class \texttt{eyedb} (which can be found in the \texttt{eyedbclass.h}
 file) is the environment class of the \eyedb layer: through this class,
 you can perform initialization, you can get the current \eyedb version,
 any configuration value, the current architecture,
 the default and the supported compilers, the standard option usage and help.
-\item the last statement \texttt{EyeDB::release()} allows you to release all
+\item the last statement \texttt{eyedb::release()} allows you to release all
 the \eyedb allocated resources and to close opened databases and connections.
 Note that this statement is optionnal as all \eyedb allocated resources,
 opened databases and connections will be automatically released or closed
@@ -129,19 +129,19 @@ But before opening any database we need to establish a connection with
 the \eyedb server.
 \\
 The connection to the \eyedb server is realized through the
-\texttt{idbConnection} class as follows:
+\texttt{eyedb::Connection} class as follows:
 \verbsize
 \begin{verbatim}
-  idbConnection conn;
+  eyedb::Connection conn;
   conn.open();
 \end{verbatim}
 \normalsize
 A few remarks about this code:
 \be
-\item the construction of an \texttt{idbConnection} instance (first line of code)
+\item the construction of an \texttt{eyedb::Connection} instance (first line of code)
 does not perform any actual actions: it only constructs a runtime instance.
 \item to establish the connection, one needs to use the
-\texttt{idbConnection::open(const char *host=0, const char *port=0)} method.
+\texttt{eyedb::Connection::open(const char *host=0, const char *port=0)} method.
 This method has two optionnal arguments: \texttt{host} and \texttt{port}.
 \\
 If these arguments are not specified, their values are taken from the
@@ -152,15 +152,15 @@ from the command line options \texttt{-eyedbhost $<$host$>$} and
 a status is returned or an exception is raised depending on the
 chosen error policy. The default error policy is the \texttt{status error
 policy} which means that each \eyedb method returns a status
-implemented by the \texttt{idbStatus} class. The special status
-\texttt{idbSuccess} (in fact a null pointer) means that the operation
+implemented by the \texttt{eyedb::Status} class. The special status
+\texttt{eyedb::Success} (in fact a null pointer) means that the operation
 has been performed successfully:
 \bi
 \item
 \verbsize
 \begin{verbatim}
-  idbStatus s;
-  idbConnection conn;
+  eyedb::Status s;
+  eyedb::Connection conn;
   s = conn.open();
   if (s)
    {
@@ -171,29 +171,29 @@ has been performed successfully:
 \normalsize
 \ei
 The \texttt{exception error policy} means that each \eyedb method throws
-an exception, implemented by the class \texttt{idbException}, when an error
+an exception, implemented by the class \texttt{eyedb::Exception}, when an error
 happened:
 \bi
 \item
 \verbsize
 \begin{verbatim}
   try {
-    idbConnection conn;
+    eyedb::Connection conn;
     conn.open();
   }
-  catch(idbException &e) {
+  catch(eyedb::Exception &e) {
     cerr << e;
     return 1;
   }
 \end{verbatim}
 \normalsize
 \ei
-Note that \texttt{idbStatus} is an alias for \texttt{const idbException *}.
+Note that \texttt{eyedb::Status} is an alias for \texttt{const eyedb::Exception *}.
 To use the \texttt{exception error policy}, one needs to call the following
 method before any operation:
 \verbsize
 \begin{verbatim}
-  idbException::setMode(idbException::ExceptionMode);
+  eyedb::Exception::setMode(eyedb::Exception::ExceptionMode);
 \end{verbatim}
 \normalsize
 Although the exception error policy is not currently the default one in
@@ -203,24 +203,24 @@ In the following examples we use the \texttt{exception error policy}
 to avoid any error management noise in the introduced C++ code.
 \ee
 \subsect{Database Opening}
-To open a database one uses the \texttt{idbDatabase} class as follows:
+To open a database one uses the \texttt{eyedb::Database} class as follows:
 \verbsize
 \begin{verbatim}
   const char *dbname = argv[1];
-  idbDatabase db(dbname);
-  db.open(&conn, idbDatabase::DBRW);
+  eyedb::Database db(dbname);
+  db.open(&conn, eyedb::Database::DBRW);
 \end{verbatim}
 \normalsize
 \be
-\item as the \texttt{idbConnection} constructor, the \texttt{idbDatabase}
+\item as the \texttt{eyedb::Connection} constructor, the \texttt{eyedb::Database}
 constructor does not perform any actual operation: it constructs
 a runtime instance.
-\item to open a database one uses the \texttt{idbDatabase::open} methods
+\item to open a database one uses the \texttt{eyedb::Database::open} methods
 which takes the following arguments:
 \be
-\item a pointer to an opened \texttt{idbConnection} instance.
-\item the opening flag which can be either \texttt{idbDatabase::DBRead} for
-read-only opening or \texttt{idbDatabase::DBRW} for read-write opening.
+\item a pointer to an opened \texttt{eyedb::Connection} instance.
+\item the opening flag which can be either \texttt{eyedb::Database::DBRead} for
+read-only opening or \texttt{eyedb::Database::DBRW} for read-write opening.
 \\
 Note that there are a dozen of opening modes that are introduced in
 the reference manual.
@@ -237,19 +237,19 @@ Note that an \eyedb client can manage several connections and
 several databases on each connection, for instance:
 \verbsize
 \begin{verbatim}
-  idbConnection conn_local;
+  eyedb::Connection conn_local;
   conn_local.open();
-  idbConnection conn_remote;
+  eyedb::Connection conn_remote;
   conn_remote.open("arzal.zoo.com", 7620);
 
-  idbDatabase db_1("foo");
-  db_1.open(&conn_local, idbDatabase::DBRW);
+  eyedb::Database db_1("foo");
+  db_1.open(&conn_local, eyedb::Database::DBRW);
 
-  idbDatabase db_2("EYEDBDBM");
-  db_2.open(&conn_local, idbDatabase::DBRead, "guest", "guest");
+  eyedb::Database db_2("EYEDBDBM");
+  db_2.open(&conn_local, eyedb::Database::DBRead, "guest", "guest");
 
-  idbDatabase db_3("droopy");
-  db_2.open(&conn_remote, idbDatabase::DBRW, "droopy", "xyztu");
+  eyedb::Database db_3("droopy");
+  db_2.open(&conn_remote, eyedb::Database::DBRW, "droopy", "xyztu");
 \end{verbatim}
 \normalsize
 \subsect{Transaction Management}
@@ -270,17 +270,17 @@ A transaction scope is composed of a starting point, \texttt{transactionBegin},
 and an ending point, \texttt{transactionCommit} or \texttt{transactionAbort}:
 \verbsize
 \begin{verbatim}
-  idbDatabase db(dbname);
-  db.open(&conn, idbDatabase::DBRW);
+  eyedb::Database db(dbname);
+  db.open(&conn, eyedb::Database::DBRW);
 
   db.transactionBegin();
   // ... object operations
   db.transactionCommit();
 \end{verbatim}
 \normalsize
-A call to \texttt{idbDatabase::transactionCommit()} means that all the
+A call to \texttt{eyedb::Database::transactionCommit()} means that all the
 operations performed in the transaction scope will be stored in
-the database, while a call to \texttt{idbDatabase::transactionAbort()} means
+the database, while a call to \texttt{eyedb::Database::transactionAbort()} means
 that all the operations will be forgotten.
 \\
 \\
@@ -301,7 +301,7 @@ But the abort at level 1 is without effect: it will
 not be performed; only the commit at level 0 will be performed.
 \\
 \\
-There are four optionnal arguments to the \texttt{idbDatabase::transactionBegin}
+There are four optionnal arguments to the \texttt{eyedb::Database::transactionBegin}
 method:
 \be
 \item the \texttt{mode} argument controls the object lock policy.
@@ -337,12 +337,12 @@ To illustrate this object model, we are going to show how to display the
 user classes of a given database:
 \verbsize
 \begin{verbatim}
-  idbDatabase db(dbname);
-  db.open(&conn, idbDatabase::DBRW);
+  eyedb::Database db(dbname);
+  db.open(&conn, eyedb::Database::DBRW);
 
   db.transactionBegin();
-  idbLinkedListCursor c(db.getSchema()->getClassList());
-  idbClass *cls;
+  eyedb::LinkedListCursor c(db.getSchema()->getClassList());
+  eyedb::Class *cls;
   while (c.getNext((void*&)cls))
     if (!cls->isSystem())
       cout << cls;
@@ -359,13 +359,13 @@ For instance, to display all the classes of type \texttt{struct} which contains
 an attribute named \texttt{age}:
 \verbsize
 \begin{verbatim}
-  idbLinkedListCursor c(db.getSchema->getClassList());
-  idbClass *cls;
+  eyedb::LinkedListCursor c(db.getSchema->getClassList());
+  eyedb::Class *cls;
   while (c.getNext((void*&)cls))
     if (cls->asStructClass())
       {
         int attr_cnt;
-        const idbAttribute **attrs = cls->getAttributes(attr_cnt);
+        const eyedb::Attribute **attrs = cls->getAttributes(attr_cnt);
         for (int i = 0; i < attr_cnt; i++)
           if (!strcmp(attrs[i]->getName(), "age"))
             {
@@ -469,12 +469,12 @@ to invoke the \texttt{newObj} method of the \texttt{Person} runtime class
 as follows:
 \verbsize
 \begin{verbatim}
-  idbClass *cls = db.getSchema()->getClass("Person");
+  eyedb::Class *cls = db.getSchema()->getClass("Person");
 
-  idbObject *p = cls->newObj(&db);
+  eyedb::Object *p = cls->newObj(&db);
 \end{verbatim}
 \normalsize
-The \texttt{idbClass::newObj(idbDatabase * = 0)} is the class instantiation
+The \texttt{eyedb::Class::newObj(eyedb::Database * = 0)} is the class instantiation
 method for both persistent and transient object.
 \\
 A transient object is created using the \texttt{newObj} without any argument,
@@ -494,11 +494,11 @@ When a persistent object is stored in the database using the
 \texttt{store} method, an unique object identifier \texttt{OID} is allocated
 to this object.
 \\
-This \texttt{OID} can be acceded using the method \texttt{idbObject::getOid()},
+This \texttt{OID} can be acceded using the method \texttt{eyedb::Object::getOid()},
 for instance to display the allocated \texttt{OID}:
 \verbsize
 \begin{verbatim}
-  idbObject *p = cls->newObj(&db);
+  eyedb::Object *p = cls->newObj(&db);
   cout << "before storing: " << p->getOid() << endl;
   p->store();
   cout << "after storing: " << p->getOid() << endl;
@@ -530,40 +530,40 @@ Assume that we want to set a name and a age values to a \texttt{Person} instance
 Here is a way to do so:
 \verbsize
 \begin{verbatim}
-  idbClass *cls = db.getSchema()->getClass("Person");
-  idbObject *p = cls->newObj(&db);
+  eyedb::Class *cls = db.getSchema()->getClass("Person");
+  eyedb::Object *p = cls->newObj(&db);
 
   // getting attributes from class
-  const idbAttribute *attr_name = cls->getAttribute("name");
-  const idbAttribute *attr_age = cls->getAttribute("age");
+  const eyedb::Attribute *attr_name = cls->getAttribute("name");
+  const eyedb::Attribute *attr_age = cls->getAttribute("age");
 
   // setting name attribute value
   attr_name->setSize(p, strlen("john")+1);
-  attr_name->setValue(p, (idbData)"john", strlen("john")+1, 0);
+  attr_name->setValue(p, (eyedb::Data)"john", strlen("john")+1, 0);
 
   // setting age attribute value
-  idb_int32 age = 27;
-  attr_age->setValue(p, (idbData)&age, 1, 0);
+  eyedb::_int32 age = 27;
+  attr_age->setValue(p, (eyedb::Data)&age, 1, 0);
 \end{verbatim}
 \normalsize
 We need to do a few remarks about this code:
 \be
 \item to get specific named attribute within a class,
-we use the method \texttt{idbClass::getAttribute(const char *)}.
+we use the method \texttt{eyedb::Class::getAttribute(const char *)}.
 \\
-This method returns a pointer to an \texttt{idbAttribute} which contains
+This method returns a pointer to an \texttt{eyedb::Attribute} which contains
 a complete description of this attribute: type, name, size, position and
 so on.
 \item to set an attribute value for the instance \texttt{p}, we
-use the method \texttt{idbAttribute::setValue(idbObject *o, idbData data,
+use the method \texttt{eyedb::Attribute::setValue(eyedb::Object *o, eyedb::Data data,
 int nb, int from)} whose arguments are as follows:
 \be
-\item \texttt{idbObject *o}: the runtime object pointer to modify.
-\item \texttt{idbData data}: the pointer to the attribute value to set.
+\item \texttt{eyedb::Object *o}: the runtime object pointer to modify.
+\item \texttt{eyedb::Data data}: the pointer to the attribute value to set.
 \item \texttt{int nb}: for an array, the number of values to set.
 \item \texttt{int from}: for an array, the starting index of the values to set.
 \ee
-\item the \texttt{idbAttribute::setSize(idbObject *, idbSize)} method is
+\item the \texttt{eyedb::Attribute::setSize(eyedb::Object *, eyedb::Size)} method is
 used for the attribute \texttt{name} because this attribute is of variable
 size (remember the schema description : \texttt{string name}).
 \\
@@ -573,7 +573,7 @@ attribute value.
 been changed in the database: only the transient values have been changed.
 \\
 To change the database object, one needs to use the method
-\texttt{idbObject::store()} as follows:
+\texttt{eyedb::Object::store()} as follows:
 \verbsize
 \begin{verbatim}
   p->store();
@@ -608,11 +608,11 @@ Generated C++ API}.
 \ee
 \subsect{Loading Database Objects}
 To load an object from a database, one needs to give its \texttt{OID} to
-the \texttt{idbDatabase::loadObject} method, for instance:
+the \texttt{eyedb::Database::loadObject} method, for instance:
 \verbsize
 \begin{verbatim}
-  idbOid oid("1456.3.38475637:oid");
-  idbObject *o;
+  eyedb::Oid oid("1456.3.38475637:oid");
+  eyedb::Object *o;
   db.loadObject(oid, o);
   cout << "object " << oid << " is of class " << o->getClass()->getName()
        << endl;
@@ -629,68 +629,68 @@ For instance to get the \texttt{name} and \texttt{age} attribute values of
 the previous loaded object, one can do as follows:
 \verbsize
 \begin{verbatim}
-  idbOid oid("1456.3.38475637:oid");
-  idbObject *o;
+  eyedb::Oid oid("1456.3.38475637:oid");
+  eyedb::Object *o;
   db.loadObject(oid, o);
 
   // getting attributes from class
-  const idbAttribute *attr_name = cls->getAttribute("name");
-  const idbAttribute *attr_age = cls->getAttribute("age");
+  const eyedb::Attribute *attr_name = cls->getAttribute("name");
+  const eyedb::Attribute *attr_age = cls->getAttribute("age");
 
   // getting name attribute size
-  idbSize name_length;
+  eyedb::Size name_length;
   attr_name->getSize(o, name_length);
 
   // getting name attribute value
   char *name = new char[name_length];
-  attr_name->getValue(o, (idbData *)name, name_length, 0);
+  attr_name->getValue(o, (eyedb::Data *)name, name_length, 0);
   cout << "name is : " << name << endl;
   delete [] name;
 
   // getting age attribute value
-  idb_int32 age;
-  attr_age->getValue(o, (idbData *)&age, 1, 0);
+  eyedb::_int32 age;
+  attr_age->getValue(o, (eyedb::Data *)&age, 1, 0);
   cout << "age is : " << age << endl;
 \end{verbatim}
 \normalsize
 To get an attribute value we use the method
-\texttt{idbAttribute::getValue(const idbObject *o, idbData *data,
-int nb, int from, idbBool * isnull = 0)} whose arguments are as follows:
+\texttt{eyedb::Attribute::getValue(const eyedb::Object *o, eyedb::Data *data,
+int nb, int from, eyedb::Bool * isnull = 0)} whose arguments are as follows:
 \be
-\item \texttt{idbObject *o}: the runtime object pointer.
-\item \texttt{idbData data}: the pointer to the attribute value to get: this
+\item \texttt{eyedb::Object *o}: the runtime object pointer.
+\item \texttt{eyedb::Data data}: the pointer to the attribute value to get: this
 pointer must be allocated correctly according to the returned value type.
 It is why we get first the size of the \texttt{name} attribute value to allocate
 the returned buffer with a valid size.
 \item \texttt{int nb}: for an array, the number of values to get.
 \item \texttt{int from}: for an array, the starting index of the values to get.
-\item \texttt{idbBool *isnull}: an optionnal boolean to check if the attribute
+\item \texttt{eyedb::Bool *isnull}: an optionnal boolean to check if the attribute
 value is null (i.e. not initialized).
 \ee
 If we want to get the \texttt{spouse} value of the loaded person,
 we must do something a little bit more complicated:
 \verbsize
 \begin{verbatim}
-  idbOid oid("1456.3.38475637:oid");
-  idbObject *o;
+  eyedb::Oid oid("1456.3.38475637:oid");
+  eyedb::Object *o;
   db.loadObject(oid, o);
 
   // getting spouse attribute from class
-  const idbAttribute *attr_spouse = cls->getAttribute("spouse");
+  const eyedb::Attribute *attr_spouse = cls->getAttribute("spouse");
 
-  idbOid spouse_oid;
+  eyedb::Oid spouse_oid;
   attr_spouse->getOid(o, &spouse_oid);
 
   if (spouse_oid.isValid())
    {
-     idbObject *spouse;
+     eyedb::Object *spouse;
      db.loadObject(spouse_oid, spouse);
      cout << "spouse is: " << spouse;
    }
 \end{verbatim}
 \normalsize
 To get the \texttt{spouse} attribute value, we need to get first the
-\texttt{spouse OID} using the \texttt{idbAttribute::getOid} method on
+\texttt{spouse OID} using the \texttt{eyedb::Attribute::getOid} method on
 the \texttt{spouse} attribute.
 \\
 Then, if the \texttt{OID} is valid, we load the \texttt{spouse} from the
@@ -701,8 +701,8 @@ Once again, using the \texttt{eyedbodl} tool, all the previous code
 becomes very simple:
 \verbsize
 \begin{verbatim}
-  idbOid oid("1456.3.38475637:oid");
-  idbObject *o;
+  eyedb::Oid oid("1456.3.38475637:oid");
+  eyedb::Object *o;
   db.loadObject(oid, o);
   Person *p = Person_c(o);
 
@@ -723,15 +723,15 @@ To load database objects it seems more reasonnable to use a query language
 such as OQL.
 \\
 The \eyedb C++ API allows you to perform any OQL queries using the class
-\texttt{idbOQL}.
+\texttt{eyedb::OQL}.
 \\
 For instance to get all Person whose age is less than a given value:
 \verbsize
 \begin{verbatim}
   db.transactionBegin();
-  idbOQL q(&db, "select Person.age < %d", given_age);
+  eyedb::OQL q(&db, "select Person.age < %d", given_age);
 
-  idbObjectArray obj_arr(idbTrue);
+  eyedb::ObjectArray obj_arr(eyedb::True);
   q.execute(obj_arr);
   for (int i = 0; i < obj_arr.getCount(); i++)
     cout << obj_arr[i];
@@ -743,8 +743,8 @@ A few remarks about this code:
 in the scope of a transaction: it is why the first statement is a call
 to the \texttt{transactionBegin} method. In most of the previous code examples,
 we volontary omit this call.
-\item the class \texttt{idbOQL} is used to perform
-any OQL query. The main constructor \texttt{idbOQL(idbDatabase *db, const char *fmt, ...)} allows you to make an OQL query in a simple way.
+\item the class \texttt{eyedb::OQL} is used to perform
+any OQL query. The main constructor \texttt{eyedb::OQL(eyedb::Database *db, const char *fmt, ...)} allows you to make an OQL query in a simple way.
 The arguments are as follows:
 \be
 \item the database pointer within which to perform the query.
@@ -753,14 +753,14 @@ The arguments are as follows:
 format.
 \ee
 \item to get all the objects returned by the query, we use the
-\texttt{idbOQL::execute(idbObjectArray \&)} method. This method filled
+\texttt{eyedb::OQL::execute(eyedb::ObjectArray \&)} method. This method filled
 the object array reference given as input parameter.
-\item the method \texttt{idbObjectArray::getCount()} returned the number
+\item the method \texttt{eyedb::ObjectArray::getCount()} returned the number
 of objects contained in an object array.
-\item the \texttt{[] idbObjectArray} operator has been overloaded to
+\item the \texttt{[] eyedb::ObjectArray} operator has been overloaded to
 allow you to perform direct access to the contained objects: \texttt{obj\_arr[i]} is
 the object \#\texttt{i} within the object array.
-\item the argument \texttt{idbTrue} to the \texttt{idbObjectArray} constructor
+\item the argument \texttt{eyedb::True} to the \texttt{eyedb::ObjectArray} constructor
 means that we want that all the contained objects to be deleted
 when this object array will be deleted.
 \ee
@@ -774,20 +774,20 @@ than the given value using an OQL query, and then get their name value
 as follows:
 \verbsize
 \begin{verbatim}
-  idbOQL q(&db, "select Person.age < %d", given_age);
-  idbObjectArray obj_arr(idbTrue);
+  eyedb::OQL q(&db, "select Person.age < %d", given_age);
+  eyedb::ObjectArray obj_arr(eyedb::True);
   q.execute(obj_arr);
 
-  const idbAttribute *attr_name = cls->getAttribute("name");
+  const eyedb::Attribute *attr_name = cls->getAttribute("name");
   for (int i = 0; i < obj_arr.getCount(); i++)
     {
       // getting name attribute size
-     idbSize name_length;
+     eyedb::Size name_length;
      attr_name->getSize(obj_arr[i], name_length);
 
      // getting name attribute value
      char *name = new char[name_length];
-     attr_name->getValue(obj_arr[i], (idbData *)name, name_length, 0);
+     attr_name->getValue(obj_arr[i], (eyedb::Data *)name, name_length, 0);
      cout << "name of #" << i << " is : " << name << endl;
      delete [] name;
    }  
@@ -796,8 +796,8 @@ as follows:
 \item the second one is to perform directly an appropriate query as follows:
 \verbsize
 \begin{verbatim}
-  idbOQL q(&db, "(select Person.age < %d).name", given_age);
-  idbValueArray val_arr;
+  eyedb::OQL q(&db, "(select Person.age < %d).name", given_age);
+  eyedb::ValueArray val_arr;
 
   q.execute(val_arr);
   for (int i = 0; i < val_arr.getCount(); i++)
@@ -805,12 +805,12 @@ as follows:
 \end{verbatim}
 \normalsize
 In this case, the returned value are not object values but string values.
-So we cannot use the \texttt{execute(idbObjectArray\&)} method to get
-these values but the more general form \texttt{execute(idbValueArray\&)}
+So we cannot use the \texttt{execute(eyedb::ObjectArray\&)} method to get
+these values but the more general form \texttt{execute(eyedb::ValueArray\&)}
 \\
 \\
-An \texttt{idbValueArray} instance is an array of \texttt{idbValue} instances.
-The \texttt{idbValue} class is the most general form of an OQL returned value.
+An \texttt{eyedb::ValueArray} instance is an array of \texttt{eyedb::Value} instances.
+The \texttt{eyedb::Value} class is the most general form of an OQL returned value.
 It can take the form of a integer, a string, an \texttt{OID}, an object and
 so on.
 \\
@@ -824,22 +824,22 @@ All the runtime objects which have been allocated by the client code
 or by a load or query method must be released by the client code.
 \\
 \\
-To release an \texttt{idbObject} or inherited class instance, we must use
-the \texttt{idbObject::release()} method as follows:
+To release an \texttt{eyedb::Object} or inherited class instance, we must use
+the \texttt{eyedb::Object::release()} method as follows:
 \verbsize
 \begin{verbatim}
-  idbObject *o1 = cls->newObj();
+  eyedb::Object *o1 = cls->newObj();
   // ...
   o1->release();
 
-  idbObject *o2;
+  eyedb::Object *o2;
   db.loadObject(oid, o2);
   // ...
   o2->release();
 \end{verbatim}
 \normalsize
 The C++ \texttt{delete} operator is forbiden: if you try to use this operator
-on any \texttt{idbObject} instance, you will get an error message at runtime.
+on any \texttt{eyedb::Object} instance, you will get an error message at runtime.
 \\
 \\
 Note that if you release a persistent runtime object you do not release
@@ -850,7 +850,7 @@ Refer to the section \texttt{Memory Management} to understand the whole
 memory policy of the C++ API.
 \subsect{Removing Database Objects}
 To remove a database object, we need to use the
-\texttt{idbObject::remove()} method or the \texttt{idbDatabase::removeObject(const idbOid \&oid)} method, for instance:
+\texttt{eyedb::Object::remove()} method or the \texttt{eyedb::Database::removeObject(const eyedb::Oid \&oid)} method, for instance:
 \verbsize
 \begin{verbatim}
   db.transactionBegin();
@@ -1001,8 +1001,8 @@ class person {
  public:
   static void init();
   static void release();
-  static idbStatus updateSchema(idbDatabase *db);
-  static idbStatus updateSchema(idbSchema *m);
+  static eyedb::Status updateSchema(eyedb::Database *db);
+  static eyedb::Status updateSchema(eyedb::Schema *m);
 };
 \end{verbatim}
 \normalsize
@@ -1016,7 +1016,7 @@ release allocated runtime memory.
 directly by client code.
 \ee
 \item the database class whose name is \emph{package}Database inherited
-from the generic \texttt{idbDatabase} class.
+from the generic \texttt{eyedb::Database} class.
 \\
 This class overloads two inherited methods: the \texttt{open} and the
 \texttt{loadObject\_realize} methods.
@@ -1037,7 +1037,7 @@ it will perform a \texttt{new Person(db)} to construct correctly
 the loaded object.
 \ei
 Note that to use the generated schema-oriented API it is not mandatory
-to use the generated database class: you can use the genetic \texttt{idbDatabase}
+to use the generated database class: you can use the genetic \texttt{eyedb::Database}
 class; there is a lot of cases where you will get no trouble.
 But to avoid any potential trouble, it is strongly recommended to use the
 generated database class.
@@ -1073,7 +1073,7 @@ For each C++ class, two constructors and the assignment operator are
 generated:
 \verbsize
 \begin{verbatim}
-  Person(idbDatabase * = 0);
+  Person(eyedb::Database * = 0);
   Person(const Person& x);
 
   Person& operator=(const Person& x);
@@ -1091,20 +1091,20 @@ The following code:
 does nearly the same things as:
 \verbsize
 \begin{verbatim}
-  idbClass *cls = db.getSchema()->getClass("Person");
-  idbObject *o = cls->newObj(&db);
+  eyedb::Class *cls = db.getSchema()->getClass("Person");
+  eyedb::Object *o = cls->newObj(&db);
 \end{verbatim}
 \normalsize
-The major difference is that in the second case, an \texttt{idbObject} instance
-(in fact an \texttt{idbStruct} instance) is created while in the first case
-an \texttt{Person} (which inherits from \texttt{idbStruct}) instance is created.
+The major difference is that in the second case, an \texttt{eyedb::Object} instance
+(in fact an \texttt{eyedb::Struct} instance) is created while in the first case
+an \texttt{Person} (which inherits from \texttt{eyedb::Struct}) instance is created.
 \\
 But in both cases, you can use the instantiated object to set and get
 \texttt{Person} attribute values and to synchronize the runtime object with
 the database.
 \\
 To set or get attribute values in the second case, you need to use
-the \texttt{idbAttribute::setValue} or \texttt{idbAttribute::getValue} methods
+the \texttt{eyedb::Attribute::setValue} or \texttt{eyedb::Attribute::getValue} methods
 while in the first case, you may use the generated selector and modifier
 methods such as \texttt{Person::setName} or \texttt{Person::getAge}.
 \item The second constructor is the copy constructor. For instance:
@@ -1191,20 +1191,20 @@ There is another case to use down casting methods and functions is when
 loading a database object.
 \\
 When loading a database object (for instance a \texttt{Person} database object)
-using the \texttt{idbDatabase::loadObject}, we get a generic \texttt{idbObject}
+using the \texttt{eyedb::Database::loadObject}, we get a generic \texttt{eyedb::Object}
 instance, not a \texttt{Person} instance nor a \texttt{Employee} instance.
 \\
 Nevertheless, in the case of a \texttt{Person} database object has been
 loaded, a \texttt{Person} persistent runtime object has been correctly
 constructed by the generated API.
 \\
-So, it is legitimate to down cast the loaded \texttt{idbObject} instance
+So, it is legitimate to down cast the loaded \texttt{eyedb::Object} instance
 to a \texttt{Person} instance as follows:
 \verbsize
 \begin{verbatim}
-  idbOQL q(&db, "select Person.age < %d", given_age);
+  eyedb::OQL q(&db, "select Person.age < %d", given_age);
 
-  idbObjectArray obj_arr(idbTrue);
+  eyedb::ObjectArray obj_arr(eyedb::True);
   q.execute(obj_arr);
   for (int i = 0; i < obj_arr.getCount(); i++)
    {
@@ -1225,7 +1225,7 @@ is legal according to the context but is not safe because neither static
 Safe down casting functions are generated by \texttt{eyedbodl} as follows:
 \verbsize
 \begin{verbatim}
-inline Person *Person_c(idbObject *o)
+inline Person *Person_c(eyedb::Object *o)
 {
   Root *x = personDatabase::asRoot(o);
   if (!x) return (Person *)0;
@@ -1317,23 +1317,23 @@ array modifier.
 The selector method is under the form:
 \verbsize
 \begin{verbatim}
-<attribute primitive type> get<attribute name>(idbBool *isnull = 0,
-                                               idbStatus *status = 0) const
+<attribute primitive type> get<attribute name>(eyedb::Bool *isnull = 0,
+                                               eyedb::Status *status = 0) const
 \end{verbatim}
 \normalsize
 for instance for the \texttt{age} attribute:
 \verbsize
 \begin{verbatim}
-  idb_int32 getAge(idbBool *isnull = 0, idbStatus *status = 0) const;
+  eyedb::_int32 getAge(eyedb::Bool *isnull = 0, eyedb::Status *status = 0) const;
 \end{verbatim}
 \normalsize
 Every selector method has the two following optional arguments:
 \be
-\item \texttt{isnull} : a pointer to a \texttt{idbBool} value.\\
-If this pointer is not null, the selector method assigns it to \texttt{idbFalse}
-if the attribute value is not null, otherwise it assigns it to \texttt{idbTrue}.
-\item \texttt{status} : a pointer to a \texttt{idbStatus} value.\\
-If this pointer is not null, the selector method assigns to \texttt{idbSuccess}
+\item \texttt{isnull} : a pointer to a \texttt{eyedb::Bool} value.\\
+If this pointer is not null, the selector method assigns it to \texttt{eyedb::False}
+if the attribute value is not null, otherwise it assigns it to \texttt{eyedb::True}.
+\item \texttt{status} : a pointer to a \texttt{eyedb::Status} value.\\
+If this pointer is not null, the selector method assigns to \texttt{eyedb::Success}
 is the operation is successul, otherwise is assigns to the error status.
 Note that if you are using the exception error policy (the recommended
 one), this argument is not useful. If you have generated the schema-oriented
@@ -1344,18 +1344,18 @@ C++ API using the \texttt{-error-policy exception} option, the
 The selector methods are under the form:
 \verbsize
 \begin{verbatim}
-const char *get<attribute name>(idbBool *isnull = 0,
-                                idbStatus *status = 0) const
+const char *get<attribute name>(eyedb::Bool *isnull = 0,
+                                eyedb::Status *status = 0) const
 char get<attribute name>(unsigned int a0,
-                         idbBool *isnull = 0,
-                         idbStatus *status = 0) const
+                         eyedb::Bool *isnull = 0,
+                         eyedb::Status *status = 0) const
 \end{verbatim}
 \normalsize
 for instance for the \texttt{name} attribute:
 \verbsize
 \begin{verbatim}
-  const char *getName(idbBool *isnull = 0, idbStatus *status = 0) const;
-  char getName(unsigned int a0, idbBool *isnull = 0, idbStatus *status = 0)  const;
+  const char *getName(eyedb::Bool *isnull = 0, eyedb::Status *status = 0) const;
+  char getName(unsigned int a0, eyedb::Bool *isnull = 0, eyedb::Status *status = 0)  const;
 \end{verbatim}
 \normalsize
 The first selector method is to get the full string value of the attribute
@@ -1365,17 +1365,17 @@ The argument \texttt{a0} is the number of the character.
 The selector methods are under the form:
 \verbsize
 \begin{verbatim}
-  <attribute primitive type>* get<attribute name>(idbBool *isnull = 0,
-                                                  idbStatus *status = 0)
-  const <attribute primitive type>* get<attribute name>(idbBool *isnull = 0,
-                                                  idbStatus *status = 0) const
+  <attribute primitive type>* get<attribute name>(eyedb::Bool *isnull = 0,
+                                                  eyedb::Status *status = 0)
+  const <attribute primitive type>* get<attribute name>(eyedb::Bool *isnull = 0,
+                                                  eyedb::Status *status = 0) const
 \end{verbatim}
 \normalsize
 for instance for the \texttt{addr} attribute:
 \verbsize
 \begin{verbatim}
-  Address *getAddr(idbBool *isnull = 0, idbStatus *status = 0) ;
-  const Address *getAddr(idbBool *isnull = 0, idbStatus *status = 0) const;
+  Address *getAddr(eyedb::Bool *isnull = 0, eyedb::Status *status = 0) ;
+  const Address *getAddr(eyedb::Bool *isnull = 0, eyedb::Status *status = 0) const;
 \end{verbatim}
 \normalsize
 Note than the returned value cannot be a null pointer as this is literal
@@ -1384,18 +1384,18 @@ attribute fully included in the instance.
 The selector methods are under the form:
 \verbsize
 \begin{verbatim}
-  <attribute primitive type>* get<attribute name>(idbBool *isnull = 0,
-                                                  idbStatus *status = 0)
-  const <attribute primitive type>* get<attribute name>(idbBool *isnull = 0,
-                                                  idbStatus *status = 0) const
+  <attribute primitive type>* get<attribute name>(eyedb::Bool *isnull = 0,
+                                                  eyedb::Status *status = 0)
+  const <attribute primitive type>* get<attribute name>(eyedb::Bool *isnull = 0,
+                                                  eyedb::Status *status = 0) const
 \end{verbatim}
 \normalsize
 for instance for the \texttt{spouse} attribute:
 \verbsize
 \begin{verbatim}
-  Person *getSpouse(idbBool *isnull = 0, idbStatus *status = 0) ;
-  const Person *getSpouse(idbBool *isnull = 0, idbStatus *status = 0) const;
-  idbOid getSpouseOid(idbStatus *status = 0);
+  Person *getSpouse(eyedb::Bool *isnull = 0, eyedb::Status *status = 0) ;
+  const Person *getSpouse(eyedb::Bool *isnull = 0, eyedb::Status *status = 0) const;
+  eyedb::Oid getSpouseOid(eyedb::Status *status = 0);
 \end{verbatim}
 \normalsize
 Note that:
@@ -1417,26 +1417,26 @@ little bit different.
 For the not ordered collections, the selector method are as follows:
 \verbsize
 \begin{verbatim}
-  <collection type>* get<attribute name>Coll(idbBool *isnull = 0,
-                                             idbStatus *status = 0) ;
-  unsigned int get<attribute name>Count(idbBool *isnull = 0,
-                                        idbStatus *status = 0) const;
-  const <collection type>* get<attribute name>Coll(idbBool *isnull = 0,
-                                              idbStatus *status = 0) const;
-  idbOid get<attribute name>Oid(idbStatus *status = 0);
+  <collection type>* get<attribute name>Coll(eyedb::Bool *isnull = 0,
+                                             eyedb::Status *status = 0) ;
+  unsigned int get<attribute name>Count(eyedb::Bool *isnull = 0,
+                                        eyedb::Status *status = 0) const;
+  const <collection type>* get<attribute name>Coll(eyedb::Bool *isnull = 0,
+                                              eyedb::Status *status = 0) const;
+  eyedb::Oid get<attribute name>Oid(eyedb::Status *status = 0);
   const <collection object type>* get<attribute name>At(unsigned int ind,
-                       idbBool *isnull = 0, idbStatus *status = 0) const;
+                       eyedb::Bool *isnull = 0, eyedb::Status *status = 0) const;
   <collection object type>* get<attribute name>At(unsigned int ind,
-                              idbBool *isnull = 0, idbStatus *status = 0);
-  idbOid get<attribute name>OidAt(unsigned int ind,
-                        idbStatus *status = 0) const;
+                              eyedb::Bool *isnull = 0, eyedb::Status *status = 0);
+  eyedb::Oid get<attribute name>OidAt(unsigned int ind,
+                        eyedb::Status *status = 0) const;
 \end{verbatim}
 \normalsize
 where $<$collection type$>$ can be:
 \be
-\item \texttt{idbCollSet} for a collection set
-\item \texttt{idbCollBag} for a collection bag
-%\item \texttt{idbCollArray} for a collection array
+\item \texttt{eyedb::CollSet} for a collection set
+\item \texttt{eyedb::CollBag} for a collection bag
+%\item \texttt{eyedb::CollArray} for a collection array
 \ee
 and where $<$collection object type$>$ is the type which is composing
 the collection.
@@ -1446,19 +1446,19 @@ Note that if the collection is not a literal but an object, the following
 extra method returning the collection oid is generated:
 \verbsize
 \begin{verbatim}
-  idbOid get<attribute name>Oid(idbStatus *status = 0);
+  eyedb::Oid get<attribute name>Oid(eyedb::Status *status = 0);
 \end{verbatim}
 \normalsize
 For the \texttt{cars} attribute the following code is generated:
 \verbsize
 \begin{verbatim}
-  idbCollSet *getCarsColl(idbBool *isnull = 0, idbStatus *status = 0) ;
-  unsigned int getCarsCount(idbBool *isnull = 0, idbStatus *status = 0) const;
-  const idbCollSet *getCarsColl(idbBool *isnull = 0, idbStatus *status = 0) const;
-  const Car *getCarsAt(unsigned int ind, idbBool *isnull = 0,
-                       idbStatus *status = 0) const;
-  Car *getCarsAt(unsigned int ind, idbBool *isnull = 0, idbStatus *status = 0);
-  idbOid getCarsOidAt(unsigned int ind, idbStatus *status = 0) const;
+  eyedb::CollSet *getCarsColl(eyedb::Bool *isnull = 0, eyedb::Status *status = 0) ;
+  unsigned int getCarsCount(eyedb::Bool *isnull = 0, eyedb::Status *status = 0) const;
+  const eyedb::CollSet *getCarsColl(eyedb::Bool *isnull = 0, eyedb::Status *status = 0) const;
+  const Car *getCarsAt(unsigned int ind, eyedb::Bool *isnull = 0,
+                       eyedb::Status *status = 0) const;
+  Car *getCarsAt(unsigned int ind, eyedb::Bool *isnull = 0, eyedb::Status *status = 0);
+  eyedb::Oid getCarsOidAt(unsigned int ind, eyedb::Status *status = 0) const;
 \end{verbatim}
 \normalsize
 Let have a look to each method:
@@ -1466,15 +1466,15 @@ Let have a look to each method:
 \item
 \verbsize
 \begin{verbatim}
-idbCollSet *getCarsColl(idbBool *isnull = 0, idbStatus *status = 0) ;
-const idbCollSet *getCarsColl(idbBool *isnull = 0, idbStatus *status = 0) const;
+eyedb::CollSet *getCarsColl(eyedb::Bool *isnull = 0, eyedb::Status *status = 0) ;
+const eyedb::CollSet *getCarsColl(eyedb::Bool *isnull = 0, eyedb::Status *status = 0) const;
 \end{verbatim}
 \normalsize
 returns the collection object (const and not const methods).
 \item
 \verbsize
 \begin{verbatim}
-unsigned int getCarsCount(idbBool *isnull = 0, idbStatus *status = 0) const;
+unsigned int getCarsCount(eyedb::Bool *isnull = 0, eyedb::Status *status = 0) const;
 \end{verbatim}
 \normalsize
 returns the collection item count.
@@ -1482,9 +1482,9 @@ returns the collection item count.
 \item
 \verbsize
 \begin{verbatim}
-const Car *getCarsAt(unsigned int ind, idbBool *isnull = 0,
-                     idbStatus *status = 0) const;
-Car *getCarsAt(unsigned int ind, idbBool *isnull = 0, idbStatus *status = 0);
+const Car *getCarsAt(unsigned int ind, eyedb::Bool *isnull = 0,
+                     eyedb::Status *status = 0) const;
+Car *getCarsAt(unsigned int ind, eyedb::Bool *isnull = 0, eyedb::Status *status = 0);
 \end{verbatim}
 \normalsize
 returns the \#\texttt{ind} element in the collection. As the collection
@@ -1495,7 +1495,7 @@ scan an array that to scan an unordered set.
 \item
 \verbsize
 \begin{verbatim}
-idbOid getCarsOidAt(unsigned int ind, idbStatus *status = 0) const;
+eyedb::Oid getCarsOidAt(unsigned int ind, eyedb::Status *status = 0) const;
 \end{verbatim}
 \normalsize
 returns the \#\texttt{ind} oid in the collection.
@@ -1504,25 +1504,25 @@ The remark about the index of the element is the same as above.
 For the ordered collections, the selector method are as follows:
 \verbsize
 \begin{verbatim}
-  <collection type>* get<attribute name>Coll(idbBool *isnull = 0,
-                                             idbStatus *status = 0) ;
-  unsigned int get<attribute name>Count(idbBool *isnull = 0,
-                                        idbStatus *status = 0) const;
-  const <collection type>* get<attribute name>Coll(idbBool *isnull = 0,
-                                              idbStatus *status = 0) const;
-  idbOid get<attribute name>Oid(idbStatus *status = 0);
+  <collection type>* get<attribute name>Coll(eyedb::Bool *isnull = 0,
+                                             eyedb::Status *status = 0) ;
+  unsigned int get<attribute name>Count(eyedb::Bool *isnull = 0,
+                                        eyedb::Status *status = 0) const;
+  const <collection type>* get<attribute name>Coll(eyedb::Bool *isnull = 0,
+                                              eyedb::Status *status = 0) const;
+  eyedb::Oid get<attribute name>Oid(eyedb::Status *status = 0);
   const <collection object type>* retrieve<attribute name>At(unsigned int ind,
-                       idbBool *isnull = 0, idbStatus *status = 0) const;
+                       eyedb::Bool *isnull = 0, eyedb::Status *status = 0) const;
   <collection object type>* retrieve<attribute name>At(unsigned int ind,
-                              idbBool *isnull = 0, idbStatus *status = 0);
-  idbOid retrieve<attribute name>OidAt(unsigned int ind,
-                                       idbStatus *status = 0) const;
+                              eyedb::Bool *isnull = 0, eyedb::Status *status = 0);
+  eyedb::Oid retrieve<attribute name>OidAt(unsigned int ind,
+                                       eyedb::Status *status = 0) const;
 \end{verbatim}
 \normalsize
 where $<$collection type$>$ can be:
 \be
-\item \texttt{idbCollArray} for a collection array
-\item \texttt{idbCollList} for a collection list\\
+\item \texttt{eyedb::CollArray} for a collection array
+\item \texttt{eyedb::CollList} for a collection list\\
 \emph{Note that the collection list are currently not implemented in
 \eyedb}.
 \ee
@@ -1534,20 +1534,20 @@ Note that if the collection is not a literal but an object, the following
 extra method returning the collection oid is generated:
 \verbsize
 \begin{verbatim}
-  idbOid get<attribute name>Oid(idbStatus *status = 0);
+  eyedb::Oid get<attribute name>Oid(eyedb::Status *status = 0);
 \end{verbatim}
 \normalsize
 For the \texttt{children} attribute the following code is generated:
 \verbsize
 \begin{verbatim}
-  idbCollArray *getChildrenColl(idbBool *isnull = 0, idbStatus *status = 0) ;
-  unsigned int getChildrenCount(idbBool *isnull = 0, idbStatus *status = 0) const;
-  const idbCollArray *getChildrenColl(idbBool *isnull = 0, idbStatus *status = 0) const;
-  const Person *retrieveChildrenAt(unsigned int ind, idbBool *isnull = 0,
-                                     idbStatus *status = 0) const;
-  Person *retrieveChildrenAt(unsigned int ind, idbBool *isnull = 0,
-                            idbStatus *status = 0);
-  idbOid retrievedChildrenOidAt(unsigned int ind, idbStatus *status = 0) const;
+  eyedb::CollArray *getChildrenColl(eyedb::Bool *isnull = 0, eyedb::Status *status = 0) ;
+  unsigned int getChildrenCount(eyedb::Bool *isnull = 0, eyedb::Status *status = 0) const;
+  const eyedb::CollArray *getChildrenColl(eyedb::Bool *isnull = 0, eyedb::Status *status = 0) const;
+  const Person *retrieveChildrenAt(unsigned int ind, eyedb::Bool *isnull = 0,
+                                     eyedb::Status *status = 0) const;
+  Person *retrieveChildrenAt(unsigned int ind, eyedb::Bool *isnull = 0,
+                            eyedb::Status *status = 0);
+  eyedb::Oid retrievedChildrenOidAt(unsigned int ind, eyedb::Status *status = 0) const;
 \end{verbatim}
 \normalsize
 Only the last three method templates differ from the corresponding
@@ -1556,10 +1556,10 @@ Only the last three method templates differ from the corresponding
 \item
 \verbsize
 \begin{verbatim}
-const Person *retrievedChildrenAt(unsigned int ind, idbBool *isnull = 0,
-                                  idbStatus *status = 0) const;
-Person *retrievedChildrenAt(unsigned int ind, idbBool *isnull = 0,
-                            idbStatus *status = 0);
+const Person *retrievedChildrenAt(unsigned int ind, eyedb::Bool *isnull = 0,
+                                  eyedb::Status *status = 0) const;
+Person *retrievedChildrenAt(unsigned int ind, eyedb::Bool *isnull = 0,
+                            eyedb::Status *status = 0);
 \end{verbatim}
 \normalsize
 returns the \#\texttt{ind} element in the collection.
@@ -1568,7 +1568,7 @@ pertinent.
 \item
 \verbsize
 \begin{verbatim}
-idbOid retrievedChildrenOidAt(unsigned int ind, idbStatus *status = 0) const;
+eyedb::Oid retrievedChildrenOidAt(unsigned int ind, eyedb::Status *status = 0) const;
 \end{verbatim}
 \normalsize
 returns the \#\texttt{ind} oid in the collection.
@@ -1584,8 +1584,8 @@ For instance, for an attribute \texttt{int x[23][12]}, the selector methods
 becomes:
 \verbsize
 \begin{verbatim}
-  idb_int32 getX(unsigned int a0, unsigned int a1,
-                idbBool *isnull = 0, idbStatus *status = 0) const;
+  eyedb::_int32 getX(unsigned int a0, unsigned int a1,
+                eyedb::Bool *isnull = 0, eyedb::Status *status = 0) const;
 \end{verbatim}
 \normalsize
 A call to \texttt{getX(1, 3)} returns the attribute value \texttt{x[1][3]}.
@@ -1594,7 +1594,7 @@ If the left dimension is variable, for instance \texttt{int x[][12]},
 the following extra method is generated:
 \verbsize
 \begin{verbatim}
-  unsigned int getXCount(idbStatus * = 0) const;
+  unsigned int getXCount(eyedb::Status * = 0) const;
 \end{verbatim}
 \normalsize
 For instance,
@@ -1602,10 +1602,10 @@ for the \texttt{other\_addrs} literal user type attribute, the following
 code is generated:
 \verbsize
 \begin{verbatim}
-  Address *getOtherAddrs(unsigned int a0, idbBool *isnull = 0, idbStatus * = 0) ;
-  const Address *getOtherAddrs(unsigned int a0, idbBool *isnull = 0,
-                               idbStatus * = 0) const;
-  unsigned int getOtherAddrsCount(idbStatus * = 0) const;
+  Address *getOtherAddrs(unsigned int a0, eyedb::Bool *isnull = 0, eyedb::Status * = 0) ;
+  const Address *getOtherAddrs(unsigned int a0, eyedb::Bool *isnull = 0,
+                               eyedb::Status * = 0) const;
+  unsigned int getOtherAddrsCount(eyedb::Status * = 0) const;
 \end{verbatim}
 \normalsize
 % EXAMPLE OF  other_addrs
@@ -1614,10 +1614,10 @@ code is generated:
 %methods:
 %\verbsize
 %\begin{verbatim}
-%  Person *getChildrenAt(unsigned int a0, idbBool *isnull = 0, idbStatus * = 0) ;
-%  const Person *getChildrenAt(unsigned int a0, idbBool *isnull = 0, idbStatus * = 0) const;
-%  idbOid getChildrenOid(unsigned int a0, idbStatus * = 0);
-%  unsigned int getChildrenCount(idbStatus * = 0) const;
+%  Person *getChildrenAt(unsigned int a0, eyedb::Bool *isnull = 0, eyedb::Status * = 0) ;
+%  const Person *getChildrenAt(unsigned int a0, eyedb::Bool *isnull = 0, eyedb::Status * = 0) const;
+%  eyedb::Oid getChildrenOid(unsigned int a0, eyedb::Status * = 0);
+%  unsigned int getChildrenCount(eyedb::Status * = 0) const;
 %\end{verbatim}
 %\normalsize
 %The two first method returns the \texttt{children} object at position \#\texttt{a0}, while
@@ -1633,28 +1633,28 @@ as the modifier methods.
 The modifier method is under the form:
 \verbsize
 \begin{verbatim}
-idbStatus set<attribute name>(<attribute primitive type>);
+eyedb::Status set<attribute name>(<attribute primitive type>);
 \end{verbatim}
 \normalsize
 for instance for the \texttt{age} attribute:
 \verbsize
 \begin{verbatim}
-  idbStatus setAge(idb_int32);
+  eyedb::Status setAge(eyedb::_int32);
 \end{verbatim}
 \normalsize
 \subsubsect{Literal String}
 The modifier methods are under the form:
 \verbsize
 \begin{verbatim}
-  idbStatus set<attribute name>(const char *);
-  idbStatus set<attribute name>(unsigned int a0, char);
+  eyedb::Status set<attribute name>(const char *);
+  eyedb::Status set<attribute name>(unsigned int a0, char);
 \end{verbatim}
 \normalsize
 for instance for the \texttt{name} attribute:
 \verbsize
 \begin{verbatim}
-  idbStatus setName(const char *);
-  idbStatus setName(unsigned int a0, char);
+  eyedb::Status setName(const char *);
+  eyedb::Status setName(unsigned int a0, char);
 \end{verbatim}
 \normalsize
 
@@ -1662,13 +1662,13 @@ for instance for the \texttt{name} attribute:
 The modifier methods are under the form:
 \verbsize
 \begin{verbatim}
-idbStatus set<attribute name>(<attribute primitive type>*);
+eyedb::Status set<attribute name>(<attribute primitive type>*);
 \end{verbatim}
 \normalsize
 for instance for the \texttt{addr} attribute:
 \verbsize
 \begin{verbatim}
-  idbStatus setAddr(Address*);
+  eyedb::Status setAddr(Address*);
 \end{verbatim}
 \normalsize
 
@@ -1676,15 +1676,15 @@ for instance for the \texttt{addr} attribute:
 The modifier methods are under the form:
 \verbsize
 \begin{verbatim}
-idbStatus set<attribute name>(<attribute primitive type>*);
-idbStatus set<attribute name>Oid(const idbOid &);
+eyedb::Status set<attribute name>(<attribute primitive type>*);
+eyedb::Status set<attribute name>Oid(const eyedb::Oid &);
 \end{verbatim}
 \normalsize
 for instance for the \texttt{spouse} attribute:
 \verbsize
 \begin{verbatim}
-  idbStatus setSpouse(Person*);
-  idbStatus setSpouseOid(const idbOid &);
+  eyedb::Status setSpouse(Person*);
+  eyedb::Status setSpouseOid(const eyedb::Oid &);
 \end{verbatim}
 \normalsize
 
@@ -1692,20 +1692,20 @@ for instance for the \texttt{spouse} attribute:
 For unordered collection types, the modifier methods are under the form:
 \verbsize
 \begin{verbatim}
-  idbStatus set<attribute name>Coll(<collection type>*);
-  idbStatus set<attribute name>Oid(const idbOid &);
-  idbStatus addTo<attribute name>Coll(<collection object type>*,
+  eyedb::Status set<attribute name>Coll(<collection type>*);
+  eyedb::Status set<attribute name>Oid(const eyedb::Oid &);
+  eyedb::Status addTo<attribute name>Coll(<collection object type>*,
                                       unsigned int magorder = 0);
-  idbStatus rmvFrom<attribute name>Coll(<collection object type>*);
-  idbStatus addTo<attribute name>Coll(const idbOid &,
+  eyedb::Status rmvFrom<attribute name>Coll(<collection object type>*);
+  eyedb::Status addTo<attribute name>Coll(const eyedb::Oid &,
                                       unsigned int magorder = 0);
-  idbStatus rmvFrom<attribute name>Coll(const idbOid &);
+  eyedb::Status rmvFrom<attribute name>Coll(const eyedb::Oid &);
 \end{verbatim}
 \normalsize
 where $<$collection type$>$ can be:
 \be
-\item \texttt{idbCollSet} for a collection set
-\item \texttt{idbCollBag} for a collection bag
+\item \texttt{eyedb::CollSet} for a collection set
+\item \texttt{eyedb::CollBag} for a collection bag
 \ee
 and where $<$collection object type$>$ is the type which composing
 the collection.
@@ -1715,17 +1715,17 @@ Note that if the collection is not a literal but an object, the following
 extra method setting the collection oid is generated:
 \verbsize
 \begin{verbatim}
-  idbStatus set<attribute name>Oid(const idbOid &);
+  eyedb::Status set<attribute name>Oid(const eyedb::Oid &);
 \end{verbatim}
 \normalsize
 For the \texttt{cars} attribute, the following code is generated:
 \verbsize
 \begin{verbatim}
-  idbStatus setCarsColl(idbCollSet*);
-  idbStatus addToCarsColl(Car*, unsigned int magorder = 0);
-  idbStatus addToCarsColl(const idbOid &, unsigned int magorder = 0);
-  idbStatus rmvFromCarsColl(Car*);
-  idbStatus rmvFromCarsColl(const idbOid &);
+  eyedb::Status setCarsColl(eyedb::CollSet*);
+  eyedb::Status addToCarsColl(Car*, unsigned int magorder = 0);
+  eyedb::Status addToCarsColl(const eyedb::Oid &, unsigned int magorder = 0);
+  eyedb::Status rmvFromCarsColl(Car*);
+  eyedb::Status rmvFromCarsColl(const eyedb::Oid &);
 \end{verbatim}
 \normalsize
 Let have a look to each method:
@@ -1733,7 +1733,7 @@ Let have a look to each method:
 \item
 \verbsize
 \begin{verbatim}
-idbStatus setCarsColl(idbCollSet *coll);
+eyedb::Status setCarsColl(eyedb::CollSet *coll);
 \end{verbatim}
 \normalsize
 sets the \texttt{cars} attribute collection to the input argument
@@ -1741,7 +1741,7 @@ sets the \texttt{cars} attribute collection to the input argument
 \item
 \verbsize
 \begin{verbatim}
-idbStatus addToCarsColl(Car *car, unsigned int magorder = 0);
+eyedb::Status addToCarsColl(Car *car, unsigned int magorder = 0);
 \end{verbatim}
 \normalsize
 adds the \texttt{car} instance to the collection attribute \texttt{cars}.
@@ -1750,7 +1750,7 @@ using the \texttt{magorder} argument for its magnitude order value.
 \item
 \verbsize
 \begin{verbatim}
-idbStatus addToCarsColl(const idbOid &car_oid, unsigned int magorder = 0);
+eyedb::Status addToCarsColl(const eyedb::Oid &car_oid, unsigned int magorder = 0);
 \end{verbatim}
 \normalsize
 adds the instance of \texttt{Car} whose oid is \texttt{car\_oid}
@@ -1760,7 +1760,7 @@ using the \texttt{magorder} argument for its magnitude order value.
 \item
 \verbsize
 \begin{verbatim}
-idbStatus rmvFromCarsColl(Car *car);
+eyedb::Status rmvFromCarsColl(Car *car);
 \end{verbatim}
 \normalsize
 removes the \texttt{car} instance from the collection attribute \texttt{cars}.
@@ -1768,7 +1768,7 @@ If the instance is not found, an error is raised.
 \item
 \verbsize
 \begin{verbatim}
-idbStatus rmvFromCarsColl(const idbOid &car_oid);
+eyedb::Status rmvFromCarsColl(const eyedb::Oid &car_oid);
 \end{verbatim}
 \normalsize
 removes the instance of \texttt{Car} whose oid is \texttt{car\_oid}
@@ -1778,19 +1778,19 @@ If the instance is not found, an error is raised.
 For ordered collection types, the modifier methods are under the form:
 \verbsize
 \begin{verbatim}
-  idbStatus set<attribute name>Coll(<collection type>*);
-  idbStatus set<attribute name>Oid(const idbOid &);
-  idbStatus setIn<attribute name>CollAt(int where, <collection object type>*,
+  eyedb::Status set<attribute name>Coll(<collection type>*);
+  eyedb::Status set<attribute name>Oid(const eyedb::Oid &);
+  eyedb::Status setIn<attribute name>CollAt(int where, <collection object type>*,
                                         unsigned int magorder = 0);
-  idbStatus setIn<attribute name>CollAt(int where, const idbOid &,
+  eyedb::Status setIn<attribute name>CollAt(int where, const eyedb::Oid &,
                                         unsigned int magorder = 0);
-  idbStatus unsetIn<attribute name>CollAt(int where);
+  eyedb::Status unsetIn<attribute name>CollAt(int where);
 \end{verbatim}
 \normalsize
 where $<$collection type$>$ can be:
 \be
-\item \texttt{idbCollArray} for a collection array
-\item \texttt{idbCollList} for a collection list\\
+\item \texttt{eyedb::CollArray} for a collection array
+\item \texttt{eyedb::CollList} for a collection list\\
 \emph{Note that the collection list are currently not implemented in
 \eyedb}.
 \ee
@@ -1802,17 +1802,17 @@ Note that if the collection is not a literal but an object, the following
 extra method setting the collection oid is generated:
 \verbsize
 \begin{verbatim}
-  idbStatus set<attribute name>Oid(const idbOid &);
+  eyedb::Status set<attribute name>Oid(const eyedb::Oid &);
 \end{verbatim}
 \normalsize
 For the \texttt{children} attribute, the following code is generated:
 \verbsize
 \begin{verbatim}
-  idbStatus setChildrenColl(idbCollArray*);
-  idbStatus setChildrenOid(const idbOid &);
-  idbStatus setInChildrenCollAt(int where, Person*, unsigned int magorder = 0);
-  idbStatus unsetInChildrenCollAt(int where);
-  idbStatus setInChildrenCollAt(int where, const idbOid &,
+  eyedb::Status setChildrenColl(eyedb::CollArray*);
+  eyedb::Status setChildrenOid(const eyedb::Oid &);
+  eyedb::Status setInChildrenCollAt(int where, Person*, unsigned int magorder = 0);
+  eyedb::Status unsetInChildrenCollAt(int where);
+  eyedb::Status setInChildrenCollAt(int where, const eyedb::Oid &,
                                 unsigned int magorder = 0);
 \end{verbatim}
 \normalsize
@@ -1821,7 +1821,7 @@ Let have a look to each method:
 \item
 \verbsize
 \begin{verbatim}
-idbStatus setChildrenColl(idbCollSet *coll);
+eyedb::Status setChildrenColl(eyedb::CollSet *coll);
 \end{verbatim}
 \normalsize
 sets the \texttt{children} attribute collection to the input argument
@@ -1829,7 +1829,7 @@ sets the \texttt{children} attribute collection to the input argument
 \item
 \verbsize
 \begin{verbatim}
-idbStatus setInChildrenCollAt(int where, Person *person,
+eyedb::Status setInChildrenCollAt(int where, Person *person,
                               unsigned int magorder = 0);
 \end{verbatim}
 \normalsize
@@ -1839,7 +1839,7 @@ using the \texttt{magorder} argument for its magnitude order value.
 \item
 \verbsize
 \begin{verbatim}
-idbStatus setInChildrenCollAt(int where, const idbOid &person_oid,
+eyedb::Status setInChildrenCollAt(int where, const eyedb::Oid &person_oid,
                               unsigned int magorder = 0);
 \end{verbatim}
 \normalsize
@@ -1850,7 +1850,7 @@ using the \texttt{magorder} argument for its magnitude order value.
 \item
 \verbsize
 \begin{verbatim}
-idbStatus unsetInChildrenCollAt(int where);
+eyedb::Status unsetInChildrenCollAt(int where);
 \end{verbatim}
 \normalsize
 removes the instance found at position \texttt{where}
@@ -1865,7 +1865,7 @@ For instance, for an attribute \texttt{int x[32][64]}, the modifier methods
 becomes:
 \verbsize
 \begin{verbatim}
-  idbStatus setX(unsigned int a0, unsigned int a1, idb_int32);
+  eyedb::Status setX(unsigned int a0, unsigned int a1, eyedb::_int32);
 \end{verbatim}
 \normalsize
 A call to \texttt{setX(2, 24)} sets the attribute value \texttt{x[2][24]}.
@@ -1876,8 +1876,8 @@ for the \texttt{other\_addrs} literal user type attribute, the following
 code is generated:
 \verbsize
 \begin{verbatim}
-  idbStatus setOtherAddrs(unsigned int a0, Address *);
-  idbStatus setOtherAddrsCount(unsigned int count);
+  eyedb::Status setOtherAddrs(unsigned int a0, Address *);
+  eyedb::Status setOtherAddrsCount(unsigned int count);
 \end{verbatim}
 \normalsize
 \subsubsect{Methods mapped from ODL methods}
@@ -1887,11 +1887,11 @@ the same name and the corresponding type.
 The generated methods in our example is as follows:
 \verbsize
 \begin{verbatim}
-  virtual idbStatus change_address(const char * street, const char * town,
+  virtual eyedb::Status change_address(const char * street, const char * town,
                                    char * &oldstreet, char * &oldtown,
-                                   idb_int32 &retarg);
+                                   eyedb::_int32 &retarg);
 
-  static idbStatus getPersonCount(idbDatabase *db, idb_int32 &retarg);
+  static eyedb::Status getPersonCount(eyedb::Database *db, eyedb::_int32 &retarg);
 \end{verbatim}
 \normalsize
 
@@ -1907,11 +1907,11 @@ is as follows (using our example):
 int
 main(int argc, char *argv[])
 {
-  EyeDB::init(argc, argv);
+  eyedb::init(argc, argv);
   person::init();
   // ...
   person::release();
-  EyeDB::release();
+  eyedb::release();
   return 0;
 }
 \end{verbatim}
@@ -1924,7 +1924,7 @@ includes the generic \eyedb API.
 \texttt{init} method of the class \texttt{EyeDB}.
 \item the generated C++ layer must be initialized using the static method
 \texttt{init} of the class \emph{package}.
-\item the last statements \texttt{person::release()} and \texttt{EyeDB::release()}
+\item the last statements \texttt{person::release()} and \texttt{eyedb::release()}
 allow you to release all the allocated resources and to close opened databases
 and connections.
 \\
@@ -1940,13 +1940,13 @@ C++ database class to open a database with the template schema.
 For instance:
 \verbsize
 \begin{verbatim}
-  idbConnection conn;
+  eyedb::Connection conn;
   conn.open();
 
   const char *dbname = argv[1];
 
   person::Database db(dbname);
-  db.open(&conn, idbDatabase::DBRW);
+  db.open(&conn, eyedb::Database::DBRW);
 \end{verbatim}
 \normalsize
 %% Topics to introduce:
@@ -1959,20 +1959,20 @@ For instance:
 %%     -> the main methods for each class family
 %%  - transactions
 %%  - creating and updating objects
-%%     -> idbRecMode
-%%     -> idbDatabase::storeOnCommit(), xxxRegister(), storeObjects()
+%%     -> eyedb::RecMode
+%%     -> eyedb::Database::storeOnCommit(), xxxRegister(), storeObjects()
 %%  - loading objects
-%%     -> idbRecMode
+%%     -> eyedb::RecMode
 %%  - removing objects
-%%     -> idbRecMode
+%%     -> eyedb::RecMode
 %%  - cache management
-%%     -> first level cache => mechanisms + idbDatabase::xxxx
+%%     -> first level cache => mechanisms + eyedb::Database::xxxx
 %%     -> schema-oriented second level 
 %%  - schema-oriented calling methods
 %%  - collections: all the methods
-%%  - complex queries: idbValue
-%%  - schema && class manipulation: idbClass, idbAttribute, idbSchema
-%%  - schema generation: idbSchema::genXXX()
+%%  - complex queries: eyedb::Value
+%%  - schema && class manipulation: eyedb::Class, eyedb::Attribute, eyedb::Schema
+%%  - schema generation: eyedb::Schema::genXXX()
 %%  - memory management
 %%  - error management
 
@@ -2019,7 +2019,7 @@ atoms.
 int
 main(int argc, char *argv[])
 {
-  EyeDB::init(argc, argv);
+  eyedb::init(argc, argv);
 
   if (argc != 3)
     {
@@ -2028,34 +2028,34 @@ main(int argc, char *argv[])
     }
 
   // set the error policy to the exception mode
-  idbException::setMode(idbException::ExceptionMode);
+  eyedb::Exception::setMode(eyedb::Exception::ExceptionMode);
 
   try {
-    idbConnection conn;
+    eyedb::Connection conn;
     // connecting to the EyeDB server
     conn.open();
 
-    idbDatabase db(argv[1]);
+    eyedb::Database db(argv[1]);
 
     // opening database argv[1]
-    db.open(&conn, idbDatabase::DBRW);
+    db.open(&conn, eyedb::Database::DBRW);
 
     // beginning a transaction
     db.transactionBegin();
 
     // performing the OQL query argv[2]
-    idbOQL q(&db, argv[2]);
+    eyedb::OQL q(&db, argv[2]);
 
-    idbValueArray arr;
+    eyedb::ValueArray arr;
     q.execute(arr);
 
     // for each value returned in the query, display it:
     for (int i = 0; i < arr.getCount(); i++)
       {
         // in case of the returned value is an oid, load it first:
-        if (arr[i].type == idbValue::OID)
+        if (arr[i].type == eyedb::Value::OID)
           {
-            idbObject *o;
+            eyedb::Object *o;
             db.loadObject(arr[i].oid, &o);
             cout << o;
             o->release();
@@ -2068,13 +2068,13 @@ main(int argc, char *argv[])
     db.transactionCommit();
   }
 
-  catch(idbException &e) {
+  catch(eyedb::Exception &e) {
     cerr << argv[0] << ": " << e;
-    EyeDB::release();
+    eyedb::release();
     return 1;
   }
 
-  EyeDB::release();
+  eyedb::release();
 
   return 0;
 }
@@ -2095,7 +2095,7 @@ creates a new instance of person using the given name and age.
 int
 main(int argc, char *argv[])
 {
-  EyeDB::init(argc, argv);
+  eyedb::init(argc, argv);
 
   if (argc != 4)
     {
@@ -2105,51 +2105,51 @@ main(int argc, char *argv[])
     }
 
   // set the error policy to the exception mode
-  idbException::setMode(idbException::ExceptionMode);
+  eyedb::Exception::setMode(eyedb::Exception::ExceptionMode);
 
   try {
-    idbConnection conn;
+    eyedb::Connection conn;
     // connecting to the EyeDB server
     conn.open();
 
-    idbDatabase db(argv[1]);
+    eyedb::Database db(argv[1]);
 
     // opening database argv[1]
-    db.open(&conn, idbDatabase::DBRW);
+    db.open(&conn, eyedb::Database::DBRW);
 
     // beginning a transaction
     db.transactionBegin();
 
     // looking for class 'Person'
-    idbClass *personClass = db.getSchema()->getClass("Person");
+    eyedb::Class *personClass = db.getSchema()->getClass("Person");
 
     // looking for the attribute 'name' and 'age' in the class 'Person'
-    const idbAttribute *name_attr = personClass->getAttribute("name");
-    const idbAttribute *age_attr = personClass->getAttribute("age");
+    const eyedb::Attribute *name_attr = personClass->getAttribute("name");
+    const eyedb::Attribute *age_attr = personClass->getAttribute("age");
 
     // instanciating a 'Person' object
-    idbObject *p = personClass->newObj(&db);
+    eyedb::Object *p = personClass->newObj(&db);
 
     // setting the name argv[2] to the new Person instance
     name_attr->setSize(p, strlen(argv[2])+1);
-    name_attr->setValue(p, (idbData)argv[2], strlen(argv[2])+1, 0);
+    name_attr->setValue(p, (eyedb::Data)argv[2], strlen(argv[2])+1, 0);
 
     // setting the age argv[3] to the new Person instance
     int age = atoi(argv[3]);
-    age_attr->setValue(p, (idbData)&age, 1, 0);
+    age_attr->setValue(p, (eyedb::Data)&age, 1, 0);
     p->store();
 
     // committing the transaction
     db.transactionCommit();
   }
 
-  catch(idbException &e) {
+  catch(eyedb::Exception &e) {
     cerr << e;
-    EyeDB::release();
+    eyedb::release();
     return 1;
   }
 
-  EyeDB::release();
+  eyedb::release();
 
   return 0;
 }
@@ -2172,7 +2172,7 @@ atoms.
 int
 main(int argc, char *argv[])
 {
-  EyeDB::init(argc, argv);
+  eyedb::init(argc, argv);
   person::init();
 
   if (argc != 3)
@@ -2182,24 +2182,24 @@ main(int argc, char *argv[])
     }
 
   // set the error policy to the exception mode
-  idbException::setMode(idbException::ExceptionMode);
+  eyedb::Exception::setMode(eyedb::Exception::ExceptionMode);
 
   try {
-    idbConnection conn;
+    eyedb::Connection conn;
     // connecting to the EyeDB server
     conn.open();
 
     // opening database argv[1] using 'personDatabase' class
     personDatabase db(argv[1]);
-    db.open(&conn, idbDatabase::DBRW);
+    db.open(&conn, eyedb::Database::DBRW);
 
     // beginning a transaction
     db.transactionBegin();
 
     // performing the OQL query argv[2]
-    idbOQL q(&db, argv[2]);
+    eyedb::OQL q(&db, argv[2]);
 
-    idbObjectArray arr;
+    eyedb::ObjectArray arr;
     q.execute(arr);
 
     // for each Person returned in the query, display its name and age,
@@ -2239,13 +2239,13 @@ main(int argc, char *argv[])
     db.transactionCommit();
   }
 
-  catch(idbException &e) {
+  catch(eyedb::Exception &e) {
     cerr << argv[0] << ": " << e;
-    EyeDB::release();
+    eyedb::release();
     return 1;
   }
 
-  EyeDB::release();
+  eyedb::release();
 
   return 0;
 }
@@ -2270,7 +2270,7 @@ int
 main(int argc, char *argv[])
 {
   // initializing the EyeDB layer
-  EyeDB::init(argc, argv);
+  eyedb::init(argc, argv);
 
   // initializing the person package
   person::init();
@@ -2288,25 +2288,25 @@ main(int argc, char *argv[])
   const char *spouse_name = argv[4];
 
   // set the error policy to the exception mode
-  idbException::setMode(idbException::ExceptionMode);
+  eyedb::Exception::setMode(eyedb::Exception::ExceptionMode);
 
   try {
-    idbConnection conn;
+    eyedb::Connection conn;
 
     // connecting to the EyeDB server
     conn.open();
 
     // opening database dbname using 'personDatabase' class
     personDatabase db(dbname);
-    db.open(&conn, idbDatabase::DBRW);
+    db.open(&conn, eyedb::Database::DBRW);
 
     // beginning a transaction
     db.transactionBegin();
 
     // first looking for spouse
-    idbOQL q(&db, "select Person.name = \"%s\"", spouse_name);
+    eyedb::OQL q(&db, "select Person.name = \"%s\"", spouse_name);
 
-    idbObjectArray arr;
+    eyedb::ObjectArray arr;
     q.execute(arr);
 
     // if not found, returns an error
@@ -2359,13 +2359,13 @@ main(int argc, char *argv[])
       {
         Person *c = new Person(&db);
         c->setAge(i);
-        c->setName(idbString(name) + "_" + (long)i);
+        c->setName(eyedb::String(name) + "_" + (long)i);
         p->setInChildrenCollAt(i, c);
         c->release();
       }
 
     // storing all in database
-    p->store(idbRecMode::FullRecurs);
+    p->store(eyedb::RecMode::FullRecurs);
 
     // committing the transaction
     db.transactionCommit();
@@ -2374,14 +2374,14 @@ main(int argc, char *argv[])
     p->release();
   }
 
-  catch(idbException &e) {
+  catch(eyedb::Exception &e) {
     cerr << argv[0] << ": " << e;
-    EyeDB::release();
+    eyedb::release();
     return 1;
   }
 
   // releasing the EyeDB layer: this is not mandatory
-  EyeDB::release();
+  eyedb::release();
 
   return 0;
 }
@@ -2407,16 +2407,16 @@ the user access information.
 
 // this function returns the mode name
 static const char *
-get_string_mode(idbDBAccessMode mode)
+get_string_mode(eyedb::DBAccessMode mode)
 {
-  if (mode == idbNoDBAccessMode)            return "idbNoDBAccessMode";
-  if (mode == idbReadDBAccessMode)          return "idbReadDBAccessMode";
-  if (mode == idbWriteDBAccessMode)         return "idbWriteDBAccessMode";
-  if (mode == idbExecDBAccessMode)          return "idbExecDBAccessMode";
-  if (mode == idbReadWriteDBAccessMode)     return "idbReadWriteDBAccessMode";
-  if (mode == idbReadExecDBAccessMode)      return "idbReadExecDBAccessMode";
-  if (mode == idbReadWriteExecDBAccessMode) return "idbReadWriteExecDBAccessMode";
-  if (mode == idbAdminDBAccessMode)         return "idbAdminDBAccessMode";
+  if (mode == eyedb::NoDBAccessMode)            return "eyedb::NoDBAccessMode";
+  if (mode == eyedb::ReadDBAccessMode)          return "eyedb::ReadDBAccessMode";
+  if (mode == eyedb::WriteDBAccessMode)         return "eyedb::WriteDBAccessMode";
+  if (mode == eyedb::ExecDBAccessMode)          return "eyedb::ExecDBAccessMode";
+  if (mode == eyedb::ReadWriteDBAccessMode)     return "eyedb::ReadWriteDBAccessMode";
+  if (mode == eyedb::ReadExecDBAccessMode)      return "eyedb::ReadExecDBAccessMode";
+  if (mode == eyedb::ReadWriteExecDBAccessMode) return "eyedb::ReadWriteExecDBAccessMode";
+  if (mode == eyedb::AdminDBAccessMode)         return "eyedb::AdminDBAccessMode";
 
   return NULL;
 }
@@ -2424,20 +2424,20 @@ get_string_mode(idbDBAccessMode mode)
 int
 main(int argc, char *argv[])
 {
-  EyeDB::init(argc, argv);
+  eyedb::init(argc, argv);
 
   // set the error policy to the exception mode
-  idbException::setMode(idbException::ExceptionMode);
+  eyedb::Exception::setMode(eyedb::Exception::ExceptionMode);
 
   try {
-    idbConnection conn;
+    eyedb::Connection conn;
 
     // connecting to the EyeDB server
     conn.open();
 
     // opening the database EYEDBDBM using 'dbmDatabase' class
     dbmDatabase db("EYEDBDBM");
-    db.open(&conn, idbDatabase::DBRead);
+    db.open(&conn, eyedb::Database::DBRead);
 
     // beginning a transaction
     db.transactionBegin();
@@ -2446,44 +2446,44 @@ main(int argc, char *argv[])
     cout << db.getSchema() << endl;
 
     // looking for all user
-    idbOQL q_user(&db, "select idbUser");
+    eyedb::OQL q_user(&db, "select user");
 
-    idbObjectArray user_arr;
+    eyedb::ObjectArray user_arr;
     q_user.execute(user_arr);
 
     cout << "User List {" << endl;
     for (int i = 0; i < user_arr.getCount(); i++)
       {
-        idbUser *user = (idbUser *)user_arr[i];
+        eyedb::User *user = (eyedb::User *)user_arr[i];
         cout << "\t" << user->name() << endl;
       }
     cout << "}\n" << endl;
 
     // looking for all database entry
-    idbOQL q_db(&db, "select idbDBEntry");
+    eyedb::OQL q_db(&db, "select database_entry");
 
-    idbObjectArray db_arr;
+    eyedb::ObjectArray db_arr;
     q_db.execute(db_arr);
 
     cout << "Database List {" << endl;
 
     for (i = 0; i < db_arr.getCount(); i++)
       {
-        idbDBEntry *dbentry = (idbDBEntry *)db_arr[i];
+        eyedb::DBEntry *dbentry = (eyedb::DBEntry *)db_arr[i];
         cout << "\t" << dbentry->dbname() << " -> " << dbentry->dbfile() << endl;
         // looking for all user which has any permission on this
         // database
-        idbOQL q_useraccess(&db,
-                            "select idbDBUserAccess->dbentry->dbname = \"%s\"",
+        eyedb::OQL q_useraccess(&db,
+                            "select database_user_access->dbentry->dbname = \"%s\"",
                             dbentry->dbname());
-        idbObjectArray useraccess_arr;
+        eyedb::ObjectArray useraccess_arr;
         q_useraccess.execute(useraccess_arr);
         if (useraccess_arr.getCount())
           {
             cout << "\tUser Access {" << endl;
             for (int j = 0; j < useraccess_arr.getCount(); j++)
               {
-                idbDBUserAccess *ua = (idbDBUserAccess *)useraccess_arr[j];
+                eyedb::DBUserAccess *ua = (eyedb::DBUserAccess *)useraccess_arr[j];
                 cout << "\t\t" << ua->user()->name() << " -> " <<
                   get_string_mode(ua->mode()) << endl;
               }
@@ -2500,14 +2500,14 @@ main(int argc, char *argv[])
     user_arr.garbage();
   }
 
-  catch(idbException &e) {
+  catch(eyedb::Exception &e) {
     cerr << argv[0] << ": " << e;
-    EyeDB::release();
+    eyedb::release();
     return 1;
   }
 
   // releasing the EyeDB layer: this is not mandatory
-  EyeDB::release();
+  eyedb::release();
 
   return 0;
 }
