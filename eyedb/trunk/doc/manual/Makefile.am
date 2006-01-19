@@ -47,8 +47,6 @@ LATEX2HTMLFLAGS=-toc_depth 6 -top_navigation -verbosity 0 -no_images -local_icon
 $(PDF_PREFIX)%.pdf: %.ps
 	$(PS2PDF) $(PS2PDFFLAGS) $< $@
 
-GettingStarted.dvi: start.tex version.tex title.tex
-
 html/%.html: %.tex
 	-test ! -d html && mkdir html
 	$(LATEX2HTML) $(LATEX2HTMLFLAGS) -split +2 -prefix $* $*.tex
@@ -56,6 +54,22 @@ html/%.html: %.tex
 html/OQL.html: OQL.tex
 	-test ! -d html && mkdir html
 	$(LATEX2HTML) $(LATEX2HTMLFLAGS) -split +3 -prefix OQL OQL.tex
+
+Administration.dvi: start.tex version.tex title.tex
+CplusplusBinding.dvi: start.tex version.tex title.tex
+GettingStarted.dvi: start.tex version.tex title.tex
+JavaBinding.dvi: start.tex version.tex title.tex
+ODL.dvi: start.tex version.tex title.tex
+OQL.dvi: start.tex version.tex title.tex
+Overview.dvi: start.tex version.tex title.tex
+
+html/Administration.html: start.tex version.tex title.tex
+html/CplusplusBinding.html: start.tex version.tex title.tex
+html/GettingStarted.html: start.tex version.tex title.tex
+html/JavaBinding.html: start.tex version.tex title.tex
+html/ODL.html: start.tex version.tex title.tex
+html/OQL.html: start.tex version.tex title.tex
+html/Overview.html: start.tex version.tex title.tex
 
 clean-local:
 	rm -f *.pdf *.ps *.dvi *.aux *.idx *.log *.toc
