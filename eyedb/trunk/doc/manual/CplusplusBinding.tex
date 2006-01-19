@@ -291,7 +291,7 @@ not be performed; only the commit at level 0 will be performed.
 One can give parameters to the transaction that one begins by setting an
 optional argument of type \texttt{eyedb::TransactionParams} to the
 \texttt{transactionBegin} method. The \texttt{TransactionParams} type is
-composed of :
+composed of the following public attributes :
 \be
 \item the \texttt{trsmode} argument controls the transaction mode,
 \item the \texttt{lockmode} argument controls the object lock policy,
@@ -303,6 +303,15 @@ ratioalrt != 0 and trans object number > ratioalrt * magorder
 \item the \texttt{wait\_timeout} argument controls 
 wait timeout value.
 \ee
+For instance :
+\begin{verbatim}
+ TransactionParams params; // create params with default values
+ params.lockmode = eyedb::ReadNWriteX; // objects are not locked for reading
+                                       // and locked exclusive for writing
+ params.magorder = 100000000; // transaction can deal with about
+                              // 100 millions of objects
+ db.transactionBegin(params);
+\end{verbatim}
 Refer to the reference manual to get more information about these arguments.
 
 \subsect{Schema and Class Manipulation}
@@ -896,62 +905,57 @@ and the \texttt{eyedbodl} tool.
 To generate a schema-oriented C++ API, the minimal \texttt{eyedbodl} invocation
 is as follows:
 \begin{verbatim}
-eyedbodl -gencode C++ -package <name> <odlfile>
+eyedbodl --gencode=C++ <odlfile>
 \end{verbatim}
 or
 \begin{verbatim}
-eyedbodl -gencode C++ -package <name> -db <database>
+eyedbodl --gencode=C++ -d <database>
 \end{verbatim}
 For instance, to generate the schema-oriented C++ API for the \texttt{person.odl}
 schema:
 \begin{verbatim}
-eyedbodl -gencode C++ -package person person.odl
+eyedbodl --gencode=C++ person.odl
 \end{verbatim}
 The \texttt{eyedbodl} tool contains a lot of command line options to
 control the generated code.
 \\
 \\
-There are two mandatory options:
-\begin{tabbing}
-\texttt{-output-file-prefix} \emph{prefix} \= : \= ouput file prefix (default is the package name)\kill
-\texttt{-package} \emph{package}     \> : \> package name\\
-\emph{odlfile}\texttt{|}-\texttt{|}-db \emph{dbname}    \> : \> input ODL file (- is the standard input) or\\
-\>                          \> the database which contains the schema \\
-\end{tabbing}
+There are two mandatory options:\\
+\emph{odlfile}\texttt{|}-\texttt{|}\texttt{-d} \emph{dbname}\texttt{|}\texttt{--database=}\emph{dbname} : Input ODL file (or - for standard input) or the database name\\
 and some optionnal options:
 \begin{tabbing}
-\texttt{-output-file-prefix} \emph{prefix} \= : \= ouput file prefix (default is the package name)\kill
-
-\texttt{-output-dir} \emph{dirname}       \> : \> output directory for generated files\\
-\texttt{-output-file-prefix} \emph{prefix}\> : \> ouput file prefix (default is the package name)\\
-\texttt{-class-prefix} \emph{prefix}      \> : \> prefix to be put at the begining of each runtime class\\
-\texttt{-db-class-prefix} \emph{prefix}   \> : \> prefix to be put at the begining of each database class\\
-\texttt{-attr-style implicit}        \> : \> attribute methods have the attribute name\\
-\texttt{-attr-style explicit}        \> : \> attribute methods have the attribute name prefixed by\\
-                              \> \>get/set (default)\\
-\texttt{-schema-name} \emph{schname}      \> : \> schema name (default is \emph{package})\\
-\texttt{-down-casting yes}           \> : \> generates the down casting methods (the default)\\
-\texttt{-down-casting no}            \> : \> does not generate the down casting methods\\
-\texttt{-attr-cache yes}             \> : \> use a second level cache for attribute value\\
-\texttt{-attr-cache no}              \> : \> does not use a second level cache for attribute value (the default)\\
-\texttt{-c-suffix} \emph{suffix}          \> : \> use \emph{suffix} as the C file suffix\\
-\texttt{-h-suffix} \emph{suffix}          \> : \> use \emph{suffix} as the H file suffix\\
-\texttt{-gen-class-stubs}            \> : \> generates a file class\_stubs.h for each class\\
-\texttt{-class-enums yes}            \> : \> generates enums within a class\\
-\texttt{-class-enums no}             \> : \> do not generate enums within a class (default)\\
-\texttt{-error-policy status}        \> : \> status oriented error policy (the default)\\
-\texttt{-error-policy exception}     \> : \> exception oriented error policy\\
-\texttt{-rootclass} \emph{rootclass}      \> : \> use \emph{rootclass} name for the root class instead\\
-\>  \> of the package name.\\
-\texttt{-no-rootclass}               \> : \> does not use any root class\\
+\texttt{--gencode-error-policy=exception} \= : \= Exception oriented error policy\kill
+\texttt{--package=}\emph{package}          \> : \> Package name\\
+\texttt{--output-dir=}\emph{dirname}       \> : \> Output directory for generated files\\
+\texttt{--output-file-prefix=}\emph{prefix}\> : \> Ouput file prefix (default is the package name)\\
+\texttt{--class-prefix=}\emph{prefix}     \> : \>  Prefix to be put at the begining of each runtime class\\
+\texttt{--db-class-prefix=}\emph{prefix}  \> : \>  Prefix to be put at the begining of each database class\\
+\texttt{--attr-style=}implicit       \> : \>  Attribute methods have the attribute name\\
+\texttt{--attr-style=}explicit       \> : \>  Attribute methods have the attribute name prefixed by get/set (default)\\
+\texttt{--schema-name=}\emph{schname}     \> : \>  Schema name (default is \emph{package})\\
+\texttt{--export}                    \> : \>  Export class instances in the .h file\\
+\texttt{--dynamic-attr}              \> : \>  Uses a dynamic fetch for attributes in the get and set methods\\
+\texttt{--down-casting=yes}          \> : \>  Generates the down casting methods (the default)\\
+\texttt{--down-casting=no}           \> : \>  Does not generate the down casting methods\\
+\texttt{--attr-cache=yes}            \> : \>  Use a second level cache for attribute value\\
+\texttt{--attr-cache=no}             \> : \>  Does not use a second level cache for attribute value (the default)\\
+\texttt{--namespace=}\emph{namespace}     \> : \>  Define classes with the namespace \emph{namespace}\\
+\texttt{--c-suffix=}\emph{suffix}         \> : \>  Use \emph{suffix} as the C file suffix\\
+\texttt{--h-suffix=}\emph{suffix}         \> : \>  Use \emph{suffix} as the H file suffix\\
+\texttt{--gen-class-stubs}           \> : \>  Generates a file class\_stubs.h for each class\\
+\texttt{--class-enums=yes}           \> : \>  Generates enums within a class\\
+\texttt{--class-enums=no}            \> : \>  Do not generate enums within a class (default)\\
+\texttt{--gencode-error-policy=status}\> : \> Status oriented error policy (the default)\\
+\texttt{--gencode-error-policy=exception} \> : \> Exception oriented error policy\\
+\texttt{--rootclass=}\emph{rootclass}     \> : \>  Use \emph{rootclass} name for the root class instead of the package name\\
+\texttt{--no-rootclass}           \> : \>     Does not use any root class\\
 \end{tabbing}
 For instance to generate a schema-oriented C++ API in the directory
 \texttt{tmp}, prefixing the runtime classes with \texttt{pp},
-using a second level attribute value cache for runtime efficiency, suffixing
-C++ files with \texttt{.cpp}, we invoke \texttt{eyedbodl} as follows:
+suffixing C++ files with \texttt{.cpp}, we invoke \texttt{eyedbodl} as follows:
 \begin{verbatim}
-eyedbodl -gencode C++ -package person -output-dir tmp \
--class-prefix pp -c-suffix .cpp -attr-cache yes person.odl
+eyedbodl --gencode C++ --output-dir=tmp --class-prefix=pp \
+         --c-suffix=.cpp person.odl
 \end{verbatim}
 \subsect{The Generated Code}
 Seven files are generated:
@@ -1355,7 +1359,7 @@ The selector methods are under the form:
   <attribute primitive type>* get<attribute name>(eyedb::Bool *isnull = 0,
                                                   eyedb::Status *status = 0)
   const <attribute primitive type>* get<attribute name>(eyedb::Bool *isnull = 0,
-                                                  eyedb::Status *status = 0) const
+                                                        eyedb::Status *status = 0) const
 \end{verbatim}
 \normalsize
 for instance for the \texttt{addr} attribute:
@@ -1374,7 +1378,7 @@ The selector methods are under the form:
   <attribute primitive type>* get<attribute name>(eyedb::Bool *isnull = 0,
                                                   eyedb::Status *status = 0)
   const <attribute primitive type>* get<attribute name>(eyedb::Bool *isnull = 0,
-                                                  eyedb::Status *status = 0) const
+                                                        eyedb::Status *status = 0) const
 \end{verbatim}
 \normalsize
 for instance for the \texttt{spouse} attribute:
@@ -1409,14 +1413,16 @@ For the not ordered collections, the selector method are as follows:
   unsigned int get<attribute name>Count(eyedb::Bool *isnull = 0,
                                         eyedb::Status *status = 0) const;
   const <collection type>* get<attribute name>Coll(eyedb::Bool *isnull = 0,
-                                              eyedb::Status *status = 0) const;
+                                                   eyedb::Status *status = 0) const;
   eyedb::Oid get<attribute name>Oid(eyedb::Status *status = 0);
   const <collection object type>* get<attribute name>At(unsigned int ind,
-                       eyedb::Bool *isnull = 0, eyedb::Status *status = 0) const;
+                                                        eyedb::Bool *isnull = 0,
+                                                        eyedb::Status *status = 0) const;
   <collection object type>* get<attribute name>At(unsigned int ind,
-                              eyedb::Bool *isnull = 0, eyedb::Status *status = 0);
+                                                  eyedb::Bool *isnull = 0,
+                                                  eyedb::Status *status = 0);
   eyedb::Oid get<attribute name>OidAt(unsigned int ind,
-                        eyedb::Status *status = 0) const;
+                                      eyedb::Status *status = 0) const;
 \end{verbatim}
 \normalsize
 where \texttt{<collection type>} can be:
@@ -1496,14 +1502,16 @@ For the ordered collections, the selector method are as follows:
   unsigned int get<attribute name>Count(eyedb::Bool *isnull = 0,
                                         eyedb::Status *status = 0) const;
   const <collection type>* get<attribute name>Coll(eyedb::Bool *isnull = 0,
-                                              eyedb::Status *status = 0) const;
+                                                   eyedb::Status *status = 0) const;
   eyedb::Oid get<attribute name>Oid(eyedb::Status *status = 0);
   const <collection object type>* retrieve<attribute name>At(unsigned int ind,
-                       eyedb::Bool *isnull = 0, eyedb::Status *status = 0) const;
+                                                             eyedb::Bool *isnull = 0,
+                                                             eyedb::Status *status = 0) const;
   <collection object type>* retrieve<attribute name>At(unsigned int ind,
-                              eyedb::Bool *isnull = 0, eyedb::Status *status = 0);
+                                                       eyedb::Bool *isnull = 0,
+                                                       eyedb::Status *status = 0);
   eyedb::Oid retrieve<attribute name>OidAt(unsigned int ind,
-                                       eyedb::Status *status = 0) const;
+                                           eyedb::Status *status = 0) const;
 \end{verbatim}
 \normalsize
 where \texttt{<collection type>} can be:
@@ -1531,9 +1539,9 @@ For the \texttt{children} attribute the following code is generated:
   unsigned int getChildrenCount(eyedb::Bool *isnull = 0, eyedb::Status *status = 0) const;
   const eyedb::CollArray *getChildrenColl(eyedb::Bool *isnull = 0, eyedb::Status *status = 0) const;
   const Person *retrieveChildrenAt(unsigned int ind, eyedb::Bool *isnull = 0,
-                                     eyedb::Status *status = 0) const;
+                                   eyedb::Status *status = 0) const;
   Person *retrieveChildrenAt(unsigned int ind, eyedb::Bool *isnull = 0,
-                            eyedb::Status *status = 0);
+                             eyedb::Status *status = 0);
   eyedb::Oid retrievedChildrenOidAt(unsigned int ind, eyedb::Status *status = 0) const;
 \end{verbatim}
 \normalsize
@@ -1572,7 +1580,7 @@ becomes:
 \verbsize
 \begin{verbatim}
   eyedb::_int32 getX(unsigned int a0, unsigned int a1,
-                eyedb::Bool *isnull = 0, eyedb::Status *status = 0) const;
+                     eyedb::Bool *isnull = 0, eyedb::Status *status = 0) const;
 \end{verbatim}
 \normalsize
 A call to \texttt{getX(1, 3)} returns the attribute value \texttt{x[1][3]}.
@@ -1682,10 +1690,10 @@ For unordered collection types, the modifier methods are under the form:
   eyedb::Status set<attribute name>Coll(<collection type>*);
   eyedb::Status set<attribute name>Oid(const eyedb::Oid &);
   eyedb::Status addTo<attribute name>Coll(<collection object type>*,
-                                      unsigned int magorder = 0);
+                                          unsigned int magorder = 0);
   eyedb::Status rmvFrom<attribute name>Coll(<collection object type>*);
   eyedb::Status addTo<attribute name>Coll(const eyedb::Oid &,
-                                      unsigned int magorder = 0);
+                                          unsigned int magorder = 0);
   eyedb::Status rmvFrom<attribute name>Coll(const eyedb::Oid &);
 \end{verbatim}
 \normalsize
@@ -1768,9 +1776,9 @@ For ordered collection types, the modifier methods are under the form:
   eyedb::Status set<attribute name>Coll(<collection type>*);
   eyedb::Status set<attribute name>Oid(const eyedb::Oid &);
   eyedb::Status setIn<attribute name>CollAt(int where, <collection object type>*,
-                                        unsigned int magorder = 0);
+                                            unsigned int magorder = 0);
   eyedb::Status setIn<attribute name>CollAt(int where, const eyedb::Oid &,
-                                        unsigned int magorder = 0);
+                                            unsigned int magorder = 0);
   eyedb::Status unsetIn<attribute name>CollAt(int where);
 \end{verbatim}
 \normalsize
@@ -1800,7 +1808,7 @@ For the \texttt{children} attribute, the following code is generated:
   eyedb::Status setInChildrenCollAt(int where, Person*, unsigned int magorder = 0);
   eyedb::Status unsetInChildrenCollAt(int where);
   eyedb::Status setInChildrenCollAt(int where, const eyedb::Oid &,
-                                unsigned int magorder = 0);
+                                    unsigned int magorder = 0);
 \end{verbatim}
 \normalsize
 Let have a look to each method:
@@ -1817,7 +1825,7 @@ sets the \texttt{children} attribute collection to the input argument
 \verbsize
 \begin{verbatim}
 eyedb::Status setInChildrenCollAt(int where, Person *person,
-                              unsigned int magorder = 0);
+                                  unsigned int magorder = 0);
 \end{verbatim}
 \normalsize
 adds the \texttt{person} instance to the collection attribute \texttt{children} at position \texttt{where}.
@@ -1827,7 +1835,7 @@ using the \texttt{magorder} argument for its magnitude order value.
 \verbsize
 \begin{verbatim}
 eyedb::Status setInChildrenCollAt(int where, const eyedb::Oid &person_oid,
-                              unsigned int magorder = 0);
+                                  unsigned int magorder = 0);
 \end{verbatim}
 \normalsize
 adds the instance of \texttt{Person} whose oid is \texttt{person\_oid}
@@ -1875,8 +1883,8 @@ The generated methods in our example is as follows:
 \verbsize
 \begin{verbatim}
   virtual eyedb::Status change_address(const char * street, const char * town,
-                                   char * &oldstreet, char * &oldtown,
-                                   eyedb::_int32 &retarg);
+                                       char * &oldstreet, char * &oldtown,
+                                       eyedb::_int32 &retarg);
 
   static eyedb::Status getPersonCount(eyedb::Database *db, eyedb::_int32 &retarg);
 \end{verbatim}
@@ -1982,10 +1990,10 @@ For instance:
 \sect{Examples}
 This section introduces a few complete simple examples that can be found
 in the directory
-\texttt{\$EYEDBROOT/examples/C++Binding}.
+\emph{prefix}\texttt{/share/doc/eyedb/examples}.
 The \texttt{README} file describes the way to compile and run these examples.
 \\
-The first two programs introduce the generic C++ API of
+The first two programs listed here introduce the generic C++ API of
 \eyedb while the two following programs presents the
 generated schema-oriented C++ API through the simple schema example introduced
 in this chapter. The last example shows \texttt{EYEDBDBM} instance
@@ -1997,29 +2005,27 @@ the OQL construct and displays on its standard output the returned
 atoms.
 \verbsize
 \begin{verbatim}
-//
-// generic/query.cc
-//
+// examples/C++Binding/generic/query/query.cc
 
 #include <eyedb/eyedb.h>
+
+using namespace std;
 
 int
 main(int argc, char *argv[])
 {
   eyedb::init(argc, argv);
 
-  if (argc != 3)
-    {
-      fprintf(stderr, "usage: %s <dbname> <query>\n", argv[0]);
-      return 1;
-    }
+  if (argc != 3) {
+    fprintf(stderr, "usage: %s <dbname> <query>\n", argv[0]);
+    return 1;
+  }
 
-  // set the error policy to the exception mode
   eyedb::Exception::setMode(eyedb::Exception::ExceptionMode);
 
   try {
     eyedb::Connection conn;
-    // connecting to the EyeDB server
+    // connecting to the eyedb server
     conn.open();
 
     eyedb::Database db(argv[1]);
@@ -2030,26 +2036,87 @@ main(int argc, char *argv[])
     // beginning a transaction
     db.transactionBegin();
 
-    // performing the OQL query argv[2]
+    // performing the OQL query argv[2] using the eyedb::OQL interface
     eyedb::OQL q(&db, argv[2]);
 
     eyedb::ValueArray arr;
     q.execute(arr);
 
+    cout << "###### Performing the OQL query " << argv[2] <<
+      " using the eyedb::OQL interface" << endl;
+
     // for each value returned in the query, display it:
-    for (int i = 0; i < arr.getCount(); i++)
-      {
-        // in case of the returned value is an oid, load it first:
-        if (arr[i].type == eyedb::Value::OID)
-          {
-            eyedb::Object *o;
-            db.loadObject(arr[i].oid, &o);
-            cout << o;
-            o->release();
-          }
-        else
-          cout << arr[i] << endl;
+    for (int i = 0; i < arr.getCount(); i++) {
+      // in case of the returned value is an oid, load it first:
+      if (arr[i].type == eyedb::Value::OID) {
+        eyedb::Object *o;
+        db.loadObject(arr[i].oid, &o);
+        cout << o;
+        o->release();
       }
+      else
+        cout << arr[i] << endl;
+    }
+
+    // performing the same query using eyedb::OQLIterator interface
+    // [1]: getting all returned values
+
+    cout << "\n###### Performing the same query using eyedb::OQLIterator "
+      "interface: getting all returned values" << endl;
+
+    eyedb::OQLIterator iter(&db, argv[2]);
+    eyedb::Value val;
+
+    while (iter.next(val)) {
+      // in case of the returned value is an oid, load it first:
+      if (val.getType() == eyedb::Value::OID) {
+        eyedb::Object *o;
+        db.loadObject(val.oid, &o);
+        cout << o;
+
+        // in case of the returned object is a collection, display its
+        // contents
+        if (o->asCollection()) {
+          eyedb::CollectionIterator citer(o->asCollection());
+          cout << "contents BEGIN\n";
+          eyedb::Object *co;
+          while(citer.next(co)) {
+            cout << co;
+            co->release();
+          }
+          cout << "contents END\n\n";
+        }
+        // in case of the returned object is a class, display its
+        // extent
+        else if (o->asClass()) {
+          eyedb::ClassIterator citer(o->asClass());
+          cout << "extent BEGIN\n";
+          eyedb::Object *co;
+          while(citer.next(co)) {
+            cout << co;
+            co->release();
+          }
+          cout << "extent END\n\n";
+        }
+
+        o->release();
+      }
+      else
+        cout << val << endl;
+    }
+
+    // [2]: getting only returned objects
+
+    cout << "\n###### Performing the same query using eyedb::OQLIterator "
+      "interface: getting only returned objects" << endl;
+
+    eyedb::OQLIterator iter2(&db, argv[2]);
+    eyedb::Object *o;
+
+    while (iter2.next(o)) {
+      cout << o;
+      o->release();
+    }
 
     // committing the transaction
     db.transactionCommit();
@@ -2066,6 +2133,11 @@ main(int argc, char *argv[])
   return 0;
 }
 \end{verbatim}
+For instance:
+\begin{verbatim}
+./query person "select Person"
+./query EYEDBDBM "select class"
+\end{verbatim}
 \normalsize
 \subsect{Generic Storing Example}
 This example introduces a simple store program which takes
@@ -2073,30 +2145,28 @@ three arguments: the database name, a person name and a person age. It
 creates a new instance of person using the given name and age.
 \verbsize
 \begin{verbatim}
-//
-// generic/store.cc
-//
+// examples/C++Binding/generic/store/store.cc
 
 #include <eyedb/eyedb.h>
+
+using namespace std;
 
 int
 main(int argc, char *argv[])
 {
   eyedb::init(argc, argv);
 
-  if (argc != 4)
-    {
-      fprintf(stderr, "usage: %s <dbname> <person_name> <person_age>\n",
-              argv[0]);
-      return 1;
-    }
+  if (argc != 4) {
+    fprintf(stderr, "usage: %s <dbname> <person_name> <person_age>\n",
+            argv[0]);
+    return 1;
+  }
 
-  // set the error policy to the exception mode
   eyedb::Exception::setMode(eyedb::Exception::ExceptionMode);
 
   try {
     eyedb::Connection conn;
-    // connecting to the EyeDB server
+    // connecting to the eyedb server
     conn.open();
 
     eyedb::Database db(argv[1]);
@@ -2112,7 +2182,17 @@ main(int argc, char *argv[])
 
     // looking for the attribute 'name' and 'age' in the class 'Person'
     const eyedb::Attribute *name_attr = personClass->getAttribute("name");
+    if (!name_attr) {
+      fprintf(stderr, "cannot find name attribute in database\n");
+      return 1;
+    }
+
     const eyedb::Attribute *age_attr = personClass->getAttribute("age");
+
+    if (!age_attr) {
+      fprintf(stderr, "cannot find age attribute in database\n");
+      return 1;
+    }
 
     // instanciating a 'Person' object
     eyedb::Object *p = personClass->newObj(&db);
@@ -2141,8 +2221,13 @@ main(int argc, char *argv[])
   return 0;
 }
 \end{verbatim}
-\normalsize
+For instance:
+\begin{verbatim}
+./store person john 32
+./store person mary 28
+\end{verbatim}
 
+\normalsize
 \subsect{Schema-Oriented Query Example}
 This example introduces a simple schema-oriented query program which takes
 two arguments: the database name and an OQL construct. It executes
@@ -2150,11 +2235,11 @@ the OQL construct and displays on its standard output the returned
 atoms.
 \verbsize
 \begin{verbatim}
-//
-// schema-oriented/query.cc
-//
+// examples/C++Binding/schema-oriented/query/query.cc
 
 #include "person.h"
+
+using namespace std;
 
 int
 main(int argc, char *argv[])
@@ -2162,18 +2247,16 @@ main(int argc, char *argv[])
   eyedb::init(argc, argv);
   person::init();
 
-  if (argc != 3)
-    {
-      fprintf(stderr, "usage: %s <dbname> <query>\n", argv[0]);
-      return 1;
-    }
+  if (argc != 3) {
+    fprintf(stderr, "usage: %s <dbname> <query>\n", argv[0]);
+    return 1;
+  }
 
-  // set the error policy to the exception mode
   eyedb::Exception::setMode(eyedb::Exception::ExceptionMode);
 
   try {
     eyedb::Connection conn;
-    // connecting to the EyeDB server
+    // connecting to the eyedb server
     conn.open();
 
     // opening database argv[1] using 'personDatabase' class
@@ -2191,36 +2274,32 @@ main(int argc, char *argv[])
 
     // for each Person returned in the query, display its name and age,
     // its address, its spouse name and age and its cars
-    for (int i = 0; i < arr.getCount(); i++)
-      {
-        Person *p = Person_c(arr[i]);
-        if (p)
-          {
-            cout << "name:    " << p->getName() << endl;
-            cout << "age:     " << p->getAge() << endl;
+    for (int i = 0; i < arr.getCount(); i++) {
+      Person *p = Person_c(arr[i]);
+      if (p) {
+        cout << "name:    " << p->getName() << endl;
+        cout << "age:     " << p->getAge() << endl;
 
-            // display street only if it is not empty
-            if (*p->getAddr()->getStreet())
-              cout << "street:  " << p->getAddr()->getStreet() << endl;
+        if (p->getAddr()->getStreet().size())
+          cout << "street:  " << p->getAddr()->getStreet() << endl;
 
-            // display town only if it is not empty
-            if (*p->getAddr()->getTown())
-              cout << "town:    " << p->getAddr()->getTown() << endl;
+        if (p->getAddr()->getTown().size())
+          cout << "town:    " << p->getAddr()->getTown() << endl;
 
-            // if spouse exists, display its name and age
-            if (p->getSpouse())
-              {
-                cout << "spouse_name: " << p->getSpouse()->getName() << endl;
-                cout << "spouse_age:  " << p->getSpouse()->getAge() << endl;
-              }
+        if (p->getSpouse()) {
+          cout << "spouse_name: " << p->getSpouse()->getName() << endl;
+          cout << "spouse_age:  " << p->getSpouse()->getAge() << endl;
+        }
 
-            // display the mark and num of the person cars
-            for (int i = 0; i < p->getCarsCount(); i++)
-              cout << "car: #" << i << ": " <<
-                p->getCarsAt(i)->getMark() << ";" <<
-                p->getCarsAt(i)->getNum() << endl;
-          }
+        eyedb::CollectionIterator iter(p->getCarsColl());
+        Car *car;
+        while (iter.next((eyedb::Object *&)car)) {
+          cout << "car: #" << i << ": " <<
+            car->getBrand() << ";" <<
+            car->getNum() << endl;
+        }
       }
+    }
 
     // committing the transaction
     db.transactionCommit();
@@ -2237,8 +2316,11 @@ main(int argc, char *argv[])
   return 0;
 }
 \end{verbatim}
+For instance:
+\begin{verbatim}
+./query person "select Person"
+\end{verbatim}
 \normalsize
-
 \subsect{Schema-Oriented Storing Example}
 This example introduces a simple schema-oriented store program which takes
 four arguments: the database name, a person name, a person age and the
@@ -2247,9 +2329,7 @@ creates a new instance of person using the given name and age and mary
 this person to the spouse whose name is given.
 \verbsize
 \begin{verbatim}
-//
-// schema-oriented/store.cc
-//
+// examples/C++Binding/schema-oriented/store/store.cc
 
 #include "person.h"
 
@@ -2262,19 +2342,17 @@ main(int argc, char *argv[])
   // initializing the person package
   person::init();
 
-  if (argc != 5)
-    {
-      fprintf(stderr, "usage: %s <dbname> <person name> <person age> "
-              "<spouse name>\n", argv[0]);
-      return 1;
-    }
+  if (argc != 5) {
+    fprintf(stderr, "usage: %s <dbname> <person name> <person age> "
+            "<spouse name>\n", argv[0]);
+    return 1;
+  }
 
   const char *dbname = argv[1];
   const char *name = argv[2];
   int age = atoi(argv[3]);
   const char *spouse_name = argv[4];
 
-  // set the error policy to the exception mode
   eyedb::Exception::setMode(eyedb::Exception::ExceptionMode);
 
   try {
@@ -2297,30 +2375,26 @@ main(int argc, char *argv[])
     q.execute(arr);
 
     // if not found, returns an error
-    if (!arr.getCount())
-      {
-        fprintf(stderr, "cannot find spouse '%s'\n", spouse_name);
-        return 1;
-      }
+    if (!arr.getCount()) {
+      fprintf(stderr, "cannot find spouse '%s'\n", spouse_name);
+      return 1;
+    }
 
-    // safe casting returned object
+    // (safe!) casting returned object
     Person *spouse = Person_c(arr[0]);
 
     // creating a Person
     Person *p = new Person(&db);
 
-    // setting civil state, name and age
     p->setCstate(Sir);
     p->setName(name);
     p->setAge(age);
 
-    // setting spouse
     p->setSpouse(spouse);
 
     // spouse is no more necessary: releasing it
     spouse->release();
 
-    // setting the address attributes
     p->getAddr()->setStreet("voltaire");
     p->getAddr()->setTown("paris");
 
@@ -2330,8 +2404,8 @@ main(int argc, char *argv[])
     car1->setNum(18374);
 
     Car *car2 = new Car(&db);
-    car1->setBrand("ford");
-    car1->setNum(233491);
+    car2->setBrand("ford");
+    car2->setNum(233491);
 
     // adding the cars to the created person
     p->addToCarsColl(car1);
@@ -2342,14 +2416,16 @@ main(int argc, char *argv[])
     car2->release();
 
     // creating ten children
-    for (int i = 0; i < 10; i++)
-      {
-        Person *c = new Person(&db);
-        c->setAge(i);
-        c->setName(eyedb::String(name) + "_" + (long)i);
-        p->setInChildrenCollAt(i, c);
-        c->release();
-      }
+    for (int i = 0; i < 10; i++) {
+      Person *c = new Person(&db);
+      char tmp[64];
+
+      c->setAge(i);
+      sprintf( tmp, "%d", i);
+      c->setName( (std::string(name) + std::string("_") + std::string(tmp)).c_str() );
+      p->setInChildrenCollAt(i, c);
+      c->release();
+    }
 
     // storing all in database
     p->store(eyedb::RecMode::FullRecurs);
@@ -2362,7 +2438,7 @@ main(int argc, char *argv[])
   }
 
   catch(eyedb::Exception &e) {
-    cerr << argv[0] << ": " << e;
+    std::cerr << argv[0] << ": " << e;
     eyedb::release();
     return 1;
   }
@@ -2372,6 +2448,10 @@ main(int argc, char *argv[])
 
   return 0;
 }
+\end{verbatim}
+\begin{verbatim}
+./store person wayne 34
+./store person poppins 51
 \end{verbatim}
 \normalsize
 
@@ -2386,24 +2466,31 @@ the user access information.
 \ee
 \verbsize
 \begin{verbatim}
-//
-// admin.cc
-//
+// examples/C++Binding/schema-oriented/admin/admin.cc
 
 #include <eyedb/eyedb.h>
 
-// this function returns the mode name
+using namespace std;
+
 static const char *
 get_string_mode(eyedb::DBAccessMode mode)
 {
-  if (mode == eyedb::NoDBAccessMode)            return "eyedb::NoDBAccessMode";
-  if (mode == eyedb::ReadDBAccessMode)          return "eyedb::ReadDBAccessMode";
-  if (mode == eyedb::WriteDBAccessMode)         return "eyedb::WriteDBAccessMode";
-  if (mode == eyedb::ExecDBAccessMode)          return "eyedb::ExecDBAccessMode";
-  if (mode == eyedb::ReadWriteDBAccessMode)     return "eyedb::ReadWriteDBAccessMode";
-  if (mode == eyedb::ReadExecDBAccessMode)      return "eyedb::ReadExecDBAccessMode";
-  if (mode == eyedb::ReadWriteExecDBAccessMode) return "eyedb::ReadWriteExecDBAccessMode";
-  if (mode == eyedb::AdminDBAccessMode)         return "eyedb::AdminDBAccessMode";
+  if (mode == eyedb::NoDBAccessMode)
+    return "eyedb::NoDBAccessMode";
+  if (mode == eyedb::ReadDBAccessMode)
+    return "eyedb::ReadDBAccessMode";
+  if (mode == eyedb::WriteDBAccessMode)
+    return "eyedb::WriteDBAccessMode";
+  if (mode == eyedb::ExecDBAccessMode)
+    return "eyedb::ExecDBAccessMode";
+  if (mode == eyedb::ReadWriteDBAccessMode)
+    return "eyedb::ReadWriteDBAccessMode";
+  if (mode == eyedb::ReadExecDBAccessMode)
+    return "eyedb::ReadExecDBAccessMode";
+  if (mode == eyedb::ReadWriteExecDBAccessMode)
+    return "eyedb::ReadWriteExecDBAccessMode";
+  if (mode == eyedb::AdminDBAccessMode)
+    return "eyedb::AdminDBAccessMode";
 
   return NULL;
 }
@@ -2411,74 +2498,70 @@ get_string_mode(eyedb::DBAccessMode mode)
 int
 main(int argc, char *argv[])
 {
+  // initializing the eyedb layer
   eyedb::init(argc, argv);
 
-  // set the error policy to the exception mode
   eyedb::Exception::setMode(eyedb::Exception::ExceptionMode);
 
   try {
     eyedb::Connection conn;
 
-    // connecting to the EyeDB server
+    // connecting to the eyedb server
     conn.open();
 
-    // opening the database EYEDBDBM using 'dbmDatabase' class
-    dbmDatabase db("EYEDBDBM");
+    // opening the database EYEDBDBM using 'dbmDataBase' class
+    eyedb::DBMDatabase db("EYEDBDBM");
     db.open(&conn, eyedb::Database::DBRead);
 
     // beginning a transaction
     db.transactionBegin();
 
-    // display the schema on stdout
+    // display the scheme on stdout
     cout << db.getSchema() << endl;
 
     // looking for all user
-    eyedb::OQL q_user(&db, "select user");
+    eyedb::OQL q_user(&db, "select User");
 
     eyedb::ObjectArray user_arr;
     q_user.execute(user_arr);
 
     cout << "User List {" << endl;
-    for (int i = 0; i < user_arr.getCount(); i++)
-      {
-        eyedb::User *user = (eyedb::User *)user_arr[i];
-        cout << "\t" << user->name() << endl;
-      }
+    for (int i = 0; i < user_arr.getCount(); i++) {
+      eyedb::UserEntry *user = (eyedb::UserEntry *)user_arr[i];
+      cout << "\t" << user->name() << endl;
+    }
     cout << "}\n" << endl;
 
     // looking for all database entry
-    eyedb::OQL q_db(&db, "select database_entry");
+    eyedb::OQL q_db(&db, "select eyedb::DBEntry");
 
     eyedb::ObjectArray db_arr;
     q_db.execute(db_arr);
 
     cout << "Database List {" << endl;
 
-    for (i = 0; i < db_arr.getCount(); i++)
-      {
-        eyedb::DBEntry *dbentry = (eyedb::DBEntry *)db_arr[i];
-        cout << "\t" << dbentry->dbname() << " -> " << dbentry->dbfile() << endl;
-        // looking for all user which has any permission on this
-        // database
-        eyedb::OQL q_useraccess(&db,
-                            "select database_user_access->dbentry->dbname = \"%s\"",
-                            dbentry->dbname());
-        eyedb::ObjectArray useraccess_arr;
-        q_useraccess.execute(useraccess_arr);
-        if (useraccess_arr.getCount())
-          {
-            cout << "\tUser Access {" << endl;
-            for (int j = 0; j < useraccess_arr.getCount(); j++)
-              {
-                eyedb::DBUserAccess *ua = (eyedb::DBUserAccess *)useraccess_arr[j];
-                cout << "\t\t" << ua->user()->name() << " -> " <<
-                  get_string_mode(ua->mode()) << endl;
-              }
-            cout << "\t}" << endl;
-          }
-        cout << endl;
-        useraccess_arr.garbage();
+    for (int i = 0; i < db_arr.getCount(); i++) {
+      eyedb::DBEntry *dbentry = (eyedb::DBEntry *)db_arr[i];
+      cout << "\t" << dbentry->dbname() << " -> " << dbentry->dbfile() << endl;
+      // looking for all user which has any permission on this
+      // database
+      eyedb::OQL q_useraccess(&db,
+                              "select eyedb::DBUserAccess->dbentry->dbname = \"%s\"",
+                              dbentry->dbname().c_str());
+      eyedb::ObjectArray useraccess_arr;
+      q_useraccess.execute(useraccess_arr);
+      if (useraccess_arr.getCount()) {
+        cout << "\tUser Access {" << endl;
+        for (int j = 0; j < useraccess_arr.getCount(); j++) {
+          eyedb::DBUserAccess *ua = (eyedb::DBUserAccess *)useraccess_arr[j];
+          cout << "\t\t" << ua->user()->name() << " -> " <<
+            get_string_mode(ua->mode()) << endl;
+        }
+        cout << "\t}" << endl;
       }
+      cout << endl;
+      useraccess_arr.garbage();
+    }
 
     cout << "}" << endl;
 
@@ -2493,7 +2576,7 @@ main(int argc, char *argv[])
     return 1;
   }
 
-  // releasing the EyeDB layer: this is not mandatory
+  // releasing the eyedb layer: this is not mandatory
   eyedb::release();
 
   return 0;

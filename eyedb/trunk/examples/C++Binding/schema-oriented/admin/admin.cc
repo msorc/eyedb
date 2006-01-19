@@ -23,6 +23,7 @@
 */
 
 #include <eyedb/eyedb.h>
+
 using namespace std;
 
 static const char *
