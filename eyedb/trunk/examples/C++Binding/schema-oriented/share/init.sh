@@ -4,7 +4,7 @@
 
 set -e
 
-db=person
+db=person_c
 
 echo Creating the database $db: \'eyedbdbcreate $db\'...
 

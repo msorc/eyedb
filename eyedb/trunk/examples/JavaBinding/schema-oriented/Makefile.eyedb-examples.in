@@ -6,7 +6,7 @@
 # Eric Viara Copyright (C) SYSRA 1998
 #
 
-SUBDIRS = store
+SUBDIRS = share store
 
 all:
 	@for dir in $(SUBDIRS); do $(MAKE) -C $${dir} $@; done
