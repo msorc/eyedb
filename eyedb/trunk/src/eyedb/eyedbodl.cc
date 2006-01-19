@@ -52,7 +52,7 @@ usage(const char *msg = 0, const char *etc = 0)
   }
 
   fprintf(stderr, "\nUsage:\n");
-  fprintf(stderr, "%s--gencode=C++ --package=<package>%s", us, nl);
+  fprintf(stderr, "%s--gencode=C++ [--package=<package>]%s", us, nl);
 
   fprintf(stderr, "%s[--output-dir=<dirname>] [--output-file-prefix=<prefix>]%s",
 	  sp, nl);
@@ -129,10 +129,10 @@ help()
   fprintf(stderr, "--help                        Displays the current information\n");
 
   fprintf(stderr, "\nThe following options must be added to the --gencode=C++ or Java option:\n");
-  fprintf(stderr, "--package=<package>           Package name\n");
-  fprintf(stderr, "<odlfile>|-|-d <dbname>|--database=<dbname> Input ODL file or '-' (standard input) or the database\n");
+  fprintf(stderr, "<odlfile>|-|-d <dbname>|--database=<dbname> Input ODL file (or - for standard input) or the database name\n");
 
   fprintf(stderr, "\nThe following options can be added to the --gencode=C++ or Java option:\n");
+  fprintf(stderr, "--package=<package>           Package name\n");
   fprintf(stderr, "--output-dir=<dirname>        Output directory for generated files\n");
   fprintf(stderr, "--output-file-prefix=<prefix> Ouput file prefix (default is the package name)\n");
   fprintf(stderr, "--class-prefix=<prefix>       Prefix to be put at the begining of each runtime class\n");
