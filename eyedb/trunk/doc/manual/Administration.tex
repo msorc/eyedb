@@ -383,12 +383,12 @@ following by letters, digits or underscore).
 \ei
 \item \emph{value} is under the following form:
 \bi
-\item \ttv{"([\^{}{\bks}"]$|${\bks}")*"}, where the surrounding double
+\item \ttv{"([\^{}{\textbackslash}"]$|${\textbackslash}")*"}, where the surrounding double
 quotes are optionnal. You need only to surround with double quotes if
 value contains one or more spaces.
 \item the following escape sequences are interpreted:
 \esc{a}, \esc{b}, \esc{f}, \esc{r}, \esc{t}.
-\esc{v}, \esc{\bks}
+\esc{v}, \esc{\textbackslash}
 \item a sequence variable delimited by two \ttv{\%} are substitued by the value
 of this variable, for instance \ttv{\%root\%} is substitued by the value of the
 variable \ttv{root}.
@@ -505,7 +505,7 @@ one,
 the standard input. Note that if you are using a C-shell, you need to
 put a backslash before the \ttv{?} character to avoid the interpretation
 of this meta-character by the shell,
-as follows: \ttv{-eyedbuser\bks?},
+as follows: \ttv{-eyedbuser\textbackslash?},
 \item \ttv{-eyedbpasswd?}: will ask for an \eyedb password on
 the standard input. Refer to previous option if you are using with a C-shell.
 \item \ttv{-eyedbauth?}: will ask for an \eyedb user/password

@@ -51,7 +51,7 @@ In \oqlsect{lsyntax}, we introduced the language syntax.
 %We introduce the function statements in \oqlsect{8}, the builtin and
 %library functions in \oqlsect{9} and finally the \texttt{eyedboql} tool
 %in \oqlsect{10}.
-\oqlsect{quickref} is a quick reference manual of OQL.
+A quick reference manual of OQL is given in \oqlsect{qref}.
 \\
 \\
 In this chapter, OQL denotes the \eyedb Object Query Language while
@@ -322,10 +322,10 @@ A few examples:
 \subsubsect{Float Atom}
 The syntax for floating point atoms is one of the following regular
 expressions:\\\\
-\texttt{[0-9]+{\bks}.[0-9]+?}\\
-\texttt{[0-9]+?{\bks}.[0-9]+}\\
-\texttt{[0-9]+\bks.[0-9]+?(e|E)[+-]?[0-9]+([fF]|[lL])?}\\
-\texttt{[0-9]+?\bks.[0-9]+(e|E)[+-]?[0-9]+([fF]|[lL])?}\\
+\texttt{[0-9]+{\textbackslash}.[0-9]+?}\\
+\texttt{[0-9]+?{\textbackslash}.[0-9]+}\\
+\texttt{[0-9]+\textbackslash.[0-9]+?(e|E)[+-]?[0-9]+([fF]|[lL])?}\\
+\texttt{[0-9]+?\textbackslash.[0-9]+(e|E)[+-]?[0-9]+([fF]|[lL])?}\\
 \\
 The domain for the float type is as follows:
 \btab[l]{|p{4cm}|p{4cm}|}
@@ -350,27 +350,27 @@ A few examples:
 \normalsize
 \subsubsect{String Atom}
 The syntax for the string type is as follows:\\
-\texttt{\bks"([\^{}"]|\bks\bks\bks")*\bks"}\\
+\texttt{\textbackslash"([\^{}"]|\textbackslash\textbackslash\textbackslash")*\textbackslash"}\\
 \\
 The following escape sequences are interpreted:
 \btab[l]{|p{2cm}|p{3cm}|p{3cm}|}
 \hline \begin{center}\emph{Escape Sequence}\end{center} &
        \begin{center}\emph{Name}\end{center} &
        \begin{center}\emph{ASCII Name}\end{center}\\
-\hline \texttt{{\bks}a} & alert & BEL\\
-\hline \texttt{{\bks}b} & backspace & BS\\
-\hline \texttt{{\bks}f} & form feed & FF\\
+\hline \texttt{{\textbackslash}a} & alert & BEL\\
+\hline \texttt{{\textbackslash}b} & backspace & BS\\
+\hline \texttt{{\textbackslash}f} & form feed & FF\\
 %\hline
 %\etab
 %\btab[l]{|p{2cm}|p{3cm}|p{3cm}|}
-\hline \texttt{{\bks}n} & newline & NL (LF)\\
-\hline \texttt{{\bks}r} & carriage return & CR\\
-\hline \texttt{{\bks}t} & horizontal tab & HT\\
-\hline \texttt{{\bks}v} & vertical tab & VT\\
-\hline \texttt{{\bks}\bks} & backslash & \bks\\
-\hline \texttt{{\bks}"} & double quote & "\\
-\hline \texttt{{\bks}'} & single quote & '\\
-\hline \texttt{{\bks}ooo} & octal number & {\bks}ooo\\
+\hline \texttt{{\textbackslash}n} & newline & NL (LF)\\
+\hline \texttt{{\textbackslash}r} & carriage return & CR\\
+\hline \texttt{{\textbackslash}t} & horizontal tab & HT\\
+\hline \texttt{{\textbackslash}v} & vertical tab & VT\\
+\hline \texttt{{\textbackslash}\textbackslash} & backslash & \textbackslash\\
+\hline \texttt{{\textbackslash}"} & double quote & "\\
+\hline \texttt{{\textbackslash}'} & single quote & '\\
+\hline \texttt{{\textbackslash}ooo} & octal number & {\textbackslash}ooo\\
 \hline
 \etab
 A few examples:
@@ -385,15 +385,15 @@ A few examples:
 \subsubsect{Char Atom}
 The syntax for the char type is one of the followings:\\
 \texttt{'}\emph{ascii character}\texttt{'}\\
-\texttt{'\bks[0-7+]'}\\
-\texttt{'\bks(x|X)[0-9a-fA-F+]'}\\
-\texttt{'{\bks}a'}\\
-\texttt{'{\bks}b'}\\
-\texttt{'{\bks}f'}\\
-\texttt{'{\bks}n'}\\
-\texttt{'{\bks}r'}\\
-\texttt{'{\bks}t'}\\
-\texttt{'{\bks}v'}\\
+\texttt{'\textbackslash[0-7+]'}\\
+\texttt{'\textbackslash(x|X)[0-9a-fA-F+]'}\\
+\texttt{'{\textbackslash}a'}\\
+\texttt{'{\textbackslash}b'}\\
+\texttt{'{\textbackslash}f'}\\
+\texttt{'{\textbackslash}n'}\\
+\texttt{'{\textbackslash}r'}\\
+\texttt{'{\textbackslash}t'}\\
+\texttt{'{\textbackslash}v'}\\
 \\
 A few examples:
 \verbsize
@@ -414,7 +414,7 @@ The syntax for a boolean atom is one of the followings:\\
 \texttt{false}
 \subsubsect{Identifier Atom}
 The syntax for an identifier atom is as follows:\\
-\texttt{[a-zA-Z{\bks}\$\_\#][a-zA-Z{\bks}\$\_0-9\#]*}\\
+\texttt{[a-zA-Z{\textbackslash}\$\_\#][a-zA-Z{\textbackslash}\$\_0-9\#]*}\\
 \\
 This means that an identifier must start whith a letter, a ``\texttt{\_}'',
 a ``\texttt{\$}'' or a ``\texttt{\#}'' which may be followed by letters, digits,
@@ -1502,7 +1502,7 @@ is as follows:
 the returned atom is the \texttt{\#}\emph{expr} character of the string
 where \emph{expr} denotes the second operand.
 If \emph{expr} is equal to the length to the string the character
-\texttt{'{\bks}000'} is returned. If it greater than the length the
+\texttt{'{\textbackslash}000'} is returned. If it greater than the length the
 string an \emph{out of bounds} error is raised.
 \item for an ordered collection, the returned atom is the
 \texttt{\#}\emph{expr} item of the collection. If \emph{expr} is greater
@@ -1602,7 +1602,7 @@ i \emph{expr2} iss greater than or is equal to the size of the collection, an
 \be
 \item if the first operand is a string,
 the returned atom is a list composed of all the characters of the
-string, including the last character \texttt{'{\bks}000'}.
+string, including the last character \texttt{'{\textbackslash}000'}.
 \item for an ordered or an unordered collection, the returned atom is a list composed
 of all the items of the collection. If the collection is a list, the
 list itself is returned. If the collection is an array, this operator
@@ -1646,10 +1646,10 @@ returns a list of all characters (or items in collection)\\
 \expex{2}\\
 \hline \emph{expression} & \emph{result}\\
 \hline \texttt{"hello"[0:2]} & \texttt{list('h', 'e', 'l')} \\
-\hline \texttt{"hello"[?]} & \texttt{list('h', 'e', 'l', 'l', 'o', '{\bks}000')} \\
+\hline \texttt{"hello"[?]} & \texttt{list('h', 'e', 'l', 'l', 'o', '{\textbackslash}000')} \\
 \hline \texttt{list(1, 2, "hello", 4)[2:3]} & \texttt{list("hello", 4)} \\
 \hline \texttt{array(1, 2, "hello", 4)[?]} & \texttt{list(1, 2, "hello", 4)}\\
-\hline \texttt{first(select Person).name[?]} & \texttt{list('j', 'o', 'h', 'n', '{\bks}000')} \\
+\hline \texttt{first(select Person).name[?]} & \texttt{list('j', 'o', 'h', 'n', '{\textbackslash}000')} \\
 \hline \texttt{list(select class.type = "user")[0:4].name} &
 \texttt{list("Employee", "Address", "Person")}\\
 \hline
@@ -2317,7 +2317,7 @@ sequence of statements.\\
 \hline \texttt{eval "10"} & \texttt{10}\\
 \hline \texttt{eval "a := 100"} & result is \texttt{100}; the variable \texttt{a}
 is set to \texttt{100}\\
-\hline \texttt{eval "a := {\bks}"hello{\bks}"; b := a + {\bks}"world{\bks}""} &result is \texttt{"hello world"}; the variable \texttt{a} is set to \texttt{"hello"}; the variable \texttt{b} is set to \texttt{"hello world"}\\
+\hline \texttt{eval "a := {\textbackslash}"hello{\textbackslash}"; b := a + {\textbackslash}"world{\textbackslash}""} &result is \texttt{"hello world"}; the variable \texttt{a} is set to \texttt{"hello"}; the variable \texttt{b} is set to \texttt{"hello world"}\\
 \hline
 \etab
 
@@ -3344,7 +3344,7 @@ The \texttt{char} operator evaluates its operand and converts or
 casts it to a \texttt{char}.\\
 If the operand is the string of length one, it returns the character of
 this string. If the string has several characters, it returns a
-\texttt{'{\bks}000}.\\
+\texttt{'{\textbackslash}000}.\\
 If the operand is a integer or float, it casts it to a character.\\
 If the operand is a character integer, it returns it.
 \btab[l]{|p{2.3cm}|p{8cm}|}
@@ -3528,7 +3528,7 @@ The \texttt{select} operator is used to perform queries in a database.
 The general syntax of this operator is as follows:\\\\
 \texttt{select} [\texttt{distinct}] \emph{projection} [\texttt{from} \emph{fromList} 
 [\texttt{where} \emph{predicat}] [\texttt{order by} \emph{orderExprList}
-[\texttt{asc}$|$\texttt{desc}]]
+[\texttt{asc}\texttt{|}\texttt{desc}]]
 \be
 \item \texttt{distinct} means that duplicates must be eliminated,
 \item \emph{projection} is an expression using the variables
@@ -4443,7 +4443,7 @@ expression-oriented function definitions.
 
 \newpage
 \sect{Quick Reference Manual}
-\label{quickref}
+\label{qref}
 This OQL quick reference manual presents consise information about
 the builtin and library functions and methods, the special variables,
 and the \texttt{eyedboql} tool. The standard library source code
