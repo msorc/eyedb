@@ -1290,11 +1290,11 @@ namespace eyedb {
 
     rd->args[n].type = rpc_Int32Type; /* rdbhid */
     rd->args[n++].send_rcv = rpc_Send;
-    rd->args[n].type = rpc_Int32Type;
+    rd->args[n].type = rpc_Int32Type; /* qid */
     rd->args[n++].send_rcv = rpc_Send;
-    rd->args[n].type = rpc_Int32Type;
+    rd->args[n].type = rpc_Int32Type; /* max */
     rd->args[n++].send_rcv = rpc_Send;
-    rd->args[n].type = rpc_Int32Type;
+    rd->args[n].type = rpc_Int32Type; /* count */
     rd->args[n++].send_rcv = rpc_Rcv;
     rd->args[n].type = rpc_DataType;
     rd->args[n++].send_rcv = rpc_Rcv;

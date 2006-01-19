@@ -899,20 +899,19 @@ class RPC extends RPClib {
 	addArg(max);
 
 	Status status = new Status();
-	if (realize(db.conn, status))
-	    {
-		int count = getIntArg();
-		byte[] data = getDataArg();
+	if (realize(db.conn, status)) {
+	    int count = getIntArg();
+	    byte[] data = getDataArg();
 
-		try {
-		    Iterator.decode(data, value_array, 0, count);
-		}
-		catch(Exception e) {
-		    return e.status;
-		}
-
-		getStatusArg(db.conn, status);
+	    try {
+		Iterator.decode(data, value_array, 0, count);
 	    }
+	    catch(Exception e) {
+		return e.status;
+	    }
+
+	    getStatusArg(db.conn, status);
+	}
     
 	return status;
     }
