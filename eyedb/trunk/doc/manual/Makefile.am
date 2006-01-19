@@ -33,7 +33,7 @@ html/Overview.html
 endif
 
 LATEX2HTML=@LATEX2HTML@
-LATEX2HTMLFLAGS=-split +2 -toc_depth 6 -top_navigation -verbosity 0 -no_images -dir html -init_file latex2html-init
+LATEX2HTMLFLAGS=-toc_depth 6 -top_navigation -verbosity 0 -no_images -local_icons -dir html -init_file latex2html-init
 
 %.dvi: %.tex
 	$(LATEX) $<
@@ -51,7 +51,11 @@ GettingStarted.dvi: start.tex version.tex title.tex
 
 html/%.html: %.tex
 	-test ! -d html && mkdir html
-	$(LATEX2HTML) $(LATEX2HTMLFLAGS) -prefix $* $*.tex
+	$(LATEX2HTML) $(LATEX2HTMLFLAGS) -split +2 -prefix $* $*.tex
+
+html/OQL.html: OQL.tex
+	-test ! -d html && mkdir html
+	$(LATEX2HTML) $(LATEX2HTMLFLAGS) -split +3 -prefix OQL OQL.tex
 
 clean-local:
 	rm -f *.pdf *.ps *.dvi *.aux *.idx *.log *.toc
