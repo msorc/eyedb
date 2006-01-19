@@ -24,21 +24,16 @@ NOTE: this must be done only once.
 
 3) run the 'persontest' C++ program with:
 ./persontest person_g
+
 4) run the 'PersonTest Java program using the eyedbjrun script:
-eyedbjrun PersonTest person_g
+CLASSPATH=. eyedbjrun PersonTest person_g
 
 5) check the database using eyedboql:
-% eyedboql -d person
+% eyedboql -d person_g
 ? select Person->lastname;
-...
-? \print
-"baby1", "baby3", "poppins", "baby2", "baby5", "travolta", "wayne",
-"baby4", "stuart"
+bag(NULL, NULL, NULL, "poppins", "poppins", "travolta", "stuart", "baby5", "wayne", "wayne", "baby4", "baby2", "baby3", "baby1")
 ? select Person->firstname;
-...
-? \print
-"baby1", "baby3", "mary", "baby2", "baby5", "john", "john",
-"baby4", "mary"
+= bag("baby5", "baby4", "john", "john", "john", "mary", "mary", "mary", "baby2", "baby2", "baby3", "baby3", "baby1", "baby1")
 ? \quit
 %
 
