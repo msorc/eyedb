@@ -162,14 +162,14 @@ EYEDBODLFLAGS_syscls = --cpp-flags=-DCOMPLETE=0 --export --package=syscls --sche
 $(top_srcdir)/src/eyedb/syscls.cc: syscls.odl
 	if test -x $(EYEDBODL_exe) ; then \
 		$(EYEDBODL) $(EYEDBODLFLAGS_syscls) $< ; \
+		for f in syscls.cc sysclsstubsbe.cc sysclsstubsfe.cc ; do \
+			sed -e 's|"syscls.h"|<eyedb/syscls.h>|' $(top_srcdir)/src/eyedb/$$f > $$f.out; \
+			mv $$f.out $(top_srcdir)/src/eyedb/$$f; \
+		done; \
+		mv $(top_srcdir)/src/eyedb/syscls.h $(top_srcdir)/include/eyedb/. ; \
 	else \
-		echo Warning: $(EYEDBODL) not found, using $*.cc old C++ code; touch $*.cc ; \
+		echo Warning: $(EYEDBODL_exe) not found, using $*.cc old C++ code; touch $*.cc ; \
 	fi
-	for f in syscls.cc sysclsstubsbe.cc sysclsstubsfe.cc ; do \
-	sed -e 's|"syscls.h"|<eyedb/syscls.h>|' $(top_srcdir)/src/eyedb/$$f > $$f.out; \
-	mv $$f.out $(top_srcdir)/src/eyedb/$$f; \
-	done; \
-	mv $(top_srcdir)/src/eyedb/syscls.h $(top_srcdir)/include/eyedb/.
 
 EYEDBODLFLAGS_oqlctb = --package=oqlctb --schema-name=eyedb --attr-style=explicit --down-casting=yes --class-enums=yes --no-rootclass --error-policy=status --system-class --namespace=eyedb
 
@@ -177,7 +177,7 @@ $(top_srcdir)/src/eyedb/oqlctb.cc $(top_srcdir)/src/eyedb/oqlctb.h: oqlctb.odl
 	if test -x $(EYEDBODL_exe) ; then \
 		$(EYEDBODL) $(EYEDBODLFLAGS_oqlctb) $< ; \
 	else \
-		echo Warning: $(EYEDBODL) not found, using $*.cc old C++ code; touch $*.cc ; \
+		echo Warning: $(EYEDBODL_exe) not found, using $*.cc old C++ code; touch $*.cc ; \
 	fi
 
 EYEDBODLFLAGS_utils = --export --package=utils --schema-name=eyedb --attr-style=explicit --down-casting=yes --class-enums=yes --no-rootclass --system-class --error-policy=exception --namespace=eyedb
@@ -185,14 +185,14 @@ EYEDBODLFLAGS_utils = --export --package=utils --schema-name=eyedb --attr-style=
 $(top_srcdir)/src/eyedb/utils.cc: utils.odl
 	if test -x $(EYEDBODL_exe) ; then \
 		$(EYEDBODL) $(EYEDBODLFLAGS_utils) $< ; \
+		for f in utils.cc utilsstubsbe.cc utilsstubsfe.cc ; do \
+			sed -e 's|"utils.h"|<eyedb/utils.h>|' $(top_srcdir)/src/eyedb/$$f > $$f.out; \
+			mv $$f.out $(top_srcdir)/src/eyedb/$$f; \
+		done; \
+		mv $(top_srcdir)/src/eyedb/utils.h $(top_srcdir)/include/eyedb/. ; \
 	else \
-		echo Warning: $(EYEDBODL) not found, using $*.cc old C++ code; touch $*.cc ; \
+		echo Warning: $(EYEDBODL_exe) not found, using $*.cc old C++ code; touch $*.cc ; \
 	fi
-	for f in utils.cc utilsstubsbe.cc utilsstubsfe.cc ; do \
-	sed -e 's|"utils.h"|<eyedb/utils.h>|' $(top_srcdir)/src/eyedb/$$f > $$f.out; \
-	mv $$f.out $(top_srcdir)/src/eyedb/$$f; \
-	done; \
-	mv $(top_srcdir)/src/eyedb/utils.h $(top_srcdir)/include/eyedb/.
 
 EXTRA_DIST= odl.l odl.y oql.l oql.y DBM.odl syscls.odl oqlctb.odl utils.odl comp_time.cc comp_time.h make_pattern.cc
 
