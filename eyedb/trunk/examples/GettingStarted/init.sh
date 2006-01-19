@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 SCHEMA=$1
-DATABASE=person
+DATABASE=person_g
 
 echo Creating the database $DATABASE
 echo eyedbdbcreate $DATABASE

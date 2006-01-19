@@ -11,79 +11,80 @@ EyeDB examples are organized in 3 directories:
 GettingStarted
 ==============
 
-To run the C++ and Java examples in this directory:
-- compile them with 'make check'
-- run the init.sh script (a script that creates the database 'person_getstart' 
-  and insert a few objects) with 'make init'. 
-  NOTE: this must be done only once.
-- run the 'persontest' C++ program with:
-  ./persontest person
-- run the 'PersonTest Java program:
-  CLASSPATH=<<path_to_eyedb.jar>>:. 
+This directory contains a simple schema and two simple programs 
+using the EyEDB C++ and Java APIs.
 
-(4) To run the `PersonTest' Java program: 
+To run the C++ and Java examples in the GettingStarted/ directory:
 
-    CLASSPATH=$EYEDBCLASSPATH:. java PersonTest -eyedbhost `eyedbgetenv host` -eyedbuser `eyedbgetenv user` -eyedbpasswd `eyedbgetenv user` -eyedbport `eyedbgetenv port` person_getstart
+1) compile them with 'make check'
 
-(5) To verify that all is fine in the person_getstart database use eyedboql
-    as follows:
-    
-    % eyedboql -d person
-    ? select Person->lastname;
-    "baby1", "baby3", "poppins", "baby2", "baby5", "travolta", "wayne",
-    "baby4", "stuart"
-    ? select Person->firstname;
-    "baby1", "baby3", "mary", "baby2", "baby5", "john", "john",
-    "baby4", "mary"
-    ? !quit
-    %
+2) run the init.sh script with 'make init'
+This script creates the database 'person_g' and insert a few objects.
+NOTE: this must be done only once.
 
+3) run the 'persontest' C++ program with:
+./persontest person_g
+4) run the 'PersonTest Java program using the eyedbjrun script:
+eyedbjrun PersonTest person_g
+
+5) check the database using eyedboql:
+% eyedboql -d person
+? select Person->lastname;
+...
+? \print
+"baby1", "baby3", "poppins", "baby2", "baby5", "travolta", "wayne",
+"baby4", "stuart"
+? select Person->firstname;
+...
+? \print
+"baby1", "baby3", "mary", "baby2", "baby5", "john", "john",
+"baby4", "mary"
+? \quit
+%
 
 
 C++Binding
 ==========
 
-This directory contains a few examples and more included in the C++ Binding
-chapter of the programming manual.
+This directory contains C++ programs that use the EyEDB C++ API.
+This API is described in EyeDB 'C++ Binding' manual.
 
-To compile the examples in this directory, you must:
+To run the C++ examples in the C++Binding/ directory:
 
-(1) Go first to the directory $EYEDBROOT/examples/common:
-    - Type `make init' in this directory using gnu make: this operation
-      must be done one and only one.
-      This makefile entry create the database `person'.
-    - Then, type `make all'
+1) compile them with 'make check'
 
-(2) Then type `make init' and `make all' in the current directory 
+2) run the init.sh script located in C++Binding/schema-oriented/share
+with 'make init'
+This script creates the database 'person_c' and insert a few objects.
+NOTE: this must be done only once.
 
-(3) To run the generated example, go to the following directories and
-    perform the indicated actions:
+3) run the programs
 
-    DIRECTORY               RUN EXAMPLES
-    -------------------------------------------------------
-    generic/query           ./query person "select Person"
-                            ./query person "select Person.name ~ \"j\""
-                            ./query person "select Person.age"
-    -------------------------------------------------------
-    generic/store           ./store person raymon 32
-                            ./store person titou 2
+To run the examples, cd to the following directories and
+run the indicated command:
 
-    -------------------------------------------------------
-    scheme-oriented/query   ./query person "select Person"
-                            ./query person "select Person.name ~ \"j\""
-    -------------------------------------------------------
-    scheme-oriented/store   ./store person nadine 32 raymond
+DIRECTORY               COMMANDS
+-------------------------------------------------------
+generic/query           ./query person "select Person"
+                        ./query person "select Person.name ~ \"j\""
+                        ./query person "select Person.age"
+-------------------------------------------------------
+generic/store           ./store person raymon 32
+                        ./store person titou 2
+-------------------------------------------------------
+schema-oriented/query   ./query person "select Person"
+                        ./query person "select Person.name ~ \"j\""
+-------------------------------------------------------
+schema-oriented/store   ./store person nadine 32 raymond
+-------------------------------------------------------
+schema-oriented/methods ./methods person john 12
+                         NOTE THAT for this directory, you need to copy
+                         the *.so files to EyeDB dynamic objects directory:
+                         cp *.so $EYEDBROOT/etc/so
+-------------------------------------------------------
+schema-oriented/admin   ./admin
+-------------------------------------------------------
 
-    -------------------------------------------------------
-    scheme-oriented/methods ./methods person john 12
-
-    NOTE THAT for this directory, you need to copy the *.so
-    files to $EYEDBROOT/etc/so as follows:
-    cp *.so $EYEDBROOT/etc/so
-
-    -------------------------------------------------------
-    scheme-oriented/admin   ./admin
-    -------------------------------------------------------
 
 JavaBinding
 ===========
@@ -103,19 +104,19 @@ To compile the examples in this directory, you must:
 (2) To run the generated example, go to the following directories and
     perform the indicated actions:
 
-    DIRECTORY                   RUNNING EXAMPLES
-    --------------------------------------------------------------
-    generic/appli/basic       eyedbjrun Basic person
-    ----------------------------------------------------------------
-    generic/appli/query       eyedbjrun Query person <any valid query>
-                              for instance:
-			      eyedbjrun Query person "select Person"
-    ----------------------------------------------------------------
-    generic/appli/store       eyedbjrun Store person <name> <age>
-    ----------------------------------------------------------------
-    generic/appli/collections eyedbjrun Collections person <prefix>
-    ----------------------------------------------------------------
-    generic/appli/schema      eyedbjrun Store person
-    ----------------------------------------------------------------
-    generic/applet            with Netscape, open the applet.html page
-    ----------------------------------------------------------------
+DIRECTORY                   RUNNING EXAMPLES
+--------------------------------------------------------------
+generic/appli/basic       eyedbjrun Basic person
+----------------------------------------------------------------
+generic/appli/query       eyedbjrun Query person <any valid query>
+                          for instance:
+                          eyedbjrun Query person "select Person"
+----------------------------------------------------------------
+generic/appli/store       eyedbjrun Store person <name> <age>
+----------------------------------------------------------------
+generic/appli/collections eyedbjrun Collections person <prefix>
+----------------------------------------------------------------
+generic/appli/schema      eyedbjrun Store person
+----------------------------------------------------------------
+generic/applet            with Netscape, open the applet.html page
+----------------------------------------------------------------
