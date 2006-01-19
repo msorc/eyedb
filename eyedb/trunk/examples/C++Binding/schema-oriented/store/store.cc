@@ -24,40 +24,6 @@
 
 #include "person.h"
 
-using namespace eyedb;
-
-template <class T>
-class ObjectReleaser
-{
-  typedef T *type;
-  type _o;
-  bool _dont_release;
-
-public:
-  ObjectReleaser(type o) : _o(o), _dont_release(false) {}
-  ObjectReleaser(Database *db) : _o(new T(db)), _dont_release(false) {}
-
-  operator const type() const {return _o;}
-  operator type() {return _o;}
-  type operator->() {return _o;}
-
-  type dontRelease() {_dont_release = true; return _o;}
-
-  ~ObjectReleaser() {if (!_dont_release) _o->release();}
-};
-
-class AutoReleaser {
-  Object *_o;
-  bool _dont_release;
-
-public:
-  AutoReleaser(Object *o) : _o(o), _dont_release(false) {}
-
-  Object *dontRelease() {_dont_release = true; return _o;}
-
-  ~AutoReleaser() {if (!_dont_release) _o->release();}
-};
-
 int
 main(int argc, char *argv[])
 {
@@ -88,7 +54,7 @@ main(int argc, char *argv[])
 
     // opening database dbname using 'personDatabase' class
     personDatabase db(dbname);
-    db.open(&conn, Database::DBRW);
+    db.open(&conn, eyedb::Database::DBRW);
 
     // beginning a transaction
     db.transactionBegin();

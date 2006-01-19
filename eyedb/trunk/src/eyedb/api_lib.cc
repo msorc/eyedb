@@ -23,6 +23,10 @@
 
 
 #include <assert.h>
+#include "eyedb/base.h"
+#include "eyedb/Error.h"
+#include "eyedb/Exception.h"
+#include "eyedb/TransactionParams.h"
 #include "api_lib.h"
 #include "eyedblib/xdr.h"
 #include <eyedbsm/xdr.h>

@@ -57,6 +57,10 @@ extern Window wid;
 
 #endif
 
+#include "eyedb/base.h"
+#include "eyedb/Error.h"
+#include "eyedb/Exception.h"
+#include "eyedb/TransactionParams.h"
 #include "OQLParser.h"
 #include "DBM_Database.h"
 #include <signal.h>
@@ -85,7 +89,7 @@ static OQLParser *mParser;
 
 static Bool auto_trmode = True;
 static int tr_cnt;
-static TransactionParams params = Database::getGlobalDefaultTransactionParams();
+static TransactionParams params = TransactionParams::getGlobalDefaultTransactionParams();
 
 static void usage(char esc)
 {
@@ -2036,7 +2040,7 @@ settrmode_realize(char *argv[], int argc, TransactionParams &params)
   if (argc > 6)
     return 0;
 
-  params = Database::getGlobalDefaultTransactionParams();
+  params = TransactionParams::getGlobalDefaultTransactionParams();
 
   if (argc == 0) return 1;
 

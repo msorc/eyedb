@@ -29,6 +29,10 @@ namespace eyedb {
   class ObjectHeader;
 }
 
+#include "eyedb/base.h"
+#include "eyedb/Error.h"
+#include "eyedb/Exception.h"
+#include "eyedb/TransactionParams.h"
 #include "kernel.h"
 #include <eyedblib/xdr.h>
 #include <eyedbsm/xdr.h>

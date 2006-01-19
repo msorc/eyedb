@@ -564,31 +564,6 @@ namespace eyedb {
 
     /**
        Not yet documented
-       @param params
-       @return
-    */
-    static Status setGlobalDefaultTransactionParams(const TransactionParams &params);
-
-    /**
-       Not yet documented
-       @return
-    */
-    static TransactionParams getGlobalDefaultTransactionParams();
-
-    /**
-       Not yet documented
-       @param magorder
-    */
-    static void setGlobalDefaultMagOrder(unsigned int magorder);
-
-    /**
-       Not yet documented
-       @return
-    */
-    static unsigned int getGlobalDefaultMagOrder();
-
-    /**
-       Not yet documented
        @param commit_on_close
     */
     void setCommitOnClose(Bool commit_on_close);
@@ -1071,11 +1046,8 @@ namespace eyedb {
 			       const char *, const char *,
 			       Database **);
     const char *Database::getTName() const;
-    static TransactionParams global_def_params;
 
     TransactionParams def_params;
-
-    static Status check_trmode(const TransactionParams &, Bool = True);
 
     char *dbmdb_str;
     Status invalidDbmdb(Error) const;
