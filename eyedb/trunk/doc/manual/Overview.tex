@@ -245,26 +245,26 @@ If \emph{new()} denotes the instantiation method:
 \\
 \\
 \ixx\ttv{struct\_class} \textsf{Person} =\\
-\ixy  \ttv{struct\_class}-$>$\emph{new}(name = "Person", ...)
+\ixy  \ttv{struct\_class}\texttt{->}\emph{new}(name = "Person", ...)
 \\
 \\
 \textsf{Person} is an \instance{struct\_class} that can be instantiated:
 \\
 \\
 \ixx \ttv{struct} \textsf{john} =\\
-\ixy  \textsf{Person}-$>$\emph{new}(name = "john", age = 32)
+\ixy  \textsf{Person}\texttt{->}\emph{new}(name = "john", age = 32)
 \\
 \\
 \textsf{john} is an \instance{struct} that cannot be instantiated
 \\
 \\
 \ixx\ttv{struct\_class} \textsf{Employee} =\\
-\ixy  \ttv{struct\_class}-$>$\emph{new}(name = "Employee",\\
+\ixy  \ttv{struct\_class}\texttt{->}\emph{new}(name = "Employee",\\
 \ixy   parent = \textsf{Person}, ...)
 \\
 \\
 \ixx \ttv{struct} \textsf{henry} =\\
-\ixy  \textsf{Employee}-$>$\emph{new}(name = "henry",\\
+\ixy  \textsf{Employee}\texttt{->}\emph{new}(name = "henry",\\
 \ixy  salary = 10000)
 \\
 \\
@@ -775,7 +775,7 @@ The previous C++ code is here translated for the \eyedb Java API:
 \end{verbatim}
 }
 As shown in this example, the code is absolutely identical except
-that that some \ttv{-$>$} in C++ are replaced by a \ttv{.} character
+that that some \ttv{->} in C++ are replaced by a \ttv{.} character
 in Java.
 \\
 The only difference that does not appear in our examples is the
