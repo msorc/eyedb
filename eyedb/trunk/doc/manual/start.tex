@@ -14,25 +14,29 @@
 \usepackage{longtable}
 
 % -- to reduce the margin pages --
-\textwidth 440pt
-%\textheight 710pt
-\textheight 690pt
 \topmargin 2pt
 \headsep 20pt
 \headheight 2pt
-\oddsidemargin 0pt
-\evensidemargin 0pt
+
+%\textwidth 440pt
+%\textheight 690pt
+%\oddsidemargin 0pt
+%\evensidemargin 0pt
+
+% 19/01/06: EV
+\textwidth 490pt
+\textheight 700pt
+\oddsidemargin -20pt
+\evensidemargin -20pt
+
 % --------------------------------
 
 \makeindex
 
 \newcommand{\eyedb}{\textsc{EyeDB} }
 \newcommand{\eyedbX}{\textsc{EyeDB}}
-%%\newcommand{\eyedb}{\textsc{Eyedb} }
-%%\newcommand{\eyedb}{EyeDB }
 \newcommand{\sysra}{SYSRA}
 \newcommand{\indexentry}[2]{\item #1 #2}
-%%\newcommand{\pp}[1]{\part{#1} \index{#1}}
 \newcommand{\chap}[1]{\chapter{#1} \index{#1}}
 \newcommand{\sect}[1]{\section{#1} \index{#1}}
 \newcommand{\subsect}[1]{\subsection{#1} \index{#1}}
@@ -51,14 +55,9 @@
 \newcommand{\ttt}{$\tilde{ }$}
 \newcommand{\ttv}[1]{\texttt{#1}}
 \newcommand{\ttu}[1]{{\verbsize\texttt{#1}}}
-%\newcommand{\verbsizex}{\scriptsize}
 \newcommand{\verbsizex}{\small}
 \newcommand{\verbsizey}{\fontsize{8}{\baselineskip}\selectfont}
-%\newcommand{\normsize}{\fontsize{10}{\baselineskip}\selectfont}
-%\newcommand{\verbsize}{\verbsizey}
-%\newcommand{\verbsize}{\verbsizey}
 \newcommand{\verbsize}{\normalsize}
-%%\newcommand{\support}{eyedb-support@eyedb.org }
 \newcommand{\bugreport}{bug-report@eyedb.org }
 \newcommand{\idt}{\mbox{ } - }
 \newcommand{\ident}{{\bf \texttt{<}identifier\texttt{>}}}
@@ -71,6 +70,7 @@
 \newcommand{\ixz}{\\\ixy {- }}
 
 \renewcommand{\normalsize}{\fontsize{9}{11pt}\selectfont}
+
 %\renewcommand{\normalsize}{\fontsize{8}{10pt}\selectfont}
 
 %% The following commands comes from corbaref.tex
@@ -105,6 +105,13 @@
 
 \newcommand{\Gets}[1]{gets the #1 value in the Object \emph{o} at the \emph{ind}}
 
+%\setcounter{secnumdepth}{-1}
+%\addtocounter{secnumdepth}{2}
+
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection}}
+\renewcommand{\thechapter}{}
 
 \begin{document}
 \normalsize
+

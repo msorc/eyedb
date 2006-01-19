@@ -83,7 +83,7 @@ namespace eyedb {
     TransactionLockMode lockmode;
     RecoveryMode recovmode;
     unsigned int magorder;     /* estimated object cardinality in trans */
-    unsigned int ratioalrt;    /* error returned if ratio != 0 &&
+    unsigned int ratioalrt;    /* error returned if ratioalrt != 0 &&
 				  trans object number > ratioalrt * magorder  */
     unsigned int wait_timeout; /* in seconds */
 
