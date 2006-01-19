@@ -69,8 +69,8 @@ to include any other eyedb files.
 The first method only initializes the \eyedb layer while the second
 one performs also some command line option processing: each command line option
 beginning by \texttt{-eyedb} is interpreted as a standard \eyedb option.
-For instance, the option \texttt{-eyedbport $<$port$>$} allows you to use
-the port \texttt{$<$port$>$} as the default connection port to the \eyedb
+For instance, the option \texttt{-eyedbport <port>} allows you to use
+the port \texttt{<port>} as the default connection port to the \eyedb
 server, while the option \texttt{-eyedblog stderr} displays log information
 on the standard error.
 \\
@@ -146,8 +146,8 @@ This method has two optionnal arguments: \texttt{host} and \texttt{port}.
 \\
 If these arguments are not specified, their values are taken from the
 configuration file (by default \texttt{\$EYEDBROOT/etc/EyeDB.cfg}) or
-from the command line options \texttt{-eyedbhost $<$host$>$} and
-\texttt{-eyedbport $<$port$>$} if specified.
+from the command line options \texttt{-eyedbhost <host>} and
+\texttt{-eyedbport <port>} if specified.
 \item in case of an error happened during the connection setting-up,
 a status is returned or an exception is raised depending on the
 chosen error policy. The default error policy is the \texttt{status error
@@ -229,7 +229,7 @@ the reference manual.
 \ee
 The two last arguments are optionnal: if not specified, their values
 are taken from the configuration file or from the command line options
-\texttt{-eyedbuser $<$user$>$} and \texttt{-eyedbpasswd $<$passwd$>$}, or from
+\texttt{-eyedbuser <user>} and \texttt{-eyedbpasswd <passwd>}, or from
 the standard input when using \texttt{-eyedbuser?}, \texttt{-eyedbpasswd?} or
 \texttt{-eyedbauth?}.
 \ee
@@ -928,7 +928,7 @@ There are two mandatory options:
 \begin{tabbing}
 \texttt{-output-file-prefix} \emph{prefix} \= : \= ouput file prefix (default is the package name)\kill
 \texttt{-package} \emph{package}     \> : \> package name\\
-\emph{odlfile}$|$-$|$-db \emph{dbname}    \> : \> input ODL file (- is the standard input) or\\
+\emph{odlfile}\texttt{|}-\texttt{|}-db \emph{dbname}    \> : \> input ODL file (- is the standard input) or\\
 \>                          \> the database which contains the schema \\
 \end{tabbing}
 and some optionnal options:
@@ -1264,7 +1264,7 @@ An attribute type is a combination of:
 \item basic type: for instance \texttt{int32}, \texttt{char} or \texttt{double}.
 \item system type: for instance \texttt{class}, \texttt{object}, \texttt{image}.
 \item user type: for instance \texttt{Person}, \texttt{Employee},
-\texttt{set$<$Car *$>$}.
+\texttt{set<Car *>}.
 \item user enum: for instance \texttt{CivilState}.
 \ee
 \item the literal or object property:
@@ -1307,7 +1307,7 @@ following attribute type family:
 \texttt{string country}.\\
 \>3. {\bf literal user type} \>: \texttt{Address addr}\\
 \>4. {\bf object basic, user or system type} \>: \texttt{Person *spouse}\\
-\>5. {\bf object collection type}\>: \texttt{array<Person *> children}, \texttt{set$<$Car *$>$> cars}.\\
+\>5. {\bf object collection type}\>: \texttt{array<Person *> children}, \texttt{set<Car *>> cars}.\\
 \end{tabbing}
 All those type families support in an orthogonal way an multi-dimenstion
 array modifier.
@@ -1432,13 +1432,13 @@ For the not ordered collections, the selector method are as follows:
                         eyedb::Status *status = 0) const;
 \end{verbatim}
 \normalsize
-where $<$collection type$>$ can be:
+where \texttt{<collection type>} can be:
 \be
 \item \texttt{eyedb::CollSet} for a collection set
 \item \texttt{eyedb::CollBag} for a collection bag
 %\item \texttt{eyedb::CollArray} for a collection array
 \ee
-and where $<$collection object type$>$ is the type which is composing
+and where \texttt{<collection object type>} is the type which is composing
 the collection.
 \\
 \\
@@ -1519,14 +1519,14 @@ For the ordered collections, the selector method are as follows:
                                        eyedb::Status *status = 0) const;
 \end{verbatim}
 \normalsize
-where $<$collection type$>$ can be:
+where \texttt{<collection type>} can be:
 \be
 \item \texttt{eyedb::CollArray} for a collection array
 \item \texttt{eyedb::CollList} for a collection list\\
 \emph{Note that the collection list are currently not implemented in
 \eyedb}.
 \ee
-and where $<$collection object type$>$ is the type which is composing
+and where \texttt{<collection object type>} is the type which is composing
 the collection.
 \\
 \\
@@ -1702,12 +1702,12 @@ For unordered collection types, the modifier methods are under the form:
   eyedb::Status rmvFrom<attribute name>Coll(const eyedb::Oid &);
 \end{verbatim}
 \normalsize
-where $<$collection type$>$ can be:
+where \texttt{<collection type>} can be:
 \be
 \item \texttt{eyedb::CollSet} for a collection set
 \item \texttt{eyedb::CollBag} for a collection bag
 \ee
-and where $<$collection object type$>$ is the type which composing
+and where \texttt{<collection object type>} is the type which composing
 the collection.
 \\
 \\
@@ -1787,14 +1787,14 @@ For ordered collection types, the modifier methods are under the form:
   eyedb::Status unsetIn<attribute name>CollAt(int where);
 \end{verbatim}
 \normalsize
-where $<$collection type$>$ can be:
+where \texttt{<collection type>} can be:
 \be
 \item \texttt{eyedb::CollArray} for a collection array
 \item \texttt{eyedb::CollList} for a collection list\\
 \emph{Note that the collection list are currently not implemented in
 \eyedb}.
 \ee
-and where $<$collection object type$>$ is the type which composing
+and where \texttt{<collection object type>} is the type which composing
 the collection.
 \\
 \\
