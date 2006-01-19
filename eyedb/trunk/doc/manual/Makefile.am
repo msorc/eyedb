@@ -33,7 +33,8 @@ html/Overview.html
 endif
 
 LATEX2HTML=@LATEX2HTML@
-LATEX2HTMLFLAGS=-toc_depth 6 -top_navigation -verbosity 0 -no_images -local_icons -dir html -init_file latex2html-init
+LATEX2HTMLCOMMONFLAGS=-toc_depth 6 -top_navigation -verbosity 0 -local_icons -dir html -init_file latex2html-init -address "`finger -l | grep Name | sed -e 's/Login.*Name: //' | iconv --from-code='UTF-8' --to-code='ISO_8859-1' -`"
+LATEX2HTMLFLAGS=$(LATEX2HTMLCOMMONFLAGS) -no_images 
 
 %.dvi: %.tex
 	$(LATEX) $<
@@ -54,6 +55,10 @@ html/%.html: %.tex
 html/OQL.html: OQL.tex
 	-test ! -d html && mkdir html
 	$(LATEX2HTML) $(LATEX2HTMLFLAGS) -split +3 -prefix OQL OQL.tex
+
+html/Overview.html: Overview.tex
+	-test ! -d html && mkdir html
+	$(LATEX2HTML) $(LATEX2HTMLCOMMONFLAGS) -split +2 -prefix Overview Overview.tex
 
 Administration.dvi: start.tex version.tex title.tex
 CplusplusBinding.dvi: start.tex version.tex title.tex
