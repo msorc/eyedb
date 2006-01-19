@@ -21,3 +21,6 @@ person.cc person.h : schema.odl
 
 # Dependencies
 person.$(OBJEXT): person.h
+
+init:
+	sh init.sh

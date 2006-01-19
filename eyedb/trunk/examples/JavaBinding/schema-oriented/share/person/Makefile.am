@@ -1,6 +1,6 @@
 JAVA_FILES=Address.java array_class_Person_ref.java Car.java CivilState.java Database.java Employee.java Person.java set_class_Car_ref.java 
 
-JAVAROOT=$(top_builddir)/examples/JavaBinding/schema-oriented/store
+JAVAROOT=$(top_builddir)/examples/JavaBinding/schema-oriented/share
 CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_builddir)/src/java/eyedb.jar
 
 check-local: class.stamp
@@ -16,7 +16,7 @@ clean-local:
 #
 EYEDBODL_exe=$(bindir)/eyedbodl
 EYEDBODL = $(EYEDBODL_exe) --gencode=java
-EYEDBODLFLAGS= --no-rootclass --package=person --output-dir=$(top_builddir)/examples/JavaBinding/schema-oriented/store/person
+EYEDBODLFLAGS= --no-rootclass --package=person --output-dir=$(top_builddir)/examples/JavaBinding/schema-oriented/share/person
 
 $(JAVA_FILES) : ../schema.odl
 	@if test -x $(EYEDBODL_exe) ; then \
