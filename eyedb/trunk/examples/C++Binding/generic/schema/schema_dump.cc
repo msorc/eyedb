@@ -37,11 +37,10 @@ main(int argc, char *argv[])
 {
   eyedb::init(argc, argv);
 
-  if (argc != 2)
-    {
-      fprintf(stderr, "usage: %s <dbname>\n", argv[0]);
-      return 1;
-    }
+  if (argc != 2) {
+    fprintf(stderr, "usage: %s <dbname>\n", argv[0]);
+    return 1;
+  }
 
   eyedb::Exception::setMode(eyedb::Exception::ExceptionMode);
 
@@ -99,17 +98,15 @@ class_dump(FILE *fd, const eyedb::Class *cls)
   if (cls->asCollectionClass() || cls->asBasicClass())
     return;
 
-  if (cls->asEnumClass())
-    {
-      enum_class_dump(fd, cls->asEnumClass());
-      return;
-    }
+  if (cls->asEnumClass()) {
+    enum_class_dump(fd, cls->asEnumClass());
+    return;
+  }
 
-  if (cls->asStructClass())
-    {
-      struct_class_dump(fd, cls->asStructClass());
-      return;
-    }
+  if (cls->asStructClass()) {
+    struct_class_dump(fd, cls->asStructClass());
+    return;
+  }
 
   eyedb::Exception::make("unknown class type '%s'", cls->getName());
 }
@@ -141,53 +138,52 @@ struct_class_dump(FILE *fd, const eyedb::StructClass *cls)
   int attr_cnt;
   const eyedb::Attribute **attrs = cls->getAttributes(attr_cnt);
 
-  for (int i = 0; i < attr_cnt; i++)
-    {
-      const eyedb::Attribute *attr = attrs[i];
+  for (int i = 0; i < attr_cnt; i++) {
+    const eyedb::Attribute *attr = attrs[i];
 
-      if (attr->isNative())
-	continue;
+    if (attr->isNative())
+      continue;
       
-      eyedb::Bool upClassAttr =
-	strcmp(attr->getClassOwner()->getName(), cls->getName()) ? eyedb::True :
-	eyedb::False;
+    eyedb::Bool upClassAttr =
+      strcmp(attr->getClassOwner()->getName(), cls->getName()) ? eyedb::True :
+      eyedb::False;
 
-      fprintf(fd, "\t");
-      if (upClassAttr)
-	fprintf(fd, "// ");
+    fprintf(fd, "\t");
+    if (upClassAttr)
+      fprintf(fd, "// ");
 
-      eyedb::Bool strdim = attr->isString() ? eyedb::True : eyedb::False;
+    eyedb::Bool strdim = attr->isString() ? eyedb::True : eyedb::False;
 
-      if (strdim) {
-	fprintf(fd, "attribute string");
-	if (attr->getTypeModifier().ndims == 1 &&
-	    attr->getTypeModifier().dims[0] > 0)
-	  fprintf(fd, "<%d>", attr->getTypeModifier().dims[0]);
-      }
-      else {
-	fprintf(fd, "%s %s",
-		(attr->hasInverse() ? "relationship" : "attribute"),
-		attr->getClass()->getName());
-
-	if (attr->isIndirect())
-	  fprintf(fd, "*");
-      }
-
-      if (upClassAttr)
-	fprintf(fd, " %s::%s", attr->getClassOwner()->getName(),
-		attr->getName());
-      else
-	fprintf(fd, " %s", attr->getName());
-
-      if (!strdim)
-	for (int j = 0; j < attr->getTypeModifier().ndims; j++) {
-	  if (attr->getTypeModifier().dims[j] < 0)
-	    fprintf(fd, "[]");
-	  else
-	    fprintf(fd, "[%d]", attr->getTypeModifier().dims[j]);
-	}
-      fprintf(fd, ";\n");
+    if (strdim) {
+      fprintf(fd, "attribute string");
+      if (attr->getTypeModifier().ndims == 1 &&
+	  attr->getTypeModifier().dims[0] > 0)
+	fprintf(fd, "<%d>", attr->getTypeModifier().dims[0]);
     }
+    else {
+      fprintf(fd, "%s %s",
+	      (attr->hasInverse() ? "relationship" : "attribute"),
+	      attr->getClass()->getName());
+
+      if (attr->isIndirect())
+	fprintf(fd, "*");
+    }
+
+    if (upClassAttr)
+      fprintf(fd, " %s::%s", attr->getClassOwner()->getName(),
+	      attr->getName());
+    else
+      fprintf(fd, " %s", attr->getName());
+
+    if (!strdim)
+      for (int j = 0; j < attr->getTypeModifier().ndims; j++) {
+	if (attr->getTypeModifier().dims[j] < 0)
+	  fprintf(fd, "[]");
+	else
+	  fprintf(fd, "[%d]", attr->getTypeModifier().dims[j]);
+      }
+    fprintf(fd, ";\n");
+  }
 
   fprintf(fd, "};\n\n", cls->getName());
 }

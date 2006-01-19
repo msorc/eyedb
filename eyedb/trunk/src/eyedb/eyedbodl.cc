@@ -1060,7 +1060,7 @@ checkDb()
 int
 realize(int argc, char *argv[])
 {
-  Database::setGlobalDefaultMagOrder(100000);
+  TransactionParams::setGlobalDefaultMagOrder(100000);
 
   eyedb::init(argc, argv);
 

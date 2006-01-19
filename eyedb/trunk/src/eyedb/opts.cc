@@ -414,7 +414,7 @@ do { \
       Config::getServerConfig()->add(map[conf_opt].value.c_str());
 
     if (map.find(trans_def_mag_opt) != map.end())
-      Database::setGlobalDefaultMagOrder(atoi(map[trans_def_mag_opt].value.c_str()));
+      TransactionParams::setGlobalDefaultMagOrder(atoi(map[trans_def_mag_opt].value.c_str()));
  
     if (map.find(error_policy_opt) != map.end()) {
       const char *policy = map[error_policy_opt].value.c_str();

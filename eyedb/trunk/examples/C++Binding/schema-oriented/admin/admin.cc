@@ -19,7 +19,7 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
+  Author: Eric Viara <viara@sysra.com>
 */
 
 #include <eyedb/eyedb.h>
@@ -79,11 +79,10 @@ main(int argc, char *argv[])
     q_user.execute(user_arr);
 
     cout << "User List {" << endl;
-    for (int i = 0; i < user_arr.getCount(); i++)
-      {
-	eyedb::UserEntry *user = (eyedb::UserEntry *)user_arr[i];
-	cout << "\t" << user->name() << endl;
-      }
+    for (int i = 0; i < user_arr.getCount(); i++) {
+      eyedb::UserEntry *user = (eyedb::UserEntry *)user_arr[i];
+      cout << "\t" << user->name() << endl;
+    }
     cout << "}\n" << endl;
 
     // looking for all database entry
@@ -94,31 +93,28 @@ main(int argc, char *argv[])
 
     cout << "Database List {" << endl;
 
-    for (int i = 0; i < db_arr.getCount(); i++)
-      {
-	eyedb::DBEntry *dbentry = (eyedb::DBEntry *)db_arr[i];
-	cout << "\t" << dbentry->dbname() << " -> " << dbentry->dbfile() << endl;
-	// looking for all user which has any permission on this
-	// database
-	eyedb::OQL q_useraccess(&db,
-                            "select eyedb::DBUserAccess->dbentry->dbname = \"%s\"",
-			    dbentry->dbname().c_str());
-	eyedb::ObjectArray useraccess_arr;
-	q_useraccess.execute(useraccess_arr);
-	if (useraccess_arr.getCount())
-	  {
-	    cout << "\tUser Access {" << endl;
-	    for (int j = 0; j < useraccess_arr.getCount(); j++)
-	      {
-		eyedb::DBUserAccess *ua = (eyedb::DBUserAccess *)useraccess_arr[j];
-		cout << "\t\t" << ua->user()->name() << " -> " <<
-		  get_string_mode(ua->mode()) << endl;
-	      }
-	    cout << "\t}" << endl;
-	  }
-	cout << endl;
-	useraccess_arr.garbage();
+    for (int i = 0; i < db_arr.getCount(); i++) {
+      eyedb::DBEntry *dbentry = (eyedb::DBEntry *)db_arr[i];
+      cout << "\t" << dbentry->dbname() << " -> " << dbentry->dbfile() << endl;
+      // looking for all user which has any permission on this
+      // database
+      eyedb::OQL q_useraccess(&db,
+			      "select eyedb::DBUserAccess->dbentry->dbname = \"%s\"",
+			      dbentry->dbname().c_str());
+      eyedb::ObjectArray useraccess_arr;
+      q_useraccess.execute(useraccess_arr);
+      if (useraccess_arr.getCount()) {
+	cout << "\tUser Access {" << endl;
+	for (int j = 0; j < useraccess_arr.getCount(); j++) {
+	  eyedb::DBUserAccess *ua = (eyedb::DBUserAccess *)useraccess_arr[j];
+	  cout << "\t\t" << ua->user()->name() << " -> " <<
+	    get_string_mode(ua->mode()) << endl;
+	}
+	cout << "\t}" << endl;
       }
+      cout << endl;
+      useraccess_arr.garbage();
+    }
 
     cout << "}" << endl;
 

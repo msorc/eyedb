@@ -47,26 +47,6 @@ LinkedList *Database::dbopen_list;
 // changed the 19/10/99
 
   Bool Database::def_commit_on_close = False;
-  TransactionParams Database::global_def_params = {
-    TransactionOn,
-    ReadNWriteSX,
-    RecoveryFull,
-    0,
-    0,
-    30
-  };
-
-  void
-  Database::setGlobalDefaultMagOrder(unsigned int magorder)
-  {
-    global_def_params.magorder = magorder;
-  }
-
-  unsigned int
-  Database::getGlobalDefaultMagOrder()
-  {
-    return global_def_params.magorder;
-  }
 
   Bool edb_is_back_end = False;
   static char *default_voldir;
@@ -155,7 +135,7 @@ LinkedList *Database::dbopen_list;
     is_back_end = edb_is_back_end;
     bequeue = new BEQueue;
 
-    def_params = global_def_params;
+    def_params = TransactionParams::getGlobalDefaultTransactionParams();
     version = 0;
 
     database_file = 0;
@@ -175,45 +155,15 @@ LinkedList *Database::dbopen_list;
   }
 
   Status
-  Database::check_trmode(const TransactionParams &params,
-			 Bool strict)
-  {
-    Status s;
-
-    if (s = Transaction::checkParams(params, strict))
-      return s;
-
-    return Success;
-  }
-
-  Status
   Database::setDefaultTransactionParams(const TransactionParams &params)
   {
     Status s;
 
-    if (s = check_trmode(params, False))
+    if (s = Transaction::checkParams(params, False))
       return s;
 
     def_params = params;
     return Success;
-  }
-
-  Status Database::setGlobalDefaultTransactionParams
-  (const TransactionParams &params)
-  {
-    Status s;
-
-    if (s = check_trmode(params))
-      return s;
-
-    global_def_params = params;
-    return Success;
-  }
-
-  TransactionParams
-  Database::getGlobalDefaultTransactionParams()
-  {
-    return global_def_params;
   }
 
   TransactionParams
@@ -1188,7 +1138,7 @@ if ((mode) !=  NoDBAccessMode && \
   Status
   Database::transactionBeginExclusive()
   {
-    TransactionParams params = getGlobalDefaultTransactionParams();
+    TransactionParams params = TransactionParams::getGlobalDefaultTransactionParams();
     params.lockmode = DatabaseX;
     params.wait_timeout = 1;
 
@@ -1213,7 +1163,7 @@ if ((mode) !=  NoDBAccessMode && \
     if (!params)
       params = &sparams;
   
-    if (s = check_trmode(*params))
+    if (s = Transaction::checkParams(*params))
       return s;
   
     Transaction *trs = new Transaction(this, *params);

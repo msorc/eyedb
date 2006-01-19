@@ -111,6 +111,7 @@ Time.cc						\
 TimeInterval.cc					\
 TimeStamp.cc					\
 Transaction.cc					\
+TransactionParams.cc				\
 Union.cc					\
 UnionClass.cc					\
 Value.cc					\

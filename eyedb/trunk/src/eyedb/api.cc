@@ -29,6 +29,8 @@
 
 #include "base_p.h"
 #include "eyedb/internals/ObjectHeader.h"
+#include "eyedb/Exception.h"
+#include "eyedb/TransactionParams.h"
 #include "api_lib.h"
 
 #include "kernel.h"

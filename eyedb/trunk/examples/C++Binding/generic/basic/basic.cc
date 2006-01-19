@@ -29,13 +29,12 @@ main(int argc, char *argv[])
 {
   eyedb::init(argc, argv);
 
-  if (argc != 2)
-    {
-      fprintf(stderr, "usage: %s <dbname>\n", argv[0]);
-      return 1;
+  if (argc != 2) {
+    fprintf(stderr, "usage: %s <dbname>\n", argv[0]);
+    return 1;
     }
 
-//  idbException::setMode(idbException::ExceptionMode);
+  eyedb::Exception::setMode(eyedb::Exception::ExceptionMode);
 
   try {
     eyedb::Connection conn;

@@ -19,7 +19,7 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
+  Author: Eric Viara <viara@sysra.com>
 */
 
 #include <eyedb/eyedb.h>
@@ -62,17 +62,16 @@ main(int argc, char *argv[])
 
     // for each value returned in the query, display it:
     for (int i = 0; i < arr.getCount(); i++) {
-	// in case of the returned value is an oid, load it first:
-	if (arr[i].type == eyedb::Value::OID)
-	  {
-	    eyedb::Object *o;
-	    db.loadObject(arr[i].oid, &o);
-	    cout << o;
-	    o->release();
-	  }
-	else
-	  cout << arr[i] << endl;
+      // in case of the returned value is an oid, load it first:
+      if (arr[i].type == eyedb::Value::OID) {
+	eyedb::Object *o;
+	db.loadObject(arr[i].oid, &o);
+	cout << o;
+	o->release();
       }
+      else
+	cout << arr[i] << endl;
+    }
 
     // performing the same query using eyedb::OQLIterator interface
     // [1]: getting all returned values
@@ -84,45 +83,42 @@ main(int argc, char *argv[])
     eyedb::Value val;
 
     while (iter.next(val)) {
-	// in case of the returned value is an oid, load it first:
-	if (val.getType() == eyedb::Value::OID) {
-	    eyedb::Object *o;
-	    db.loadObject(val.oid, &o);
-	    cout << o;
+      // in case of the returned value is an oid, load it first:
+      if (val.getType() == eyedb::Value::OID) {
+	eyedb::Object *o;
+	db.loadObject(val.oid, &o);
+	cout << o;
 
-	    // in case of the returned object is a collection, display its
-	    // contents
-	    if (o->asCollection())
-	      {
-		eyedb::CollectionIterator citer(o->asCollection());
-		cout << "contents BEGIN\n";
-		eyedb::Object *co;
-		while(citer.next(co))
-		  {
-		    cout << co;
-		    co->release();
-		  }
-		cout << "contents END\n\n";
-	      }
-	    // in case of the returned object is a class, display its
-	    // extent
-	    else if (o->asClass()) {
-		eyedb::ClassIterator citer(o->asClass());
-		cout << "extent BEGIN\n";
-		eyedb::Object *co;
-		while(citer.next(co))
-		  {
-		    cout << co;
-		    co->release();
-		  }
-		cout << "extent END\n\n";
-	      }
-
-	    o->release();
+	// in case of the returned object is a collection, display its
+	// contents
+	if (o->asCollection()) {
+	  eyedb::CollectionIterator citer(o->asCollection());
+	  cout << "contents BEGIN\n";
+	  eyedb::Object *co;
+	  while(citer.next(co)) {
+	    cout << co;
+	    co->release();
 	  }
-	else
-	  cout << val << endl;
+	  cout << "contents END\n\n";
+	}
+	// in case of the returned object is a class, display its
+	// extent
+	else if (o->asClass()) {
+	  eyedb::ClassIterator citer(o->asClass());
+	  cout << "extent BEGIN\n";
+	  eyedb::Object *co;
+	  while(citer.next(co)) {
+	    cout << co;
+	    co->release();
+	  }
+	  cout << "extent END\n\n";
+	}
+
+	o->release();
       }
+      else
+	cout << val << endl;
+    }
 
     // [2]: getting only returned objects
 
@@ -133,9 +129,9 @@ main(int argc, char *argv[])
     eyedb::Object *o;
 
     while (iter2.next(o)) {
-	cout << o;
-	o->release();
-      }
+      cout << o;
+      o->release();
+    }
 
     // committing the transaction
     db.transactionCommit();

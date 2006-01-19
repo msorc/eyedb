@@ -19,10 +19,11 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
+  Author: Eric Viara <viara@sysra.com>
 */
 
 #include "person.h"
+
 using namespace std;
 
 int
@@ -34,12 +35,11 @@ main(int argc, char *argv[])
   // initializing the person package
   person::init();
 
-  if (argc != 4)
-    {
-      fprintf(stderr, "usage: %s <dbname> <person name> <person age>\n",
-	      argv[0]);
-      return 1;
-    }
+  if (argc != 4) {
+    fprintf(stderr, "usage: %s <dbname> <person name> <person age>\n",
+	    argv[0]);
+    return 1;
+  }
 
   const char *dbname = argv[1];
   const char *name = argv[2];

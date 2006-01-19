@@ -48,6 +48,8 @@
 
 #include <eyedb/Object.h>
 
+#include <eyedb/TransactionParams.h>
+
 #include <eyedb/Class.h>
 #include <eyedb/Value.h>
 #include <eyedb/Attribute.h>

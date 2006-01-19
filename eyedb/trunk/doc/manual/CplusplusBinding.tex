@@ -29,11 +29,17 @@ Each type in the \eyedb object model is implemented as a C++ class whithin
 the C++ API: there is a one for one mapping between the object model and
 the C++ API.
 \\
-This mapping follows a very simple naming schema: each C++ class mapped from
+This mapping follows a very simple naming scheme: each C++ class mapped from
 a type has the name of this type prefixed by the namespace \texttt{eyedb}.
 \\
 For instance, the \texttt{object} type in the \eyedb object model is
-mapped on the \texttt{eyedb::Object} C++ class.
+mapped to the \texttt{eyedb::Object} C++ class and the \texttt{agregat}
+type is mapped to the \texttt{eyedb::Agregat} C++ class.
+\\
+\\
+To avoid writing each time the full qualified type name
+(i.e. \texttt{eyedb::}\emph{type}), you may use the C++ instruction
+\texttt{using namespace eyedb}.
 \\
 \\
 We are going to introduce the main classes and methods through some simple
@@ -67,56 +73,39 @@ to include any other eyedb files.
 \item static void eyedb::init(int \&argc, char *argv[])
 \ee
 The first method only initializes the \eyedb layer while the second
-one performs also some command line option processing: each command line option
-beginning by \texttt{-eyedb} is interpreted as a standard \eyedb option.
-For instance, the option \texttt{-eyedbport <port>} allows you to use
+one performs also some command line option processing.
+For instance, the option \texttt{--port=<port>} allows you to use
 the port \texttt{<port>} as the default connection port to the \eyedb
-server, while the option \texttt{-eyedblog stderr} displays log information
+server, while the option \texttt{-logdev=stderr} displays log information
 on the standard error.
 \\
-Note that the prefix \texttt{-eyedb} is used to avoid any conflicts
-with client command line options.
 \\
-\\
-The option \texttt{-eyedbhelp} displays a brief usage for each standard options:
+The option \texttt{--help-eyedb-options} displays a brief usage for each standard options:
 \verbsize
 \begin{verbatim}
-        -eyedbroot <root>             eyedb root directory
-        -eyedbhost <host>             eyedb host server
-        -eyedbport <portname>         eyedb port name
-        -eyedbdbm <dbmfile>           EYEDBDBM database file
-        -eyedbuser <user>             eyedb user name
-        -eyedbpasswd <passwd>         eyedb password
-        -eyedbuser?                   asks for eyedb user name on stdin
-        -eyedbpasswd?                 asks for eyedb password on stdin
-        -eyedbauth?                   asks for eyedb user/password on stdin
-        -eyedbconf <conffile>         configuration file
-        -eyedblog <logfile>           output log file
-        -eyedblogmask <mask>          output log mask
-        -eyedblogdate on|off          controls date display in output log
-        -eyedblogtimer on|off         controls timer display in output log
-        -eyedblogpid on|off           controls pid display in output log
-        -eyedblogprog on|off          controls progname display in output log
-        -eyedb-error-policy status    returns a status on any eyedb error
-        -eyedb-error-policy exception throws an exception on any eyedb error
-        -eyedb-error-policy abort     aborts the program on any eyedb error
-        -eyedb-error-policy stop      stops the program on any eyedb error
-        -eyedb-error-policy echo      displays each error on the standard error
-        -eyedbtransless               default transaction mode is less
-        -eyedbtransdefmgo <magorder>  sets the default transaction magnitude order
-        -eyedbarch                    displays the client architecture
-        -eyedbversion                 displays the eyedb version
-        -eyedbhelp                    displays this message
+  -U <user>|@, --user=<user>|@       User name
+  -P [<passwd>], --passwd[=<passwd>] Password
+  --host=<host>                      eyedbd host
+  --port=<port>                      eyedbd port
+  --inet                             Use the tcp_port variable if port is not set
+  --dbm=<dbmfile>                    EYEDBDBM database file
+  --conf=<conffile>                  Configuration file
+  --logdev=<logfile>                 Output log file
+  --logmask=<mask>                   Output log mask
+  --logdate=on|off                   Control date display in output log
+  --logtimer=on|off                  Control timer display in output log
+  --logpid=on|off                    Control pid display in output log
+  --logprog=on|off                   Control progname display in output log
+  --error-policy=<value>             Control error policy: status|exception|abort|stop|echo
+  --trans-def-mag=<magorder>         Default transaction magnitude order
+  --arch                             Display the client architecture
+  -v, --version                      Display the version
+  --help-eyedb-options               Display this message
 \end{verbatim}
 \normalsize
 Note that all the standard command line options recognized in the
 \texttt{argc/argv} array are suppressed from this array by
 \texttt{eyedb::init(int \&argc, char *argv[])}.
-\item the class \texttt{eyedb} (which can be found in the \texttt{eyedbclass.h}
-file) is the environment class of the \eyedb layer: through this class,
-you can perform initialization, you can get the current \eyedb version,
-any configuration value, the current architecture,
-the default and the supported compilers, the standard option usage and help.
 \item the last statement \texttt{eyedb::release()} allows you to release all
 the \eyedb allocated resources and to close opened databases and connections.
 Note that this statement is optionnal as all \eyedb allocated resources,
@@ -145,9 +134,9 @@ does not perform any actual actions: it only constructs a runtime instance.
 This method has two optionnal arguments: \texttt{host} and \texttt{port}.
 \\
 If these arguments are not specified, their values are taken from the
-configuration file (by default \texttt{\$EYEDBROOT/etc/EyeDB.cfg}) or
-from the command line options \texttt{-eyedbhost <host>} and
-\texttt{-eyedbport <port>} if specified.
+configuration or
+from the command line options \texttt{--host=<host>} and
+\texttt{--port=<port>} if specified.
 \item in case of an error happened during the connection setting-up,
 a status is returned or an exception is raised depending on the
 chosen error policy. The default error policy is the \texttt{status error
@@ -162,11 +151,10 @@ has been performed successfully:
   eyedb::Status s;
   eyedb::Connection conn;
   s = conn.open();
-  if (s)
-   {
-     cerr << status;
-     return 1;
-   }
+  if (s) {
+    cerr << status;
+    return 1;
+  }
 \end{verbatim}
 \normalsize
 \ei
@@ -229,9 +217,8 @@ the reference manual.
 \ee
 The two last arguments are optionnal: if not specified, their values
 are taken from the configuration file or from the command line options
-\texttt{-eyedbuser <user>} and \texttt{-eyedbpasswd <passwd>}, or from
-the standard input when using \texttt{-eyedbuser?}, \texttt{-eyedbpasswd?} or
-\texttt{-eyedbauth?}.
+\texttt{--user=<user>} and \texttt{--passwd=<passwd>}, or from
+the standard input when using \texttt{--passwd} without given value.
 \ee
 Note that an \eyedb client can manage several connections and
 several databases on each connection, for instance:
@@ -301,16 +288,20 @@ But the abort at level 1 is without effect: it will
 not be performed; only the commit at level 0 will be performed.
 \\
 \\
-There are four optionnal arguments to the \texttt{eyedb::Database::transactionBegin}
-method:
+One can give parameters to the transaction that one begins by setting an
+optional argument of type \texttt{eyedb::TransactionParams} to the
+\texttt{transactionBegin} method. The \texttt{TransactionParams} type is
+composed of :
 \be
-\item the \texttt{mode} argument controls the object lock policy.
-\item the \texttt{writing mode} argument controls when to write the object to
-the database.
-\item the \texttt{parameters} argument controls the deadlock policy and the
+\item the \texttt{trsmode} argument controls the transaction mode,
+\item the \texttt{lockmode} argument controls the object lock policy,
+\item the \texttt{recovmode} argument controls the recovery mode,
+\item the \texttt{magorder} argument controls the size of the allocated
+tables for the transaction,
+\item the \texttt{ratioalrt} argument controls the  error returned if
+ratioalrt != 0 and trans object number > ratioalrt * magorder
+\item the \texttt{wait\_timeout} argument controls 
 wait timeout value.
-\item the \texttt{magnitude order} argument controls the size of the allocated
-tables for the transaction.
 \ee
 Refer to the reference manual to get more information about these arguments.
 
@@ -362,17 +353,15 @@ an attribute named \texttt{age}:
   eyedb::LinkedListCursor c(db.getSchema->getClassList());
   eyedb::Class *cls;
   while (c.getNext((void*&)cls))
-    if (cls->asStructClass())
-      {
-        int attr_cnt;
-        const eyedb::Attribute **attrs = cls->getAttributes(attr_cnt);
-        for (int i = 0; i < attr_cnt; i++)
-          if (!strcmp(attrs[i]->getName(), "age"))
-            {
-              cout << cls;
-              break;
-            }
-      }
+    if (cls->asStructClass()) {
+      int attr_cnt;
+      const eyedb::Attribute **attrs = cls->getAttributes(attr_cnt);
+      for (int i = 0; i < attr_cnt; i++)
+        if (!strcmp(attrs[i]->getName(), "age")) {
+          cout << cls;
+          break;
+       }
+     }
 \end{verbatim}
 \normalsize
 \subsect{Object Manipulation}
@@ -390,7 +379,7 @@ A runtime object is persistent if it is tied to a database object.
 Otherwise, it is  transient.
 \\
 \\
-Contrary to some other OODBMS, such as \texttt{ObjectStore}, \eyedb does not
+Contrary to some other OODBMS, \eyedb does not
 provide an automatic synchronisation between persistent runtime objects
 and database objects.
 \\
@@ -456,7 +445,7 @@ class Employee extends Person {
 };
 \end{verbatim}
 \normalsize
-This file can be found in \texttt{\$EYEDBROOT/examples/common}.
+This file is located at \emph{prefix}/\texttt{share/doc/eyedb/examples/C++Binding/schema-oriented/share/schema.odl}.
 \subsect{Creating Runtime Objects}
 Using the C++ API, we cannot create directly a database object.
 We must create first a runtime object.
@@ -681,12 +670,11 @@ we must do something a little bit more complicated:
   eyedb::Oid spouse_oid;
   attr_spouse->getOid(o, &spouse_oid);
 
-  if (spouse_oid.isValid())
-   {
-     eyedb::Object *spouse;
-     db.loadObject(spouse_oid, spouse);
-     cout << "spouse is: " << spouse;
-   }
+  if (spouse_oid.isValid()) {
+    eyedb::Object *spouse;
+    db.loadObject(spouse_oid, spouse);
+    cout << "spouse is: " << spouse;
+  }
 \end{verbatim}
 \normalsize
 To get the \texttt{spouse} attribute value, we need to get first the
@@ -779,18 +767,17 @@ as follows:
   q.execute(obj_arr);
 
   const eyedb::Attribute *attr_name = cls->getAttribute("name");
-  for (int i = 0; i < obj_arr.getCount(); i++)
-    {
-      // getting name attribute size
-     eyedb::Size name_length;
-     attr_name->getSize(obj_arr[i], name_length);
+  for (int i = 0; i < obj_arr.getCount(); i++) {
+     // getting name attribute size
+    eyedb::Size name_length;
+    attr_name->getSize(obj_arr[i], name_length);
 
-     // getting name attribute value
-     char *name = new char[name_length];
-     attr_name->getValue(obj_arr[i], (eyedb::Data *)name, name_length, 0);
-     cout << "name of #" << i << " is : " << name << endl;
-     delete [] name;
-   }  
+    // getting name attribute value
+    char *name = new char[name_length];
+    attr_name->getValue(obj_arr[i], (eyedb::Data *)name, name_length, 0);
+    cout << "name of #" << i << " is : " << name << endl;
+    delete [] name;
+  }  
 \end{verbatim}
 \normalsize
 \item the second one is to perform directly an appropriate query as follows:
