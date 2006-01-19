@@ -1,5 +1,6 @@
 packagedir=$(pkglibdir)/java/classes/org/eyedb/utils
 dist_package_JAVA = \
+CURL.java \
 Database.java \
 Date.java \
 Image.java \
@@ -15,7 +16,7 @@ WConfig.java \
 Weekday.java
 
 JAVAROOT=$(top_builddir)/src/java/src
-CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_srcdir)/src/java/src
+CLASSPATH_ENV= CLASSPATH=$(top_srcdir)/src/java/src:$(JAVAROOT)
 
 EYEDBODL_exe=$(bindir)/eyedbodl
 

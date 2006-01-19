@@ -99,8 +99,8 @@ sparc-sun-solaris2.9)
 	then
 		DEFINES="-DSOLARIS -DSPARCV9 -DSOLARIS_SPARCV9_GCC"
 	else
-		CFLAGS="-mt -xtarget=ultra -xarch=v9"
-		CXXFLAGS="$CXXFLAGS -mt -xtarget=ultra -xarch=v9"
+		CFLAGS="-xtarget=ultra -xarch=v9"
+		CXXFLAGS="$CXXFLAGS -xtarget=ultra -xarch=v9"
 		LDFLAGS="-XCClinker -xtarget=ultra -XCClinker -xarch=v9"
 		DEFINES="-DSOLARIS -DSPARCV9 -DSOLARIS_SPARCV9_CC"
 	fi
@@ -136,6 +136,11 @@ AC_CHECK_TYPE(flock_t, AC_DEFINE([HAS_FLOCK_T], 1, [Defined if flock_t is define
 # check for union semun
 AC_CHECK_MEMBER( union semun.val, AC_DEFINE([HAS_UNION_SEMUN], 1, [Defined if union semun is defined]),, [#include <sys/sem.h>])
 
+# check for pthread
+ACX_PTHREAD
+LIBS="$LIBS $PTHREAD_LIBS"
+CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
+
 # check for functions
 AC_CHECK_FUNC(pthread_kill_other_threads_np, AC_DEFINE([HAS_PTHREAD_KILL_OTHER_THREADS_NP], 1, [Defined if function pthread_kill_other_threads_np exists]),,[#include <pthread.h>])
 AC_CHECK_FUNC(fattach, AC_DEFINE([HAS_FATTACH], 1, [Defined if function fattach exists]))
@@ -152,14 +157,8 @@ AC_FUNC_FSEEKO
 # check for libraries
 dnl AC_CHECK_LIB( nsl, ??) # -lnsl is not necessary apparently
 AC_CHECK_LIB( dl, dlopen)
-dnl AC_CHECK_LIB( pthread, pthread_create)
 AC_CHECK_LIB( crypt, crypt)
 AC_SEARCH_LIBS( socket, socket)
-
-# check for pthread
-ACX_PTHREAD
-LIBS="$LIBS $PTHREAD_LIBS"
-CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
 
 # ========================================
 # JAVA compilation
