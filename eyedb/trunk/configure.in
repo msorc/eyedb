@@ -312,9 +312,11 @@ examples/JavaBinding/generic/appli/store/Makefile
 examples/JavaBinding/generic/appli/store/Makefile.eyedb-examples
 examples/JavaBinding/schema-oriented/Makefile
 examples/JavaBinding/schema-oriented/Makefile.eyedb-examples
+examples/JavaBinding/schema-oriented/share/Makefile
+examples/JavaBinding/schema-oriented/share/Makefile.eyedb-examples
+examples/JavaBinding/schema-oriented/share/person/Makefile
 examples/JavaBinding/schema-oriented/store/Makefile
 examples/JavaBinding/schema-oriented/store/Makefile.eyedb-examples
-examples/JavaBinding/schema-oriented/store/person/Makefile
 examples/Makefile
 examples/Makefile.eyedb-examples
 examples/Makefile.eyedb
