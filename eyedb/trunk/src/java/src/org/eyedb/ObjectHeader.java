@@ -28,8 +28,8 @@ public class ObjectHeader {
     int    magic;
     int    type;
     int    size;
-    int    ctime;
-    int    mtime;
+    long   ctime;
+    long   mtime;
     int    xinfo;
     Oid oid_mcl;
     Oid oid_prot;
@@ -40,7 +40,8 @@ public class ObjectHeader {
     ObjectHeader() {
 	//magic = IDB_OBJ_HEAD_MAGIC;
 	magic = 0;
-	type = size = ctime = mtime = xinfo = 0;
+	type = size = xinfo = 0;
+	ctime = mtime = 0;
 	oid_mcl = new Oid();
 	oid_prot = new Oid();
     }
@@ -60,8 +61,8 @@ public class ObjectHeader {
 	objh.magic    = magic;
 	objh.type     = coder.decodeInt();
 	objh.size     = coder.decodeInt();
-	objh.ctime    = coder.decodeInt();
-	objh.mtime    = coder.decodeInt();
+	objh.ctime    = coder.decodeLong();
+	objh.mtime    = coder.decodeLong();
 	objh.xinfo    = coder.decodeInt();
 	objh.oid_mcl  = coder.decodeOid();
 	objh.oid_prot = coder.decodeOid();

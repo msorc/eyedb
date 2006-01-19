@@ -27,8 +27,8 @@ public class Object {
 
     protected Database db = null;
     protected Oid oid = new Oid();
-    protected int m_time     = 0;
-    protected int c_time     = 0;
+    protected long m_time     = 0;
+    protected long c_time     = 0;
     protected IDR idr     = null;
     protected boolean modify = false;
     int refcnt     = 1;
@@ -170,9 +170,9 @@ public class Object {
 
     public int getIDRSize() {return (idr != null ? idr.idr.length : 0);}
 
-    public int getCTime() {return c_time;}
+    public long getCTime() {return c_time;}
 
-    public int getMTime() {return m_time;}
+    public long getMTime() {return m_time;}
 
     public int getRefCount() {return refcnt;}
 
