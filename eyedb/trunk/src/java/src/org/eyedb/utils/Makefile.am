@@ -14,7 +14,6 @@ URL.java \
 WConfig.java \
 Weekday.java
 
-
 JAVAROOT=$(top_builddir)/src/java/src
 CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_srcdir)/src/java/src
 
@@ -31,6 +30,9 @@ JAVA_ODL_FILES= \
 $(top_srcdir)/src/java/src/org/eyedb/utils/Database.java 
 
 $(JAVA_ODL_FILES): utils.odl
-	$(EYEDBODL) $(EYEDBODLFLAGS_utils) $<
-
+	@if test -x $(EYEDBODL_exe) ; then \
+		echo $(EYEDBODL) $(EYEDBODLFLAGS_utils) $< ; $(EYEDBODL) $(EYEDBODLFLAGS_utils) $< ; \
+	else \
+		echo Warning: $(EYEDBODL) not found, using existing $@; touch $@ ; \
+	fi
 

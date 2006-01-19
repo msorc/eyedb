@@ -19,7 +19,7 @@ To run the C++ and Java examples in this directory:
 - run the 'persontest' C++ program with:
   ./persontest person
 - run the 'PersonTest Java program:
-  CLASSPATH=
+  CLASSPATH=<<path_to_eyedb.jar>>:. 
 
 (4) To run the `PersonTest' Java program: 
 

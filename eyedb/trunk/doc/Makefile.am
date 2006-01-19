@@ -1,5 +1,5 @@
 if COND_DOXYGEN
-DOXYGEN_DIR= #doxygen # for now, we don't compile and install doxygen doc
+DOXYGEN_DIR= doxygen # for now, we don't compile and install doxygen doc
 else
 DOXYGEN_DIR= 
 endif

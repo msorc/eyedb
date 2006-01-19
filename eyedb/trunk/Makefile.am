@@ -1,4 +1,4 @@
-SUBDIRS=doc examples include scripts src install tests
+SUBDIRS=doc include scripts src install examples tests
 
 EXTRA_DIST= AUTHORS COPYING ChangeLog README VERSION autogen.sh
 
