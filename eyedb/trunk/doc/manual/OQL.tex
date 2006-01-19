@@ -4728,7 +4728,9 @@ as follows (assuming that \texttt{\$} is your shell prompt):
 \verbsize
 \begin{verbatim}
 $ eyedboql
-Welcome to eyedboql. Type `!help' to display the command list.
+Welcome to eyedboql.
+  Type `\help' to display the command list.
+  Type `\copyright' to display the copyright.
 ?
 \end{verbatim}
 \normalsize
@@ -4759,7 +4761,9 @@ For instance, to perform the addition \texttt{1+3}:
 \verbsize
 \begin{verbatim}
 $ eyedboql
-Welcome to eyedboql. Type `!help' to display the command list.
+Welcome to eyedboql.
+  Type `\help' to display the command list.
+  Type `\copyright' to display the copyright.
 ? 1+3;
 = 4
 ?
@@ -4870,17 +4874,19 @@ Here is a commented example showing the use of these internal commands:\\
 \emph{run} \texttt{eyedboql}:
 \begin{verbatim}
 $ eyedboql
-Welcome to eyedboql. Type `!help' to display the command list.
+Welcome to eyedboql.
+  Type `\help' to display the command list.
+  Type `\copyright' to display the copyright.
 \end{verbatim}
 \emph{open the database} \texttt{person} \emph{in read-write mode}:
 \begin{verbatim}
-? !open person rw
+? \open person rw
 \end{verbatim}
 \emph{get the first person whose name is "john" and display it}:
 \begin{verbatim}
 ? john := first(select Person.name = "john");
 = 66373.12.4008447:oid
-? !print
+? \print
 66373.12.4008447:oid Person = { 
         name = "john";
         age = 32;
@@ -4923,7 +4929,7 @@ Welcome to eyedboql. Type `!help' to display the command list.
 \emph{abort the transaction and look for the person whose name is
 "JOHNNY": no person is returned! this is ok as the transaction was aborted}:
 \begin{verbatim}
-? !abort
+? \abort
 ? select Person.name = "JOHNNY";
 = list()
 \end{verbatim}
@@ -4931,7 +4937,7 @@ Welcome to eyedboql. Type `!help' to display the command list.
 \begin{verbatim}
 ? john.name := "JOHNNY";
 = "JOHNNY"
-? !commit
+? \commit
 \end{verbatim}
 \emph{then retrieve again the person whose name is "JOHNNY" and compare
 it to} \texttt{john} \emph{using}
@@ -4941,7 +4947,7 @@ it to} \texttt{john} \emph{using}
 \end{verbatim}
 \emph{quit} \texttt{eyedboql} \emph{session}
 \begin{verbatim}
-? !quit
+? \quit
 $
 \end{verbatim}
 We are going to conclude this section by this important note:\\
@@ -4979,39 +4985,52 @@ xxx\=xxxxxxxxxxxx\=\kill
 For instance, to execute the statement ``\texttt{delete\_from(Person)}''
 on the database \texttt{person}:
 \begin{verbatim}
-$ eyedboql -db person -rw -c "delete_from(Person)"
+$ eyedboql -d person -w -c "delete_from(Person)"
 $
 \end{verbatim}
 To execute the command ``\texttt{persons := (select Person)}'' and then
 enter the interactive mode of \texttt{eyedboql}:
 \begin{verbatim}
-$ eyedboql -db person -rw -c "persons := (select Person)" -i
-Welcome to eyedboql. Type `!help' to display the command list.
+$ eyedboql -d person -w -c "persons := (select Person)" -i
+Welcome to eyedboql.
+  Type `\help' to display the command list.
+  Type `\copyright' to display the copyright.
 ?
 \end{verbatim}
 To execute the file \texttt{mylib.oql}:
 \begin{verbatim}
-$ eyedboql -db person -rw mylib.oql
+$ eyedboql -d person -w mylib.oql
 \end{verbatim}
 
 
 \subsect{The Standard Library Package}
 The \texttt{stdlib.oql} file contains a few basic library functions.
-It can be found in the directory \texttt{\$EYEDBROOT/etc/oql}.
+It can be found in the directory \emph{libdir}\texttt{/eyedb/oql}.
 It is automatically imported when opening an OQL session.
 The following code, extracted from this file, provides an interesting way to
 understand OQL.
 \begin{verbatim}
+//
+// minimal and maximal integer values
+//
+
+oql$maxint := 0x7FFFFFFFFFFFFFFF;
+oql$minint := 0x8000000000000000;
+
+nulloid := 0:0:0:oid;
+NULLOID := 0:0:0:oid;
+
 //
 // type predicat functions
 //
 
 define is_int(x)    as (typeof x == "integer");
 define is_char(x)   as (typeof x == "char");
-define is_double(x) as (typeof x == "double");
+define is_float(x)  as (typeof x == "float");
 define is_string(x) as (typeof x == "string");
 define is_oid(x)    as (typeof x == "oid");
-define is_num(x)    as (is_int(x) || is_double(x) || is_char(x));
+define is_object(x) as (typeof x == "object");
+define is_num(x)    as (is_int(x) || is_float(x) || is_char(x));
 define is_bool(x)   as (typeof x == "bool");
 define is_bag(x)    as (typeof x == "bag");
 define is_set(x)    as (typeof x == "set");
@@ -5050,13 +5069,14 @@ function min(l) {
 
   m := oql$maxint;
 
-  for (x in l)
-    {
+  for (x in l) {
+    if (x != null) {
       if (!is_num(x))
-        throw (msg + "numeric expected");
+	throw (msg + "numeric expected");
       if (x < m) 
-        m := x;
+	m := x;
     }
+  }
 
   return m;
 }
@@ -5070,13 +5090,14 @@ function max(l) {
   if (!is_coll(l))
     throw msg + "collection expected";
   m := oql$minint;
-  for (x in l)
-    {
+  for (x in l) {
+    if (x != null) {
       if (!is_num(x))
-        throw (msg + "numeric expected");
+	throw (msg + "numeric expected");
       if (x > m)
-        m := x;
+	m := x;
     }
+  }
   return m;
 }
 
@@ -5085,31 +5106,31 @@ function max(l) {
 //
 
 function first(l) {
-  if (!is_list(l) && !is_array(l))
-    return l;
+  if (!is_coll(l)) // if (!is_list(l) && !is_array(l))
+    throw "function first: collection expected";
 
   start := 0;
   f := nil;
   for (x in l)
-    if (start == 0)
-      {
-        start := 1;
-        f := x;
-        break;
-      }
+    if (start == 0) {
+      start := 1;
+      f := x;
+      break;
+    }
   return f;
 }
 
-car := first;
+car := &first;
 
 //
 // last(l): returns the last element in a list or array
 //
 
 function last(l) {
-  if (!is_list(l) && !is_array(l))
+  if (!is_coll(l)) // if (!is_list(l) && !is_array(l))
     throw "function last: list or array expected";
-  unset f;
+
+  f := nil;
   for (x in l)
     f := x;
   return f;
@@ -5120,17 +5141,62 @@ function last(l) {
 //
 
 function cdr(l) {
-  if (!is_list(l) && !is_array(l))
+  if (!is_coll(l)) // if (!is_list(l) && !is_array(l))
     throw "function cdr: list or array expected";
+
   r := list();
   n := 0;
-  for (x in l)
-    {
-      if (n != 0)
-        r += x;
-      n++;
-    }
+  for (x in l) {
+    if (n != 0)
+      r += x;
+    n++;
+  }
   return r;
+}
+
+//
+// getn(l, n): returns all elements in a collection
+//
+
+function getn(l, n) {
+   rl := list();
+   cnt := 0;
+
+   for (x in l) {
+     if (cnt++ >= n)
+       break;
+     rl += x;
+   }
+
+   return rl;
+}
+
+//
+// getrange(l, f, nb): returns all elements in a collection from element from
+//
+// identical to l[f:f+nb]
+//
+
+function getrange(l, f, nb) {
+  if (!is_list(l) && !is_array(l))
+    throw "function getrange: list or array expected";
+
+   rl := list();
+   cnt := 0;
+
+   max := f + nb;
+
+   for (x in l) {
+     if (cnt >= max)
+       break;
+
+     if (cnt >= f)
+       rl += x;
+
+     cnt++;
+   }
+
+   return rl;
 }
 
 //
@@ -5142,10 +5208,7 @@ function count(l) {
     return 0;
   if (!is_coll(l))
     throw "function count: collection expected, got " + typeof(l);
-  n := 0;
-  for (x in l)
-    n++;
-  return n;        
+  return l[!];
 }
 
 //
@@ -5243,7 +5306,7 @@ function flatten1(l) {
     ll += x;
   return ll;
 }
-            
+    	
 //
 // tolower(s): returns lower case string
 //
@@ -5254,14 +5317,13 @@ function tolower(s) {
   x := "";
   delta := 'a' - 'A';
 
-  while (s[n] != '\000')
-    {
-      if (s[n] >= 'A' && s[n] <= 'Z')
-        x += string(char(s[n] + delta));
-      else
-        x += string(s[n]);
-      n++;
-    }
+  while (s[n] != '\000') {
+    if (s[n] >= 'A' && s[n] <= 'Z')
+      x += string(char(s[n] + delta));
+    else
+      x += string(s[n]);
+    n++;
+  }
 
   return x;
 }
@@ -5276,13 +5338,12 @@ function toupper(s) {
   x := "";
   delta := 'A' - 'a';
 
-  while (s[n] != '\000')
-    {
-      if (s[n] >= 'a' && s[n] <= 'z')
-        x += string(char(s[n] + delta));
-      else x += string(s[n]);
-      n++;
-    }
+  while (s[n] != '\000') {
+    if (s[n] >= 'a' && s[n] <= 'z')
+      x += string(char(s[n] + delta));
+    else x += string(s[n]);
+    n++;
+  }
 
   return x;
 }
@@ -5302,17 +5363,20 @@ function tocap(s) {
   if (s[0] >= 'a' && s[0] <= 'z')
     x += string(char(s[0] + delta));
 
-  while (s[n] != '\000')
-    {
-      if (s[n] == '_')
-        x += string(char(s[++n] + delta));
-      else
-        x += string(s[n]);
-      n++;
-    }
+  while (s[n] != '\000') {
+    if (s[n] == '_')
+      x += string(char(s[++n] + delta));
+    else
+      x += string(s[n]);
+    n++;
+  }
 
   return x;
 }
+
+//
+// Collection Conversion Functions
+//
 
 //
 // General Conversion Functions
@@ -5322,13 +5386,12 @@ function toset(l) {
   if (!is_coll(l))
     throw ("function toset: collection expected, got " + typeof(l));
 
-  if (!is_set(l))
-    {
-      s := set();
-      for (x in l)
-        s += x;
-      return s;
-    }
+  if (!is_set(l)) {
+    s := set();
+    for (x in l)
+      s += x;
+    return s;
+  }
 
   return l;
 }
@@ -5337,13 +5400,12 @@ function tolist(l) {
   if (!is_coll(l))
     throw ("function tolist: collection expected, got " +  typeof(l));
 
-  if (!is_list(l))
-    {
-      s := list();
-      for (x in l)
-        s += x;
-      return s;
-    }
+  if (!is_list(l)) {
+    s := list();
+    for (x in l)
+      s += x;
+    return s;
+  }
 
   return l;
 }
@@ -5352,13 +5414,12 @@ function tobag(l) {
   if (!is_coll(l))
     throw ("function tobag: collection expected, got " +  typeof(l));
 
-  if (!is_bag(l))
-    {
-      s := bag();
-      for (x in l)
-        s += x;
-      return s;
-    }
+  if (!is_bag(l)) {
+    s := bag();
+    for (x in l)
+      s += x;
+    return s;
+  }
 
   return l;
 }
@@ -5367,13 +5428,12 @@ function toarray(l) {
   if (!is_coll(l))
     throw ("function toarray: collection expected, got " +  typeof(l));
 
-  if (!is_array(l))
-    {
-      s := array();
-      for (x in l)
-        s += x;
-      return s;
-    }
+  if (!is_array(l)) {
+    s := array();
+    for (x in l)
+      s += x;
+    return s;
+  }
 
   return l;
 }
@@ -5399,6 +5459,7 @@ function arraytoset(l) {
     throw ("function arraytoset: array expected, got " + typeof(l));
   return toset(l);
 }
+
 
 //
 // tobag family Conversion Functions
@@ -5478,18 +5539,17 @@ function strlen(s) {
 }
 
 //
-// substring(str, f, len): same as str[f:f+len]
+// substring(str, f, len)
 //
 
 function substring(str, f, len) {
   s := "";
   n := 0;
-  max := strlen(str) - f;
-  while (n < len && n < max)
-    {
-      s += string(str[n+f]);
-      n++;
-    }
+  max := str[!] - f;
+  while (n < len && n < max) {
+    s += string(str[n+f]);
+    n++;
+  }
 
   return s;
 }
@@ -5504,7 +5564,7 @@ function forone(l, fpred, data) {
     if (fpred(x, data)) return true;
   return false;
 }
-        
+	
 //
 // forone(l, fpred, data): returns true if and only if the function 'fpred'
 // returns true for all elements 'x' in list 'l'
@@ -5515,7 +5575,7 @@ function forall(l, fpred, data) {
     if (!fpred(x, data)) return false;
   return true;
 }
-        
+	
 //
 // delete_from(cls): delete all instances of class 'cls'
 //
@@ -5526,12 +5586,263 @@ function delete_from(|cls) {
 }
 
 //
+// delete_(coll): delete contents of collection coll
+//
+
+function delete_(coll) {
+  for (x in coll)
+    delete x;
+}
+
+//
 // get_from(cls): returns all instances of class 'cls'
 //
 
 function get_from(|cls) {
   eval "select " + cls;
 }
+
+//
+// generates an unused global symbol
+//
+
+function gensym() {
+  prefix := "::oql#_#_#";
+  for (i := 0; ; i++) {
+    varname := prefix + string(i);
+    if (!(eval "isset " + varname)) {
+      eval varname + " := 0";
+      return ident(varname);
+    }			
+  }		
+}
+
+//
+// expression-like for-each function
+//
+
+function foreach_expr(|x, |coll, |expr, colltyp ? "list") {
+  varname := "_#_#_R_#_#_";
+
+  statement := "push " + varname + " := " + colltyp + "(); " +
+    "for (" + x + " in " + coll + ") " +
+    "{" + varname + " += " + expr + ";}" +
+    "pop " + varname;
+
+  return eval statement;
+}
+
+//
+// expression-like for-C function
+//
+
+function for_expr(|start, |cond, |end, |expr, colltyp ? "list") {
+  varname := "_#_#_R_#_#_";
+
+  statement := "push " + varname + " := " + colltyp + "(); " +
+    "for (" + start + "; " + cond + "; " + end + ")" +
+    "{" + varname + " += " + expr + ";}" +
+    "pop " + varname;
+   
+   return eval statement;
+}
+
+//
+// expression-like while-C function
+//
+
+function while_expr(|cond, |expr, colltyp ? "list") {
+  varname := "_#_#_R_#_#_";
+
+  statement := "push " + varname + " := " + colltyp + "(); " +
+    "while (" + cond + ")" +
+    "{" + varname + " += " + expr + ";}" +
+    "pop " + varname;
+   
+   return eval statement;
+}
+
+//
+// expression-like do/while-C function
+//
+
+function do_while_expr(|expr, |cond, colltyp ? "list") {
+  varname := "_#_#_R_#_#_";
+
+  statement := "push " + varname + " := " + colltyp + "(); " +
+    "do {" + varname + " += " + expr + ";}" +
+    "while (" + cond + ");" +
+    "pop " + varname;
+  
+   return eval statement;
+}
+
+function extentof(|classname) {
+  return (select one class.name = classname).extent;
+}
+
+function countof(|classname) {
+  return (select one class.name = classname).extent.count;
+}
+
+function objectcount(db := oql$db) {
+     objcnt := 0;
+     db->transactionBegin();
+     for (cl in (select <db> x from class x where
+                 x.type != "system" and x.name !~ "<"))
+        objcnt += cl.extent.count;
+     db->transactionCommit();
+     return objcnt;
+}
+
+function ifempty(x, y) {
+  if (is_empty(x)) 
+    return y;
+  return x;
+}
+
+function null_ifempty(x) {
+  return ifempty(x, null);
+}
+
+function getone(x) {
+  if (is_empty(x)) 
+    return null;
+  return first(flatten(x));
+}
+
+//
+// database and transaction management
+//
+
+function open_db(db_name_or_id, strmode, user := null, passwd := null) {
+
+  if (strmode == "r")
+    mode := DBREAD;
+  else if (strmode == "rw")
+    mode := DBRW;
+  else if (strmode == "rlocal")
+    mode := DBREAD|DBOPENLOCAL;
+  else if (strmode == "rwlocal")
+    mode := DBRW|DBOPENLOCAL;
+  else
+    throw "invalid open mode: r, rw, rlocal or rwlocal expected, got " +
+      strmode;
+
+  if (is_int(db_name_or_id))
+    db := new<> database(dbid : db_name_or_id);
+  else
+    db := new<> database(dbname : db_name_or_id);
+
+  if (user == null)
+    db.open(oql$db.getConnection(), mode);
+  else
+    db.open(oql$db.getConnection(), mode, user, passwd);
+
+  return db;
+}
+
+function set_default(db) {
+  db->setDefaultDatabase();
+}
+
+function begin(db := oql$db) {
+  db->transactionBegin();
+}
+
+function begin_params(trsmode, lockmode, recovmode, magorder, ratioalrt, wait_timeout, db := oql$db) {
+  db->transactionBegin(trsmode, lockmode, recovmode, magorder, ratioalrt, wait_timeout);
+}
+
+function commit(db := oql$db) {
+  db->transactionCommit();
+}
+
+function abort(db := oql$db) {
+  db->transactionAbort();
+}
+
+//
+// miscellaneous
+//
+
+function print_function(f) {
+  print "function " + (bodyof f) + "\n";
+}
+
+function print_functions() {
+  cnt := 0;
+  for (f in oql$functions) {
+    if (cnt > 0) print "\n";
+    print_function(f);
+    cnt++;
+  }
+}
+
+function print_variable(v) {
+   print string(v) + " = " + string(eval string(v)) + ";\n";
+}
+
+function print_variables() {
+  for (v in oql$variables) {
+    print_variable(v);
+    cnt++;
+  }
+}
+
+function print_classes(system := false) {
+  if (system)
+    l := (select list(x, x.name) from class x order by x.name);
+  else
+    l :=  (select list(x, x.name) from class x where x.type = "user" and x.name !~ "<" order by x.name);
+
+  for (c in l) {
+    cls := c[0];
+    clsname := c[1];
+    print "class " + clsname;
+    if (cls.parent != NULL && (system || cls.parent.type != "system"))
+       print " extends " + cls.parent.name;
+    print "\n";
+  }
+}
+
+function print_obj(o, flags := 0) {
+   print o->toString(flags);
+}
+
+function print_objs(l, flags := 0) {
+   for (o in l)
+     print_obj(o, flags);
+}
+
+//
+// contents_ expression
+//
+
+function contents_(coll) {
+  r := list();
+  for (x in coll) {
+   for (s in contents(x)) 
+     r += s;
+  }
+
+  return r;
+};
+
+function println(s) {
+  print(s+"\n");
+}
+
+function bench(|cmd) {
+  t0 := time_stamp::local_time_stamp();
+  r := eval cmd;
+  t1 := time_stamp::local_time_stamp();
+  us := t1->substract(t0).usecs;
+  println("Elapsed time: " + string(us/1000.) + " ms");
+  return r;
+}
+
+;
 \end{verbatim}
 
 

@@ -139,12 +139,11 @@ function first(l) {
   start := 0;
   f := nil;
   for (x in l)
-    if (start == 0)
-      {
-	start := 1;
-	f := x;
-	break;
-      }
+    if (start == 0) {
+      start := 1;
+      f := x;
+      break;
+    }
   return f;
 }
 
@@ -174,12 +173,11 @@ function cdr(l) {
 
   r := list();
   n := 0;
-  for (x in l)
-    {
-      if (n != 0)
-	r += x;
-      n++;
-    }
+  for (x in l) {
+    if (n != 0)
+      r += x;
+    n++;
+  }
   return r;
 }
 
@@ -238,12 +236,6 @@ function count(l) {
   if (!is_coll(l))
     throw "function count: collection expected, got " + typeof(l);
   return l[!];
-/*
-  n := 0;
-  for (x in l)
-    n++;
-  return n;	
-*/
 }
 
 //
@@ -352,14 +344,13 @@ function tolower(s) {
   x := "";
   delta := 'a' - 'A';
 
-  while (s[n] != '\000')
-    {
-      if (s[n] >= 'A' && s[n] <= 'Z')
-	x += string(char(s[n] + delta));
-      else
-	x += string(s[n]);
-      n++;
-    }
+  while (s[n] != '\000') {
+    if (s[n] >= 'A' && s[n] <= 'Z')
+      x += string(char(s[n] + delta));
+    else
+      x += string(s[n]);
+    n++;
+  }
 
   return x;
 }
@@ -374,13 +365,12 @@ function toupper(s) {
   x := "";
   delta := 'A' - 'a';
 
-  while (s[n] != '\000')
-    {
-      if (s[n] >= 'a' && s[n] <= 'z')
-	x += string(char(s[n] + delta));
-      else x += string(s[n]);
-      n++;
-    }
+  while (s[n] != '\000') {
+    if (s[n] >= 'a' && s[n] <= 'z')
+      x += string(char(s[n] + delta));
+    else x += string(s[n]);
+    n++;
+  }
 
   return x;
 }
@@ -400,14 +390,13 @@ function tocap(s) {
   if (s[0] >= 'a' && s[0] <= 'z')
     x += string(char(s[0] + delta));
 
-  while (s[n] != '\000')
-    {
-      if (s[n] == '_')
-	x += string(char(s[++n] + delta));
-      else
-	x += string(s[n]);
-      n++;
-    }
+  while (s[n] != '\000') {
+    if (s[n] == '_')
+      x += string(char(s[++n] + delta));
+    else
+      x += string(s[n]);
+    n++;
+  }
 
   return x;
 }
@@ -424,13 +413,12 @@ function toset(l) {
   if (!is_coll(l))
     throw ("function toset: collection expected, got " + typeof(l));
 
-  if (!is_set(l))
-    {
-      s := set();
-      for (x in l)
-	s += x;
-      return s;
-    }
+  if (!is_set(l)) {
+    s := set();
+    for (x in l)
+      s += x;
+    return s;
+  }
 
   return l;
 }
@@ -439,13 +427,12 @@ function tolist(l) {
   if (!is_coll(l))
     throw ("function tolist: collection expected, got " +  typeof(l));
 
-  if (!is_list(l))
-    {
-      s := list();
-      for (x in l)
-	s += x;
-      return s;
-    }
+  if (!is_list(l)) {
+    s := list();
+    for (x in l)
+      s += x;
+    return s;
+  }
 
   return l;
 }
@@ -454,13 +441,12 @@ function tobag(l) {
   if (!is_coll(l))
     throw ("function tobag: collection expected, got " +  typeof(l));
 
-  if (!is_bag(l))
-    {
-      s := bag();
-      for (x in l)
-	s += x;
-      return s;
-    }
+  if (!is_bag(l)) {
+    s := bag();
+    for (x in l)
+      s += x;
+    return s;
+  }
 
   return l;
 }
@@ -469,13 +455,12 @@ function toarray(l) {
   if (!is_coll(l))
     throw ("function toarray: collection expected, got " +  typeof(l));
 
-  if (!is_array(l))
-    {
-      s := array();
-      for (x in l)
-	s += x;
-      return s;
-    }
+  if (!is_array(l)) {
+    s := array();
+    for (x in l)
+      s += x;
+    return s;
+  }
 
   return l;
 }
@@ -588,11 +573,10 @@ function substring(str, f, len) {
   s := "";
   n := 0;
   max := str[!] - f;
-  while (n < len && n < max)
-    {
-      s += string(str[n+f]);
-      n++;
-    }
+  while (n < len && n < max) {
+    s += string(str[n+f]);
+    n++;
+  }
 
   return s;
 }
@@ -651,15 +635,13 @@ function get_from(|cls) {
 
 function gensym() {
   prefix := "::oql#_#_#";
-  for (i := 0; ; i++)
-    {
-      varname := prefix + string(i);
-      if (!(eval "isset " + varname))
-	{
-	  eval varname + " := 0";
-	  return ident(varname);
-	}			
-    }		
+  for (i := 0; ; i++) {
+    varname := prefix + string(i);
+    if (!(eval "isset " + varname)) {
+      eval varname + " := 0";
+      return ident(varname);
+    }			
+  }		
 }
 
 //
@@ -749,10 +731,6 @@ function for_(|x1, |x2, |x3, |x4 ? "__empty__") {
     return foreach_expr(x1, x2, x3);
   return for_expr(x1, x2, x3, x4);
 }
-
-//
-// IMDL support
-//
 
 function ifempty(x, y) {
   if (is_empty(x)) 
