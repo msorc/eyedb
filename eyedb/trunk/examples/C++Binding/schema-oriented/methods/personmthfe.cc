@@ -34,7 +34,7 @@
  *  - run `gnumake -f Makefile.person all'
  */
 
-static Bool __init = False;
+static bool __init = false;
 
-#define PACK_INIT() if (!__init) {person::init(); __init = True;}
+#define PACK_INIT() if (!__init) {person::init(); __init = true;}
 
