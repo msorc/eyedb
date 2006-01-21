@@ -35,6 +35,8 @@ latex, dvips, ps2pdf (for manual)
 doxygen (for api documentation)
 xsltproc (for manpages)
 
+If you have latex2html installed, the HTML version of the manual will be generated.
+
 Please refer to your distribution to check if these tools are packaged for your distribution (which is very likely the case) and to get their respective installation instructions.
 
 To compile EyeDB, just run:
@@ -50,13 +52,9 @@ configure script takes the following useful options:
 Full description of configure options can be obtained with:
 ./configure --help
 
-Note that tests are not build from the top-level directory; you need 
-to cd to the right sub-directory and run make, as in:
-cd tests/
-make
-
 Examples and tests programs, located in sub-directories examples/ and tests/, are not compiled by 'make' 
 or 'make all' but by 'make check'.
+
 
 Installing EyeDB
 ----------------
@@ -90,8 +88,12 @@ eyedbrc status
 To check that EyeDB runs, after starting the server, you can run the 
 following command:
 eyedboql -U eyedbroot -P eyedbroot -c "select schema" --print
-
 This should print a number of EyeDB base structures.
+
+You can then try some examples, such as examples/GettingStarted, that 
+shows how to create a database using a schema, insert objects, build
+OQL queries (OQL is the Object Query Language) and use the C++ and Java
+programming interfaces.
 
 
 Finding documentation
@@ -100,16 +102,18 @@ Finding documentation
 You can find EyeDB documentation in the following places, in the source 
 tree after compilation:
 - doc/eyedb-VERSION/manual: the different manuals
-- doc/eyedb-VERSION/api: the API documentation build using doxygen
-- doc/eyedb-VERSION/examples: EyeDB programming examples (you can build 
-the examples by cd'ing to this directory and run make)
+- doc/eyedb-VERSION/api: the C++ API documentation build using doxygen
+- doc/eyedb-VERSION/examples: EyeDB programming examples using the C++
+and the Java APIs
 
 
 Getting help
 ------------
 
-EyeDB mailing list: eyedb-devel@lists.sourceforge.net
-Mailman page: http://lists.sourceforge.net/lists/listinfo/eyedb-devel
+EyEDB web site: http://www.eyedb.org
+
+EyeDB mailing list: eyedb-general@lists.sourceforge.net
+Mailman page: http://lists.sourceforge.net/lists/listinfo/eyedb-general
 
 EyeDB wiki: http://wiki.eyedb.org
 
