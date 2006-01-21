@@ -27,6 +27,8 @@
 
 #include "person.h"
 
+using namespace eyedb;
+
 /*
  * perform the following operations:
  *  - copy this file to personmthbe.cc
@@ -36,9 +38,9 @@
  *  - run `chmod a+rx $EYEDBROOT/etc/so/personmthbe-2.4.4'
  */
 
-static Bool __init = False;
+static bool __init = false;
 
-#define PACK_INIT() if (!__init) {person::init(); __init = True;}
+#define PACK_INIT() if (!__init) {person::init(); __init = true;}
 
 //
 // int32 Person::change_address(in string, in string, out string, out string)
@@ -54,8 +56,8 @@ __method__OUT_int32_change_address_Person__IN_string__IN_string__OUT_string__OUT
   //
 
   Person *p = (Person *)o;
-  oldstreet = Argument::dup(p->getAddr()->getStreet());
-  oldtown = Argument::dup(p->getAddr()->getTown());
+  oldstreet = Argument::dup((p->getAddr()->getStreet()).c_str());
+  oldtown = Argument::dup((p->getAddr()->getTown()).c_str());
 
   p->getAddr()->setStreet(street);
   p->getAddr()->setTown(town);

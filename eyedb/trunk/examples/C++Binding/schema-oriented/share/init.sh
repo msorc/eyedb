@@ -1,36 +1,33 @@
 #!/bin/sh
-#
-# init.sh
-
 set -e
+SCHEMA=$1
+DATABASE=person_c
 
-db=person_c
-
-echo Creating the database $db: \'eyedbdbcreate $db\'...
-
-eyedbdbcreate $db
-
-echo
-echo Changing the default access to read/write: \'eyedbdbaccess $db rw\'...
-eyedbdbaccess $db rw
+echo Creating the database $DATABASE
+echo eyedbdbcreate $DATABASE
+eyedbdbcreate $DATABASE
 
 echo
-echo Updating the database $db with the schema person...
+echo Changing the default access to read/write
+echo eyedbdbaccess $DATABASE rw
+eyedbdbaccess $DATABASE rw
 
-eyedbodl -update -db $db -package $db person.odl
+echo
+echo Updating the database $DATABASE with the schema person...
+echo eyedbodl --update --database=$DATABASE $SCHEMA
+eyedbodl --update --database=$DATABASE $SCHEMA
 
-echo Creating a few instances in the database $db ...
+echo Creating a few instances in the database $DATABASE ...
 
-eyedboql -db $db -rw << EOF
-!settermchar ;
-
+echo Creating a few instances in the database $DATABASE ...
+echo eyedboql -d $DATABASE -w
+eyedboql -d $DATABASE -w << EOF
 john := new Person(
     name        : "john", 
     age         : 32,
     addr.street : "clichy",
     addr.town   : "Paris",
     cstate      : Sir);
-	   
 mary := new Person(
     name        : "mary", 
     age         : 30,
@@ -38,10 +35,8 @@ mary := new Person(
     addr.town   : "Paris",
     spouse      : john,
     cstate      : Lady);
-
 for (x in interval(1, 4))
- add (new Car(mark : "renault", num : x+100)) to john->cars;
-
+ add (new Car(brand : "renault", num : x+100)) to john->cars;
 henry := new Employee(
    name        : "henry",
    salary      : 100000,
@@ -49,7 +44,6 @@ henry := new Employee(
    addr.street : "parmentier",
    addr.town   : "Paris",
    cstate      : Sir);
-
 nadou := new Employee(
    name        : "nadou",
    salary      : 20000,
@@ -58,12 +52,8 @@ nadou := new Employee(
    addr.town   : "Paris",
    spouse      : henry,
    cstate      : Sir);
-
 for (x in interval(1, 8))
- add (new Car(mark : "renault", num : x+100)) to nadou->cars;
-
-!commit
-
-!quit
-
+ add (new Car(brand : "citroen", num : x+100)) to nadou->cars;
+\commit
+\quit
 EOF

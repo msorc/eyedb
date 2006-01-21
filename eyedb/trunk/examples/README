@@ -56,23 +56,23 @@ NOTE: this must be done only once.
 3) run the programs
 
 To run the examples, cd to the following directories and
-run the indicated command:
+run the indicated commands:
 
 DIRECTORY               COMMANDS
 -------------------------------------------------------
-generic/query           ./query person "select Person"
-                        ./query person "select Person.name ~ \"j\""
-                        ./query person "select Person.age"
+generic/query           ./query person_c "select Person"
+                        ./query person_c "select Person.name ~ \"j\""
+                        ./query person_c "select Person.age"
 -------------------------------------------------------
-generic/store           ./store person raymon 32
-                        ./store person titou 2
+generic/store           ./store person_c raymond 32
+                        ./store person_c titou 2
 -------------------------------------------------------
-schema-oriented/query   ./query person "select Person"
-                        ./query person "select Person.name ~ \"j\""
+schema-oriented/query   ./query person_c "select Person"
+                        ./query person_c "select Person.name ~ \"j\""
 -------------------------------------------------------
-schema-oriented/store   ./store person nadine 32 raymond
+schema-oriented/store   ./store person_c nadine 32 raymond
 -------------------------------------------------------
-schema-oriented/methods ./methods person john 12
+schema-oriented/methods ./methods person_c john 12
                          NOTE THAT for this directory, you need to copy
                          the *.so files to EyeDB dynamic objects directory:
                          cp *.so $EYEDBROOT/etc/so
@@ -84,20 +84,22 @@ schema-oriented/admin   ./admin
 JavaBinding
 ===========
 
-EyeDB Package, Java Binding examples
-------------------------------------
+This directory contains Java programs that use the EyEDB Java API.
+This API is described in EyeDB 'Java Binding' manual.
 
-[Directory $EYEDBROOT/examples/JavaBinding]
+To run the Java examples in the JavaBinding/ directory:
 
-This directory contains a few examples about Java binding.
+1) compile them with 'make check'
 
-To compile the examples in this directory, you must:
+2) run the init.sh script located in JavaBinding/schema-oriented/share
+with 'make init'
+This script creates the database 'person_j' and insert a few objects.
+NOTE: this must be done only once.
 
-(1) Then type `make init' and `make all' in the current directory 
-    using GNU make.
+3) run the programs
 
-(2) To run the generated example, go to the following directories and
-    perform the indicated actions:
+To run the examples, cd to the following directories and
+run the indicated commands:
 
 DIRECTORY                   RUNNING EXAMPLES
 --------------------------------------------------------------
