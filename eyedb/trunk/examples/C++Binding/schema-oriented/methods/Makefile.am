@@ -2,7 +2,7 @@ abs_top_builddir=@abs_top_builddir@
 
 eyedbexamplesdir=$(datadir)/doc/$(PACKAGE)/examples/C++Binding/schema-oriented/methods
 dist_eyedbexamples_DATA= methods.cc personmthbe.cc personmthfe.cc
-eyedbexamples_DATA=Makefile.eyedb-examples
+#eyedbexamples_DATA=Makefile.eyedb-examples
 
 check_PROGRAMS= methods
 
