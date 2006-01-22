@@ -1,6 +1,5 @@
 SUBDIRS=internals
 
-#eyedbdir=$(includedir)/eyedb
 pkginclude_HEADERS= \
 AbstractIterator.h \
 AgregatClass.h \

@@ -10,7 +10,7 @@ INCLUDES=-I$(top_srcdir)/src -I$(top_srcdir)/include -I$(top_builddir)/include
 
 EYEDBODL_exe=$(bindir)/eyedbodl
 EYEDBODL = $(EYEDBODL_exe) --gencode=C++
-EYEDBODLFLAGS= --package=person
+EYEDBODLFLAGS= --package=person --schema-name=person
 
 person.cc person.h : schema.odl
 	if test -x $(EYEDBODL_exe) ; then \
