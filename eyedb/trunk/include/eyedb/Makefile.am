@@ -70,6 +70,7 @@ StructClass.h \
 Struct.h \
 syscls.h \
 Transaction.h \
+TransactionParams.h \
 UnionClass.h \
 Union.h \
 utils.h \

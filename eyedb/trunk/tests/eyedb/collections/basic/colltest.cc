@@ -21,6 +21,24 @@ using namespace eyedb;
 #define COLLECTION_ARRAY
 #define COLLECTION_ARRAY_2
 
+void nop()
+{
+}
+
+void ppp()
+{
+  abort();
+  /*
+  if (Exception::getMode() == Exception::StatusMode)
+    fprintf(stderr, "exit(int) function has been called : getting a chance to trap this call\n");
+  //sleep(10000);
+  std::set_unexpected(nop);
+  std::set_terminate(nop);
+  Exception::setMode(Exception::ExceptionMode);
+  Exception::make(IDB_EXIT_CALLED, "invalid called");
+  */
+}
+
 namespace eyedb {
   extern void idb_dump_data(Data data, Size size);
 }
@@ -907,6 +925,8 @@ main(int argc, char *argv[])
   const char *dbname = argv[1];
 
   Exception::setMode(Exception::ExceptionMode);
+  //set_terminate(ppp);
+  //atexit(ppp);
 
   try {
     Connection conn;
@@ -930,7 +950,7 @@ main(int argc, char *argv[])
 
     // EV : 18/01/06
     // when opening database in local mode, exit() cause server freeze
-#if 0
+#if 1
     //sleep(1000);
     exit(1);
 #endif
@@ -946,9 +966,11 @@ main(int argc, char *argv[])
   }
 
   catch(Exception &e) {
+    fprintf(stderr, "oups\n");
     cerr << argv[0] << ": " << e;
     return 1;
   }
 
   return 0;
 }
+

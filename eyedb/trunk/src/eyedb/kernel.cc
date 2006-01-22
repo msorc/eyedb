@@ -5840,11 +5840,15 @@ namespace eyedb {
     int attr_cnt;
     const Attribute **attrs = cl->getAttributes(attr_cnt);
     for (int n = 0; n < attr_cnt; n++) {
+      if (!cl->compare(attrs[n]->getClassOwner()))
+	continue;
+
       Oid attr_comp_oid = attrs[n]->getAttrCompSetOid();
       if (attr_comp_oid.isValid()) {
 	Bool removed;
 	Status s = db->isRemoved(attr_comp_oid, removed);
-	if (s) return rpcStatusMake(s);
+	if (s)
+	  return rpcStatusMake(s);
 	if (!removed) {
 	  s = db->removeObject(attrs[n]->getAttrCompSetOid());
 	  if (s) return rpcStatusMake(s);
@@ -5873,18 +5877,15 @@ namespace eyedb {
 
     RPCStatus rpc_status;
 
-    printf("removing class %s\n", cl->getName());
     if (flags == Class::RemoveInstances) {
       rpc_status = IDB_removeInstances(dbh, db, cl);
       if (rpc_status) return rpc_status;
 
       // remove components collection
       Collection *components;
-      printf("lookup for components...\n");
       Status s = cl->getComponents(components, True);
       if (s)
 	return rpcStatusMake(s);
-      printf("deleting components %s\n", components->getOid().toString());
       Bool isremoved;
       s = db->isRemoved(components->getOid(), isremoved);
       if (s)
@@ -5894,9 +5895,6 @@ namespace eyedb {
 	if (s)
 	  return rpcStatusMake(s);
       }
-      else
-	printf("oups %s is removed\n", components->getOid().toString());
-      printf("done\n");
     }
 
     rpc_status = IDB_removeAttrCompSet(db, cl);

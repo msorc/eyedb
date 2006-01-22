@@ -555,7 +555,7 @@ namespace eyedb {
       return;
     }
 
-    fprintf(fd, "EyeDB Server is up from %s\n",
+    fprintf(fd, "EyeDB Server running since %s\n",
 	    ctime(&connhead->start));
 
     fprintf(fd, "  Version       V%s\n", connhead->version);
@@ -619,7 +619,7 @@ namespace eyedb {
 	continue;
 
       fprintf(fd, "%sClient #%d\n", (n ? "\n" : ""), n);
-      fprintf(fd, "  Connected from %s", ctime(&conninfo->start));
+      fprintf(fd, "  Connected on %s", ctime(&conninfo->start));
       if (*conninfo->hostname && *conninfo->portname)
 	fprintf(fd, "  Host:Port    %s:%s\n", conninfo->hostname,
 		conninfo->portname);
@@ -633,13 +633,13 @@ namespace eyedb {
 	fprintf(fd, "  EyeDB Server Pid %d\n",   conninfo->backend_pid);
 
       if (conninfo->n_dbs) {
-	fprintf(fd, "  Opened Database%s ", conninfo->n_dbs > 1 ? "s" : "");
+	fprintf(fd, "  Open Database%s ", conninfo->n_dbs > 1 ? "s" : "");
 	for (int j = 0; j < conninfo->n_dbs; j++) {
-	  fprintf(fd, "%s'%s' [mode='%s']", (j?"\n                   ":""),
+	  fprintf(fd, "%s'%s' [mode=%s]", (j?"\n                   ":""),
 		  conninfo->dbs[j].dbname,
 		  Database::getStringFlag((Database::OpenFlag)conninfo->dbs[j].flags));
 	  if (*conninfo->dbs[j].userauth)
-	    fprintf(fd, " [userauth='%s']", conninfo->dbs[j].userauth);
+	    fprintf(fd, " [userauth=%s]", conninfo->dbs[j].userauth);
 	}
 	fprintf(fd, "\n");
       }

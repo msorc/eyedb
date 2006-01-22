@@ -8133,7 +8133,11 @@ AttributeComponentSet::makeCache()
   collimpl_cache = new Cache();
   card_cache = new Cache();
 
-  Iterator iter(getCompsColl());
+  Status rs = 0;
+  Collection *comps = getCompsColl(0, &rs);
+  if (rs)
+    return rs;
+  Iterator iter(comps);
   ObjectArray obj_arr;
   Status s = iter.scan(obj_arr);
   if (s) return s;
