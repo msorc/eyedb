@@ -156,6 +156,7 @@ AC_FUNC_FSEEKO
 
 # check for libraries
 dnl AC_CHECK_LIB( nsl, ??) # -lnsl is not necessary apparently
+AC_CHECK_LIB( pthread, pthread_create)
 AC_CHECK_LIB( dl, dlopen)
 AC_CHECK_LIB( crypt, crypt)
 AC_SEARCH_LIBS( socket, socket)

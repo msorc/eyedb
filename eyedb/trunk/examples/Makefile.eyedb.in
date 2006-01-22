@@ -1,46 +1,27 @@
-CXX = @CXX@
-CXXFLAGS_COMMON = @CXXFLAGS_COMMON@
-CXXFLAGS_OTHER = @CXXFLAGS_OTHER@
-EYEDBNUMVERSION = @EYEDB_NUMVERSION@
-EYEDBVERSION = @EYEDB_VERSION@
-EYEDB_SYSLIBS = @LIBS@
-SO_FLAGS=@SO_FLAGS@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
 bindir = @bindir@
-exec_prefix = @exec_prefix@
-includedir = @includedir@
-libdir = @libdir@
-prefix = @prefix@
+EYEDB_INCLUDEDIR= @includedir@
+EYEDB_NUMVERSION = @EYEDB_NUMVERSION@
 
-CXXFLAGS = $(CXXFLAGS_COMMON) $(CXXFLAGS_OTHER) -I$(includedir) -DEYEDBNUMVERSION=$(EYEDBNUMVERSION) $(EXTRA_CXXFLAGS)
-EYEDBODL = $(bindir)/eyedbodl
-EYEDBLIB = -L$(libdir) \
-                      -leyedb \
-	              -leyedbrpcfe \
-	              -leyedbsm \
-	              -leyedbutils \
-		      $(EYEDB_SYSLIBS)
-LDXX = $(CXX)
-LDXXFLAGS=$(CXXFLAGS_COMMON) $(CXXFLAGS_OTHER) $(EXTRA_CXXFLAGS)
-LDXXLIBS = $(EYEDBLIB)
+EYEDB_CPPFLAGS=-I$(EYEDB_INCLUDEDIR) -DEYEDBNUMVERSION=$(EYEDB_NUMVERSION)
+EYEDB_CXXFLAGS = @CXXFLAGS_COMMON@ @CXXFLAGS_OTHER@ 
+EYEDB_SOFLAGS=@SO_FLAGS@
 
-ifndef CC_SUFFIX
-CC_SUFFIX = cc
-endif
+EYEDB_SYSLIBS = @LIBS@
+EYEDB_LIBDIR = @libdir@
+EYEDB_LDFLAGS = -L$(EYEDB_LIBDIR)
+EYEDB_LDLIBS = -leyedb -leyedbrpcfe -leyedbsm -leyedbutils $(EYEDB_SYSLIBS)
+
+EYEDB_ODL = $(bindir)/eyedbodl
+
+EYEDB_CLASSPATH=$(EYEDB_LIBDIR)/eyedb/java/eyedb.jar
+
 
 #
 # Implicit Rules
 #
 
-.PRECIOUS: %.$(CC_SUFFIX) %.h %.idl %.o %Impl.h %Impl.$(CC_SUFFIX) %Impl_x.$(CC_SUFFIX)
+%.cc: %.odl
+	$(EYEDB_ODL) --gencode=C++ $(EYEDBODLCPLUSOPTS) --package=$* --schema-name=$* $<
 
-%.$(CC_SUFFIX): %.odl
-	$(EYEDBODL) --gencode=C++ $(EYEDBODLCPLUSOPTS) --package=$* --schema-name=$* $<
-
-%.o: %.$(CC_SUFFIX)
-	$(CXX) $(CXXFLAGS) -c $<
-
-%.so: %.o
-	$(CXX) $(LDXXFLAGS) $(SO_FLAGS) -o $@ $< $(LDXXLIBS)
-
-%: %.o
-	$(LDXX) $(LDXXFLAGS) -o $@ $< $(LDXXLIBS)
