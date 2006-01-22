@@ -8,14 +8,16 @@ class RSSParser {
   var $description;
   var $link;
   var $out;
+  var $empty;
 
   function parse( $url, $file)
   {
-    $this->$insideitem = false;
-    $this->$tag = "";
-    $this->$title = "";
-    $this->$description = "";
-    $this->$link = "";
+    $this->insideitem = false;
+    $this->tag = "";
+    $this->title = "";
+    $this->description = "";
+    $this->link = "";
+    $this->empty = true;
 
     $xml_parser = xml_parser_create();
     xml_set_object($xml_parser,&$this);
@@ -27,7 +29,7 @@ class RSSParser {
     if (!$fp)
       return;
 
-    $this->$out = fopen( $file, "w");
+    $this->out = fopen( $file, "w");
 
     while ($data = fread($fp, 4096))
       {
@@ -39,10 +41,17 @@ class RSSParser {
     fclose($fp);
     xml_parser_free($xml_parser);
 
-    fclose( $this->$out);
+    if ($this->empty == false)
+      fwrite( $this->out, "</dl>\n");
+
+    fclose( $this->out);
   }
 
   function startElement($parser, $tagName, $attrs) {
+
+    // debug
+    //fwrite( $this->out, "<!-- ".$tagName." -->\n");
+
     if ($this->insideitem) 
       {
 	$this->tag = $tagName;
@@ -56,16 +65,23 @@ class RSSParser {
   function endElement($parser, $tagName) {
     if ($tagName == "ITEM") 
       {
-	$s = sprintf( "<dt><b><a href='%s'>%s</a></b></dt>\n<dd>%s</dd>\n",
+	if ($this->empty) {
+	  fwrite( $this->out, "<dl class=\"NewsList\">\n");
+	  $this->empty = false;
+	}
+
+	$s = sprintf( "<dt>%s</dt>\n<dd><a href='%s' class=\"NewsTitleLink\">%s</a></dd>\n<dd>%s</dd>\n",
+		      trim($this->date),
 		      trim($this->link),
 		      htmlspecialchars(trim($this->title)),
-		      htmlspecialchars(trim($this->description)));
+		      trim($this->description));
 
-	fwrite( $this->$out, $s);
+	fwrite( $this->out, $s);
 
 	$this->title = "";
 	$this->description = "";
 	$this->link = "";
+	$this->date = "";
 
 	$this->insideitem = false;
     }
@@ -83,6 +99,9 @@ class RSSParser {
 	  break;
 	case "LINK":
 	  $this->link .= $data;
+	  break;
+	case "PUBDATE":
+	  $this->date .= $data;
 	  break;
 	}
     }
