@@ -216,8 +216,12 @@ LinkedList *Database::dbopen_list;
       return granted_dbm;
 
     const char *path = Config::getServerValue("granted_dbm");
-    if (!path)
+    if (!path) {
+      const char *default_dbm = getDefaultServerDBMDB();
+      if (default_dbm)
+	granted_dbm.push_back(default_dbm);
       return granted_dbm;
+    }
 
     char *p = strdup(path);
     char *sp = p;
@@ -238,10 +242,14 @@ LinkedList *Database::dbopen_list;
 
   const char *Database::getDefaultServerDBMDB()
   {
+    return Config::getServerValue("default_dbm");
+    /*
     const std::vector<std::string> & granted_dbm = getGrantedDBMDB();
     if (granted_dbm.size())
       return granted_dbm[0].c_str();
+
     return "";
+    */
   }
 
   const char *Database::getDefaultDBMDB()

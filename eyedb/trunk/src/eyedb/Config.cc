@@ -703,8 +703,14 @@ namespace eyedb {
     // sopath
     setValue( "sopath", (libdir + "/eyedb").c_str());
 
+    // Default EYEDBDBM Databases
+    setValue( "default_dbm", (localstatedir + "/lib/eyedb/db/dbmdb.dbs").c_str());
+
     // Granted EYEDBDBM Databases
-    setValue( "granted_dbm", (localstatedir + "/lib/eyedb/db/dbmdb.dbs").c_str());
+    //setValue( "granted_dbm", (localstatedir + "/lib/eyedb/db/dbmdb.dbs").c_str());
+    // EV : 22/01/06
+    // when variable expansion will be done in getValue(), granted_dbm will be:
+    //setValue( "granted_dbm", "%default_dbm%");
 
     // Server Parameters
     setValue( "access_file", (sysconfdir + "/eyedb/Access").c_str());

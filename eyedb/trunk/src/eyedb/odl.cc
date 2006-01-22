@@ -186,6 +186,17 @@ namespace eyedb {
       }
   }
 
+  static bool is_in(const std::vector<Class *> &rm_v, Class *cls) {
+    std::vector<Class *>::const_iterator begin = rm_v.begin();
+    std::vector<Class *>::const_iterator end = rm_v.end();
+    while (begin != end) {
+      if (cls == *begin)
+	return true;
+      ++begin;
+    }
+    return false;
+  }
+
   static void
   odl_check_removed(Schema *m, LinkedList *&list)
   {
@@ -193,21 +204,65 @@ namespace eyedb {
       if (!list)
 	list = new LinkedList();
       const LinkedList *cls_list = m->getClassList();
-      LinkedListCursor c(cls_list);
-      Class *cls;
       odlUpdateHint *rmHints = new odlUpdateHint(odlUpdateHint::Remove);
-      while (c.getNext((void *&)cls)) {
-	if (!cls->isSystem()) {
-	  odlClassSpec *clsspec = new odlClassSpec(cls->getName(), 0,
-						   cls->getName(), 0);
-	  new odlAgregatClass(rmHints, odl_Struct,
-			      clsspec,
-			      new odlDeclRootList());
+      Class *cls;
+      // bug corrected 21/01/06
+#if 1
+      std::vector<Class *> rm_v;
+
+      unsigned int cnt = 0;
+
+      do {
+	LinkedListCursor c(cls_list);
+	cnt = 0;
+	while (c.getNext((void *&)cls)) {
+	  if (cls->isSystem() || is_in(rm_v, cls))
+	    continue;
+
+	  Class **subclasses;
+	  int subclass_cnt;
+	  cls->getSubClasses(subclasses, subclass_cnt);
+	  bool subclass_notin = false;
+	  for (int n = 0; n < subclass_cnt; n++) {
+	    if (subclasses[n] != cls && !is_in(rm_v, subclasses[n])) {
+	      subclass_notin = true;
+	      break;
+	    }
+	  }
+
+	  if (!subclass_notin) {
+	    rm_v.push_back(cls);
+	    cnt++;
+	  }
 	}
+
+      } while(cnt);
+
+      std::vector<Class *>::iterator begin = rm_v.begin();
+      std::vector<Class *>::iterator end = rm_v.end();
+      while (begin != end) {
+	cls = *begin;
+	odlClassSpec *clsspec = new odlClassSpec(cls->getName(), 0,
+						 cls->getName(), 0);
+	new odlAgregatClass(rmHints, odl_Struct,  clsspec,
+			    new odlDeclRootList());
+	++begin;
       }
+#else
+      LinkedListCursor c(cls_list);
+      while (c.getNext((void *&)cls)) {
+	if (cls->isSystem())
+	  continue;
+	odlClassSpec *clsspec = new odlClassSpec(cls->getName(), 0,
+						 cls->getName(), 0);
+	new odlAgregatClass(rmHints, odl_Struct,  clsspec,
+			    new odlDeclRootList());
+      }
+#endif
+
       return;
     }
-
+    
     if (odl_cls_rm.getCount() == 0)
       return;
 

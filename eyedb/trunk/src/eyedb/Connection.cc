@@ -72,6 +72,10 @@ namespace eyedb {
 
 #include <pwd.h>
 
+  static void eyedb_exit() {
+    abort();
+  }
+
   static const char *
   getUserName()
   {
@@ -152,6 +156,8 @@ namespace eyedb {
 	  printf("Continue? ");
 	  getchar();
 	}
+
+	atexit(eyedb_exit);
 
 	return Success;
       }
