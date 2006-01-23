@@ -6,7 +6,8 @@
 # Eric Viara Copyright (C) SYSRA 1995-1998
 #
 
-include @prefix@/share/@PACKAGE@/Makefile.eyedb
+prefix=@prefix@
+include @datadir@/@PACKAGE@/Makefile.eyedb
 
 all: person.o personstubsfe.o personstubsbe.o
 

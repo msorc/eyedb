@@ -4,7 +4,8 @@
 # C++Binding/scheme-oriented/methods package
 #
 
-include @prefix@/share/@PACKAGE@/Makefile.eyedb
+prefix=@prefix@
+include @datadir@/@PACKAGE@/Makefile.eyedb
 
 EXTRA_CXXFLAGS= -I../share
 
