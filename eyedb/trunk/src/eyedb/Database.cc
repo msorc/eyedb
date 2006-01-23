@@ -49,8 +49,9 @@ LinkedList *Database::dbopen_list;
   Bool Database::def_commit_on_close = False;
 
   Bool edb_is_back_end = False;
-  static char *default_voldir;
+  //static char *default_voldir;
 
+#if 0
   static char *
   getPath(char *path, Bool inplace = False)
   {
@@ -62,38 +63,38 @@ LinkedList *Database::dbopen_list;
 
     static char dirname[256], name[256];
 
-    if (!*dirname)
-      {
-	const char *voldir = default_voldir;
+    if (!*dirname) {
+      const char *voldir = default_voldir;
 
-	if (!voldir)
-	  voldir = Config::getClientValue("data_dir");
+      if (!voldir)
+	voldir = Config::getClientValue("data_dir");
 
-	if (voldir)
-	  strcpy(dirname, voldir);
-	else
-	  getcwd(dirname, sizeof(dirname)-1);
-      }
+      if (voldir)
+	strcpy(dirname, voldir);
+      else
+	getcwd(dirname, sizeof(dirname)-1);
+    }
 
     sprintf(name, "%s/%s", dirname, path);
 
-    if (inplace)
-      {
-	strcpy(path, name);
-	return path;
-      }
-    else
-      {
-	delete path;
-	return strdup(name);
-      }
+    if (inplace) {
+      strcpy(path, name);
+      return path;
+    }
+    else {
+      delete path;
+      return strdup(name);
+    }
   }
+#endif
 
+  /*
   void Database::setDefaultVolumeDirectory(const char *voldir)
   {
     if (voldir)
       default_voldir = strdup(voldir);
   }
+  */
 
   void Database::init(const char *_dbmdb_str)
   {
@@ -467,13 +468,9 @@ LinkedList *Database::dbopen_list;
       return Exception::make(IDB_DATABASE_CREATE_ERROR,
 			     "when creating a dbmfile, dbfile must be equal to dbmdb_str ('%s' != '%s')", (*pdbdesc)->dbfile, dbmdb_str);
 
-    getPath(dbdesc.dbfile, True);
-    eyedbsm::DbCreateDescription *d = &(*pdbdesc)->sedbdesc;
+    //getPath(dbdesc.dbfile, True);
 
-    /*
-      for (int i = 0; i < d->nvol; i++)
-      getPath(d->vol[0].file, True);
-    */
+    eyedbsm::DbCreateDescription *d = &(*pdbdesc)->sedbdesc;
 
     return Success;
   }

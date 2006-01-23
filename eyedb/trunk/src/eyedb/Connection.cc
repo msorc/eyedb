@@ -72,9 +72,18 @@ namespace eyedb {
 
 #include <pwd.h>
 
-  static void eyedb_exit() {
-    abort();
+  /*
+  extern "C" void exit(int s) {
+    static bool e = false;
+    if (e)
+      return;
+    e = true;
+    if (Exception::getMode() == Exception::StatusMode)
+      fprintf(stderr, "exit(int) function has been called : getting a chance to trap this call\n");
+    Exception::setMode(Exception::ExceptionMode);
+    Exception::make(IDB_EXIT_CALLED, "invalid called");
   }
+  */
 
   static const char *
   getUserName()
@@ -157,7 +166,7 @@ namespace eyedb {
 	  getchar();
 	}
 
-	atexit(eyedb_exit);
+	//atexit(eyedb_exit);
 
 	return Success;
       }

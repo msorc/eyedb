@@ -642,18 +642,23 @@ namespace eyedb {
     eyedbsm::Status se_status;
 
     ((eyedbsm::DbCreateDescription *)sedbdesc)->dbid = dbid;
+
+    std::string dbs;
+    if (*dbfile != '/') {
+      dbs = string(Config::getServerValue("data_dir")) + "/" + dbfile;
+      dbfile = dbs.c_str();
+    }
+
     se_status = eyedbsm::dbCreate(dbfile, eyedb::getVersionNumber(),
 				  sedbdesc);
 
-    if (!se_status)
-      {
+    if (!se_status) {
 	RPCStatus rpc_status;
 	int pid;
 	DbHandle *dbh = 0;
 	Status status;
 
-	if (dbm && makeTemp)
-	  {
+	if (dbm && makeTemp) {
 	    status = dbm->updateEntry(dbid,
 				      DBM_Database::makeTempName(dbid).c_str(),
 				      dbname, dbfile);
@@ -6773,7 +6778,7 @@ do { \
   }
 
   void
-  IDB_init(const char *voldir,
+  IDB_init(const char *data_dir,
 	   const char *dummy, // was  _passwdfile,
 	   void *xsesslog, int _timeout)
   {
@@ -6785,11 +6790,11 @@ do { \
 #endif
     timeout = _timeout;
 
-    if (voldir)
-      Database::setDefaultVolumeDirectory(voldir);
-
     eyedb::init();
     config_init();
+
+    if (data_dir)
+      Config::getServerConfig()->setValue("data_dir", data_dir);
   }
 
   RPCStatus
