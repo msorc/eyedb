@@ -674,12 +674,6 @@ namespace eyedb {
 
     /**
        Not yet documented
-       @param voldir
-    */
-    static void setDefaultVolumeDirectory(const char *voldir);
-
-    /**
-       Not yet documented
        @return
     */
     const char *getDBMDB() const;

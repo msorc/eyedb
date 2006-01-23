@@ -489,24 +489,41 @@ getDatafile(const char *dbname, const char *dbfile)
   return datafile;
 }
 
+#define NO_CLIENT_DATDIR
+
 static int
 dbcreate_prologue(Database *db, const char *dbname,
 		  char *&dbfile, char *datafiles[], int &datafiles_cnt,
 		  const char *deffiledir, DbCreateDescription *dbdesc,
 		  eyedbsm::Oid::NX nbobjs = DEF_NBOBJS, int dbid = 0)
 {
+#ifdef NO_CLIENT_DATDIR
+  std::string dirname = (deffiledir ? deffiledir : "");
+  if (dirname.length())
+    dirname += "/";
+
+  if (!dbfile) {
+    if (strcmp(dbname, DBM_Database::getDbName()))
+      dbfile = strdup((dirname + dbname + ".dbs").c_str());
+    else
+      dbfile = strdup(Database::getDefaultDBMDB());
+  }
+  else if (dbfile[0] != '/')
+    dbfile = strdup((dirname + dbfile).c_str());
+
+#else
   std::string dirname = (deffiledir ? deffiledir :
 			 eyedb::Config::getClientValue("data_dir"));
-
-  if (!dbfile)
-    {
-      if (strcmp(dbname, DBM_Database::getDbName()))
-	dbfile = strdup((dirname + "/" + dbname + ".dbs").c_str());
-      else
-	dbfile = strdup(Database::getDefaultDBMDB());
-    }
+  if (!dbfile) {
+    if (strcmp(dbname, DBM_Database::getDbName()))
+      dbfile = strdup((dirname + "/" + dbname + ".dbs").c_str());
+    else
+      dbfile = strdup(Database::getDefaultDBMDB());
+  }
   else if (dbfile[0] != '/')
     dbfile = strdup((dirname + "/" + dbfile).c_str());
+
+#endif
 
   strcpy(dbdesc->dbfile, dbfile);
   eyedbsm::DbCreateDescription *d = &dbdesc->sedbdesc;
@@ -570,9 +587,20 @@ dbmove_prologue(Database *db, const char *dbname,
 		char *&dbfile, char *datafiles[], int &datafiles_cnt,
 		const char *deffiledir, DbCreateDescription *dbdesc)
 {
+#ifdef NO_CLIENT_DATDIR
+  std::string dirname = (deffiledir ? deffiledir : "");
+  if (dirname.length())
+    dirname += "/";
+  if (!dbfile) {
+    if (!deffiledir)
+      return move_error("--dbfile");
+    dbfile = strdup((dirname + dbname + ".dbs").c_str());
+  }
+  else if (dbfile[0] != '/')
+    dbfile = strdup((dirname + dbfile).c_str());
+#else
   std::string dirname = (deffiledir ? deffiledir :
 			 eyedb::Config::getClientValue("data_dir"));
-
   if (!dbfile)
     {
       if (!deffiledir)
@@ -581,37 +609,36 @@ dbmove_prologue(Database *db, const char *dbname,
     }
   else if (dbfile[0] != '/')
     dbfile = strdup((dirname + "/" + dbfile).c_str());
+#endif
 
   strcpy(dbdesc->dbfile, dbfile);
 
-  if (!datafiles_cnt)
-    {
-      if (!deffiledir)
-	return move_error("--datafiles");
+  if (!datafiles_cnt)  {
+    if (!deffiledir)
+      return move_error("--datafiles");
 
-      DbCreateDescription dbdesc;
-      Status status = db->getInfo(conn, 0, 0, &dbdesc);
+    DbCreateDescription dbdesc;
+    Status status = db->getInfo(conn, 0, 0, &dbdesc);
       CHECK(status);
-
-      for (int i = 0; i < dbdesc.sedbdesc.ndat; i++)
-	{
-	  const char *datafile = dbdesc.sedbdesc.dat[i].file;
-	  char *p = (char *)strrchr(datafile, '/');
-	  if (p)
-	    {
-	      datafiles[i] = strdup((dirname + "/" + (p+1)).c_str());
-	      continue;
-	    }
-
-	  const char *dbfile_dir = get_dir(dbfile);
-	  if (strcmp(dbfile_dir, dirname.c_str()))
-	    {
-	      datafiles[i] = strdup((dirname + "/" + datafile).c_str());
-	      continue;
-	    }
-
-	  datafiles[i] = strdup(datafile);
+      
+      for (int i = 0; i < dbdesc.sedbdesc.ndat; i++) {
+	const char *datafile = dbdesc.sedbdesc.dat[i].file;
+	char *p = (char *)strrchr(datafile, '/');
+	if (p) {
+	  datafiles[i] = strdup((dirname + (p+1)).c_str());
+	  continue;
 	}
+
+	/*
+	const char *dbfile_dir = get_dir(dbfile);
+	if (strcmp(dbfile_dir, dirname.c_str())) {
+	  datafiles[i] = strdup((dirname + datafile).c_str());
+	  continue;
+	}
+	*/
+	
+	datafiles[i] = strdup(datafile);
+      }
 
       datafiles_cnt = dbdesc.sedbdesc.ndat;
     }
@@ -639,69 +666,76 @@ dbcopy_prologue(Database *db, const char *dbname, const char *newdbname,
 		char *&dbfile, char *datafiles[], int &datafiles_cnt,
 		const char *deffiledir, DbCreateDescription *dbdesc)
 {
+#ifdef NO_CLIENT_DATDIR
+  std::string dirname = (deffiledir ? deffiledir : "");
+  if (dirname.length())
+    dirname += "/";
+
+  if (!dbfile)
+    dbfile = strdup((dirname + newdbname + ".dbs").c_str());
+  else if (dbfile[0] != '/')
+    dbfile = strdup((dirname + dbfile).c_str());
+#else
   std::string dirname = (deffiledir ? deffiledir :
 			 eyedb::Config::getClientValue("data_dir"));
-
   if (!dbfile)
     dbfile = strdup((dirname + "/" + newdbname + ".dbs").c_str());
   else if (dbfile[0] != '/')
     dbfile = strdup((dirname + "/" + dbfile).c_str());
+#endif
+
 
   strcpy(dbdesc->dbfile, dbfile);
 
-  if (!datafiles_cnt)
-    {
-      DbCreateDescription dbdesc;
-      Status status = db->getInfo(conn, 0, 0, &dbdesc);
-      CHECK(status);
+  if (!datafiles_cnt) {
+    DbCreateDescription dbdesc;
+    Status status = db->getInfo(conn, 0, 0, &dbdesc);
+    CHECK(status);
 
-      Bool oneDatafile = IDBBOOL(dbdesc.sedbdesc.ndat == 1);
-      if (!deffiledir && !oneDatafile)
-	{
-	  print_prog();
-	  fprintf(stderr, "when copying a database with more than "
-		  "one datafile, one must use one of the two options: "
-		  "--datafiles or --filedir\n");
-	  return 1;
-	}
-
-      for (int i = 0; i < dbdesc.sedbdesc.ndat; i++)
-	{
-	  char *datafile = dbdesc.sedbdesc.dat[i].file;
-	  char *q = strrchr(datafile, '.');
-	  *q = 0;
-	  char *p = strrchr(datafile, '/');
-	  if (p)
-	    {
-	      datafiles[i] = strdup((dirname + "/" +
-				     make_copy_name(oneDatafile, newdbname, p+1)).c_str());
-	      continue;
-	    }
-
-	  const char *dbfile_dir = get_dir(dbfile);
-	  if (strcmp(dbfile_dir, dirname.c_str()))
-	    {
-	      datafiles[i] = strdup((dirname + "/" +
-				     make_copy_name(oneDatafile, newdbname,
-						    datafile)).c_str());
-	      continue;
-	    }
-
-	  datafiles[i] = strdup(make_copy_name(oneDatafile, newdbname, datafile).c_str());
-
-	}
-
-      datafiles_cnt = dbdesc.sedbdesc.ndat;
+    Bool oneDatafile = IDBBOOL(dbdesc.sedbdesc.ndat == 1);
+    if (!deffiledir && !oneDatafile) {
+      print_prog();
+      fprintf(stderr, "when copying a database with more than "
+	      "one datafile, one must use one of the two options: "
+	      "--datafiles or --filedir\n");
+      return 1;
     }
+
+    for (int i = 0; i < dbdesc.sedbdesc.ndat; i++) {
+      char *datafile = dbdesc.sedbdesc.dat[i].file;
+      char *q = strrchr(datafile, '.');
+      *q = 0;
+      char *p = strrchr(datafile, '/');
+      if (p) {
+	datafiles[i] = strdup((dirname +
+			       make_copy_name(oneDatafile, newdbname, p+1)).c_str());
+	continue;
+      }
+
+      /*
+	const char *dbfile_dir = get_dir(dbfile);
+	if (strcmp(dbfile_dir, dirname.c_str())) {
+	datafiles[i] = strdup((dirname + "/" +
+	make_copy_name(oneDatafile, newdbname,
+	datafile)).c_str());
+	continue;
+	}
+      */
+
+      datafiles[i] = strdup(make_copy_name(oneDatafile, newdbname, datafile).c_str());
+
+    }
+
+    datafiles_cnt = dbdesc.sedbdesc.ndat;
+  }
 
   eyedbsm::DbCreateDescription *d = &dbdesc->sedbdesc;
   d->ndat = datafiles_cnt;
-  for (int i = 0; i < datafiles_cnt; i++)
-    {
-      strcpy(d->dat[i].file, datafiles[i]);
-      d->dat[i].maxsize = 0;
-      d->dat[i].sizeslot = 0;
-    }
+  for (int i = 0; i < datafiles_cnt; i++) {
+    strcpy(d->dat[i].file, datafiles[i]);
+    d->dat[i].maxsize = 0;
+    d->dat[i].sizeslot = 0;
+  }
 
   return 0;
 }
@@ -1608,7 +1642,7 @@ dbimport_realize(int fd, const char *file, const char *dbname,
   int i;
   if (lseek_ok && !_filedir) {
     getansw("Directory for Database File",
-	    dbdir, eyedb::Config::getClientValue("data_dir"));
+	    dbdir, eyedb::Config::getServerValue("data_dir"));
 
     for (i = 0; i < info.ndat; i++) {
       if (!*info.datafiles[i].file)

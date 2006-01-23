@@ -679,9 +679,6 @@ namespace eyedb {
     // EYEDBDBM Database
     //setValue( "dbm", (localstatedir + "/lib/eyedb/db/dbmdb.dbs").c_str());
     setValue( "dbm", "default");
-
-    // Bases directory
-    setValue( "data_dir", (localstatedir + "/lib/eyedb/db").c_str());
   }
 
   void
@@ -693,6 +690,9 @@ namespace eyedb {
 
     // Executables directory
     setValue( "bindir", eyedblib::CompileBuiltin::getBindir());
+
+    // Bases directory
+    setValue( "data_dir", (localstatedir + "/lib/eyedb/db").c_str());
 
     // pipes:
     setValue( "pipedir", (localstatedir + "/lib/eyedb/pipes").c_str());

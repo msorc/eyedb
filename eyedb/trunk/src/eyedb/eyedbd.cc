@@ -61,7 +61,7 @@ using namespace eyedb;
 
 static Bool nod;
 
-#define NO_DATDIR
+//#define NO_DATDIR
 
 static int
 get_opts(int argc, char *argv[],
@@ -85,8 +85,8 @@ get_opts(int argc, char *argv[],
   *datdir = "";
 #endif
 
-  static const std::string access_file_opt = "access_file";
-  static const std::string datdir_opt = "datdir";
+  static const std::string access_file_opt = "access-file";
+  static const std::string datdir_opt = "data-dir";
   static const std::string nod_opt = "nod";
   static const std::string sesslogdev_opt = "sesslogdev";
   static const std::string sessloglevel_opt = "sessloglevel";
@@ -141,10 +141,10 @@ get_opts(int argc, char *argv[],
 
 #ifndef NO_DATDIR
   if (!*datdir) {
-    if (s = eyedb::Config::getClientValue("data_dir"))
+    if (s = eyedb::Config::getServerValue("data_dir"))
       *datdir = strdup(s);
     else {
-      fprintf(stderr, "configuration variable sv_datdir is not set\n");
+      fprintf(stderr, "configuration variable data_dir is not set\n");
       exit(1);
     }
   }
@@ -296,9 +296,9 @@ main(int argc, char *argv[])
 			   datdir, sesslogdev, sessloglevel);
 
 #ifndef NO_DATDIR
-  IDB_init(0, 0 /* passwdfile */, sesslog, 0 /*timeout*/);
-#else
   IDB_init(datdir, 0 /* passwdfile */, sesslog, 0 /*timeout*/);
+#else
+  IDB_init(0, 0 /* passwdfile */, sesslog, 0 /*timeout*/);
 #endif
 
   if (sesslog->getStatus()) {
