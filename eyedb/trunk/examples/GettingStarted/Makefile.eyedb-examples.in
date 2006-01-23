@@ -6,7 +6,8 @@
 # Eric Viara Copyright (C) SYSRA 1995-1998
 #
 
-include @prefix@/share/@PACKAGE@/Makefile.eyedb
+prefix=@prefix@
+include @datadir@/@PACKAGE@/Makefile.eyedb
 
 CXXFLAGS += $(EYEDB_CXXFLAGS) $(EYEDB_CPPFLAGS)
 LDFLAGS += ${EYEDB_LDFLAGS}
@@ -16,10 +17,10 @@ all: persontest PersonTest.class
 
 persontest.o: person.h
 
+person.o: person.cc
+
 persontest: person.o persontest.o
 	$(CXX) $(LDFLAGS) -Wl,-R$(EYEDB_LIBDIR) -o $@ $^ $(LDLIBS)
-
-person.o: person.cc
 
 person.cc person.h: schema.odl
 	$(EYEDB_ODL) --gencode=C++ --package=person $<
