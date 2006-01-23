@@ -48,7 +48,7 @@ create(eyedb::Database *db)
   john->setSpouse(mary);
 
   // creates children
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < 3; i++) {
     std::string name = std::string("baby") + str_convert(i+1);
     Person *child = new Person(db);
     child->setFirstname(name.c_str());
@@ -67,18 +67,20 @@ create(eyedb::Database *db)
 }
 
 static void
-read(eyedb::Database *db)
+read(eyedb::Database *db, const char *s)
 {
   db->transactionBegin();
 
-  eyedb::OQL q(db, "select Person");
+  eyedb::OQL q(db, "select Person.lastname ~ \"%s\"", s);
 
   eyedb::ObjectArray obj_arr;
   q.execute(obj_arr);
 
   for (int i = 0; i < obj_arr.getCount(); i++) {
     Person *p   = Person_c(obj_arr[i]);
-    p->trace();
+    if (p)
+      printf("person = %s %s, age = %d\n", p->getFirstname().c_str(),
+	     p->getLastname().c_str(), p->getAge());
   }
 
   db->transactionCommit();
@@ -99,15 +101,17 @@ main(int argc, char *argv[])
 
   try {
     eyedb::Connection conn;
+
     conn.open();
+
     personDatabase db(argv[1]);
+
     db.open(&conn, eyedb::Database::DBRW);
 
     create(&db);
 
-    read(&db);
+    read(&db, "baby");
   }
-
   catch(eyedb::Exception &e) {
     e.print();
   }

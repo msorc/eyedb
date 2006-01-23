@@ -14,16 +14,14 @@ We will introduce \eyedb by working through some simple administration
 operations such as adding a user, creating a database, and through
 a simple example of defining an ODL schema, and then writing a C++
 client program.
-\\
+
 At this early stage, we will explain only what is necessary to understand
 the examples to avoid being swamped by unnecessary details.
-\\
-\\
+
 We assume that \eyedb has been correctly installed on your
 computer.
 Refer to the installation guide in the annex for installation information.
-\\
-\\
+
 Depending on who you are (the DBA, the installer, a lambda user), you do not need
 to read all this chapter. In particular, the first sections about the
 distribution, the environment and administrative operations 
@@ -32,241 +30,59 @@ for you an \eyedb user that has the \emph{database creation} system privilege.
 Then you can jump directly to the section
 \emph{Using the default configuration} and then to the section
 \emph{Creating a database using a specific user}.
+
 \sect{The Distribution}
-When you installed \eyedbX, you specified a target directory, for instance
-\texttt{/usr/local/eyedb}.
-\\
-If you look at the directory contents, you will find the following directories
-and files:
-\begin{tabbing}
-- \texttt{eyedb-V\eyedbversion}\mbox{ } \= : directory \\
-- \texttt{eyedb} \> : symbolic link to eyedb-V\eyedbversion \\
-- \texttt{etc} \> : directory containing environment files \\
-- \texttt{db} \> : default directory containing the databases \\
-- \texttt{log} \> : directory containing log files
-\end{tabbing}
-The actual binary distribution is under the directory
-\texttt{/usr/local/eyedb/eyedb-V\eyedbversion} which is equivalent (because of the
-symbolic link) to \texttt{/usr/local/eyedb/eyedb}.
-\\
-\\
-This distribution architecture, and in particular the symbolic link
-\texttt{eyedb} has been introduced to facilitate the installation of the
-next \eyedb versions.
-\\
-\\
-Under the binary distribution directory \texttt{eyedb-V\eyedbversion}, you will find
-the following directories:
-\begin{tabbing}
-- \texttt{examples} \= : a few examples \kill
-- \texttt{doc} \> : documentation \\
-- \texttt{etc} \> : environment files \\
-- \texttt{examples} \> : a few examples \\
-- \texttt{include} \> : C++ binding include files \\
-- \texttt{java} \> : Java classes \\
-- \emph{archdir} \> : one or more architecture directories
-\end{tabbing}
-The architecture directories contain the libraries and executables that
-are suitable to your computer, operating system and compiler.
-\\
-The name of an architecture directory is built as follows:
-%\[debug-\]\emph{os}-\emph{proc}\[-\emph{compiler}\]
-%[debug-\]\emph{os}-\emph{proc}[-\emph{compiler}]
-\begin{verbatim}
-[debug-]os-proc[-compiler]
-\end{verbatim}
-for instance:\\
-- \texttt{debug-solaris-sparcv7-gcc} for the Solaris Sparc 32 bits debug version
-using the GNU C++ compiler.\\
-- \texttt{solaris-sparcv9-cc} for the Solaris Sparc 64 bits optimized version
-using the SUN C++ compiler.\\
-- \texttt{linux-x86} for the Linux X86 optimized version
-using the default C++ compiler (GNU).\\
-\\
-Under an architecture directory, you will find
-the following directories:
-\begin{tabbing}
-- \texttt{xetc} \= : contains the architecture environment files \kill
-- \texttt{etc} \> : contains the architecture environment files \\
-- \texttt{lib} \> : contains the C++ libraries for CC and gcc \\
-- \texttt{bin} \> : contains the \eyedb tools prefixed with \texttt{eyedb} \\
-- \texttt{xbin} \> : contains the \eyedb tools not prefixed with \texttt{eyedb} \\
-\end{tabbing}
-\subsect{The Environment}
-All what concern the environment is under the directories \texttt{etc}.
-This directory {\EYEDBARCH} contains the following
-files:
-\begin{tabbing}
-- \texttt{Makefile}.eyedb \= : \kill
-- \texttt{environ}.sh \> : the Bourne shell environment script \\
-- \texttt{environ}.csh \> : the C Shell environment script \\
-- \texttt{ArchConfig} \> : the configuration file for your architecture \\
-- \texttt{Makefile}.eyedb \> : the template Makefile \\
-\end{tabbing}
-\subsection{Using the default configuration}
-To use \eyedb with its default configuration, you only need to source
-the shell script file environ.sh (Bourne Shell) or environ.csh (C Shell)
-as follows:
-\begin{tabbing}
-\mbox{ } - Bourne shell environment \= : {\LARGE .} \emph{eyedbtop}/\texttt{eyedb-V\eyedbversion}/\emph{archdir}/etc/environ.sh \\
-%\mbox{ } - C shell environment \> : source {\EYEDBARCH}/etc/environ.csh
-\mbox{ } - C shell environment \> : source {\EYEDBARCH}/etc/environ.csh
-\end{tabbing}
-where \emph{eyedbtop} denotes the directory in which \eyedb has been installed, for instance \texttt{/usr/local/eyedb} and \emph{archdir}, the architecture
-directory, for instance \texttt{solaris-sparcv7-cc}.
-\\
-These shell scripts set a few environment variables, \texttt{EYEDBROOT},
-\texttt{EYEDBARCH} and \texttt{EYEDBCLASSPATH} and modify the \texttt{PATH} 
-and the \texttt{LD\_LIBRARY\_PATH} environment variables to allow you to execute properly the \eyedb
-tools.
-\\
-Once you have sourced one of this environment file, you are able to use
-\eyedbX.
-\subsection{The \eyedb tools}
-If you use a modern shell such as \texttt{bash} or \texttt{tcsh}
-which provides an interactive completion for programs, by typing:
-\\
-\mbox{ } - \texttt{eyedb}\emph{TAB TAB} on your terminal if you use \texttt{bash} \\
-\mbox{ } - \texttt{eyedb}\emph{Ctl-D} on your terminal if you use \texttt{tcsh} \\
-all the \eyedb tools will be displayed on your terminal as follows:
-\begin{tabbing}
-xxxxxxxxxxxxxxxxxxxx \= xxxxxxxxxxxxxxxxxxxx \= xxxxxxxxxxxxxxxxxxxx \= xxxxxxx
-xxxxxxxxxxxxx \kill
-\texttt{eyedbadmin} \> \texttt{eyedbdbmcreate} \> \texttt{eyedbdbmove} \> \texttt{eyedbjrun} \\
-\texttt{eyedbdbrename} \> \texttt{eyedbloca} \> \texttt{eyedbcollimpladmin} \> \texttt{eyedbdspcreate} \\
-\texttt{eyedbmvattr} \> \texttt{eyedbcollimplgetdef} \> \texttt{eyedbdspdelete} \> \texttt{eyedbmvcoll} \\
-\texttt{eyedbcollimpllist} \> \texttt{eyedbdspgetcurdat} \> \texttt{eyedbmvidx} \> \texttt{eyedbcollimplsetdef} \\
-\texttt{eyedbdspgetdefault} \> \texttt{eyedbmvinst} \> \texttt{eyedbcollimplsimulate} \> \texttt{eyedbdsplist} \\
-\texttt{eyedbmvobj} \> \texttt{eyedbcollimplstats} \> \texttt{eyedbdsprename} \> \texttt{eyedbodl} \\
-\texttt{eyedbcollimplupdate} \> \texttt{eyedbdspsetcurdat} \> \texttt{eyedboql} \> \texttt{eyedbconsadmin} \\
-\texttt{eyedbdspsetdefault} \> \texttt{eyedbpasswd} \> \texttt{eyedbconscreate} \> \texttt{eyedbdspupdate} \\
-\texttt{eyedbprotadmin} \> \texttt{eyedbconsdelete} \> \texttt{eyedbgetattrloca} \> \texttt{eyedbconslist} \\
-\texttt{eyedbgetcollloca} \> \texttt{eyedbgetdefattrdsp} \> \texttt{eyedbsetdefattrdsp} \> \texttt{eyedbgetdefcolldsp} \\
-\texttt{eyedbsetdefcolldsp} \> \texttt{eyedbdatcreate} \> \texttt{eyedbgetdefdsp} \> \texttt{eyedbsetdefdsp} \\
-\texttt{eyedbdatdefragment} \> \texttt{eyedbgetdefidxdsp} \> \texttt{eyedbsetdefidxdsp} \> \texttt{eyedbdatdelete} \\
-\texttt{eyedbgetdefinstdsp} \> \texttt{eyedbsetdefinstdsp} \> \texttt{eyedbdatlist} \> \texttt{eyedbgetenv} \\
-\texttt{eyedbdatmove} \> \texttt{eyedbgetidxloca} \> \texttt{eyedbsmtool} \> \texttt{eyedbdatrename} \\
-\texttt{eyedbgetinstloca} \> \texttt{eyedbsysaccess} \> \texttt{eyedbdatresize} \> \texttt{eyedbgetobjloca} \\
-\texttt{eyedbuseradd} \> \texttt{eyedbdbaccess} \> \texttt{eyedbidxadmin} \> \texttt{eyedbuserdbaccess} \\
-\texttt{eyedbdbcopy} \> \texttt{eyedbidxcreate} \> \texttt{eyedbuserdelete} \> \texttt{eyedbdbcreate} \\
-\texttt{eyedbidxdelete} \> \texttt{eyedbuserlist} \> \texttt{eyedbdbdelete} \> \texttt{eyedbidxlist} \\
-\texttt{eyedbuserpasswd} \> \texttt{eyedbdbexport} \> \texttt{eyedbidxsimulate} \> \texttt{eyedbwconf} \\
-\texttt{eyedbdbimport} \> \texttt{eyedbidxstats} \> \texttt{eyedbwwwd} \> \texttt{eyedbdblist} \\
-\texttt{eyedbidxupdate} \\
 
-%\texttt{eyedbadmin} \> \texttt{eyedbdbimport} \> \texttt{eyedbgetdefcolldsp} \>\texttt{eyedbpasswd} \\
-%\texttt{eyedbcgiclean} \> \texttt{eyedbdblist} \> \texttt{eyedbgetdefdsp} \>\texttt{eyedbpatchbin} \\
-%\texttt{eyedbcgife} \> \texttt{eyedbdbmcreate} \> \texttt{eyedbgetdefidxdsp} \>\texttt{eyedbrc} \\
-%\texttt{eyedbcrypt} \> \texttt{eyedbdbmove} \> \texttt{eyedbgetdefinstdsp} \>\texttt{eyedbsetdefattrdsp} \\
-%\texttt{eyedbd} \> \texttt{eyedbdbrename} \> \texttt{eyedbgetenv} \>\texttt{eyedbsetdefcolldsp} \\
-%\texttt{eyedbdatcreate} \> \texttt{eyedbdspcreate} \> \texttt{eyedbgetidxloca} \>\texttt{eyedbsetdefdsp} \\
-%\texttt{eyedbdatdefragment} \> \texttt{eyedbdspdelete} \> \texttt{eyedbgetinstloca} \>\texttt{eyedbsetdefidxdsp} \\
-%\texttt{eyedbdatdelete} \> \texttt{eyedbdspgetcurdat} \> \texttt{eyedbgetobjloca} \>\texttt{eyedbsetdefinstdsp} \\
-%\texttt{eyedbdatlist} \> \texttt{eyedbdspgetdefault} \> \texttt{eyedbjrun} \>\texttt{eyedbsmtool} \\
-%\texttt{eyedbdatmove} \> \texttt{eyedbdsplist} \> \texttt{eyedbloca} \>\texttt{eyedbsysaccess} \\
-%\texttt{eyedbdatrename} \> \texttt{eyedbdsprename} \> \texttt{eyedbmvattr} \>\texttt{eyedbuseradd} \\
-%\texttt{eyedbdatresize} \> \texttt{eyedbdspsetcurdat} \> \texttt{eyedbmvcoll} \>\texttt{eyedbuserdbaccess} \\
-%\texttt{eyedbdbaccess} \> \texttt{eyedbdspsetdefault} \> \texttt{eyedbmvidx} \>\texttt{eyedbuserdelete} \\
-%\texttt{eyedbdbcopy} \> \texttt{eyedbdspupdate} \> \texttt{eyedbmvinst} \>\texttt{eyedbuserlist} \\
-%\texttt{eyedbdbcreate} \> \texttt{eyedbgetattrloca} \> \texttt{eyedbmvobj} \>\texttt{eyedbuserpasswd} \\
-%\texttt{eyedbdbdelete} \> \texttt{eyedbgetcollloca} \> \texttt{eyedbodl} \>\texttt{eyedbwconf} \\
-%\texttt{eyedbdbexport} \> \texttt{eyedbgetdefattrdsp} \> \texttt{eyedboql} \>\texttt{eyedbwwwd} \\
 
-%\texttt{eyedbadmin} \>          \texttt{eyedbdbcreate}      \> \texttt{eyedbpasswd} \> \texttt{eyedbcgiclean}\\
-%\texttt{eyedbdbdelete} \>       \texttt{eyedbpatchbin}\> \texttt{eyedbcgife} \>          \texttt{eyedbdbexport}\\
-%\texttt{eyedbrc} \> \texttt{eyedbcrypt}         \> \texttt{eyedbdbimport} \>       \texttt{eyedbsmtool}\\
-%\texttt{eyedbd} \>              \texttt{eyedbdblist}        \> \texttt{eyedbsysaccess} \> \texttt{eyedbdatcreate}\\
-%\texttt{eyedbdbmcreate} \>      \texttt{eyedbuseradd}\> \texttt{eyedbdatdefragment} \>  \texttt{eyedbdbmove}\\
-%\texttt{eyedbuserdbaccess} \> \texttt{eyedbdatdelete}     \> \texttt{eyedbdbrename} \>       \texttt{eyedbuserdelete}\\
-%\texttt{eyedbdatlist} \>        \texttt{eyedbgetenv}        \> \texttt{eyedbuserlist} \> \texttt{eyedbdatmove}\\
-%\texttt{eyedbjrun} \>           \texttt{eyedbuserpasswd}\> \texttt{eyedbdatresize} \>      \texttt{eyedbodl}\\
-%\texttt{eyedbwconf} \> \texttt{eyedbdbaccess}      \> \texttt{eyedboql} \>            \texttt{eyedbwwwd}\\
-%\texttt{eyedbdbcopy} \>         \texttt{eyedborbixd}\\      
 
-\end{tabbing}
-But do not worry, you do not need to know all these tools to use
-\eyedbX, only a few of them are commonly used.
-\\
-The directory {\EYEDBARCH}/\texttt{xbin} contains symbolic links to 
-these main tools; the name links are not prefixed with \texttt{eyedb}.
-For instance, in this directory
-you will find \texttt{odl} which is a symbolic link to {\EYEDBARCH}/\texttt{bin}/\texttt{eyedbodl}. As the directory \texttt{xbin} has been set in
-your \texttt{PATH} environment variables, you can use either \texttt{eyedbodl}
-or \texttt{odl}.
-\\
-Here is the contents of the {\EYEDBARCH}/\texttt{xbin} directory:
-\begin{tabbing}
-xxxxxxxxxxxxxxxxxxxx \= xxxxxxxxxxxxxxxxxxxx \= xxxxxxxxxxxxxxxxxxxx \= xxxxxxxxxxxxxxxxxxxx \kill
-\texttt{collimpladmin} \> \texttt{collimplgetdef} \> \texttt{collimpllist} \> \texttt{collimplsetdef} \\
-\texttt{collimplsimulate} \> \texttt{collimplstats} \> \texttt{collimplupdate} \> \texttt{consadmin} \\
-\texttt{conscreate} \> \texttt{consdelete} \> \texttt{conslist} \> \texttt{datcreate} \\
-\texttt{datdefragment} \> \texttt{datdelete} \> \texttt{datlist} \> \texttt{datmove} \\
-\texttt{datrename} \> \texttt{datresize} \> \texttt{dbaccess} \> \texttt{dbadmin} \\
-\texttt{dbcopy} \> \texttt{dbcreate} \> \texttt{dbdelete} \> \texttt{dbexport} \\
-\texttt{dbimport} \> \texttt{dblist} \> \texttt{dbmcreate} \> \texttt{dbmove} \\
-\texttt{dbrename} \> \texttt{dspcreate} \> \texttt{dspdelete} \> \texttt{dspgetcurdat} \\
-\texttt{dspgetdefault} \> \texttt{dsplist} \> \texttt{dsprename} \> \texttt{dspsetcurdat} \\
-\texttt{dspsetdefault} \> \texttt{dspupdate} \> \texttt{getattrloca} \> \texttt{getcollloca} \\
-\texttt{getdefattrdsp} \> \texttt{getdefcolldsp} \> \texttt{getdefdsp} \> \texttt{getdefidxdsp} \\
-\texttt{getdefinstdsp} \> \texttt{getidxloca} \> \texttt{getinstloca} \> \texttt{getobjloca} \\
-\texttt{idxadmin} \> \texttt{idxcreate} \> \texttt{idxdelete} \> \texttt{idxlist} \\
-\texttt{idxsimulate} \> \texttt{idxstats} \> \texttt{idxupdate} \> \texttt{mvattr} \\
-\texttt{mvcoll} \> \texttt{mvidx} \> \texttt{mvinst} \> \texttt{mvobj} \\
-\texttt{odl} \> \texttt{oql} \> \texttt{setdefattrdsp} \> \texttt{setdefcolldsp} \\
-\texttt{setdefdsp} \> \texttt{setdefidxdsp} \> \texttt{setdefinstdsp} \> \texttt{smtool} \\
-\texttt{sysaccess} \> \texttt{useradd} \> \texttt{userdbaccess} \> \texttt{userdelete} \\
-\texttt{userlist} \> \texttt{userpasswd} \\
-%\texttt{datcreate} \>      \texttt{dbaccess} \>       \texttt{dbimport} \>       \texttt{oql}\\
-%\texttt{userlist} \> \texttt{datdefragment} \>  \texttt{dbadmin} \>        \texttt{dblist}\\
-%\texttt{smtool} \>         \texttt{userpasswd} \> \texttt{datdelete} \>      \texttt{dbcopy}\\
-%\texttt{dbmcreate} \>      \texttt{sysaccess} \> \texttt{datlist} \>        \texttt{dbcreate}\\
-%\texttt{dbmove} \>         \texttt{useradd} \> \texttt{datmove} \>        \texttt{dbdelete}\\
-%\texttt{dbrename} \>       \texttt{userdbaccess} \> \texttt{datresize} \>      \texttt{dbexport}\\
-%\texttt{odl} \>            \texttt{userdelete}
-\end{tabbing}
+
 \sect{Starting the server}
-%\emph{This Section concerns DBAs}.\\
+
 For any \eyedb operation, a server must run on your computer.
-\\
-To see if a server is running, type this:
+
+To check if a server is running, use the following command:
 \verbsize \begin{verbatim}
 % eyedbrc status
 \end{verbatim}
 \normalsize
-Two kinds of messages could be displayed:
-\be
-\item 
+If a server is running, this command will print a message like:
 \verbsize \begin{verbatim}
-EyeDB Server is up from Mon Nov  2 13:06:24 2000
- 
-  Version 2.6.6
-  Program Pid 765
-  Running Under 'eyedb'
- 
-  Listening Ports 6140
-  Volume Dir '/eyedb/db'
- 
+EyeDB Server running since Mon Jan 23 13:45:55 2006
+
+  Version       V2.7.2
+  Date          Jan 23 2006 13:25:04
+  Architecture  linux-x86
+  Program Pid   19013
+  Running Under francois
+
+  SMD Port      /home/francois/projects/eyedb/install/var/lib/eyedb/pipes/eyedbsmd
+  Listening on  localhost:6240
+                localhost:/home/francois/projects/eyedb/install/var/lib/eyedb/pipes/eyedbd
+  Datafile Directory 
+
   No Clients connected.
 \end{verbatim}
 \normalsize
-means that an \eyedb server is running and all is fine.
-\item \verbsize \begin{verbatim}
+
+\verbsize \begin{verbatim}
 EyeDB server, port 6140, is down from Mon Nov  2 16:04:15 2000
 \end{verbatim}
 \normalsize
 means that no \eyedb server is running, and you must start one.
-\ee
+
 To start a server, just do this:
 \verbsize \begin{verbatim}
 % eyedbrc start
 \end{verbatim}
 \normalsize
-Then, you may try again \texttt{eyedbrc status}.\\
-\\
-If you get any trouble at this step, refer to the administration chapter.
+
+Then, you may try again \texttt{eyedbrc status}.
+
+If you get any trouble at this step, refer to the administration manual.
+
 \sect{Creating a database}
 The next step is to create a database to perform our tests.
-\\
+
 This is very simple, you can try as follows:
 \verbsize
 \begin{verbatim}
@@ -285,14 +101,16 @@ eyedbdbcreate: insufficient privileges: user 'guest': creating database 'foo'
 \normalsize
 This mean that all is ok: you - in fact user \texttt{guest} - was not
 authorized to create a database.
-\\
-\\
-Two questions: \\
-\mbox{ } 1- why are you user \texttt{guest}? \\
-\mbox{ } 2- why the user \texttt{guest} does not have the privilege to create a database? \\
-\\
+
+
+Two questions: 
+\begin{enumerate}
+\item why are you user \texttt{guest}? 
+\item why the user \texttt{guest} does not have the privilege to create a database? 
+\end{enumerate}
+
 The answer to the first question is very simple: because the default
-configuration file is\\{\EYEDBARCH}\texttt{/etc/ArchConfig}
+configuration file is{\EYEDBARCH}\texttt{/etc/ArchConfig}
 which includes the following lines:
 \verbsize \begin{verbatim}
 #
@@ -304,7 +122,7 @@ passwd = guest;
 \end{verbatim}
 \normalsize
 The answer to the second question is a little bit more complex.
-\\
+
 If you display the user \texttt{guest} as follows:
 \verbsize \begin{verbatim}
 % eyedbuserlist guest
@@ -314,26 +132,29 @@ sysaccess : idbNoSysAccessMode
 \normalsize
 the second line indicates that the user \texttt{guest} has no system access
 privileges:
-\\
-\\
-The system access privileges control the following operations: \\
-\mbox{ } - any database creation \\
-\mbox{ } - any user creation \\
-\mbox{ } - any user deletion \\
-\mbox{ } - any user password setting \\
-\mbox{ } - any database administration \\
-\mbox{ } - any operation (or superuser access) \\
-\\
+
+
+The system access privileges control the following operations: 
+\begin{itemize}
+\item any database creation 
+\item any user creation 
+\item any user deletion 
+\item any user password setting 
+\item any database administration 
+\item any operation (or superuser access) 
+\end{itemize}
+
 To create a database, one needs the first system access privilege.
-\\
-\\
-So how to create a database?\\
-There are two ways:\\
-\mbox{ } 1- using an \eyedb superuser, \\
-\mbox{ } 2- creating a new user that has the appropriate system privilege
-and use it.
-\\
-\\
+
+
+So how to create a database?
+There are two ways:
+\begin{enumerate}
+\item using an \eyedb superuser, 
+\item creating a new user that has the appropriate system privilege and use it.
+\end{enumerate}
+
+
 We are going to introduce these two ways.
 
 \subsect{Using an \eyedb superuser}
@@ -357,10 +178,10 @@ You can notice that \texttt{eyedbroot} and \texttt{eyedb}
 - mentionned as a \texttt{strict unix user} - have
 the \emph{super user} system privilege which means that they can perform
 any operation on any database. The difference between these two users
-is beyond the scope of this chapter. In this Section, we will use 
+is beyond the scope of this manual. In this Section, we will use 
 the \texttt{eyedbroot} user.
-\\
-\\
+
+
 To create a database using the \texttt{eyedbroot} user, you need to do
 as follows:
 \verbsize
@@ -375,15 +196,15 @@ these characters are not echoed on your terminal).
 \subsect{Creating a user with a system privilege}
 To create a user, you need to be a user that has the system privilege
 \emph{any user creation}.
-\\
+
 The simplest way is to use the \eyedb superuser \texttt{eyedbroot}.
-\\
+
 Note that an \eyedb user is not a UNIX user. \eyedb provides its own
 user management. But an \eyedb user can be mapped on a UNIX user.
-Refer to the security section of the administation chapter to get
+Refer to the security section of the administation manual to get
 all information about that.
-\\
-\\
+
+
 Let's assume you want to add the user \texttt{bill}, and try this:
 \verbsize \begin{verbatim}
 % eyedbuseradd bill
@@ -396,7 +217,7 @@ eyedbuseradd: insufficient privileges: user 'guest': adding user
 \normalsize
 because you need to perform this operation under the user \texttt{eyedbroot}
 and you are still user \texttt{guest}.
-\\
+
 So, you need to use the option \texttt{-eyedbauth?} as follows:
 \verbsize \begin{verbatim}
 % eyedbuseradd -U eyedbroot -P {eyedbroot password} bill
@@ -405,11 +226,11 @@ retype bill password: {thekid}
 \end{verbatim}
 \normalsize
 If no error messages appear, the operation is sucessful.
-\\
-\\
+
+
 Now, you need to add the \emph{any database creation} system privilege
 to the user bill.
-\\
+
 Try this:
 \verbsize \begin{verbatim}
 % eyedbsysaccess
@@ -417,7 +238,7 @@ usage: eyedbsysaccess <username> ['+' combination of] dbcreate|adduser|deleteuse
 \end{verbatim}
 \normalsize
 As shown above, the usage is displayed on your terminal.
-\\
+
 For instance if you want to set the \emph{database creation} and the
 \emph{user creation} system privileges:
 \verbsize \begin{verbatim}
@@ -438,13 +259,13 @@ or as follows:
 \end{verbatim}
 \normalsize
 Nice, isn't it?
-\\
-\\
+
+
 The problem is that you need to type your user and password each time you
 want to become the user \texttt{bill} because of the default configuration
 you are still the user \texttt{guest}, and this user cannot acces the
 database \texttt{foo} for read or write operations.
-\\
+
 For instance, try:
 \verbsize \begin{verbatim}
 % eyedboql -d foo
@@ -486,7 +307,7 @@ bill
 \normalsize
 if the good version number \texttt{\eyedbversion} and \texttt{bill} are displayed,
 the operation has succeeded.
-\\
+
 Now you can try again:
 \verbsize \begin{verbatim}
 % eyedboql -d foo
@@ -499,32 +320,34 @@ eyedboql.
 \sect{Defining a simple schema}
 Now that a database has been created, a legitimate wish is to input data
 in it.
-\\
+
 The first step is to define the database schema.
-\\
+
 A standard example in database documentations is the well known
 \texttt{Person} class (or table in relational system) which contains
 a few attributes such as a firstname, a lastname, an age, an address, a spouse
 and a set of children.
-\\
+
 We will show the inheritance feature through the simple class \texttt{Employee}
 which inherits from the \texttt{Person} class and will contains a simple
 attribute: salary.
-\\
-\\
-There are several ways to create such a schema:\\
-\mbox{ } 1- define the schema in ODL and use the \texttt{eyedbodl} tool. \\
-\mbox{ } 2- use the C++ binding. \\
-\mbox{ } 3- use the Java binding. \\
-\\
+
+
+There are several ways to create such a schema:
+\begin{enumerate}
+\item define the schema in ODL and use the \texttt{eyedbodl} tool. 
+\item use the C++ binding. 
+\item use the Java binding. 
+\end{enumerate}
+
 All these choices are valid however the last *two* are too complicated
-to describe here. Please refer to the appropriate chapters.
-\\
-\\
+to describe here. Please refer to the appropriate manuals.
+
+
 So we opt for the first choice which is the most pratical
 and flexible way to define and create a schema within a database.
-\\
-\\
+
+
 Here is simple ODL schema for the classes \texttt{Address}, \texttt{Person} 
 and \texttt{Employee}:
 \verbsize \begin{verbatim}
@@ -554,41 +377,43 @@ class Employee extends Person {
 \end{verbatim}
 \normalsize
 A few comments about this schema:
-\bi
+\begin{itemize}
 \item the \texttt{Address} class contains four attributes, one integer
 and three strings.
-\bi
-\item {\bf integer}: there are three types of ODL integers: \\
-\mbox{ } 1- 16-bits integer, names \texttt{int16} or \texttt{short} \\
-\mbox{ } 2- 32-bits integer, names \texttt{int32} or \texttt{int} \\
-\mbox{ } 3- 64-bits integer, names \texttt{int64} or \texttt{long} \\
+\begin{itemize}
+\item {\bf integer}: there are three types of ODL integers: 
+\begin{enumerate}
+\item 16-bits integer, names \texttt{int16} or \texttt{short} 
+\item 32-bits integer, names \texttt{int32} or \texttt{int} 
+\item 64-bits integer, names \texttt{int64} or \texttt{long} 
+\end{enumerate}
 so the \texttt{num} attribute is a 32-bits integer.
 \item {\bf string}: an ODL string is under the form: \texttt{string} or
 \texttt{string<N>}. The
 first form means that the string is not bounded, the second form means
 that the string contains at most \texttt{N} characters.
-\ei
+\end{itemize}
 \item the \texttt{Person} class contains six attributes: two strings, one
 32-bits integer, one \texttt{Person} object and one set of \texttt{Person}
 objects.
-\bi
+\begin{itemize}
 \item the third attribute \texttt{addr} is of \texttt{Address} type and is
-a litteral because there is no \texttt{*} before the attribute name.\\
+a litteral because there is no \texttt{*} before the attribute name.
 A litteral is an object without identifier: the \texttt{addr} attribute
 is tied to a \texttt{Person} instance, it has no proper existence.
 \item the \texttt{spouse} attribute is an object, not a litteral, because
 it is preceded by a \texttt{*}. An object has an identifier and has its
 proper existence. The \texttt{*} means a reference or pointer to an
-object.\\
+object.
 The directive after the attribute name \texttt{inverse Person::spouse}
 is a relationship directive.
 \item the \texttt{children} attribute is a collection set of
 \texttt{Person} objects.
-\ei
+\end{itemize}
 \item the \texttt{Employee} contains seven attributes: the six \texttt{Person}
 attributes because \texttt{Employee} inherits from \texttt{Person} and 
 64-bits integer attribute: \texttt{salary}.
-\ei
+\end{itemize}
 
 To add the previous schema in the \texttt{foo} database, you need to
 use the \texttt{eyedbodl} tool as follows:
@@ -643,17 +468,17 @@ class Employee (implementation <hash, hints = "key_count = 2048;">) extends Pers
 
 Note that the exact output may differ a bit from what is displayed above, depending on the \eyedb version.
 
-By default, \texttt{eyedbodl} generates the ODL on the standard output.\\
+By default, \texttt{eyedbodl} generates the ODL on the standard output.
 You see here that the displayed ODL is very similar to the original ODL except
 that the keywords \texttt{attribute} and \texttt{relationship} have been added
-before each attribute declaration.\\
+before each attribute declaration.
 The \texttt{relationship} keyword means that the attribute has an \texttt{inverse}
 directive.
-\\
+
 Note that these two keywords are optional: it is why we have not use
 them in our example.
-\\
-\\
+
+
 Another way to check that the schema has been created within the database,
 is to use the \texttt{eyedboql} tool, as follows:
 \verbsize \begin{verbatim}
@@ -692,35 +517,35 @@ Note that the object identifiers (\texttt{oid}) of the classes are displayed.
 Now the schema has been created in the database, we want to create, update
 and query \texttt{Person} and \texttt{Employee} instances.
 \subsect{Creating and updating objects}
-To create and update objects, there are four ways:\\
-\idt the OQL language\\
-\idt the C++ binding\\
-\idt the Java binding\\
-\\
+To create and update objects, there are 3 ways:
+\idt the OQL language
+\idt the C++ binding
+\idt the Java binding
+
 Contrary to the schema creation, all these solutions are quite reasonnable.
-\\
+
 The first way is the most attractive because one can create and update objects
 in a very intuitive and interprated way using the \texttt{eyedboql} monitor.
-\\
-\\
-We will introduce in the chapter the two first solutions, the OQL language 
-and the C++ binding, and just briefly expose the last two solutions.
+
+We will introduce in the manual the three solutions.
+
 \subsect{Querying objects}
-To query objects, there are only one way: use the OQL language.\\
-\\
+To query objects, there are only one way: use the OQL language.
+
 But note that the OQL language can be used within the C++ and Java binding
 in a very well integrated way.
 \sect{Manipulating objects using OQL}
 Using the \texttt{eyedboql} monitor, we are going to perform the following
-operations:\\
-\mbox{ } 1- create a person named ``john wayne''\\
-\mbox{ } 2- create a person named ``mary poppins''\\
-\mbox{ } 3- mary them\\
-\mbox{ } 4- create 3 ``john wayne'' children named ``baby1'', ``baby2'' and
-``baby3''\\
-\mbox{ } 5- perform queries on the name and age\\
-\mbox{ } 6- increment the age of each person in the database\\
-\\
+operations:
+\begin{enumerate}
+\item create a person named ``john wayne''
+\item create a person named ``mary poppins''
+\item mary them
+\item create 3 ``john wayne'' children named ``baby1'', ``baby2'' and ``baby3''
+\item perform queries on the name and age
+\item increment the age of each person in the database
+\end{enumerate}
+
 Here is the way to perform the first three step:
 \verbsize \begin{verbatim}
 % eyedboql -U bill -P {bill password, i.e. 'thekid'} -d foo -w
@@ -736,17 +561,17 @@ Welcome to eyedboql.
 \end{verbatim}
 \normalsize
 As you see, this is a very intuitive way to perform such operations.
-\\
-A few comments:\\
+
+A few comments:
 \idt \texttt{?} is the \texttt{eyedboql} prompt: of course, do not type
-this string!\\
-\idt \texttt{:=} is the affectation operator.\\
+this string!
+\idt \texttt{:=} is the affectation operator.
 \idt each time you create an object, its identifier (\texttt{oid}) is displayed
-on your terminal.\\
+on your terminal.
 \idt because of the relationship integrity constraint on the \texttt{spouse}
 attribute, the operation \texttt{john.spouse := mary} is equivalent to
-\texttt{mary.spouse := john}.\\
-\\
+\texttt{mary.spouse := john}.
+
 To create the three ``john wayne'' children:
 \verbsize \begin{verbatim}
 ? add Person(firstname : "baby1", age : 2) to john->children;
@@ -757,8 +582,8 @@ To create the three ``john wayne'' children:
 46398.3.1380607:oid
 \end{verbatim}
 \normalsize
-Once again, this is very intuitive and simple.\\
-\\
+Once again, this is very intuitive and simple.
+
 To query all persons in the database:
 \verbsize \begin{verbatim}
 ? select Person;
@@ -790,7 +615,7 @@ Person {2576.2.881020:oid} = {
 \normalsize
 Note that the \texttt{!print} command allows to display the contains of the
 last objects returned on your terminal.
-\\
+
 To query all persons whose firstname contains a \texttt{y}:
 \verbsize \begin{verbatim}
 ? select Person.firstname ~ "y";
@@ -798,7 +623,7 @@ To query all persons whose firstname contains a \texttt{y}:
 \end{verbatim}
 \normalsize
 
-At this stage, it is interesting to perform the following operation:\\
+At this stage, it is interesting to perform the following operation:
 in another terminal opens an \texttt{eyedboql} session on the database \texttt{foo}
 and query all persons, as follows:
 \verbsize \begin{verbatim}
@@ -808,10 +633,10 @@ and query all persons, as follows:
 \end{verbatim}
 \normalsize
 It will perharps surprise you that no person instances will be returned.
-\\
+
 But this is quite normal as you have not committed the transaction
 in your first \texttt{eyedboql} session.
-\\
+
 To commit the transaction, type \texttt{!commit} in your first \texttt{eyedboql}
 session:
 \verbsize \begin{verbatim}
@@ -833,19 +658,19 @@ operations:
 \normalsize
 The first operation creates 2000 person instances: as you can notice,
 this operation takes only a few seconds on a reasonnable computer.
-\\
+
 The two last operations query person instance according to their firstname
 attribute.
-\\
+
 As you can notice, these query operations take a while: about 3 seconds
 for each operation on a ULTRA Sparc: of course, this is too much.
-\\
-\\
+
+
 A good idea is to affect an index on the attributes - for instance
 \texttt{firstname}, \texttt{lastname} and \texttt{age} - for which one wants
 to perform efficient query.
-\\
-\\
+
+
 This is very simple:
 \be
 \item add index specification to the class \texttt{Person}edit within
@@ -888,12 +713,12 @@ firstname, lastname or age:
 \end{verbatim}
 \normalsize
 and you will notice that these operations are immediate.
-\\
-\\
+
+
 %Note that an index specification takes a different form according
-%to the type for which it is applicable:\\
+%to the type for which it is applicable:
 %\idt \texttt{index} : applicable to the types :
-%        \texttt{int, char, byte, float, int[n], byte[n], float[n]} \\
+%        \texttt{int, char, byte, float, int[n], byte[n], float[n]} 
 %\idt \texttt{index[]} : applicable to the types : \texttt{char[]} and \texttt{char[n]}
 \sect{Adding constraints}
 In the same way, you can add a \texttt{notnull} and an \texttt{unique} constraint
@@ -944,107 +769,113 @@ near line 3: 'Person()' => oql error: new operator <<new<oql\$db> Person()>> : n
 \end{verbatim}
 \normalsize
 
+
+
 \sect{Using the C++ Binding}
+
 We are going to introduce now the C++ binding through the same schema
 and examples as previously.
-\\
-There are two ways to use the C++ binding for such operations: \\
-\mbox{ } 1- using the generic C++ binding\\
-\mbox{ } 2- using both the generic C++ binding and the generated specific
-\texttt{Person} C++ binding.\\
-\\
-In this chapter, we expose only the second way, as it is far more
-simple and pratical than the first one.
-\\
-\\
-To manipulate person instances using the second way, the following steps
-are necessary:
-\\
-\mbox{ } 1- generates the specific \texttt{Person} binding using the \texttt{eyedbodl}
-tool\\
-\mbox{ } 2- write the C++ client program\\
-\mbox{ } 3- compile the generated binding and the client program\\
-\\
-Note that this example can be found in the directory \$EYEDBROOT/examples/GettingStarted.
+
+There are two ways to use the C++ binding: 
+\begin{enumerate}
+\item using the generic C++ binding
+\item using both the generic C++ binding and the specific \texttt{Person} C++ code generated from the ODL schema
+\end{enumerate}
+
+We will explain here only the second way, as it is far more simple and pratical than the first one. For more information on the generic C++ binding, please refer to the C++ binding manual.
+
+Writing a C++ program that can create, retrieve, modify and delete person instances that are stored in an \eyedb database involves the following steps:
+\begin{enumerate}
+\item generates the specific \texttt{Person} binding using the \texttt{eyedbodl} tool
+\item write the C++ client program
+\item compile the generated binding and the client program
+\end{enumerate}
+
+This example is located in the \texttt{examples/GettingStarted} subdirectory.
+
 \subsect{Generating the specific C++ binding}
-To generate the specific C++ binding, do as follows:
+
+To generate the specific C++ binding, run the \texttt{eyedbodl} tool as follow:
 \verbsize \begin{verbatim}
-% eyedbodl -gencode C++ -package person person.odl
+% eyedbodl --gencode=C++ --package=person schema.odl
 \end{verbatim}
 \normalsize
-the \texttt{-package} option is mandatory: you may give any name you want.
-This name will be used as the generated prefix files.
-\\
-\texttt{eyedbodl} generates a few files, all prefixed by \texttt{person}.\\
-The two main generated files are \texttt{person.h} and \texttt{person.cc}.
-\\
+The \texttt{--package} option is mandatory: you may give any name you want, this name will 
+be used as the prefix for generated files names.
+
+\texttt{eyedbodl} generates a few files, all prefixed by \texttt{person}, fhe most important 
+being \texttt{person.h} and \texttt{person.cc}.
+
 If you have a look to the file \texttt{person.h},
-you will notice that the following classes have been generated:\\
-\mbox{ } 1- the class \texttt{person}\\
-\mbox{ } 2- the class \texttt{personDatabase}\\
-\mbox{ } 3- the class \texttt{Root}\\
-\mbox{ } 4- the class \texttt{Address}\\
-\mbox{ } 5- the class \texttt{Person}\\
-\mbox{ } 6- the class \texttt{Employee}\\
-\\
+you will notice that the following classes have been generated:
+\begin{enumerate}
+\item the class \texttt{person}
+\item the class \texttt{personDatabase}
+\item the class \texttt{Root}
+\item the class \texttt{Address}
+\item the class \texttt{Person}
+\item the class \texttt{Employee}
+\end{enumerate}
+
 The first class, \texttt{person}, is the package class:
 \verbsize \begin{verbatim}
 class person {
  public:
   static void init();
   static void release();
-  static idbStatus updateSchema(idbDatabase *db);
-  static idbStatus updateSchema(idbSchema *m);
+  static eyedb::Status updateSchema(eyedb::Database *db);
+  static eyedb::Status updateSchema(eyedb::Schema *m);
 };
 \end{verbatim}
 \normalsize
-it is used to perform package initialization and schema update.\\
+it is used to perform package initialization and schema update.
 Before any use of the \texttt{person} package, you need to call
-\texttt{person::init}. \\
-\\
+\texttt{person::init}. 
+
 The second class, \texttt{personDatabase} is used to open, close and
-manipulate objects within a database which contains the \texttt{person} schema.
-\\
+manipulate objects within a database containing the \texttt{person} schema.
+
 The \texttt{open} method has two
 purposes: the first one is to open the database, as the standard
-\texttt{idbDatabase} will do; the second one is to check that the database
-schema is consistant with the generated runtime schema.\\
-Although it is possible to use the standard \texttt{idbDatabase} class to open
+\texttt{eyedb::Database} will do; the second one is to check that the database
+schema is consistant with the generated runtime schema.
+Although it is possible to use the standard \texttt{Database} class to open
 a database containing the \texttt{person} schema, it is strongly recommended
 to use the \texttt{personDatabase} class.
-\\
-\\
+
 The third class, \texttt{Root}, is the root class for all the generated classes.
 This class is useful to perform safe down-casting during object loading.
-\\
-\\
+
 The three last classes, \texttt{Address}, \texttt{Person} and \texttt{Employee}
 are generated from the \texttt{person.odl} class specifications: for each
 attribute in the \texttt{person.odl}, a set of get and set methods is generated.
-\\
+
 For instance, for the \texttt{firstname} attribute, the following methods
 are generated:
 \verbsize \begin{verbatim}
-  idbStatus setFirstname(const char *);
-  const char *getFirstname(idbBool *isnull = 0, idbStatus * = 0) const;
-  idbStatus setFirstname(unsigned int a0, char);
-  char getFirstname(unsigned int a0, idbBool *isnull = 0, idbStatus * = 0)
-                    const;
+  eyedb::Status setFirstname(const std::string &);
+  std::string getFirstname(eyedb::Bool *isnull = 0, eyedb::Status * = 0) const;
+  eyedb::Status setFirstname(unsigned int a0, char);
+  char getFirstname(unsigned int a0, eyedb::Bool *isnull = 0, eyedb::Status * = 0)  const;
 \end{verbatim}
 \normalsize
 The two first methods manipulate the \texttt{firstname} attribute as a string
 while the two last ones manipulate each character within this string.
-\\
+
 There are two \texttt{set} methods and two \texttt{get} methods.
+
+
 \subsect{A minimal client program}
-We are now going to write a minimal client program which will performed
-the following operations:\\
-\mbox{ } 1- initialize the \eyedb package and the \texttt{person} package\\
-\mbox{ } 3- open a connection with the \eyedb server\\
-\mbox{ } 4- open a database\\
-\mbox{ } 5- perform error management\\
-\mbox{ } 6- release the \eyedb package and the \texttt{person} package\\
-\\
+We are now going to write a minimal client program which will perform
+the following operations:
+\begin{enumerate}
+\item initialize the \eyedb package and the \texttt{person} package
+\item open a connection with the \eyedb server
+\item open a database
+\item perform error management
+\item release the \eyedb package and the \texttt{person} package
+\end{enumerate}
+
 Here is the code for this minimal client:
 \verbsize \begin{verbatim}
 #include "person.h"
@@ -1052,70 +883,79 @@ Here is the code for this minimal client:
 int
 main(int argc, char *argv[])
 {
-  EyeDB::init(argc, argv);      // initializes EyeDB package
+  eyedb::init(argc, argv);      // initializes EyeDB package
   person::init();               // initializes person package
 
-  idbException::setMode(idbException::ExceptionMode); // use exception mode
+  eyedb::Exception::setMode(eyedb::Exception::ExceptionMode); // use exception mode
 
   try {
-    idbConnection conn;
+    eyedb::Connection conn;
+
     conn.open();                // opens the connection
+
     personDatabase db(argv[1]); // creates a database handle
-    db.open(&conn, idbDatabase::DBRW); // opens the database in read/write mode
+    db.open(&conn, eyedb::Database::DBRW); // opens the database in read/write mode
   }
 
-  catch(idbException &e) {      // catch any exception and print it
+  catch(Exception &e) {      // catch any exception and print it
     e.print();
   }
 
   person::release();            // releases person package
-  EyeDB::release();             // releases EyeDB package
+  eyedb::release();             // releases EyeDB package
 
   return 0;
 }
 \end{verbatim}
 \normalsize
-Note that statement \texttt{idbException::setMode(...)} is mandatory
+
+Note that statement \texttt{Exception::setMode(...)} is mandatory
 if you want to use the exception error policy.
-\\
-To use this client:\\
-\mbox{ } 1- compile it using a standard Makefile, as follows:
+
+To use this client, you must first compile it using a standard Makefile, as follows 
+(replace \texttt{<<datadir>>} with the data directory, usually /usr/share):
 \verbsize \begin{verbatim}
-include $(EYEDBROOT)/$(EYEDBARCH)/etc/Makefile.eyedb
+include <<datadir>>/eyedb/Makefile.eyedb
+
+CXXFLAGS += $(EYEDB_CXXFLAGS) $(EYEDB_CPPFLAGS)
+LDFLAGS += ${EYEDB_LDFLAGS}
+LDLIBS += ${EYEDB_LDLIBS}
 
 all: persontest
 
-persontest: persontest.o person.o
-          $(CXX) -o $@ $+ $(LDXXFLAGS)
+persontest.o: person.h
+
+person.o: person.cc
+
+persontest: person.o persontest.o
+	$(CXX) $(LDFLAGS) -Wl,-R$(EYEDB_LIBDIR) -o $@ $^ $(LDLIBS)
+
+person.cc person.h: schema.odl
+	$(EYEDB_ODL) --gencode=C++ --package=person $<
 \end{verbatim}
 \normalsize
+
 Important note: you need a recent version of GNU make to use this makefile.
 This makefile does not work with the standard SUN make.
-\mbox{ } 2- execute the program as follows:
+
+Once compiled, you can execute the program as follows:
 \verbsize \begin{verbatim}
 % ./persontest foo
 \end{verbatim}
 \normalsize
-If you try to open a database which does not contain the \texttt{person} schema,
-some error messages will be displayed, for instance:
-\verbsize \begin{verbatim}
-% ./persontest EYEDBDM
-eyedb error: 'Address' class does not exist
-'Person' class does not exist
-'Employee' class does not exist
-\end{verbatim}
-\normalsize
-We are going now to add a function to manipulate \texttt{Person} instances:\\
-\mbox{ } 1- create a person named ``john wayne''\\
-\mbox{ } 2- create a person named ``mary poppins''\\
-\mbox{ } 3- mary them\\
-\mbox{ } 4- create 3 ``john wayne'' children named ``baby1'', ``baby2'' and
-``baby3''\\
-\\
-These operations are very simple as you will see here:
+
+We are going now to add a function to manipulate \texttt{Person} instances:
+\begin{enumerate}
+\item create a person named ``john wayne''
+\item create a person named ``mary poppins''
+\item mary them
+\item create 3 ``john wayne'' children named ``baby1'', ``baby2'' and ``baby3''
+\end{enumerate}
+
+These operations are performed in the following function:
 \verbsize \begin{verbatim}
 static void
-create(idbDatabase *db)
+create(eyedb::Database *db)
 {
   db->transactionBegin(); // starts a new transaction
 
@@ -1139,18 +979,17 @@ create(idbDatabase *db)
   // creates children
   for (int i = 0; i < 5; i++)
     {
-      char name[32];
-      sprintf(name, "baby%d", i+1);
+      std::string name = std::string("baby") + str_convert(i+1);
       Person *child = new Person(db);
-      child->setFirstname(name);
-      child->setLastname(name);
+      child->setFirstname(name.c_str());
+      child->setLastname(name.c_str());
       child->setAge(1+i);
       john->addToChildrenColl(child);
       child->release(); // release the allocated pointer
     }
 
   // store john and all its related instances within the database
-  john->store(idbFullRecurs);
+  john->store(eyedb::FullRecurs);
 
   // release the allocated pointers
   mary->release();
@@ -1160,38 +999,38 @@ create(idbDatabase *db)
 }
 \end{verbatim}
 \normalsize
+
 A few remarks about this code:
-\be
+\begin{itemize}
 \item all operations - setting, getting attributes, storing, querying instances
-in a database - must be performed within a transaction. \\
-A transaction is initiated using the \texttt{idbDatabase::transactionBegin}
+in a database - must be performed within a transaction.
+A transaction is initiated using the \texttt{Database::transactionBegin}
 method and is committed (resp. aborted) using the
-\texttt{idbDatabase::transactionCommit}
-(resp. \texttt{idbDatabase::transactionAbort}) method.
+\texttt{Database::transactionCommit}
+(resp. \texttt{Database::transactionAbort}) method.
 \item to store any instance in the database, you need to call the 
-emph{store} (or \texttt{realize}) method on this instance.\\
-In our case, we use the argument \texttt{idbFullRecurs} indicating that
+emph{store} (or \texttt{realize}) method on this instance.
+In our case, we use the argument \texttt{FullRecurs} indicating that
 we want all related instances (through relationship or indirect
 attribute) to be stored in the database.
 \item all runtime pointers allocated with the \texttt{new} operator must
 be deleted using the \texttt{release} method. The \texttt{delete} operator
 is forbidden: if you try to use it, an exception will be thrown at
 runtime.
-\ee
-We are now going to query and display all the person instances 
-whose \texttt{lastname} attribute matches a regular expression \texttt{s}.
-\\
-\\
-Here is the code for such an operation:
+\end{itemize}
+
+We are now going to query and display all the person instances.
+
+Here is the corresponding code:
 \verbsize \begin{verbatim}
 static void
-read(idbDatabase *db, const char *s)
+read(eyedb::Database *db, const char *s)
 {
   db->transactionBegin();
 
-  idbOQL q(db, "select Person.lastname ~ \"%s\"", s);
+  eyedb::OQL q(db, "select Person.lastname ~ \"%s\"", s);
 
-  idbObjectArray obj_arr;
+  eyedb::ObjectArray obj_arr;
   q.execute(obj_arr);
 
   for (int i = 0; i < obj_arr.getCount(); i++)
@@ -1206,28 +1045,27 @@ read(idbDatabase *db, const char *s)
 }
 \end{verbatim}
 \normalsize
-A few remarks about this code:
-\be
-\item an OQL construct can be used within the C++ code using the
-\texttt{idbOQL(idbDatabase *, const char *fmt, ...)} constructor.
-\\
-Assuming \texttt{s} is equal to \texttt{baby}, the code:
+
+An OQL construct can be used within the C++ code using the
+\texttt{OQL(Database *, const char *fmt, ...)} constructor.
+For instance, in the above example, assuming \texttt{s} is equal to \texttt{baby}, the code:
 \verbsize \begin{verbatim}
-  idbOQL q(db, "select Person.lastname ~ \"%s\"", s);
+  eyedb::OQL q(db, "select Person.lastname ~ \"%s\"", s);
 \end{verbatim}
 \normalsize
-will send the query \texttt{select Person.lastname ~ "baby"} to the OQL interpreter.\\
+will send the query \texttt{select Person.lastname ~ "baby"} to the OQL interpreter.
+
 This interpreter will perform the query and returned all the found objects.
-The returned objects can be found using the the \texttt{idbOQL::execute} method
+The returned objects can be found using the \texttt{OQL::execute} method
 as follows:
 \verbsize \begin{verbatim}
-  idbObjectArray obj_arr;
+  eyedb::ObjectArray obj_arr;
   q.execute(obj_arr);
 \end{verbatim}
 \normalsize
-\item the returned objects are of type \texttt{idbObject}, so you cannot use the
-\texttt{Person} methods such as \texttt{getFirstname()}, \texttt{getAge()} and
-so on.\\
+
+The returned objects are of type \texttt{eyedb::Object}, so you cannot use the
+\texttt{Person} methods such as \texttt{getFirstname()}, \texttt{getAge()}\ldots
 To use them, you need to perform a down-cast using the \texttt{Person\_c} static
 function as follows:
 \verbsize \begin{verbatim}
@@ -1237,83 +1075,71 @@ function as follows:
       if (p) ...
 \end{verbatim}
 \normalsize
-If the object \texttt{obj\_arr[i]} is not of \texttt{Person} type, the returned
-pointer will be null. It is why we make a test on the value of \texttt{p}.\\
+If the object \texttt{obj\_arr[i]} is not of type \texttt{Person}, the returned
+pointer will be null. It is why we make a test on the value of \texttt{p}.
 If \texttt{p} is not null, we can use all the \texttt{Person} methods as follows:
 \verbsize \begin{verbatim}
     printf("person = %s %s, age = %d\n", p->getFirstname(),
            p->getLastname(), p->getAge());
 \end{verbatim}
 \normalsize
-\item note that you can use the \texttt{trace} method on any \texttt{idbObject}
-instance to display all its attributes and relationships:
-\verbsize \begin{verbatim}
-  for (int i = 0; i < obj_arr.getCount(); i++)
-    {
-      Person *p = Person_c(obj_arr[i]);
-      if (p)
-        p->trace();
-      else
-        obj_arr[i]->trace();
-    }
-\end{verbatim}
-\normalsize
-note that the two calls: \texttt{p->trace()} and \texttt{obj\_arr[i]->trace()}
-give the same output if the object is of \texttt{Person} type.
-\ee
+
 To have more information about the C++ binding, please refer to the
-appriopriate chapter.
+appriopriate manual.
+
 
 \sect{Using the Java Binding}
+
 Although the C++ binding is more complete than the Java binding
 - essentially according to the administrative operations - the Java
 bindings allow to manipulate data without limitations.
-For instance, to use the Java binding, subsitute the word \texttt{Java}
-to the word \texttt{C++} in the \texttt{eyedbodl} use, as follows:
+
+Using the Java binding is very similar to the C++ binding. The Java code is 
+generated from the ODL schema definition using for instance the following command, to generate
+code for the \texttt{person} schema that we have already used:
 \verbsize \begin{verbatim}
-% eyedbodl -gencode Java -package person person.odl
+% eyedbodl --gencode=Java --package=person person.odl
 \end{verbatim}
 \normalsize
-the following files will be generated:\\
-\mbox{ } 1- Database.java\\
-\mbox{ } 2- Root.java\\
-\mbox{ } 3- Address.java\\
-\mbox{ } 4- Person.java\\
-\mbox{ } 5- Employee.java\\
-\\
-Each generated file contains a Java class of the same name.
-\\
-\\
-In the same way than for the C++ binding, you can write a Java client and
-compile it with the generated Java binding.
-The Java layer support both the standalone applications and the applets.
-\\
-\\
-Here is a simple example which show how to:\\
-\mbox{ } 1- initialize the \eyedb and \texttt{person} packages\\
-\mbox{ } 2- connect to the \eyedb server\\
-\mbox{ } 3- open a database\\
-\mbox{ } 4- creates two person instances and mary them
+This command will generate a number of Java file in subdirectory \texttt{person/},
+each generated file containing a Java class having the same name.
+
+The Java binding support both the standalone applications and the applets.
+
+To compile the Java code, you will need to pass to the Java compiler a \texttt{classpath}
+that contains \texttt{eyedb.jar}, located in directory \texttt{<<libdir>>/eyedb/java/} where
+libdir is the library directory, usually \texttt{/usr/lib}.
+
+Here is a simple example which show how to:
+\begin{enumerate}
+\item initialize the \eyedb and \texttt{person} packages
+\item connect to the \eyedb server
+\item open a database
+\item creates two person instances and mary them
+\end{enumerate}
+
+This example is located in the \texttt{examples/GettingStarted} subdirectory.
+
+
 \verbsize \begin{verbatim}
 //
-// persontest.java
+// Persontest.java
 //
 
-import COM.sysra.eyedb.*;
 import person.*;
 
-class Test {
+class PersonTest {
   public static void main(String args[]) {
 
     // Initialize the eyedb package and parse the default eyedb options
     // on the command line
-    String[] outargs = idbRoot.init("Test", args);
+    String[] outargs = org.eyedb.Root.init("PersonTest", args);
      
     // Check that a database name is given on the command line
     int argc = outargs.length;
     if (argc != 1)
       {
-        System.err.println("usage: java Test dbname");
+        System.err.println("usage: java PersonTest dbname");
         System.exit(1);
       }
 
@@ -1322,31 +1148,35 @@ class Test {
       person.Database.init();
 
       // Open the connection with the backend
-      idbConnection conn = new idbConnection();
+      org.eyedb.Connection conn = new org.eyedb.Connection();
 
       // Open the database named outargs[0]
       person.Database db = new person.Database(outargs[0]);
-      db.open(conn, idbDatabase.DBRW);
+      db.open(conn, org.eyedb.Database.DBRW);
 
       db.transactionBegin();
       // Create two persons john and mary
       Person john = new Person(db);
       john.setFirstname("john");
+      john.setLastname("travolta");
       john.setAge(26);
      
       Person mary = new Person(db);
       mary.setFirstname("mary");
+      mary.setLastname("stuart");
       mary.setAge(22);
      
-      // Mary them :-)
+      // Mary them ;-)
       john.setSpouse(mary);
 
       // Store john and mary in the database
-      john.store(idbRecMode.FullRecurs);
+      john.store(org.eyedb.RecMode.FullRecurs);
+
+      john.trace();
 
       db.transactionCommit();
     }
-    catch(idbException e) { // Catch any eyedb exception
+    catch(org.eyedb.Exception e) { // Catch any eyedb exception
        e.print();
        System.exit(1);
     }
@@ -1355,21 +1185,21 @@ class Test {
 \end{verbatim}
 \normalsize
 
+
 \sect{Learning more about \eyedb}
-We have briefly introduce in this chapter some of the main features
+
+We have briefly introduce in this manual some of the main features
 of \eyedbX.
-\\
-\\
-The next chapters describes the features of \eyedb in more detail.
 
+More detailled information can be found in the other parts of the \eyedb manual:
+\begin{itemize}
+\item Administration guide
+\item Object Definition Language (ODL) manual
+\item Object Query Language (OQL) manual
+\item C++ Binding manual
+\item Java Binding manual
+\end{itemize}
 
-%\texttt{eyedbadmin} \> \texttt{eyedbdbcreate} \> \texttt{eyedbuseradd} \> \texttt{eyedbdbdelete}\\
-%\texttt{eyedbodl} \> \texttt{eyedbuserdbaccess} \> \texttt{eyedbchklicense} \> \texttt{eyedbdbexport}\\
-%\texttt{eyedboql} \> \texttt{eyedbuserdelete} \> \texttt{eyedbcrypt} \> \texttt{eyedbdbimport}\\
-%\texttt{eyedbuserlist} \> \texttt{eyedbd} \> \texttt{eyedbdblist} \> \texttt{eyedbpasswd} \\
-%\texttt{eyedbuserpasswd} \> \texttt{eyedbd}-gcc \> \texttt{eyedbdbmcreate} \> \texttt{eyedbdbaccess}\\
-%\texttt{eyedbdbmove} \> \texttt{eyedbwwwd} \> \texttt{eyedbdbadmin} \> \texttt{eyedbdbrename}\\
-%\texttt{eyedbrc} \> \texttt{eyedbdbcopy} \> \texttt{eyedbgetenv} \> \texttt{eyedbsysaccess}  \\
 
 
 \end{document}
