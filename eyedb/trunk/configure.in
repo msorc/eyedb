@@ -165,6 +165,7 @@ AC_SEARCH_LIBS( socket, socket)
 # JAVA compilation
 # ========================================
 AC_PROG_JAVAC
+AC_PROG_JAVA
 AC_PATH_PROG(JAR, jar)
 AM_CONDITIONAL(COND_JAVA, test x"$JAVAC" != x -a x"$JAR" != x  )
 
@@ -217,27 +218,27 @@ AM_CONDITIONAL(COND_LATEX2HTML, test x"$LATEX2HTML" != x)
 # ========================================
 case "$host" in
 i*86-*-linux*)
-	CXXFLAGS_COMMON="-D_REENTRANT -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
-	CXXFLAGS_OTHER=-fPIC
-	SO_FLAGS=-shared
+	EYEDB_ARCH_CCPFLAGS="-D_REENTRANT -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
+	EYEDB_ARCH_CXXFLAGS=-fPIC
+	EYEDB_ARCH_SO_FLAGS=-shared
 	;;
 
 x86_64-*-linux*)
-	CXXFLAGS_COMMON="-D_REENTRANT -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
-	CXXFLAGS_OTHER=-fPIC
-	SO_FLAGS=-shared
+	EYEDB_ARCH_CPPFLAGS="-D_REENTRANT -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
+	EYEDB_ARCH_CXXFLAGS=-fPIC
+	EYEDB_ARCH_SO_FLAGS=-shared
 	;;
 
 sparc-sun-solaris2.9)
 	if test "$ac_cv_cxx_compiler_gnu" = "yes"
 	then
-		CXXFLAGS_COMMON="-D_REENTRANT -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
-		CXXFLAGS_OTHER=-fPIC
-		SO_FLAGS=-shared
+		EYEDB_ARCH_CPPFLAGS="-D_REENTRANT -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
+		EYEDB_ARCH_CXXFLAGS=-fPIC
+		EYEDB_ARCH_SO_FLAGS=-shared
 	else
-		CXXFLAGS_COMMON="-mt -xtarget=ultra -xarch=v9"
-		CXXFLAGS_OTHER=-KPIC
-		SO_FLAGS=-G
+		EYEDB_ARCH_CPPFLAGS="-mt -xtarget=ultra -xarch=v9"
+		EYEDB_ARCH_CXXFLAGS=-KPIC
+		EYEDB_ARCH_SO_FLAGS=-G
 	fi
 	;;
 
@@ -247,9 +248,9 @@ sparc-sun-solaris2.9)
 
 esac
 
-AC_SUBST(CXXFLAGS_COMMON)
-AC_SUBST(CXXFLAGS_OTHER)
-AC_SUBST(SO_FLAGS)
+AC_SUBST(EYEDB_ARCH_CPPFLAGS)
+AC_SUBST(EYEDB_ARCH_CXXFLAGS)
+AC_SUBST(EYEDB_ARCH_SO_FLAGS)
 # ========================================
 # End of Examples building
 # ========================================

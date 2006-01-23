@@ -34,6 +34,6 @@ if [ "x$EYEDB_PASSWD" != "x" ] ; then OPTIONS="$OPTIONS --passwd=$EYEDB_PASSWD" 
 
 prefix=@prefix@
 exec_prefix=@exec_prefix@
-EYEDBCLASSPATH=@libdir@/eyedb/java/eyedb.jar
+EYEDB_CLASSPATH=@libdir@/eyedb/java/eyedb.jar
 
-CLASSPATH=$CLASSPATH:$EYEDBCLASSPATH java $class $OPTIONS "$@"
+CLASSPATH=$CLASSPATH:$EYEDB_CLASSPATH @JAVA@ $class $OPTIONS "$@"
