@@ -36,9 +36,9 @@ the binaries installation directory.
 5) check the database using eyedboql:
 % eyedboql -d person_g
 ? select Person->lastname;
-bag(NULL, NULL, NULL, "poppins", "poppins", "travolta", "stuart", "baby5", "wayne", "wayne", "baby4", "baby2", "baby3", "baby1")
+= bag(NULL, NULL, NULL, "poppins", "poppins", "travolta", "stuart", "wayne", "wayne", "baby2", "baby3", "baby1")
 ? select Person->firstname;
-= bag("baby5", "baby4", "john", "john", "john", "mary", "mary", "mary", "baby2", "baby2", "baby3", "baby3", "baby1", "baby1")
+= bag("john", "john", "john", "mary", "mary", "mary", "baby2", "baby2", "baby3", "baby3", "baby1", "baby1")
 ? \quit
 %
 
