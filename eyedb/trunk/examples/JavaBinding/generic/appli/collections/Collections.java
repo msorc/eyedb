@@ -68,7 +68,7 @@ class Collections {
   }
 
   static org.eyedb.Class person_cls;
-  static org.eyedb.Attribute fname_attr;
+  static org.eyedb.Attribute name_attr;
   static org.eyedb.Attribute age_attr;
   static org.eyedb.Attribute children_attr;
   static String prefix;
@@ -96,10 +96,10 @@ class Collections {
       return;
 
     person_cls = db.getSchema().getClass("Person");
-    fname_attr = person_cls.getAttribute("firstname");
-    if (fname_attr == null)
+    name_attr = person_cls.getAttribute("name");
+    if (name_attr == null)
       {
-	display_("Attribute firstname not found");
+	display_("Attribute name not found");
 	System.exit(1);
       }
 
@@ -205,8 +205,8 @@ class Collections {
     for (int i = 0; i < count; i++) {
 	p = person_cls.newObj(db);
 	String s = prefix + i;
-	fname_attr.setSize(p, s.length()+1);
-	fname_attr.setStringValue(p, s);
+	name_attr.setSize(p, s.length()+1);
+	name_attr.setStringValue(p, s);
 	display("Inserting a new person");
 	set.insert(p);
     }
@@ -280,8 +280,8 @@ class Collections {
     for (int i = 0; i < count; i++) {
 	p = person_cls.newObj(db);
 	String s = prefix + i;
-	fname_attr.setSize(p, s.length()+1);
-	fname_attr.setStringValue(p, s);
+	name_attr.setSize(p, s.length()+1);
+	name_attr.setStringValue(p, s);
 	display("Inserting a new person");
 	bag.insert(p);
     }
@@ -357,8 +357,8 @@ class Collections {
     for (int i = 0; i < count; i++) {
 	p = person_cls.newObj(db);
 	String s = prefix + i;
-	fname_attr.setSize(p, s.length()+1);
-	fname_attr.setStringValue(p, s);
+	name_attr.setSize(p, s.length()+1);
+	name_attr.setStringValue(p, s);
 	display("Inserting a new person");
 	array.append(p);
     }

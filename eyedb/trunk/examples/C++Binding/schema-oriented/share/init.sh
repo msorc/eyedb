@@ -17,8 +17,7 @@ echo Updating the database $DATABASE with the schema person...
 echo eyedbodl --update --database=$DATABASE $SCHEMA
 eyedbodl --update --database=$DATABASE $SCHEMA
 
-echo Creating a few instances in the database $DATABASE ...
-
+echo
 echo Creating a few instances in the database $DATABASE ...
 echo eyedboql -d $DATABASE -w
 eyedboql -d $DATABASE -w << EOF

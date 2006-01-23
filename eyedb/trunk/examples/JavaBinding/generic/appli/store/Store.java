@@ -33,7 +33,7 @@ class Store {
 	int n = args.length;
 
 	if (n != 3)  {
-	    System.err.println("usage: java Store dbname firstname age");
+	    System.err.println("usage: java Store dbname name age");
 	    System.exit(1);
 	}
 
@@ -64,7 +64,7 @@ class Store {
     }
 
     static org.eyedb.Class person_cls;
-    static org.eyedb.Attribute fname_attr;
+    static org.eyedb.Attribute name_attr;
     static org.eyedb.Attribute age_attr;
     static org.eyedb.Attribute children_attr;
 
@@ -79,9 +79,9 @@ class Store {
 	    System.exit(1);
 	}
 
-	fname_attr = person_cls.getAttribute("firstname");
-	if (fname_attr == null) {
-	    System.out.println("Attribute firstname not found");
+	name_attr = person_cls.getAttribute("name");
+	if (name_attr == null) {
+	    System.out.println("Attribute name not found");
 	    System.exit(1);
 	}
 
@@ -109,8 +109,8 @@ class Store {
 
 	org.eyedb.Object o = person_cls.newObj(db);
       
-	fname_attr.setSize(o, args[1].length()+1);
-	fname_attr.setStringValue(o, args[1]);
+	name_attr.setSize(o, args[1].length()+1);
+	name_attr.setStringValue(o, args[1]);
 
 	age_attr.setValue(o, new org.eyedb.Value(Integer.parseInt(args[2])));
       
@@ -144,13 +144,13 @@ class Store {
 	if (xchildren != null)
 	    xchildren.trace();
 
-	String base_name = fname_attr.getStringValue(o);
+	String base_name = name_attr.getStringValue(o);
 
 	for (int n = 0; n < 10; n++) {
 	    org.eyedb.Object child = person_cls.newObj(db);
 	    String name = base_name + "_" + (n+1);
-	    fname_attr.setSize(child, name.length()+1);
-	    fname_attr.setStringValue(child, name);
+	    name_attr.setSize(child, name.length()+1);
+	    name_attr.setStringValue(child, name);
 	    age_attr.setValue(child, new org.eyedb.Value(n+1));
 	    child.store();
 	    children.insert(child.getOid());

@@ -1,5 +1,6 @@
 eyedbexamplesdir=$(datadir)/doc/$(PACKAGE)/examples/JavaBinding/generic/appli/basic
-dist_eyedbexamples_DATA=Basic.java Makefile.eyedb-examples
+dist_eyedbexamples_DATA=Basic.java 
+#eyedbexamples_DATA= Makefile.eyedb-examples
 
 JAVAROOT=$(top_builddir)/examples/JavaBinding/generic/appli/basic
 CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_builddir)/src/java/eyedb.jar
