@@ -18,3 +18,4 @@ endif
 
 
 SUBDIRS=$(DOXYGEN_DIR) $(MANPAGES_DIR) $(MANUAL_DIR)
+DIST_SUBDIRS=doxygen manpages manual

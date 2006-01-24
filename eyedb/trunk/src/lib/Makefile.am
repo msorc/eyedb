@@ -51,3 +51,5 @@ rpc_beP.h \
 rpc_feP.h \
 utlog.h
 
+EXTRA_DIST=compile_builtin.cc compile_builtin.h
+
