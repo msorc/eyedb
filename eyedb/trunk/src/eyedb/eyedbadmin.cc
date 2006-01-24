@@ -1657,7 +1657,7 @@ dbimport_realize(int fd, const char *file, const char *dbname,
   }
   else {
     if (!_filedir)
-      _filedir = eyedb::Config::getClientValue("data_dir");
+      _filedir = eyedb::Config::getServerValue("data_dir");
 
     /*
       for (i = 0; i < info.ndat; i++)
