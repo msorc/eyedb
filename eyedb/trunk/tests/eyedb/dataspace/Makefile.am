@@ -21,7 +21,7 @@ JAVA_FILES= TestDataspace.java
 JAVAROOT=$(top_builddir)/tests/eyedb/dataspace
 CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_srcdir)/tests/eyedb/dataspace:$(top_builddir)/src/java/eyedb.jar
 
-EXTRA_DIST=$(JAVA_FILES)
+EXTRA_DIST=$(JAVA_FILES) dspsch.odl fill.oql 
 
 check-local: class.stamp
 class.stamp: $(JAVA_FILES)
