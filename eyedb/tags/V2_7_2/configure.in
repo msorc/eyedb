@@ -1,0 +1,376 @@
+
+#
+# /* needpad.c */
+#
+# struct TestAlign {
+#   short i1;
+#   long long i2;
+# };
+# 
+# #define OFFSET(T, X) (unsigned int)(&((T *)0)->X)
+# 
+# int main(int argc, char *argv[])
+# {
+#   unsigned int offset = OFFSET(struct TestAlign, i2);
+#   
+#   /*
+#     offset == 4: needs pad
+#     offset == 8: does not need pad
+#   */
+# 
+#   return offset;
+# }
+
+
+# 
+# configure.in for eyedb
+#
+
+AC_INIT(include/eyedb/eyedb.h)
+
+PACKAGE_NAME=eyedb
+
+. $srcdir/VERSION
+EYEDB_VERSION=${EYEDB_MAJOR_VERSION}.${EYEDB_MINOR_VERSION}.${EYEDB_PATCH_VERSION}${EYEDB_VERSION_STATUS}
+PACKAGE_VERSION=$EYEDB_VERSION
+AC_SUBST(EYEDB_VERSION)
+
+EYEDB_NUMVERSION=`echo | awk '{printf("%d%02d%03d", '${EYEDB_MAJOR_VERSION}','${EYEDB_MINOR_VERSION}','${EYEDB_PATCH_VERSION}')}' `
+AC_SUBST(EYEDB_NUMVERSION)
+
+AM_INIT_AUTOMAKE(${PACKAGE_NAME}, ${PACKAGE_VERSION})
+
+#
+# Checks for command line flags
+#
+
+# if CXXFLAGS are not already set, set them to an empty value
+if test x"$CXXFLAGS" = "x"
+then
+	CXXFLAGS=''
+fi
+
+# debug
+AC_ARG_ENABLE(debug,
+  AS_HELP_STRING([--enable-debug],[compile with debug (default is no)]),
+  enable_debug="yes",
+  enable_debug="no")
+if test "$enable_debug" = "yes"
+then
+  CXXFLAGS="$CXXFLAGS -g"
+fi
+
+# optimize
+AC_ARG_ENABLE(optimize,
+  AS_HELP_STRING([[--enable-optimize=flag]],[compile with given optimization flag (default is no)]),
+  ,
+  enable_optimize="")
+if test "x$enable_optimize" != "x"
+then
+  CXXFLAGS="$CXXFLAGS $enable_optimize"
+fi
+
+# config header file
+AM_CONFIG_HEADER(eyedbconfig.h)
+
+# by default we install in /usr
+AC_PREFIX_DEFAULT(/usr)
+
+# check for compilers
+AC_PROG_CXX
+
+AC_LANG(C++)
+
+# check for architecture
+AC_CANONICAL_HOST
+
+# must disappear
+case "$host" in
+i*86-*-linux*)
+	DEFINES="-DLINUX -DX86 -DLINUX_X86"
+	;;
+
+x86_64-*-linux*)
+	DEFINES="-DLINUX -DLINUX_X86_64"
+	;;
+
+sparc-sun-solaris2.9)
+	if test "$ac_cv_cxx_compiler_gnu" = "yes"
+	then
+		DEFINES="-DSOLARIS -DSPARCV9 -DSOLARIS_SPARCV9_GCC"
+	else
+		CFLAGS="-xtarget=ultra -xarch=v9"
+		CXXFLAGS="$CXXFLAGS -xtarget=ultra -xarch=v9"
+		LDFLAGS="-XCClinker -xtarget=ultra -XCClinker -xarch=v9"
+		DEFINES="-DSOLARIS -DSPARCV9 -DSOLARIS_SPARCV9_CC"
+	fi
+	;;
+esac
+
+# -D are taken verbatim for now. Later, may use autodetection and/or command line flags
+DEFINES="$DEFINES -DOPTOPEN -DMOZILLA -DNEW_COLL_XDR -DNEW_COLL_XDR2 -DSUPPORT_NON_BASIC_LITERAL_COLL -DSTUART_AUTH"
+CXXFLAGS="$CXXFLAGS $DEFINES"
+
+# check for endianism
+AC_C_BIGENDIAN
+if test $ac_cv_c_bigendian = yes; then
+EYEDB_CONFIG_BYTE_ORDER=EYEDBLIB_BIG_ENDIAN
+else
+EYEDB_CONFIG_BYTE_ORDER=EYEDBLIB_LITTLE_ENDIAN
+fi
+AC_SUBST(EYEDB_CONFIG_BYTE_ORDER)
+
+# check for libtool
+AC_PROG_LIBTOOL
+
+# Check for lex/flex and yacc/bison
+AM_PROG_LEX
+AC_PROG_YACC
+
+# check for headers
+AC_CHECK_HEADERS( sys/time.h unistd.h sys/types.h regex.h libgen.h)
+AC_HEADER_TIME
+
+# check for flock structure
+AC_CHECK_TYPE(flock_t, AC_DEFINE([HAS_FLOCK_T], 1, [Defined if flock_t is defined in fcntl.h]),,[#include <fcntl.h>])
+# check for union semun
+AC_CHECK_MEMBER( union semun.val, AC_DEFINE([HAS_UNION_SEMUN], 1, [Defined if union semun is defined]),, [#include <sys/sem.h>])
+
+# check for pthread
+ACX_PTHREAD
+LIBS="$LIBS $PTHREAD_LIBS"
+CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
+
+# check for functions
+AC_CHECK_FUNC(pthread_kill_other_threads_np, AC_DEFINE([HAS_PTHREAD_KILL_OTHER_THREADS_NP], 1, [Defined if function pthread_kill_other_threads_np exists]),,[#include <pthread.h>])
+AC_CHECK_FUNC(fattach, AC_DEFINE([HAS_FATTACH], 1, [Defined if function fattach exists]))
+# check if function ctime_r exists and has 2 or 3 arguments
+AC_FUNC_CTIME_R_3_ARGS
+
+# check for X11
+AC_PATH_XTRA
+
+# check for large file
+AC_SYS_LARGEFILE
+AC_FUNC_FSEEKO
+
+# check for libraries
+dnl AC_CHECK_LIB( nsl, ??) # -lnsl is not necessary apparently
+AC_CHECK_LIB( pthread, pthread_create)
+AC_CHECK_LIB( dl, dlopen)
+AC_CHECK_LIB( crypt, crypt)
+AC_SEARCH_LIBS( socket, socket)
+
+# ========================================
+# JAVA compilation
+# ========================================
+AC_PROG_JAVAC
+AC_PROG_JAVA
+AC_PATH_PROG(JAR, jar)
+AM_CONDITIONAL(COND_JAVA, test x"$JAVAC" != x -a x"$JAR" != x  )
+
+if test "$enable_debug" = "yes"
+then
+  JAVACFLAGS="$JAVACFLAGS -g"
+fi
+AC_SUBST(JAVACFLAGS)
+
+# ========================================
+# SWIG
+# ========================================
+AC_ARG_ENABLE(swig,
+	AS_HELP_STRING([--enable-swig],[generate various languages bindings with SWIG (default is no)]),
+  	[enable_swig="yes"],
+	[enable_swig="no"])
+
+AM_CONDITIONAL(COND_SWIG, test "$enable_swig" = "yes")
+
+if test "$enable_swig" = "yes"
+then
+	AC_PROG_SWIG
+	SWIG_ENABLE_CXX
+	SWIG_PYTHON
+fi
+
+# ========================================
+# Documentation building
+# ========================================
+# check for needed programs
+AC_PATH_PROG(DOXYGEN, doxygen)
+AM_CONDITIONAL(COND_DOXYGEN, test x"$DOXYGEN" != x)
+
+AC_PATH_PROG(XSLTPROC, xsltproc)
+AM_CONDITIONAL(COND_XSLTPROC, test x"$XSLTPROC" != x)
+
+AC_PATH_PROG(LATEX, latex)
+AC_PATH_PROG(DVIPS, dvips)
+AC_PATH_PROG(PS2PDF, ps2pdf)
+AM_CONDITIONAL(COND_LATEX, test x"$LATEX" != x -a x"$DVIPS" != x -a x"$PS2PDF" != x)
+
+AC_PATH_PROG(LATEX2HTML, latex2html)
+AM_CONDITIONAL(COND_LATEX2HTML, test x"$LATEX2HTML" != x)
+
+
+# ========================================
+# Examples building
+#  is not architecture independant because of CXXFLAGS setting by hand
+#  must be replaced in order to have a configure.in that does not do 'case $host'
+# ========================================
+case "$host" in
+i*86-*-linux*)
+	EYEDB_ARCH_CPPFLAGS="-D_REENTRANT -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
+	EYEDB_ARCH_CXXFLAGS=-fPIC
+	EYEDB_ARCH_SO_FLAGS=-shared
+	;;
+
+x86_64-*-linux*)
+	EYEDB_ARCH_CPPFLAGS="-D_REENTRANT -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
+	EYEDB_ARCH_CXXFLAGS=-fPIC
+	EYEDB_ARCH_SO_FLAGS=-shared
+	;;
+
+sparc-sun-solaris2.9)
+	if test "$ac_cv_cxx_compiler_gnu" = "yes"
+	then
+		EYEDB_ARCH_CPPFLAGS="-D_REENTRANT -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
+		EYEDB_ARCH_CXXFLAGS=-fPIC
+		EYEDB_ARCH_SO_FLAGS=-shared
+	else
+		EYEDB_ARCH_CPPFLAGS="-mt -xtarget=ultra -xarch=v9"
+		EYEDB_ARCH_CXXFLAGS=-KPIC
+		EYEDB_ARCH_SO_FLAGS=-G
+	fi
+	;;
+
+*)
+	# should output some error?
+	;;
+
+esac
+
+AC_SUBST(EYEDB_ARCH_CPPFLAGS)
+AC_SUBST(EYEDB_ARCH_CXXFLAGS)
+AC_SUBST(EYEDB_ARCH_SO_FLAGS)
+# ========================================
+# End of Examples building
+# ========================================
+
+
+
+AC_OUTPUT(
+Makefile 
+doc/Makefile
+doc/doxygen/Makefile
+doc/doxygen/eyedb-doxygen.cfg
+doc/manpages/Makefile
+doc/manual/Makefile
+doc/manual/figures/Makefile
+doc/manual/version.tex
+doc/manual/latex2html-init
+examples/C++Binding/Makefile
+examples/C++Binding/Makefile.eyedb-examples
+examples/C++Binding/generic/Makefile
+examples/C++Binding/generic/Makefile.eyedb-examples
+examples/C++Binding/generic/basic/Makefile
+examples/C++Binding/generic/basic/Makefile.eyedb-examples
+examples/C++Binding/generic/query/Makefile
+examples/C++Binding/generic/query/Makefile.eyedb-examples
+examples/C++Binding/generic/schema/Makefile
+examples/C++Binding/generic/schema/Makefile.eyedb-examples
+examples/C++Binding/generic/store/Makefile
+examples/C++Binding/generic/store/Makefile.eyedb-examples
+examples/C++Binding/schema-oriented/Makefile
+examples/C++Binding/schema-oriented/Makefile.eyedb-examples
+examples/C++Binding/schema-oriented/admin/Makefile
+examples/C++Binding/schema-oriented/admin/Makefile.eyedb-examples
+examples/C++Binding/schema-oriented/methods/Makefile
+examples/C++Binding/schema-oriented/methods/Makefile.eyedb-examples
+examples/C++Binding/schema-oriented/query/Makefile
+examples/C++Binding/schema-oriented/query/Makefile.eyedb-examples
+examples/C++Binding/schema-oriented/share/Makefile
+examples/C++Binding/schema-oriented/share/Makefile.eyedb-examples
+examples/C++Binding/schema-oriented/store/Makefile
+examples/C++Binding/schema-oriented/store/Makefile.eyedb-examples
+examples/GettingStarted/Makefile
+examples/GettingStarted/Makefile.eyedb-examples
+examples/JavaBinding/Makefile
+examples/JavaBinding/Makefile.eyedb-examples
+examples/JavaBinding/generic/Makefile
+examples/JavaBinding/generic/Makefile.eyedb-examples
+examples/JavaBinding/generic/applet/Makefile
+examples/JavaBinding/generic/applet/Makefile.eyedb-examples
+examples/JavaBinding/generic/appli/Makefile
+examples/JavaBinding/generic/appli/Makefile.eyedb-examples
+examples/JavaBinding/generic/appli/basic/Makefile
+examples/JavaBinding/generic/appli/basic/Makefile.eyedb-examples
+examples/JavaBinding/generic/appli/collections/Makefile
+examples/JavaBinding/generic/appli/collections/Makefile.eyedb-examples
+examples/JavaBinding/generic/appli/query/Makefile
+examples/JavaBinding/generic/appli/query/Makefile.eyedb-examples
+examples/JavaBinding/generic/appli/schema/Makefile
+examples/JavaBinding/generic/appli/schema/Makefile.eyedb-examples
+examples/JavaBinding/generic/appli/store/Makefile
+examples/JavaBinding/generic/appli/store/Makefile.eyedb-examples
+examples/JavaBinding/schema-oriented/Makefile
+examples/JavaBinding/schema-oriented/Makefile.eyedb-examples
+examples/JavaBinding/schema-oriented/share/Makefile
+examples/JavaBinding/schema-oriented/share/Makefile.eyedb-examples
+examples/JavaBinding/schema-oriented/share/person/Makefile
+examples/JavaBinding/schema-oriented/store/Makefile
+examples/JavaBinding/schema-oriented/store/Makefile.eyedb-examples
+examples/Makefile
+examples/Makefile.eyedb-examples
+examples/Makefile.eyedb
+examples/oql/Makefile
+include/Makefile
+include/eyedb/Makefile
+include/eyedb/internals/Makefile
+include/eyedblib/Makefile
+include/eyedblib/endian.h
+include/eyedbsm/Makefile
+install/Makefile
+install/etc/Makefile
+scripts/Makefile
+scripts/eyedb-postinstall.sh
+scripts/eyedbjrun
+src/Makefile
+src/bindings/Makefile
+src/bindings/python/Makefile
+src/eyedb/Makefile
+src/eyedb/eyedbversion.h
+src/eyedbsm/Makefile
+src/java/Makefile
+src/java/src/Makefile
+src/java/src/org/Makefile
+src/java/src/org/eyedb/Makefile
+src/java/src/org/eyedb/Version.java
+src/java/src/org/eyedb/dbm/Makefile
+src/java/src/org/eyedb/syscls/Makefile
+src/java/src/org/eyedb/utils/Makefile
+src/lib/Makefile
+src/oql/Makefile
+src/www/Makefile
+src/www/eyedb.conf
+src/www/html/Makefile
+src/www/icons/Makefile
+tests/Makefile
+tests/eyedb/Makefile
+tests/eyedb/collections/Makefile
+tests/eyedb/collections/basic/Makefile
+tests/eyedb/collections/litcoll/Makefile
+tests/eyedb/dataspace/Makefile
+tests/eyedb/dataspace/dspsch/Makefile
+tests/eyedb/export/Makefile
+tests/eyedbsm/Makefile
+tests/eyedbsm/basic/Makefile
+)
+
+# make symbolic links for ODL files
+for f in src/java/src/org/eyedb/dbm/DBM.odl src/java/src/org/eyedb/utils/utils.odl src/java/src/org/eyedb/syscls/syscls.odl 
+do
+	if test ! -f $srcdir/$f
+	then 
+		test -L $srcdir/$f && rm $srcdir/$f
+		(cd $srcdir/`dirname $f`; ln -s $srcdir/src/eyedb/`basename $f`)
+	fi
+done
