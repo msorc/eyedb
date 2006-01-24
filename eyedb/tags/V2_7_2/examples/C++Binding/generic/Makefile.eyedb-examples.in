@@ -1,0 +1,18 @@
+#
+# Makefile, Eyedb Package
+#
+# examples/C++Binding/generic makefile
+#
+# Eric Viara Copyright (C) SYSRA 1998
+#
+
+SUBDIRS = basic query store schema
+
+all:
+	@for dir in $(SUBDIRS); do $(MAKE) -C $${dir} $@; done
+
+init:
+	@echo $@
+
+%:
+	@for dir in $(SUBDIRS); do $(MAKE) -C $${dir} $@; done
