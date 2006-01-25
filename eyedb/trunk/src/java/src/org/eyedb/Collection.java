@@ -47,20 +47,6 @@ public class Collection extends Instance {
     
 	IndexImpl idximpl = IndexImpl.decode(db, coder);
 
-	//System.err.println("16/05/05: collection.make patched to come through but should be implement correctly ! " + item_size);
-	// 6?05/05 on doit créer une class IndexImpl
-	// puis les classes Dataspace, Datafile
-	/*
-	  char impl_type = coder.decodeChar();
-	  short xdspid = coder.decodeShort();
-	  int impl_info = coder.decodeInt();
-	  Oid mthoid = coder.decodeOid();
-
-	  for (int i = 0; i < ObjectHeader.IDB_MAX_HINTS_CNT; i++) {
-	  int h = coder.decodeInt();
-	  }
-	*/
-
 	Oid idx1_oid, idx2_oid;
 
 	idx1_oid = coder.decodeOid(); // not used in frontend

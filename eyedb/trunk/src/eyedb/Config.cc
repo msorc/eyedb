@@ -467,6 +467,8 @@ namespace eyedb {
   }
 
   // @@@ FIXME: this constructor does not set the defaults
+  // But it should not!!! You don't know which default to set, the
+  // client one or the server one.
   Config::Config(const char *file)
   {
     add(file);
@@ -733,7 +735,7 @@ namespace eyedb {
 
     theClientConfig->setClientDefaults();
 
-    std::string configFile = getConfigFile( "EYEDBDCONF", "eyedbd.conf");
+    std::string configFile = getConfigFile( "EYEDBCONF", "eyedb.conf");
 
     theClientConfig->add( configFile.c_str(), 1);
 
@@ -750,7 +752,7 @@ namespace eyedb {
     
     theServerConfig->setServerDefaults();
 
-    std::string configFile = getConfigFile( "EYEDBCONF", "eyedb.conf");
+    std::string configFile = getConfigFile( "EYEDBDCONF", "eyedbd.conf");
 
     theServerConfig->add( configFile.c_str(), 1);
 
