@@ -183,6 +183,7 @@ do { \
     static const std::string smd_port_opt = "smd-port";
     static const std::string dbm_opt = "dbm";
     static const std::string granted_dbm_opt = "granted-dbm";
+    static const std::string default_dbm_opt = "default-dbm";
     static const std::string conf_opt = "conf";
     static const std::string logdev_opt = "logdev";
     static const std::string logmask_opt = "logmask";
@@ -221,6 +222,11 @@ do { \
 	Option(prefix + granted_dbm_opt, OptionStringType(),
 	       Option::MandatoryValue,
 	       OptionDesc("Granted EYEDBDBM database files", "<dbmfiles>"));
+
+      opts[opt_cnt++] = 
+	Option(prefix + default_dbm_opt, OptionStringType(),
+	       Option::MandatoryValue,
+	       OptionDesc("Default EYEDBDBM database file", "<dbmfile>"));
     }
     else {
       opts[opt_cnt++] = 
@@ -338,6 +344,10 @@ do { \
     if (map.find(granted_dbm_opt) != map.end())
       Config::getServerConfig()->setValue("granted_dbm",
 					  map[granted_dbm_opt].value.c_str());
+
+    if (map.find(default_dbm_opt) != map.end())
+      Config::getServerConfig()->setValue("default_dbm",
+					  map[default_dbm_opt].value.c_str());
 
     if (map.find(dbm_opt) != map.end())
       Database::setDefaultDBMDB(map[dbm_opt].value.c_str());

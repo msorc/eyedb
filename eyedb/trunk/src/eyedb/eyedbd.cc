@@ -234,88 +234,94 @@ main(int argc, char *argv[])
 
   string sv_listen;
 
-  eyedb::init(argc, argv, &sv_listen, true);
+  try {
+    eyedb::init(argc, argv, &sv_listen, true);
 
-  listen = sv_listen.c_str();
+    listen = sv_listen.c_str();
 
-  server = rpcBeInit();
+    server = rpcBeInit();
 
-  garbage_handler = GARBAGE;
+    garbage_handler = GARBAGE;
 #ifdef RPC_TIMEOUT
-  settimeout = rpc_setTimeOut;
+    settimeout = rpc_setTimeOut;
 #endif
 
-  eyedbsm::backend = eyedbsm::True;
+    eyedbsm::backend = eyedbsm::True;
 
-  if (get_opts(argc, argv, &accessfile, &datdir, &sesslogdev,
-	       &sessloglevel, &nofork))
-    return notice(1);
-
-  rpc_setProgName(argv[0]);
-
-  if (!*listen)
-    listen = eyedb::Config::getServerValue("listen");
-
-  nlisten = get_ports(ports, hosts, listen);
-
-  for (int n = 0; n < nlisten; n++) {
-    if (!eyedblib::is_number(ports[n]) && strcmp(hosts[n], "localhost")) {
-      fprintf(stderr, "eyedbd: cannot specify host '%s' for named pipe '%s'\n",
-	      hosts[n], ports[n]);
-      return 1;
-    }
-  }
-
-  if (rpc_connman_init(accessfile))
-    return notice(1);
-
-  if (!nlisten) {
-    fprintf(stderr, "eyedbd: at least one port must be set.\n");
-    return notice(1);
-  }
-
-  for (int i = 0; i < nlisten; i++)
-    if (rpc_portOpen(server, hosts[i], ports[i], &port[i]))
+    if (get_opts(argc, argv, &accessfile, &datdir, &sesslogdev,
+		 &sessloglevel, &nofork))
       return notice(1);
 
-  int *pid = new int;
-  *pid = getpid();
-  rpc_setQuitHandler(_quit_handler, pid);
+    rpc_setProgName(argv[0]);
 
-  const char *sv_tmpdir = eyedb::Config::getServerValue("tmpdir");
+    if (!*listen)
+      listen = eyedb::Config::getServerValue("listen");
 
-  if (!sv_tmpdir)
-    sv_tmpdir = "/tmp";
+    nlisten = get_ports(ports, hosts, listen);
 
-  std::string logdir = sv_tmpdir;
+    for (int n = 0; n < nlisten; n++) {
+      if (!eyedblib::is_number(ports[n]) && strcmp(hosts[n], "localhost")) {
+	fprintf(stderr, "eyedbd: cannot specify host '%s' for named pipe '%s'\n",
+		hosts[n], ports[n]);
+	return 1;
+      }
+    }
 
-  eyedb::Exception::setMode(eyedb::Exception::StatusMode);
+    if (rpc_connman_init(accessfile))
+      return notice(1);
 
-  sesslog = new SessionLog(logdir.c_str(), eyedb::getVersion(),
-			   nlisten, hosts, ports,
-			   datdir, sesslogdev, sessloglevel);
+    if (!nlisten) {
+      fprintf(stderr, "eyedbd: at least one port must be set.\n");
+      return notice(1);
+    }
+
+    for (int i = 0; i < nlisten; i++)
+      if (rpc_portOpen(server, hosts[i], ports[i], &port[i]))
+	return notice(1);
+
+    int *pid = new int;
+    *pid = getpid();
+    rpc_setQuitHandler(_quit_handler, pid);
+
+    const char *sv_tmpdir = eyedb::Config::getServerValue("tmpdir");
+
+    if (!sv_tmpdir)
+      sv_tmpdir = "/tmp";
+
+    std::string logdir = sv_tmpdir;
+
+    eyedb::Exception::setMode(eyedb::Exception::StatusMode);
+
+    sesslog = new SessionLog(logdir.c_str(), eyedb::getVersion(),
+			     nlisten, hosts, ports,
+			     datdir, sesslogdev, sessloglevel);
 
 #ifndef NO_DATDIR
-  IDB_init(datdir, 0 /* passwdfile */, sesslog, 0 /*timeout*/);
+    IDB_init(datdir, 0 /* passwdfile */, sesslog, 0 /*timeout*/);
 #else
-  IDB_init(0, 0 /* passwdfile */, sesslog, 0 /*timeout*/);
+    IDB_init(0, 0 /* passwdfile */, sesslog, 0 /*timeout*/);
 #endif
 
-  if (sesslog->getStatus()) {
-    sesslog->getStatus()->print();
-    return notice(1);
+    if (sesslog->getStatus()) {
+      sesslog->getStatus()->print();
+      return notice(1);
+    }
+
+    (void)notice(0);
+
+    if (!nod) {
+      close(0);
+      if (!Log::getLog() || strcmp(Log::getLog(), "stdout"))
+	close(1);
+      if (!Log::getLog() || strcmp(Log::getLog(), "stderr"))
+	close(2);
+    }
+
+    rpc_serverMainLoop(server, port, nlisten);
   }
-
-  (void)notice(0);
-
-  if (!nod) {
-    close(0);
-    if (!Log::getLog() || strcmp(Log::getLog(), "stdout"))
-      close(1);
-    if (!Log::getLog() || strcmp(Log::getLog(), "stderr"))
-      close(2);
+  catch(Exception &e) {
+    cerr << e << flush;
+    return 1;
   }
-
-  rpc_serverMainLoop(server, port, nlisten);
   return 0;
 }
