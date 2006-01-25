@@ -251,98 +251,104 @@ main(int argc, char *argv[])
   string sv_host, sv_port;
 
   string sv_listen;
-  eyedb::init(argc, argv, &sv_listen, false);
+  try {
+    eyedb::init(argc, argv, &sv_listen, false);
 
-  listen = sv_listen.c_str();
+    listen = sv_listen.c_str();
 
-  if (argc < 2)
-    return usage(argv[0]);
+    if (argc < 2)
+      return usage(argv[0]);
 
-  eyedb::Exception::setMode(eyedb::Exception::StatusMode);
+    eyedb::Exception::setMode(eyedb::Exception::StatusMode);
 
-  Command cmd;
+    Command cmd;
 
-  if (!strcmp(argv[1], "start"))
-    cmd = Start;
-  else if (!strcmp(argv[1], "stop"))
-    cmd = Stop;
-  else if (!strcmp(argv[1], "status"))
-    cmd = CStatus;
-  else if (!strcmp(argv[1], "-h") || !strcmp(argv[1], "--help")) {
-    help(argv[0]);
-    return 0;
-  }
-  else
-    return usage(argv[0]);
-
-  for (int i = 2; i < argc; i++) {
-    char *s = argv[i];
-    if (!strcmp(s, "-f"))
-      force = True;
-    else if (!strcmp(s, "--creating-dbm"))
-      creatingDbm = True;
-    else if (!strcmp(s, "-h") || !strcmp(s, "--help")) {
+    if (!strcmp(argv[1], "start"))
+      cmd = Start;
+    else if (!strcmp(argv[1], "stop"))
+      cmd = Stop;
+    else if (!strcmp(argv[1], "status"))
+      cmd = CStatus;
+    else if (!strcmp(argv[1], "-h") || !strcmp(argv[1], "--help")) {
       help(argv[0]);
       return 0;
     }
-  }
+    else
+      return usage(argv[0]);
 
-  if (!*listen && (s = eyedb::Config::getServerValue("listen")))
-    listen = s;
+    for (int i = 2; i < argc; i++) {
+      char *s = argv[i];
+      if (!strcmp(s, "-f"))
+	force = True;
+      else if (!strcmp(s, "--creating-dbm"))
+	creatingDbm = True;
+      else if (!strcmp(s, "-h") || !strcmp(s, "--help")) {
+	help(argv[0]);
+	return 0;
+      }
+    }
 
-  smdport = smd_get_port();
+    if (!*listen && (s = eyedb::Config::getServerValue("listen")))
+      listen = s;
 
-  if (!bindir)
-    bindir = eyedb::Config::getServerValue("bindir");
+    smdport = smd_get_port();
 
-  int ac;
-  char **av;
+    if (!bindir)
+      bindir = eyedb::Config::getServerValue("bindir");
 
-  if (cmd == Start) {
-    int st = force + creatingDbm;
+    int ac;
+    char **av;
 
-    if (checkPostInstall(creatingDbm))
-      return 1;
+    if (cmd == Start) {
+      int st = force + creatingDbm;
 
-    ac = argc - st;
-    av = &argv[st+1];
-  }
+      if (checkPostInstall(creatingDbm))
+	return 1;
 
-  const char *host, *port;
-  make_host_port(listen, host, port);
+      ac = argc - st;
+      av = &argv[st+1];
+    }
+
+    const char *host, *port;
+    make_host_port(listen, host, port);
     
-  SessionLog sesslog(host, port, eyedb::Config::getServerValue("tmpdir"));
+    SessionLog sesslog(host, port, eyedb::Config::getServerValue("tmpdir"));
 
-  if (sesslog.getStatus()) {
+    if (sesslog.getStatus()) {
+      if (cmd == Start)
+	return startServer(ac, av, smdport);
+      sesslog.getStatus()->print();
+      return 1;
+    }
+
     if (cmd == Start)
       return startServer(ac, av, smdport);
-    sesslog.getStatus()->print();
+
+    if (cmd == Stop) {
+      Status status = sesslog.stopServers(force);
+      if (status) {
+	status->print();
+	return 1;
+      }
+
+      smdcli_conn_t *conn = smdcli_open(smd_get_port());
+      if (!conn) {
+	fprintf(stderr, "cannot connect to eyedbsmd daemon\n");
+	return 1;
+      }
+    
+      int r = smdcli_stop(conn);
+      smdcli_close(conn);
+      conn = 0;
+      return r;
+    }
+
+    sesslog.display(stdout, force);
+  }
+  catch(Exception &e) {
+    cerr << e << flush;
     return 1;
   }
-
-  if (cmd == Start)
-    return startServer(ac, av, smdport);
-
-  if (cmd == Stop) {
-    Status status = sesslog.stopServers(force);
-    if (status) {
-      status->print();
-      return 1;
-    }
-
-    smdcli_conn_t *conn = smdcli_open(smd_get_port());
-    if (!conn) {
-      fprintf(stderr, "cannot connect to eyedbsmd daemon\n");
-      return 1;
-    }
-    
-    int r = smdcli_stop(conn);
-    smdcli_close(conn);
-    conn = 0;
-    return r;
-  }
-
-  sesslog.display(stdout, force);
 
   return 0;
 }
