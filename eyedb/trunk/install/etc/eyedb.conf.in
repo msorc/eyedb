@@ -1,0 +1,27 @@
+# EyeDB client configuration file
+# 
+# This file is a template that you can use to override the default values.
+# For each variable, the current default value is given
+
+
+# Port for Unix socket connection
+# Variable value is the file name of the Unix socket used to connect to the EyEDB server
+
+#port = @localstatedir@/lib/eyedb/pipes/eyedbd
+
+# TCP Port for TCP socket connection
+# Variable value is the port number of the TCP socket used to connect to the EyEDB server
+
+#tcp_port = 6240
+
+# Hostname 
+    // Hostname
+    setValue( "host", "localhost");
+
+    // User
+    setValue( "user", "@");
+
+    // EYEDBDBM Database
+    //setValue( "dbm", (localstatedir + "/lib/eyedb/db/dbmdb.dbs").c_str());
+    setValue( "dbm", "default");
+
