@@ -23,22 +23,6 @@
 
 package org.eyedb;
 
-/*
- * Traitement des string vardims
- * -----------------------------
- *
- * Le calcul des idr_poff doit être différent: trivial (cf code)
- *
- * Le load et le update doivent être différents.
- *
- * Le load, il faut:
- *   1. lire la size
- *   2. faire setSizeRealize()
- *   3. récupérer le o.pdata[num].data qui vient d'être créer par setSizeRealize
- *   4. if (!oid.isValid()) => il faut copier la string qui se trouve dans
- *      o.getIDR() + idr_poff + iniSize + ... dans o.pdata[num].data
- */
-
 class AttrVarDim extends AttrVD {
 
   public AttrVarDim(Database db, Coder coder, int num)  throws Exception {
@@ -53,16 +37,6 @@ class AttrVarDim extends AttrVD {
 
   void setSizeRealize(Database db, Object o, int nsize,
 		      boolean make) throws Exception {
-    //if (VARS_COND() && nsize <= VARS_SZ)
-      {
-	// en fait, le + simple est de faire la même chose dans
-	// le cas de varstring indirecte ou non.
-	/*
-	setSizeRealize(o, nsize);
-	return;
-	*/
-      }
-
     int rsize;
     byte[] opdata, npdata;
 
@@ -216,8 +190,6 @@ class AttrVarDim extends AttrVD {
 
     int size = getSize(o);
 
-    //System.out.println("newObjRealize(" + size + ")");
-
     if (size > 0)
       setSizeRealize(db, o, size, false);
     else if (basic_enum &&
@@ -241,7 +213,6 @@ class AttrVarDim extends AttrVD {
     int size = getSize(o);
     int wpsize = size * idr_item_psize * typmod.pdims;
 
-    // added on 27/11/98
     setSizeRealize(db, o, size, false);
 
     byte[] pdata = o.pdata[num].data;
@@ -255,10 +226,6 @@ class AttrVarDim extends AttrVD {
       {
 	if (VARS_COND() && wpsize > 0)
 	  {
-	    /*
-	    System.out.println("attribute " + name +
-			       ": dataoid is not valid; wpsize=" + wpsize);
-			       */
 	    System.arraycopy(o.getIDR(), idr_poff + VARS_OFFSET, pdata, 0,
 			     wpsize);
 	  }
@@ -281,7 +248,6 @@ class AttrVarDim extends AttrVD {
 			 objects[j].idr.idr, ObjectHeader.IDB_OBJ_HEAD_SIZE,
 			 idr_item_psize);
 
-	//objects[j].loadItems(db, rcm);
 	objects[j].loadPerform(db, clsoid, lockmode, idx_ctx, rcm);
 
 	System.arraycopy(objects[j].idr.idr, ObjectHeader.IDB_OBJ_HEAD_SIZE,
