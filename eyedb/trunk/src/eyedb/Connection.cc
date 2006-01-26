@@ -401,7 +401,7 @@ namespace eyedb {
   void
   Connection::setServerMessage(const char *msg)
   {
-    setServerMessage(msg);
+    eyedb::setServerMessage(msg);
   }
 
   void
