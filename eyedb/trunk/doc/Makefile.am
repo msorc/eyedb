@@ -20,5 +20,5 @@ endif
 SUBDIRS=$(DOXYGEN_DIR) $(MANPAGES_DIR) $(MANUAL_DIR)
 DIST_SUBDIRS=doxygen manpages manual
 
-#htmldir=$(datadir)/doc/$(PACKAGE)
-#html_DATA=index.html
+htmldir=$(datadir)/doc/$(PACKAGE)
+html_DATA=index.html
