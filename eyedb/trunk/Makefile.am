@@ -20,3 +20,5 @@ check-ascii:
 		done ; \
 		echo No non-ASCII java file found ; \
 	)
+
+dist-hook: check-ascii
