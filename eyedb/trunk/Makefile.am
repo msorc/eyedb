@@ -9,3 +9,14 @@ TAGS:
 doc:
 	(cd doc && $(MAKE) $(AM_MAKEFLAGS) all)
 
+check-ascii:
+	( \
+		cd $(top_srcdir) ; \
+		for f in `find . -name '*.java'` ; \
+		do \
+			echo $$f ; \
+			iconv --to-code=ASCII -c --output=- $$f | diff --brief - $$f ; \
+			if test $$? != 0 ; then echo $$f not ASCII; exit 1; fi ; \
+		done ; \
+		echo No non-ASCII java file found ; \
+	)
