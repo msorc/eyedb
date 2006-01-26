@@ -1,0 +1,42 @@
+body {
+  font-family:Verdana, Arial, Helvetica, sans-serif;
+  font-size: 0.9em;
+  margin: 2px;
+  padding: 0;
+  text-align: center ;
+}
+
+.Hide {
+  display: none;
+  height: 0;
+  width: 0;
+  overflow: hidden;
+  position: absolute;
+}
+
+#Container {
+/*  width: 770px ; */
+ margin: 0 auto ;
+ text-align: left ;
+}
+
+#Header {
+ width: 770px ;
+ height: 70px;
+ background-color: #C0C0C0;
+}
+
+#TOC ul {
+}
+
+#TOC li {
+  margin-bottom: 5px;
+}
+
+#TOC a {
+  margin: 0 2px;
+}
+
+#Footer {
+}
+
