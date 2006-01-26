@@ -22,3 +22,6 @@ check-ascii:
 	)
 
 dist-hook: check-ascii
+
+doc-archive:
+	tar cvzf eyedb-doc-$(EYEDB_VERSION).tar.gz -C $(datadir)/doc eyedb
