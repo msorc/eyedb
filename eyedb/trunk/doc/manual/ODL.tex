@@ -670,7 +670,56 @@ class C {
 Note that we cannot define one index on several attributes.
 \\
 \subsubsect{Index and inheritance propagation}
+As constraints, indexes may be or not propagated to subclasses.
+The behavior is the same as for constraints: indexes are propagated
+by default to subclasses:
+\begin{verbatim}
+class C {
+  attribute string s;
+  attribute int i;
+
+  index on s;
+  index on i;
+};
+
+class C2 extends C {
+  attribute long l;
+  
+};
+\end{verbatim}
+Indexes are created for:
+\be
+\item \texttt{C::s}
+\item \texttt{C::i}
+\item \texttt{C2::s}
+\item \texttt{C2::i}
+\ee
+Note that the index on \texttt{C::s} (resp. \texttt{C::i} is different from the
+index on \texttt{C2::s} (resp. \texttt{C2::i}).
+\\
+To forbid propagation:
+\begin{verbatim}
+class C {
+  attribute string s;
+  attribute int i;
+
+  index<propagate=off> on s;
+  index<propagate=off> on i;
+};
+
+class C2 extends C {
+  attribute long l;
+  
+};
+\end{verbatim}
+Indexes are created only for:
+\be
+\item \texttt{C::s}
+\item \texttt{C::i}
+\ee
 \subsubsect{Index on attribute of literal composite type}
+One can create indexes on an attribute of a literal composite type, for
+instance:
 \begin{verbatim}
 class C1 {
   attribute int i;
@@ -679,7 +728,7 @@ class C1 {
 
 class C {
   attribute string s;
-  C1 c1;
+  C1 c1; // literal composite type
 
   index on s;
   index on c1.i;
@@ -687,19 +736,68 @@ class C {
 };
 \end{verbatim}
 \subsubsect{Index specifications}
+By default, index on number attribute (char, short, int, long and double)
+are implemented as BTree, while index on string or bounded string are
+implemented as Hash.
+\\
+The differences between BTree and Hash are as follows:
+\bi
+\item BTree indexes allows one to retrieve in an efficient way
+entries with values greater or lesser than a given value. Hash indexes
+does not allows this in a efficient way.
+\item On big volume of data, BTree indexes are more efficient 
+with the default parameters than Hash indexes with the default parameters
+\item On the other hand, for exact match search a Hash index
+with good parameters is more efficient than as BTree index
+\item At least, Hash indexes creation is about four times faster
+than BTree indexes
+\ei
+The ODL index specification allows one to change the default index
+type and parameters of a given attribute.
+To set the type of a given index:
+\begin{verbatim}
+class C {
+  attribute string<32> s;
+  attribute int i;
+
+  index<type = btree> on s; // default is hash: change to btree
+  index<type = hash> on i;  // default is btree: change to hash
+};
+\end{verbatim}
+Important note: one cannot set a BTree index on non bounded string.
+One can set implementation parameters for indexes as follows:
+\begin{verbatim}
+class C {
+  attribute string<32> s;
+  attribute int i;
+
+  index<type = btree, hints = "degree = 64;"> on s;
+  index<type = hash, hints = "key_count = 4096; initial_size = 4096;
+        extend_coef = 1; size_max = 4096;"> on i;
+};
+\end{verbatim}
 
 %\subsect{Advances features}
 %  collection implementation
 %  class implementation ??
-%  index specification
 %  name alias
 %  quoted sequences
-%  client methods
 
 \sect{The eyedbodl tool}
 The eyedbodl tool can be used to:
 \bi
-\item update a database from an ODL file
+\item update a database from an ODL file:
+\bi
+\item create a schema
+\item add methods, triggers, constraints, indexes to classes
+\item remove methods, triggers, constraints, indexes to classes
+\item add classes
+\item remove classes
+\item add attributes
+\item rename attributes
+\item remove attributes
+\item remove classes
+\ei
 \item generate C++ stubs from an ODL file or a database containing
 a schema
 \item generate Java stubs from an ODL file or a database containing
@@ -711,15 +809,55 @@ schema
 \ei
 For instance, let \texttt{schema.odl} an ODL file and \texttt{dbtest}
 a database.
-\\
-\\
+\subsect{Updating a schema}
 To update a database from an ODL file:
 \vspace{-2mm}
 \begin{verbatim}
 eyedbodl -u -d dbtest schema.odl
-# or:
+\end{verbatim}
+or:
+\vspace{-2mm}
+\begin{verbatim}
 eyedbodl --update --database=dbtest schema.odl
 \end{verbatim}
+Important notes:
+\bi
+\item All classes defined in the ODL file will be added to the
+existing schema in the database
+\item The classes in the database and not in the ODL file will not
+be removed from the database
+\item To remove a class from a database, one must use the
+\texttt{--rmcls=}\emph{class} option. Because of class dependancies,
+the removal of a class can fail because one needs to remove
+other classes, for instance collection classes of the class one want
+to remove.
+\\
+In this case, one must delete classes in the good order.
+\item To remove a entire schema from a database, on must use
+the \texttt{--rmsch} option
+\item The methods, triggers, constraint and indexes
+in the ODL file and not in the database will be added to the database
+\item The methods, triggers, constraint and indexes in the databae
+and not in the ODL file will {\bf not} be removed from the database
+unless the \texttt{-rmv-undex-attrcomp=yes} option is given
+\item The common indexes (on same attributes) in the ODL file and in the
+database with a different implementation will not be updated unless
+the \texttt{--update-index=yes} is given
+\item A class \texttt{C} defined in the ODL and in the database with
+different attributes will have the following behavior:
+\bi
+\item an attribute \texttt{a} in a class \texttt{C} of the ODL, not
+in the class \texttt{C} of the database will be automatically added to the
+class \texttt{C} in the database
+\item an attribute \texttt{a} in a class \texttt{C} in the database, not
+in the class \texttt{C} in ODL will be automatically {\bf removed} from
+the class \texttt{C} in the database: {\bf This operation is not undoable}
+\item an attribute \texttt{a} in a class \texttt{C} in the database and
+in the class \texttt{C} in ODL with different types will lead
+to an update failure
+\ei
+\ei
+\subsect{Generates C++ code}
 To generate C++ stubs from an ODL file:
 \vspace{-2mm}
 \begin{verbatim}
@@ -730,6 +868,10 @@ To generate C++ stubs from a database:
 \begin{verbatim}
 eyedbodl --gencode=C++ -d dbtest
 \end{verbatim}
+
+% parler des quoted sequence
+
+\subsect{Generates Java code}
 To generate Java stubs from an ODL file:
 \vspace{-2mm}
 \begin{verbatim}
@@ -740,26 +882,147 @@ To generate Java stubs from a database:
 \begin{verbatim}
 eyedbodl --gencode=Java -d dbtest
 \end{verbatim}
+
+\subsect{Generates ODL}
 To generate the ODL from a database:
 \vspace{-2mm}
 \begin{verbatim}
-eyedbodl --gencode=ODL -d dbtest
+eyedbodl --gencode=ODL -d dbtest # generates on the standard ouput
+eyedbodl --gencode=ODL -d dbtest -o schema.odl
 \end{verbatim}
+
+\subsect{Display schema differences}
 To display the difference between a schema in an ODL file and a database
 schema:
 \vspace{-2mm}
 \begin{verbatim}
 eyedbodl --diff schema.odl -d dbtest
 \end{verbatim}
+
+\subsect{Checking the syntax of an ODL file}
 To check the syntax of an ODL file:
 \vspace{-2mm}
 \begin{verbatim}
 eyedbodl --checkfile schema.odl
 \end{verbatim}
+
 Beside these major options, eyedbodl has a lot of extra options as
 described when running eyedbodl with the --help option.
 \newpage
 \sect{Annexes}
+\subsect{A simple example}
+Here is a simple example that can be found
+in examples/C++Binding/schema-oriented/share/schema.odl:
+\begin{verbatim}
+enum CivilState {
+  Lady = 0x10,
+  Sir  = 0x20,
+  Miss = 0x40
+};
+
+class Address {
+  attribute string street;
+  attribute string<32> town;
+  attribute string country;
+
+  index on street;
+};
+
+class Person {
+  attribute string name;
+  attribute int age;
+  attribute Address addr;
+  attribute Address other_addrs[];
+  attribute CivilState cstate;
+  attribute Person * spouse inverse Person::spouse;
+  attribute set<Car *> cars inverse owner;
+  attribute array<Person *> children;
+  int change_address(in string street, in string town,
+                     out string oldstreet, out string oldtown);
+  index on  name;
+};
+
+class Car {
+  attribute string brand;
+  attribute int num;
+  Person *owner inverse cars;
+};
+
+class Employee extends Person {
+  attribute long salary;
+};
+\end{verbatim}
+\newpage
+\subsect{A more complex example}
+Here is a more complex example used for the management of biological
+databases:
+\begin{verbatim}
+enum StatusType {
+  running = 0,
+  done = 1
+};
+
+class File {
+  attribute string path;
+  attribute string name;
+  attribute string desc;
+  attribute set<Import_ctx *> imported_in inverse Import_ctx::file;
+
+  constraint<notnull, propagate=on> on name;
+};
+
+class Import_ctx {
+  attribute File * file inverse File::imported_in;
+  attribute Import * import inverse Import::contexts;
+  attribute StatusType status;
+  attribute string comment;
+  attribute int32 count;
+  attribute int32 elapsed;
+  attribute float average;
+  attribute string start_date;
+  attribute string last_update;
+
+  constraint<notnull, propagate=on> on file;
+  constraint<notnull, propagate=on> on import;
+};
+
+class Import {
+  attribute Db * related_db inverse Db::imports;
+  attribute string database_name;
+  attribute string cvs_tag;
+  attribute set<Import_ctx *> contexts inverse Import_ctx::import;
+  attribute string comment;
+  attribute bool deletable;
+
+  instance_method <client, called_from=OQL> time_interval getElapsed()
+
+  constraint<unique, propagate=on> on database_name;
+  constraint<notnull, propagate=on> on database_name;
+  constraint<unique, propagate=on> on cvs_tag;
+  constraint<notnull, propagate=on> on related_db;
+
+  index< propagate=on> on database_name;
+  index< propagate=on> on cvs_tag;
+};
+
+class Db {
+  attribute string name;
+  attribute string title;
+  attribute int32 version;
+  attribute set<Import *> imports inverse Import::related_db;
+  attribute array<File *> files;
+  attribute set<Db *> divisions;
+  attribute Import * official;
+
+  instance_method <client, called_from=OQL> string [] get_db_names();
+
+  constraint<unique, propagate=on> on name;
+  constraint<notnull, propagate=on> on name;
+
+  index< propagate=on> on name;
+};
+\end{verbatim}
+\newpage
 \subsect{The eyedbodl usage}
 \begin{verbatim}
 Usage:
@@ -866,118 +1129,6 @@ Common Options:
   --arch                             Display the client architecture
   -v, --version                      Display the version
   --help-eyedb-options               Display this message
-\end{verbatim}
-\newpage
-\subsect{A simple example}
-Here is a simple example that can be found
-in examples/C++Binding/schema-oriented/share/schema.odl:
-\begin{verbatim}
-enum CivilState {
-  Lady = 0x10,
-  Sir  = 0x20,
-  Miss = 0x40
-};
-
-class Address {
-  attribute string street;
-  attribute string<32> town;
-  attribute string country;
-
-  index on street;
-};
-
-class Person {
-  attribute string name;
-  attribute int age;
-  attribute Address addr;
-  attribute Address other_addrs[];
-  attribute CivilState cstate;
-  attribute Person * spouse inverse Person::spouse;
-  attribute set<Car *> cars inverse owner;
-  attribute array<Person *> children;
-  int change_address(in string street, in string town,
-                     out string oldstreet, out string oldtown);
-  index on  name;
-};
-
-class Car {
-  attribute string brand;
-  attribute int num;
-  Person *owner inverse cars;
-};
-
-class Employee extends Person {
-  attribute long salary;
-};
-\end{verbatim}
-\newpage
-\subsect{A more complex example}
-Here is a more complex example used in a biological projet:
-\begin{verbatim}
-enum StatusType {
-  running = 0,
-  done = 1
-};
-
-class File {
-  attribute string path;
-  attribute string name;
-  attribute string desc;
-  attribute set<Import_ctx *> imported_in inverse Import_ctx::file;
-
-  constraint<notnull, propagate=on> on name;
-};
-
-class Import_ctx {
-  attribute File * file inverse File::imported_in;
-  attribute Import * import inverse Import::contexts;
-  attribute StatusType status;
-  attribute string comment;
-  attribute int32 count;
-  attribute int32 elapsed;
-  attribute float average;
-  attribute string start_date;
-  attribute string last_update;
-
-  constraint<notnull, propagate=on> on file;
-  constraint<notnull, propagate=on> on import;
-};
-
-class Import {
-  attribute Db * related_db inverse Db::imports;
-  attribute string database_name;
-  attribute string cvs_tag;
-  attribute set<Import_ctx *> contexts inverse Import_ctx::import;
-  attribute string comment;
-  attribute bool deletable;
-
-  instance_method <client, called_from=OQL> time_interval getElapsed()
-
-  constraint<unique, propagate=on> on database_name;
-  constraint<notnull, propagate=on> on database_name;
-  constraint<unique, propagate=on> on cvs_tag;
-  constraint<notnull, propagate=on> on related_db;
-
-  index< propagate=on> on database_name;
-  index< propagate=on> on cvs_tag;
-};
-
-class Db {
-  attribute string name;
-  attribute string title;
-  attribute int32 version;
-  attribute set<Import *> imports inverse Import::related_db;
-  attribute array<File *> files;
-  attribute set<Db *> divisions;
-  attribute Import * official;
-
-  instance_method <client, called_from=OQL> string [] get_db_names();
-
-  constraint<unique, propagate=on> on name;
-  constraint<notnull, propagate=on> on name;
-
-  index< propagate=on> on name;
-};
 \end{verbatim}
 \end{document}
 
