@@ -7,11 +7,34 @@ body {
 }
 
 p {
-  margin: 0px 5px 0px 5px ;
+  margin: 0px 0px 0px 0px ;
+}
+
+ul {
+/*   list-style: square inside url('arrow.gif'); */
+  padding: 0cm 0.5cm;
+ margin-left: 0.5cm;
+}
+
+li {
+ padding: 0cm 0cm;
+ border-style: solid;
+ border-width: 0px;
 }
 
 table {
+}
+
+tr {
   margin: 0px 5px 0px 5px ;
+  border: 1px 1px 1px 1px;
+  border-color: #1020E0;
+}
+
+td {
+  margin: 0px 5px 0px 5px ;
+  border: 1px 1px 1px 1px;
+  border-color: #1020E0;
 }
 
 .Hide {
