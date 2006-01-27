@@ -9,34 +9,20 @@
 \chapter*{Getting Started}
 
 
-We will introduce \eyedb by going through some simple administration
-operations such as adding a user, creating a database, and through
-a simple example of defining an ODL schema, and then writing a C++
-client program.
-
-At this early stage, we will explain only what is necessary to understand
-the examples to avoid being swamped by unnecessary details.
+We will introduce \eyedb by going through some simple 
+operations such as creating a database, defining an ODL schema,
+creating and updating objects, querying objects with OQL, adding
+indexes and constraints, and then writing simple C++ and Java
+client programs.
 
 We assume that \eyedb has been correctly installed on your
-computer.
-Refer to the installation guide in the annex for installation information.
-
-Depending on who you are (the DBA, the installer, a lambda user), you do not need
-to read all this chapter. In particular, the first sections about the
-distribution, the environment and administrative operations 
-can be skipped if you are a lambda user. In this case, ask your DBA to create
-for you an \eyedb user that has the \emph{database creation} system privilege. 
-Then you can jump directly to the section
-\emph{Using the default configuration} and then to the section
-\emph{Creating a database using a specific user}.
-
-
-\sect{The Distribution}
-
-
+computer. Refer to the installation guide for installation information.
 
 
 \sect{Starting the server}
+
+In the following sections, we assume that you are running all the \eyedb tools under
+the same Unix user as the one used when installing \eyedb, in order not to be forced to create a new \eyedb user and give this new user the necessary authorizations to create a database. In case this assumption is not valid, please refer to the administration guide for further information about creating a user and assigning a user database creation permission.
 
 For any \eyedb operation, a server must run on your computer.
 
@@ -45,30 +31,22 @@ To check if a server is running, use the following command:
 % eyedbrc status
 \end{verbatim}
 \normalsize
+
 If a server is running, this command will print a message like:
 \verbsize \begin{verbatim}
-EyeDB Server running since Mon Jan 23 13:45:55 2006
-
-  Version       V2.7.2
-  Date          Jan 23 2006 13:25:04
-  Architecture  linux-x86
-  Program Pid   19013
-  Running Under francois
-
-  SMD Port      /home/francois/projects/eyedb/install/var/lib/eyedb/pipes/eyedbsmd
-  Listening on  localhost:6240
-                localhost:/home/francois/projects/eyedb/install/var/lib/eyedb/pipes/eyedbd
-  Datafile Directory 
-
-  No Clients connected.
+Starting EyeDB Server
+ Version      V2.7.5
+ Compiled     Jan 28 2006 04:06:17
+ Architecture linux-x86-64
+ Program Pid  9159
 \end{verbatim}
 \normalsize
 
+If no server is running, it will print an error message such as:
 \verbsize \begin{verbatim}
-EyeDB server, port 6140, is down from Mon Nov  2 16:04:15 2000
+No EyeDB Server is running on localhost:6240
 \end{verbatim}
 \normalsize
-means that no \eyedb server is running, and you must start one.
 
 To start a server, just do this:
 \verbsize \begin{verbatim}
@@ -78,252 +56,46 @@ To start a server, just do this:
 
 Then, you may try again \texttt{eyedbrc status}.
 
-If you get any trouble at this step, refer to the administration manual.
+If you get any trouble at this step, refer to the installation and to the
+administration manuals.
+
 
 \sect{Creating a database}
+
 The next step is to create a database to perform our tests.
 
-This is very simple, you can try as follows:
+Before creating a database, you can check that you are authorized to perform this
+operation, using the \texttt{eyedbuserlist} command, as in:
+\verbsize \begin{verbatim}
+% eyedbuserlist `whoami`
+name      : "francois" [strict unix user]
+sysaccess : SUPERUSER_SYSACCESS_MODE
+\end{verbatim}
+\normalsize
+If you are running the \texttt{eyedbuserlist} command under the same Unix user as the one used when installing \eyedb, the command output will be a message like the one above, showing that you have \texttt{superuser} priviledge and are thus allowed to create a database.
+
+Creating a database is performed using the \texttt{eyedbcreate} tool, as in:
 \verbsize
 \begin{verbatim}
 % eyedbdbcreate foo
 \end{verbatim}
-or more simply:
-\begin{verbatim}
-% dbcreate foo
-\end{verbatim}
-\normalsize
-If you use the default installation configuration, the following message
-will be displayed:
-\verbsize \begin{verbatim}
-eyedbdbcreate: insufficient privileges: user 'guest': creating database 'foo'
-\end{verbatim}
-\normalsize
-This mean that all is ok: you - in fact user \texttt{guest} - was not
-authorized to create a database.
+where \texttt{foo} is the name of the database.
 
-
-Two questions: 
-\begin{enumerate}
-\item why are you user \texttt{guest}? 
-\item why the user \texttt{guest} does not have the privilege to create a database? 
-\end{enumerate}
-
-The answer to the first question is very simple: because the default
-configuration file is{EYEDBARCH}\texttt{/etc/ArchConfig}
-which includes the following lines:
-\verbsize \begin{verbatim}
-#
-# Default Authentication
-#
- 
-user   = guest;
-passwd = guest;
-\end{verbatim}
-\normalsize
-The answer to the second question is a little bit more complex.
-
-If you display the user \texttt{guest} as follows:
-\verbsize \begin{verbatim}
-% eyedbuserlist guest
-name      : "guest"
-sysaccess : idbNoSysAccessMode
-\end{verbatim}
-\normalsize
-the second line indicates that the user \texttt{guest} has no system access
-privileges:
-
-
-The system access privileges control the following operations: 
-\begin{itemize}
-\item any database creation 
-\item any user creation 
-\item any user deletion 
-\item any user password setting 
-\item any database administration 
-\item any operation (or superuser access) 
-\end{itemize}
-
-To create a database, one needs the first system access privilege.
-
-
-So how to create a database?
-There are two ways:
-\begin{enumerate}
-\item using an \eyedb superuser, 
-\item creating a new user that has the appropriate system privilege and use it.
-\end{enumerate}
-
-
-We are going to introduce these two ways.
-
-\subsect{Using an \eyedb superuser}
-We need first to know the name of an \eyedb superuser. During the installation
-process, three \eyedb users were created as shown by using the tool
-\texttt{eyedbuserlist} as follows:
+Similarly, deleting a database is performed using the \texttt{eyedbdelete} tool, as in:
 \verbsize
 \begin{verbatim}
-% eyedbuserlist
-name      : "eyedbroot"
-sysaccess : idbSuperUserSysAccessMode
- 
-name      : "eyedb" [strict unix user]
-sysaccess : idbSuperUserSysAccessMode
-
-name      : "guest"
-sysaccess : idbNoSysAccessMode
+% eyedbdbdelete foo
 \end{verbatim}
-\normalsize
-You can notice that \texttt{eyedbroot} and \texttt{eyedb}
-- mentionned as a \texttt{strict unix user} - have
-the \emph{super user} system privilege which means that they can perform
-any operation on any database. The difference between these two users
-is beyond the scope of this manual. In this Section, we will use 
-the \texttt{eyedbroot} user.
+where \texttt{foo} is the name of the database.
 
 
-To create a database using the \texttt{eyedbroot} user, you need to do
-as follows:
-\verbsize
-\begin{verbatim}
-% eyedbdbcreate foo -U eyedbroot -P
-password authentication : {eyedbroot password}
-\end{verbatim}
-\normalsize
-You need to type the \texttt{eyedbroot} password that has been entered
-during the installation process (the embraces around the password means that
-these characters are not echoed on your terminal).
-\subsect{Creating a user with a system privilege}
-To create a user, you need to be a user that has the system privilege
-\emph{any user creation}.
+\sect{Defining a simple schema with ODL}
 
-The simplest way is to use the \eyedb superuser \texttt{eyedbroot}.
-
-Note that an \eyedb user is not a UNIX user. \eyedb provides its own
-user management. But an \eyedb user can be mapped on a UNIX user.
-Refer to the security section of the administation manual to get
-all information about that.
-
-
-Let's assume you want to add the user \texttt{bill}, and try this:
-\verbsize \begin{verbatim}
-% eyedbuseradd bill
-\end{verbatim}
-\normalsize
-Once again, an error message will be displayed:
-\verbsize \begin{verbatim}
-eyedbuseradd: insufficient privileges: user 'guest': adding user
-\end{verbatim}
-\normalsize
-because you need to perform this operation under the user \texttt{eyedbroot}
-and you are still user \texttt{guest}.
-
-So, you need to use the option \texttt{-eyedbauth?} as follows:
-\verbsize \begin{verbatim}
-% eyedbuseradd -U eyedbroot -P {eyedbroot password} bill
-bill password: {thekid}
-retype bill password: {thekid}
-\end{verbatim}
-\normalsize
-If no error messages appear, the operation is sucessful.
-
-
-Now, you need to add the \emph{any database creation} system privilege
-to the user bill.
-
-Try this:
-\verbsize \begin{verbatim}
-% eyedbsysaccess
-usage: eyedbsysaccess <username> ['+' combination of] dbcreate|adduser|deleteuser|setuserpasswd|admin|superuser|no
-\end{verbatim}
-\normalsize
-As shown above, the usage is displayed on your terminal.
-
-For instance if you want to set the \emph{database creation} and the
-\emph{user creation} system privileges:
-\verbsize \begin{verbatim}
-% eyedbsysaccess -U eyedbroot -P {eyedbroot password} bill dbcreate+adduser 
-password authentication: {eyedbroot}
-\end{verbatim}
-\normalsize
-\subsect{Creating a database using a specific user}
-Using an \eyedb user (for instance \texttt{bill}) that has the \emph{database
-creation} system privilege, you can create a database as follows:
-\verbsize \begin{verbatim}
-% eyedbdbcreate -U bill -P {bill password} foo
-\end{verbatim}
-\normalsize
-or as follows:
-\verbsize \begin{verbatim}
-% eyedbdbcreate foo --user=bill --passwd=thekid
-\end{verbatim}
-\normalsize
-Nice, isn't it?
-
-
-The problem is that you need to type your user and password each time you
-want to become the user \texttt{bill} because of the default configuration
-you are still the user \texttt{guest}, and this user cannot acces the
-database \texttt{foo} for read or write operations.
-
-For instance, try:
-\verbsize \begin{verbatim}
-% eyedboql -d foo
-insufficient privileges: user 'guest': opening database 'foo'
-\end{verbatim}
-\normalsize
-Of course, it is possible to allow the user \texttt{guest} to perform
-read or write operations on the database \texttt{foo}, but it will be
-more clever to become the user \texttt{bill}.
-\subsect{Customizing your environment}
-It is very sumple to customize your environment:
-create a file, for instance EyeDBConfig in your home
-directory which contains the following lines:
-\verbsize \begin{verbatim}
-include //etc/ArchConfig
- 
-user   = bill;
-passwd = thekid;
-\end{verbatim}
-\normalsize
-Change the file access mode to 0600 for security reasons, as follows:
-\verbsize \begin{verbatim}
-% chmod 0600 EyeDBConfig
-\end{verbatim}
-\normalsize
-then, set the environment variable EYEDBCONF to this file as follows:
-\verbsize \begin{verbatim}
-% EYEDBCONF=~/EyeDBConfig; export EYEDBCONF # for Bourne Shells
-% setenv EYEDBCONF ~/EyeDBConfig # for C Shells
-\end{verbatim}
-\normalsize
-To check, if this operation worked, try:
-\verbsize \begin{verbatim}
-% eyedbgetenv version
-2.6.6
-% eyedbgetenv user
-bill
-\end{verbatim}
-\normalsize
-if the good version number \texttt{\eyedbversion} and \texttt{bill} are displayed,
-the operation has succeeded.
-
-Now you can try again:
-\verbsize \begin{verbatim}
-% eyedboql -d foo
-Welcome to eyedboql. Type `!help' to display the command list.
-? 
-\end{verbatim}
-\normalsize
-this is better. Type \texttt{!quit} or \texttt{Control-D} to exit from
-eyedboql.
-\sect{Defining a simple schema}
-Now that a database has been created, a legitimate wish is to input data
-in it.
+Now that a database has been created, we are going to populate it with objects.
 
 The first step is to define the database schema.
 
-A standard example in database documentations is the well known
+A standard example in databases is the well known
 \texttt{Person} class (or table in relational system) which contains
 a few attributes such as a firstname, a lastname, an age, an address, a spouse
 and a set of children.
@@ -331,22 +103,6 @@ and a set of children.
 We will show the inheritance feature through the simple class \texttt{Employee}
 which inherits from the \texttt{Person} class and will contains a simple
 attribute: salary.
-
-
-There are several ways to create such a schema:
-\begin{enumerate}
-\item define the schema in ODL and use the \texttt{eyedbodl} tool. 
-\item use the C++ binding. 
-\item use the Java binding. 
-\end{enumerate}
-
-All these choices are valid however the last *two* are too complicated
-to describe here. Please refer to the appropriate manuals.
-
-
-So we opt for the first choice which is the most pratical
-and flexible way to define and create a schema within a database.
-
 
 Here is simple ODL schema for the classes \texttt{Address}, \texttt{Person} 
 and \texttt{Employee}:
@@ -418,7 +174,7 @@ attributes because \texttt{Employee} inherits from \texttt{Person} and
 To add the previous schema in the \texttt{foo} database, you need to
 use the \texttt{eyedbodl} tool as follows:
 \verbsize \begin{verbatim}
-% eyedbodl -d foo -u --package=person person.odl
+% eyedbodl -d foo -u person.odl
 Updating 'person' schema in database foo...
 Adding class Address
 Adding class Person
@@ -427,21 +183,23 @@ Adding class Employee
 Done
 \end{verbatim}
 \normalsize
+Note that you must pass the following command line options to the \texttt{eyedbodl} command: \texttt{-d foo} to specify to which database you are applying the schema and \texttt{-u} to update the database schema.
+
 To verify that the update has correctly worked, you can generate
 the ODL schema from the database, as follows:
 \verbsize \begin{verbatim}
 % eyedbodl -d foo --gencode=ODL
 
 //
-// EyeDB Version 2.7.0 Copyright (c) 1995-2005 SYSRA
+// EyeDB Version 2.7.5 Copyright (c) 1995-2005 SYSRA
 //
 // UNTITLED Schema
 //
-// Automatically Generated by eyedbodl at Sat Dec  3 19:02:00 2005
+// Automatically Generated by eyedbodl at Sat Jan 28 04:21:32 2006
 //
 
-#if defined(EYEDBNUMVERSION) && EYEDBNUMVERSION != 207000
-#error "This file is being compiled with a version of eyedb different from that used to create it (2.7.0)"
+#if defined(EYEDBNUMVERSION) && EYEDBNUMVERSION != 207005
+#error "This file is being compiled with a version of eyedb different from that used to create it (2.7.5)"
 #endif
 
 class Address (implementation <hash, hints = "key_count = 2048;">) {
@@ -478,19 +236,18 @@ directive.
 Note that these two keywords are optional: it is why we have not use
 them in our example.
 
-
 Another way to check that the schema has been created within the database,
 is to use the \texttt{eyedboql} tool, as follows:
 \verbsize \begin{verbatim}
 % eyedboql -d foo -c "select schema" --print
-= bag(2544.2.881020:oid, 2552.2.291360:oid, 2568.2.164397:oid)
-struct Address {2544.2.881020:oid} : struct : agregat : instance : object { 
+= bag(2546.2.120579:oid, 2553.2.112046:oid, 2568.2.515951:oid)
+struct Address {2546.2.120579:oid} : struct : agregat : instance : object { 
         attribute int32 num;
         attribute string street;
         attribute string town;
         attribute string country;
 };
-struct Person {2552.2.291360:oid} : struct : agregat : instance : object { 
+struct Person {2553.2.112046:oid} : struct : agregat : instance : object { 
         attribute string firstname;
         attribute string lastname;
         attribute int32 age;
@@ -498,7 +255,7 @@ struct Person {2552.2.291360:oid} : struct : agregat : instance : object {
         relationship Person* spouse inverse Person::spouse;
         attribute set<Person*> children;
 };
-struct Employee {2568.2.164397:oid} : Person : struct : agregat : instance : object { 
+struct Employee {2568.2.515951:oid} : Person : struct : agregat : instance : object { 
         attribute string Person::firstname;
         attribute string Person::lastname;
         attribute int32 Person::age;
@@ -513,28 +270,13 @@ struct Employee {2568.2.164397:oid} : Person : struct : agregat : instance : obj
 Again, note that the exact output may differ a bit from what is displayed above, depending on the \eyedb version.
 
 Note that the object identifiers (\texttt{oid}) of the classes are displayed.
-\sect{Data manipulation}
-Now the schema has been created in the database, we want to create, update
-and query \texttt{Person} and \texttt{Employee} instances.
-\subsect{Creating and updating objects}
-To create and update objects, there are 3 ways:
-\idt the OQL language
-\idt the C++ binding
-\idt the Java binding
 
-Contrary to the schema creation, all these solutions are quite reasonnable.
 
-The first way is the most attractive because one can create and update objects
-in a very intuitive and interprated way using the \texttt{eyedboql} monitor.
+\sect{Creating and updating objects with the OQL interpreter}
 
-We will introduce in the manual the three solutions.
+Once a schema has been created in the database, we can create and update
+\texttt{Person} and \texttt{Employee} instances.
 
-\subsect{Querying objects}
-To query objects, there are only one way: use the OQL language.
-
-But note that the OQL language can be used within the C++ and Java binding
-in a very well integrated way.
-\sect{Manipulating objects using OQL}
 Using the \texttt{eyedboql} monitor, we are going to perform the following
 operations:
 \begin{enumerate}
@@ -542,25 +284,23 @@ operations:
 \item create a person named ``mary poppins''
 \item mary them
 \item create 3 ``john wayne'' children named ``baby1'', ``baby2'' and ``baby3''
-\item perform queries on the name and age
-\item increment the age of each person in the database
 \end{enumerate}
 
 Here is the way to perform the first three step:
 \verbsize \begin{verbatim}
-% eyedboql -U bill -P {bill password, i.e. 'thekid'} -d foo -w
+% eyedboql -d foo -w
 Welcome to eyedboql.
   Type `\help' to display the command list.
   Type `\copyright' to display the copyright.
 ? john := Person(firstname : "john", lastname : "wayne", age : 72);
-46382.3.1979263:oid
+= 2585.2.196439:oid
 ? mary := Person(firstname : "mary", lastname : "poppins", age : 68);
-46386.3.643071:oid
+= 2587.2.702511:oid
 ? john.spouse := mary;
-46386.3.643071:oid
+= 2587.2.702511:oid
 \end{verbatim}
 \normalsize
-As you see, this is a very intuitive way to perform such operations.
+Note the \texttt{-w} option on the \texttt{eyedboql} command line, specifying that you open the \texttt{foo} database in write mode.
 
 A few comments:
 \idt \texttt{?} is the \texttt{eyedboql} prompt: of course, do not type
@@ -575,27 +315,62 @@ attribute, the operation \texttt{john.spouse := mary} is equivalent to
 To create the three ``john wayne'' children:
 \verbsize \begin{verbatim}
 ? add Person(firstname : "baby1", age : 2) to john->children;
-46390.3.3985535:oid
+= 2589.2.36448:oid
 ? add Person(firstname : "baby2", age : 3) to john->children;
-46394.3.360831:oid
+= 2595.2.683802:oid
 ? add Person(firstname : "baby3", age : 4) to john->children;
-46398.3.1380607:oid
+= 2597.2.134950:oid
 \end{verbatim}
 \normalsize
-Once again, this is very intuitive and simple.
 
-To query all persons in the database:
+At this stage, it is interesting to perform the following operation:
+in another terminal, launch another \texttt{eyedboql} command on the same database \texttt{foo} and query all persons, as follows:
 \verbsize \begin{verbatim}
-? select Person;
-= bag(2580.2.955941:oid, 2576.2.881020:oid, 2578.2.821166:oid, 2588.2.382585:oid, 2586.2.500653:oid)
+% eyedboql -d foo -w -c "select Person;"
+= bag()
 \end{verbatim}
 \normalsize
+
+It may seem surprising that no person instance is returned, but in fact it is not: each interaction with the database occurs within a \emph{transaction}, and as long as this transaction has not been \emph{committed}, the database is not modified by the operations that have been done since the beginning of the transaction. To perform effectively these operations, you must \emph{commit} the transaction, by typing in the first \texttt{eyedboql} session:
+\verbsize \begin{verbatim}
+? \commit
+\end{verbatim}
+\normalsize
+
+If you now query the person instances in your second \texttt{eyedboql}
+session, the five person instances will be returned:
+\verbsize \begin{verbatim}
+eyedboql -d foo -w -c "select Person;"
+= bag(2597.2.134950:oid, 2595.2.683802:oid, 2589.2.36448:oid, 2587.2.702511:oid, 2585.2.196439:oid)
+\end{verbatim}
+\normalsize
+
+You can now quit the first \texttt{eyedboql} session with the following command:
+\verbsize \begin{verbatim}
+? \quit
+\end{verbatim}
+\normalsize
+
+
+\sect{Querying objects using the OQL interpreter}
+
+To query all persons in the database, launch an \texttt{eyedboql} session as in:
+\verbsize \begin{verbatim}
+% eyedboql -d foo
+Welcome to eyedboql.
+  Type `\help' to display the command list.
+  Type `\copyright' to display the copyright.
+? select Person;
+= bag(2597.2.134950:oid, 2595.2.683802:oid, 2589.2.36448:oid, 2587.2.702511:oid, 2585.2.196439:oid)
+\end{verbatim}
+\normalsize
+
 To query all persons whose firstname is ``john'':
 \verbsize \begin{verbatim}
 ? select Person.firstname = "john";
-= bag(2576.2.881020:oid)
+= bag(2585.2.196439:oid)
 ? \print
-Person {2576.2.881020:oid} = { 
+Person {2585.2.196439:oid} = { 
         firstname = "john";
         lastname = "wayne";
         age = 72;
@@ -605,7 +380,7 @@ Person {2576.2.881020:oid} = {
                 town = NULL;
                 country = NULL;
         };
-        *spouse = {2578.2.821166:oid};
+        *spouse = {2587.2.702511:oid};
         children set<Person*> = set { 
                 name = "";
                 count = 3;
@@ -613,67 +388,78 @@ Person {2576.2.881020:oid} = {
 };
 \end{verbatim}
 \normalsize
-Note that the \texttt{!print} command allows to display the contains of the
+Note that the \texttt{\\print} command allows to display the contains of the
 last objects returned on your terminal.
 
 To query all persons whose firstname contains a \texttt{y}:
 \verbsize \begin{verbatim}
 ? select Person.firstname ~ "y";
-= bag(2580.2.955941:oid, 2578.2.821166:oid, 2588.2.382585:oid, 2586.2.500653:oid)
+= bag(2597.2.134950:oid, 2595.2.683802:oid, 2589.2.36448:oid, 2587.2.702511:oid)
 \end{verbatim}
 \normalsize
 
-At this stage, it is interesting to perform the following operation:
-in another terminal opens an \texttt{eyedboql} session on the database \texttt{foo}
-and query all persons, as follows:
+
+\sect{Manipulating objects using OQL}
+
+The OQL interpreter can be used to manipulate object, for instance updating the attributes of objects returned by a query.
+
+First, launch an \texttt{eyedboql} session as in:
 \verbsize \begin{verbatim}
-% eyedboql -U bill -P {bill password, i.e. 'thekid'} -d foo -w
-? select Person;
-= bag()
+% eyedboql -d foo -w
+Welcome to eyedboql.
+  Type `\help' to display the command list.
+  Type `\copyright' to display the copyright.
+?
 \end{verbatim}
 \normalsize
-It will perharps surprise you that no person instances will be returned.
 
-But this is quite normal as you have not committed the transaction
-in your first \texttt{eyedboql} session.
+The database must be opened in write mode, because we are going to modify the objects stored in the database.
 
-To commit the transaction, type \texttt{!commit} in your first \texttt{eyedboql}
-session:
+To change the \texttt{lastname} attribute of the person whose firstname is \texttt{mary}:
 \verbsize \begin{verbatim}
-? \commit
+? (select Person.firstname = "mary").lastname := "stuart";
+= bag("stuart")
 \end{verbatim}
 \normalsize
-if you query once more the person instances in your second \texttt{eyedboql}
-session, the five person instances will be returned.
-\sect{Adding indexes}
+
+To increment the \texttt{age} attribute of all persons, we use a \texttt{for} loop to iterate on the result of a query:
+\verbsize \begin{verbatim}
+? select Person.age;
+= bag(4, 3, 2, 68, 72)
+? for (p in (select Person)) { p.age += 1 ; };
+? select Person.age;
+= bag(5, 4, 3, 69, 73)
+\end{verbatim}
+\normalsize
+
+
+
+\sect{Adding indexes and constaints}
+
+\subsect{Adding indexes}
 To introduce the necessity of indexes, we propose to perform the following
 operations:
 \verbsize \begin{verbatim}
-? for (x in 1 <= 2000) Person(firstname : "xx" + string(x));
+? for (x in 1 <= 50000) new Person(firstname : "xx" + string(x));
 ? select Person.firstname = "xx20";
-= bag(2628.2.201654:oid)
+= bag(23336.2.420154:oid)
 ? select Person.firstname = "xx10";
-= bag(2608.2.642448:oid)
+= bag(23316.2.824639:oid)
 \end{verbatim}
 \normalsize
-The first operation creates 2000 person instances: as you can notice,
-this operation takes only a few seconds on a reasonnable computer.
 
-The two last operations query person instance according to their firstname
-attribute.
-
-As you can notice, these query operations take a while: about 3 seconds
-for each operation on a ULTRA Sparc: of course, this is too much.
-
+The first operation creates 50000 person instances: as you can notice,
+this operation takes a few seconds. The two last operations query 
+person instance according to their firstname attribute. These operations
+also take a few seconds to perform and take a significant amount of CPU.
 
 A good idea is to affect an index on the attributes - for instance
 \texttt{firstname}, \texttt{lastname} and \texttt{age} - for which one wants
 to perform efficient query.
 
-
 This is very simple:
-\be
-\item add index specification to the class \texttt{Person}edit within
+\begin{itemize}
+\item add index specification to the class \texttt{Person} in 
 the \texttt{person.odl} file as follows:
 \verbsize \begin{verbatim}
 class Person {
@@ -692,7 +478,7 @@ class Person {
 \normalsize
 \item then, use the \texttt{eyedbodl} tool to update the database schema:
 \verbsize \begin{verbatim}
-% eyedbodl -U bill -P {bill password, i.e. 'thekid'} -d foo -u --package=person person.odl
+% eyedbodl -d foo -u person.odl
 Updating 'person' schema in database foo...
 Creating [NULL] hashindex 'index<type = hash, propagate = on> on Person.firstname' on class 'Person'...
 Creating [NULL] hashindex 'index<type = hash, propagate = on> on Person.lastname' on class 'Person'...
@@ -701,29 +487,26 @@ Creating [NULL] btreeindex 'index<type = btree, propagate = on> on Person.age' o
 Done
 \end{verbatim}
 \normalsize
-\ee
+\end{itemize}
+
 Now, you can try again to query Person instances according to its
 firstname, lastname or age:
 \verbsize \begin{verbatim}
-% eyedboql -U bill -P thekid -d foo -w
+% eyedboql -d foo -w
 ? select Person.firstname = "xx20";
-= bag(2628.2.201654:oid)
+= bag(23336.2.420154:oid)
 ? select Person.firstname = "xx10";
-= bag(2608.2.642448:oid)
+= bag(23316.2.824639:oid)
 \end{verbatim}
 \normalsize
 and you will notice that these operations are immediate.
 
 
-%Note that an index specification takes a different form according
-%to the type for which it is applicable:
-%\idt \texttt{index} : applicable to the types :
-%        \texttt{int, char, byte, float, int[n], byte[n], float[n]} 
-%\idt \texttt{index[]} : applicable to the types : \texttt{char[]} and \texttt{char[n]}
-\sect{Adding constraints}
+\subsect{Adding constraints}
+
 In the same way, you can add a \texttt{notnull} and an \texttt{unique} constraint
 on the \texttt{lastname} attribute within the class \texttt{Person}:
-\be
+\begin{itemize}
 \item add the constraint specification to the class \texttt{Person} within
 the \texttt{person.odl} file as follows:
 \verbsize \begin{verbatim}
@@ -744,7 +527,7 @@ class Person {
 \normalsize
 \item then, use the \texttt{eyedbodl} tool to update the database schema:
 \verbsize \begin{verbatim}
-% eyedbodl -U bill -P thekid -d foo -u --package=person person.odl
+% eyedbodl -d foo -u person.odl
 Updating 'person' schema in database foo...
 Creating [NULL] notnull_constraint 'constraint<notnull, propagate = on> on Person.lastname' on class 'Person'...
 Creating [NULL] unique_constraint 'constraint<unique, propagate = on> on Person.lastname' on class 'Person'...
@@ -752,21 +535,22 @@ Creating [NULL] unique_constraint 'constraint<unique, propagate = on> on Person.
 Done
 \end{verbatim}
 \normalsize
-\ee
+\end{itemize}
+
 Now try to create two person instances with the same \texttt{lastname} attribute:
 \verbsize \begin{verbatim}
-% eyedboql -U bill -P {bill password, i.e. 'thekid'} -d foo -w
-? Person(lastname : "curtis");
-= 6792.2.881020:oid
-? Person(lastname : "curtis");
-near line 3: 'Person()' => oql error: new operator <<new<oql\$db> Person()>> : notnull[] constraint error: attribute path 'Person.lastname'.
-\end{verbatim}
+% eyedboql -d foo -w
+? new Person(lastname : "curtis");
+= 79902.2.884935:oid
+? new Person(lastname : "curtis");
+near line 2: 'new Person(lastname : "curtis")' => oql error: new operator 'new<oql$db> Person(lastname:"curtis"); ' : unique[] constraint error: attribute path 'Person.lastname'.
+\end{verbatim} %$
 \normalsize
 or with no \texttt{lastname} attribute:
 \verbsize \begin{verbatim}
-? Person();
-near line 3: 'Person()' => oql error: new operator <<new<oql\$db> Person()>> : notnull[] constraint error: attribute path 'Person.lastname'.
-\end{verbatim}
+? new Person();
+near line 3: 'new Person()' => oql error: new operator 'new<oql$db> Person(); ' : notnull[] constraint error: attribute path 'Person.lastname'.
+\end{verbatim} %$
 \normalsize
 
 
