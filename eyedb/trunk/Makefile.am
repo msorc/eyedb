@@ -24,4 +24,8 @@ check-ascii:
 dist-hook: check-ascii
 
 doc-archive:
-	tar cvzf eyedb-doc-$(EYEDB_VERSION).tar.gz -C $(datadir)/doc eyedb
+	-rm -rf /var/tmp/eyedb-doc-$(EYEDB_VERSION)
+	cp -r $(datadir)/doc/eyedb /var/tmp/eyedb-doc-$(EYEDB_VERSION)
+	tar cvzf eyedb-doc-$(EYEDB_VERSION).tar.gz -C /var/tmp eyedb-doc-$(EYEDB_VERSION)
+	-rm -rf /var/tmp/eyedb-doc-$(EYEDB_VERSION)
+
