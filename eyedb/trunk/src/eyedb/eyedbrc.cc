@@ -317,8 +317,8 @@ main(int argc, char *argv[])
     if (sesslog.getStatus()) {
       if (cmd == Start)
 	return startServer(ac, av, smdport);
-      if (sesslog.getStatus()->getStatus() == IDB_SERVER_NOT_RUNNING) {
-	cerr << sesslog.getStatus()->getString() << endl;
+      if (sesslog.getStatus()->getStatus() == IDB_CONNECTION_LOG_FILE_ERROR) {
+	cerr << "No EyeDB Server is running on " << host << ":" << port << endl;
 	return 1;
       }
       sesslog.getStatus()->print();
