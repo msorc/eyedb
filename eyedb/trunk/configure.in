@@ -199,6 +199,9 @@ fi
 AC_PATH_PROG(DOXYGEN, doxygen)
 AM_CONDITIONAL(COND_DOXYGEN, test x"$DOXYGEN" != x)
 
+AC_PATH_PROG(JAVADOC, javadoc)
+AM_CONDITIONAL(COND_JAVADOC, test x"$JAVADOC" != x)
+
 AC_PATH_PROG(XSLTPROC, xsltproc)
 AM_CONDITIONAL(COND_XSLTPROC, test x"$XSLTPROC" != x)
 
@@ -262,6 +265,7 @@ Makefile
 doc/Makefile
 doc/doxygen/Makefile
 doc/doxygen/eyedb-doxygen.cfg
+doc/javadoc/Makefile
 doc/manpages/Makefile
 doc/manual/Makefile
 doc/manual/figures/Makefile
