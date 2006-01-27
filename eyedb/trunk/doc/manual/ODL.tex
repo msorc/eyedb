@@ -8,20 +8,21 @@
 \chapter*{The Object Definition Language}
 
 The \eyedb Object Definition Language (ODL) is a specification language
-to define the specifications of object types based on the ODMG ODL.\\
+to define the specifications of object types based on the ODMG ODL (but not compliant).\\
 ODL \footnote{ODL is used for shortness to denote \eyedb ODL} 
 is not intented to be a full programming language. It is
 a definition language for object specifications. Database management
 systems traditionaly provide facilities that support
 data definition (using a Data Definition Language (DDL)). The DDL allows
 users to define their data types and interfaces while the
-Data Manipulation Languages (DML) allows to create, delete, read update
+Data Manipulation Language (DML) allows to create, delete, read update
 instances of those data types.\\
 ODL is a DDL for objects types.
 If defines the characteristics of types, including their properties
 and operations.
-ODL defines only the signatures of operations and does not address
-definitions of the methods that implements those operations.
+ODL defines only the signatures of operations defined in C++ and does not
+address definitions of the methods that implements those operations.
+Operations defined in OQL can be defined in the ODL.
 \\
 ODL is intented to define object types that can be implemented
 in a variety of programming languages. Therefore, ODL is not tied
@@ -41,493 +42,312 @@ an object. In ODMG ODL, this property is tied to the type: all
 basic types and user defined \emph{struct} are literal while \emph{interface}s
 and \emph{class}es are objects.
 In \eyedb ODL, any type instance can be an object, even the basic types.
-\item at last, \eyedb ODL allows to specify whether a method is backend or frontend,
+\item at last, \eyedb ODL allows to specify whether a method is executed by the server or by the client,
 and whether it is a class or instance method.
 \ei
 
 \sect{The Language Specifications}
 
-To specify ODL we use the BNF notation with the following typographic
-conventions:
-\begin{list}{-}{{\itemsep 0mm}} %%{\parsep 0mm}}
-\item non terminal are in standard font and in lowcase.
-\item token are in {\bf bold} font, and surrounded with {\bf \texttt{<>}} if they
-denote a set of tokens.
-\item optional grammar symbols are surrounded with open and close brackets.
-\end{list}
-
-\sect{The Top Level ODL}
-The top-level BNF is a sequence of type specifications:
-\begin{tabbing}
-\grindent
-odl\_construct \> : odl\_construct type\_spec\\
-\> \texttt{|} \emph{empty token}
-\end{tabbing}
-
-\sect{Type Specification}
-
-A type is defined by specifying its class, union or enum in ODL.\\
-The characteristics of the type itself appears first, followed by
-lists that defined attributes, relationships and operations of its
-class.
-\begin{tabbing}
-\grindent
-type\_spec \> : type\_qualifier class\_spec {\bf \{} [class\_body] {\bf ;} {\bf \}} {\bf ;}\\
-type\_spec \> : {\bf enum} \ident [alias\_name] {\bf \{} enum\_body [{\bf ,}] {\bf \}}
-\end{tabbing}
-
-\subsect{The Type Qualifier}
-
-\begin{tabbing}
-\grindent
-type\_qualifier \> : {\bf class}\\
-\> \texttt{|} {\bf struct}\\
-\> \texttt{|} {\bf union}\\
-\> \texttt{|} {\bf interface}\\
-\> \texttt{|} {\bf superclass}\\
-\> \texttt{|} {\bf superstruct}
-\end{tabbing}
-A \emph{type\_spec} is denoted by a \emph{type\_qualifier} which must be one
-of the following tokens:\\
-\idt {\bf class} (equivalent to {\bf interface} and {\bf struct})\\
-\idt {\bf union} (\emph{not implemented in version \eyedbversion})\\
-\idt {\bf superclass} (equivalent to {\bf superstruct})
-
-\subsect{The Class Specification}
-
-\begin{tabbing}
-\grindent
-class\_spec \> : \ident [class\_impl] [alias\_name] [extends \ident]
-\end{tabbing}
-
-\subsect{The Alias Name}
-\begin{tabbing}
-\grindent
-alias\_name \> : {\bf [} \ident {\bf ]}
-\end{tabbing}
-
-\subsect{The Class Implementation}
-\begin{tabbing}
-\grindent
-class\_impl \> : {\bf ( implementation \texttt{<}} index\_spec {\bf \texttt{>})}
-\end{tabbing}
-
-\subsect{Examples}
-
-\begin{tabbing}
-{\bf cla}\={\bf ss} Person {\bf \{}\\
-\>\emph{[class\_body]}\\
-{\bf \}};\\
-\\
-{\bf class} Employee {\bf extends} Person {\bf \{}\\
-\>\emph{[class\_body]}\\
-{\bf \}};\\
-\\
-{\bf class} Employee {\bf :} Person {\bf \{}\\
-\>\emph{[class\_body]}\\
-{\bf \}};\\
-\\
-{\bf class} Slave [pp\_Slave] {\bf extends} Employee {\bf \{}\\
-\>\emph{[class\_body]}\\
-{\bf \}};\\
-\\
-{\bf class} Slave [slave\_class] [\~{ }100K] {\bf extends} Employee {\bf \{}\\
-\>\emph{[class\_body]}\\
-{\bf \}};\\
-\\
-{\bf enum} CivilState {\bf \{}\\
-\>\emph{[enum\_body]}\\
-{\bf \}};\\
-\\
-{\bf enum} CivilState [civil\_state] {\bf \{}\\
-\>\emph{[enum\_body]}\\
-{\bf \}};
-\end{tabbing}
-
-\sect{Class Body Specification}
-\begin{tabbing}
-\grindent
-class\_body \> : class\_body item\_dcl\\
-\> \texttt{|} item\_dcl\\
-\\
-item\_dcl \> : attr\_dcl\\
-\> \texttt{|} {\bf attribute} attr\_dcl\\
-\> \texttt{|} {\bf relship} attr\_dcl\\
-\> \texttt{|} attr\_hint\\
-\> \texttt{|} op\_dcl
-\end{tabbing}
-
-\sect{Attribute Specification}
-
-\begin{tabbing}
-\grindent
-attr\_dcl \> : \ident [ref] \ident [array] [inverse] {\bf ;}\\
-\> \texttt{|} coll\_spec [ref] \ident [array] [inverse] {\bf ;}
-\end{tabbing}
-
-\subsect{Reference Qualifier}
-\begin{tabbing}
-\grindent
-ref \> : {\bf *}\\
-\> \texttt{|} {\bf \&}
-\end{tabbing}
-The reference type qualifier denoted by {\bf *} or {\bf \&}, indicates that the
-attribute refers to an object in the database of the indicated type.
+The basic concept of the \eyedb object model is the class which, as in any
+traditionnal object model, modelize a set
+of objects of similar properties (attributes) and behaviors (methods).
+The attributes can be basic types, user types, references, arrays, collections.
+The methods can be defined in C++ or in OQL (Object Query Language).
 \\
 \\
-For instance the attribute field \emph{Person *spouse}, means that spouse
-is an object of type Person, while \emph{Address addr} means that addr
-is an attribute of type Address but not an object of the database: it is
-fully included in the structure Person.
+ODL allows one to specify classes, attributes, methods, triggers, constraints,
+enumerate types, indexes and implementation hints.
 \\
 \\
-The attribute \emph{spouse} is called an \underline{indirect attribute},
-while \emph{addr} is called an \underline{direct attribute}.
+We are going to introduced in details all the features of ODL.
+\subsect{Basic types}
+The basic types are as follows:\\\\
+\begin{tabular}{|p{2cm}|p{5cm}|}
+\hline
+byte & 1-byte integer \\
+\hline
+char & 1-byte character \\
+\hline
+short & 2-byte integer \\
+\hline
+int & 4-byte integer \\
+\hline
+long & 8-byte integer \\
+\hline
+double & 8-byte floating point \\
+\hline
+oid & 8-byte internal object identifier \\
+\hline
+enum & 4-byte integer \\
+\hline
+\end{tabular}
 \\
+For instance:
+\vspace{-0.2cm}
+\begin{verbatim}
+class C {
+  attribute byte b;
+  attribute char c;
+  attribute short s;
+  attribute int i;
+  attribute long l;
+  attribute double d;
+  attribute oid o;
+};
+\end{verbatim}
+Notes :
+\be
+\vspace{-0.2cm}
+\item The key word \texttt{attribute} is optional:
+\vspace{-0.2cm}
+\begin{verbatim}
+class C {
+  byte b;
+  char c;
+  // ...
+};
+\end{verbatim}
+\vspace{-0.2cm}
+is correct.
+\item The grammar does not allow one to gather several attributes on
+the same line declaration:
+\vspace{-0.2cm}
+\begin{verbatim}
+class C {
+  attribute char c1, c2, c3; // is NOT correct
+  // ...
+};
+\end{verbatim}
+\ee
+\subsect{Array types}
+The object model supports multi-dimensionnal fixed or variable size arrays
+of any type. For instance:
+\vspace{-0.2cm}
+\begin{verbatim}
+class C {
+  attribute byte b_a[4];      // fixed length mono-dimensionnal array
+  attribute char str[];       // variable size mono-dimensionnal array
+  attribute int i_a[3][4][8]; // multi-dimensionnal fixed size array
+  attribute long l_a[][4][8]; // multi-dimensionnal variable size array
+};
+\end{verbatim}
+%\vspace{-0.2cm}
+One particular interesting array type is the array of characters, which
+can be denoted as \texttt{string} as follows:
+\vspace{-0.2cm}
+\begin{verbatim}
+class C {
+  attribute string s;       // <=> char s[] (unlimited size string)
+  attribute string<32> bs;  // <=> char bs[32] (bounded string)
+};
+\end{verbatim}
+%\vspace{-0.2cm}
+Note that in a multi-dimensionnal array, only the extreme left dimension can be
+variable:
+\vspace{-0.2cm}
+\begin{verbatim}
+class C {
+  attribute long l_a1[][4][8]; // correct
+  attribute long l_a2[4][][8]; // NOT correct
+  attribute long l_a2[4][8][]; // NOT correct
+};
+\end{verbatim}
+\subsect{Literal and object types}
+Remember that each object in a set of \eyedb databases has an unique identifier called OID.
 \\
-Do not confuse the {\bf *} ODL meaning and the {\bf *} C/C++ meaning.
-\\
-\\
-In C/C++, the {\bf *} type modifier denotes an address to an area of the
+A literal attribute is an attribute fully included in the class and has
+no OID, while an object attribute denotes the reference
+to another object with an object identifier.
+A reference attribute is denoted by a \texttt{*} or a \texttt{\&} symbol.
+For instance:
+\vspace{-0.2cm}
+\begin{verbatim}
+class C1 {
+  attribute int i;
+};
+
+class C {
+  attribute C1  l_c1;  // literal attribute included in C
+  attribute C1 *o_c1;  // object attribute referenced by C (or &oc1_1)
+};
+\end{verbatim}
+Let \texttt{c} an instance of the class \texttt{C}.
+\bi
+\item \texttt{c} includes a literal of type \texttt{C1} through the attribute
+\texttt{l\_c1}
+\item \texttt{c} can reference an object of type \texttt{C1} through the attributes 
+\texttt{o\_c1}
+\item if \texttt{c} is removed from the database, the attribute \texttt{l\_c1}
+is removed at the same time, but the object denoted by \texttt{o\_c1} is
+not removed
+\ei
+\begin{tabular}{|p{16.8cm}|}
+\hline
+\vspace{0.1mm}
+Do not confuse the \texttt{*} ODL meaning and the \texttt{*} C/C++ meaning:
+in C/C++, the \texttt{*} type modifier denotes an address to an area of the
 indicated type instances: it is a pointer to an address. This pointer
 can be incremented and decremented to change its location in the area.
 \\
-In ODL, the {\bf *} denotes a reference to one and only one object, it is why
-the {\bf \&} token is also accepted, although the meaning of this token
+In ODL, the \texttt{*} denotes a reference to one and only one object, it is why
+the \texttt{\&} token is also accepted, although the meaning of this token
 is a little bit different in C++.
 \\
 \\
-So, in ODL the construct \emph{Person **x} makes no sense, in the same
-manner that the construct \emph{Person} \&\&\emph{x} makes no sense in C++.
+So, in ODL the construct \texttt{C1 **oc1} makes no sense, in the same
+manner that the construct \texttt{C1 \&\&oc1} makes no sense in C++.\\
+\hline
+\end{tabular}\\
+\\
+One can have arrays of litteral or object as follows:
+\vspace{-0.2cm}
+\begin{verbatim}
+class C {
+  attribute C1  l_c1_1[2];
+  attribute C1  l_c1_2[];
+  attribute C1  l_c1_3[][10][20];
+
+  attribute C1 *o_c1_1[4];
+  attribute C1 *o_c1_2[];
+  attribute C1 *o_c1_3[][4][5];
+};
+\end{verbatim}
+
+\subsect{Collection types}
+The \eyedb object model support three types of collections, set, bag and array. A fourth type, list, will be implemented in a further version:
+\bi
+\item a set an unordered collection of elements of the same type
+not allowing duplicate elements
+\item a bag a unordered collection of elements of the same type
+allowing duplicate elements
+\item an array an ordered collection of elements of the same type
+allowing duplicate elements
+\item a list (\emph{non yet implemented}) is an ordered collections of elements of
+the same type allowing duplicate elements
+and where element insertion and removal is
+efficiently implemented
+\ei
+An element may be of any type, literal or object and
+a collection attribute may be a literal or an object, and one can have
+arrays of collection, for instance:
+\vspace{-0.2cm}
+\begin{verbatim}
+class C {
+  attribute set<int>  i_lset;    // literal set of int
+  attribute set<C1>   l_c1_lset; // literal set of C1 literals
+  attribute set<C1 *> o_c1_lset; // literal set of C1 objects
+
+  attribute set<int>  *i_oset;    // object set of int
+  attribute set<C1>   *l_c1_oset; // object set of C1 literals
+  attribute set<C1 *> *o_c1_oset; // object set of C1 objects
+
+  attribute bag<C1 *> o_c1_lbag;  // literal bag of C1 objects
+
+  attribute array<C1 *> o_c1_larr;   // literal array of C1 objects
+  attribute bag<C1 *>   o_c1_lbag[]; // array of literal bag of C1 objects
+
+  // multi-dimensionnal array of literal bag of set of array of C1 objects
+  attribute bag<set<array<set<C1 *> > > > x[2][3][4]; 
+};
+\end{verbatim}
+The differences between an array collection (i.e.
+\texttt{array<}\emph{type}\texttt{>} and an attribute array (i.e. 
+\emph{type} \texttt{[]}) are:
+\bi
+\item a collection array may exists independently from any class as a
+an attribute array exists only within a class
+\item the implementation is very different:
+\bi
+\item one can have a big collection array (thousand or millions of elements)
+without loss of performance (if the collection is well parametered, see
+below)). Big attribute array are unefficient
+\item collection array can have ``holes'' without loss of performance, for instance an element at index 1 and another one at index 1000000 and nothing between. An attribute array with holes are unefficient as they are stored
+consecutively
+\item a collection array is heavier than an attribute array, and so is not
+recommended for little size
+\ei
+\ei
+
+\subsect{Inheritance}
+The object model support single inheritance using the keyword \texttt{extends}:
+\vspace{-0.2cm}
+\begin{verbatim}
+class C1 {
+  attribute string c1;
+};
+
+class C2 extends C1 {
+  attribute string c2;
+};
+
+class C3 extends C2 {
+  attribute string c3;
+};
+\end{verbatim}
+As in usual object conception, an object of class \texttt{C2} includes the two
+attributes \texttt{c1} and \texttt{c2} and an object of class \texttt{C3}
+includes the three attributes \texttt{c1}, \texttt{c2} and \texttt{c3}.
+\\
+\\
+In the following construct:
+%\vspace{-0.2cm}
+\begin{verbatim}
+class C4 {
+  attribute C1 *oc1;
+  attribute C2 *oc2;
+  attribute C3 *oc3;
+
+  attribute C1 lc1;
+  attribute C2 lc2;
+  attribute C3 lc3;
+};
+\end{verbatim}
+The attribute \texttt{oc1} may be of type \texttt{C1}, \texttt{C2} or
+\texttt{C3}.\\
+The attribute \texttt{oc2} may be of type \texttt{C2} or \texttt{C3}.\\
+The attribute \texttt{oc3} may be of type \texttt{C3} only.\\
+The attribute \texttt{lc1} is of type \texttt{C1}.\\
+The attribute \texttt{lc2} is of type \texttt{C2}.\\
+The attribute \texttt{lc3} is of type \texttt{C3}.
 
 
-\subsect{Array Qualifier}
-\begin{tabbing}
-\grindent
-array \> : {\bf [} [expr\_int] {\bf ]}\\
-\> \texttt{|} array {\bf [} [expr\_int] {\bf ]}
-\end{tabbing}
+\subsect{Constraints}
+The object model supports currently two declarative constraints: notnull
+and unique. The cardinality constraint on collection is partially
+implemented and is not currently supported.
+Non declarative constraints are defined using triggers (see below).
+For instance:
+\vspace{-0.2cm}
+\begin{verbatim}
+class C1 {
+  attribute string s1;
+  attribute string s2;
 
-\subsect{Collection Type Specification}
-\begin{tabbing}
-\grindent
-coll\_spec \> : \ident {\bf \texttt{<}} \ident {\bf [} expr\_int {\bf ]} {\bf \texttt{>}}\\
-\> \texttt{|} \ident {\bf \texttt{<}} \ident [ref] {\bf \texttt{>}}\\
-\> \texttt{|} \ident {\bf \texttt{<}} coll\_spec [ref] {\bf \texttt{>}}\\
-\> \texttt{|} \ident {\bf \texttt{<}} coll\_spec {\bf [} expr\_int {\bf ]} {\bf \texttt{>}}
-\end{tabbing}
+  constraint<notnull> on s1;
 
-\subsect{Attribute Hint Specification}
-\begin{tabbing}
-\grindent
-attr\_hint \> : index\\
-\> \texttt{|} notnull\\
-\> \texttt{|} implementation\\
-\> \texttt{|} card
-\end{tabbing}
+  constraint<notnull> on s2;
+  constraint<unique> on s2;
+};
+\end{verbatim}
 
-\subsect{Index Specification}
-\begin{tabbing}
-\grindent
-index \> : {\bf index on} attr\_path\\
-\> \texttt{|} {\bf index} {\bf \texttt{<}} index\_spec {\bf \texttt{>}} {\bf on} attr\_path\\
-\> \texttt{|} {\bf index} {\bf \texttt{<}} propagate {\bf \texttt{>}} {\bf on} attr\_path\\
-\> \texttt{|} {\bf index} {\bf \texttt{<}} index\_spec {\bf ,} propagate{\bf \texttt{>}} {\bf on} attr\_path\\
-\\
-index\_spec \> : {\bf btree} \\
-\> \texttt{|} {\bf hash}\\
-\> \texttt{|} {\bf type = btree}\\
-\> \texttt{|} {\bf type = hash}\\
-\> \texttt{|} {\bf hints =} hints\_spec\\
-\\
-hints\_spec \> : [{\bf key\_count = \texttt{<}integer\texttt{>};}]\\
-\>[{\bf initial\_size = \texttt{<}integer\texttt{>};}]\\
-\>[{\bf initial\_object\_count = \texttt{<}integer\texttt{>};}]\\
-\>[{\bf extend\_coef = \texttt{<}integer\texttt{>};}]\\
-\>[{\bf size\_max = \texttt{<}integer\texttt{>};}]\\
-\>[{\bf key\_function = \texttt{<}class\texttt{>}::\texttt{<}method\texttt{>};}]\\
-\>[{\bf dataspace = }\ident{\bf ;}]
-\end{tabbing}
+\subsect{Referential integrity}
 
-\subsect{Unique Specification}
-\begin{tabbing}
-\grindent
-unique \> : {\bf constraint \texttt{<} unique \texttt{>}}
-\end{tabbing}
+\subsect{Methodes}
+ C++
+ OQL
 
-\subsect{Notnull Specification}
-\begin{tabbing}
-\grindent
-notnull \> : {\bf constraint \texttt{<} notnull \texttt{>}}
-\end{tabbing}
+\subsect{Triggers}
 
-\subsect{Implementation Specification}
-\begin{tabbing}
-\grindent
-implementation \> : {\bf implementation} {\bf \texttt{<}} index\_spec {\bf \texttt{>}} {\bf on} attr\_path\\
-\>\texttt{|} {\bf implementation} {\bf \texttt{<}} propagate {\bf \texttt{>}} {\bf on} attr\_path\\
-\>\texttt{|} {\bf implementation} {\bf \texttt{<}} index\_spec {\bf, }propagate {\bf \texttt{>}} {\bf on} attr\_path
-\end{tabbing}
+\subsect{Indexes}
 
-\sect{Propagate Specification}
-\begin{tabbing}
-\grindent
-propagate \> : {\bf propagate} {\bf = on}\\
-\>\texttt{|} {\bf propagate} {\bf = off}
-\end{tabbing}
+\subsect{Advances features}
+  collection implementation
+  class implementation ??
+  index specification
+  name alias
+  quoted sequences
+  client methods
 
-\sect{Attribute Path Specification}
-\begin{tabbing}
-\grindent
-attr\_path \> : \ident\\
-\> \texttt{|} attr\_path {\bf .} \ident\\
-\> \texttt{|} \ident {\bf ::} \ident
-\end{tabbing}
-
-\sect{Inverse Specification}
-\begin{tabbing}
-\grindent
-inverse \> : {\bf inverse} \ident {\bf ::} \ident\\
-\> \texttt{|} {\bf inverse} \ident
-\end{tabbing}
-
-\sect{Operation Specification}
-\begin{tabbing}
-\grindent
-op\_dcl \> : trigger\_dcl {\bf ;}\\
-\> \texttt{|} method\_dcl {\bf ;}
-\end{tabbing}
-
-\sect{Method Specification}
-\begin{tabbing}
-\grindent
-method\_hints \> : {\bf method}\\
-\> \texttt{|} {\bf instmethod}\\
-\> \texttt{|} {\bf classmethod}\\
-\> \texttt{|} {\bf static}\\
-\\
-method\_dcl \> : method\_hints client\_server method\_dcl\_base {\bf extref} {\bf :} string\\
-\> \texttt{|} method\_hints client\_server method\_dcl\_base\\
-\> \texttt{|} method\_dcl\_base\\
-\\
-method\_dcl\_base \> : \ident ref \ident {\bf (} arg\_list {\bf )}\\
-\> \texttt{|} \ident \ident {\bf (} arg\_list {\bf )}\\
-\> \texttt{|} \ident {\bf [} {\bf ]} \ident {\bf (} arg\_list {\bf )}\\
-\> \texttt{|} \ident ref {\bf [} {\bf ]} \ident {\bf (} arg\_list {\bf )}\\
-\\
-client\_server \> : {\bf \texttt{<}} {\bf client} {\bf \texttt{>}}\\
-\> \texttt{|} {\bf \texttt{<}} {\bf server} {\bf \texttt{>}}\\
-\> \texttt{|}\\
-\\
-arg\_list \> : arg\_list {\bf ,} in\_out arg [\ident]\\
-\> \texttt{|} in\_out arg [\ident]\\
-\> \texttt{|}\\
-\\
-in\_out \> : {\bf in}\\
-\> \texttt{|} {\bf out}\\
-\> \texttt{|} {\bf inout}\\
-\\
-arg \> : \ident\\
-\> \texttt{|} \ident ref\\
-\> \texttt{|} \ident {\bf [} {\bf ]}\\
-\> \texttt{|} \ident ref {\bf [} {\bf ]}
-\end{tabbing}
-
-\sect{Trigger Specification}
-\begin{tabbing}
-\grindent
-trigger\_dcl \> : {\bf trigger} {\bf \texttt{<}} \ident {\bf \texttt{>}} \ident {\bf (} {\bf )}\\
-\> \texttt{|} {\bf trigger} \ident {\bf \texttt{<}} \ident {\bf \texttt{>}} {\bf (} {\bf )}
-\end{tabbing}
-
-\sect{Integer Expression}
-\begin{tabbing}
-\grindent
-expr\_int \> : expr\_int {\bf +} expr\_int\\
-\> \texttt{|} expr\_int {\bf -} expr\_int\\
-\> \texttt{|} expr\_int {\bf *} expr\_int\\
-\> \texttt{|} expr\_int {\bf /} expr\_int\\
-\> \texttt{|} expr\_int {\bf \texttt{<}\texttt{<}} expr\_int\\
-\> \texttt{|} expr\_int {\bf \texttt{>}\texttt{>}} expr\_int\\
-\> \texttt{|} expr\_int {\bf \%} expr\_int\\
-\> \texttt{|} expr\_int {\bf \texttt{|}} expr\_int\\
-\> \texttt{|} expr\_int {\bf \^{ }} expr\_int\\
-\> \texttt{|} expr\_int {\bf \&} expr\_int\\
-\> \texttt{|} {\bf \~{ }} expr\_int\\
-\> \texttt{|} {\bf !} expr\_int\\
-\> \texttt{|} {\bf -} expr\_int\\
-\> \texttt{|} {\bf (} expr\_int {\bf )}\\
-\> \texttt{|} {\bf \texttt{<}integer\texttt{>}}\\
-\> \texttt{|} {\bf \texttt{<}character\texttt{>}}
-\end{tabbing}
-
-\sect{String Specification}
-\begin{tabbing}
-\grindent
-string \> : string {\bf \texttt{<}string\texttt{>}}\\
-\> \texttt{|} {\bf \texttt{<}string\texttt{>}}
-\end{tabbing}
-
-\sect{Code Inclusion}
-\begin{tabbing}
-\grindent
-type\_spec \> : {\bf \texttt{<}quoted\_seq\texttt{>}}\\
-\\
-attr\_dcl \> : \texttt{|} {\bf \texttt{<}quoted\_seq\texttt{>}}
-\end{tabbing}
-\subsect{Examples}
-\begin{tabbing}
-cla\=ss \= Per\=son \{\\
-\>attribute int age;\\
-\>attribute char firstname[];\\
-\\
-\>void perform(in string, out float);\\
-\\
-\>{\bf \%C++\{}\\
-\>\>virtual int f(int a, float b);\\
-\>\>static int list\_count;\\
-\>\%{\bf \}}\\
-\\
-\>{\bf \%Java\{}\\
-\>\>int f(int a, float b) \{\\
-\>\>\>return a+(int)b;\\
-\>\>\}\\
-\>\>static int list\_count = 3;\\
-\>\%{\bf \}}\\
-\};
-\end{tabbing}
-\sect{The eyedbodl compiler}
-
-\begin{tabbing}
-eyedbodl \={\bf -gencode} C++ {\bf -package-name} \emph{package}\\
-         \>[{\bf -output-dir} \emph{dirname}] [{\bf -output-file-prefix} \emph{prefix}]\\
-         \>[{\bf -schema-name} \emph{schname}]\\
-         \>[{\bf -class-prefix} \emph{prefix}] [{\bf -db-class-prefix} \emph{dbprefix}\\
-         \>[{\bf -attr-style} implicit\texttt{|}explicit]\\
-         \>[{\bf -gen-class-stubs]} [{\bf -class-enums} yes\texttt{|}no]\\
-         \>[{\bf -c-suffix} \emph{suffix}] [{\bf -h-suffix} \emph{suffix}]\\
-         \>[{\bf -down-casting} yes\texttt{|}no] [{\bf -error-policy} status\texttt{|}exception]\\
-         \>[{\bf -attr-cache} yes\texttt{|}no] [{\bf -rootclass} \emph{rootclass}] [{\bf -no-rootclass}]\\
-         \>[{\bf -cpp} \emph{cpp}] [{\bf -cpp-flags} \emph{flags}] [{\bf -no-cpp]} \emph{odlfile}\texttt{|}{\bf -\texttt{|}-db} \emph{dbname}\\
-\\
-eyedbodl \>{\bf -gencode} Java {\bf -package-name} \emph{package}\\
-         \>[{\bf -output-dir} \emph{dirname}] [{\bf -output-file-prefix} \emph{prefix}]\\
-         \>[{\bf -schema-name} \emph{schname}]\\
-         \>[{\bf -class-prefix} \emph{prefix}] [{\bf -db-class-prefix} \emph{dbprefix}\\
-         \>[{\bf -attr-style} implicit\texttt{|}explicit]\\
-         \>[{\bf -down-casting} yes\texttt{|}no] [{\bf -error-policy} status\texttt{|}exception]\\
-         \>[{\bf -cpp} \emph{cpp}] [{\bf -cpp-flags} \emph{flags}] [{\bf -no-cpp]} \emph{odlfile}\texttt{|}{\bf -\texttt{|}-db} \emph{dbname}\\
-\\
-eyedbodl \>{\bf -gencode} CORBA\texttt{|}IDL {\bf -package-name} \emph{package} {\bf -idl-module} \emph{module}\\
-         \>[{\bf -imdl} \emph{imdlfile}] [{\bf -output-dir} \emph{dirname}] [{\bf -no-generic-idl}]\\
-         \>[{\bf -generic-idl} \emph{idlfile}] [{\bf -class-prefix} \emph{prefix}]\\
-         \>[{\bf -no-factory]} [{\bf -sync} yes\texttt{|}no] [{\bf -comments} yes\texttt{|}no]\\
-         \>[{\bf -cpp} \emph{cpp}] [{\bf -cpp-flags} \emph{flags}] [{\bf -no-cpp]} \emph{odlfile}\texttt{|}{\bf -\texttt{|}-db} \emph{dbname}\\
-\\
-eyedbodl \>{\bf -gencode} ODL {\bf -db} \emph{dbname} [{\bf -o} \emph{odlfile}]\\
-\\
-eyedbodl \>{\bf -diff} {\bf -db} \emph{dbname}\\
-         \>[{\bf -cpp} \emph{cpp}] [{\bf -cpp-flags} \emph{flags}] [{\bf -no-cpp]} \emph{odlfile}\texttt{|}{\bf -}\\
-\\
-eyedbodl \>{\bf -update} {\bf -db} \emph{dbname} {\bf -package-name} \emph{package}\\
-         \>[{\bf -db-class-prefix} \emph{dbprefix}] [{\bf -admin}]\\
-         \>[{\bf -schema-name} \emph{schname}] \emph{odlfile}\texttt{|}{\bf -}\\
-\\
-eyedbodl \>{\bf -checkfile} \emph{odlfile}\texttt{|}{\bf -}\\
-\\
-eyedbodl \>{\bf -help}
-\end{tabbing}
-\begin{tabbing}
-%%{\bf -gencode} C++xxxxxxxxxxxxxxxxx\= : \=generates C++ code\kill
-one must specify one and only one\= of \=the following major options:\\
-{\bf -gencode} C++                 \>: generates C++ code\\
-{\bf -gencode} Java                \>: generates Java code\\
-{\bf -gencode} CORBA               \>: generates CORBA code (IDL and C++ stubs)\\
-{\bf -gencode} IDL                 \>: generates IDL\\
-{\bf -gencode} ODL                 \>: generates ODL\\
-{\bf -update}                      \>: updates schema in database \emph{dbname}\\
-{\bf -diff}                        \>: displays the differences between\\
-                             \>\> a database schema and an odl file\\
-{\bf -checkfile}                   \>: check input ODL file\\
-{\bf -help}                        \>: displays the current information\\
-\\
-the following options must be added to the {\bf -gencode} C++ or Java option:\\
-{\bf -package-name} \emph{package}      \>: package name\\
-\emph{odlfile}\texttt{|}{\bf -\texttt{|}-db} \emph{dbname} \>: input ODL file ({\bf -} is the standard input) or\\
-                             \>\> the database which contains the schema\\
-\\
-the following options can be added to the {\bf -gencode} C++ or Java option:\\
-{\bf -output-dir} \emph{dirname}        \>: output directory for generated files\\
-{\bf -output-file-prefix} \emph{prefix} \>: ouput file prefix (default is the package name)\\
-{\bf -class-prefix} \emph{prefix}       \>: prefix to be put at the begining of each runtime class\\
-{\bf -db-class-prefix} \emph{prefix}    \>: prefix to be put at the begining of each database class\\
-{\bf -attr-style} implicit         \>: attribute methods have the attribute name\\
-{\bf -attr-style} explicit         \>: attribute methods have the attribute name\\
-                             \>\> prefixed by get/set (default)\\
-{\bf -schema-name} \emph{schname}   \>: schema name (default is \emph{package})\\
-{\bf -down-casting} yes            \>: generates the down casting methods (the default)\\
-{\bf -down-casting} no             \>: does not generate the down casting methods\\
-{\bf -attr-cache} yes              \>: generates attribute cache instance variable\\
-{\bf -attr-cache} no               \>: does not generate attribute cache instance variable\\
-\>\> (the default)\\
-\\
-for the {\bf -gencode} C++ option only:\\
-{\bf -c-suffix} \emph{suffix}           \>: use \emph{suffix} as the C file suffix\\
-{\bf -h-suffix} \emph{suffix}           \>: use \emph{suffix} as the H file suffix\\
-{\bf -gen-class-stubs}             \>: generates a file class\_stubs.h for each class\\
-{\bf -class-enums} yes             \>: generates enums within a class\\
-{\bf -class-enums} no              \>: do not generate enums within a class (default)\\
-{\bf -error-policy} status         \>: status oriented error policy (the default)\\
-{\bf -error-policy} exception      \>: exception oriented error policy\\
-{\bf -rootclass} \emph{rootclass}    \>: use \emph{rootclass} name for the root class instead\\
-                             \>\>  of the package name.\\
-{\bf -no-rootclass}                \>: does not use any root class\\
-\\
-the following options must be added to the {\bf -gencode} CORBA or IDL option:\\
-{\bf -package-name} \emph{package}      \>: package name\\
-{\bf -idl-module} \emph{module}         \>: the IDL module name\\
-\\
-one of the following options must be added to the {\bf -gencode} CORBA option:\\
-\emph{odlfile}\texttt{|}{\bf -\texttt{|}-db} \emph{dbname} \>: input ODL file ({\bf -} is the standard input) or\\
-                             \>\>the database which contains the schema\\
-\\
-the following options can be added to the {\bf -gencode} CORBA or IDL option:\\
-{\bf -output-dir} \emph{dirname}        \>: output directory for generated files\\
-{\bf -imdl} \emph{imdlfile}\texttt{|}{\bf -}           \>: IMDL file ({\bf -} is the standard input)\\
-{\bf -no-generic-idl}              \>: the EyeDB generic IDL file eyedb.idl will not\\
-                             \>\>  be automatically included in the IDML file\\
-{\bf -generic-idl} \emph{idlfile}       \>: give the location of the EyeDB generic IDL file eyedb.idl\\
-{\bf -no-factory}                  \>: the factory interface will not be generated\\
-{\bf -sync} yes\texttt{|}no                 \>: the backend runtime objects will be synchronized\\
-                             \>\>  (yes: the default), or not synchronized (no)\\
-                             \>\>  with the database.\\
-{\bf -comments} yes\texttt{|}no             \>: does (yes) or does not (no) generate mapping\\
-                              \>\>comments in the IDL\\
-\\
-the following option must be added to the {\bf -update} option:\\
-{\bf -db} \emph{dbname}                 \>: the database for which operation is performed\\
-\emph{odlfile}\texttt{|}{\bf -}                  \>: input ODL file ({\bf -} is the standard input)\\
-\\
-the following options can be added to the {\bf -update} option:\\
-{\bf -schema-name} \emph{schname}       \>: schema name (default is package)\\
-{\bf -db-class-prefix} \emph{prefix}    \>: prefix to be put at the begining of each database class\\
-{\bf -admin}                       \>: opens the database in admin mode.\\
-\\
-the following options must be added to the {\bf -diff} option:\\
-{\bf -db} \emph{dbname}                 \>: the database for which the schema\\
-                             \>\>  difference is performed\\
-\emph{odlfile}                    \>: the input ODL file for which the schema\\
-                               difference is performed\\
-\\
-the following option must be added to the {\bf -checkfile} option:\\
-\emph{odlfile}\texttt{|}{\bf -}                  \>: input ODL file ({\bf -} is the standard input)\\
-\\
-the following options can be added when an \emph{odlfile} is set:\\
-{\bf -cpp} \emph{cpp}                   \>: uses \emph{cpp} preprocessor instead of\\
-                             \>\> the default one\\
-{\bf -cpp-flags} \emph{cpp{\bf -flags}}       \>: adds \emph{cpp{\bf -flags}} to the preprocessing command\\
-{\bf -no-cpp}                      \>: does not use any preprocessor.
-\end{tabbing}
-
+\sect{Concrete examples}
 
 \end{document}
