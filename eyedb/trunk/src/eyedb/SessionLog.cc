@@ -311,22 +311,28 @@ namespace eyedb {
 
     if (create)
       fd = open(files[0], O_CREAT | O_TRUNC | O_RDWR,
-		0600 /*SE_DEFAULT_CREATION_MODE*/);
+		0644 /*SE_DEFAULT_CREATION_MODE*/);
     else {
-      if (access(files[0], F_OK) < 0)
+      if (access(files[0], F_OK) < 0) {
+	return Exception::make(IDB_SERVER_NOT_RUNNING,
+			       "No EyeDB Server is running on %s:%s",
+			       host, port);
+	/*
 	return Exception::make(IDB_ERROR,
-			       "cannot access connection log file '%s'",
+			       "cannot access connection file '%s'",
 			       files[0]);
+	*/
+      }
       if (access(files[0], R_OK) < 0)
 	return Exception::make(IDB_ERROR,
-			       "cannot open connection log file '%s' "
+			       "cannot open connection file '%s' "
 			       "for reading", files[0]);
       fd = open(files[0], O_RDWR);
     }
     
     if (fd < 0 && create)
       return Exception::make(err,
-			     "cannot %s connection log file '%s'",
+			     "cannot %s connection file '%s'",
 			     (create ? "create" :
 			      "open"), files[0]);
     if (fd < 0)
@@ -336,7 +342,7 @@ namespace eyedb {
     if (create && ftruncate(fd, CONNLOG_SIZE) < 0) {
       close(fd);
       return Exception::make(err,
-			     "cannot create connection log file '%s'", files[0]);
+			     "cannot create connection file '%s'", files[0]);
     }
 
     if (!(m_connlog = m_mmap(0, CONNLOG_SIZE, PROT_READ|PROT_WRITE,
@@ -344,7 +350,7 @@ namespace eyedb {
 			     files[0], 0, 0))) {
       close(fd);
       return Exception::make(err,
-			     "cannot map connection log file '%s' for size %d",
+			     "cannot map connection file '%s' for size %d",
 			     files[0], CONNLOG_SIZE);
     }
     
@@ -377,7 +383,7 @@ namespace eyedb {
 
     if (!xm_connlog)
       return Exception::make(err,
-			     "cannot map connection log file '%s' for size %d",
+			     "cannot map connection file '%s' for size %d",
 			     files[0], CONNLOG_SIZE);
     return Success;
   }
@@ -393,7 +399,7 @@ namespace eyedb {
 
     if (!conninfo)
       return Exception::make(IDB_SESSION_LOG_NO_SPACE_LEFT,
-			     "no space left on connection log file");
+			     "no space left on connection file");
 
     memset(conninfo, 0, sizeof(*conninfo));
 
