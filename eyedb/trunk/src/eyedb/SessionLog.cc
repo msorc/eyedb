@@ -314,17 +314,12 @@ namespace eyedb {
 		0644 /*SE_DEFAULT_CREATION_MODE*/);
     else {
       if (access(files[0], F_OK) < 0) {
-	return Exception::make(IDB_SERVER_NOT_RUNNING,
-			       "No EyeDB Server is running on %s:%s",
-			       host, port);
-	/*
-	return Exception::make(IDB_ERROR,
+	return Exception::make(IDB_CONNECTION_LOG_FILE_ERROR,
 			       "cannot access connection file '%s'",
 			       files[0]);
-	*/
       }
       if (access(files[0], R_OK) < 0)
-	return Exception::make(IDB_ERROR,
+	return Exception::make(IDB_CONNECTION_LOG_FILE_ERROR,
 			       "cannot open connection file '%s' "
 			       "for reading", files[0]);
       fd = open(files[0], O_RDWR);

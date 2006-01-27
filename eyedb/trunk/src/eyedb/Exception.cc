@@ -90,6 +90,8 @@ statusDesc[ST].desc = MSG
 	MAKE_DESC(IDB_NOT_YET_IMPLEMENTED, "feature not yet implemented");
 	MAKE_DESC(IDB_INTERNAL_ERROR, "eyedb internal error");
 	MAKE_DESC(IDB_EXIT_CALLED, "exit function has been called");
+	MAKE_DESC(IDB_SERVER_NOT_RUNNING, "eyedb server is not running");
+	MAKE_DESC(IDB_CONNECTION_LOG_FILE_ERROR, "cannot access connection log file");
 	MAKE_DESC(IDB_INTERNAL_BUG, "eyedb internal bug");
 	MAKE_DESC(IDB_CONNECTION_FAILURE, "connection failure");
 	MAKE_DESC(IDB_SERVER_FAILURE, "server failure");
