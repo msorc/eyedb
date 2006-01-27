@@ -6,13 +6,10 @@
 \tableofcontents
 %\listoftables
 
-\newcommand{\EYEDBARCH}{\emph{eyedbtop}/\texttt{eyedb-V\eyedbversion}/\emph{archdir}}
-
 \chapter*{Getting Started}
 
 
-
-We will introduce \eyedb by working through some simple administration
+We will introduce \eyedb by going through some simple administration
 operations such as adding a user, creating a database, and through
 a simple example of defining an ODL schema, and then writing a C++
 client program.
@@ -32,6 +29,7 @@ for you an \eyedb user that has the \emph{database creation} system privilege.
 Then you can jump directly to the section
 \emph{Using the default configuration} and then to the section
 \emph{Creating a database using a specific user}.
+
 
 \sect{The Distribution}
 
@@ -112,7 +110,7 @@ Two questions:
 \end{enumerate}
 
 The answer to the first question is very simple: because the default
-configuration file is{\EYEDBARCH}\texttt{/etc/ArchConfig}
+configuration file is{EYEDBARCH}\texttt{/etc/ArchConfig}
 which includes the following lines:
 \verbsize \begin{verbatim}
 #
@@ -1087,7 +1085,7 @@ If \texttt{p} is not null, we can use all the \texttt{Person} methods as follows
 \normalsize
 
 To have more information about the C++ binding, please refer to the
-appriopriate manual.
+\eyedb C++ binding manual.
 
 
 \sect{Using the Java Binding}
@@ -1096,23 +1094,47 @@ Although the C++ binding is more complete than the Java binding
 - essentially according to the administrative operations - the Java
 bindings allow to manipulate data without limitations.
 
-Using the Java binding is very similar to the C++ binding. The Java code is 
-generated from the ODL schema definition using for instance the following command, to generate
-code for the \texttt{person} schema that we have already used:
+Using the Java binding is very similar to the C++ binding. Writing a
+Java program that can create, retrieve, modify and delete person
+instances that are stored in an \eyedb database involves the following
+steps:
+\begin{enumerate}
+\item generates the specific \texttt{Person} binding using the \texttt{eyedbodl} tool
+\item write the Java client program
+\item compile the generated binding and the client program
+\end{enumerate}
+
+This example is located in the \texttt{examples/GettingStarted} subdirectory.
+
+
+\subsect{Generating the Java code}
+
+The Java code is generated from the ODL schema definition using the following command:
 \verbsize \begin{verbatim}
 % eyedbodl --gencode=Java --package=person person.odl
 \end{verbatim}
 \normalsize
+The \texttt{--package} option is mandatory: this name will be used as the name of the Java package to which all generated Java classes will belong.
+
 This command will generate a number of Java file in subdirectory \texttt{person/},
 each generated file containing a Java class having the same name.
 
-The Java binding support both the standalone applications and the applets.
+If you have a look to the files in sub-directory \texttt{person},
+you will notice that the following classes have been generated:
+\begin{enumerate}
+\item the class \texttt{Address}
+\item the class \texttt{Database}
+\item the class \texttt{Employee}
+\item the class \texttt{Person}
+\item the class \texttt{set\_class\_Person\_ref}
+\end{enumerate}
 
-To compile the Java code, you will need to pass to the Java compiler a \texttt{classpath}
-that contains \texttt{eyedb.jar}, located in directory \texttt{<<libdir>>/eyedb/java/} where
-libdir is the library directory, usually \texttt{/usr/lib}.
 
-Here is a simple example which show how to:
+
+\subsect{A minimal client program}
+
+We are now going to write a minimal client program which will perform
+the following operations:
 \begin{enumerate}
 \item initialize the \eyedb and \texttt{person} packages
 \item connect to the \eyedb server
@@ -1120,9 +1142,7 @@ Here is a simple example which show how to:
 \item creates two person instances and mary them
 \end{enumerate}
 
-This example is located in the \texttt{examples/GettingStarted} subdirectory.
-
-
+Here is the code for this minimal client:
 \verbsize \begin{verbatim}
 //
 // Persontest.java
@@ -1186,6 +1206,50 @@ class PersonTest {
 }
 \end{verbatim}
 \normalsize
+
+To use this client, you must first compile it using a standard Makefile, as follows 
+(replace \texttt{<<datadir>>} with the data directory, usually /usr/share):
+\verbsize \begin{verbatim}
+include <<datadir>>/eyedb/Makefile.eyedb
+
+all: PersonTest.class
+
+person/Database.java: schema.odl
+	$(EYEDB_ODL) --gencode=Java --package=person --output-dir=person $<
+
+PersonTest.class: PersonTest.java person/Database.java
+	CLASSPATH=$(EYEDB_CLASSPATH):. javac *.java person/*.java
+\end{verbatim} %%$ 
+\normalsize 
+
+Once compiled, you can execute the program as follows:
+\verbsize \begin{verbatim}
+% CLASSPATH=. eyedbjrun PersonTest person_g
+\end{verbatim}
+\normalsize
+
+The \texttt{eyedbjrun} script is a helper script that wraps the call to the Java 
+virtual machine with an appropriate CLASSPATH environment variable containing the path to \texttt{eyedb.jar} and passes the necessary options to the \texttt{PersonTest} class.
+
+A few remarks about the Java code:
+\begin{itemize}
+\item all operations - setting, getting attributes, storing, querying instances
+in a database - must be performed within a transaction.
+A transaction is initiated using the \texttt{Database::transactionBegin}
+method and is committed (resp. aborted) using the
+\texttt{Database::transactionCommit}
+(resp. \texttt{Database::transactionAbort}) method.
+\item to store any instance in the database, you need to call the 
+emph{store} (or \texttt{realize}) method on this instance.
+In our case, we use the argument \texttt{FullRecurs} indicating that
+we want all related instances (through relationship or indirect
+attribute) to be stored in the database.
+\end{itemize}
+
+The Java binding support both the standalone applications and the applets.
+
+To have more information about the Java binding, please refer to the
+\eyedb Java binding manual.
 
 
 \sect{Learning more about \eyedb}
