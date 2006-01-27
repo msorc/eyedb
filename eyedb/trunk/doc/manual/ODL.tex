@@ -1024,17 +1024,30 @@ class Db {
 \end{verbatim}
 \newpage
 \subsect{The eyedbodl usage}
+The usage of the eyedbodl is as follows:
 \begin{verbatim}
-Usage:
-eyedbodl --gencode=C++ [--package=<package>] [--output-dir=<dirname>] [--output-file-prefix=<prefix>] [--schema-name=<schname>] [--namespace=<namespace>] [--class-prefix=<prefix>] [--db-class-prefix=<dbprefix>] [--attr-style=implicit|explicit] [--dynamic-attr] [--gen-class-stubs] [--class-enums=yes|no] [--c-suffix=<suffix>] [--h-suffix=<suffix>] [--export] [--down-casting=yes|no] [--gencode-error-policy=status|exception] [--attr-cache=yes|no} [--rootclass=<rootclass>] [--no-rootclass] [--cpp=<cpp>] [--cpp-flags=<flags>] [--no-cpp] <odlfile>|-|-d <dbname>|--database=<dbname> [<openflags>]
+eyedbodl --gencode=C++ [--package=<package>] [--output-dir=<dirname>] [--output-file-prefix=<prefix>]
+         [--schema-name=<schname>] [--namespace=<namespace>] [--class-prefix=<prefix>]
+         [--db-class-prefix=<dbprefix>] [--attr-style=implicit|explicit] [--dynamic-attr]
+         [--gen-class-stubs] [--class-enums=yes|no] [--c-suffix=<suffix>] [--h-suffix=<suffix>]
+         [--export] [--down-casting=yes|no] [--gencode-error-policy=status|exception] [--attr-cache=yes|no]
+         [--rootclass=<rootclass>] [--no-rootclass] [--cpp=<cpp>] [--cpp-flags=<flags>]
+         [--no-cpp] <odlfile>|-|-d <dbname>|--database=<dbname> [<openflags>]
 
-eyedbodl --gencode=Java --package=<package> [--output-dir=<dirname>] [--output-file-prefix=<prefix>] [--schema-name=<schname>] [--class-prefix=<prefix>] [--db-class-prefix=<dbprefix>] [--attr-style=implicit|explicit] [--dynamic-attr] [--down-casting=yes|no] [--gencode-error-policy=status|exception] [--cpp=<cpp>] [--cpp-flags=<flags>] [--no-cpp] <odlfile>|-|-d <dbname>|--database=<dbname> [<openflags>]
+eyedbodl --gencode=Java --package=<package> [--output-dir=<dirname>] [--output-file-prefix=<prefix>]
+         [--schema-name=<schname>] [--class-prefix=<prefix>] [--db-class-prefix=<dbprefix>]
+         [--attr-style=implicit|explicit] [--dynamic-attr] [--down-casting=yes|no]
+         [--gencode-error-policy=status|exception] [--cpp=<cpp>] [--cpp-flags=<flags>]
+         [--no-cpp] <odlfile>|-|-d <dbname>|--database=<dbname> [<openflags>]
 
 eyedbodl --gencode=ODL -d <dbname>|--database=<dbname> [--system-class]
- [-o <odlfile>] [<openflags>]
-eyedbodl --diff -d <dbname>|--database=<dbname> [--system-class] [<openflags>] [--cpp=<cpp>] [--cpp-flags=<flags>] [--no-cpp] <odlfile>|-
+         [-o <odlfile>] [<openflags>]
+eyedbodl --diff -d <dbname>|--database=<dbname> [--system-class] [<openflags>] [--cpp=<cpp>]
+         [--cpp-flags=<flags>] [--no-cpp] <odlfile>|-
 
-eyedbodl -u|-update -d <dbname>|--database=<dbname> [--db-class-prefix=<dbprefix>] [<openflags>] [--schema-name=<schname>] [--rmv-undef-attrcomp=yes|no] [--update-index=yes|no] [--cpp=<cpp>] [--cpp-flags=<flags>] [--no-cpp] [--rmcls={<class>}] [--rmsch] [<odlfile>|-]
+eyedbodl -u|-update -d <dbname>|--database=<dbname> [--db-class-prefix=<dbprefix>] [<openflags>]
+         [--schema-name=<schname>] [--rmv-undef-attrcomp=yes|no] [--update-index=yes|no]
+         [--cpp=<cpp>] [--cpp-flags=<flags>] [--no-cpp] [--rmcls={<class>}] [--rmsch] [<odlfile>|-]
 
 eyedbodl --checkfile <odlfile>|-
 
@@ -1090,8 +1103,10 @@ The following options can be added to the --update|-u option:
 <odlfile>|-                   Input ODL file or '-' (standard input)
 --schema-name=<schname>       Schema name (default is package)
 --db-class-prefix=<prefix>    Prefix to be put at the begining of each database class
---rmv-undef-attrcomp=yes|no   Removes (yes) or not (no) the undefined attribute components (constraint, index and implementation). Default is no
---update-index=yes|no         Updates (yes) or not (no) the index with a different implementation in the DB. Default is no
+--rmv-undef-attrcomp=yes|no   Removes (yes) or not (no) the undefined attribute components
+                              (constraint, index and implementation). Default is no
+--update-index=yes|no         Updates (yes) or not (no) the index with a different
+                              implementation in the DB. Default is no
 --rmcls={<class>}             Removes the given class list
 --rmsch                       Removes the entire schema
 

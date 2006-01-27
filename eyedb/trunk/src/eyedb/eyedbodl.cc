@@ -66,7 +66,7 @@ usage(const char *msg = 0, const char *etc = 0)
 
   fprintf(stderr, "%s[--down-casting=yes|no] [--gencode-error-policy=status|exception]%s",
 	  sp, nl);
-  fprintf(stderr, "%s[--attr-cache=yes|no} [--rootclass=<rootclass>] [--no-rootclass]%s", sp, nl);
+  fprintf(stderr, "%s[--attr-cache=yes|no] [--rootclass=<rootclass>] [--no-rootclass]%s", sp, nl);
   fprintf(stderr, "%s[--cpp=<cpp>] [--cpp-flags=<flags>] [--no-cpp]%s%s<odlfile>|-|-d <dbname>|--database=<dbname> [<openflags>]\n", sp, nl, sp);
 
  
@@ -92,7 +92,7 @@ usage(const char *msg = 0, const char *etc = 0)
   fprintf(stderr, "%s[--cpp <cpp] [--cpp-flags <flags] [--no-cpp] <odlfile>|-|-d <dbname>|--database=<dbname> [<openflags>]\n", sp);
 #endif
 
-  fprintf(stderr, "\n%s--gencode=ODL -d <dbname>|--database=<dbname> [--system-class]\n%s[-o <odlfile>] [<openflags>]%s", us, sp, nl);
+  fprintf(stderr, "\n%s--gencode=ODL -d <dbname>|--database=<dbname> [--system-class] [-o <odlfile>] [<openflags>]%s", us, nl);
   fprintf(stderr, "\n%s--diff -d <dbname>|--database=<dbname> [--system-class] [<openflags>]%s", us, nl);
   fprintf(stderr, "%s[--cpp=<cpp>] [--cpp-flags=<flags>] [--no-cpp] <odlfile>|-\n",
 	  sp);
