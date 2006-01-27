@@ -347,7 +347,7 @@ of C objects.\\
 The attribute \texttt{s3} is unique in the collection
 of C objects.
 \subsubsect{Constraint and inheritance propagation}
-By default, constraints are propagated on subclasses, let \texttt{C2}
+By default, constraints are propagated to subclasses, let \texttt{C2}
 a subclass of \texttt{C}:
 \vspace{-0.2cm}
 \begin{verbatim}
@@ -496,10 +496,110 @@ class B {
 \end{verbatim}
 
 \subsect{Methodes}
- C++
- OQL
+In ODL, one can declared the signature of C++ and OQL methods
+and one can defined the body of OQL methods.
+By default, a method is executed on the server side.
+\\
+A method argument can be any basic type, reference on a composite type or
+mono-dimensionnal array of basic or composite type. An argument
+can be \texttt{in}, \texttt{out} or \texttt{inout}.
+Argument may be named or unnamed (only type is given), for instance:
+\vspace{-0.2cm}
+\begin{verbatim}
+class C1 {
+  attribute string c1;
+};
+
+class C2 {
+  attribute string c2;
+  int perform(in int size, in string str, out double, in C1 &, inout C2 &);
+};
+\end{verbatim}
+Note that the \texttt{\&} symbol may be replaced by the \texttt{*} symbol
+or no symbol as anyhow only a persistent object (not a litteral) may
+be passed to a method call.
+\\
+\\
+The \texttt{C::perform} method must be defined in C++ but may be called
+from OQL or a C++ client. To define a C++ method, refer to the
+document \emph{C++ Binding}.
+\\
+\\
+Methods can be overloaded (same name but different signatures), for instance:
+\vspace{-0.2cm}
+\begin{verbatim}
+class C2 {
+  attribute string c2;
+  int perform(in int size, in string str, out double, in C1 &, inout C2 &);
+  int perform(in double, out string mystr);
+};
+\end{verbatim}
+One can defined OQL methods in ODL. In this case, the name of the
+arguments must be given:
+\vspace{-0.2cm}
+\begin{verbatim}
+class C2 {
+  attribute string c2;
+  int append(in string s) %oql{
+    this.s2 += s;
+    return strlen(this.s);
+  %}
+};
+\end{verbatim}
+The OQL \texttt{this} variable denotes the calling instance.
+\\
+\\
+A method can be an instance method (the default) or a class method (equivalent
+to C++ or Java static methods). To defined a class method, there are
+two constructs, using the keyword \texttt{static} or \texttt{classmethod}:
+\vspace{-0.2cm}
+\begin{verbatim}
+class C {
+  static int perform1(in string); // or
+  classmethod int perform2(in string);
+
+  instmethod int perform3(in string); // <=> int perform3(in string)
+};
+\end{verbatim}
+If you want to execute a method on the client side, you must
+use the keyword \texttt{client} as follows:
+\vspace{-0.2cm}
+\begin{verbatim}
+class C {
+  instmethod<client> int perform1(in string);
+  classmethod<client> int perform2(in string);
+
+  instmethod<server> int perform3(in string);  // <=> int perform3(...)
+  classmethod<server> int perform4(in string); // <=> classmethod perform3(...)
+};
+\end{verbatim}
 
 \subsect{Triggers}
+Triggers are server methods which are executed when a particular
+event occurs on an object: before or after creation, update, load or delete.
+\\
+Like methods, a trigger can be written in C++ or in OQL. On the other
+hand a trigger has no argument but has a name;
+\vspace{-0.2cm}
+\begin{verbatim}
+class C {
+   attribute string s;
+   trigger<create_before> c_b();
+   trigger<create_after> c_a();
+
+   trigger<update_before> u_b();
+   trigger<update_after> u_a();
+
+   trigger<load_before> l_a();
+   trigger<load_after> l_b();
+
+   trigger<remove_before> r_b();
+   trigger<remove_after> r_a();
+
+   trigger<create_before> c_b2(); // one can have several create_before triggers
+};
+\end{verbatim}
+
 
 \subsect{Indexes}
 
