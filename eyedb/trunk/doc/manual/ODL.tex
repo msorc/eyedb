@@ -316,21 +316,184 @@ The object model supports currently two declarative constraints: notnull
 and unique. The cardinality constraint on collection is partially
 implemented and is not currently supported.
 Non declarative constraints are defined using triggers (see below).
+\\
+\\
+Note that:
+\bi
+\item unique constraint cannot be defined on several attributes and
+\item unique constraint on an attribute needs an index. The index is not
+automatically created, it must be defined in the ODL (see below)
+or outside using the \texttt{idxcreate} tool.
+\ei
 For instance:
 \vspace{-0.2cm}
 \begin{verbatim}
-class C1 {
+class C {
   attribute string s1;
   attribute string s2;
+  attribute string s3;
 
   constraint<notnull> on s1;
 
   constraint<notnull> on s2;
   constraint<unique> on s2;
+
+  constraint<unique> on s3;
+};
+\end{verbatim}
+The attribute \texttt{s1} must not be null.\\
+The attribute \texttt{s2} must not be null and is unique in the collection
+of C objects.\\
+The attribute \texttt{s3} is unique in the collection
+of C objects.
+\subsubsect{Constraint and inheritance propagation}
+By default, constraints are propagated on subclasses, let \texttt{C2}
+a subclass of \texttt{C}:
+\vspace{-0.2cm}
+\begin{verbatim}
+class C2 extends C {
+  attribute string c2;
+};
+\end{verbatim}
+When one creates an \texttt{C2} object, the attributes \texttt{s1} and
+\texttt{s2} must not be null and the attributes \texttt{s2} and
+\texttt{s3} must be unique.\\
+\\
+Important note: the unique constraint applies separately on each class
+(\texttt{C} and \texttt{C2}) and not on the set of inheritance class tree.
+This means that one can have a \texttt{C} object with a given value
+for \texttt{s2} and a \texttt{C2} object with the same value for \texttt{s2}.
+\\
+This is not the expected default behavior and will
+can be parametrised in a next version.
+\\
+\\
+If you do no want to propagate automatically a constraint to the subclasses,
+you need to use the construct \texttt{propagate = off} as follows:
+\vspace{-0.2cm}
+\begin{verbatim}
+class C {
+  attribute string s1;
+  attribute string s2;
+  attribute string s3;
+
+  constraint<notnull, propagate = off> on s1;
+
+  constraint<notnull> on s2;
+  constraint<unique, propagate = off> on s2;
+
+  constraint<unique> on s3;
+};
+
+class C2 extends C {
+  attribute string c2;
+};
+\end{verbatim}
+The notnull constraint on \texttt{C::s1} and the unique constraint
+on \texttt{C1::s2} will not be propagated to \texttt{C2}, but the
+notnull constraint on \texttt{C::s1} and the unique constraint on
+\texttt{C::s3} will be propagated to \texttt{C2}.
+
+\subsubsect{Constraint on attribute of literal composite type}
+One can define constraints on attributes of literal composite type
+attribute, for instance:
+\vspace{-0.2cm}
+\begin{verbatim}
+class C1 {
+  attribute string s1;
+  attribute int i1;
+};
+
+class C {
+  attribute C1 c1;
+ 
+  constraint<notnull> on c1.s1;
+  constraint<unique> on c1.i1;
 };
 \end{verbatim}
 
 \subsect{Referential integrity}
+The \eyedb object model support one-to-one, one-to-many and many-to-many
+relationships. 
+\\
+\\
+A relationship between a class \texttt{A} and a class \texttt{B} is
+materialized by attributes in the two classes of the following
+types according to the cardinality of the relationship:
+\bi
+\item one-to-one : \texttt{A} contains an attribute of type \texttt{B *} and
+\texttt{A} contains an attribute  of type \texttt{B *}
+\item one-to-many : \texttt{A} contains an attribute of type \emph{collection}\texttt{<B *>} (\emph{collection} is a set or a bag) and
+\texttt{A} contains an attribute  of type \texttt{B *}
+\item many-to-many : \texttt{A} contains an attribute of type \emph{collection}\texttt{<B *>} and
+\texttt{A} contains an attribute  of type \emph{collection}\texttt{<B *}
+\ei
+For instance for a one-to-one relationship:
+\vspace{-0.2cm}
+\begin{verbatim}
+class A {
+  attribute string sa;
+  attribute B *b;
+};
+
+class B {
+  attribute string sb;
+  attribute A *a;
+};
+\end{verbatim}
+In the previous cas, \eyedb maintains only partially the referential
+integrity: for instance, one cannot create an object \texttt{A}
+with an attribute \texttt{b} which refers an non-existent \texttt{B}
+object. But, if the referenced \texttt{B} object is removed, the attribute
+\texttt{b} will still referenced the removed object.
+\\
+\\
+\eyedb can maintain the referential integrity by indicating the
+\texttt{inverse directive} in the ODL as follows:
+\vspace{-0.2cm}
+\begin{verbatim}
+class A {
+  attribute string sa;
+  relationship B *b inverse B::b; // or inverse b
+};
+
+class B {
+  attribute string sb;
+  relationship A *a inverse A::b; // or inverse a
+};
+\end{verbatim}
+Note \texttt{attribute} has been replaced by \texttt{relationship} in
+this case: this is mandatory.
+\\
+In this case, if the \texttt{B} object referenced by a \texttt{A} object
+through \texttt{b} is removed, \texttt{b} is set to the null value.
+\\
+A one-to-many relationship:
+\vspace{-0.2cm}
+\begin{verbatim}
+class A {
+  attribute string sa;
+  relationship set<B *> b_set inverse a;
+};
+
+class B {
+  attribute string sb;
+  relationship A *a inverse b_set;;
+};
+\end{verbatim}
+and a many-to-many relationship:
+\vspace{-0.2cm}
+\begin{verbatim}
+class A {
+  attribute string sa;
+  relationship set<B *> b_set inverse a_set;
+};
+
+class B {
+  attribute string sb;
+  relationship set<A *> a_set inverse b_set;;
+};
+\end{verbatim}
 
 \subsect{Methodes}
  C++
