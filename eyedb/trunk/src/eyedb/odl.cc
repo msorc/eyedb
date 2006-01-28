@@ -1,6 +1,6 @@
 /* 
    EyeDB Object Database Management System
-   Copyright (C) 1994-1999,2004,2005 SYSRA
+   Copyright (C) 1994-1999,2004-2006 SYSRA
    
    EyeDB is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -411,7 +411,7 @@ namespace eyedb {
 
     odl_check_removed(m, list);
 
-    if (list) {
+    if (list && list->getCount()) {
       odlDeclaration *decl;
       
       m->setUserData(odlUPDLIST, new LinkedList());

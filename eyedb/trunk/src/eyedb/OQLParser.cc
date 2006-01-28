@@ -1,6 +1,6 @@
 /* 
    EyeDB Object Database Management System
-   Copyright (C) 1994-1999,2004,2005 SYSRA
+   Copyright (C) 1994-1999,2004-2006 SYSRA
    
    EyeDB is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -2240,7 +2240,7 @@ static int
 copyright_command(OQLParser *parser, int argc, char *argv[])
 {
   printf("EyeDB Object Database Management System\n");
-  printf("Copyright (C) 1994-1999,2004,2005 SYSRA\n");
+  printf("Copyright (C) 1994-1999,2004-2006 SYSRA\n");
   printf("\n");
   printf("EyeDB is free software; you can redistribute it and/or\n");
   printf("modify it under the terms of the GNU Lesser General Public\n");
