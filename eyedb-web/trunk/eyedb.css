@@ -26,20 +26,6 @@ body {
  text-align: left ;
 }
 
-#HeaderLeft {
-  float: left;
-  position: relative;
-  width: 766px;
-  height: 75px;
-  border: 0px;
-  padding: 0px;
-  margin: 0px;
-}
-
-#HeaderLeft img { 
-  border: 0px; 
-}
-
 #NavBlock {
   float:left;
   margin-left: 5px;

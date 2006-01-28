@@ -11,8 +11,5 @@
 <div id="Container">
 
 <div id="HeaderBlock">
-  <h2 class="Hide">Header</h2>
-	<div id="HeaderLeft">
-	  <a href="index.php" title="EyeDB"><img src="images/eyedb-logo.png" width="766" height="75" alt="EyeDB" /></a>
-	</div>
+<a href="index.php" title="EyeDB"><img src="images/eyedb-logo.png" width="766" height="75" alt="EyeDB" /></a>
 </div>
