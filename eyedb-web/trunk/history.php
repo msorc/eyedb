@@ -1,7 +1,4 @@
-<? include( 'header.php'); ?>
-<? include( 'nav.php'); ?>
-
-<div id="CenterBlock">
+<? $title = 'History'; include( 'header.php'); ?>
 
 <h1 id="PageTitle">History</h1>
 
@@ -14,7 +11,5 @@
 <p>Since April 1994, a new version has being developed at SYSRA with partial fundings from the ANVAR (Agence Nationale pour la Valorisation de la Recherche), the Conseil Regional d'Ile de France and the European Contract EC BIO4-CT96-0346.</p>
 
 <p>This second version of EYEDB, is a complete rewrite. </p>
-
-</div>
 
 <? include( 'footer.php'); ?>

@@ -1,7 +1,5 @@
-<? include( 'header.php'); ?>
-<? include( 'nav.php'); ?>
+<? $title = 'Platforms'; include( 'header.php'); ?>
 
-<div id="CenterBlock">
 <h1 id="PageTitle">Platforms</h1>
 <p>
 EyeDB has been ported and tested on the following platforms:
@@ -21,7 +19,7 @@ Porting to the following platforms is in progress:
 
 <p>
 To get more information about the status of the different platforms, please 
-visit EyeDB's <a href="http://wiki.eyedb.org">wiki</a>.</p>
-</div>
+visit EyeDB's <a href="http://wiki.eyedb.org">wiki</a>.
+</p>
 
 <? include( 'footer.php'); ?>

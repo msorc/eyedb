@@ -1,7 +1,5 @@
-<? include( 'header.php'); ?>
-<? include( 'nav.php'); ?>
+<? $title = 'Mailing lists'; include( 'header.php'); ?>
 
-<div id="CenterBlock">
 <h1 id="PageTitle">Mailing lists</h1>
 <p>
 Following is a list of EyeDB mailing lists.
@@ -54,6 +52,5 @@ List&nbsp;archive:&nbsp;<a href="http://sourceforge.net/mailarchive/forum.php?fo
 </tr>
 </table>
 </p>
-</div>
 
 <? include( 'footer.php'); ?>
