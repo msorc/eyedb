@@ -1,29 +1,45 @@
+/* 
+   EyeDB Object Database Management System
+   Copyright (C) 1994-1999,2004,2005 SYSRA
+   
+   EyeDB is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+   
+   EyeDB is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+   
+   You should have received a copy of the GNU Lesser General Public
+   License along with this library; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA 
+*/
+
+/*
+   Author: Eric Viara <viara@sysra.com>
+*/
 
 // Creating a few courses
 
-oodbms := new Course(status: REQUIRED,
-		     title : "OODBMS",
+oodbms := new Course(title : "OODBMS",
 		     description : "Object database management systems");
 
 
-rdbms := new Course(status: REQUIRED,
-		    title : "RDBMS",
+rdbms := new Course(title : "RDBMS",
 		    description : "Relational database management systems");
 
-uml := new Course(status: REQUIRED,
-		  title : "UML",
+uml := new Course(title : "UML",
 		  description : "Unified Modeling Language");
 
-cplus := new Course(status: REQUIRED,
-		    title : "C++",
+cplus := new Course(title : "C++",
 		    description : "C++ Language");
 
-java := new Course(status: REQUIRED,
-		   title : "Java",
+java := new Course(title : "Java",
 		   description : "Java Language");
 
-php := new Course(status: COMPLEMENTARY,
-		  title : "PHP",
+php := new Course(title : "PHP",
 		  description : "PHP Language");
 
 
@@ -31,28 +47,23 @@ php := new Course(status: COMPLEMENTARY,
 
 john_harris := new Student(firstname : "John",
 			   lastname : "Harris",
-			   birthdate : date::date("1994-03-02"),
 			   begin_year : 2002);
 
 suzan_mulder := new Student(firstname : "Suzan",
 			    lastname : "Mulder",
-			    birthdate : date::date("1996-04-12"),
 			    begin_year : 2002);
 
 francois_martin := new Student(firstname : "Francois",
 			       lastname : "Martin",
-			       birthdate : date::date("1983-08-04"),
 			       begin_year : 2001);
 
 // Creating a few teachers
 
 eric_viara := new Teacher(firstname : "Eric",
-			  lastname : "Viara",
-			  birthdate : date::date("1958-12-15"));
+			  lastname : ");
 
 francois_dechelle := new Teacher(firstname : "Francois",
-				 lastname : "Dechelle",
-				 birthdate : date::date("1960-06-23"));
+				 lastname : "Dechelle");
 
 // Assign courses to teachers
 
@@ -94,8 +105,6 @@ select Person.firstname = "Francois";
 // looking for Courses
 select description from Course where title = "OODBMS";
 select * from Course where title = "OODBMS";
-
-select title from Course where status = REQUIRED;
 
 // looking for Teacher teaching a given course
 select x.teacher.firstname + " " + x.teacher.lastname from Course x

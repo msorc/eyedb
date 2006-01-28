@@ -150,6 +150,15 @@ namespace eyedb {
     if (!strcmp(name, "URL"))
       return "org.eyedb.utils.URL";
 
+    if (!strcmp(name, "date"))
+      return "org.eyedb.utils.Date";
+
+    if (!strcmp(name, "time"))
+      return "org.eyedb.utils.Time";
+
+    if (!strcmp(name, "timestamp"))
+      return "org.eyedb.utils.TimeStamp";
+
     if (!strcmp(name, "bool"))
       return "org.eyedb.Bool";
 

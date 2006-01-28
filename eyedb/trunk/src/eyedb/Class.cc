@@ -583,9 +583,9 @@ namespace eyedb {
   {
     static char *buf = new char[256];
     const char *cname = cls->getCName();
-    if (!strncmp(cname, DEF_PREFIX, 3)) { // WARNING : does not work if DEF_PREFIX is ""
+    if (!strncmp(cname, DEF_PREFIX, strlen(DEF_PREFIX))) { // WARNING : does not work if DEF_PREFIX is ""
       strcpy(buf, "org.eyedb.");
-      strcat(buf, &cname[3]);
+      strcat(buf, &cname[strlen(DEF_PREFIX)]);
     }
     else
       strcpy(buf, cname);

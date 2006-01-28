@@ -67,8 +67,11 @@ static const char make_pattern[] =
 "# if you use gcc\n"
 "GCC_FLAGS = -Wl,-R$(EYEDB_LIBDIR)\n"
 "\n"
-"# example for compiling the template program:\n"
-"template_%s: %s.o template_%s.o\n"
+"# Example for compiling a client program:\n"
+"\n"
+"client_program = template_%s\n"
+"\n"
+"$(client_program): %s.o $(client_program).o\n"
 "	$(CXX) $(LDFLAGS) $(GCC_FLAGS) -o $@ $^ $(LDLIBS)\n"
 "\n";
 
@@ -115,7 +118,8 @@ static const char template_pattern[] =
 "    db.close();\n"
 "  }\n"
 "  catch(eyedb::Exception &e) {\n"
-"    e.print();\n"
+"    std::cerr << e << std::endl;\n"
+"    return 1;\n"
 "  }\n"
 "\n"
 "  %s::release();\n"
