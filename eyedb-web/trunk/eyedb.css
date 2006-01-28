@@ -119,9 +119,38 @@ h5 { font-size: 100%; }
 h6 { font-size: 80%;  }
 
 #NewsCol {
-  width: 200px;
+  width: 170px;
   text-align: left ;
   vertical-align: top;
+}
+
+#News {
+  border-top: solid 15px #97A2C2;
+  background-color: #DCE4FC;
+}
+
+#News p {
+  margin-left: 10px;
+}
+
+.NewsFrom {
+  font-weight: bold;
+}
+
+.NewsFrom a {
+  text-decoration: none;
+}
+.NewsFrom a:link {
+  color: #501010;
+}
+.NewsFrom a:visited {
+  color: #501010;
+}
+.NewsFrom a:hover {
+  color: #501010;
+}
+.NewsFrom a:active {
+  color: #501010;
 }
 
 #FooterRow {
