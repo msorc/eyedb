@@ -97,9 +97,19 @@ between the <code>Teacher</code> and its in charge <code>Courses</code>
 indicate to EyeDB to maintain the referential integrity of
 the relationships
 </ul>
+To enter this schema in a database, we must use the <code>eyedbodl</code>
+tool which checks the syntax and semantics of the schema and in
+case of succes submit the given schema to the given database.
 <h2><a name="oqlm">Create data using OQL</a></h2>
-
+We show in this section how to create the objects and relationships between
+these objects as defined in the ODL schema 
+using the Object Query Language (OQL). The EyeDB OQL
+is a superset of the standard ODMG 3 OQL.
+<br>
+To enter the following OQL statement, we can use the <code>eyedboql</code>
+interactive tool included in the distribution.
 <h3>Creating a few courses</h3>
+We begin by creating a few courses:
 <table border=1 cellpadding=5 cellspacing=0>
 <tr><td width=<?= $width ?> >
 <pre class="code">
@@ -127,11 +137,20 @@ php := new Course(title : "PHP",
 <br>
 A few comments:
 <ul>
-<li>The <code>new</code> OQL operator...
-<li>To construct on object, one must give its attribute values...
-<li>The OQL variables <code>oodbms, rdbms</code> etc. are 
+<li>The <code>new</code> OQL operator allows us to create
+a persistent object of the given type
+<li>To construct an object, we give a list
+of pairs of attribute name and attributes value as shown previously, for
+instance: <code>title: "Java", description : "Java Language"</code>.
+<br>
+If an attribute value is not given during construction, its value
+is assigned to the <code>NULL</code> value (not initialised)
+<li>The OQL variables <code>oodbms, rdbms</code> and so on are 
+not persistent: they are assigned to persistent objects, but
+there scope is limitated to the current OQL session.
 </ul>
 <h3>Creating a few students</h3>
+We can now create a few students:
 <table border=1 cellpadding=5 cellspacing=0>
 <tr><td width=<?= $width ?> >
 <pre class="code">
@@ -147,8 +166,12 @@ francois_martin := new Student(firstname : "Francois", lastname : "Martin",
 </td></tr>
 </table>
 <br>
+Note that as a <code>Student</code> inherits from a <code>Person</code>,
+it includes the <code>firstname</code> and <code>lastname</code>
+attributes.
 <br>
 <h3>Creating two teachers</h3>
+We create now two teachers:
 <table border=1 cellpadding=5 cellspacing=0>
 <tr><td width=<?= $width ?> >
 <pre class="code">
@@ -160,6 +183,8 @@ francois_dechelle := new Teacher(firstname : "Francois",
 </td></tr>
 </table>
 <h3>Assigning the courses to the teachers</h3>
+We deal now with the relationship "in charge" between <code>Course</code>
+and <code>Teacher</code>:
 <table border=1 cellpadding=5 cellspacing=0>
 <tr><td width=<?= $width ?> >
 <pre class="code">
@@ -172,7 +197,26 @@ php.teacher := francois_dechelle;
 </pre>
 </td></tr>
 </table>
+<br>
+<br>
+Important notices:
+<ul>
+<li> When we assigned a teacher to a given course (for
+instance <code>oodbms.teacher := eric_viara</code>), the inverse attribute
+<code>courses</code> in the <code>Teacher</code> class is automatically
+updated (the course is added to the <code>courses</code> collections of
+the teacher <code>eric_viara</code>) because of the inverse directive
+<li> When we change the teacher of a given course (for
+instance <code>oodbms.teacher := francois_dechelle</code>),
+the inverse attribute <code>courses</code> of <code>eric_viara</code> is updated
+(the course is suppressed from its <code>courses</code>
+collection) and the inverse attribute <code>courses</code> of <code>francois_dechelle</code>
+is also updated (the course is added to the <code>courses</code>
+collections of the teacher <code>francois_dechelle</code>).
+</ul>
 <h3>Assigning the courses to the students</h3>
+We deal now with the relationship "registered to" between <code>Student</code>
+and <code>Course</code>:
 <table border=1 cellpadding=5 cellspacing=0>
 <tr><td width=<?= $width ?> >
 <pre class="code">
@@ -191,6 +235,21 @@ add cplus to francois_martin.courses;
 add php to francois_martin.courses;
 </pre>
 </td></tr></table>
+<br>
+<br>
+Important notices:
+<ul>
+<li> When we add a course to a given student (for
+instance <code>add oodbms to suzan_mulder.courses</code>), the inverse attribute
+<code>students</code> in the <code>Course</code> class is automatically
+updated (the student is added to the <code>students</code> collections of
+the course <code>oodbms</code>) because of the inverse directive
+<li> When we suppress a course of a given student (for
+instance <code>suppress oodbms from suzan_mulder.courses</code>),
+the inverse attribute <code>students</code> of <code>oodbms</code> is updated
+(the student is suppressed from its <code>students</code>
+collection)
+</ul>
 
 <h2><a name="oqlq">Query data using OQL</a></h2>
 
