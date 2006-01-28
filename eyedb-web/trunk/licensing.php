@@ -1,6 +1,6 @@
 <? $title = 'History'; include( 'header.php'); ?>
 
-<h1 id="PageTitle">Licensing</h1>
+<h1>Licensing</h1>
 <p>
    EyeDB is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public

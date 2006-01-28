@@ -2,7 +2,7 @@
 <? include( 'nav.php'); ?>
 
 <div id="CenterBlock">
-<h1 id="PageTitle">IRC</h1>
+<h1>IRC</h1>
 <p>
 bla bla bla
 </p>

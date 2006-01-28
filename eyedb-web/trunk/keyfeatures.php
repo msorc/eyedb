@@ -21,16 +21,16 @@ The main key features of the EyeDB OODBMS are:
 
 <h2>Language orientation</h2>
 <ul>
-<li>a definition language based on the ODMG Object Definition Language (ODL)
-a query language based on the ODMG Object Query Language (OQL)</li>
-<li>C++ binding</li>
-<li>Java binding</li>
+<li>a definition language based on the ODMG Object Definition Language (ODL)</li>
+<li>a query language based on the ODMG Object Query Language (OQL)</li>
+<li>a C++ binding</li>
+<li>a Java binding</li>
 </ul>
 
 <h2>Genericity and orthogonality of the object model</h2>
 <ul>
 <li>inspired by the SmallTalk, LOOPS, Java and ObjVlisp object models
-(i.e. every class derives from the <code>object</code> and can
+(i.e. every class derives from the <code>object</code> class and can
 be manipulated as an object)</li>
 <li>type polymorphism</li>
 <li>binary relationships</li>
