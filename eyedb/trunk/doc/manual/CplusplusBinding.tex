@@ -909,13 +909,26 @@ eyedbodl --gencode=C++ <odlfile>
 \end{verbatim}
 or
 \begin{verbatim}
-eyedbodl --gencode=C++ -d <database>
+eyedbodl --gencode=C++ --package=<package> -d <database>
 \end{verbatim}
 For instance, to generate the schema-oriented C++ API for the \texttt{person.odl}
 schema:
 \begin{verbatim}
 eyedbodl --gencode=C++ person.odl
 \end{verbatim}
+For a given \emph{package}.odl ODL file, the generated files are as follows:
+\bi
+\item \emph{package}.h, \emph{package}.cc: the generated C++ API to be used in
+a client program
+\item template\_\emph{package}.cc: an example of a client program using the generated
+API
+\item Makefile.\emph{package}: an example of Makefile to compile \emph{package}.cc and
+template\_\emph{package}.cc: make -f Makefile.\emph{package} will compile
+and link the generated API and template files
+\item \emph{package}stubsfe.cc, \emph{package}stubsbe.cc: stubs for client and server methods
+\item \emph{package}mthfe-skel.cc, \emph{package}mthbe-skel.cc: skeletons for
+client and server methods
+\ei
 The \texttt{eyedbodl} tool contains a lot of command line options to
 control the generated code.
 \\
