@@ -851,31 +851,47 @@ to an update failure
 \ei
 \ei
 \subsect{Generates C++ code}
-To generate C++ stubs from an ODL file:
+To generate the C++ API from an ODL file:
 \vspace{-2mm}
 \begin{verbatim}
 eyedbodl --gencode=C++ schema.odl
 \end{verbatim}
-To generate C++ stubs from a database:
+To generate the C++ API from a database:
 \vspace{-2mm}
 \begin{verbatim}
-eyedbodl --gencode=C++ -d dbtest
+eyedbodl --gencode=C++ --package=schema -d dbtest
 \end{verbatim}
+For a given \emph{package}.odl ODL file, the generated files are as follows:
+\bi
+\item \emph{package}.h, \emph{package}.cc: the generated C++ API to be used in
+a client program
+\item template\_\emph{package}.cc: an example of a client program using the generated
+API
+\item Makefile.\emph{package}: an example of Makefile to compile \emph{package}.cc and
+template\_\emph{package}.cc: make -f Makefile.\emph{package} will compile
+and link the generated API and template files
+\item \emph{package}stubsfe.cc, \emph{package}stubsbe.cc: stubs for client and server methods
+\item \emph{package}mthfe-skel.cc, \emph{package}mthbe-skel.cc: skeletons for
+client and server methods
+\ei
 
-% parler des quoted sequence
+%Quoted sequence
 
 \subsect{Generates Java code}
-To generate Java stubs from an ODL file:
+To generate the Java API from an ODL file:
 \vspace{-2mm}
 \begin{verbatim}
 eyedbodl --gencode=Java schema.odl
 \end{verbatim}
-To generate Java stubs from a database:
+To generate the Java API from a database:
 \vspace{-2mm}
 \begin{verbatim}
-eyedbodl --gencode=Java -d dbtest
+eyedbodl --gencode=Java --package=schema -d dbtest
 \end{verbatim}
-
+For a given \emph{package}.odl ODL file, 
+the \emph{package} directory contains a Java file for each class
+defined in the ODL file plus a Java file for each collection template
+class used as an attribute in classes of the ODL file.
 \subsect{Generates ODL}
 To generate the ODL from a database:
 \vspace{-2mm}
