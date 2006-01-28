@@ -1,28 +1,43 @@
 <?
 
+class Item {
+  var $title;
+  var $description;
+  var $link;
+  var $date;
+
+  function Item( $title, $description, $link, $date)
+  {
+    $this->title = $title;
+    $this->description = $description;
+    $this->link = $link;
+    $this->date = $date;
+  }
+}
+
 class RSSParser {
 
   var $insideitem;
   var $tag;
-
-  var $out;
-  var $empty;
 
   var $title;
   var $description;
   var $link;
   var $date;
 
-  function parse( $url, $file)
+  var $item_array;
+
+  function parse( $url)
   {
     $this->insideitem = false;
     $this->tag = "";
+
     $this->title = "";
     $this->description = "";
     $this->link = "";
     $this->date = "";
-	
-    $this->empty = true;
+
+    $this->item_array = array();
 
     $xml_parser = xml_parser_create();
     xml_set_object($xml_parser,&$this);
@@ -34,8 +49,6 @@ class RSSParser {
     if (!$fp)
       return;
 
-    $this->out = fopen( $file, "w");
-
     while ($data = fread($fp, 4096))
       {
 	$res = xml_parse($xml_parser, $data, feof($fp));
@@ -46,17 +59,10 @@ class RSSParser {
     fclose($fp);
     xml_parser_free($xml_parser);
 
-    if ($this->empty == false)
-      fwrite( $this->out, "</dl>\n");
-
-    fclose( $this->out);
+    return $this->item_array;
   }
 
   function startElement($parser, $tagName, $attrs) {
-
-    // debug
-    //fwrite( $this->out, "<!-- ".$tagName." -->\n");
-
     if ($this->insideitem) 
       {
 	$this->tag = $tagName;
@@ -70,18 +76,10 @@ class RSSParser {
   function endElement($parser, $tagName) {
     if ($tagName == "ITEM") 
       {
-	if ($this->empty) {
-	  fwrite( $this->out, "<dl class=\"NewsList\">\n");
-	  $this->empty = false;
-	}
-
-	$s = sprintf( "<dt>%s</dt>\n<dd><a href='%s' class=\"NewsTitleLink\">%s</a></dd>\n<dd>%s</dd>\n",
-		      trim($this->date),
-		      trim($this->link),
-		      htmlspecialchars(trim($this->title)),
-		      trim($this->description));
-
-	fwrite( $this->out, $s);
+	$this->item_array[] = new Item( htmlspecialchars(trim($this->title)),
+					trim($this->description),
+					trim($this->link),
+					trim($this->date));
 
 	$this->title = "";
 	$this->description = "";
@@ -111,16 +109,34 @@ class RSSParser {
 	}
     }
   }
-
 }
-
 
 
 function regenerateNewsCache( $url, $cache_file)
 {
   $rss_parser = new RSSParser();
 
-  $rss_parser->parse( $url, $cache_file);
+  $item_array = $rss_parser->parse( $url);
+
+  if (count($item_array) == 0)
+    return;
+
+  $out = fopen( $cache_file, "w");
+  fwrite( $out, "<dl class=\"NewsList\">\n");
+    
+  foreach ($item_array as $item)
+    {
+      $s = sprintf( "<dt>%s</dt>\n<dd><a href='%s' class=\"NewsTitleLink\">%s</a></dd>\n<dd>%s</dd>\n",
+		    $item->date,
+		    $item->link,
+		    $item->title,
+		    $item->description);
+
+      fwrite( $out, $s);
+    }
+
+  fwrite( $out, "</dl>\n");
+  fclose( $out);
 }
 
 /*
@@ -135,7 +151,5 @@ function includeNews( $url, $cache_file, $cache_lifetime) {
 
   include( $cache_file);
 }
-
-
 
 ?>
