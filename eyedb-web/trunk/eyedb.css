@@ -54,11 +54,11 @@ body {
  vertical-align: top;
  margin: 0px;
  padding: 0px;
+ background-color: #DCE4FC;
+ border-top: solid 15px #97A2C2;
 }
 
 #Nav {
-  border-top: solid 15px #97A2C2;
-  background-color: #DCE4FC;
 }
 
 #Nav ul {
@@ -122,14 +122,11 @@ h6 { font-size: 80%;  }
   width: 170px;
   text-align: left ;
   vertical-align: top;
-}
-
-#News {
   border-top: solid 15px #97A2C2;
   background-color: #DCE4FC;
 }
 
-#News p {
+#NewsCol p {
   margin-left: 10px;
 }
 
@@ -138,7 +135,6 @@ h6 { font-size: 80%;  }
 }
 
 .NewsFrom a {
-  text-decoration: none;
 }
 .NewsFrom a:link {
   color: #501010;
