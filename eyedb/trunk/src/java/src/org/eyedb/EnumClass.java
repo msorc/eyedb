@@ -1,6 +1,6 @@
 /* 
    EyeDB Object Database Management System
-   Copyright (C) 1994-1999,2004,2005 SYSRA
+   Copyright (C) 1994-1999,2004-2006 SYSRA
    
    EyeDB is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -70,7 +70,7 @@ public class EnumClass extends Class {
 
     private void init() {
 	idr_objsz = ObjectHeader.IDB_OBJ_HEAD_SIZE + 
-	    Coder.CHAR_SIZE + Coder.INT32_SIZE;
+	    /*Coder.CHAR_SIZE + */ Coder.INT32_SIZE;
 
 	idr_psize = idr_objsz;
 	idr_vsize = 0;
@@ -114,7 +114,7 @@ public class EnumClass extends Class {
     }
 
     Value getValueValue(Coder coder) {
-	byte b = coder.decodeByte();
+	//byte b = coder.decodeByte();
 	return new Value(coder.decodeInt());
     }
 
@@ -155,7 +155,7 @@ public class EnumClass extends Class {
 	// 27/11/98
 	// this seems to be wrong: should be
 	// decodeByte() to skip, and then decodeInt32()
-	coder.decodeByte();
+	//coder.decodeByte();
 	EnumItem en = getEnumItemFromVal(coder.decodeInt());
 
 	if (en != null)

@@ -1,6 +1,6 @@
 /* 
    EyeDB Object Database Management System
-   Copyright (C) 1994-1999,2004,2005 SYSRA
+   Copyright (C) 1994-1999,2004-2006 SYSRA
    
    EyeDB is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -29,8 +29,6 @@ public class Enum extends Instance {
 			Oid class_oid, int lockmode, RecMode rcm)
 			throws Exception
   {
-    //    System.out.println("Enum::make(" + oid + ")");
-
     Class mclass = db.getSchema().getClass(class_oid);
 
     Coder coder = new Coder(idr, ObjectHeader.IDB_OBJ_HEAD_SIZE);
@@ -39,17 +37,13 @@ public class Enum extends Instance {
 
     coder.setOffset(ObjectHeader.IDB_OBJ_HEAD_SIZE);
 
-    boolean isset = coder.decodeBoolean();
+    //boolean isset = coder.decodeBoolean();
 
-    System.out.println("isset = " + isset);
-
-    if (isset)
-      {
+    /*if (isset) */ {
 	int val = coder.decodeInt();
 	((Enum)o).setIntValue(val);
-	System.out.println("val = " + val);
-      }
-
+    }
+    
     return o;
   }
 

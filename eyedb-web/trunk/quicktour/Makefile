@@ -24,3 +24,6 @@ client_program = student_test
 $(client_program): student.o $(client_program).o
 	$(CXX) $(LDFLAGS) $(GCC_FLAGS) -o $@ $^ $(LDLIBS)
 
+StudentTest.class: StudentTest.java student/Database.java
+	CLASSPATH=$(EYEDB_CLASSPATH):. javac *.java student/*.java
+

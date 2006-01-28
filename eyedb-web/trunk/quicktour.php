@@ -10,7 +10,6 @@
 class Person {
   attribute string firstname;
   attribute string lastname;
-  attribute date birthdate;
 };
 
 class Student extends Person {
@@ -18,13 +17,7 @@ class Student extends Person {
   relationship set<Course *> courses inverse students;
 };
 
-enum CourseStatus {
-  COMPLEMENTARY,
-  REQUIRED
-};
-
 class Course {
-  attribute CourseStatus status;
   attribute string title;
   attribute string description;
   relationship set<Student *> students inverse courses;
@@ -40,29 +33,23 @@ Get the <a href="quicktour/student.odl" target="_blank">ODL file</a>
 <pre class="code">
 // Creating a few courses
 
-oodbms := new Course(status: REQUIRED,
-		     title : "OODBMS",
+oodbms := new Course(title : "OODBMS",
 		     description : "Object database management systems");
 
 
-rdbms := new Course(status: REQUIRED,
-		    title : "RDBMS",
+rdbms := new Course(title : "RDBMS",
 		    description : "Relational database management systems");
 
-uml := new Course(status: REQUIRED,
-		  title : "UML",
+uml := new Course(title : "UML",
 		  description : "Unified Modeling Language");
 
-cplus := new Course(status: REQUIRED,
-		    title : "C++",
+cplus := new Course(title : "C++",
 		    description : "C++ Language");
 
-java := new Course(status: REQUIRED,
-		   title : "Java",
+java := new Course(title : "Java",
 		   description : "Java Language");
 
-php := new Course(status: COMPLEMENTARY,
-		  title : "PHP",
+php := new Course(title : "PHP",
 		  description : "PHP Language");
 
 
@@ -70,28 +57,23 @@ php := new Course(status: COMPLEMENTARY,
 
 john_harris := new Student(firstname : "John",
 			   lastname : "Harris",
-			   birthdate : date::date("1994-03-02"),
 			   begin_year : 2002);
 
 suzan_mulder := new Student(firstname : "Suzan",
 			    lastname : "Mulder",
-			    birthdate : date::date("1996-04-12"),
 			    begin_year : 2002);
 
 francois_martin := new Student(firstname : "Francois",
 			       lastname : "Martin",
-			       birthdate : date::date("1983-08-04"),
 			       begin_year : 2001);
 
 // Creating a few teachers
 
 eric_viara := new Teacher(firstname : "Eric",
-			  lastname : "Viara",
-			  birthdate : date::date("1958-12-15"));
+			  lastname : ");
 
 francois_dechelle := new Teacher(firstname : "Francois",
-				 lastname : "Dechelle",
-				 birthdate : date::date("1960-06-23"));
+				 lastname : "Dechelle");
 
 // Assign courses to teachers
 
@@ -121,6 +103,7 @@ add php to francois_martin.courses;
 <h2>OQL queries</h2>
 
 <pre class="code">
+
 // looking for Persons
 select Student;
 select Teacher;
@@ -135,8 +118,6 @@ select Person.firstname = "Francois";
 // looking for Courses
 select description from Course where title = "OODBMS";
 select * from Course where title = "OODBMS";
-
-select title from Course where status = REQUIRED;
 
 // looking for Teacher teaching a given course
 select x.teacher.firstname + " " + x.teacher.lastname from Course x
@@ -170,58 +151,39 @@ Get the <a href="quicktour/student.oql" target="_blank">OQL file</a>
 static void create(eyedb::Database *db)
 {
   Course *perl = new Course(db);
-  perl->setStatus(REQUIRED);
   perl->setTitle("Perl");
   perl->setDescription("Perl Language");
 
   Course *python = new Course(db);
-  perl->setStatus(COMPLEMENTARY);
   python->setTitle("Python");
   python->setDescription("Python Language");
 
   Course *eyedb_ = new Course(db);
-  perl->setStatus(REQUIRED);
   eyedb_->setTitle("EyeDB");
   eyedb_->setDescription("EyeDB OODBMS");
-  eyedb::Date *birthdate;
 
   Student *henri_muller = new Student(db);
   henri_muller->setFirstname("Henri");
   henri_muller->setLastname("Muller");
-  birthdate = eyedb::Date::date(0, 1986, eyedb::Month::September, 20);
-  henri_muller->setBirthdate(birthdate);
-  birthdate->release();
   henri_muller->setBeginYear(2003);
 
   Student *jacques_martin = new Student(db);
   jacques_martin->setFirstname("Jacques");
   jacques_martin->setLastname("Martin");
-  birthdate = eyedb::Date::date(0, 1988, eyedb::Month::October, 2);
-  jacques_martin->setBirthdate(birthdate);
-  birthdate->release();
   jacques_martin->setBeginYear(2003);
   
   Student *mary_kiss = new Student(db);
   mary_kiss->setFirstname("Mary");
   mary_kiss->setLastname("Kiss");
-  birthdate = eyedb::Date::date(0, 1989, eyedb::Month::January, 10);
-  mary_kiss->setBirthdate(birthdate);
-  birthdate->release();
   mary_kiss->setBeginYear(2003);
 
   Teacher *max_first = new Teacher(db);
   max_first->setFirstname("Max");
   max_first->setLastname("First");
-  birthdate = eyedb::Date::date(0, 1969, eyedb::Month::March, 12);
-  max_first->setBirthdate(birthdate);
-  birthdate->release();
 
   Teacher *georges_shorter = new Teacher(db);
   georges_shorter->setFirstname("Georges");
   georges_shorter->setLastname("Shorter");
-  birthdate = eyedb::Date::date(0, 1954, eyedb::Month::July, 30);
-  georges_shorter->setBirthdate(birthdate);
-  birthdate->release();
 
   perl->setTeacher(max_first);
   python->setTeacher(max_first);
@@ -240,6 +202,7 @@ static void create(eyedb::Database *db)
   henri_muller->store(eyedb::RecMode::FullRecurs);
   jacques_martin->store(eyedb::RecMode::FullRecurs);
   mary_kiss->store(eyedb::RecMode::FullRecurs);
+}
 </pre>
 <h2>C++ queries</h2>
 <pre class="code">
@@ -276,6 +239,103 @@ static void query_courses(eyedb::Database *db,
 }
 </pre>
 Get the <a href="quicktour/student_test.cc" target="_blank">C++ file</a>
+<h2>Java creation</h2>
+<pre class="code">
+static void create(student.Database db) throws org.eyedb.Exception {
+    Course perl = new Course(db);
+    perl.setTitle("Perl");
+    perl.setDescription("Perl Language");
+
+    Course python = new Course(db);
+    python.setTitle("Python");
+    python.setDescription("Python Language");
+
+    Course eyedb_ = new Course(db);
+    eyedb_.setTitle("EyeDB");
+    eyedb_.setDescription("EyeDB OODBMS");
+
+    Student henri_muller = new Student(db);
+    henri_muller.setFirstname("Henri");
+    henri_muller.setLastname("Muller");
+    henri_muller.setBeginYear((short)2003);
+
+    Student jacques_martin = new Student(db);
+    jacques_martin.setFirstname("Jacques");
+    jacques_martin.setLastname("Martin");
+    jacques_martin.setBeginYear((short)2003);
+
+    Student mary_kiss = new Student(db);
+    mary_kiss.setFirstname("Mary");
+    mary_kiss.setLastname("Kiss");
+    mary_kiss.setBeginYear((short)2003);
+
+    Teacher max_first = new Teacher(db);
+    max_first.setFirstname("Max");
+    max_first.setLastname("First");
+
+    Teacher georges_shorter = new Teacher(db);
+    georges_shorter.setFirstname("Georges");
+    georges_shorter.setLastname("Shorter");
+
+    perl.setTeacher(max_first);
+    python.setTeacher(max_first);
+    eyedb_.setTeacher(georges_shorter);
+
+    henri_muller.addToCoursesColl(perl);
+    henri_muller.addToCoursesColl(eyedb_);
+
+    jacques_martin.addToCoursesColl(python);
+    jacques_martin.addToCoursesColl(perl);
+    jacques_martin.addToCoursesColl(eyedb_);
+
+    mary_kiss.addToCoursesColl(python);
+
+    // storing objects to database
+    henri_muller.store(org.eyedb.RecMode.FullRecurs);
+    jacques_martin.store(org.eyedb.RecMode.FullRecurs);
+    mary_kiss.store(org.eyedb.RecMode.FullRecurs);
+}
+</pre>
+
+<h2>Java queries</h2>
+<pre class="code">
+static void query_students(org.eyedb.Database db)
+   throws org.eyedb.Exception {
+    org.eyedb.OQL oql = new org.eyedb.OQL(db, "select Student");
+    org.eyedb.ObjectArray obj_arr = new org.eyedb.ObjectArray();
+    oql.execute(obj_arr);
+    int count = obj_arr.getCount();
+    for (int n = 0; n < count; n++) {
+        Student s = (Student)obj_arr.getObject(n);
+        if (s != null) {
+            System.out.println(s.getFirstname() + " " + s.getLastname());
+        }
+    }
+}
+
+static void query_courses(org.eyedb.Database db,
+                          String firstname, String lastname)
+    throws org.eyedb.Exception
+{
+    org.eyedb.OQL oql = new org.eyedb.OQL
+        (db, "select c from Course c where " +
+         "c.teacher.lastname = \"" + lastname + "\" && " +
+         "c.teacher.firstname = \"" + firstname + "\"");
+    
+    org.eyedb.ObjectArray obj_arr = new org.eyedb.ObjectArray();
+    oql.execute(obj_arr);
+    int count = obj_arr.getCount();
+    for (int n = 0; n < count; n++) {
+        Course c = (Course)obj_arr.getObject(n);
+        if (c != null) {
+            System.out.println(firstname + " " + lastname + ": " +
+                               c.getTitle() + " " + c.getDescription());
+        }
+    }
+}
+</pre>
+Get the <a href="quicktour/StudentTest.java" target="_blank">Java file</a>
+
 </div>
 
 <? include( 'footer.php'); ?>
