@@ -38,8 +38,8 @@ The following schema implements the previous model by introducing:
 attributes of students and teachers
 <li>Relationships between:
 <ul>
-<li>Student and registered courses
-<li>Teacher and in charge courses
+<li>Student and registered courses (called "registered to")
+<li>Teacher and in charge courses (called "in charge")
 </ul>
 </ul>
 Here is the Object Definition Language (ODL) implementation of the previous
