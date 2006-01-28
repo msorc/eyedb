@@ -52,9 +52,12 @@ td {
 }
 
 #Header {
- width: 770px ;
- height: 70px;
- background-color: #C0C0C0;
+ width: 766px ;
+ height: 75px;
+}
+
+#Header img {
+ border: 0px solid ;
 }
 
 #TOC ul {
