@@ -1,0 +1,124 @@
+
+// Creating a few courses
+
+oodbms := new Course(status: REQUIRED,
+		     title : "OODBMS",
+		     description : "Object database management systems");
+
+
+rdbms := new Course(status: REQUIRED,
+		    title : "RDBMS",
+		    description : "Relational database management systems");
+
+uml := new Course(status: REQUIRED,
+		  title : "UML",
+		  description : "Unified Modeling Language");
+
+cplus := new Course(status: REQUIRED,
+		    title : "C++",
+		    description : "C++ Language");
+
+java := new Course(status: REQUIRED,
+		   title : "Java",
+		   description : "Java Language");
+
+php := new Course(status: COMPLEMENTARY,
+		  title : "PHP",
+		  description : "PHP Language");
+
+
+// Creating a few students
+
+john_harris := new Student(firstname : "John",
+			   lastname : "Harris",
+			   birthdate : date::date("1994-03-02"),
+			   begin_year : 2002);
+
+suzan_mulder := new Student(firstname : "Suzan",
+			    lastname : "Mulder",
+			    birthdate : date::date("1996-04-12"),
+			    begin_year : 2002);
+
+francois_martin := new Student(firstname : "Francois",
+			       lastname : "Martin",
+			       birthdate : date::date("1983-08-04"),
+			       begin_year : 2001);
+
+// Creating a few teachers
+
+eric_viara := new Teacher(firstname : "Eric",
+			  lastname : "Viara",
+			  birthdate : date::date("1958-12-15"));
+
+francois_dechelle := new Teacher(firstname : "Francois",
+				 lastname : "Dechelle",
+				 birthdate : date::date("1960-06-23"));
+
+// Assign courses to teachers
+
+oodbms.teacher := eric_viara;
+rdbms.teacher := eric_viara;
+uml.teacher := francois_dechelle;
+cplus.teacher := eric_viara;
+java.teacher := francois_dechelle;
+php.teacher := francois_dechelle;
+
+// Assign courses to student
+add oodbms to john_harris.courses;
+add rdbms to john_harris.courses;
+
+add oodbms to suzan_mulder.courses;
+add uml to suzan_mulder.courses;
+add java to suzan_mulder.courses;
+
+add oodbms to francois_martin.courses;
+add rdbms to francois_martin.courses;
+add uml to francois_martin.courses;
+add java to francois_martin.courses;
+add cplus to francois_martin.courses;
+add php to francois_martin.courses;
+
+// Queries
+
+// looking for Persons
+select Student;
+select Teacher;
+select Person;
+
+select Student.firstname = "Francois";
+select firstname + " " + lastname from Student where firstname = "Francois";
+
+select Teacher.firstname = "Francois";
+select Person.firstname = "Francois";
+
+// looking for Courses
+select description from Course where title = "OODBMS";
+select * from Course where title = "OODBMS";
+
+select title from Course where status = REQUIRED;
+
+// looking for Teacher teaching a given course
+select x.teacher.firstname + " " + x.teacher.lastname from Course x
+       where x.title = "OODBMS";
+
+select (Course.title = "OODBMS").teacher.lastname;
+
+// looking for courses teached by a given teacher
+// from Course class:
+select title from Course where teacher.lastname = "Dechelle";
+// from Teacher class:
+select x.courses[?].title from Teacher x where x.lastname = "Dechelle";
+
+// looking for courses learnt by a given student
+// from Student
+select s.courses[?].title from Student s where s.lastname = "Mulder";
+
+select s.courses[?].title from Student s where s.lastname = "Mulder" 
+                                               and s.firstname = "Suzan";
+
+// from Course
+select c.title from Course c where c.students[?].lastname = "Mulder";
+
+select c.title from Course c where c.students[?] =
+   (select one s from Student s where s.lastname = "Mulder" and
+                                      s.firstname = "Suzan");
