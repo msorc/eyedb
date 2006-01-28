@@ -65,7 +65,7 @@ The ODL comments are like in C++:
 \bi
 \item mono-line comments: any characters following \texttt{//} and until
 the end of the line are comments
-\item multi-line comments: any characters (incluin newlines) between \texttt{/*} and \texttt{*/}
+\item multi-line comments: any characters (including newlines) between \texttt{/*} and \texttt{*/}
 are comments
 \ei
 For instance:
@@ -687,13 +687,10 @@ class C2 extends C {
   
 };
 \end{verbatim}
-Indexes are created for:
-\be
-\item \texttt{C::s}
-\item \texttt{C::i}
-\item \texttt{C2::s}
-\item \texttt{C2::i}
-\ee
+Indexes are created for \texttt{C::s}, \texttt{C::i}, \texttt{C2::s}
+and \texttt{C2::i}.
+\\
+\\
 Note that the index on \texttt{C::s} (resp. \texttt{C::i} is different from the
 index on \texttt{C2::s} (resp. \texttt{C2::i}).
 \\
@@ -712,11 +709,7 @@ class C2 extends C {
   
 };
 \end{verbatim}
-Indexes are created only for:
-\be
-\item \texttt{C::s}
-\item \texttt{C::i}
-\ee
+Indexes are created only for only \texttt{C::s} and \texttt{C::i}.
 \subsubsect{Index on attribute of literal composite type}
 One can create indexes on an attribute of a literal composite type, for
 instance:
