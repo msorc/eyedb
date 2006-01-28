@@ -39,7 +39,7 @@
 </div>
 
 <div id="Download">
-links to sourceforge
+<div id="DownloadTitle">Download EyeDB</div>
 </div>
 
 </td>
