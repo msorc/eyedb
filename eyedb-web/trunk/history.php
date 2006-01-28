@@ -2,7 +2,9 @@
 <? include( 'nav.php'); ?>
 
 <div id="CenterBlock">
+
 <h1 id="PageTitle">History</h1>
+
 <p>A first prototype, IDB, was developed at Genethon laboratories for the Genome View project.</p>
 
 <p>The Genome View project was initiated in 1992 to store and facilitate access to the human genome data produced at Genethon (physical and genetic maps).</p>

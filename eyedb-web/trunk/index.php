@@ -3,21 +3,17 @@
 <? include( 'nav.php'); ?>
 
 <div id="CenterBlock">
+
+<h1 id="PageTitle">Welcome to EyeDB</h1>
+
 <p>
-bla bla bla
+EyeDB is an Object Oriented Database Management System (OODBMS) based on the ODMG 3.0
+specification.
 </p>
 
-<div id="NewsBlock">
-> LATEST NEWS 
-<div class="News">
-From <a href="http://sourceforge.net/news/?group_id=127988">Sourceforge</a>:
-<? includeNews( 'http://sourceforge.net/export/rss2_projnews.php?group_id=127988', 'news_cache_sourceforge.net_news.html', 30); ?>
-</div>
-<div class="News">
-From <a href="http://blog.eyedb.org">EyEDB blog</a>:
-<? includeNews( 'http://blog.eyedb.org/?feed=rss2', 'news_cache_blog.eyedb.org_2.html', 60); ?>
-</div>
-</div>
+<p>
+EyeDB features an advanced object model (inheritance, collections, arrays, methods, triggers, constraints, reflexivity), a type definition language based on ODMG ODL, an object query and manipulation language based on ODMG OQL and programming interfaces for C++ and Java.
+</p>
 
 </div>
 

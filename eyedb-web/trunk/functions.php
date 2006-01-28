@@ -4,11 +4,14 @@ class RSSParser {
 
   var $insideitem;
   var $tag;
+
+  var $out;
+  var $empty;
+
   var $title;
   var $description;
   var $link;
-  var $out;
-  var $empty;
+  var $date;
 
   function parse( $url, $file)
   {
@@ -17,6 +20,8 @@ class RSSParser {
     $this->title = "";
     $this->description = "";
     $this->link = "";
+    $this->date = "";
+	
     $this->empty = true;
 
     $xml_parser = xml_parser_create();
