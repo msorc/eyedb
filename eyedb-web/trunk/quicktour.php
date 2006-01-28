@@ -1,5 +1,7 @@
 <? $title = 'EyeDB Quick Tour'; include( 'header.php'); ?>
 
+<? $width = 540 ?>
+
 <h1><?= $title ?></h1>
 
 <p>
@@ -45,7 +47,7 @@ model:
 <br>
 <br>
 <table border=1 cellpadding=5 cellspacing=0>
-<tr><td width=540>
+<tr><td width=<?= $width ?> >
 <pre class="code">
 class Person {
   attribute string firstname;
@@ -97,9 +99,9 @@ the relationships
 </ul>
 <h2><a name="oqlm">Create data using OQL</a></h2>
 
+<table border=1 cellpadding=5 cellspacing=0>
+<tr><td width=<?= $width ?> >
 <pre class="code">
-// Creating a few courses
-
 oodbms := new Course(title : "OODBMS",
 		     description : "Object database management systems");
 
@@ -118,10 +120,14 @@ java := new Course(title : "Java",
 
 php := new Course(title : "PHP",
 		  description : "PHP Language");
-
-
-// Creating a few students
-
+</pre>
+</td></tr>
+</table>
+<br>
+<br>
+<table border=1 cellpadding=5 cellspacing=0>
+<tr><td width=<?= $width ?> >
+<pre class="code">
 john_harris := new Student(firstname : "John",
 			   lastname : "Harris",
 			   begin_year : 2002);
@@ -134,6 +140,14 @@ francois_martin := new Student(firstname : "Francois",
 			       lastname : "Martin",
 			       begin_year : 2001);
 
+</pre>
+</td></tr>
+</table>
+<br>
+<br>
+<table border=1 cellpadding=5 cellspacing=0>
+<tr><td width=<?= $width ?> >
+<pre class="code">
 // Creating a few teachers
 
 eric_viara := new Teacher(firstname : "Eric",
@@ -166,11 +180,13 @@ add java to francois_martin.courses;
 add cplus to francois_martin.courses;
 add php to francois_martin.courses;
 </pre>
+</td></tr></table>
 
 <h2><a name="oqlq">Query data using OQL</a></h2>
 
+<table border=1 cellpadding=5 cellspacing=0>
+<tr><td width=<?= $width ?> >
 <pre class="code">
-
 // looking for Persons
 select Student;
 select Teacher;
@@ -212,8 +228,14 @@ select c.title from Course c where c.students[?] =
    (select one s from Student s where s.lastname = "Mulder" and
                                       s.firstname = "Suzan");
 </pre>
-View the <a href="quicktour/student.oql" target="_blank">OQL file</a>
+</td></tr></table>
+<br>
+<br>
+View the whole <a href="quicktour/student.oql" target="_blank">OQL file</a>
 <h2><a name="cm">Create data using the C++ binding</a></h2>
+
+<table border=1 cellpadding=5 cellspacing=0>
+<tr><td width=<?= $width ?> >
 <pre class="code">
 static void create(eyedb::Database *db)
 {
@@ -271,7 +293,12 @@ static void create(eyedb::Database *db)
   mary_kiss->store(eyedb::RecMode::FullRecurs);
 }
 </pre>
+</td></tr></table>
+<br>
+<br>
 <h2><a name="cq">Query data using the C++ binding and OQL</a></h2>
+<table border=1 cellpadding=5 cellspacing=0>
+<tr><td width=<?= $width ?> >
 <pre class="code">
 static void query_students(eyedb::Database *db)
 {
@@ -305,8 +332,14 @@ static void query_courses(eyedb::Database *db,
   }
 }
 </pre>
-View the <a href="quicktour/student_test.cc" target="_blank">C++ file</a>
+</td></tr></table>
+<br>
+<br>
+
+View the whole <a href="quicktour/student_test.cc" target="_blank">C++ file</a>
 <h2><a name="jm">Create data using the Java binding</a></h2>
+<table border=1 cellpadding=5 cellspacing=0>
+<tr><td width=<?= $width ?> >
 <pre class="code">
 static void create(student.Database db) throws org.eyedb.Exception {
     Course perl = new Course(db);
@@ -363,8 +396,13 @@ static void create(student.Database db) throws org.eyedb.Exception {
     mary_kiss.store(org.eyedb.RecMode.FullRecurs);
 }
 </pre>
+</td></tr></table>
+<br>
+<br>
 
 <h2><a name="jq">Query data using the C++ binding and OQL</a></h2>
+<table border=1 cellpadding=5 cellspacing=0>
+<tr><td width=<?= $width ?> >
 <pre class="code">
 static void query_students(org.eyedb.Database db)
    throws org.eyedb.Exception {
@@ -401,7 +439,10 @@ static void query_courses(org.eyedb.Database db,
     }
 }
 </pre>
-View the <a href="quicktour/StudentTest.java" target="_blank">Java file</a>
+</td></tr></table>
+<br>
+<br>
+View the whole <a href="quicktour/StudentTest.java" target="_blank">Java file</a>
 
 </p>
 
