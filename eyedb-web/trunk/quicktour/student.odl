@@ -1,0 +1,29 @@
+
+class Person {
+  attribute string firstname;
+  attribute string lastname;
+  attribute date birthdate;
+};
+
+class Student extends Person {
+  attribute short begin_year;
+  relationship set<Course *> courses inverse students;
+};
+
+enum CourseStatus {
+  COMPLEMENTARY,
+  REQUIRED
+};
+
+class Course {
+  attribute CourseStatus status;
+  attribute string title;
+  attribute string description;
+  relationship set<Student *> students inverse courses;
+  relationship Teacher *teacher inverse courses;
+};
+
+class Teacher extends Person {
+  relationship set<Course *> courses inverse teacher;
+};
+
