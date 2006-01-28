@@ -99,12 +99,12 @@ the relationships
 </ul>
 <h2><a name="oqlm">Create data using OQL</a></h2>
 
+<h3>Creating a few courses</h3>
 <table border=1 cellpadding=5 cellspacing=0>
 <tr><td width=<?= $width ?> >
 <pre class="code">
 oodbms := new Course(title : "OODBMS",
 		     description : "Object database management systems");
-
 
 rdbms := new Course(title : "RDBMS",
 		    description : "Relational database management systems");
@@ -125,47 +125,57 @@ php := new Course(title : "PHP",
 </table>
 <br>
 <br>
+A few comments:
+<ul>
+<li>The <code>new</code> OQL operator...
+<li>To construct on object, one must give its attribute values...
+<li>The OQL variables <code>oodbms, rdbms</code> etc. are 
+</ul>
+<h3>Creating a few students</h3>
 <table border=1 cellpadding=5 cellspacing=0>
 <tr><td width=<?= $width ?> >
 <pre class="code">
-john_harris := new Student(firstname : "John",
-			   lastname : "Harris",
+john_harris := new Student(firstname : "John", lastname : "Harris",
 			   begin_year : 2002);
 
-suzan_mulder := new Student(firstname : "Suzan",
-			    lastname : "Mulder",
+suzan_mulder := new Student(firstname : "Suzan", lastname : "Mulder",
 			    begin_year : 2002);
 
-francois_martin := new Student(firstname : "Francois",
-			       lastname : "Martin",
+francois_martin := new Student(firstname : "Francois", lastname : "Martin",
 			       begin_year : 2001);
-
 </pre>
 </td></tr>
 </table>
 <br>
 <br>
+<h3>Creating two teachers</h3>
 <table border=1 cellpadding=5 cellspacing=0>
 <tr><td width=<?= $width ?> >
 <pre class="code">
-// Creating a few teachers
-
-eric_viara := new Teacher(firstname : "Eric",
-			  lastname : ");
+eric_viara := new Teacher(firstname : "Eric", lastname : "Viara");
 
 francois_dechelle := new Teacher(firstname : "Francois",
-				 lastname : "Dechelle");
-
-// Assign courses to teachers
-
+                                 lastname : "Dechelle");
+</pre>
+</td></tr>
+</table>
+<h3>Assigning the courses to the teachers</h3>
+<table border=1 cellpadding=5 cellspacing=0>
+<tr><td width=<?= $width ?> >
+<pre class="code">
 oodbms.teacher := eric_viara;
 rdbms.teacher := eric_viara;
 uml.teacher := francois_dechelle;
 cplus.teacher := eric_viara;
 java.teacher := francois_dechelle;
 php.teacher := francois_dechelle;
-
-// Assign courses to student
+</pre>
+</td></tr>
+</table>
+<h3>Assigning the courses to the students</h3>
+<table border=1 cellpadding=5 cellspacing=0>
+<tr><td width=<?= $width ?> >
+<pre class="code">
 add oodbms to john_harris.courses;
 add rdbms to john_harris.courses;
 
@@ -184,10 +194,10 @@ add php to francois_martin.courses;
 
 <h2><a name="oqlq">Query data using OQL</a></h2>
 
+<h3>Looking for persons</h3>
 <table border=1 cellpadding=5 cellspacing=0>
 <tr><td width=<?= $width ?> >
 <pre class="code">
-// looking for Persons
 select Student;
 select Teacher;
 select Person;
@@ -198,30 +208,51 @@ select firstname + " " + lastname from Student where firstname = "Francois";
 select Teacher.firstname = "Francois";
 select Person.firstname = "Francois";
 
-// looking for Courses
+</pre>
+</td></tr>
+</table>
+<h3>Looking for courses</h3>
+<table border=1 cellpadding=5 cellspacing=0>
+<tr><td width=<?= $width ?> >
+<pre class="code">
 select description from Course where title = "OODBMS";
 select * from Course where title = "OODBMS";
-
-// looking for Teacher teaching a given course
+</pre>
+</td></tr>
+</table>
+<h3>Looking for Teacher teaching a given course</h3>
+<table border=1 cellpadding=5 cellspacing=0>
+<tr><td width=<?= $width ?> >
+<pre class="code">
 select x.teacher.firstname + " " + x.teacher.lastname from Course x
        where x.title = "OODBMS";
 
 select (Course.title = "OODBMS").teacher.lastname;
-
-// looking for courses teached by a given teacher
-// from Course class:
+</pre>
+</td></tr>
+</table>
+<h3>Looking for courses teached by a given teacher</h3>
+<table border=1 cellpadding=5 cellspacing=0>
+<tr><td width=<?= $width ?> >
+<pre class="code">
+// Using Course class:
 select title from Course where teacher.lastname = "Dechelle";
-// from Teacher class:
+// Using Teacher class:
 select x.courses[?].title from Teacher x where x.lastname = "Dechelle";
-
-// looking for courses learnt by a given student
-// from Student
+</pre>
+</td></tr>
+</table>
+<h3>Looking for courses learnt by a given student</h3>
+<table border=1 cellpadding=5 cellspacing=0>
+<tr><td width=<?= $width ?> >
+<pre class="code">
+// Using Student class:
 select s.courses[?].title from Student s where s.lastname = "Mulder";
 
 select s.courses[?].title from Student s where s.lastname = "Mulder" 
                                                and s.firstname = "Suzan";
 
-// from Course
+// Using Course class:
 select c.title from Course c where c.students[?].lastname = "Mulder";
 
 select c.title from Course c where c.students[?] =

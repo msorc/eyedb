@@ -60,7 +60,7 @@ francois_martin := new Student(firstname : "Francois",
 // Creating a few teachers
 
 eric_viara := new Teacher(firstname : "Eric",
-			  lastname : ");
+			  lastname : "Viara");
 
 francois_dechelle := new Teacher(firstname : "Francois",
 				 lastname : "Dechelle");
