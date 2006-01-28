@@ -1,11 +1,26 @@
-<? include( 'header.php'); ?>
-<? include( 'nav.php'); ?>
+<? $title = 'EyeDB Quick Tour'; include( 'header.php'); ?>
 
-<div id="CenterBlock">
-<h1 id="PageTitle">EyeDB Quick Tour</h1>
-<p>
+<h1 id="PageTitle"><?= $title ?></h1>
 
-<h2>A short ODL schema</h2>
+This page provide a very quick tour of the EyeDB OODBMS by
+showing some of its capabilities.
+<br>
+<br>
+We introduce here the ways to:
+<ul>
+<li><a href="#odl">Define a schema using the Object Definition Language (ODL)</a></li>
+<li><a href="#oqlm">Create data using the Object
+Query Language (OQL)</a></li>
+<li><a href="#oqlq">Query data using OQL</a></li>
+<li><a href="#cm">Create data using the C++ binding</a></li>
+<li><a href="#cq">Query data using the C++ binding and OQL</a></li>
+<li><a href="#jm">Create data using the Java binding</a></li>
+<li><a href="#jq">Query data using the C++ binding and OQL</a></li>
+</ul>
+<h2><a name="odl">Defining a schema using ODL</a></h2>
+We want to modelize a very simple university
+<ul>
+<li>A student has a firstname, a lastname and 
 <pre class="code">
 class Person {
   attribute string firstname;
@@ -29,7 +44,8 @@ class Teacher extends Person {
 };
 </pre>
 Get the <a href="quicktour/student.odl" target="_blank">ODL file</a>
-<h2>OQL creation</h2>
+<h2><a name="oqlm">Create data using OQL</a></h2>
+
 <pre class="code">
 // Creating a few courses
 
@@ -100,7 +116,7 @@ add cplus to francois_martin.courses;
 add php to francois_martin.courses;
 </pre>
 
-<h2>OQL queries</h2>
+<h2><a name="oqlq">Query data using OQL</a></h2>
 
 <pre class="code">
 
@@ -146,7 +162,7 @@ select c.title from Course c where c.students[?] =
                                       s.firstname = "Suzan");
 </pre>
 Get the <a href="quicktour/student.oql" target="_blank">OQL file</a>
-<h2>C++ creation</h2>
+<h2><a name="cm">Create data using the C++ binding</a></h2>
 <pre class="code">
 static void create(eyedb::Database *db)
 {
@@ -204,7 +220,7 @@ static void create(eyedb::Database *db)
   mary_kiss->store(eyedb::RecMode::FullRecurs);
 }
 </pre>
-<h2>C++ queries</h2>
+<h2><a name="cq">Query data using the C++ binding and OQL</a></h2>
 <pre class="code">
 static void query_students(eyedb::Database *db)
 {
@@ -239,7 +255,7 @@ static void query_courses(eyedb::Database *db,
 }
 </pre>
 Get the <a href="quicktour/student_test.cc" target="_blank">C++ file</a>
-<h2>Java creation</h2>
+<h2><a name="jm">Create data using the Java binding</a></h2>
 <pre class="code">
 static void create(student.Database db) throws org.eyedb.Exception {
     Course perl = new Course(db);
@@ -297,7 +313,7 @@ static void create(student.Database db) throws org.eyedb.Exception {
 }
 </pre>
 
-<h2>Java queries</h2>
+<h2><a name="jq">Query data using the C++ binding and OQL</a></h2>
 <pre class="code">
 static void query_students(org.eyedb.Database db)
    throws org.eyedb.Exception {
