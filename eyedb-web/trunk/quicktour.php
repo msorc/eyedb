@@ -1,7 +1,5 @@
 <? $title = 'EyeDB Quick Tour'; include( 'header.php'); ?>
 
-<? $width = 540 ?>
-
 <h1><?= $title ?></h1>
 
 <p>
@@ -47,8 +45,8 @@ model:
 <br>
 <br>
 <table border=1 cellpadding=5 cellspacing=0>
-<tr><td width=<?= $width ?> >
-<pre class="code">
+<tr><td class="Code">
+<pre>
 class Person {
   attribute string firstname;
   attribute string lastname;
@@ -110,9 +108,11 @@ To enter the following OQL statement, we can use the <code>eyedboql</code>
 interactive tool included in the distribution.
 <h3>Creating a few courses</h3>
 We begin by creating a few courses:
+<br>
+<br>
 <table border=1 cellpadding=5 cellspacing=0>
-<tr><td width=<?= $width ?> >
-<pre class="code">
+<tr><td class="Code">
+<pre>
 oodbms := new Course(title : "OODBMS",
 		     description : "Object database management systems");
 
@@ -152,8 +152,8 @@ there scope is limitated to the current OQL session.
 <h3>Creating a few students</h3>
 We can now create a few students:
 <table border=1 cellpadding=5 cellspacing=0>
-<tr><td width=<?= $width ?> >
-<pre class="code">
+<tr><td class="Code">
+<pre>
 john_harris := new Student(firstname : "John", lastname : "Harris",
 			   begin_year : 2002);
 
@@ -173,8 +173,8 @@ attributes.
 <h3>Creating two teachers</h3>
 We create now two teachers:
 <table border=1 cellpadding=5 cellspacing=0>
-<tr><td width=<?= $width ?> >
-<pre class="code">
+<tr><td class="Code">
+<pre>
 eric_viara := new Teacher(firstname : "Eric", lastname : "Viara");
 
 francois_dechelle := new Teacher(firstname : "Francois",
@@ -186,8 +186,8 @@ francois_dechelle := new Teacher(firstname : "Francois",
 We deal now with the relationship "in charge" between <code>Course</code>
 and <code>Teacher</code>:
 <table border=1 cellpadding=5 cellspacing=0>
-<tr><td width=<?= $width ?> >
-<pre class="code">
+<tr><td class="Code">
+<pre>
 oodbms.teacher := eric_viara;
 rdbms.teacher := eric_viara;
 uml.teacher := francois_dechelle;
@@ -218,8 +218,8 @@ collections of the teacher <code>francois_dechelle</code>).
 We deal now with the relationship "registered to" between <code>Student</code>
 and <code>Course</code>:
 <table border=1 cellpadding=5 cellspacing=0>
-<tr><td width=<?= $width ?> >
-<pre class="code">
+<tr><td class="Code">
+<pre>
 add oodbms to john_harris.courses;
 add rdbms to john_harris.courses;
 
@@ -255,8 +255,8 @@ collection)
 
 <h3>Looking for persons</h3>
 <table border=1 cellpadding=5 cellspacing=0>
-<tr><td width=<?= $width ?> >
-<pre class="code">
+<tr><td class="Code">
+<pre>
 select Student;
 select Teacher;
 select Person;
@@ -272,8 +272,8 @@ select Person.firstname = "Francois";
 </table>
 <h3>Looking for courses</h3>
 <table border=1 cellpadding=5 cellspacing=0>
-<tr><td width=<?= $width ?> >
-<pre class="code">
+<tr><td class="Code">
+<pre>
 select description from Course where title = "OODBMS";
 select * from Course where title = "OODBMS";
 </pre>
@@ -281,8 +281,8 @@ select * from Course where title = "OODBMS";
 </table>
 <h3>Looking for Teacher teaching a given course</h3>
 <table border=1 cellpadding=5 cellspacing=0>
-<tr><td width=<?= $width ?> >
-<pre class="code">
+<tr><td class="Code">
+<pre>
 select x.teacher.firstname + " " + x.teacher.lastname from Course x
        where x.title = "OODBMS";
 
@@ -292,8 +292,8 @@ select (Course.title = "OODBMS").teacher.lastname;
 </table>
 <h3>Looking for courses teached by a given teacher</h3>
 <table border=1 cellpadding=5 cellspacing=0>
-<tr><td width=<?= $width ?> >
-<pre class="code">
+<tr><td class="Code">
+<pre>
 // Using Course class:
 select title from Course where teacher.lastname = "Dechelle";
 // Using Teacher class:
@@ -303,8 +303,8 @@ select x.courses[?].title from Teacher x where x.lastname = "Dechelle";
 </table>
 <h3>Looking for courses learnt by a given student</h3>
 <table border=1 cellpadding=5 cellspacing=0>
-<tr><td width=<?= $width ?> >
-<pre class="code">
+<tr><td class="Code">
+<pre>
 // Using Student class:
 select s.courses[?].title from Student s where s.lastname = "Mulder";
 
@@ -325,8 +325,8 @@ View the whole <a href="quicktour/student.oql" target="_blank">OQL file</a>
 <h2><a name="cm">Create data using the C++ binding</a></h2>
 
 <table border=1 cellpadding=5 cellspacing=0>
-<tr><td width=<?= $width ?> >
-<pre class="code">
+<tr><td class="Code">
+<pre>
 static void create(eyedb::Database *db)
 {
   Course *perl = new Course(db);
@@ -388,8 +388,8 @@ static void create(eyedb::Database *db)
 <br>
 <h2><a name="cq">Query data using the C++ binding and OQL</a></h2>
 <table border=1 cellpadding=5 cellspacing=0>
-<tr><td width=<?= $width ?> >
-<pre class="code">
+<tr><td class="Code">
+<pre>
 static void query_students(eyedb::Database *db)
 {
   eyedb::OQL oql(db, "select Student");
@@ -429,8 +429,8 @@ static void query_courses(eyedb::Database *db,
 View the whole <a href="quicktour/student_test.cc" target="_blank">C++ file</a>
 <h2><a name="jm">Create data using the Java binding</a></h2>
 <table border=1 cellpadding=5 cellspacing=0>
-<tr><td width=<?= $width ?> >
-<pre class="code">
+<tr><td class="Code">
+<pre>
 static void create(student.Database db) throws org.eyedb.Exception {
     Course perl = new Course(db);
     perl.setTitle("Perl");
@@ -492,8 +492,8 @@ static void create(student.Database db) throws org.eyedb.Exception {
 
 <h2><a name="jq">Query data using the C++ binding and OQL</a></h2>
 <table border=1 cellpadding=5 cellspacing=0>
-<tr><td width=<?= $width ?> >
-<pre class="code">
+<tr><td class="Code">
+<pre>
 static void query_students(org.eyedb.Database db)
    throws org.eyedb.Exception {
     org.eyedb.OQL oql = new org.eyedb.OQL(db, "select Student");

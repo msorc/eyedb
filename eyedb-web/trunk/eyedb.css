@@ -30,9 +30,22 @@ body {
  padding: 0px;
 }
 
+.Code {
+  width: 540px;
+  background-color: #FFEEEE;
+}
+
 #HeaderCol img {
  vertical-align: top;
  border: solid 0px;
+}
+
+.MailList tr {
+  background-color: #EEEEEE;
+}
+
+.MailList a {
+  padding-left: 10px;
 }
 
 #NavCol {
@@ -50,13 +63,13 @@ body {
 
 #Nav ul {
   margin: 0px;
-  padding: 10px 0 10px 10px;
+  padding: 10px 0 10px 5px;
   list-style-type: none;
 }
 
 #Nav li {
   margin: 0;
-  padding: 0.15em;
+  padding: 0.10em;
 }
 
 #Nav a {

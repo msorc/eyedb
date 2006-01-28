@@ -1,6 +1,6 @@
 <? $title = 'Platforms'; include( 'header.php'); ?>
 
-<h1 id="PageTitle">Platforms</h1>
+<h1>Platforms</h1>
 <p>
 EyeDB has been ported and tested on the following platforms:
 <ul>

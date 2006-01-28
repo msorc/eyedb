@@ -29,14 +29,16 @@
 <li>&raquo; <a href="history.php">History</a></li>
 <li>&raquo; <a href="platforms.php">Platforms</a></li>
 <li>&raquo; <a href="licensing.php">Licensing</a></li>
-<li>&raquo; <a href="devteam.php">Development team</a></li>
+<!-- TBD -->
+<!-- <li>&raquo; <a href="devteam.php">Development team</a></li> -->
 <li>&raquo; <a href="mailinglists.php">Mailing Lists</a></li>
 <li>&raquo; <a href="http://sourceforge.net/projects/eyedb">Sourceforge</a></li>
 <li>&raquo; <a href="http://wiki.eyedb.org">Wiki</a></li>
 <li>&raquo; <a href="http://blog.eyedb.org">Blog</a></li>
 <li>&raquo; <a href="irc.php">IRC</a></li>
 <li>&raquo; <a href="http://doc.eyedb.org">Documentation</a></li>
-<li>&raquo; <a href="links.php">Links</a></li>
+<!-- TBD -->
+<!-- <li>&raquo; <a href="links.php">Links</a></li> -->
 </ul>
 </div>
 
