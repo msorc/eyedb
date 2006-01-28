@@ -3,38 +3,40 @@ body {
   font-size: 0.8em;
   margin: 5px;
   padding: 0;
-  text-align: center ;
-}
-
-.Hide {
-  display: none;
-  height: 0;
-  width: 0;
-  overflow: hidden;
-  position: absolute;
+  text-align: left;
 }
 
 #Container {
  width: 776px ;
- margin: 0 auto ;
+ margin: 0px;
+ padding: 0px;
  text-align: left ;
+ border: solid 0px;
 }
 
-#HeaderBlock {
+#HeaderRow {
  width: 776px ;
  height: 75px;
  text-align: left ;
 }
 
-#NavBlock {
-  float:left;
-  margin-left: 5px;
-  margin-top: 10px;
-  width: 150px;
-  text-align: left;
+#CenterRow {
+ width: 776px ;
+ text-align: left ;
+ vertical-align: top;
 }
 
-#NavBlock ul {
+#HeaderCol img {
+ border: solid 0px;
+}
+
+#NavCol {
+ width: 150px;
+ text-align: left;
+ vertical-align: top;
+}
+
+#Nav {
   list-style-type: none;
   margin: 0;
   padding:0;
@@ -48,29 +50,29 @@ body {
   margin: 0 2px;
 }
 
-#CenterBlock {
-  margin-left: 200px;
-  margin-right: 10px;
+#CenterCol {
   text-align: left ;
-  width: 626px;
-  left: 0px;
-  top: 76px;
-  position: absolute;
+  vertical-align: top;
 }
 
-#CenterText {
-  margin: 0;
-  text-align: left ;
-}
-
-#CenterBlock h1 {
+#PageTitle {
   font-weight: bold;
   font-size: 1.2em;
 }
 
-#FooterBlock {
+h1 {
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+#NewsCol {
+  width: 200px;
+  text-align: left ;
+  vertical-align: top;
+}
+
+#FooterRow {
  width: 776px ;
- height: 75px;
  text-align: left ;
 }
 

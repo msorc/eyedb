@@ -1,7 +1,5 @@
-<? include( 'header.php'); ?>
-<? include( 'nav.php'); ?>
+<? $title = 'History'; include( 'header.php'); ?>
 
-<div id="CenterBlock">
 <h1 id="PageTitle">Licensing</h1>
 <p>
    EyeDB is free software; you can redistribute it and/or
@@ -16,7 +14,5 @@
 <p>
 The use of the LGPL allows the integration of EyeDB in proprietary software developments while keeping EyeDB itself free. However, if you develop an application using EyeDB, we strongly encourage you to publish your applications under an open source licence.
 </p>
-
-</div>
 
 <? include( 'footer.php'); ?>

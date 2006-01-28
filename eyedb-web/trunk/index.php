@@ -1,8 +1,4 @@
-<? include( 'functions.php'); ?>
-<? include( 'header.php'); ?>
-<? include( 'nav.php'); ?>
-
-<div id="CenterBlock">
+<? $title = 'Home'; include( 'header.php'); ?>
 
 <h1 id="PageTitle">Welcome to EyeDB</h1>
 
@@ -15,6 +11,5 @@ specification.
 EyeDB features an advanced object model (inheritance, collections, arrays, methods, triggers, constraints, reflexivity), a type definition language based on ODMG ODL, an object query and manipulation language based on ODMG OQL and programming interfaces for C++ and Java.
 </p>
 
-</div>
-
+<? include( 'news.php'); ?>
 <? include( 'footer.php'); ?>
