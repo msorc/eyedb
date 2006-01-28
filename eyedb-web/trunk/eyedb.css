@@ -49,10 +49,13 @@ body {
 }
 
 #CenterBlock {
-  margin-left: 150px;
+  margin-left: 200px;
   margin-right: 10px;
   text-align: left ;
   width: 626px;
+  left: 0px;
+  top: 76px;
+  position: absolute;
 }
 
 #CenterText {
