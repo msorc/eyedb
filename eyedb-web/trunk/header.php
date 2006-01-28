@@ -24,6 +24,7 @@
 <td id="NavCol">
 <div id="Nav">
 <ul>
+<li>&raquo; <a href="index.php">Home</a></li>
 <li>&raquo; <a href="keyfeatures.php">Key features</a></li>
 <li>&raquo; <a href="quicktour.php">Quick tour</a></li>
 <li>&raquo; <a href="history.php">History</a></li>
