@@ -18,15 +18,20 @@ body {
  width: 776px ;
  height: 75px;
  text-align: left ;
+ margin: 0px;
+ padding: 0px;
 }
 
 #CenterRow {
  width: 776px ;
  text-align: left ;
  vertical-align: top;
+ margin: 0px;
+ padding: 0px;
 }
 
 #HeaderCol img {
+ vertical-align: top;
  border: solid 0px;
 }
 
@@ -34,25 +39,46 @@ body {
  width: 150px;
  text-align: left;
  vertical-align: top;
+ margin: 0px;
+ padding: 0px;
 }
 
 #Nav {
+  border-top: solid 15px #97A2C2;
+  background-color: #DCE4FC;
+}
+
+#Nav ul {
+  margin: 0px;
+  padding: 10px 0 10px 10px;
   list-style-type: none;
-  margin: 0;
-  padding:0;
 }
 
 #Nav li {
-  margin-bottom: 5px;
+  margin: 0;
+  padding: 0.15em;
 }
 
 #Nav a {
-  margin: 0 2px;
+  text-decoration: none;
+}
+#Nav a:link {
+  color: #501010;
+}
+#Nav a:visited {
+  color: #501010;
+}
+#Nav a:hover {
+  color: #501010;
+}
+#Nav a:active {
+  color: #501010;
 }
 
 #CenterCol {
   text-align: left ;
   vertical-align: top;
+  border-left: 10px solid #ffffff;
 }
 
 #PageTitle {
@@ -74,5 +100,6 @@ h1 {
 #FooterRow {
  width: 776px ;
  text-align: left ;
+ vertical-align: top;
 }
 
