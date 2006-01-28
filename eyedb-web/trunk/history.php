@@ -1,6 +1,6 @@
 <? $title = 'History'; include( 'header.php'); ?>
 
-<h1 id="PageTitle">History</h1>
+<h1>History</h1>
 
 <p>A first prototype, IDB, was developed at Genethon laboratories for the Genome View project.</p>
 

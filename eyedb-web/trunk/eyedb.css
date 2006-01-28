@@ -7,7 +7,7 @@ body {
 }
 
 #Container {
- width: 776px ;
+ width: 766px ;
  margin: 0px;
  padding: 0px;
  text-align: left ;
@@ -15,7 +15,7 @@ body {
 }
 
 #HeaderRow {
- width: 776px ;
+ width: 766px ;
  height: 75px;
  text-align: left ;
  margin: 0px;
@@ -23,7 +23,7 @@ body {
 }
 
 #CenterRow {
- width: 776px ;
+ width: 766px ;
  text-align: left ;
  vertical-align: top;
  margin: 0px;
@@ -86,10 +86,24 @@ body {
   font-size: 1.2em;
 }
 
-h1 {
-  font-weight: bold;
-  font-size: 1.2em;
+h1, h2, h3, h4, h5, h6 {
+    color: black;
+    background: none;
+    font-weight: normal;
+    margin: 0;
+    padding-top: 0.5em;
+    padding-bottom: 0.17em;
+    border-bottom: 1px solid #aaaaaa;
 }
+h1 { font-size: 188%;}
+h2 { font-size: 150%;}
+h2, h3, h4, h5, h6 {
+    border-bottom: none;
+}
+h3 { font-size: 132%; }
+h4 { font-size: 116%; }
+h5 { font-size: 100%; }
+h6 { font-size: 80%;  }
 
 #NewsCol {
   width: 200px;
@@ -98,7 +112,7 @@ h1 {
 }
 
 #FooterRow {
- width: 776px ;
+ width: 766px ;
  text-align: left ;
  vertical-align: top;
 }
