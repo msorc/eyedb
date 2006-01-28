@@ -2,7 +2,7 @@ noinst_htmldir=$(datadir)/doc/$(PACKAGE)/api/java
 noinst_html_DATA= index.html
 
 JAVADOC=@JAVADOC@
-JAVADOC_FLAGS=-public -all -sourcepath $(top_srcdir)/src/java/src
+JAVADOC_FLAGS=-public -sourcepath $(top_srcdir)/src/java/src
 
 JAVA_FILES= $(wildcard $(top_srcdir)/src/java/src/org/eyedb/*.java)
 
