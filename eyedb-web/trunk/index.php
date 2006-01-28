@@ -1,6 +1,6 @@
 <? $title = 'Home'; include( 'header.php'); ?>
 
-<h1 id="PageTitle">Welcome to EyeDB</h1>
+<h1>Welcome to EyeDB</h1>
 
 <p>
 EyeDB is an Object Oriented Database Management System (OODBMS) based
