@@ -1,3 +1,5 @@
+<? include( 'functions.php'); ?>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
@@ -40,6 +42,7 @@
 
 <div id="Download">
 <div id="DownloadTitle">Download EyeDB</div>
+<? includeRSS( 'http://sourceforge.net/export/rss2_projfiles.php?group_id=127988', 'sourceforge_download.html', 60, 'printDownload'); ?>
 </div>
 
 </td>

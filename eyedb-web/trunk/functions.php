@@ -111,43 +111,88 @@ class RSSParser {
   }
 }
 
-
-function regenerateNewsCache( $url, $cache_file)
+function convertDate( $date, $sep = "-")
 {
-  $rss_parser = new RSSParser();
+  static $months = array( "Jan" => "01", 
+			  "Feb" => "02", 
+			  "Mar" => "03", 
+			  "Apr" => "04", 
+			  "May" => "05", 
+			  "Jun" => "06", 
+			  "Jul" => "07", 
+			  "Aug" => "08", 
+			  "Sep" => "09", 
+			  "Oct" => "10", 
+			  "Nov" => "11", 
+			  "Dec" => "12");
 
-  $item_array = $rss_parser->parse( $url);
+  /* Thu, 26 Jan 2006 21:55:46 GMT -> 2006-01-26 */
+  $arr = explode( " ", $date);
 
-  if (count($item_array) == 0)
-    return;
+  return $arr[3].$sep.$months[$arr[2]].$sep.$arr[1];
+}
 
-  $out = fopen( $cache_file, "w");
-  fwrite( $out, "<dl class=\"NewsList\">\n");
-    
+function printNews( $item_array, $out)
+{
   foreach ($item_array as $item)
     {
-      $s = sprintf( "<dt>%s</dt>\n<dd><a href='%s' class=\"NewsTitleLink\">%s</a></dd>\n<dd>%s</dd>\n",
-		    $item->date,
+      $s = sprintf( "<p><span class=\"NewsDate\">%s</span><br/>\n<a href=\"%s\" class=\"NewsLink\">%s</a></p>\n",
+		    convertDate( $item->date),
 		    $item->link,
-		    $item->title,
-		    $item->description);
+		    $item->title);
 
       fwrite( $out, $s);
     }
+}
 
-  fwrite( $out, "</dl>\n");
-  fclose( $out);
+function printDownload( $item_array, $out)
+{
+  $link = 'http://sourceforge.net/project/showfiles.php?group_id=127988';
+  $count = 3;
+
+  foreach ($item_array as $item)
+    {
+      if( ereg( "^[A-Za-z]+ *[0-9]+.[0-9]+.[0-9]+", $item->title, $res))
+	{
+	  $s = sprintf( "<p><a href=\"%s\" class=\"NewsLink\">%s</a></p>\n",
+			$link,
+			$res[0]);
+
+	  fwrite( $out, $s);
+
+	  if (--$count <= 0)
+	    break;
+	}
+    }
 }
 
 /*
  - test if news cache file needs regeneration
  - includes it
 */
-function includeNews( $url, $cache_file, $cache_lifetime) {
+function includeRSS( $url, $cache_file, $cache_lifetime, $rss_function) {
+  $cache_dir = 'cache';
+  $cache_file = $cache_dir.'/'.$cache_file;
+  
   /* check if cache file does not exist or has a modification time that is older that cache lifetime */
   if (!file_exists( $cache_file) 
       || (time() - filemtime ($cache_file)) >= $cache_lifetime)
-    regenerateNewsCache( $url, $cache_file);
+    {
+      $rss_parser = new RSSParser();
+      $item_array = $rss_parser->parse( $url);
+
+      if (count($item_array) == 0)
+	return;
+
+      if (!file_exists( $cache_dir))
+	mkdir ( $cache_dir);
+
+      $out = fopen( $cache_file, "w");
+    
+      call_user_func( $rss_function, $item_array, $out);
+      
+      fclose( $out);
+    }
 
   include( $cache_file);
 }
