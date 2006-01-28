@@ -13,9 +13,6 @@
 <div id="HeaderBlock">
   <h2 class="Hide">Header</h2>
 	<div id="HeaderLeft">
-	  <a href="index.php" title="EyeDB"><img src="/images/eyedb.png" width="270" height="70" alt="EyeDB" /></a>
-	</div>
-	<div id="HeaderRight">
-	  The open-source<br/>object database
+	  <a href="index.php" title="EyeDB"><img src="images/eyedb-logo.png" width="766" height="75" alt="EyeDB" /></a>
 	</div>
 </div>

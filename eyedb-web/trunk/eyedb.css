@@ -1,7 +1,7 @@
 body {
   font-family:Verdana, Arial, Helvetica, sans-serif;
-  font-size: 0.9em;
-  margin: 2px;
+  font-size: 0.8em;
+  margin: 5px;
   padding: 0;
   text-align: center ;
 }
@@ -15,22 +15,22 @@ body {
 }
 
 #Container {
-/*  width: 770px ; */
+ width: 776px ;
  margin: 0 auto ;
- text-align: left ;
+ text-align: center ;
 }
 
 #HeaderBlock {
- width: 770px ;
-  height: 70px;
- background-color: #C0C0C0;
+ width: 776px ;
+ height: 75px;
+ text-align: left ;
 }
 
 #HeaderLeft {
   float: left;
   position: relative;
-  width: 200px;
-  height: 70px;
+  width: 766px;
+  height: 75px;
   border: 0px;
   padding: 0px;
   margin: 0px;
@@ -39,34 +39,19 @@ body {
 #HeaderLeft img { 
   border: 0px; 
 }
-#HeaderRight {
-  float: right;
-  position: relative;
-  width: 170px;
-  height: 70px;
-  padding: 0px;
-  margin: 0px 25px 0px ;
-  font-size: 1.3em;
-  font-weight: bold ;
-  color: #FFFFFF;
-  text-align: right;
-}
 
 #NavBlock {
   float:left;
   margin-left: 5px;
   margin-top: 10px;
   width: 150px;
+  text-align: left;
 }
 
 #NavBlock ul {
   list-style-type: none;
   margin: 0;
   padding:0;
-}
-
-.NavTitle {
-  font-weight: bold;
 }
 
 #Nav li {
@@ -79,7 +64,13 @@ body {
 
 #CenterBlock {
   margin-left: 150px;
-  margin-right: 150px;
+  margin-right: 10px;
+  text-align: left ;
+}
+
+#CenterText {
+  margin: 0;
+  text-align: left ;
 }
 
 #CenterBlock h1 {
@@ -88,5 +79,8 @@ body {
 }
 
 #FooterBlock {
+ width: 776px ;
+ height: 75px;
+ text-align: left ;
 }
 
