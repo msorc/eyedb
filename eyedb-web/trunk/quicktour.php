@@ -1,7 +1,8 @@
 <? $title = 'EyeDB Quick Tour'; include( 'header.php'); ?>
 
-<h1 id="PageTitle"><?= $title ?></h1>
+<h1><?= $title ?></h1>
 
+<p>
 This page provide a very quick tour of the EyeDB OODBMS by
 showing some of its capabilities.
 <br>
@@ -18,9 +19,33 @@ Query Language (OQL)</a></li>
 <li><a href="#jq">Query data using the C++ binding and OQL</a></li>
 </ul>
 <h2><a name="odl">Defining a schema using ODL</a></h2>
-We want to modelize a very simple university
+We want to modelize a very simple university environment:
 <ul>
-<li>A student has a firstname, a lastname and 
+<li>A course is caracterized by a title and a description
+<li>A student is caracterized by a firstname,
+a lastname and a registration year
+<li>A teacher is caracterized by a firstname and
+a lastname
+<li>A teacher is in charge of one or several courses
+<li>A student is registered to one or several courses
+</ul>
+The following schema implements the previous model by introducing:
+<ul>
+<li>The given attributes: firstname, lastname, begin_year, title, description
+<li>A superclass Person which factorizes the firstname and lastname
+attributes of students and teachers
+<li>Relationships between:
+<ul>
+<li>Student and registered courses
+<li>Teacher and in charge courses
+</ul>
+</ul>
+Here is the Object Definition Language (ODL) implementation of the previous
+model:
+<br>
+<br>
+<table border=1 cellpadding=5 cellspacing=0>
+<tr><td width=540>
 <pre class="code">
 class Person {
   attribute string firstname;
@@ -43,7 +68,33 @@ class Teacher extends Person {
   relationship set<Course *> courses inverse teacher;
 };
 </pre>
-Get the <a href="quicktour/student.odl" target="_blank">ODL file</a>
+</td></tr></table>
+<br>
+<br>
+View the <a href="quicktour/student.odl" target="_blank">ODL file</a>
+<br>
+<br>
+A few comments:
+<ul>
+<li>The inheritance between the classes <code>Student</code> and
+<code>Person</code> and between
+<code>Teacher</code> and <code>Person</code>
+is indicated by the <code>extends</code> keyword.
+<li>The <code>set&lt;Course *&gt; courses</code> attribute in
+the <code>Student</code> class and
+the <code>set&lt;Student *&gt; students</code> attribute in
+the <code>Course</code> class
+denote the relationship
+between the <code>Student</code> and its registered courses
+<li>The <code>set&lt;Course *&gt; courses</code> attribute in
+the <code>Teacher</code> class 
+and the <code>Teacher *teacher</code> attribute in the
+<code>Course</code> class denotes the relationship
+between the <code>Teacher</code> and its in charge <code>Courses</code>
+<li>The inverse directives on the relationship attributes are there to
+indicate to EyeDB to maintain the referential integrity of
+the relationships
+</ul>
 <h2><a name="oqlm">Create data using OQL</a></h2>
 
 <pre class="code">
@@ -161,7 +212,7 @@ select c.title from Course c where c.students[?] =
    (select one s from Student s where s.lastname = "Mulder" and
                                       s.firstname = "Suzan");
 </pre>
-Get the <a href="quicktour/student.oql" target="_blank">OQL file</a>
+View the <a href="quicktour/student.oql" target="_blank">OQL file</a>
 <h2><a name="cm">Create data using the C++ binding</a></h2>
 <pre class="code">
 static void create(eyedb::Database *db)
@@ -254,7 +305,7 @@ static void query_courses(eyedb::Database *db,
   }
 }
 </pre>
-Get the <a href="quicktour/student_test.cc" target="_blank">C++ file</a>
+View the <a href="quicktour/student_test.cc" target="_blank">C++ file</a>
 <h2><a name="jm">Create data using the Java binding</a></h2>
 <pre class="code">
 static void create(student.Database db) throws org.eyedb.Exception {
@@ -350,8 +401,8 @@ static void query_courses(org.eyedb.Database db,
     }
 }
 </pre>
-Get the <a href="quicktour/StudentTest.java" target="_blank">Java file</a>
+View the <a href="quicktour/StudentTest.java" target="_blank">Java file</a>
 
-</div>
+</p>
 
 <? include( 'footer.php'); ?>
