@@ -46,7 +46,31 @@
 <div id="Download">
 <span class="ColTitle">&gt;&nbsp;DOWNLOAD</span>
 <ul>
-<? includeRSS( 'http://sourceforge.net/export/rss2_projfiles.php?group_id=127988', 'sourceforge_download.html', 60, 'printDownload'); ?>
+
+<?
+function printDownload( $item_array, $out)
+{
+  $link = 'http://sourceforge.net/project/showfiles.php?group_id=127988';
+  $count = 3;
+
+  foreach ($item_array as $item)
+    {
+      if( ereg( "^[A-Za-z ]+[0-9]+.[0-9]+.[0-9]+", $item->title, $res))
+	{
+	  $s = sprintf( "<li><a href=\"%s\" class=\"DownloadLink\">%s</a></li>\n",
+			$link,
+			$res[0]);
+
+	  fwrite( $out, $s);
+
+	  if (--$count <= 0)
+	    break;
+	}
+    }
+}
+includeRSS( 'http://sourceforge.net/export/rss2_projfiles.php?group_id=127988', 'sourceforge_download.html', 60, 'printDownload'); 
+
+?>
 </ul>
 </div>
 
