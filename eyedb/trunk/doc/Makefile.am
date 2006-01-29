@@ -26,4 +26,4 @@ SUBDIRS=$(DOXYGEN_DIR) $(JAVADOC_DIR) $(MANPAGES_DIR) $(MANUAL_DIR)
 DIST_SUBDIRS=doxygen javadoc manpages manual
 
 htmldir=$(datadir)/doc/$(PACKAGE)
-dist_html_DATA=index.html eyedbdoc.css
+dist_html_DATA=index.html publications.html eyedbdoc.css
