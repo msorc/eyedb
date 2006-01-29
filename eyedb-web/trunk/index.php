@@ -15,5 +15,11 @@ manipulation language based on ODMG OQL and programming interfaces for
 C++ and Java.
 </p>
 
+<p>
+EyeDB is free software, distributed under the terms of the GNU Lesser General Public
+ License.
+</p>
+
+<? /* include( 'events.php'); */ ?>
 <? include( 'news.php'); ?>
 <? include( 'footer.php'); ?>

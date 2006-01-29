@@ -132,45 +132,6 @@ function convertDate( $date, $sep = "-")
   return $arr[3].$sep.$months[$arr[2]].$sep.$arr[1];
 }
 
-function printNews( $item_array, $out)
-{
-  foreach ($item_array as $item)
-    {
-      $s = sprintf( "
-<p>
-<span class=\"NewsDate\">%s</span><br/>
-<a href=\"%s\" class=\"NewsLink\">%s</a>
-</p>
-",
-		    convertDate( $item->date),
-		    $item->link,
-		    $item->title);
-
-      fwrite( $out, $s);
-    }
-}
-
-function printDownload( $item_array, $out)
-{
-  $link = 'http://sourceforge.net/project/showfiles.php?group_id=127988';
-  $count = 3;
-
-  foreach ($item_array as $item)
-    {
-      if( ereg( "^[A-Za-z ]+[0-9]+.[0-9]+.[0-9]+", $item->title, $res))
-	{
-	  $s = sprintf( "<li><a href=\"%s\" class=\"DownloadLink\">%s</a></li>\n",
-			$link,
-			$res[0]);
-
-	  fwrite( $out, $s);
-
-	  if (--$count <= 0)
-	    break;
-	}
-    }
-}
-
 /*
  - test if news cache file needs regeneration, i.e. does not exist or has a modification time that is older than cache_lifetime in seconds
  - includes it
