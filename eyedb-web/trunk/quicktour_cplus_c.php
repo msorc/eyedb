@@ -73,18 +73,7 @@ View the whole <a href="quicktour/student_test.cc" target="_blank">C++ file</a>
 
 <br>
 <br>
-<table border=0>
-
-<tr><td>Next</td>
-<td><a href="quicktour_cplus_q.php">Query data using the C++ binding and OQL</a></td></tr>
-
-<tr><td>Previous</td>
-<td><a href="quicktour_cplus_c.php">Create data using the C++ binding</a></td></tr>
-
-<tr><td>Top</td>
-<td><a href="quicktour.php">EyeDB Quick Tour</a></td>
-</tr></table>
-
+<? quicktour_nav("quicktour_oql_q.php", "quicktour_cplus_q.php" ); ?>
 </p>
 <br>
 <br>

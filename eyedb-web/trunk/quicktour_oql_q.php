@@ -78,15 +78,7 @@ View the whole <a href="quicktour/student.oql" target="_blank">OQL file</a>
 
 <br>
 <br>
-<table border=0>
-
-<tr><td>Next</td>
-<td><a href="quicktour_cplus_c.php">Create data using the C++ binding</a></td></tr>
-<tr><td>Previous&nbsp;</td>
-<td><a href="quicktour_oql_c.php">Create data using OQL</a></td></tr>
-<tr><td>Top</td>
-<td><a href="quicktour.php">EyeDB Quick Tour</a></td>
-</tr></table>
+<? quicktour_nav("quicktour_oql_c.php", "quicktour_cplus_c.php" ); ?>
 
 </p>
 

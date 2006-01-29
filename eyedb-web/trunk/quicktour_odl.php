@@ -85,14 +85,8 @@ case of succes submit the given schema to the given database.
 
 <br>
 <br>
-<table border=0>
 
-<tr><td>Next</td>
-<td><a href="quicktour_oql_c.php">Create data using OQL</a></td></tr>
-
-<tr><td>Top</td>
-<td><a href="quicktour.php">EyeDB Quick Tour</a></td>
-</tr></table>
+<? quicktour_nav("", "quicktour_oql_c.php"); ?>
 </p>
 <br>
 <br>

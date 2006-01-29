@@ -51,13 +51,7 @@ View the whole <a href="quicktour/StudentTest.java" target="_blank">Java file</a
 
 <br>
 <br>
-<table border=0>
-
-<tr><td>Previous&nbsp;</td>
-<td><a href="quicktour_java_c.php">Create data using the Java binding</a></td></tr>
-<tr><td>Top</td>
-<td><a href="quicktour.php">EyeDB Quick Tour</a></td>
-</tr></table>
+<? quicktour_nav("quicktour_java_c.php", "" ); ?>
 <br>
 <br>
 <? include( 'footer.php'); ?>

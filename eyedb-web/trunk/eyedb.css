@@ -222,3 +222,7 @@ h6 { font-size: 80%;  }
 }
 #FooterRight a:active {
 }
+
+#QuickTourNav {
+  float: right;
+}
