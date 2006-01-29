@@ -55,7 +55,7 @@ body {
  vertical-align: top;
  margin: 0px;
  padding: 0px;
- background-color: #DCE4FC;
+ background-color: #EBF0FD;
  border-top: solid 5px #97A2C2;
  border-bottom: 5px solid #97A2C2;
 }
@@ -96,6 +96,17 @@ body {
   color: #501010;
 }
 
+#Download {
+  border-top: solid 5px #97A2C2;
+  margin: 0;
+  padding: 0;
+}
+
+#Download p {
+  margin-left: 10px;
+  font-size: 90%;
+}
+
 #CenterCol {
   text-align: left ;
   vertical-align: top;
@@ -109,31 +120,39 @@ body {
   width: 170px;
   text-align: left ;
   vertical-align: top;
-  background-color: #DCE4FC;
+  background-color: #EBF0FD;
   border-top: solid 5px #97A2C2;
   border-bottom: 5px solid #97A2C2;
 }
 
 #NewsCol p {
   margin-left: 10px;
+  font-size: 90%;
 }
 
-.NewsFrom {
+.ColTitle {
   font-weight: bold;
+  color: #888888;
 }
 
-.NewsFrom a {
+.ColTitle a {
+  text-decoration: none;
+  color: #888888;
 }
-.NewsFrom a:link {
+
+a.NewsLink {
+  text-decoration: none;
+}
+a.NewsLink:link {
   color: #501010;
 }
-.NewsFrom a:visited {
+a.NewsLink:visited {
   color: #501010;
 }
-.NewsFrom a:hover {
+a.NewsLink:hover {
   color: #501010;
 }
-.NewsFrom a:active {
+a.NewsLink:active {
   color: #501010;
 }
 
