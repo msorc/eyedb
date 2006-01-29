@@ -169,7 +169,7 @@ h5 { font-size: 100%; }
 h6 { font-size: 80%;  }
 
 #FooterLeft {
-  font-size: 80%;
+  font-size: 0.8em;
   margin-left: 5px;
   margin-top: 5px;
   vertical-align: top;
@@ -178,7 +178,7 @@ h6 { font-size: 80%;  }
 }
 
 #FooterRight {
-  font-size: 80%;
+  font-size: 0.8em;
   margin-right: 5px;
   margin-top: 5px;
   vertical-align: top;
