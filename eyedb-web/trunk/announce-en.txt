@@ -19,26 +19,3 @@ SYSRA SARL
 30, avenue General Leclerc
 91330 Yerres
 FRANCE
-
---------------------------------------------------------------------------------
-
-Première distribution publique open source de EyeDB
-
-SYSRA annonce la première distribution publique open source de EyeDB, Système de Gestion de Base de données Orientée Objet (SGBDO) distribué sous licence LGPL.
-
-Les principales caractéristiques de EyeDB sont un modèle objet avancé (héritage, collections, tableaux, méthodes, triggers, constraintes, réflexivité), un langage de définition de types basé sur le langage ODL de ODMG, un langage de requête et de manipulation d'objets basé sur le langage OQL de ODMG et des interfaces de programmation C++ et Java.
-
-EyeDB a été utilisé depuis 1994 dans le cadre de plusieurs grands projets de recherche en biologie moléculaire, en collaboration avec le CRI Infobiogen (http://www.infobiogen.fr) et l'Institut Européen de Bioinformatique (http://www.ebi.ac.uk).
-
-EyeDB est développé par la société SYSRA, par Eric Viara et François Déchelle.
-
-Pour plus d'information et pour le téléchargement, veuillez vous reporter au site EyeDB, accessible à:
-http://www.eyedb.org
-
-Contact: info@eyedb.org
-
---
-SYSRA SARL
-30, avenue General Leclerc
-91330 Yerres
-FRANCE
