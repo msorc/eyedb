@@ -263,6 +263,7 @@ AC_SUBST(EYEDB_ARCH_SO_FLAGS)
 AC_OUTPUT(
 Makefile 
 doc/Makefile
+doc/images/Makefile
 doc/doxygen/Makefile
 doc/doxygen/eyedb-doxygen.cfg
 doc/javadoc/Makefile
