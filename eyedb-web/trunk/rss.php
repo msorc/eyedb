@@ -37,7 +37,7 @@ EyeDB provides an advanced object model (inheritance, collections, arrays, metho
 francois@dechelle.net (Francois Dechelle)
 </author>
 <link>
-events/eyedb-announce.pdf
+events/announce.pdf
 </link>
 <pubDate>Sun, 29 Jan 2006 17:00:00 GMT</pubDate>
 </item>
