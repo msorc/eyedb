@@ -3,13 +3,15 @@ DIST_SUBDIRS=figures
 manualdir=$(datadir)/doc/$(PACKAGE)/manual/pdf
 PDF_PREFIX=EyeDB
 manual_DATA=\
-$(PDF_PREFIX)Administration.pdf \
 $(PDF_PREFIX)CplusplusBinding.pdf \
 $(PDF_PREFIX)GettingStarted.pdf \
 $(PDF_PREFIX)JavaBinding.pdf \
 $(PDF_PREFIX)ODL.pdf \
 $(PDF_PREFIX)OQL.pdf \
 $(PDF_PREFIX)Overview.pdf
+
+# EV 29/01/06
+#$(PDF_PREFIX)Administration.pdf
 
 LATEX= TEXINPUTS=.:$(srcdir): @LATEX@
 LATEX_INPUTS=start.tex version.tex title.tex
@@ -21,13 +23,15 @@ PS2PDFFLAGS= -dPDFsettings=/prepress
 noinst_htmldir=$(datadir)/doc/$(PACKAGE)/manual/html
 if COND_LATEX2HTML
 noinst_html_DATA= \
-html/Administration/index.html \
 html/CplusplusBinding/index.html \
 html/GettingStarted/index.html \
 html/JavaBinding/index.html \
 html/ODL/index.html \
 html/OQL/index.html \
 html/Overview/index.html
+
+# EV 29/01/06
+#html/Administration/index.html
 endif
 
 LATEX2HTML=@LATEX2HTML@
@@ -57,7 +61,8 @@ html/Overview/index.html: Overview.tex
 	-test ! -d html && mkdir html ; test ! -d html/Overview && mkdir html/Overview
 	$(LATEX2HTML) $(LATEX2HTMLFLAGS) -split +2 -dir html/Overview Overview.tex
 
-Administration.dvi: $(LATEX_INPUTS)
+# EV 29/01/06
+#Administration.dvi: $(LATEX_INPUTS)
 CplusplusBinding.dvi: $(LATEX_INPUTS)
 GettingStarted.dvi: $(LATEX_INPUTS)
 JavaBinding.dvi: $(LATEX_INPUTS)
@@ -65,7 +70,8 @@ ODL.dvi: $(LATEX_INPUTS)
 OQL.dvi: $(LATEX_INPUTS)
 Overview.dvi: $(LATEX_INPUTS)
 
-html/Administration/index.html: $(LATEX_INPUTS)
+# EV 29/01/06
+#html/Administration/index.html: $(LATEX_INPUTS)
 html/CplusplusBinding/index.html: $(LATEX_INPUTS)
 html/GettingStarted/index.html: $(LATEX_INPUTS)
 html/JavaBinding/index.html: $(LATEX_INPUTS)
@@ -81,7 +87,9 @@ if COND_LATEX2HTML
 install-data-hook:
 	test -z "$(noinst_htmldir)" || $(mkdir_p) "$(DESTDIR)$(noinst_htmldir)"
 	-rm "$(DESTDIR)$(noinst_htmldir)/index.html"
-	for d in Administration CplusplusBinding GettingStarted JavaBinding ODL OQL Overview ; \
+# EV 29/01/06
+#	for d in Administration CplusplusBinding GettingStarted JavaBinding ODL OQL Overview ; \
+	for d in CplusplusBinding GettingStarted JavaBinding ODL OQL Overview ; \
 	do \
 		test -z "$(noinst_htmldir)/$$d" || $(mkdir_p) "$(DESTDIR)$(noinst_htmldir)/$$d" ; \
 		(cd html/$$d ; \
@@ -96,10 +104,12 @@ endif
 EXTRA_DIST=\
 start.tex \
 title.tex \
-Administration.tex \
 CplusplusBinding.tex \
 GettingStarted.tex \
 JavaBinding.tex \
 ODL.tex \
 OQL.tex \
 Overview.tex
+
+# EV 29/01/06
+# Administration.tex
