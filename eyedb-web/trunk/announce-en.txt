@@ -3,7 +3,7 @@ EyeDB OODBMS first open source public release
 
 SYSRA is pleased to announce the first open source public release of the EyeDB Object Oriented Database Management System under the Lesser General Public License (LGPL).
 
-EyeDB features include an advanced object model (inheritance, collections, arrays, methods, triggers, constraints, reflexivity), an object definition language based on ODMG ODL, an object query and manipulation language based on ODMG OQL and programming interfaces for C++ and Java.
+EyeDB provides an advanced object model (inheritance, collections, arrays, methods, triggers, constraints, reflexivity), an object definition language based on ODMG ODL, an object query and manipulation language based on ODMG OQL and programming interfaces for C++ and Java.
 
 EyeDB has been developped since 1993 by SYSRA and has been used for several large scale projects in molecular biology in collaboration with CRI Infobiogen (http://www.infobiogen.fr) and the European Bioinformatics Institute (http://www.ebi.ac.uk).
 
