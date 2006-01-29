@@ -1,0 +1,22 @@
+
+#
+# Makefile, EyeDB Package
+#
+# Eric Viara Copyright (C) SYSRA 1995-1998
+#
+
+JAVAC = CLASSPATH=.:$(EYEDBCLASSPATH) javac -d .
+
+all: person/Person.class
+
+%.class: %.java
+	$(JAVAC) $<
+
+person/Person.java: schema.odl
+	eyedbodl --gencode=java --no-rootclass --package=person schema.odl
+
+clean_all: clean
+	rm -f person/*.java
+
+clean:
+	rm -f *.class person/*.class
