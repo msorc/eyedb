@@ -68,7 +68,7 @@ function printDownload( $item_array, $out)
 	}
     }
 }
-includeRSS( 'http://sourceforge.net/export/rss2_projfiles.php?group_id=127988', 'sourceforge_download.html', 60, 'printDownload'); 
+includeRSS( 'http://sourceforge.net/export/rss2_projfiles.php?group_id=127988', 'sourceforge_download.html', 'printDownload'); 
 
 ?>
 </ul>

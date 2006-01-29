@@ -24,6 +24,6 @@ function printEvents( $item_array, $out)
 }
 ?>
 
-<? includeRSS( 'events/eyedbrss.php', 'eyedb_events.html', 1*60, 'printEvents'); ?>
+<? includeRSS( 'events/eyedbrss.php', 'eyedb_events.html', 'printEvents'); ?>
 
 </div>
