@@ -27,6 +27,7 @@
 <li>&raquo;<a href="keyfeatures.php">Key features</a></li>
 <li>&raquo;<a href="quicktour.php">Quick tour</a></li>
 <li>&raquo;<a href="history.php">History</a></li>
+<li>&raquo;<a href="publis.php">Publications</a></li>
 <li>&raquo;<a href="platforms.php">Platforms</a></li>
 <li>&raquo;<a href="licensing.php">Licensing</a></li>
 <!-- TBD -->

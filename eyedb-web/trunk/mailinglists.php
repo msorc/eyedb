@@ -39,7 +39,7 @@ eyedb-devel@lists.sourceforge.net
 <td>
 Development discussion list for EyeDB.<br>
 <a href="http://lists.sourceforge.net/lists/listinfo/eyedb-devel">List&nbsp;info&nbsp;page</a><br>
-<a href="http://sourceforge.net/mailarchive/forum.php?forum=eyedb-devel">List&nbsp;archive;</a>
+<a href="http://sourceforge.net/mailarchive/forum.php?forum=eyedb-devel">List&nbsp;archive</a>
 </td>
 </tr>
 <tr valign="center">
