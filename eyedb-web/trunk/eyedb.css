@@ -56,8 +56,8 @@ body {
  margin: 0px;
  padding: 0px;
  background-color: #EBF0FD;
- border-top: solid 5px #97A2C2;
- border-bottom: 5px solid #97A2C2;
+ /* border-top: solid 5px #97A2C2; */
+ /* border-bottom: 5px solid #97A2C2; */
 }
 
 #NavCol ul {
@@ -121,8 +121,13 @@ body {
   text-align: left ;
   vertical-align: top;
   background-color: #EBF0FD;
-  border-top: solid 5px #97A2C2;
-  border-bottom: 5px solid #97A2C2;
+  /* border-top: solid 5px #97A2C2; */
+  /* border-bottom: 5px solid #97A2C2; */
+}
+
+#News {
+  margin: 0px;
+  padding: 10px 0px 10px 0px;
 }
 
 #NewsCol p {
