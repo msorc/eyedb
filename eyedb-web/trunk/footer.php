@@ -13,6 +13,8 @@ if (!isset($rightColumnDone)) {
 
 <tr id="FooterRow">
 <td id="FooterCol" colspan=3>
+<span id="FooterLeft">&copy;&nbsp;2006&nbsp;-&nbsp;eyedb.org</span>
+<span id="FooterRight">|&nbsp;Hosted&nbsp;by&nbsp;Nexen&nbsp;Services&nbsp;|&nbsp;<a href="mailto:info@eyedb.org">Contact</a>&nbsp;|</span>
 </td>
 </tr>
 </table>

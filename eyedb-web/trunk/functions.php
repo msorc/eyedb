@@ -136,7 +136,10 @@ function printNews( $item_array, $out)
 {
   foreach ($item_array as $item)
     {
-      $s = sprintf( "<p><span class=\"NewsDate\">%s</span><br/>\n<a href=\"%s\" class=\"NewsLink\">%s</a></p>\n",
+      $s = sprintf( "
+<p><span class=\"NewsDate\">%s</span><br/>
+<a href=\"%s\" class=\"NewsLink\">%s</a></p>
+",
 		    convertDate( $item->date),
 		    $item->link,
 		    $item->title);
@@ -154,7 +157,7 @@ function printDownload( $item_array, $out)
     {
       if( ereg( "^[A-Za-z ]+[0-9]+.[0-9]+.[0-9]+", $item->title, $res))
 	{
-	  $s = sprintf( "<p><a href=\"%s\" class=\"NewsLink\">%s</a></p>\n",
+	  $s = sprintf( "<p><a href=\"%s\" class=\"DownloadLink\">%s</a></p>\n",
 			$link,
 			$res[0]);
 
@@ -167,14 +170,14 @@ function printDownload( $item_array, $out)
 }
 
 /*
- - test if news cache file needs regeneration
+ - test if news cache file needs regeneration, i.e. does not exist or has a modification time that is older than cache_lifetime in seconds
  - includes it
 */
 function includeRSS( $url, $cache_file, $cache_lifetime, $rss_function) {
   $cache_dir = 'cache';
   $cache_file = $cache_dir.'/'.$cache_file;
   
-  /* check if cache file does not exist or has a modification time that is older that cache lifetime */
+  /* check if cache file does not exist or has a modification time that is older than cache lifetime */
   if (!file_exists( $cache_file) 
       || (time() - filemtime ($cache_file)) >= $cache_lifetime)
     {

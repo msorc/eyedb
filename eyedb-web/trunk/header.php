@@ -4,7 +4,7 @@
    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
 <head>
-<title><? echo 'EyeDB - '.$title; ?></title>
+<title><?= 'EyeDB - '.$title; ?></title>
     <link href="eyedb.css" rel="stylesheet" type="text/css" />
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15" />
 </head>
@@ -23,23 +23,23 @@
 <tr id="CenterRow">
 <td id="NavCol" height="700">
 <ul>
-<li>&gt; <a href="index.php">Home</a></li>
-<li>&gt; <a href="keyfeatures.php">Key features</a></li>
-<li>&gt; <a href="quicktour.php">Quick tour</a></li>
-<li>&gt; <a href="history.php">History</a></li>
-<li>&gt; <a href="platforms.php">Platforms</a></li>
-<li>&gt; <a href="licensing.php">Licensing</a></li>
+<li>&raquo;<a href="index.php">Home</a></li>
+<li>&raquo;<a href="keyfeatures.php">Key features</a></li>
+<li>&raquo;<a href="quicktour.php">Quick tour</a></li>
+<li>&raquo;<a href="history.php">History</a></li>
+<li>&raquo;<a href="platforms.php">Platforms</a></li>
+<li>&raquo;<a href="licensing.php">Licensing</a></li>
 <!-- TBD -->
-<!-- <li>&gt; <a href="devteam.php">Development team</a></li> -->
-<li>&gt; <a href="mailinglists.php">Mailing Lists</a></li>
-<li>&gt; <a href="http://sourceforge.net/projects/eyedb">Sourceforge</a></li>
-<li>&gt; <a href="http://wiki.eyedb.org">Wiki</a></li>
-<li>&gt; <a href="http://blog.eyedb.org">Blog</a></li>
+<!-- <li>&raquo;<a href="devteam.php">Development team</a></li> -->
+<li>&raquo;<a href="mailinglists.php">Mailing Lists</a></li>
+<li>&raquo;<a href="http://sourceforge.net/projects/eyedb">Sourceforge</a></li>
+<li>&raquo;<a href="http://wiki.eyedb.org">Wiki</a></li>
+<li>&raquo;<a href="http://blog.eyedb.org">Blog</a></li>
 <!-- TBD -->
-<!-- <li>&gt; <a href="irc.php">IRC</a></li> -->
-<li>&gt; <a href="http://doc.eyedb.org">Documentation</a></li>
+<!-- <li>&raquo;<a href="irc.php">IRC</a></li> -->
+<li id="LastNav">&raquo;<a href="http://doc.eyedb.org">Documentation</a></li>
 <!-- TBD -->
-<!-- <li>&gt; <a href="links.php">Links</a></li> -->
+<!-- <li>&raquo;<a href="links.php">Links</a></li> -->
 </ul>
 
 <div id="Download">
