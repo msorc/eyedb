@@ -4,13 +4,13 @@
 
 <h2>EyeDB Papers</h2>
 <ul>
-<li><a href="http://www.sysra.com/eyedb-paper.pdf">The EyeDB OODBMS</a>.<br>
+<li><a href="eyedb-paper.pdf">The EyeDB OODBMS</a>.<br>
 E. Viara, E. Barillot &amp; G. Vaysseix;<br>
 <i> International Database Engineering and Applications Symposium 1999, Montreal</i>
 August 1999, IEEE publications, pp 390-402, 1999. 
 </li>
 <br>
-<li>Distributing CORBA Views From an OODBMS.<br>
+<li><a href="eyedb-corba.pdf">Distributing CORBA Views From an OODBMS</a>.<br>
 E. Viara,  E. Barillot and G. Vaysseix,
 <i>International Database Engineering and Applications Symposium 2002</i>, Edmonton July 2002, IEEE publications, pp 116-129, 2002.
 </li>
