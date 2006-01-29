@@ -8,7 +8,7 @@ on the ODMG 3 specification.
 </p>
 
 <p>
-EyeDB features include an advanced object model (inheritance, collections,
+EyeDB provides an advanced object model (inheritance, collections,
 arrays, methods, triggers, constraints, reflexivity), an object
 definition language based on ODMG ODL, an object query and
 manipulation language based on ODMG OQL and programming interfaces for
