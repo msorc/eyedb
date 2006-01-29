@@ -157,16 +157,7 @@ collection)
 
 <br>
 <br>
-<table border=0>
-
-<tr><td>Next</td>
-<td><a href="quicktour_oql_q.php">Query data using OQL</td></tr>
-<tr><td>Previous&nbsp;</td>
-<td><a href="quicktour_odl.php">Define a schema using the Object Definition Language (ODL)</a></td></tr>
-
-<tr><td>Top</td>
-<td><a href="quicktour.php">EyeDB Quick Tour</a></td>
-</tr></table>
+<? quicktour_nav("quicktour_odl.php", "quicktour_oql_q.php" ); ?>
 
 </p>
 <br>

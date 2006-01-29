@@ -163,4 +163,15 @@ function includeRSS( $url, $cache_file, $cache_lifetime, $rss_function) {
   include( $cache_file);
 }
 
+function quicktour_nav($previous, $next) {
+  $s = "<span id=\"QuickTourNav\">";
+  if ($previous)
+    $s .= "<a href=\"$previous\">Previous</a> | ";
+  $s .= "<a href=\"quicktour.php\">Top</a>";
+  if ($next)
+    $s .= " | <a href=\"$next\">Next</a>";
+  $s .= "</span>\n";
+
+  echo $s;
+}
 ?>
