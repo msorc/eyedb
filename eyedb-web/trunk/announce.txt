@@ -10,7 +10,9 @@ EyeDB has been developped since 1993 and was first distributed in 1995 under a p
 For more information and download, please visit EyeDB web site at:
 http://www.eyedb.org
 
-SYSRA (http://www.sysra.com), Yerres, France, provides services, training and consulting in object technologies. It has been created in 1993 by Eric Viara. SYSRA proposes training, services and support on EyeDB.
+About SYSRA: SYSRA (http://www.sysra.com), France, is a software company specialized in object technologies. It has been created in 1993 by Eric Viara. SYSRA proposes services, training and support on the EyeDB OODBMS.
+
+EyeDB development team: Eric Viara, SYSRA CEO, Francois Dechelle, consultant in open source strategies.
 
 Contact: info@eyedb.org
 
@@ -28,12 +30,14 @@ SYSRA annonce la première distribution publique open source de EyeDB, Système de
 
 Les principales caractéristiques de EyeDB sont un modèle objet avancé (héritage, collections, tableaux, méthodes, triggers, constraintes, réflexivité), un langage de définition de types basé sur le langage ODL de ODMG, un langage de requête et de manipulation d'objets basé sur le langage OQL de ODMG et des interfaces de programmation C++ et Java.
 
-EyeDB a été utilisé depuis 1994 dans le cadre de plusieurs grands projets de recherche en biologie moléculaire, en collaboration avec le CRI Infobiogen (http://www.infobiogen.fr) et l'Institut Européen de Bioinformatique (http://www.ebi.ac.uk).
-
-EyeDB est développé par la société SYSRA, par Eric Viara et François Déchelle.
+EyeDB est développé depuis 1993 et a été distribué pour la première fois en 1995 sous licence propriétaire. Il a été utilisé dans le cadre de plusieurs projets de recherche en biologie moléculaire, en collaboration avec le CRI Infobiogen (http://www.infobiogen.fr) et l'Institut Européen de Bioinformatique (http://www.ebi.ac.uk).
 
 Pour plus d'information et pour le téléchargement, veuillez vous reporter au site EyeDB, accessible à:
 http://www.eyedb.org
+
+A propos de SYSRA: SYSRA (http://www.sysra.com), Yerres, France, est une société de services spécialiste des technologies objets. SYSRA a été créée en 1993 par Eric Viara. SYSRA offre des services de conseil, support et formation pour les utilisateurs de EyeDB.
+
+Equipe de développement de EyeDB: Eric Viara, fondateur et président de SYSRA, François Déchelle, consultant en stratégies open source.
 
 Contact: info@eyedb.org
 
