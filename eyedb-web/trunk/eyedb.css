@@ -92,6 +92,7 @@ body {
   text-align: left ;
   vertical-align: top;
   border-left: 10px solid #ffffff;
+  border-right: 10px solid #ffffff;
 }
 
 #PageTitle {
