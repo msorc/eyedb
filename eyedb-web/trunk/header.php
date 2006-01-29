@@ -22,36 +22,34 @@
 </tr>
 <tr id="CenterRow">
 <td id="NavCol" height="700">
-<ul>
-<li>&raquo;<a href="index.php">Home</a></li>
-<li>&raquo;<a href="keyfeatures.php">Key features</a></li>
-<li>&raquo;<a href="quicktour.php">Quick tour</a></li>
-<li>&raquo;<a href="history.php">History</a></li>
-<li>&raquo;<a href="publis.php">Publications</a></li>
-<li>&raquo;<a href="platforms.php">Platforms</a></li>
-<li>&raquo;<a href="licensing.php">Licensing</a></li>
-<!-- TBD -->
-<!-- <li>&raquo;<a href="devteam.php">Development team</a></li> -->
-<li>&raquo;<a href="mailinglists.php">Mailing Lists</a></li>
-<li>&raquo;<a href="http://sourceforge.net/projects/eyedb">Sourceforge</a></li>
-<li>&raquo;<a href="http://wiki.eyedb.org">Wiki</a></li>
-<li>&raquo;<a href="http://blog.eyedb.org">Blog</a></li>
-<!-- TBD -->
-<!-- <li>&raquo;<a href="irc.php">IRC</a></li> -->
-<li id="LastNav">&raquo;<a href="http://doc.eyedb.org">Documentation</a></li>
-<!-- TBD -->
-<!-- <li>&raquo;<a href="links.php">Links</a></li> -->
+
+<ul class="List">
+<li class="FirstItem">&raquo;<a href="index.php">Home</a></li>
+<li class="Item">&raquo;<a href="keyfeatures.php">Key features</a></li>
+<li class="Item">&raquo;<a href="quicktour.php">Quick tour</a></li>
+<li class="Item">&raquo;<a href="history.php">History</a></li>
+<li class="Item">&raquo;<a href="publis.php">Publications</a></li>
+<li class="Item">&raquo;<a href="platforms.php">Platforms</a></li>
+<li class="Item">&raquo;<a href="licensing.php">Licensing</a></li>
+<li class="LastItem">&raquo;<a href="mailinglists.php">Mailing Lists</a></li>
+<!-- Development team -->
+<!-- IRC -->
+<!-- Links -->
 </ul>
 
-<div id="Download">
-<span class="ColTitle">&gt;&nbsp;DOWNLOAD</span>
-<ul>
+<div class="BlockTitle">&gt;&nbsp;EYEDB SITES</div>
+<ul class="List">
+<li class="FirstItem">&raquo;<a href="http://sourceforge.net/projects/eyedb">Sourceforge</a></li>
+<li class="Item">&raquo;<a href="http://wiki.eyedb.org">Wiki</a></li>
+<li class="Item">&raquo;<a href="http://blog.eyedb.org">Blog</a></li>
+<li class="LastItem">&raquo;<a href="http://doc.eyedb.org">Documentation</a></li>
+</ul>
+
+<div class="BlockTitle">&gt;&nbsp;DOWNLOAD</div>
 
 <?
 includeRSS( 'http://sourceforge.net/export/rss2_projfiles.php?group_id=127988', 'sourceforge_download.html', 'printDownload'); 
 ?>
-</ul>
-</div>
 
 </td>
 <td id="CenterCol">

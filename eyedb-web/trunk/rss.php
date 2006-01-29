@@ -30,14 +30,14 @@ EyeDB, the open source object database
 <item>
 <title>EyeDB OODBMS first open source public release</title>
 <description>
-SYSRA is pleased to announce the first open source public release of the EyeDB Object Oriented Database Management System (OODBMS) under the Lesser General Public License (LGPL).
+SYSRA is pleased to announce the first open source public release of the EyeDB Object Oriented Database Management System (OODBMS) under the Lesser General Public License (LGPL).&lt;br&gt;
 EyeDB provides an advanced object model (inheritance, collections, arrays, methods, triggers, constraints, reflexivity), an object definition language based on ODMG ODL, an object query and manipulation language based on ODMG OQL and programming interfaces for C++ and Java.
 </description>
 <author>
 francois@dechelle.net (Francois Dechelle)
 </author>
 <link>
-http://www.eyedb.org/events/eyedb-announce.pdf
+events/eyedb-announce.pdf
 </link>
 <pubDate>Sun, 29 Jan 2006 17:00:00 GMT</pubDate>
 </item>

@@ -4,7 +4,6 @@
 
 error_reporting( E_ALL);
 
-
 include( 'functions.php');
 
 includeRSS( 'http://localhost/eyedb/rss.php', 'eyedb_events.html', 'printEvents', true, 30);
