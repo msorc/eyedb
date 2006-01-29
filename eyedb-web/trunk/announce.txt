@@ -5,12 +5,12 @@ SYSRA is pleased to announce the first open source public release of the EyeDB O
 
 EyeDB provides an advanced object model (inheritance, collections, arrays, methods, triggers, constraints, reflexivity), an object definition language based on ODMG ODL, an object query and manipulation language based on ODMG OQL and programming interfaces for C++ and Java.
 
-EyeDB has been used since 1994 for several large scale projects in molecular biology in collaboration with CRI Infobiogen (http://www.infobiogen.fr) and the European Bioinformatics Institute (http://www.ebi.ac.uk).
-
-EyeDB is currently being developed at SYSRA by Eric Viara and Francois Dechelle.
+EyeDB has been developped since 1993 and was first distributed in 1995 under a proprietary licence. It has been used for several projects in molecular biology, in collaboration with CRI Infobiogen (http://www.infobiogen.fr), Evry, France, and the European Bioinformatics Institute (http://www.ebi.ac.uk), Cambridge, UK.
 
 For more information and download, please visit EyeDB web site at:
 http://www.eyedb.org
+
+SYSRA (http://www.sysra.com), Yerres, France, provides services, training and consulting in object technologies. It has been created in 1993 by Eric Viara. SYSRA proposes training, services and support on EyeDB.
 
 Contact: info@eyedb.org
 
