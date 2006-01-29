@@ -1,0 +1,15 @@
+#
+# Makefile, Eyedb Package
+#
+# examples/JavaBinding/generic makefile
+#
+# Eric Viara Copyright (C) SYSRA 1998
+#
+
+SUBDIRS = appli applet
+
+all:
+	@for dir in $(SUBDIRS); do $(MAKE) -C $${dir} $@; done
+
+%:
+	@for dir in $(SUBDIRS); do $(MAKE) -C $${dir} $@; done
