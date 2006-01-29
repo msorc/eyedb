@@ -34,7 +34,7 @@ and precedence are quite identical to the corresponding C and C++ expressions}.
 
 \sect{Introduction}
 In this chapter, we present the \eyedb Object Query Language which supports
-the \eyedb object model. It is based on the ODMG 2.0 Object Query Language
+the \eyedb object model. It is based on the ODMG 3 Object Query Language
 OQL.
 \\
 \\
@@ -55,12 +55,12 @@ A quick reference manual of OQL is given in \oqlsect{qref}.
 \\
 \\
 In this chapter, OQL denotes the \eyedb Object Query Language while
-the standard ODMG 2.0 Object Query Language will be denoted as ODMG OQL.
+the standard ODMG 3 Object Query Language will be denoted as ODMG OQL.
 
 \sect{Principles}
 \label{principles}
 The principles of OQL are close to the principles of ODMG OQL introduced
-in the book \emph{Object Database Standard, ODMG 2.0} by Rick Cattell and al.
+in the book \emph{Object Database Standard, ODMG 3} by Rick Cattell and al.
 \\
 \\
 Our design is based on the following principles and assumptions:
@@ -81,7 +81,7 @@ long as the operands respect the type system.
 Conversely, OQL can invoke operations programmed in this language.
 \ei
 
-\sect{OQL vs. ODMG 2.0 OQL}
+\sect{OQL vs. ODMG 3 OQL}
 \label{diffoql}
 OQL implements all the ODMG OQL functionalities with a few exceptions
 concerning the \texttt{select} clause.
@@ -2053,7 +2053,7 @@ mechanisms: that means, that one cannot have differents functions with
 the same name and a different signature.
 To take benefit of the overloading mechanisms, one must use methods.
 \\
-\emph{Note}: contrary to the ODMG 2.0 specifications, one currently needs
+\emph{Note}: contrary to the ODMG 3 specifications, one currently needs
 to use parenthesis to invoke a method even if the method has no arguments.
 \btab[l]{|p{3cm}|p{7cm}|}
 \geninfo\\
@@ -2200,7 +2200,7 @@ between the ODL and the OQL types.
  \odlbind{\texttt{X[]} \denotex}{\emph{ordered collection} of atoms bound to \texttt{X}}{n}\\
 \hline
 \end{longtable}
-\emph{Note}: contrary to the ODMG 2.0 specifications, one currently needs
+\emph{Note}: contrary to the ODMG 3 specifications, one currently needs
 to use parenthesis to invoke a method even if the method has no arguments.
 \btab[l]{|p{3cm}|p{7cm}|}
 \geninfo\\
@@ -2678,7 +2678,7 @@ operators \texttt{[:]} and \texttt{[?]},
 \item append an element in an ordered collection:
 operator \texttt{append/to},
 \item checks if a given condition is realized for at least one
-element in a collection: operator \texttt{exists/in} (ODMG compliant),
+element in a collection: operator \texttt{in} (ODMG compliant),
 \item checks if a given condition is realized for all
 elements in a collection: operator \texttt{for/all} (ODMG compliant),
 \item checks if a given condition is realized for a given
@@ -3001,14 +3001,14 @@ containing initially a new \texttt{Car}, and empty it!\\
 \hline
 \etab
 
-\subsubsect{\texttt{exists/in} Operator}
-The \texttt{exists/in} operator is used to check if a given condition is
+\subsubsect{\texttt{in} Operator}
+The \texttt{in} operator is used to check if a given condition is
 realized for at least one element in an ordered or unordered collection.
 \btab[l]{|p{2.3cm}|p{8cm}|}
 \geninfo\\
-\hline Operator & \texttt{exists/in} \\
+\hline Operator & \texttt{in} \\
 \hline Syntax
-& \texttt{exists} \ide \texttt{in} \ex \texttt{:} \ex \\
+& \ide \texttt{in} \ex \texttt{:} \ex \\
 \hline Type & ternary\\
 \hline Operand Types & first operand: \texttt{identifier}, second operand:
 \texttt{oid} or \texttt{object} collection,
@@ -3021,9 +3021,9 @@ evaluated to \texttt{true}.\\
 \hline
 \etab\bettab\btab[l]{|p{7cm}|p{5cm}|}
 \expex{2}\\
-\hline \texttt{exists x in p0.children: x.name = "mary"}
+\hline \texttt{x in p0.children: x.name = "mary"}
 & \texttt{true} or \texttt{false}\\
-\hline \texttt{exists x in p0.cars: x.num < 100 and
+\hline \texttt{x in p0.cars: x.num < 100 and
 x.num >= 90} & \texttt{true} or \texttt{false}\\
 \hline
 \etab
@@ -3059,9 +3059,9 @@ the second operand the third operand is evaluated to \texttt{true}.\\
 The \texttt{for}/\emph{cardinality} operator is used to check if
 a given condition is realized for a given
 number range of elements in an orderer or unordered collection.
-Note that this operator is the generalisation of the \texttt{exists/in}
+Note that this operator is the generalisation of the \texttt{in}
 and \texttt{for/all} operators:\\
-\texttt{for <0:\$>} is equivalent to \texttt{exists/in}\\
+\texttt{for <0:\$>} is equivalent to \texttt{in}\\
 \texttt{for <\$>} is equivalent to \texttt{for all}\\
 \btab[l]{|p{2.3cm}|p{8cm}|}
 \geninfo\\
@@ -3092,7 +3092,7 @@ is in the interval \texttt{[}first operand\texttt{,} second operand\texttt{]}.\\
 \hline \texttt{for <4> x in p0.children: x.name == "john"} &
 \texttt{true} if one an only one children have its name equals to \texttt{john}\\
 \hline \texttt{for <0:\$> x in p0.cars: x.num = 10} &
-equivalent to \texttt{exists/in}\\
+equivalent to \texttt{in}\\
 \hline \texttt{for <\$> x in p0.cars: x.num = 10} &
 equivalent to \texttt{for/all}\\
 \hline
@@ -3550,7 +3550,7 @@ way (the default) and \texttt{desc} means the inverse.
 
 % ----------------------------------------------------------------
 \subsubsect{ODMG vs. \eyedb OQL Query Expressions}
-As explained in the Section \emph{OQL vs. ODMG 2.0 OQL},
+As explained in the Section \emph{OQL vs. ODMG 3 OQL},
 there are a few differences between ODMG OQL and \eyedb OQL query expressions:
 \bi
 \item the \texttt{having/group} clause is not
@@ -3735,7 +3735,6 @@ As every abstraction is an object, one can perform queries on the schema
 and classes. For instance, to get the \texttt{oid}s of all the
 existing classes in a schema:\\
 \texttt{select schema} which is equivalent to \texttt{select class}.\\
-\\
 In the \eyedb object model, the class \texttt{class} has the following
 native attributes (some are inherited from the \texttt{object} class):
 \be
@@ -4741,7 +4740,7 @@ In an \texttt{eyedboql} session, anything you type is interpreted as an
 OQL construct (or a part of an OQL construct),
 \\
 Nevertheless, if the first word of an input line begins with the escape
-character ``\texttt{!}'', this word is interpreted as an \texttt{eyedboql}
+character ``\texttt{\\}'', this word is interpreted as an \texttt{eyedboql}
 internal command.
 There are about 30 internal commands, but you need to know only of few of them
 to use \texttt{eyedboql}.\\
@@ -4827,26 +4826,26 @@ in the OQL specifications.
 \subsubsect{Getting Started}
 By default in an \texttt{eyedboql} session, the database \texttt{EYEDBDBM} is opened in
 read-only mode. To use another database, one must use either the command line
-option \texttt{-db} either the \texttt{!open} internal command.\\
+option \texttt{-db} either the \texttt{\\open} internal command.\\
 \\
 To start to play with \texttt{eyedboql} one needs to know the following
 five internal commands:
 \be
-\item \texttt{!open} \emph{database} [\texttt{rw}$|$\texttt{ro}] \texttt{local} \texttt{trsless}:
+\item \texttt{\\open} \emph{database} [\texttt{rw}$|$\texttt{ro}] \texttt{local} \texttt{trsless}:
 opens the \emph{database} in read-write (\texttt{rw}) or
 read-only (\texttt{ro} or no option) mode. If \texttt{local} is there,
 \emph{database} is opened in a local mode. If \texttt{trsless} is
 there \emph{database} is opened in transaction-less mode.\\
-For instance ``\texttt{!open foo rw}'' opens the database \texttt{foo} is
+For instance ``\texttt{\\open foo rw}'' opens the database \texttt{foo} is
 read-write mode.
-\item \texttt{!print} [\emph{sequence of oids}] \emph{other options}: 	
+\item \texttt{\\print} [\emph{sequence of oids}] \emph{other options}: 	
 if a sequence of oids is given: loads the object corresponding to each \texttt{oid}
 and displays its string representation,\\
 if no sequence of oids is given: loads the object corresponding to each \texttt{oid}
 returned by the last statement and displays its string representation.\\
 For instance, ``\texttt{select Person;}'' will return a \texttt{bag} containing
 the \texttt{oid} of each \texttt{Person} instance.\\
-The internal command ``\texttt{!print}'' typed after that will loads and
+The internal command ``\texttt{\\print}'' typed after that will loads and
 displays of the corresponding \texttt{Person} instances.\\
 The \emph{other options} are one or more space-separated of the followings:
 \begin{tabbing}
@@ -4858,15 +4857,15 @@ xx\=xxxxxxxxx\=\kill
 \>\texttt{native}\>:  displays the native attributes\\
 \>\texttt{all}\>: means ``\texttt{ctime mtime contents native}''
 \end{tabbing}
-For instance ``\texttt{!print full contents}'' will load and display 
+For instance ``\texttt{\\print full contents}'' will load and display 
 the objects and their collection contents in a full recursive mode.
-\item \texttt{!commit}: commits the current transaction
-\item \texttt{!abort}: aborts the current transaction
-\item \texttt{!quit} or \emph{\^{}D}: quits the current \texttt{eyedboql} session
+\item \texttt{\\commit}: commits the current transaction
+\item \texttt{\\abort}: aborts the current transaction
+\item \texttt{\\quit} or \emph{\^{}D}: quits the current \texttt{eyedboql} session
 \ee
 Note that a transaction is started automatically before the first
 complete statement of the sesssion of before the complete statement
-immediately following \texttt{!commit} or \texttt{!abort} internal command.
+immediately following \texttt{\\commit} or \texttt{\\abort} internal command.
 \\
 \\
 Here is a commented example showing the use of these internal commands:\\
@@ -4952,35 +4951,54 @@ $
 \end{verbatim}
 We are going to conclude this section by this important note:\\
 as introduced previously,
-the current transaction will be committed (resp. aborted) by a \texttt{!commit}
-(resp. \texttt{!abort}) command.
+the current transaction will be committed (resp. aborted) by a \texttt{\\commit}
+(resp. \texttt{\\abort}) command.
 \\
 If you quit \texttt{eyedboql} before committing (resp. aborting) the transaction,
 it will be automatically aborted, so all your changes will be lost.
 \\
 This is the default behaviour. This behaviour can be changed by using the
-\texttt{!commitonclose} internal command.
+\texttt{\\commitonclose} internal command.
 
 \subsubsect{Command Line Options}
 The \texttt{eyedboql} command line options are as follows:
 \begin{tabbing}
-xxx\=xxxxxxxxxxxx\=\kill
-\> \texttt{-help}       \> : displays this current message\\
-\> \texttt{-db} \emph{dbname}\> : opens database 'dbname'\\
-\> \texttt{-rw}         \> : opens database in read/write mode\\
-\> \texttt{-admin}      \> : opens database in admin mode\\
-\> \texttt{-local}      \> : opens database in local mode\\
-\> \texttt{-trsless}    \> : opens database in transaction less mode\\
-\> \texttt{-c} \emph{command}\> : executes command\\
-\> \texttt{-print}      \> : displays all the objects loaded\\
-\> \texttt{-full}       \> : the full recursive mode is used to display objects\\
-\> \texttt{-echo}       \> : echoes each commands\\
-\> \texttt{-i}          \> : enter interpreter after executing file or commands\\
-\> \texttt{-display}    \> : display to use for the \texttt{show} command\\
-\> \texttt{-cgi}        \> : cgi to use for the \texttt{show} command\\
-\> \texttt{-wid}        \> : window identifier to use with the 'show' command\\
-\> \emph{file}s      \> : executes \emph{file}s\\
-\> and the \emph{\eyedb standard options}\\
+xx\=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\=\kill
+\>{\bf Program Options}:\\
+\>  -d \texttt{<}name\texttt{>}, --database=\texttt{<}name>    \>  Database name\\
+\>  -r, --read                     \>   Open database in read mode\\
+\>  -w, --read-write               \>   Open database in read/write mode\\
+\>  -s, --strict-read               \>  Open database in strict read mode\\
+\>  -l, --local                \>       Open database in local mode\\
+\>  -c \texttt{<}command\texttt{>}, --command=\texttt{<}command\texttt{>}\> OQL command to execute\\
+\>  -p, --print                      \> Display all the objects loaded\\
+\>  --full                          \>  Full recursive mode is used to display objects\\
+\>  --commit                        \>  Commits the current transaction on close\\
+\>  -i, --interact                  \>  Enter interpreter after executing file or commands\\
+\>  -e, --echo                      \>  Echo each command\\
+\>  --admin                         \>  Open database in admin mode\\
+\>  -h, --help                      \>  Display this message\\
+\>  {\texttt{<}file>}                        \>  File(s) to execute\\
+\> \\
+\>{\bf Common Options}:\\
+\>  -U \texttt{<}user\texttt{>}\texttt{|}@, --user=\texttt{<}user\texttt{>}\texttt{|}@    \>    User name\\
+\>  -P [\texttt{<}passwd\texttt{>}], --passwd[=\texttt{<}passwd\texttt{>}]\>  Password\\
+\>  --host=\texttt{<}host\texttt{>}                \>       eyedbd host\\
+\>  --port=\texttt{<}port\texttt{>}              \>         eyedbd port\\
+\>  --inet                       \>       Use the tcp\_port variable if port is not set\\
+\>  --dbm=\texttt{<}dbmfile\texttt{>}                \>     EYEDBDBM database file\\
+\>  --conf=\texttt{<}conffile\texttt{>}               \>    Configuration file\\
+\>  --logdev=\texttt{<}logfile\texttt{>}               \>   Output log file\\
+\>  --logmask=\texttt{<}mask\texttt{>}                 \>   Output log mask\\
+\>  --logdate=on\texttt{|}off                 \>   Control date display in output log\\
+\>  --logtimer=on\texttt{|}off                \>   Control timer display in output log\\
+\>  --logpid=on\texttt{|}off                  \>   Control pid display in output log\\
+\>  --logprog=on\texttt{|}off                 \>   Control progname display in output log\\
+\>  --error-policy=\texttt{<}value\texttt{>}            \>  Control error policy: status\texttt{|}exception\texttt{|}abort\texttt{|}stop\texttt{|}echo\\
+\>  --trans-def-mag=\texttt{<}magorder\texttt{>}       \>   Default transaction magnitude order\\
+\>  --arch                           \>   Display the client architecture\\
+\>  -v, --version                    \>   Display the version\\
+\>  --help-eyedb-options             \>   Display this message\\
 \end{tabbing}
 For instance, to execute the statement ``\texttt{delete\_from(Person)}''
 on the database \texttt{person}:
@@ -5072,9 +5090,9 @@ function min(l) {
   for (x in l) {
     if (x != null) {
       if (!is_num(x))
-	throw (msg + "numeric expected");
+        throw (msg + "numeric expected");
       if (x < m) 
-	m := x;
+        m := x;
     }
   }
 
@@ -5093,9 +5111,9 @@ function max(l) {
   for (x in l) {
     if (x != null) {
       if (!is_num(x))
-	throw (msg + "numeric expected");
+        throw (msg + "numeric expected");
       if (x > m)
-	m := x;
+        m := x;
     }
   }
   return m;
@@ -5306,7 +5324,7 @@ function flatten1(l) {
     ll += x;
   return ll;
 }
-    	
+            
 //
 // tolower(s): returns lower case string
 //
@@ -5564,7 +5582,7 @@ function forone(l, fpred, data) {
     if (fpred(x, data)) return true;
   return false;
 }
-	
+        
 //
 // forone(l, fpred, data): returns true if and only if the function 'fpred'
 // returns true for all elements 'x' in list 'l'
@@ -5575,7 +5593,7 @@ function forall(l, fpred, data) {
     if (!fpred(x, data)) return false;
   return true;
 }
-	
+        
 //
 // delete_from(cls): delete all instances of class 'cls'
 //
@@ -5613,8 +5631,8 @@ function gensym() {
     if (!(eval "isset " + varname)) {
       eval varname + " := 0";
       return ident(varname);
-    }			
-  }		
+    }                        
+  }                
 }
 
 //
@@ -5981,7 +5999,7 @@ suppress from collection & \texttt{suppress from}& \texttt{suppress} \ex \texttt
 set element in or get element from an indexed collection & \texttt{[]}& \ex \texttt{[} \ex \texttt{]}\\
 append to an indexed collection & \texttt{append/to}& \texttt{append} \ex \texttt{to} \ex\\
 empty collection & \texttt{empty} & \una{empty} \\
-exists in collection & \texttt{exists in} & \texttt{exists} \ide \texttt{in} \ex \texttt{:} \ex \\
+exists in collection & \texttt{in} & \texttt{exists} \ide \texttt{in} \ex \texttt{:} \ex \\
 for all in collection & \texttt{for all} & \texttt{for} \texttt{all} \ide  \texttt{in} \ex \texttt{:} \ex \\
 for some in collection & \texttt{for} & \texttt{for} \texttt{<} \ex \texttt{,} \ex \texttt{>}
   \texttt{in} \ex \texttt{:} \ex \\
