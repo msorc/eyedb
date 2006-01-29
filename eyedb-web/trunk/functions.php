@@ -152,7 +152,7 @@ function printDownload( $item_array, $out)
 
   foreach ($item_array as $item)
     {
-      if( ereg( "^[A-Za-z]+ *[0-9]+.[0-9]+.[0-9]+", $item->title, $res))
+      if( ereg( "^[A-Za-z ]+[0-9]+.[0-9]+.[0-9]+", $item->title, $res))
 	{
 	  $s = sprintf( "<p><a href=\"%s\" class=\"NewsLink\">%s</a></p>\n",
 			$link,
