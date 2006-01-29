@@ -6,7 +6,7 @@
 <? includeRSS( 'http://sourceforge.net/export/rss2_projnews.php?group_id=127988', 'sourceforge_news.html', 30, 'printNews'); ?>
 </p>
 <p>
-<span class="NewsFrom"><a href="http://blog.eyedb.org">EyEDB blog</a> news:</span><br/>
+<span class="NewsFrom"><a href="http://blog.eyedb.org">EyeDB blog</a> news:</span><br/>
 <? includeRSS( 'http://blog.eyedb.org/?feed=rss2', 'blog_news.html', 60, 'printNews'); ?>
 </p>
 </td>
