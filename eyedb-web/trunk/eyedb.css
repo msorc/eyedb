@@ -38,6 +38,7 @@ body {
 .Code {
   width: 540px;
   background-color: #FFEEEE;
+  font-size: 1.1em;
 }
 
 .MailList tr {
