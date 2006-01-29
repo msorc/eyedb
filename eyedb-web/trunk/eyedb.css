@@ -124,6 +124,10 @@ li.LastItem {
 }
 
 #Events {
+  margin-top: 10px;
+  border-left: solid 1px #d5d6e7;
+  padding-left: 3px;
+  padding-right: 3px;
 }
 
 .EventTitle {
