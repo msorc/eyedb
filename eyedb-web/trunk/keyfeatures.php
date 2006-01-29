@@ -9,7 +9,6 @@ The main key features of the EyeDB OODBMS are:
 <li>persistent typed data management</li>
 <li>client/server model</li>
 <li>transactional services</li>
-<li>recovery system</li>
 <li>expressive object model</li>
 <li>inheritance</li>
 <li>integrity constraints</li>
@@ -49,15 +48,15 @@ be manipulated as an object)</li>
 <h2>Efficiency</h2>
 
 <ul>
-<li>database objects must be directly mapped within
+<li>database objects are directly mapped within
 the virtual memory space</li>
-<li>object memory copy must be reduced to the minimum</li>
+<li>object memory copy are reduced to the minimum</li>
 <li>caching policy is implemented</li>
 </ul>
 
 <h2>Scalability</h2>
 <ul>
-<li>programs must be able to deal with hundred
+<li>programs are able to deal with hundred
 of millions of objects without loss of performance</li>
 </ul>
 

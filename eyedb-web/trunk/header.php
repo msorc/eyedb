@@ -21,7 +21,7 @@
 </td>
 </tr>
 <tr id="CenterRow">
-<td id="NavCol">
+<td id="NavCol" height="700">
 <div id="Nav">
 <ul>
 <li>&raquo; <a href="index.php">Home</a></li>
@@ -36,7 +36,8 @@
 <li>&raquo; <a href="http://sourceforge.net/projects/eyedb">Sourceforge</a></li>
 <li>&raquo; <a href="http://wiki.eyedb.org">Wiki</a></li>
 <li>&raquo; <a href="http://blog.eyedb.org">Blog</a></li>
-<li>&raquo; <a href="irc.php">IRC</a></li>
+<!-- TBD -->
+<!-- <li>&raquo; <a href="irc.php">IRC</a></li> -->
 <li>&raquo; <a href="http://doc.eyedb.org">Documentation</a></li>
 <!-- TBD -->
 <!-- <li>&raquo; <a href="links.php">Links</a></li> -->
