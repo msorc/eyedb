@@ -1,15 +1,12 @@
 </td>
 
 <td id="NewsCol">
-<p>
-<span class="NewsFrom"><a href="http://sourceforge.net/news/?group_id=127988">Sourceforge</a> news:</span><br/>
+<div id="News">
+<span class="ColTitle">&gt;&nbsp;<a href="http://sourceforge.net/news/?group_id=127988">SOURCEFORGE</a></span><br/>
 <? includeRSS( 'http://sourceforge.net/export/rss2_projnews.php?group_id=127988', 'sourceforge_news.html', 2*60, 'printNews'); ?>
-</p>
-<p>
-<span class="NewsFrom"><a href="http://blog.eyedb.org">EyeDB blog</a> news:</span><br/>
-<? includeRSS( 'http://blog.eyedb.org/?feed=rss2', 'blog_news.html', 60*60, 'printNews'); ?>
-</p>
+<span class="ColTitle">&gt;&nbsp;<a href="http://blog.eyedb.org">EYEDB BLOG</a></span><br/>
+<? includeRSS( 'http://blog.eyedb.org/?feed=rss2', 'blog_news.html', 2*60, 'printNews'); ?>
+</div>
 </td>
-<?
-$rightColumnDone = true;
-?>
+
+<? $rightColumnDone = true; ?>

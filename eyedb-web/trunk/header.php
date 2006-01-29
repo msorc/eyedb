@@ -43,8 +43,10 @@
 </ul>
 
 <div id="Download">
-<div id="DownloadTitle">Download EyeDB</div>
+<span class="ColTitle">&gt;&nbsp;DOWNLOAD</span>
+<ul>
 <? includeRSS( 'http://sourceforge.net/export/rss2_projfiles.php?group_id=127988', 'sourceforge_download.html', 60, 'printDownload'); ?>
+</ul>
 </div>
 
 </td>

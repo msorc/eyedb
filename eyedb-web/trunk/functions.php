@@ -47,7 +47,7 @@ class RSSParser {
     $fp = fopen( $url,"r");
 
     if (!$fp)
-      return;
+      return null;
 
     while ($data = fread($fp, 4096))
       {
@@ -137,8 +137,10 @@ function printNews( $item_array, $out)
   foreach ($item_array as $item)
     {
       $s = sprintf( "
-<p><span class=\"NewsDate\">%s</span><br/>
-<a href=\"%s\" class=\"NewsLink\">%s</a></p>
+<p>
+<span class=\"NewsDate\">%s</span><br/>
+<a href=\"%s\" class=\"NewsLink\">%s</a>
+</p>
 ",
 		    convertDate( $item->date),
 		    $item->link,
@@ -157,7 +159,7 @@ function printDownload( $item_array, $out)
     {
       if( ereg( "^[A-Za-z ]+[0-9]+.[0-9]+.[0-9]+", $item->title, $res))
 	{
-	  $s = sprintf( "<p><a href=\"%s\" class=\"DownloadLink\">%s</a></p>\n",
+	  $s = sprintf( "<li><a href=\"%s\" class=\"DownloadLink\">%s</a></li>\n",
 			$link,
 			$res[0]);
 
@@ -184,17 +186,17 @@ function includeRSS( $url, $cache_file, $cache_lifetime, $rss_function) {
       $rss_parser = new RSSParser();
       $item_array = $rss_parser->parse( $url);
 
-      if (count($item_array) == 0)
-	return;
+      if ($item_array != null && count($item_array) == 0)
+	{
+	  if (!file_exists( $cache_dir))
+	    mkdir ( $cache_dir);
 
-      if (!file_exists( $cache_dir))
-	mkdir ( $cache_dir);
-
-      $out = fopen( $cache_file, "w");
+	  $out = fopen( $cache_file, "w");
     
-      call_user_func( $rss_function, $item_array, $out);
+	  call_user_func( $rss_function, $item_array, $out);
       
-      fclose( $out);
+	  fclose( $out);
+	}
     }
 
   include( $cache_file);
