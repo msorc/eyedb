@@ -44,7 +44,7 @@ class RSSParser {
     xml_set_element_handler($xml_parser, "startElement", "endElement");
     xml_set_character_data_handler($xml_parser, "characterData");
 
-    $fp = fopen( $url,"r");
+    $fp = fopen( $url, "r");
 
     if (!$fp)
       return null;
@@ -133,16 +133,17 @@ function convertDate( $date, $sep = "-")
 }
 
 /*
- - test if news cache file needs regeneration, i.e. does not exist or has a modification time that is older than cache_lifetime in seconds
- - includes it
+ - if cache_refresh is true, test if news cache file needs regeneration, i.e. does not exist or has a modification time that is older than cache_lifetime in seconds
+ - includes cache file
 */
-function includeRSS( $url, $cache_file, $cache_lifetime, $rss_function) {
+function includeRSS( $url, $cache_file, $rss_function, $cache_refresh = false, $cache_lifetime = 3600) {
   $cache_dir = 'cache';
   $cache_file = $cache_dir.'/'.$cache_file;
   
   /* check if cache file does not exist or has a modification time that is older than cache lifetime */
-  if (!file_exists( $cache_file) 
-      || (time() - filemtime ($cache_file)) >= $cache_lifetime)
+  if ( $cache_refresh && 
+       (!file_exists( $cache_file) 
+	|| (time() - filemtime ($cache_file)) >= $cache_lifetime))
     {
       $rss_parser = new RSSParser();
       $item_array = $rss_parser->parse( $url);
