@@ -197,23 +197,23 @@ the ODL schema from the database, as follows:
 #endif
 
 class Address (implementation <hash, hints = "key_count = 2048;">) {
-	attribute int32 num;
-	attribute string street;
-	attribute string town;
-	attribute string country;
+        attribute int32 num;
+        attribute string street;
+        attribute string town;
+        attribute string country;
 };
 
 class Person (implementation <hash, hints = "key_count = 2048;">) {
-	attribute string firstname;
-	attribute string lastname;
-	attribute int32 age;
-	attribute Address addr;
-	relationship Person* spouse inverse Person::spouse;
-	attribute set<Person*> children;
+        attribute string firstname;
+        attribute string lastname;
+        attribute int32 age;
+        attribute Address addr;
+        relationship Person* spouse inverse Person::spouse;
+        attribute set<Person*> children;
 };
 
 class Employee (implementation <hash, hints = "key_count = 2048;">) extends Person {
-	attribute int64 salary;
+        attribute int64 salary;
 };
 \end{verbatim}
 \normalsize
@@ -559,25 +559,25 @@ You can then check the class removal by:
 #endif
 
 class Address (implementation <hash, hints = "key_count = 2048;">) {
-	attribute int32 num;
-	attribute string street;
-	attribute string town;
-	attribute string country;
+        attribute int32 num;
+        attribute string street;
+        attribute string town;
+        attribute string country;
 };
 
 class Person (implementation <hash, hints = "key_count = 2048;">) {
-	attribute string firstname;
-	attribute string lastname;
-	attribute int32 age;
-	attribute Address addr;
-	relationship Person* spouse inverse Person::spouse;
-	attribute set<Person*> children;
+        attribute string firstname;
+        attribute string lastname;
+        attribute int32 age;
+        attribute Address addr;
+        relationship Person* spouse inverse Person::spouse;
+        attribute set<Person*> children;
 
-	index<type = hash, hints = "key_count = 4096; initial_size = 4096; extend_coef = 1; size_max = 4096;", propagate = on> on Person.firstname;
-	index<type = hash, hints = "key_count = 4096; initial_size = 4096; extend_coef = 1; size_max = 4096;", propagate = on> on Person.lastname;
-	constraint<unique, propagate = on> on Person.lastname;
-	constraint<notnull, propagate = on> on Person.lastname;
-	index<type = btree, hints = "degree = 128;", propagate = on> on Person.age;
+        index<type = hash, hints = "key_count = 4096; initial_size = 4096; extend_coef = 1; size_max = 4096;", propagate = on> on Person.firstname;
+        index<type = hash, hints = "key_count = 4096; initial_size = 4096; extend_coef = 1; size_max = 4096;", propagate = on> on Person.lastname;
+        constraint<unique, propagate = on> on Person.lastname;
+        constraint<notnull, propagate = on> on Person.lastname;
+        index<type = btree, hints = "degree = 128;", propagate = on> on Person.age;
 };
 
 \end{verbatim}
@@ -789,7 +789,7 @@ GCC_FLAGS = -Wl,-R$(EYEDB_LIBDIR)
 client_program = template_person
 
 $(client_program): person.o $(client_program).o
-	$(CXX) $(LDFLAGS) $(GCC_FLAGS) -o $@ $^ $(LDLIBS)
+        $(CXX) $(LDFLAGS) $(GCC_FLAGS) -o $@ $^ $(LDLIBS)
 \end{verbatim}
 \normalsize
 Important note: you need a recent version of GNU make to use this makefile.
@@ -1056,10 +1056,10 @@ include <<datadir>>/eyedb/Makefile.eyedb
 all: PersonTest.class
 
 person/Database.java: schema.odl
-	$(EYEDB_ODL) --gencode=Java --package=person --output-dir=person $<
+        $(EYEDB_ODL) --gencode=Java --package=person --output-dir=person $<
 
 PersonTest.class: PersonTest.java person/Database.java
-	CLASSPATH=$(EYEDB_CLASSPATH):. javac *.java person/*.java
+        CLASSPATH=$(EYEDB_CLASSPATH):. javac *.java person/*.java
 \end{verbatim} %%$ 
 \normalsize 
 Once compiled, you can execute the program as follows:
