@@ -211,14 +211,14 @@ function printEvents( $item_array, $out)
       $s = sprintf( "
 <p>
 <span class=\"NewsDate\">%s</span><br/>
-%s<br/>
-More info: <a href=\"%s\" class=\"NewsLink\">%s</a>
+<a href=\"%s\" class=\"NewsLink\">%s</a><br/>
+%s
 </p>
 ",
 		    convertDate( $item->date),
+		    $item->link,
 		    $item->title,
-		    $item->description,
-		    $item->link);
+		    $item->description);
 
       fwrite( $out, $s);
     }
