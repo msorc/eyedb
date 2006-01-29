@@ -22,7 +22,6 @@
 </tr>
 <tr id="CenterRow">
 <td id="NavCol" height="700">
-<div id="Nav">
 <ul>
 <li>&gt; <a href="index.php">Home</a></li>
 <li>&gt; <a href="keyfeatures.php">Key features</a></li>
@@ -42,7 +41,6 @@
 <!-- TBD -->
 <!-- <li>&gt; <a href="links.php">Links</a></li> -->
 </ul>
-</div>
 
 <div id="Download">
 <div id="DownloadTitle">Download EyeDB</div>
