@@ -49,6 +49,7 @@ body {
 }
 
 #NavCol {
+ min-height: 720px;
  width: 150px;
  text-align: left;
  vertical-align: top;
@@ -58,33 +59,30 @@ body {
  border-top: solid 15px #97A2C2;
 }
 
-#Nav {
-}
-
-#Nav ul {
+#NavCol ul {
   margin: 0px;
   padding: 10px 0 10px 5px;
   list-style-type: none;
 }
 
-#Nav li {
+#NavCol li {
   margin: 0;
   padding: 0.10em;
 }
 
-#Nav a {
+#NavCol a {
   text-decoration: none;
 }
-#Nav a:link {
+#NavCol a:link {
   color: #501010;
 }
-#Nav a:visited {
+#NavCol a:visited {
   color: #501010;
 }
-#Nav a:hover {
+#NavCol a:hover {
   color: #501010;
 }
-#Nav a:active {
+#NavCol a:active {
   color: #501010;
 }
 
