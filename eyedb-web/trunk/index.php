@@ -20,6 +20,6 @@ EyeDB is free software, distributed under the terms of the GNU Lesser General Pu
  License.
 </p>
 
-<? /* include( 'events.php'); */ ?>
+<? include( 'events.php'); ?>
 <? include( 'news.php'); ?>
 <? include( 'footer.php'); ?>

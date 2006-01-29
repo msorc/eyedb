@@ -148,7 +148,7 @@ function includeRSS( $url, $cache_file, $rss_function, $cache_refresh = false, $
       $rss_parser = new RSSParser();
       $item_array = $rss_parser->parse( $url);
 
-      if ($item_array != null && count($item_array) == 0)
+      if ($item_array != null && count($item_array) != 0)
 	{
 	  if (!file_exists( $cache_dir))
 	    mkdir ( $cache_dir);
@@ -164,6 +164,66 @@ function includeRSS( $url, $cache_file, $rss_function, $cache_refresh = false, $
   include( $cache_file);
 }
 
+// RSS user functions
+function printNews( $item_array, $out)
+{
+  foreach ($item_array as $item)
+    {
+      $s = sprintf( "
+<p>
+<span class=\"NewsDate\">%s</span><br/>
+<a href=\"%s\" class=\"NewsLink\">%s</a>
+</p>
+",
+		    convertDate( $item->date),
+		    $item->link,
+		    $item->title);
+
+      fwrite( $out, $s);
+    }
+}
+
+function printDownload( $item_array, $out)
+{
+  $link = 'http://sourceforge.net/project/showfiles.php?group_id=127988';
+  $count = 3;
+
+  foreach ($item_array as $item)
+    {
+      if( ereg( "^[A-Za-z ]+[0-9]+.[0-9]+.[0-9]+", $item->title, $res))
+	{
+	  $s = sprintf( "<li><a href=\"%s\" class=\"DownloadLink\">%s</a></li>\n",
+			$link,
+			$res[0]);
+
+	  fwrite( $out, $s);
+
+	  if (--$count <= 0)
+	    break;
+	}
+    }
+}
+
+function printEvents( $item_array, $out)
+{
+  foreach ($item_array as $item)
+    {
+      $s = sprintf( "
+<p>
+<span class=\"NewsDate\">%s</span><br/>
+%s<br/>
+More info: <a href=\"%s\" class=\"NewsLink\">%s</a>
+</p>
+",
+		    convertDate( $item->date),
+		    $item->title,
+		    $item->description,
+		    $item->link);
+
+      fwrite( $out, $s);
+    }
+}
+
 function quicktour_nav($previous, $next) {
   $s = "<span id=\"QuickTourNav\">";
   if ($previous)
@@ -175,4 +235,5 @@ function quicktour_nav($previous, $next) {
 
   echo $s;
 }
+
 ?>
