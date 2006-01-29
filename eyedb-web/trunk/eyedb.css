@@ -60,23 +60,30 @@ body {
  /* border-bottom: 5px solid #97A2C2; */
 }
 
-#NavCol ul {
+ul.List {
   margin: 0px;
-  padding: 10px 0px 10px 0px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  padding-right: 0px;
+  padding-left: 0px;
   list-style-type: none;
 }
 
-#NavCol li {
+li.Item {
   margin: 0;
   padding: 0.10em 5px 0.10em 5px;
-  border-top: solid 1px #ced9f7;
+  border-bottom: solid 1px #ced9f7;
 }
 
-#LastNav {
+li.FirstItem {
   margin: 0;
   padding: 0.10em 5px 0.10em 5px;
-  border-top: solid 1px #ced9f7;
   border-bottom: solid 1px #ced9f7;
+}
+
+li.LastItem {
+  margin: 0;
+  padding: 0.10em 5px 0.10em 5px;
 }
 
 #NavCol a {
@@ -117,9 +124,23 @@ body {
 }
 
 #Events {
- width: 350px;
- float: right;
 }
+
+.EventTitle {
+  font-weight: bold;
+  font-size: 110%;
+}
+ 
+.EventDate {
+  font-style: italic;
+}
+
+.EventText {
+}
+
+.EventLink {
+}
+
 
 #NewsCol {
   width: 170px;
@@ -140,14 +161,18 @@ body {
   font-size: 90%;
 }
 
-.ColTitle {
+.BlockTitle {
   font-weight: bold;
-  color: #888888;
+  color: #666666;
+  /* background-image: url('images/titlegradient.png'); */
+  /* background-repeat: repeat-x; */
+  background-color: #d5d6e7;
+  height: 19px;
+  padding-left: 2px;
 }
 
-.ColTitle a {
+.BlockTitle a {
   text-decoration: none;
-  color: #888888;
 }
 
 a.NewsLink {

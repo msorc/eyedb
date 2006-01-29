@@ -165,38 +165,24 @@ function includeRSS( $url, $cache_file, $rss_function, $cache_refresh = false, $
 }
 
 // RSS user functions
-function printNews( $item_array, $out)
-{
-  foreach ($item_array as $item)
-    {
-      $s = sprintf( "
-<p>
-<span class=\"NewsDate\">%s</span><br/>
-<a href=\"%s\" class=\"NewsLink\">%s</a>
-</p>
-",
-		    convertDate( $item->date),
-		    $item->link,
-		    $item->title);
-
-      fwrite( $out, $s);
-    }
-}
-
 function printDownload( $item_array, $out)
 {
   $link = 'http://sourceforge.net/project/showfiles.php?group_id=127988';
   $count = 3;
 
+  $style = "FirstItem";
   foreach ($item_array as $item)
     {
       if( ereg( "^[A-Za-z ]+[0-9]+.[0-9]+.[0-9]+", $item->title, $res))
 	{
-	  $s = sprintf( "<li><a href=\"%s\" class=\"DownloadLink\">%s</a></li>\n",
+	  $s = sprintf( "<li class=\"$style\"><a href=\"%s\" class=\"DownloadLink\">%s</a></li>\n",
 			$link,
 			$res[0]);
 
 	  fwrite( $out, $s);
+
+	  if ($style == "FirstItem")
+	    $style = "Item";
 
 	  if (--$count <= 0)
 	    break;
@@ -210,15 +196,44 @@ function printEvents( $item_array, $out)
     {
       $s = sprintf( "
 <p>
-<span class=\"NewsDate\">%s</span><br/>
-<a href=\"%s\" class=\"NewsLink\">%s</a><br/>
-%s
+<span class=\"EventTitle\">%s</span><br/>
+<span class=\"EventDate\">%s</span><br/>
+<span class=\"EventText\">%s</span><br/>
+<a href=\"%s\" class=\"EventLink\">More info</a>
 </p>
+",
+		    $item->title,
+		    convertDate( $item->date),
+		    $item->description,
+		    $item->link);
+
+      fwrite( $out, $s);
+    }
+}
+
+function printNews( $item_array, $out)
+{
+  $count = count( $item_array);
+  for ($i = 0; $i < $count; $i++)
+    {
+      $item = &$item_array[$i];
+
+      if ($i == 0)
+	$style = "FirstItem";
+      else if ($i == $count - 1)
+	$style = "LastItem";
+      else
+	$style = "Item";
+	
+      $s = sprintf( "
+<li class=\"$style\">
+<span class=\"NewsDate\">%s</span><br/>
+<a href=\"%s\" class=\"NewsLink\">%s</a>
+</li>
 ",
 		    convertDate( $item->date),
 		    $item->link,
-		    $item->title,
-		    $item->description);
+		    $item->title);
 
       fwrite( $out, $s);
     }
