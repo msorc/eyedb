@@ -116,6 +116,11 @@ body {
   border-bottom: 5px solid #ffffff;
 }
 
+#Events {
+ width: 350px;
+ float: right;
+}
+
 #NewsCol {
   width: 170px;
   text-align: left ;

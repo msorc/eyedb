@@ -7,7 +7,7 @@ error_reporting( E_ALL);
 
 include( 'functions.php');
 
-includeRSS( 'http://localhost/eyedb/rss.php', 'eyedb_events.html', 'printEvents', true, 60);
+includeRSS( 'http://localhost/eyedb/rss.php', 'eyedb_events.html', 'printEvents', true, 30);
 
 includeRSS( 'http://sourceforge.net/export/rss2_projfiles.php?group_id=127988', 'sourceforge_download.html', 'printDownload', true, 60);
 

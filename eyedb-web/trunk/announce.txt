@@ -1,7 +1,7 @@
 
 EyeDB OODBMS first open source public release
 
-SYSRA is pleased to announce the first open source public release of the EyeDB Object Oriented Database Management System (OODBMS) under the Lesser General Public License (LGPL).
+Paris, France (January 29, 2006) -- SYSRA is pleased to announce the first open source public release of the EyeDB Object Oriented Database Management System (OODBMS) under the Lesser General Public License (LGPL).
 
 EyeDB provides an advanced object model (inheritance, collections, arrays, methods, triggers, constraints, reflexivity), an object definition language based on ODMG ODL, an object query and manipulation language based on ODMG OQL and programming interfaces for C++ and Java.
 
@@ -26,7 +26,7 @@ FRANCE
 
 Première distribution publique open source de EyeDB
 
-SYSRA annonce la première distribution publique open source de EyeDB, Système de Gestion de Base de données Orientée Objet (SGBDO) distribué sous licence LGPL.
+Paris, France (29 Janvier 2006) -- SYSRA annonce la première distribution publique open source de EyeDB, Système de Gestion de Base de données Orientée Objet (SGBDO) distribué sous licence LGPL.
 
 Les principales caractéristiques de EyeDB sont : un modèle objet avancé (héritage, collections, tableaux, méthodes, triggers, contraintes, réflexivité), un langage de définition de types basé sur le langage ODL de ODMG, un langage de requête et de manipulation d'objets basé sur le langage OQL de ODMG et des interfaces de programmation C++ et Java.
 
