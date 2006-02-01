@@ -38,18 +38,18 @@ class Person {
 
 class Student extends Person {
   attribute short begin_year;
-  relationship set<Course *> courses inverse students;
+  relationship set&lt;Course *&gt; courses inverse students;
 };
 
 class Course {
   attribute string title;
   attribute string description;
-  relationship set<Student *> students inverse courses;
+  relationship set&lt;Student *&gt; students inverse courses;
   relationship Teacher *teacher inverse courses;
 };
 
 class Teacher extends Person {
-  relationship set<Course *> courses inverse teacher;
+  relationship set&lt;Course *&gt; courses inverse teacher;
 };
 </pre>
 </td></tr></table>
