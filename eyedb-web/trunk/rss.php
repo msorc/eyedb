@@ -44,7 +44,7 @@ events/announce.pdf
 <item>
 <title>EyeDB podium talk at ObjectWebCon '06</title>
 <description>
-EyeDB will be presented in a podium talk at ObjectWebCon '06, the ObjectWeb annual Conference. The talk will take place on Thursday, January 31.
+EyeDB will be presented in a podium talk at ObjectWebCon '06, the ObjectWeb annual Conference. The talk will take place on Tuesday 31 January.
 </description>
 <author>
 francois@dechelle.net (Francois Dechelle)
