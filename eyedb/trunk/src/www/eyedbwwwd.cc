@@ -106,12 +106,18 @@ sig_h(int sig)
 static int
 usage(const char *prog)
 {
-  printf("usage: %s --port=<port> [--alias=<alias>] [--wdir=<directory>] "
+  fprintf(stderr, "usage: %s [--alias=<alias>] [--wdir=<directory>] "
 	 "[--cgidir=<directory>] "
 	 "[--server-timeout=<timeout>] "
 	 "[--max-servers=<maxservers>] "
 	 "[--cookie-timeout=<timeout> [--access-file=<accessfile>]\n",
 	 prog);
+  fflush(stderr);
+  cerr << "\n\nSTANDARD HELP TBD\\n\n";
+  //print_standard_usage(getopt, "", std::cerr, true);
+  cerr << "\nCommon Options:\n";
+  print_common_help(cerr);
+  cerr << "\n";
   //[-imgdir <image-temp-directory>] 
   return 1;
 }
@@ -842,12 +848,12 @@ realize(int argc, char *argv[])
   std::string listen;
   eyedb::init(argc, argv, &listen, true);
 
+  if (getopts(argc, argv))
+    return 1;
+
   sv_port = atoi(listen.c_str());
 
   if (!sv_port)
-    return 1;
-
-  if (getopts(argc, argv))
     return 1;
 
   idbWInit();

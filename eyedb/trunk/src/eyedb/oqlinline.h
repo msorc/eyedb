@@ -138,6 +138,7 @@ inline oqmlAtom_obj::oqmlAtom_obj(Object *_o, unsigned int _idx,
   type.cls = (Class *)_class;
   o = _o;
   idx = _idx;
+  //printf("oqmlAtom_obj(%p, %p, %d)\n", this, o, idx);
 }
 
 inline oqmlAtom_bool::oqmlAtom_bool(oqmlBool _b) : oqmlAtom()
@@ -358,7 +359,9 @@ inline oqmlAtom *oqmlAtom_oid::copy()
 
 inline oqmlAtom *oqmlAtom_obj::copy()
 {
-  return new oqmlAtom_obj(o, idx);
+  //printf("copy obj %p %p %d\n", this, o, idx);
+  //return new oqmlAtom_obj(o, idx);
+  return oqmlObjectManager::registerObject(o);
 }
 
 inline oqmlAtom *oqmlAtom_bool::copy()
@@ -675,7 +678,13 @@ inline oqmlAtom_ident::~oqmlAtom_ident()
 
 inline oqmlAtom_obj::~oqmlAtom_obj()
 {
-//  o->release();
+  //printf("oqmlAtom_obj::~oqmlAtom_obj(%p, %p, %u)\n", this, o, idx);
+  oqmlStatus *s = oqmlObjectManager::unregisterObject(0, o);
+  if (s) {
+    fprintf(stderr, "~oqmlAtom_obj error: %s\n", s->msg);
+    abort();
+  }
+  o = 0;
 }
 
 inline oqmlAtom_node::~oqmlAtom_node()
@@ -772,6 +781,7 @@ inline oqmlAtomList::~oqmlAtomList()
   while (a)
     {
       oqmlAtom *next = a->next;
+      //printf("a->refcnt %d %s\n", a->refcnt, a->getString());
       if (!a->refcnt)
 	delete a;
       a = next;

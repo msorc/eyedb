@@ -54,7 +54,7 @@ namespace eyedb {
 
     strcpy(string_time_interval, s_time);
 
-    delete s_time;
+    delete [] s_time;
   }
 
 

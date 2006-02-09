@@ -277,7 +277,7 @@ called_from[ \t]*=[ \t]*Java {
 
   return IDENT;
 }
-(#|@)[a-zA-Z_][a-zA-Z_0-9]* {
+(#|$)[a-zA-Z_][a-zA-Z_0-9]* {
   yylval.s = strdup(&_YYTEXT_[1]);
   return IDENT;
 }

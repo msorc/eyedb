@@ -18,7 +18,7 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
+  Author: Eric Viara <viara@sysra.com>
 */
 
 
@@ -26,792 +26,802 @@
 
 namespace eyedb {
 
-int oqmlLoopLevel, oqmlBreakLevel;
-static const char OQML_BREAK_MAGIC[] = "$oqml$break$magic$";
+  int oqmlLoopLevel, oqmlBreakLevel;
+  static const char OQML_BREAK_MAGIC[] = "$oqml$break$magic$";
 
 #define oqml_is_break(S) ((S) && !strcmp((S)->msg, OQML_BREAK_MAGIC))
 
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//
-// oqmlIf operator methods
-//
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  //
+  // oqmlIf operator methods
+  //
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-oqmlIf::oqmlIf(oqmlNode * _qcond, oqmlNode * _qthen, oqmlNode *_qelse,
-	       oqmlBool _is_cond_expr) :
-  oqmlNode(oqmlIF)
-{
-  qcond = _qcond;
-  qthen = _qthen;
-  qelse = _qelse;
-  qthen_compiled = oqml_False;
-  qelse_compiled = oqml_False;
-  is_cond_expr = _is_cond_expr;
-}
+  oqmlIf::oqmlIf(oqmlNode * _qcond, oqmlNode * _qthen, oqmlNode *_qelse,
+		 oqmlBool _is_cond_expr) :
+    oqmlNode(oqmlIF)
+  {
+    qcond = _qcond;
+    qthen = _qthen;
+    qelse = _qelse;
+    qthen_compiled = oqml_False;
+    qelse_compiled = oqml_False;
+    is_cond_expr = _is_cond_expr;
+  }
 
-oqmlIf::~oqmlIf()
-{
-}
+  oqmlIf::~oqmlIf()
+  {
+  }
 
-oqmlStatus *oqmlIf::compile(Database *db, oqmlContext *ctx)
-{
-  return qcond->compile(db, ctx);
-}
+  oqmlStatus *oqmlIf::compile(Database *db, oqmlContext *ctx)
+  {
+    return qcond->compile(db, ctx);
+  }
 
-oqmlStatus *oqmlIf::eval(Database *db, oqmlContext *ctx, oqmlAtomList **alist, oqmlComp *, oqmlAtom *)
-{
-  oqmlStatus *s;
-  oqmlAtomList *al = 0;
-  oqmlNode *toeval;
-  oqmlBool *compiled = 0;
+  oqmlStatus *oqmlIf::eval(Database *db, oqmlContext *ctx, oqmlAtomList **alist, oqmlComp *, oqmlAtom *)
+  {
+    oqmlStatus *s;
+    oqmlAtomList *al = 0;
+    oqmlNode *toeval;
+    oqmlBool *compiled = 0;
 
-  s = qcond->eval(db, ctx, &al);
-  if (s) return s;
-
-  if (!al->cnt)
-    {
-      toeval = qelse;
-      compiled = &qelse_compiled;
-    }
-  else if (al->cnt == 1)
-    {
-      oqmlAtom *a = al->first;
-
-      if (!OQML_IS_BOOL(a))
-	return new oqmlStatus(this, "boolean expected for condition");
-
-      if (OQML_ATOM_BOOLVAL(a))
-	{
-	  toeval = qthen;
-	  compiled = &qthen_compiled;
-	}
-      else
-	{
-	  toeval = qelse;
-	  compiled = &qelse_compiled;
-	}
-    }
-  else
-    toeval = qthen;
-
-#ifdef SYNC_GARB
-  delete al;
-#endif
-
-  *alist = 0;
-
-  if (toeval) {
-    if (!*compiled) {
-      s = toeval->compile(db, ctx);
-      if (s) return s;
-      *compiled = oqml_True;
-    }
-
-    s = toeval->eval(db, ctx, alist);
+    s = qcond->eval(db, ctx, &al);
     if (s) return s;
-  }
-  else
-    *alist = new oqmlAtomList();
 
-  if (!is_cond_expr && toeval) {
+    if (!al->cnt)
+      {
+	toeval = qelse;
+	compiled = &qelse_compiled;
+      }
+    else if (al->cnt == 1)
+      {
+	oqmlAtom *a = al->first;
+
+	if (!OQML_IS_BOOL(a))
+	  return new oqmlStatus(this, "boolean expected for condition");
+
+	if (OQML_ATOM_BOOLVAL(a))
+	  {
+	    toeval = qthen;
+	    compiled = &qthen_compiled;
+	  }
+	else
+	  {
+	    toeval = qelse;
+	    compiled = &qelse_compiled;
+	  }
+      }
+    else
+      toeval = qthen;
+
 #ifdef SYNC_GARB
-    delete *alist;
+    delete al;
 #endif
-    *alist = new oqmlAtomList();
-  }
 
-  return oqmlSuccess;
-}
+    *alist = 0;
 
-oqmlBool
-oqmlIf::hasIdent(const char *_ident)
-{
-  return OQMLBOOL(qcond->hasIdent(_ident) ||
-		  qthen->hasIdent(_ident) ||
-		  (qelse && qelse->hasIdent(_ident)));
-}
+    if (toeval) {
+      if (!*compiled) {
+	s = toeval->compile(db, ctx);
+	if (s) return s;
+	*compiled = oqml_True;
+      }
 
-void oqmlIf::evalType(Database *db, oqmlContext *ctx, oqmlAtomType *at)
-{
-  *at = eval_type;
-}
+      s = toeval->eval(db, ctx, alist);
+      if (s) return s;
+    }
+    else
+      *alist = new oqmlAtomList();
 
-oqmlBool oqmlIf::isConstant() const
-{
-  return oqml_False;
-}
-
-std::string
-oqmlIf::toString(void) const
-{
-  if (is_statement)
-    return std::string("if (") + qcond->toString() + ") " + qthen->toString() +
-      (qelse ? std::string(" else " ) + qelse->toString() : std::string(""));
-  //oqml_isstat();
-  
-  return std::string("(") + qcond->toString() + "?" + qthen->toString() +
-    ":" + qelse->toString() + ")";
-}
-
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//
-// oqmlForEach operator methods
-//
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-oqmlForEach::oqmlForEach(const char * _ident, oqmlNode * _in,
-			 oqmlNode * _action) : oqmlNode(oqmlFOREACH)
-{
-  ident = strdup(_ident);
-  in = _in;
-  action = _action;
-}
-
-oqmlForEach::~oqmlForEach()
-{
-  free(ident);
-}
-
-void oqmlForEach::setAction(oqmlNode *_action)
-{
-  action = _action;
-}
-
-oqmlStatus *oqmlForEach::compile(Database *db, oqmlContext *ctx)
-{
-  oqmlStatus *s;
-
-  s = in->compile(db, ctx);
-  if (s) return s;
-
-  if (action)
-    {
-      oqmlAtomType at;
-      ctx->pushSymbol(ident, &at);
-      s = action->compile(db, ctx);
-      ctx->popSymbol(ident);
+    if (!is_cond_expr && toeval) {
+#ifdef SYNC_GARB
+      delete *alist;
+#endif
+      *alist = new oqmlAtomList();
     }
 
-  if (s) return s;
-
-  return oqmlSuccess;
-}
-
-oqmlStatus *oqmlForEach::eval(Database *db, oqmlContext *ctx,
-			      oqmlAtomList **alist, oqmlComp *, oqmlAtom *)
-{
-  oqmlStatus *s;
-  oqmlAtomList *al;
-
-  s = in->eval(db, ctx, &al);
-  if (s) return s;
-
-  oqmlAtom *a = al->first;
-  int iter = 0;
-  int level = ++oqmlLoopLevel;
-
-  oqmlAtomList *tal;
-  if (OQML_IS_COLL(a)) {
-    oqmlAtomList *list = OQML_ATOM_COLLVAL(a);
-    oqmlAtom *x = list->first;
-    while(x) {
-#ifdef SYNC_GARB
-      if (level == 1) {
-	//printf("foreach level #%d, iter #%d\n", level, iter);
-	iter++;
-      }
-#endif
-      oqmlAtom * next = x->next;
-
-      if (action) {
-	ctx->pushSymbol(ident, &x->type, x);
-	tal = 0;
-	s = action->eval(db, ctx, &tal);
-#ifdef SYNC_GARB
-	delete tal;
-#endif
-	ctx->popSymbol(ident);
-	if (s) break;
-      }
-      
-      OQML_CHECK_INTR();
-      
-      x = next;
-    }
-  }
-  else if (action) {
-    ctx->pushSymbol(ident, &a->type, a);
-#ifdef SYNC_GARB
-    tal = 0;
-    s = action->eval(db, ctx, &tal);
-    delete tal;
-#else
-    s = action->eval(db, ctx, alist);
-#endif
-    ctx->popSymbol(ident);
-  }
-
-#ifdef SYNC_GARB
-  delete al;
-#endif
-  --oqmlLoopLevel;
-
-  *alist = new oqmlAtomList();
-  if (s && !oqml_is_break(s))
-    return s;
-
-  if (oqml_is_break(s) && oqmlBreakLevel == level) {
-    delete s;
     return oqmlSuccess;
   }
 
-  return s;
-}
+  oqmlBool
+  oqmlIf::hasIdent(const char *_ident)
+  {
+    return OQMLBOOL(qcond->hasIdent(_ident) ||
+		    qthen->hasIdent(_ident) ||
+		    (qelse && qelse->hasIdent(_ident)));
+  }
 
-void oqmlForEach::evalType(Database *db, oqmlContext *ctx, oqmlAtomType *at)
-{
-  *at = eval_type;
-}
+  void oqmlIf::evalType(Database *db, oqmlContext *ctx, oqmlAtomType *at)
+  {
+    *at = eval_type;
+  }
 
-oqmlBool oqmlForEach::isConstant() const
-{
-  return oqml_False;
-}
+  oqmlBool oqmlIf::isConstant() const
+  {
+    return oqml_False;
+  }
 
-oqmlBool
-oqmlForEach::hasIdent(const char *_ident)
-{
-  return OQMLBOOL(in->hasIdent(_ident) ||
-		  (action ? action->hasIdent(_ident) : oqml_False));
-}
+  std::string
+  oqmlIf::toString(void) const
+  {
+    if (is_statement)
+      return std::string("if (") + qcond->toString() + ") " + qthen->toString() +
+	(qelse ? std::string(" else " ) + qelse->toString() : std::string(""));
+    //oqml_isstat();
+  
+    return std::string("(") + qcond->toString() + "?" + qthen->toString() +
+      ":" + qelse->toString() + ")";
+  }
 
-std::string
-oqmlForEach::toString(void) const
-{
-  return std::string("for (") + ident + " in " + in->toString() + ") " +
-    (action ? action->toString() : std::string("")); // + oqml_isstat();
-}
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  //
+  // oqmlForEach operator methods
+  //
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-void
-oqmlForEach::lock()
-{
-  oqmlNode::lock();
-  in->lock();
-  if (action)
-    action->lock();
-}
+  oqmlForEach::oqmlForEach(const char * _ident, oqmlNode * _in,
+			   oqmlNode * _action) : oqmlNode(oqmlFOREACH)
+  {
+    ident = strdup(_ident);
+    in = _in;
+    action = _action;
+  }
 
-void
-oqmlForEach::unlock()
-{
-  oqmlNode::unlock();
-  in->unlock();
-  if (action)
-    action->unlock();
-}
+  oqmlForEach::~oqmlForEach()
+  {
+    free(ident);
+  }
 
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//
-// oqmlWhile operator methods
-//
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  void oqmlForEach::setAction(oqmlNode *_action)
+  {
+    action = _action;
+  }
 
-oqmlWhile::oqmlWhile(oqmlNode * _qleft, oqmlNode *_qright) : oqmlNode(oqmlWHILE)
-{
-  qleft = _qleft;
-  qright = _qright;
-}
+  oqmlStatus *oqmlForEach::compile(Database *db, oqmlContext *ctx)
+  {
+    oqmlStatus *s;
 
-oqmlWhile::~oqmlWhile()
-{
-}
+    s = in->compile(db, ctx);
+    if (s) return s;
 
-oqmlStatus *oqmlWhile::compile(Database *db, oqmlContext *ctx)
-{
-  oqmlStatus *s;
+    if (action)
+      {
+	oqmlAtomType at;
+	ctx->pushSymbol(ident, &at);
+	s = action->compile(db, ctx);
+	ctx->popSymbol(ident);
+      }
 
-  s = qleft->compile(db, ctx);
-  if (s) return s;
+    if (s) return s;
 
-  s = qright->compile(db, ctx);
-  if (s) return s;
+    return oqmlSuccess;
+  }
 
-  return oqmlSuccess;
-}
+  oqmlStatus *oqmlForEach::eval(Database *db, oqmlContext *ctx,
+				oqmlAtomList **alist, oqmlComp *, oqmlAtom *)
+  {
+    oqmlStatus *s;
+    oqmlAtomList *al;
 
-oqmlStatus *oqmlWhile::eval(Database *db, oqmlContext *ctx, oqmlAtomList **alist, oqmlComp *, oqmlAtom *)
-{
-  oqmlStatus *s = oqmlSuccess;
+    s = in->eval(db, ctx, &al);
+    if (s) return s;
 
-  int level = ++oqmlLoopLevel;
-  for (;;)
-    {
+    oqmlAtom *a = al->first;
+    int iter = 0;
+    int level = ++oqmlLoopLevel;
+
+    oqmlAtomList *tal;
+    if (OQML_IS_COLL(a)) {
+      oqmlAtomList *list = OQML_ATOM_COLLVAL(a);
+      oqmlAtom *x = list->first;
+      while(x) {
+#ifdef SYNC_GARB
+	if (level == 1) {
+	  //printf("foreach level #%d, iter #%d\n", level, iter);
+	  iter++;
+	}
+#endif
+	oqmlAtom * next = x->next;
+
+	if (action) {
+	  gbLink *curLink = oqmlGarbManager::peek();
+	  ctx->pushSymbol(ident, &x->type, x);
+	  tal = 0;
+	  s = action->eval(db, ctx, &tal);
+#ifdef SYNC_GARB
+	  delete tal;
+#endif
+	  ctx->popSymbol(ident);
+	  oqmlGarbManager::garbage(curLink);
+	  if (s)
+	    break;
+	}
+      
+	OQML_CHECK_INTR();
+      
+	x = next;
+      }
+    }
+    else if (action) {
+      ctx->pushSymbol(ident, &a->type, a);
+#ifdef SYNC_GARB
+      tal = 0;
+      s = action->eval(db, ctx, &tal);
+      delete tal;
+#else
+      s = action->eval(db, ctx, alist);
+#endif
+      ctx->popSymbol(ident);
+    }
+
+#ifdef SYNC_GARB
+    // 8/02/06
+    //  delete al;
+#endif
+    --oqmlLoopLevel;
+
+    *alist = new oqmlAtomList();
+    if (s && !oqml_is_break(s))
+      return s;
+
+    if (oqml_is_break(s) && oqmlBreakLevel == level) {
+      delete s;
+      return oqmlSuccess;
+    }
+
+    return s;
+  }
+
+  void oqmlForEach::evalType(Database *db, oqmlContext *ctx, oqmlAtomType *at)
+  {
+    *at = eval_type;
+  }
+
+  oqmlBool oqmlForEach::isConstant() const
+  {
+    return oqml_False;
+  }
+
+  oqmlBool
+  oqmlForEach::hasIdent(const char *_ident)
+  {
+    return OQMLBOOL(in->hasIdent(_ident) ||
+		    (action ? action->hasIdent(_ident) : oqml_False));
+  }
+
+  std::string
+  oqmlForEach::toString(void) const
+  {
+    return std::string("for (") + ident + " in " + in->toString() + ") " +
+      (action ? action->toString() : std::string("")); // + oqml_isstat();
+  }
+
+  void
+  oqmlForEach::lock()
+  {
+    oqmlNode::lock();
+    in->lock();
+    if (action)
+      action->lock();
+  }
+
+  void
+  oqmlForEach::unlock()
+  {
+    oqmlNode::unlock();
+    in->unlock();
+    if (action)
+      action->unlock();
+  }
+
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  //
+  // oqmlWhile operator methods
+  //
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  oqmlWhile::oqmlWhile(oqmlNode * _qleft, oqmlNode *_qright) : oqmlNode(oqmlWHILE)
+  {
+    qleft = _qleft;
+    qright = _qright;
+  }
+
+  oqmlWhile::~oqmlWhile()
+  {
+  }
+
+  oqmlStatus *oqmlWhile::compile(Database *db, oqmlContext *ctx)
+  {
+    oqmlStatus *s;
+
+    s = qleft->compile(db, ctx);
+    if (s) return s;
+
+    s = qright->compile(db, ctx);
+    if (s) return s;
+
+    return oqmlSuccess;
+  }
+
+  oqmlStatus *oqmlWhile::eval(Database *db, oqmlContext *ctx, oqmlAtomList **alist, oqmlComp *, oqmlAtom *)
+  {
+    oqmlStatus *s = oqmlSuccess;
+
+    int level = ++oqmlLoopLevel;
+    for (;;)
+      {
+	oqmlAtomList *al;
+
+	s = qleft->eval(db, ctx, &al);
+	if (s) break;
+
+	if (al->cnt != 1 || !OQML_IS_BOOL(al->first))
+	  return new oqmlStatus(this, "boolean expected for condition");
+
+	if (!OQML_ATOM_BOOLVAL(al->first))
+	  break;
+
+	OQML_CHECK_INTR();
+
+	if (qright)
+	  {
+	    gbLink *curLink = oqmlGarbManager::peek();
+	    s = qright->eval(db, ctx, &al);
+	    oqmlGarbManager::garbage(curLink);
+	    if (s) break;
+	  }
+      }
+
+    --oqmlLoopLevel;
+
+    *alist = new oqmlAtomList();
+    if (s && !oqml_is_break(s))
+      return s;
+
+    if (oqml_is_break(s) && oqmlBreakLevel == level)
+      {
+	delete s;
+	return oqmlSuccess;
+      }
+
+    return s;
+  }
+
+  void oqmlWhile::evalType(Database *db, oqmlContext *ctx, oqmlAtomType *at)
+  {
+    *at = eval_type;
+  }
+
+  oqmlBool oqmlWhile::isConstant() const
+  {
+    return OQMLBOOL(qleft->isConstant() && qright->isConstant());
+  }
+
+  std::string
+  oqmlWhile::toString(void) const
+  {
+    return std::string("while (") + qleft->toString() + ") " +
+      (qright ? qright->toString() : std::string(""));
+    //oqml_isstat();
+  }
+
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  //
+  // oqmlDoWhile operator methods
+  //
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  oqmlDoWhile::oqmlDoWhile(oqmlNode * _qleft, oqmlNode *_qright) : oqmlNode(oqmlDOWHILE)
+  {
+    qleft = _qleft;
+    qright = _qright;
+  }
+
+  oqmlDoWhile::~oqmlDoWhile()
+  {
+  }
+
+  oqmlStatus *oqmlDoWhile::compile(Database *db, oqmlContext *ctx)
+  {
+    oqmlStatus *s;
+
+    s = qleft->compile(db, ctx);
+    if (s) return s;
+
+    s = qright->compile(db, ctx);
+    if (s) return s;
+
+    return oqmlSuccess;
+  }
+
+  oqmlStatus *oqmlDoWhile::eval(Database *db, oqmlContext *ctx, oqmlAtomList **alist, oqmlComp *, oqmlAtom *)
+  {
+    oqmlStatus *s = oqmlSuccess;
+    oqmlBool b;
+
+    int level = ++oqmlLoopLevel;
+    do {
       oqmlAtomList *al;
 
       s = qleft->eval(db, ctx, &al);
       if (s) break;
-
+    
       if (al->cnt != 1 || !OQML_IS_BOOL(al->first))
 	return new oqmlStatus(this, "boolean expected for condition");
 
-      if (!OQML_ATOM_BOOLVAL(al->first))
-	break;
-
       OQML_CHECK_INTR();
 
+      b = OQML_ATOM_BOOLVAL(al->first);
+    
       if (qright)
 	{
+	  gbLink *curLink = oqmlGarbManager::peek();
 	  s = qright->eval(db, ctx, &al);
+	  oqmlGarbManager::garbage(curLink);
 	  if (s) break;
 	}
-    }
 
-  --oqmlLoopLevel;
+    } while(b);
 
-  *alist = new oqmlAtomList();
-  if (s && !oqml_is_break(s))
-    return s;
+    --oqmlLoopLevel;
 
-  if (oqml_is_break(s) && oqmlBreakLevel == level)
-    {
-      delete s;
-      return oqmlSuccess;
-    }
+    *alist = new oqmlAtomList();
 
-  return s;
-}
+    if (s && !oqml_is_break(s))
+      return s;
 
-void oqmlWhile::evalType(Database *db, oqmlContext *ctx, oqmlAtomType *at)
-{
-  *at = eval_type;
-}
-
-oqmlBool oqmlWhile::isConstant() const
-{
-  return OQMLBOOL(qleft->isConstant() && qright->isConstant());
-}
-
-std::string
-oqmlWhile::toString(void) const
-{
-  return std::string("while (") + qleft->toString() + ") " +
-    (qright ? qright->toString() : std::string(""));
-  //oqml_isstat();
-}
-
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//
-// oqmlDoWhile operator methods
-//
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-oqmlDoWhile::oqmlDoWhile(oqmlNode * _qleft, oqmlNode *_qright) : oqmlNode(oqmlDOWHILE)
-{
-  qleft = _qleft;
-  qright = _qright;
-}
-
-oqmlDoWhile::~oqmlDoWhile()
-{
-}
-
-oqmlStatus *oqmlDoWhile::compile(Database *db, oqmlContext *ctx)
-{
-  oqmlStatus *s;
-
-  s = qleft->compile(db, ctx);
-  if (s) return s;
-
-  s = qright->compile(db, ctx);
-  if (s) return s;
-
-  return oqmlSuccess;
-}
-
-oqmlStatus *oqmlDoWhile::eval(Database *db, oqmlContext *ctx, oqmlAtomList **alist, oqmlComp *, oqmlAtom *)
-{
-  oqmlStatus *s = oqmlSuccess;
-  oqmlBool b;
-
-  int level = ++oqmlLoopLevel;
-  do {
-    oqmlAtomList *al;
-
-    s = qleft->eval(db, ctx, &al);
-    if (s) break;
-    
-    if (al->cnt != 1 || !OQML_IS_BOOL(al->first))
-      return new oqmlStatus(this, "boolean expected for condition");
-
-    OQML_CHECK_INTR();
-
-    b = OQML_ATOM_BOOLVAL(al->first);
-    
-    if (qright)
+    if (oqml_is_break(s) && oqmlBreakLevel == level)
       {
-	s = qright->eval(db, ctx, &al);
-	if (s) break;
+	delete s;
+	return oqmlSuccess;
       }
 
-  } while(b);
-
-  --oqmlLoopLevel;
-
-  *alist = new oqmlAtomList();
-
-  if (s && !oqml_is_break(s))
     return s;
+  }
 
-  if (oqml_is_break(s) && oqmlBreakLevel == level)
-    {
-      delete s;
-      return oqmlSuccess;
-    }
+  void oqmlDoWhile::evalType(Database *db, oqmlContext *ctx, oqmlAtomType *at)
+  {
+    *at = eval_type;
+  }
 
-  return s;
-}
+  oqmlBool oqmlDoWhile::isConstant() const
+  {
+    return OQMLBOOL(qleft->isConstant() && qright->isConstant());
+  }
 
-void oqmlDoWhile::evalType(Database *db, oqmlContext *ctx, oqmlAtomType *at)
-{
-  *at = eval_type;
-}
+  std::string
+  oqmlDoWhile::toString(void) const
+  {
+    return std::string("do ") +
+      (qright ? qright->toString() : std::string(""))
+      + " while " + qleft->toString(); // + oqml_isstat();
+  }
 
-oqmlBool oqmlDoWhile::isConstant() const
-{
-  return OQMLBOOL(qleft->isConstant() && qright->isConstant());
-}
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  //
+  // oqmlForDo operator methods
+  //
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-std::string
-oqmlDoWhile::toString(void) const
-{
-  return std::string("do ") +
-    (qright ? qright->toString() : std::string(""))
-    + " while " + qleft->toString(); // + oqml_isstat();
-}
+  oqmlForDo::oqmlForDo(oqmlNode *_start,
+		       oqmlNode *_cond,
+		       oqmlNode *_next,
+		       oqmlNode *_body) : oqmlNode(oqmlFORDO)
+  {
+    ident = 0;
+    start = _start;
+    cond = _cond;
+    next = _next;
+    body = _body;
+  }
 
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//
-// oqmlForDo operator methods
-//
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  oqmlForDo::oqmlForDo(const char *_ident,
+		       oqmlNode *_start,
+		       oqmlNode *_cond,
+		       oqmlNode *_next,
+		       oqmlNode *_body) : oqmlNode(oqmlFORDO)
+  {
+    ident = strdup(_ident);
+    start = _start;
+    cond = _cond;
+    next = _next;
+    body = _body;
+  }
 
-oqmlForDo::oqmlForDo(oqmlNode *_start,
-		     oqmlNode *_cond,
-		     oqmlNode *_next,
-		     oqmlNode *_body) : oqmlNode(oqmlFORDO)
-{
-  ident = 0;
-  start = _start;
-  cond = _cond;
-  next = _next;
-  body = _body;
-}
+  oqmlForDo::~oqmlForDo()
+  {
+    free(ident);
+  }
 
-oqmlForDo::oqmlForDo(const char *_ident,
-		     oqmlNode *_start,
-		     oqmlNode *_cond,
-		     oqmlNode *_next,
-		     oqmlNode *_body) : oqmlNode(oqmlFORDO)
-{
-  ident = strdup(_ident);
-  start = _start;
-  cond = _cond;
-  next = _next;
-  body = _body;
-}
+  oqmlStatus *oqmlForDo::compile(Database *db, oqmlContext *ctx)
+  {
+    oqmlStatus *s;
 
-oqmlForDo::~oqmlForDo()
-{
-  free(ident);
-}
+    if (ident)
+      {
+	oqmlAtomType at;
+	ctx->pushSymbol(ident, &at, 0, oqml_False);
+      }
 
-oqmlStatus *oqmlForDo::compile(Database *db, oqmlContext *ctx)
-{
-  oqmlStatus *s;
+    if (start)
+      {
+	s = start->compile(db, ctx);
+	if (s) return s;
+      }
 
-  if (ident)
-    {
-      oqmlAtomType at;
-      ctx->pushSymbol(ident, &at, 0, oqml_False);
-    }
+    if (cond)
+      {
+	s = cond->compile(db, ctx);
+	if (s) return s;
+      }
 
-  if (start)
-    {
-      s = start->compile(db, ctx);
-      if (s) return s;
-    }
+    if (next)
+      {
+	s = next->compile(db, ctx);
+	if (s) return s;
+      }
 
-  if (cond)
-    {
-      s = cond->compile(db, ctx);
-      if (s) return s;
-    }
+    if (body)
+      {
+	s = body->compile(db, ctx);
+	if (s) return s;
+      }
 
-  if (next)
-    {
-      s = next->compile(db, ctx);
-      if (s) return s;
-    }
+    if (ident)
+      ctx->popSymbol(ident, oqml_False);
 
-  if (body)
-    {
-      s = body->compile(db, ctx);
-      if (s) return s;
-    }
+    return oqmlSuccess;
+  }
 
-  if (ident)
-    ctx->popSymbol(ident, oqml_False);
+  oqmlStatus *oqmlForDo::eval(Database *db, oqmlContext *ctx, oqmlAtomList **alist, oqmlComp *, oqmlAtom *)
+  {
+    oqmlStatus *s = oqmlSuccess;
+    oqmlBool b;
 
-  return oqmlSuccess;
-}
+    oqmlAtomList *al;
 
-oqmlStatus *oqmlForDo::eval(Database *db, oqmlContext *ctx, oqmlAtomList **alist, oqmlComp *, oqmlAtom *)
-{
-  oqmlStatus *s = oqmlSuccess;
-  oqmlBool b;
+    if (ident)
+      {
+	oqmlAtomType at;
+	ctx->pushSymbol(ident, &at, 0, oqml_False);
+      }
 
-  oqmlAtomList *al;
-
-  if (ident)
-    {
-      oqmlAtomType at;
-      ctx->pushSymbol(ident, &at, 0, oqml_False);
-    }
-
-  if (start)
-    {
-      s = start->eval(db, ctx, &al);
-      if (s) return s;
-    }
+    if (start)
+      {
+	s = start->eval(db, ctx, &al);
+	if (s) return s;
+      }
     
-  int level = ++oqmlLoopLevel;
+    int level = ++oqmlLoopLevel;
 
-  for (;;)
-    {
-      if (cond)
-	{
-	  s = cond->eval(db, ctx, &al);
-	  if (s) return s;
+    for (;;)
+      {
+	if (cond)
+	  {
+	    s = cond->eval(db, ctx, &al);
+	    if (s) return s;
 
-	  if (al->cnt != 1 || !OQML_IS_BOOL(al->first))
-	    {
-	      s = new oqmlStatus(this, "boolean expected for condition");
+	    if (al->cnt != 1 || !OQML_IS_BOOL(al->first))
+	      {
+		s = new oqmlStatus(this, "boolean expected for condition");
+		break;
+	      }
+
+	    if (!OQML_ATOM_BOOLVAL(al->first))
 	      break;
-	    }
-
-	  if (!OQML_ATOM_BOOLVAL(al->first))
-	    break;
-	}
+	  }
     
-      OQML_CHECK_INTR();
+	OQML_CHECK_INTR();
 
-      if (body)
-	{
-	  s = body->eval(db, ctx, &al);
-	  if (s) break;
-	}
+	if (body)
+	  {
+	    gbLink *curLink = oqmlGarbManager::peek();
+	    s = body->eval(db, ctx, &al);
+	    oqmlGarbManager::garbage(curLink);
+	    if (s) break;
+	  }
 
-      if (next)
-	{
-	  s = next->eval(db, ctx, &al);
-	  if (s) break;
-	}
-    }
+	if (next)
+	  {
+	    s = next->eval(db, ctx, &al);
+	    if (s) break;
+	  }
+      }
 
-  --oqmlLoopLevel;
+    --oqmlLoopLevel;
 
-  if (ident)
-    ctx->popSymbol(ident, oqml_False);
+    if (ident)
+      ctx->popSymbol(ident, oqml_False);
 
-  *alist = new oqmlAtomList();
-  if (s && !oqml_is_break(s))
-    return s;
+    *alist = new oqmlAtomList();
+    if (s && !oqml_is_break(s))
+      return s;
 
-  if (oqml_is_break(s) && oqmlBreakLevel == level)
-    {
-      delete s;
-      return oqmlSuccess;
-    }
+    if (oqml_is_break(s) && oqmlBreakLevel == level)
+      {
+	delete s;
+	return oqmlSuccess;
+      }
 
-  return oqmlSuccess;
-}
+    return oqmlSuccess;
+  }
 
-void oqmlForDo::evalType(Database *db, oqmlContext *ctx, oqmlAtomType *at)
-{
-  *at = eval_type;
-}
+  void oqmlForDo::evalType(Database *db, oqmlContext *ctx, oqmlAtomType *at)
+  {
+    *at = eval_type;
+  }
 
-oqmlBool oqmlForDo::isConstant() const
-{
-  return oqml_False;
-}
+  oqmlBool oqmlForDo::isConstant() const
+  {
+    return oqml_False;
+  }
 
-oqmlBool
-oqmlForDo::hasIdent(const char *_ident)
-{
-  return OQMLBOOL((start ? start->hasIdent(_ident) : oqml_False)||
-		  (cond ? cond->hasIdent(_ident) : oqml_False) ||
-		  (next ? next->hasIdent(_ident) : oqml_False) ||
-		  (body ? body->hasIdent(_ident) : oqml_False));
-}
+  oqmlBool
+  oqmlForDo::hasIdent(const char *_ident)
+  {
+    return OQMLBOOL((start ? start->hasIdent(_ident) : oqml_False)||
+		    (cond ? cond->hasIdent(_ident) : oqml_False) ||
+		    (next ? next->hasIdent(_ident) : oqml_False) ||
+		    (body ? body->hasIdent(_ident) : oqml_False));
+  }
 
-void oqmlForDo::lock()
-{
-  oqmlNode::lock();
-  if (start)
-    start->lock();
-  if (cond)
-    cond->lock();
-  if (next)
-    next->lock();
-  if (body)
-    body->lock();
-}
+  void oqmlForDo::lock()
+  {
+    oqmlNode::lock();
+    if (start)
+      start->lock();
+    if (cond)
+      cond->lock();
+    if (next)
+      next->lock();
+    if (body)
+      body->lock();
+  }
 
-void oqmlForDo::unlock()
-{
-  oqmlNode::unlock();
-  if (start)
-    start->unlock();
-  if (cond)
-    cond->unlock();
-  if (next)
-    next->unlock();
-  if (body)
-    body->unlock();
-}
+  void oqmlForDo::unlock()
+  {
+    oqmlNode::unlock();
+    if (start)
+      start->unlock();
+    if (cond)
+      cond->unlock();
+    if (next)
+      next->unlock();
+    if (body)
+      body->unlock();
+  }
 
-std::string
-oqmlForDo::toString(void) const
-{
-  return std::string("for(") +
-    (start ? start->toString() : std::string("")) + ";" +
-    (cond ? cond->toString() : std::string("")) + ";" +
-    (next ? next->toString() : std::string("")) + ") " +
-    (body ? body->toString() : std::string(""));
-  //+ oqml_isstat();
-}
+  std::string
+  oqmlForDo::toString(void) const
+  {
+    return std::string("for(") +
+      (start ? start->toString() : std::string("")) + ";" +
+      (cond ? cond->toString() : std::string("")) + ";" +
+      (next ? next->toString() : std::string("")) + ") " +
+      (body ? body->toString() : std::string(""));
+    //+ oqml_isstat();
+  }
 
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//
-// oqmlThrow operator methods
-//
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  //
+  // oqmlThrow operator methods
+  //
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-oqmlThrow::oqmlThrow(oqmlNode * _ql) : oqmlNode(oqmlTHROW)
-{
-  ql = _ql;
-}
+  oqmlThrow::oqmlThrow(oqmlNode * _ql) : oqmlNode(oqmlTHROW)
+  {
+    ql = _ql;
+  }
 
-oqmlThrow::~oqmlThrow()
-{
-}
+  oqmlThrow::~oqmlThrow()
+  {
+  }
 
-oqmlStatus *oqmlThrow::compile(Database *db, oqmlContext *ctx)
-{
-  return ql->compile(db, ctx);
-}
-
-oqmlStatus *oqmlThrow::eval(Database *db, oqmlContext *ctx, oqmlAtomList **alist, oqmlComp *, oqmlAtom *)
-{
-  oqmlStatus *s;
-  oqmlAtomList *al;
-
-  s = ql->eval(db, ctx, &al); 
-
-  if (s) return s;
-
-  if (al->cnt == 1 && al->first->as_string())
-    return new oqmlStatus(OQML_ATOM_STRVAL(al->first));
-
-  if (al->cnt == 1)
-    return oqmlStatus::expected(this, "string", al->first->type.getString());
-
-  return new oqmlStatus(this, "string argument expected");
-}
-
-void oqmlThrow::evalType(Database *db, oqmlContext *ctx, oqmlAtomType *at)
-{
-  *at = eval_type;
-}
-
-oqmlBool oqmlThrow::isConstant() const
-{
-  return oqml_False;
-}
-
-std::string
-oqmlThrow::toString(void) const
-{
-  return std::string("throw ") + ql->toString() + oqml_isstat();
-}
-
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//
-// oqmlBreak operator methods
-//
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-oqmlBreak::oqmlBreak(oqmlNode * _ql) : oqmlNode(oqmlBREAK)
-{
-  ql = _ql;
-}
-
-oqmlBreak::~oqmlBreak()
-{
-}
-
-oqmlStatus *oqmlBreak::compile(Database *db, oqmlContext *ctx)
-{
-  if (ql)
+  oqmlStatus *oqmlThrow::compile(Database *db, oqmlContext *ctx)
+  {
     return ql->compile(db, ctx);
+  }
 
-  return oqmlSuccess;
-}
+  oqmlStatus *oqmlThrow::eval(Database *db, oqmlContext *ctx, oqmlAtomList **alist, oqmlComp *, oqmlAtom *)
+  {
+    oqmlStatus *s;
+    oqmlAtomList *al;
 
-oqmlStatus *oqmlBreak::eval(Database *db, oqmlContext *ctx, oqmlAtomList **alist, oqmlComp *, oqmlAtom *)
-{
-  int level;
+    s = ql->eval(db, ctx, &al); 
 
-  if (ql)
-    {
-      oqmlStatus *s;
-      oqmlAtomList *al;
+    if (s) return s;
+
+    if (al->cnt == 1 && al->first->as_string())
+      return new oqmlStatus(OQML_ATOM_STRVAL(al->first));
+
+    if (al->cnt == 1)
+      return oqmlStatus::expected(this, "string", al->first->type.getString());
+
+    return new oqmlStatus(this, "string argument expected");
+  }
+
+  void oqmlThrow::evalType(Database *db, oqmlContext *ctx, oqmlAtomType *at)
+  {
+    *at = eval_type;
+  }
+
+  oqmlBool oqmlThrow::isConstant() const
+  {
+    return oqml_False;
+  }
+
+  std::string
+  oqmlThrow::toString(void) const
+  {
+    return std::string("throw ") + ql->toString() + oqml_isstat();
+  }
+
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  //
+  // oqmlBreak operator methods
+  //
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  oqmlBreak::oqmlBreak(oqmlNode * _ql) : oqmlNode(oqmlBREAK)
+  {
+    ql = _ql;
+  }
+
+  oqmlBreak::~oqmlBreak()
+  {
+  }
+
+  oqmlStatus *oqmlBreak::compile(Database *db, oqmlContext *ctx)
+  {
+    if (ql)
+      return ql->compile(db, ctx);
+
+    return oqmlSuccess;
+  }
+
+  oqmlStatus *oqmlBreak::eval(Database *db, oqmlContext *ctx, oqmlAtomList **alist, oqmlComp *, oqmlAtom *)
+  {
+    int level;
+
+    if (ql)
+      {
+	oqmlStatus *s;
+	oqmlAtomList *al;
       
-      s = ql->eval(db, ctx, &al); 
+	s = ql->eval(db, ctx, &al); 
 
-      if (s) return s;
+	if (s) return s;
 
-      if (al->cnt != 1 || !al->first->as_int())
-	return new oqmlStatus(this, "integer expected");
+	if (al->cnt != 1 || !al->first->as_int())
+	  return new oqmlStatus(this, "integer expected");
 
-      level = OQML_ATOM_INTVAL(al->first);
-    }
-  else
-    level = 1;
+	level = OQML_ATOM_INTVAL(al->first);
+      }
+    else
+      level = 1;
 
-  if (level > oqmlLoopLevel)
-    return new oqmlStatus(this, "level %d is too deep", level);
+    if (level > oqmlLoopLevel)
+      return new oqmlStatus(this, "level %d is too deep", level);
 
-  oqmlBreakLevel = oqmlLoopLevel - level + 1;
+    oqmlBreakLevel = oqmlLoopLevel - level + 1;
 
-  return new oqmlStatus(OQML_BREAK_MAGIC);
-}
+    return new oqmlStatus(OQML_BREAK_MAGIC);
+  }
 
-void oqmlBreak::evalType(Database *db, oqmlContext *ctx, oqmlAtomType *at)
-{
-  *at = eval_type;
-}
+  void oqmlBreak::evalType(Database *db, oqmlContext *ctx, oqmlAtomType *at)
+  {
+    *at = eval_type;
+  }
 
-oqmlBool oqmlBreak::isConstant() const
-{
-  return oqml_False;
-}
+  oqmlBool oqmlBreak::isConstant() const
+  {
+    return oqml_False;
+  }
 
-std::string
-oqmlBreak::toString(void) const
-{
-  return std::string("break") +
-    (ql ? std::string(" ") + ql->toString() : std::string("")) + oqml_isstat();
-}
+  std::string
+  oqmlBreak::toString(void) const
+  {
+    return std::string("break") +
+      (ql ? std::string(" ") + ql->toString() : std::string("")) + oqml_isstat();
+  }
 }

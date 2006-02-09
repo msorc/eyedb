@@ -182,9 +182,9 @@ namespace eyedb {
     strcat(this->string_time_stamp, s_zone);
 
     // release temporary data
-    delete s_date;
-    delete s_time;
-    delete s_zone;
+    delete [] s_date;
+    delete [] s_time;
+    delete [] s_zone;
   
     //
     // Set date and time values
