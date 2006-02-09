@@ -44,7 +44,7 @@ namespace eyedb {
        Not yet documented
        @param n
     */
-    ObjCache(int n = 8);
+    ObjCache(unsigned int n = 8);
 
     /**
        Not yet documented
@@ -52,7 +52,7 @@ namespace eyedb {
        @param o
        @return
     */
-    Bool insertObject(const Oid &oid, void *o);
+    Bool insertObject(const Oid &oid, void *o, unsigned int refcnt = 0);
 
     /**
        Not yet documented
@@ -66,7 +66,7 @@ namespace eyedb {
        @param oid
        @return
     */
-    void *getObject(const Oid &oid);
+    void *getObject(const Oid &oid, bool incr = false);
 
     /**
        Not yet documented
@@ -79,14 +79,22 @@ namespace eyedb {
     */
     void empty();
 
+    /**
+       Not yet documented
+    */
+    unsigned int getObjectCount() {return obj_cnt;}
+
     ~ObjCache();
 
   private:
     unsigned int key;
-    int links_cnt;
+    unsigned int links_cnt;
+    unsigned int obj_cnt;
     ObjCacheLink **links;
-    int getIndex(const Oid&);
+    unsigned int getIndex(const Oid&);
     unsigned int tstamp;
+    bool rescaling;
+    void rescale();
   };
 
   /**

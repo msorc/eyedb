@@ -847,7 +847,7 @@ namespace eyedb {
     static gbLink *first, *last;
     static gbLink *add_realize(gbLink *);
     static oqmlBool garbaging;
-    static int count;
+    static unsigned int count;
     static LinkedList str_list;
 
   public:
@@ -856,6 +856,11 @@ namespace eyedb {
     static gbLink *add(oqmlAtomList *);
     static void remove(gbLink *);
     static void add(char *);
+    static unsigned int getCount() {return count;}
+
+    // 8/02/06: idea ???
+    static void oqmlGarbManager::garbage(gbLink *l, bool full = false);
+    static gbLink *oqmlGarbManager::peek();
   };
 
   class oqml_Location {
@@ -967,7 +972,8 @@ namespace eyedb {
     oqmlSymbolEntry(oqmlContext *, const char *_ident, oqmlAtomType *_type,
 		    oqmlAtom *_at, oqmlBool _global, oqmlBool _system);
 
-    void set(oqmlAtomType *_type, oqmlAtom *_at, oqmlBool force = oqml_False);
+    void set(oqmlAtomType *_type, oqmlAtom *_at, oqmlBool force = oqml_False,
+	     oqmlBool tofree = oqml_False);
 
     void addEntry(oqmlAtom_ident *ident);
 
@@ -1011,7 +1017,8 @@ namespace eyedb {
     oqmlStatus *pushSymbolRealize(const char *, oqmlAtomType *, oqmlAtom *,
 				  oqmlBool global, oqmlBool system);
     oqmlStatus *setSymbolRealize(const char *, oqmlAtomType *, oqmlAtom *,
-				 oqmlBool global, oqmlBool system);
+				 oqmlBool global, oqmlBool system,
+				 oqmlBool to_free);
     oqmlStatus *popSymbolRealize(const char *, oqmlBool global);
     static std::string makeTempSymb(int idx);
 
@@ -1131,9 +1138,6 @@ namespace eyedb {
 
     static void addToFreeList(Object *o);
     static LinkedList freeList;
-    static ObjCache *objCacheIdx;
-    static ObjCache *objCacheObj;
-
   public:
 
     static oqmlStatus *getObject(oqmlNode *, Database *, oqmlAtom *,
@@ -1156,6 +1160,9 @@ namespace eyedb {
     static oqmlBool isRegistered(const Object *, unsigned long &);
 
     static void garbageObjects();
+
+    static ObjCache *objCacheIdx;
+    static ObjCache *objCacheObj;
   };
 
   enum oqmlBinopType {
@@ -1166,10 +1173,10 @@ namespace eyedb {
   };
 
   extern void
-  oqmlLock(oqmlAtom *a, oqmlBool lock);
+  oqmlLock(oqmlAtom *a, oqmlBool lock, oqmlBool rm = oqml_False);
 
   extern void
-  oqmlLock(oqmlAtomList *l, oqmlBool lock);
+  oqmlLock(oqmlAtomList *l, oqmlBool lock, oqmlBool rm = oqml_False);
 
   /* base node */
   class oqmlNode {

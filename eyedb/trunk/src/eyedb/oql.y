@@ -525,7 +525,8 @@ select_order_spec_opt : ASC
 }
 ;
 
-select_ident: symbol IN select_expr
+select_ident: 
+symbol IN select_expr
 {
   $$.symb = $1;
   $$.select = $3;
@@ -672,7 +673,12 @@ assign_statement : compound_statement
   $$ = $1;
   $$->is_statement = oqml_True;
 }
-| /* empty */ TERM
+| TERM
+{
+  $$ = 0;
+}
+/* added 9/02/06 */
+| ACC_OPEN ACC_CLOSE
 {
   $$ = 0;
 }
@@ -749,10 +755,12 @@ cond_expr : while_expr
 {
   $$ = new oqmlIf($1, $3, $5, oqml_True);
 }
-| logical_or_expr IN cond_expr
+/*
+| EXISTS logical_or_expr IN cond_expr
 {
-  $$ = new oqmlIn($1, $3);
+  $$ = new oqmlIn($2, $4);
 }
+*/
 /*
 | logical_or_expr IN range
 {
@@ -808,6 +816,7 @@ cond_expr : while_expr
 }
 */
 
+/*
 | ELEMENT cond_expr
 {
   $$ = new oqmlElement($2);
@@ -822,6 +831,7 @@ cond_expr : while_expr
   $$ = new oqmlFor($2, $3, $5, $7, oqml_False);
   free($3);
 }
+*/
 ;
 
 interval: LT interval_hint GT
@@ -1038,6 +1048,11 @@ equal_expr : rel_expr
 | rel_expr NOT BETWEEN range
 {
   $$ = new oqmlNotBetween($1, $4);
+}
+/* 9/02/06 */
+| rel_expr IN rel_expr
+{
+  $$ = new oqmlIn($1, $3);
 }
 ;
 

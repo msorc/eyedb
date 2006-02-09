@@ -879,8 +879,10 @@ do { \
 	    else
 	      xlist->append(new oqmlAtom_oid(obj_oid));
 	  }
-	  else
-	    xlist->append(new oqmlAtom_obj(o, 0));
+	  else {
+	    xlist->append(oqmlObjectManager::registerObject(o));
+	    //xlist->append(new oqmlAtom_obj(o, 0));
+	  }
 	}
       
 	if (is) return new oqmlStatus(this, is);

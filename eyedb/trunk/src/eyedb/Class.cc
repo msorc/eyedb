@@ -324,7 +324,67 @@ namespace eyedb {
   const char *
   Class::classNameToCName(const char *name)
   {
+    if (!strcmp("agregat_class", name))
+      return "eyedb::AgregatClass";
+
+    if (!strcmp("agregat", name))
+      return "eyedb::Agregat";
+
+    if (!strcmp("array_class", name))
+      return "eyedb::CollArrayClass";
+
+    if (!strcmp("array", name))
+      return "eyedb::CollArray";
+
+    if (!strcmp("bag_class", name))
+      return "eyedb::CollBagClass";
+
+    if (!strcmp("bag", name))
+      return "eyedb::CollBag";
+
+    if (!strcmp("basic_class", name))
+      return "eyedb::BasicClass";
+
+    if (!strcmp("basic", name))
+      return "eyedb::Basic";
+
+    if (!strcmp("class", name))
+      return "eyedb::Class";
+
+    if (!strcmp("collection_class", name))
+      return "eyedb::CollectionClass";
+
+    if (!strcmp("enum_class", name))
+      return "eyedb::EnumClass";
+
+    if (!strcmp("enum", name))
+      return "eyedb::Enum";
+
+    if (!strcmp("instance", name))
+      return "eyedb::Instance";
+
+    if (!strcmp("object", name))
+      return "eyedb::Object";
+
+    if (!strcmp("schema", name))
+      return "eyedb::Schema";
+
+    if (!strcmp("set_class", name))
+      return "eyedb::CollSetClass";
+
+    if (!strcmp("set", name))
+      return "eyedb::CollSet";
+
+    if (!strcmp("struct_class", name))
+      return "eyedb::StructClass";
+
+    if (!strcmp("struct", name))
+      return "eyedb::Struct";
+
+    return name;
+#if 1
     static char sname[64];
+
     static const char class_suffix[] = "_class";
     static const int class_suffix_len = strlen(class_suffix);
     static const int prefix_len = strlen(DEF_PREFIX);
@@ -334,22 +394,23 @@ namespace eyedb {
     int len = strlen(name);
 	
     if (len > class_suffix_len &&
-	!strncmp(&name[len-class_suffix_len], "_class", class_suffix_len))
-      {
-	char s[64];
-	strncpy(s, name, len-class_suffix_len);
-	s[len-class_suffix_len] = 0;
-	sprintf(sname, DEF_PREFIX "%sClass", s);
-      }
+	!strncmp(&name[len-class_suffix_len], "_class", class_suffix_len)) {
+      char s[64];
+      strncpy(s, name, len-class_suffix_len);
+      s[len-class_suffix_len] = 0;
+      sprintf(sname, "%s%sClass", DEF_PREFIX, s);
+    }
     else
-      sprintf(sname, DEF_PREFIX "%s", name);
+      sprintf(sname, "%s%s", DEF_PREFIX, name);
 
     sname[prefix_len] += 'A' - 'a';
 
     if (!strncmp(name, coll_prefix, coll_prefix_len))
       sname[coll_prefix_len] += 'A' - 'a';
 
+    printf("class name : %s -> %s\n", name, sname);
     return sname;
+#endif
   }
 
   // added 18/05/05
@@ -384,9 +445,146 @@ namespace eyedb {
     return sname;
   }
 
-  const char *
-  Class::getSCName(const char *name)
+  static std::string
+  getSCName_2(const char *name, const std::string &prefix,
+	      const char *prefix_sep = 0)
   {
+#if 1    
+    if (!strcmp(name, "bool"))
+      return prefix + "Bool";
+
+    // syscls
+    if (!strcmp(name, "attribute_component"))
+      return prefix + (prefix_sep ? "syscls." : "") + "AttributeComponent";
+    if (!strcmp(name, "attribute_component_set"))
+      return prefix + (prefix_sep ? "syscls." : "") + "AttributeComponentSet";
+    if (!strcmp(name, "class_component"))
+      return prefix + (prefix_sep ? "syscls." : "") + "ClassComponent";
+    if (!strcmp(name, "agregat_class_component"))
+      return prefix + (prefix_sep ? "syscls." : "") + "AgregatClassComponent";
+    if (!strcmp(name, "class_variable"))
+      return prefix + (prefix_sep ? "syscls." : "") + "ClassVariable"; 
+    if (!strcmp(name, "index"))
+      return prefix + (prefix_sep ? "syscls." : "") + "Index";
+    if (!strcmp(name, "hashindex"))
+      return prefix + (prefix_sep ? "syscls." : "") + "HashIndex";
+    if (!strcmp(name, "btreeindex"))
+      return prefix + (prefix_sep ? "syscls." : "") + "BTreeIndex";
+    if (!strcmp(name, "index_type"))
+      return prefix + (prefix_sep ? "syscls." : "") + "IndexType";
+    if (!strcmp(name, "collection_attribute_implementation"))
+      return prefix + (prefix_sep ? "syscls." : "") + "CollAttrImpl";
+    if (!strcmp(name, "executable_lang"))
+      return prefix + (prefix_sep ? "syscls." : "") + "ExecutableLang";
+    if (!strcmp(name, "argtype_type"))
+      return prefix + (prefix_sep ? "syscls." : "") + "ArgType_Type";
+    if (!strcmp(name, "argtype"))
+      return prefix + (prefix_sep ? "syscls." : "") + "ArgType";
+    if (!strcmp(name, "executable_localisation"))
+      return prefix + (prefix_sep ? "syscls." : "") + "ExecutableLocalisation";
+    if (!strcmp(name, "executable_type"))
+      return prefix + (prefix_sep ? "syscls." : "") + "ExecutableType";
+    if (!strcmp(name, "trigger_type"))
+      return prefix + (prefix_sep ? "syscls." : "") + "TriggerType";
+    if (!strcmp(name, "signature"))
+      return prefix + (prefix_sep ? "syscls." : "") + "Signature";
+    if (!strcmp(name, "executable"))
+      return prefix + (prefix_sep ? "syscls." : "") + "Executable";
+    if (!strcmp(name, "agregat_class_executable"))
+      return prefix + (prefix_sep ? "syscls." : "") + "AgregatClassExecutable";
+    if (!strcmp(name, "method"))
+      return prefix + (prefix_sep ? "syscls." : "") + "Method";
+    if (!strcmp(name, "fe_method"))
+      return prefix + (prefix_sep ? "syscls." : "") + "FEMethod";
+    if (!strcmp(name, "fe_method_C"))
+      return prefix + (prefix_sep ? "syscls." : "") + "FEMethod_C";
+    if (!strcmp(name, "be_method"))
+      return prefix + (prefix_sep ? "syscls." : "") + "BEMethod";
+    if (!strcmp(name, "be_method_C"))
+      return prefix + (prefix_sep ? "syscls." : "") + "BEMethod_C";
+    if (!strcmp(name, "be_method_OQL"))
+      return prefix + (prefix_sep ? "syscls." : "") + "BEMethod_OQL";
+    if (!strcmp(name, "trigger"))
+      return prefix + (prefix_sep ? "syscls." : "") + "Trigger";
+    if (!strcmp(name, "unique_constraint"))
+      return prefix + (prefix_sep ? "syscls." : "") + "UniqueConstraint";
+    if (!strcmp(name, "notnull_constraint"))
+      return prefix + (prefix_sep ? "syscls." : "") + "NotNullConstraint";
+    if (!strcmp(name, "cardinality_description"))
+      return prefix + (prefix_sep ? "syscls." : "") + "CardinalityDescription";
+    if (!strcmp(name, "cardinality_constraint"))
+      return prefix + (prefix_sep ? "syscls." : "") + "CardinalityConstraint";
+    if (!strcmp(name, "cardinality_constraint_test"))
+      return prefix + (prefix_sep ? "syscls." : "") + "CardinalityConstraint_Test";
+    if (!strcmp(name, "protection_mode"))
+      return prefix + (prefix_sep ? "syscls." : "") + "ProtectionMode";
+    if (!strcmp(name, "protection_user"))
+      return prefix + (prefix_sep ? "syscls." : "") + "ProtectionUser";
+    if (!strcmp(name, "protection"))
+      return prefix + (prefix_sep ? "syscls." : "") + "Protection";
+    if (!strcmp(name, "unreadable_object"))
+      return prefix + (prefix_sep ? "syscls." : "") + "UnreadableObject";
+    if (!strcmp(name, "class_update_type"))
+      return prefix + (prefix_sep ? "syscls." : "") + "ClassUpdateType";
+    if (!strcmp(name, "attribute_convert_type"))
+      return prefix + (prefix_sep ? "syscls." : "") + "AttributeConvertType";
+    if (!strcmp(name, "class_conversion"))
+      return prefix + (prefix_sep ? "syscls." : "") + "ClassConversion";
+
+    // utils
+    if (!strcmp(name, "image_type"))
+      return prefix + (prefix_sep ? "utils." : "") + "ImageType";
+    if (!strcmp(name, "image"))
+      return prefix + (prefix_sep ? "utils." : "") + "Image";
+    if (!strcmp(name, "URL"))
+      return prefix + (prefix_sep ? "utils." : "") + "CURL";
+    if (!strcmp(name, "w_config"))
+      return prefix + (prefix_sep ? "utils." : "") + "WConfig";
+    if (!strcmp(name, "month"))
+      return prefix + (prefix_sep ? "utils." : "") + "Month";
+    if (!strcmp(name, "weekday"))
+      return prefix + (prefix_sep ? "utils." : "") + "Weekday";
+    if (!strcmp(name, "date"))
+      return prefix + (prefix_sep ? "utils." : "") + "Date";
+    if (!strcmp(name, "time"))
+      return prefix + (prefix_sep ? "utils." : "") + "Time";
+    if (!strcmp(name, "time_stamp"))
+      return prefix + (prefix_sep ? "utils." : "") + "TimeStamp";
+    if (!strcmp(name, "time_interval"))
+      return prefix + (prefix_sep ? "utils." : "") + "TimeInterval";
+    if (!strcmp(name, "ostring"))
+      return prefix + (prefix_sep ? "utils." : "") + "OString";
+
+    // oqlctb
+    if (!strcmp(name, "database_open_mode"))
+      return prefix + (prefix_sep ? "oqlctb." : "") + "OqlCtbDatabaseOpenMode";
+    if (!strcmp(name, "lock_mode"))
+      return prefix + (prefix_sep ? "oqlctb." : "") + "OqlCtbLockMode";
+    if (!strcmp(name, "transaction_mode"))
+      return prefix + (prefix_sep ? "oqlctb." : "") + "OqlCtbTransactionMode";
+    if (!strcmp(name, "transaction_lockmode"))
+      return prefix + (prefix_sep ? "oqlctb." : "") + "OqlCtbTransactionLockMode";
+    if (!strcmp(name, "recovery_mode"))
+      return prefix + (prefix_sep ? "oqlctb." : "") + "OqlCtbRecoveryMode";
+    if (!strcmp(name, "tostring_flags"))
+      return prefix + (prefix_sep ? "oqlctb." : "") + "OqlCtbToStringFlags";
+    if (!strcmp(name, "MapType"))
+      return prefix + (prefix_sep ? "oqlctb." : "") + "OqlCtbMapType";
+    if (!strcmp(name, "DatType"))
+      return prefix + (prefix_sep ? "oqlctb." : "") + "OqlCtbDatType";
+    if (!strcmp(name, "datafile"))
+      return prefix + (prefix_sep ? "oqlctb." : "") + "OqlCtbDatafile";
+    if (!strcmp(name, "dataspace"))
+      return prefix + (prefix_sep ? "oqlctb." : "") + "OqlCtbDataspace";
+    if (!strcmp(name, "eyedb"))
+      return prefix + (prefix_sep ? "oqlctb." : "") + "OqlCtbEyedb";
+    if (!strcmp(name, "connection"))
+      return prefix + (prefix_sep ? "oqlctb." : "") + "OqlCtbConnection";
+    if (!strcmp(name, "database"))
+      return prefix + (prefix_sep ? "oqlctb." : "") + "OqlCtbDatabase";
+    if (!strcmp(name, "math"))
+      return prefix + (prefix_sep ? "oqlctb." : "") + "OqlCtbMath";
+#else
     if (!strcmp(name, "class_component"))
       return "ClassComponent";
 
@@ -575,8 +773,21 @@ namespace eyedb {
 
     if (!strcmp(name, "ostring"))
       return DEF_PREFIX1 "OString";
+#endif
 
-    return 0;
+    return "";
+  }
+
+  const char *
+  Class::getSCName(const char *name)
+  {
+    std::string str = getSCName_2(name, DEF_PREFIX);
+    if (str.length() == 0)
+      return 0;
+    static char sname[128];
+    sprintf(sname, "%s", str.c_str());
+    return sname;
+
   }
 
   const char *getJavaName(const Class *cls)

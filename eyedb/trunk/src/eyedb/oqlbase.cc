@@ -32,6 +32,11 @@
 //#define SUPPORT_OQLRESULT
 //#define SUPPORT_POSTACTIONS
 
+//9/02/06: does not work
+//#define SYNC_SYM_GARB
+
+#define GARB_TRACE
+
 #include "oql_p.h"
 
 namespace eyedb {
@@ -42,9 +47,13 @@ namespace eyedb {
   //
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+  LinkedList oqmlObjectManager::freeList;
+  ObjCache *oqmlObjectManager::objCacheIdx = new ObjCache(1024);;
+  ObjCache *oqmlObjectManager::objCacheObj = new ObjCache(1024);;
+
   gbLink *oqmlGarbManager::first, *oqmlGarbManager::last;
   oqmlBool oqmlGarbManager::garbaging = oqml_False;
-  int oqmlGarbManager::count = 0;
+  unsigned int oqmlGarbManager::count = 0;
   LinkedList oqmlGarbManager::str_list;
   LinkedList oqmlNode::node_list;
 
@@ -54,10 +63,27 @@ namespace eyedb {
   //
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-  void oqmlGarbManager::garbage()
+  gbLink *oqmlGarbManager::peek()
   {
-    int cnt_atoms = 0, cnt_lists = 0, cnt_str = 0;
-    gbLink *l = first;
+    return last;
+  }
+
+  void oqmlGarbManager::garbage(gbLink *l, bool full)
+  {
+    if (!l)
+      return;
+
+    if (!full)
+      l = l->next;
+
+    unsigned int cnt_atoms = 0, cnt_lists = 0;
+    unsigned int total_cnt_atoms = 0, total_cnt_lists = 0;
+
+#ifdef GARB_TRACE
+    printf("GARBAGE %s %u %u\n", (full ? "full" : "partial"),
+	   oqmlObjectManager::objCacheIdx->getObjectCount(),
+	   oqmlObjectManager::objCacheObj->getObjectCount());
+#endif
 
     garbaging = oqml_True;
     int toDel_cnt = 0;
@@ -67,12 +93,12 @@ namespace eyedb {
       Bool toDel = False;
       gbLink *next = l->next;
       if (l->at) {
-	//printf("garbaging '%p' %d\n", l->at, l->at->refcnt);
 	if (!l->at->refcnt) {
 	  delete l->at;
 	  cnt_atoms++;
 	  toDel = True;
 	}
+	total_cnt_atoms++;
       }
 
       if (l->atlist) {
@@ -82,6 +108,7 @@ namespace eyedb {
 	  cnt_lists++;
 	  toDel = True;
 	}
+	total_cnt_lists++;
       }
 
       if (toDel)
@@ -89,6 +116,67 @@ namespace eyedb {
       l = next;
     }
 
+    garbaging = oqml_False;
+
+    for (int i = 0; i < toDel_cnt; i++)
+      remove(links[i]);
+
+    delete [] links;
+
+#ifdef GARB_TRACE
+    printf("%u/%u atoms garbaged\n", cnt_atoms, total_cnt_atoms);
+    printf("%u/%u lists garbaged\n", cnt_lists, total_cnt_atoms);
+#endif
+  }
+
+  void oqmlGarbManager::garbage()
+  {
+    unsigned int cnt_str = 0;
+#if 0
+    unsigned int cnt_atoms = 0, cnt_lists = 0;
+    unsigned int total_cnt_atoms = 0, total_cnt_lists = 0;
+    gbLink *l = first;
+
+#ifdef GARB_TRACE
+    printf("GARBAGE global %u %u\n",
+	   oqmlObjectManager::objCacheIdx->getObjectCount(),
+	   oqmlObjectManager::objCacheObj->getObjectCount());
+#endif
+
+    garbaging = oqml_True;
+    int toDel_cnt = 0;
+    gbLink **links = new gbLink*[count];
+
+    while (l) {
+      Bool toDel = False;
+      gbLink *next = l->next;
+      if (l->at) {
+	if (!l->at->refcnt) {
+	  delete l->at;
+	  cnt_atoms++;
+	  toDel = True;
+	}
+	total_cnt_atoms++;
+      }
+
+      if (l->atlist) {
+	if (!l->atlist->refcnt) {
+	  l->atlist->first = 0;
+	  delete l->atlist;
+	  cnt_lists++;
+	  toDel = True;
+	}
+	total_cnt_lists++;
+      }
+
+      if (toDel)
+	links[toDel_cnt++] = l;
+      l = next;
+    }
+#else
+    garbage(first, true);
+    garbaging = oqml_True;
+#endif
     if (str_list.getCount()) {
       LinkedListCursor c(str_list);
       char **tabs = new char *[str_list.getCount()];
@@ -97,25 +185,28 @@ namespace eyedb {
 	free(s);
 	tabs[cnt_str++] = s;
       }
-
+	
       for (int i = 0; i < cnt_str; i++)
 	str_list.deleteObject(tabs[i]);
-
+      
       delete [] tabs;
     }
 
     garbaging = oqml_False;
 
-    //first = last = 0;
+#if 0
     for (int i = 0; i < toDel_cnt; i++)
       remove(links[i]);
 
     delete [] links;
+#endif
 
+#if 0
 #ifdef GARB_TRACE
-    printf("%d atoms garbaged\n", cnt_atoms);
-    printf("%d lists garbaged\n", cnt_lists);
-    printf("%d string garbaged\n", cnt_str);
+    printf("%u/%u atoms garbaged\n", cnt_atoms, total_cnt_atoms);
+    printf("%u/%u lists garbaged\n", cnt_lists, total_cnt_atoms);
+    printf("%u strings garbaged\n", cnt_str);
+#endif
 #endif
     oqmlNode::garbageNodes();
     oqmlObjectManager::garbageObjects();
@@ -326,7 +417,7 @@ namespace eyedb {
 
   void oqmlNode::requalifyType(oqmlTYPE _type)
   {
-    printf("requalify from %d to %d\n", type, _type);
+    //printf("requalify from %d to %d\n", type, _type);
     type = _type;
   }
 
@@ -827,7 +918,7 @@ namespace eyedb {
       return string;
     else
       {
-	char buf[4];
+	char buf[16];
 	sprintf(buf, "%s", (b ? "true" : "false"));
 	((oqmlAtom *)this)->string = strdup(buf);
 	return string;
@@ -2479,12 +2570,13 @@ namespace eyedb {
   //#define LOCK_TRACE
 
   void
-  oqmlLock(oqmlAtomList *l, oqmlBool lock)
+  oqmlLock(oqmlAtomList *l, oqmlBool lock, oqmlBool rm)
   {
     if (!l || l->recurs)
       return;
 
     l->recurs = oqml_True;
+    bool donotdel = false;
   
 #ifdef LOCK_TRACE
     printf("oqmlLock list(%p, %d) -> ", l, lock);
@@ -2494,6 +2586,8 @@ namespace eyedb {
     else {
       if (l->refcnt > 0)
 	l->refcnt--;
+      else
+	donotdel = true;
     }
 
 #ifdef LOCK_TRACE
@@ -2502,18 +2596,29 @@ namespace eyedb {
 
     oqmlAtom *a = l->first;
     while (a) {
-      oqmlLock(a, lock);
+      oqmlLock(a, lock, oqml_False);
       a = a->next;
     }
-
+    
     l->recurs = oqml_False;
+
+    // 8/02/06
+    if (!donotdel) {
+      if (!lock && rm && !l->refcnt) {
+	//printf("before deleting LIST\n");
+	delete l;
+	//printf("after deleting LIST\n");
+      }
+    }
   }
 
   void
-  oqmlLock(oqmlAtom *a, oqmlBool lock)
+  oqmlLock(oqmlAtom *a, oqmlBool lock, oqmlBool rm)
   {
     if (!a || a->recurs)
       return;
+
+    bool donotdel = false;
 
     a->recurs = oqml_True;
 
@@ -2525,6 +2630,8 @@ namespace eyedb {
     else {
       if (a->refcnt > 0)
 	a->refcnt--;
+      else
+	donotdel = true;
     }
   
 #ifdef LOCK_TRACE
@@ -2532,16 +2639,30 @@ namespace eyedb {
 #endif
 
     if (OQML_IS_COLL(a))
-      oqmlLock(OQML_ATOM_COLLVAL(a), lock);
+      oqmlLock(OQML_ATOM_COLLVAL(a), lock,
+	       //rm && !donotdel ? oqml_True : oqml_False);
+	       oqml_False);
     else if (OQML_IS_IDENT(a) && a->as_ident()->entry)
-      oqmlLock(a->as_ident()->entry->at, lock);
+      oqmlLock(a->as_ident()->entry->at, lock,
+	       //rm && !donotdel ? oqml_True : oqml_False);
+	       oqml_False);
     else if (OQML_IS_STRUCT(a)) {
       oqmlAtom_struct *sa = a->as_struct();
       for (int i = 0; i < sa->attr_cnt; i++)
-	oqmlLock(sa->attr[i].value, lock);
+	oqmlLock(sa->attr[i].value, lock,
+		 //rm && !donotdel ? oqml_True : oqml_False);
+		 oqml_False);
     }
 
     a->recurs = oqml_False;
+
+    // 8/02/06
+    if (!donotdel) {
+      if (!lock && rm && !a->refcnt) {
+	//printf("deleting atom\n");
+	delete a;
+      }
+    }
   }
 
   const char oqml_global_scope[] = "::";
@@ -2583,7 +2704,8 @@ namespace eyedb {
   //#define SYMB_TRACE
   //#define LOCAL_TRACE
 
-  void oqmlSymbolEntry::set(oqmlAtomType *_type, oqmlAtom *_at, oqmlBool force)
+  void oqmlSymbolEntry::set(oqmlAtomType *_type, oqmlAtom *_at, oqmlBool force,
+			    oqmlBool tofree)
   {
 #ifdef SYMB_TRACE
     printf("setting symbol '%s' to %p, [old=%p] force %d\n",
@@ -2591,14 +2713,24 @@ namespace eyedb {
 #endif
 
     type = (_type ? *_type : st_atom_type);
-    if (_at || force)
-      {
-	if (at && !oqml_is_global_ident(ident))
-	  oqmlLock(at, oqml_False);
-      
-	at = _at;
-	oqmlLock(at, oqml_True);
+    if (_at || force) {
+#ifdef SYNC_SYM_GARB
+      if (at) {
+	printf("at %p %p %d %d\n", at, _at, tofree,
+	       oqml_is_global_ident(ident));
+	//if (tofree || !oqml_is_global_ident(ident))
+	oqmlLock(at, oqml_False, tofree); // 8/02/06
+	printf("eof\n");
       }
+#else
+      // 9/02/06
+      //if (at && !oqml_is_global_ident(ident))
+      if (at)
+	oqmlLock(at, oqml_False);
+#endif
+      at = _at;
+      oqmlLock(at, oqml_True);
+    }
   }
 
   void oqmlSymbolEntry::addEntry(oqmlAtom_ident *x)
@@ -2630,6 +2762,7 @@ namespace eyedb {
 #ifdef SYNC_GARB
     delete list;
 #endif
+    //    printf("~oqmlSymbolEntry(%s)\n", ident);
     oqmlLock(at, oqml_False);
     free(ident);
   }
@@ -2719,7 +2852,7 @@ namespace eyedb {
   oqmlStatus *
   oqmlContext::setSymbolRealize(const char *ident, oqmlAtomType *type,
 				oqmlAtom *at, oqmlBool global,
-				oqmlBool system)
+				oqmlBool system, oqmlBool tofree)
   {
     oqmlSymbolEntry *s = (global ? symtab->sfirst : symtab->slast);
 
@@ -2744,7 +2877,7 @@ namespace eyedb {
 	    return new oqmlStatus("'%s' is a system variable: "
 				  "it cannot be modified.", ident);
 	
-	  s->set(type, at, oqml_True);
+	  s->set(type, at, oqml_True, tofree);
 
 	  return oqmlSuccess;
 	}
@@ -2801,6 +2934,10 @@ namespace eyedb {
 	if (!strcmp(s->ident, ident) && s->global == global &&
 	    (s->global || s->level == local_cnt))
 	  {
+#ifdef SYNC_SYM_GARB
+	    oqmlLock(s->at, oqml_False, oqml_True);
+	    s->at = 0;
+#endif
 	    if (s->prev)
 	      s->prev->next = s->next;
 	    if (s->next)
@@ -2834,26 +2971,26 @@ namespace eyedb {
   oqmlContext::setSymbol(const char *ident, oqmlAtomType *type, oqmlAtom *at,
 			 oqmlBool global, oqmlBool system)
   {
-    if (global)
-      {
-	oqmlStatus *s;
-	if (oqml_is_global_ident(ident))
-	  {
-	    s = setSymbolRealize(&ident[oqml_global_scope_len], type, at,
-				 oqml_True, system);
-	    if (s) return s;
-	  }
-	else if (!getLocalTable())
-	  {
-	    s = setSymbolRealize((std::string(oqml_global_scope) + ident).c_str(), type, at,
-				 oqml_True, system);
-	    if (s) return s;
-	  }
-	else
-	  global = oqml_False;
+    oqmlBool tofree = oqml_True;
+    if (global) {
+      oqmlStatus *s;
+      if (oqml_is_global_ident(ident)) {
+	s = setSymbolRealize(&ident[oqml_global_scope_len], type, at,
+			     oqml_True, system, oqml_True);
+	if (s) return s;
+	tofree = oqml_False;
       }
-
-    return setSymbolRealize(ident, type, at, global, system);
+      else if (!getLocalTable()) {
+	s = setSymbolRealize((std::string(oqml_global_scope) + ident).c_str(), type, at,
+			     oqml_True, system, oqml_True);
+	if (s) return s;
+	tofree = oqml_False;
+      }
+      else
+	global = oqml_False;
+    }
+    
+    return setSymbolRealize(ident, type, at, global, system, oqml_True);
   }
 
   oqmlStatus *
@@ -3787,10 +3924,6 @@ namespace eyedb {
     return oqmlSuccess;
   }
 
-  LinkedList oqmlObjectManager::freeList;
-  ObjCache *oqmlObjectManager::objCacheIdx = new ObjCache();;
-  ObjCache *oqmlObjectManager::objCacheObj = new ObjCache();;
-
   void
   oqmlObjectManager::addToFreeList(Object *o)
   {
@@ -3870,7 +4003,7 @@ namespace eyedb {
   }
 
 #define IDX2OID(IDX) (Oid(IDX, 0, 0))
-#define OBJ2OID(O)   (Oid((long)o, 0, 0))
+#define OBJ2OID(O)   (Oid((unsigned int)o, 0, 0))
 
   oqmlStatus *
   oqmlObjectManager::getObject(oqmlNode *node, const char *s,
@@ -3925,9 +4058,17 @@ namespace eyedb {
     if (!o)
       return new oqmlAtom_obj(o, 0);
 
-    unsigned long idx = (unsigned long)objCacheObj->getObject(OBJ2OID(o));
-    if (idx)
+    unsigned int idx = (unsigned int)objCacheObj->getObject(OBJ2OID(o),
+							    true);
+#ifdef GARB_TRACE
+    printf("register %p: %u\n", o, idx);
+#endif
+    if (idx) {
+      unsigned int idx2 = (unsigned int)objCacheIdx->getObject(IDX2OID(idx),
+							       true);
+      assert(idx2);
       return new oqmlAtom_obj(o, idx, o->getClass());
+    }
 
     static unsigned int stidx = 1000;
 
@@ -3942,9 +4083,12 @@ namespace eyedb {
     if (!o)
       return oqmlSuccess;
 
-    static const char fmt[] = "object '%p' is not registered";
-    unsigned long idx = (unsigned long)objCacheObj->getObject(OBJ2OID(o));
+    static const char fmt[] = "object '%p' is not registered #1";
+    unsigned int idx = (unsigned int)objCacheObj->getObject(OBJ2OID(o));
 
+#ifdef GARB_TRACE
+    printf("unregister %p: %u\n", o, idx);
+#endif
     if (!idx)
       return new oqmlStatus(node, fmt, o);
 

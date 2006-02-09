@@ -26,6 +26,7 @@
 #define _EYEDB_EYEDB_P_H
 
 #include <eyedb/eyedb.h>
+#include <eyedb/ObjCache.h>
 #include <eyedblib/xdr.h>
 #include <eyedbsm/xdr.h>
 #include <eyedb/IteratorAtom.h>
