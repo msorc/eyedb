@@ -1,2 +1,36 @@
 # EyeDB server configuration file
-# see man eyedb-config(5)
+# 
+# This file is a template that you can use to override the default values.
+
+# Executables directory
+#bindir = @bindir@;
+
+# Bases directory
+#data_dir = @localstatedir@/lib/eyedb/db;
+
+# Pipes directory
+#pipedir = @localstatedir@/lib/eyedb/pipes;
+
+# Temporary files directory
+#tmpdir = @localstatedir@/lib/eyedb/tmp;
+
+# Path to .so files
+#sopath = @libdir@/eyedb;
+
+# Default EYEDBDBM database
+#default_dbm = @localstatedir@/lib/eyedb/db/dbmdb.dbs;
+
+# Granted EYEDBDBM database
+#granted_dbm = %default_dbm%;
+
+# Server access file
+#access_file = @sysconfdir@/eyedb/Access;
+
+# Smd connection port
+#smdport = @localstatedir@/lib/eyedb/pipes/eyedbsmd;
+
+# Server listen ports and sockets list
+#listen = localhost:6240,@localstatedir@/lib/eyedb/pipes/eyedbd;
+
+# OQL files path
+#oqlpath = @libdir@/eyedb/oql
