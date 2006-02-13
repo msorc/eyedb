@@ -1,72 +1,9 @@
-2005-12-17  François  <francois@localhost.localdomain>
+2006-02-13  Francois  <francois@dechelle.net>
 
-	* Changed configure.in for better portability. Work in progress.
+	* Added install/etc/eyedb.conf.in and install/etc/eyedbd.conf.in, configuration file templates, plus substitution in Makefile.am instead of configure.in
 
-2005-09-20  François  <francois@localhost.localdomain>
+2006-01-29  Francois  <francois@dechelle.net>
 
-	* Fixing compilation of src/www. Not complete yet.
+	* Release 2.7.5
 
-2005-09-09  François  <francois@localhost.localdomain>
-
-	* Fixed compilation of a .tar.gz distribution ('make dist')
-
-2005-08-09  François  <francois@pc-francois>
-
-	* Added all doxygen documentation tags in header
-	files. Documentation is empty however, even if all the tags are
-	there :-(
-
-2005-06-17  François  <francois@pc-francois>
-
-	* Added doxygen documentation directory plus config files.
-	Updated configure.in and Makefile.am to enable doc building by 'make doc'
-
-2005-06-06  François  <francois@localhost>
-
-	* added swig bindings compilation with automake (currently not
-	compiled by default, see configure.in)
-
-2005-05-16  François  <francois@localhost>
-
-	* added --enable-debug and --enable-optimize to configure's args
-
-2005-05-10  François  <francois@localhost>
-
-	* added tests for eyedbsm (directory tests/eyedbsm)
-
-2005-03-24  François  <francois@dechelle.net>
-
-	* added installation of examples
-
-2005-02-14  François  <francois@localhost>
-
-	* fixed compilation on GNU/Linux after merge of branch autoconf
-
-2005-02-12  Francois Dechelle  <francois@dechelle.net>
-
-	* fixed compilation on GNU/Linux after changes for Solaris
-
-2005-02-12  Francois Dechelle  <francois@dechelle.net>
-
-	* compilation on Solaris: compiles except a problem with X11 
-	libraries
-
-2005-02-01  François  <francois@localhost>
-
-	* fixed configure.in and Makefiles to compile in a different
-	directory than the source tree
-
-2005-01-03  Francois Dechelle  <dechelle@limbe.ircam.fr>
-
-	* compiled successfully a tarball result of a 'make dist' 
-
-2004-12-21  Francois Dechelle  <dechelle@limbe.ircam.fr>
-
-	* compiled all libraries with autoconf/automake
-	* compiled all binaries in src/eyedb with autoconf/automake
-
-2004-12-16  Francois Dechelle  <dechelle@limbe.ircam.fr>
-
-	* added configure.in
-	
 
