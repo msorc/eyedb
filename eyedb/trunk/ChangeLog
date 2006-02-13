@@ -1,5 +1,9 @@
 2006-02-13  Francois  <francois@dechelle.net>
 
+	* Fixed src/www/Makefile.am and src/www/html/Makefile.am to not overwrite existing files (Apache config file, cgi scripts, html files)
+	
+2006-02-13  Francois  <francois@dechelle.net>
+
 	* Added install/etc/eyedb.conf.in and install/etc/eyedbd.conf.in, configuration file templates, plus substitution in Makefile.am instead of configure.in
 
 2006-01-29  Francois  <francois@dechelle.net>
