@@ -21,9 +21,9 @@ eyedbd.conf: Makefile $(srcdir)/eyedbd.conf.in
 install-data-local:
 	test -z "$(eyedbconfdir)" || $(mkdir_p) "$(DESTDIR)$(eyedbconfdir)"
 	( \
-		test ! -f $(eyedbconfdir)/eyedb.conf && $(INSTALL_DATA) eyedb.conf $(DESTDIR)$(eyedbconfdir)/eyedb.conf ; \
-		test ! -f $(eyedbconfdir)/eyedbd.conf && $(INSTALL_DATA) eyedbd.conf $(DESTDIR)$(eyedbconfdir)/eyedbd.conf ; \
-		test ! -f $(eyedbconfdir)/Access && $(INSTALL_DATA) $(srcdir)/Access $(DESTDIR)$(eyedbconfdir)/Access ; \
+		test ! -f $(DESTDIR)$(eyedbconfdir)/eyedb.conf && $(INSTALL_DATA) eyedb.conf $(DESTDIR)$(eyedbconfdir)/eyedb.conf ; \
+		test ! -f $(DESTDIR)$(eyedbconfdir)/eyedbd.conf && $(INSTALL_DATA) eyedbd.conf $(DESTDIR)$(eyedbconfdir)/eyedbd.conf ; \
+		test ! -f $(DESTDIR)$(eyedbconfdir)/Access && $(INSTALL_DATA) $(srcdir)/Access $(DESTDIR)$(eyedbconfdir)/Access ; \
 		exit 0 \
 	)
 
