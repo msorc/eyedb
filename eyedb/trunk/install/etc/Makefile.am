@@ -1,5 +1,4 @@
-eyedbconfdir=$(sysconfdir)/$(PACKAGE)
-noinst_DATA= eyedb.conf eyedbd.conf
+pkgdata_DATA= eyedb.conf.sample eyedbd.conf.sample Access.sample
 
 EDIT = sed \
         -e 's,@bindir\@,$(bindir),g' \
@@ -10,21 +9,12 @@ EDIT = sed \
         -e 's,@prefix\@,$(prefix),g' \
         -e 's,@sysconfdir\@,$(sysconfdir),g'
 
-eyedb.conf: Makefile $(srcdir)/eyedb.conf.in
-eyedbd.conf: Makefile $(srcdir)/eyedbd.conf.in
+eyedb.conf.sample: Makefile $(srcdir)/eyedb.conf.sample.in
+eyedbd.conf.sample: Makefile $(srcdir)/eyedbd.conf.sample.in
 
-%.conf: Makefile $(srcdir)/%.conf.in
-	rm -f $*.conf $*.conf.tmp
-	$(EDIT) $(srcdir)/$*.conf.in >$*.conf.tmp
-	mv $*.conf.tmp $*.conf
+%.conf.sample: Makefile $(srcdir)/%.conf.sample.in
+	rm -f $*.conf.sample $*.conf.sample.tmp
+	$(EDIT) $(srcdir)/$*.conf.sample.in >$*.conf.sample.tmp
+	mv $*.conf.sample.tmp $*.conf.sample
 
-install-data-local:
-	test -z "$(eyedbconfdir)" || $(mkdir_p) "$(DESTDIR)$(eyedbconfdir)"
-	( \
-		test ! -f $(DESTDIR)$(eyedbconfdir)/eyedb.conf && $(INSTALL_DATA) eyedb.conf $(DESTDIR)$(eyedbconfdir)/eyedb.conf ; \
-		test ! -f $(DESTDIR)$(eyedbconfdir)/eyedbd.conf && $(INSTALL_DATA) eyedbd.conf $(DESTDIR)$(eyedbconfdir)/eyedbd.conf ; \
-		test ! -f $(DESTDIR)$(eyedbconfdir)/Access && $(INSTALL_DATA) $(srcdir)/Access $(DESTDIR)$(eyedbconfdir)/Access ; \
-		exit 0 \
-	)
-
-EXTRA_DIST=eyedb.conf.in eyedbd.conf.in Access
+EXTRA_DIST=eyedb.conf.sample.in eyedbd.conf.sample.in Access.sample
