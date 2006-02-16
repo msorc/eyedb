@@ -42,8 +42,8 @@
 #define LOGDEVLEN 511
 
 #ifdef UT_SEM
-#define eyedbsm_mutexLock(X, Y)
-#define eyedbsm_mutexUnlock(X, Y)
+#define eyedbsm_mutexLock(X, Y) eyedbsm::mutexLock(X, Y)
+#define eyedbsm_mutexUnlock(X, Y) eyedbsm::mutexUnlock(X, Y)
 #else
 #define eyedbsm_mutexLock(X, Y) eyedbsm::mutexLock(X, Y)
 #define eyedbsm_mutexUnlock(X, Y) eyedbsm::mutexUnlock(X, Y)
@@ -110,15 +110,51 @@ namespace eyedb {
   //#define CONNLOG_SIZE 0x10000
 #define CONNLOG_SIZE (sizeof(SessionHead) + 128 * sizeof(ClientInfo))
 
+#ifdef UT_SEM
+  const int SessionLog::INVALID_SEMKEY = -1;
+
+  bool SessionLog::valid_sems() const
+  {
+    return semkeys[0] != INVALID_SEMKEY;
+  }
+
+  Status
+  SessionLog::init_sems()
+  {
+    for (int n = 0; n < sizeof(semkeys)/sizeof(semkeys[0]); n++)
+      semkeys[0] = INVALID_SEMKEY;
+    locked = 0;
+    smdcli_conn_t *conn = smdcli_open(smd_get_port());
+    if (!conn)
+      return Exception::make(IDB_ERROR, "sessionlog: cannot connect to eyedbsmd ");
+    smdcli_init_getsems(conn, Config::getServerValue("default_dbm"), semkeys);
+    //printf("init_sems(%d, %d)\n", semkeys[0], semkeys[1]);
+    //smdcli_close(conn);
+    if (!valid_sems())
+      return Exception::make(IDB_ERROR, "sessionlog: cannot create semaphores ");
+    return Success;
+  }
+#endif
+
   SessionLog::SessionLog(const char *host, const char *port, const char *logdir)
   {
     islocked = False;
     addr_connlog = 0;
     status = openRealize(host, port, logdir, False);
-    if (!status) {
-      sesslog = this;
-      eyedbsm::mutexLightInit(0, &mp, (connhead ? &connhead->mp : 0));
-    }
+    if (status)
+      return;
+
+    sesslog = this;
+#ifdef UT_SEM
+    status = init_sems();
+    if (status)
+      return;
+
+
+    eyedbsm::mutexLightInit(semkeys, &locked, &mp, (connhead ? &connhead->mp : 0));
+#else
+    eyedbsm::mutexLightInit(0, &mp, (connhead ? &connhead->mp : 0));
+#endif
   }
 
   // create constructor
@@ -176,7 +212,14 @@ namespace eyedb {
     connhead->loglevel = loglevel;
     connhead->conn_first = XM_NULLOFFSET;
 
+#ifdef UT_SEM
+    status = init_sems();
+    if (status)
+      return;
+    eyedbsm::mutexInit(semkeys, &locked, &mp, &connhead->mp, "CONNLOG");
+#else
     eyedbsm::mutexInit(0, &mp, &connhead->mp, "CONNLOG");
+#endif
   }
 
   static char *truedir(const char *rs)

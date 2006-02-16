@@ -158,6 +158,7 @@ msg_make(const char *fmt, ...)
 static void
 close_files(void)
 {
+#if 0
   int fd;
   int maxfd = sizeof(fd_mask) * 8;
   
@@ -167,6 +168,7 @@ close_files(void)
 	if (close(fd) < 0)
 	  PERROR (msg_make("error closing file %d", fd));
       }
+#endif
 }
 
 static void
@@ -233,6 +235,7 @@ signal_handler(int sig)
   int s;
   for (s = 0; s < NSIG; s++)
     signal(s, SIG_DFL);
+  //printf("thead %d:%d got signal %d\n", getpid(), pthread_self());
   /*@@@@ M_strsignal*/
   IDB_LOG(IDB_LOG_CONN, ("backend got %s [signal=%d]\n", M_strsignal(sig), sig));
   /*@@@@ M_strsignal*/
@@ -266,27 +269,65 @@ static void
 sig_h(int sig, siginfo_t *info, void *any)
 {
 /*  utlog(msg_make("Got %s [sigaction=%d]\n", _sys_siglistp[sig], sig)); */
-  if (info)
-    {
-      int fd, i;
-      rpc_ClientInfo *ci;
+//  printf("Got %s [sigaction=%d]\n", _sys_siglistp[sig], sig);
+  if (info) {
+    int fd, i;
+    rpc_ClientInfo *ci;
 
-      for (fd = 0; fd < sizeof(clientInfo)/sizeof(clientInfo[0]); fd++)
-	if (ci = clientInfo[fd])
-	  {
-	    for (i = 0; i < ci->fd_cnt; i++)
-	      if (ci->tid[i] == info->si_pid)
-		rpc_garbClientInfo(rpc_mainServer, i, fd);
-	    
-	    break;
+    pid_t pid =  info->si_pid;
+    for (fd = 0; fd < sizeof(clientInfo)/sizeof(clientInfo[0]); fd++)
+      if (ci = clientInfo[fd]) {
+	for (i = 0; i < ci->fd_cnt; i++)
+	  if (ci->tid[i] == info->si_pid) {
+	    rpc_garbClientInfo(rpc_mainServer, i, fd);
 	  }
-    }
-  wait(0);
+	break;
+      }
+  }
+  //wait(0);
 }
 
 void rpc_setProgName(const char *name)
 {
   progName = strdup(name);
+}
+
+static void
+set_sigaction()
+{
+  struct sigaction act;
+  
+  act.sa_handler = 0;
+  act.sa_sigaction = sig_h;
+
+  /*@@@@*/
+#if defined(LINUX) || defined(LINUX64) || defined(LINUX_IA64) || defined(LINUX_PPC64) || defined(ORIGIN) || defined(ALPHA) || defined(CYGWIN)
+  act.sa_flags = SA_SIGINFO | SA_NOCLDSTOP;
+#else
+  act.sa_flags = SA_SIGINFO | SA_NOCLDWAIT;
+#endif
+
+  memset(&act.sa_mask, 0, sizeof(act.sa_mask));
+  int r = sigaction(SIGCHLD, &act, 0);
+}
+
+static void
+suspend_sigaction()
+{
+  struct sigaction act;
+  
+  act.sa_handler = 0;
+  act.sa_sigaction = 0;
+
+  /*@@@@*/
+#if defined(LINUX) || defined(LINUX64) || defined(LINUX_IA64) || defined(LINUX_PPC64) || defined(ORIGIN) || defined(ALPHA) || defined(CYGWIN)
+  act.sa_flags = SA_SIGINFO | SA_NOCLDSTOP;
+#else
+  act.sa_flags = SA_SIGINFO | SA_NOCLDWAIT;
+#endif
+
+  memset(&act.sa_mask, 0, sizeof(act.sa_mask));
+  int r = sigaction(SIGCHLD, &act, 0);
 }
 
 static void
@@ -316,6 +357,8 @@ rpc_ServerInit()
 
       signal(SIGPIPE, SIG_IGN);
 
+      set_sigaction();
+#if 0
       {
 	struct sigaction act;
 
@@ -332,6 +375,7 @@ rpc_ServerInit()
 	memset(&act.sa_mask, 0, sizeof(act.sa_mask));
 	sigaction(SIGCHLD, &act, 0);
       }
+#endif
       init = rpc_True;
     }
 }
@@ -691,6 +735,33 @@ check_fd(int fd, const char *msg)
 			     msg, fd));
 }
 
+static char exiting = 0;
+
+eyedblib::Mutex exit_mp;
+eyedblib::Mutex wait_thr_mp;
+eyedblib::Condition *wait_thr_cond;
+
+static void *wait_thr(void *arg)
+{
+  pid_t pid = *(pid_t *)arg;
+  free(arg);
+#ifdef TRACE2
+  printf("%d:%d waiting for pid %d\n", getpid(), pthread_self(), pid);
+#endif
+  int status;
+  errno = 0;
+  wait_thr_cond->signal();
+  do {
+    waitpid(pid, &status, 0);
+  } while(errno);
+
+#ifdef TRACE2
+  printf("%d:%d done pid %d\n", getpid(), pthread_self(), pid);
+#endif
+  pthread_detach(pthread_self());
+  pthread_exit(&status);
+}
+
 static void *serv_thr(void *arg)
 {
   rpc_ThreadArg *thr_arg = (rpc_ThreadArg *)arg;
@@ -710,11 +781,18 @@ static void *serv_thr(void *arg)
       {
 	if (server->mode == rpc_MultiThreaded || server->conn_cnt > 1)
 	  {
+	    eyedblib::MutexLocker _(exit_mp);
 	    void *status = 0;
-	    rpc_garbClientInfo(server, which, fd);
 #ifdef TRACE
-	    utlog(msg_make("thread EXIT\n"));
+	    utlog(msg_make("%d thread EXIT\n", pthread_self()));
 #endif
+#ifdef TRACE2
+	    fprintf(stderr, "%d:%d thread EXIT\n", getpid(), pthread_self());
+	    fflush(stderr);
+#endif
+	    //	    rpc_garbClientInfo(server, which, fd);
+	    rpc_garbClientInfo(server, 0, fd); // force which
+	    exit(0);
 #ifdef THR_POSIX
 	    pthread_exit(&status);
 #else
@@ -845,13 +923,19 @@ rpc_makeNewConnection(rpc_Server *server, int new_fd[], int fd_cnt,
 	}
       else if (server->mode == rpc_MultiProcs)
 	{
+	  suspend_sigaction();
+
 	  if ((ci->tid[0] = fork()) == 0)
 	    {
-	      if (getenv("EYEDBWAIT"))
+	      const char *w;
+	      if ((w = getenv("EYEDBWAIT")))
 		{
-		  printf("[%d] waiting 30 seconds\n", getpid());
-		  sleep(30);
-		  printf("continuing!!!\n");
+		  int sec = atoi(w);
+		  if (!sec)
+		    sec = 30;
+		  printf("Pid %d waiting for %d seconds\n", getpid(), sec);
+		  sleep(sec);
+		  printf("Continuing...\n");
 		}
 
 	      rpc_serverStart(server, new_fd, fd_cnt, rpc_ci);
@@ -888,6 +972,18 @@ rpc_makeNewConnection(rpc_Server *server, int new_fd[], int fd_cnt,
 	      rpc_serverEnd(server, rpc_ci);
 	      rpc_quit(0, 0);
 	    }
+
+	  wait_thr_cond = new eyedblib::Condition();
+	  pthread_t wait_thr_p;
+	  pid_t *pid = new pid_t(ci->tid[0]);
+	  errno = 0;
+	  if (!pthread_create(&wait_thr_p, 0, wait_thr, pid))
+	    wait_thr_cond->wait();
+	  else
+	    IDB_LOG(IDB_LOG_CONN, ("cannot create waiting thread\n"));
+
+	  delete wait_thr_cond;
+	  set_sigaction();
 
 	  rpc_garbRealize(server, ci, 1);
 	  free(rpc_ci);
@@ -1226,8 +1322,9 @@ rpc_serverMainLoop(rpc_Server *server, rpc_PortHandle **ports, int nports)
 	      rpc_multiConnManage(server, fd, &max_fd);
 	    else 
 	      {
-		if (!rpc_inputHandle(server, 0, fd))
+		if (!rpc_inputHandle(server, 0, fd)) {
 		  rpc_garbClientInfo(server, 0, fd);
+		}
 	      }
 	  }
     }
@@ -1314,6 +1411,9 @@ rpc_garbClientInfo(rpc_Server *server, int which, int fd)
 {
   rpc_ClientInfo *ci = clientInfo[fd];
 
+#ifdef TRACE2
+  printf("%d:%d garbClientInfo...\n", getpid(), pthread_self());
+#endif
 #ifdef TRACE
   utlog(msg_make("rpc_garbClientInfo(which = %d, fd = %d, ci = %p)\n",
 			   which, fd, ci));
@@ -1333,20 +1433,22 @@ rpc_garbClientInfo(rpc_Server *server, int which, int fd)
 
   /*@@@@ #if !defined(LINUX) && !defined(CYGWIN)*/
 
-  /*#if defined(SOLARIS) || defined(ULTRASOL7)  */
-  {
-    int i;
-    for (i = 0; i < ci->fd_cnt; i++) {
-      if (ci->tid[i] != pthread_self()) {
-	//printf("killing thread %d\n", ci->tid[i]);
-	pthread_kill(ci->tid[i], SIGTERM);
-      }
-    }
-  }
-  /*#endif */
-
-#ifdef HAS_PTHREAD_KILL_OTHER_THREADS_NP
+#if 0
+#if 0 /*def HAS_PTHREAD_KILL_OTHER_THREADS_NP*/
   pthread_kill_other_threads_np();
+#else
+  int i = 0;
+  for (i = 0; i < ci->fd_cnt; i++) {
+    if (ci->tid[i] == pthread_self())
+      break;
+  }
+
+  for (++i; i < ci->fd_cnt; i++) {
+    printf("%d:%d killing thread %d:%d\n", getpid(),
+	   pthread_self(), getpid(), ci->tid[i]);
+    pthread_kill(ci->tid[i], SIGTERM);
+  }
+#endif
 #endif
 
   if (!--ci->refcnt)
@@ -1359,6 +1461,23 @@ rpc_garbClientInfo(rpc_Server *server, int which, int fd)
   utlog("rpc_garbClientInfo: close(%d)\n", fd);
 #endif
   close(fd);
+
+#if 0
+  if (ci->refcnt) {
+    _.unlock();
+    int i = 0;
+    for (i = 0; i < ci->fd_cnt; i++) {
+      if (ci->tid[i] == pthread_self())
+	break;
+    }
+
+    for (++i; i < ci->fd_cnt; i++) {
+      printf("%d:%d killing thread %d:%d\n", getpid(),
+	     pthread_self(), getpid(), ci->tid[i]);
+      pthread_kill(ci->tid[i], SIGTERM);
+    }
+  }
+#endif
 
 #ifdef TRACE
   utlog(msg_make("close connection fd=%d\n", fd));

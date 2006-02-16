@@ -74,7 +74,10 @@ static const char trTooLarge[] =
 #include <kern_p.h>
 #include <eyedblib/semlib.h>
 
-//#define NO_INTERNAL_LOCK
+// reconnected 10/02/06 because of a bug
+// anyhow trs->mut and tro->mut are intra-processus mutex
+// and should not be used in inter processus mode
+#define NO_INTERNAL_LOCK
 
 namespace eyedbsm {
 
@@ -606,7 +609,10 @@ ESM_objectDownLock(DbHandle const *dbh, Oid const *const oid)
 
   tro = (TRObject *)XM_ADDR(xmh, tro_off);
   eyedblib::MutexLocker trolock(tro->mut);
+
+#ifndef NO_INTERNAL_LOCK
   mtlock.unlock();
+#endif
       
   if (!tro->lockSX && !tro->lockX && !tro->lockP)
     return statusMake(ERROR, "object '%s' is neither lock X, nor lock SX, nor lock P",
@@ -1135,7 +1141,9 @@ ESM_objectLockCheck(DbHandle const *dbh, const Oid *oid,
     }
 
     eyedblib::MutexLocker trolock(tro->mut);
+#ifndef NO_INTERNAL_LOCK
     mtlock.unlock();
+#endif
 
     if (trctx->params.ratioalrt != 0 &&
 	trctx->params.magorder != MAX_MAGORDER &&
@@ -1225,7 +1233,9 @@ ESM_objectLockCheck(DbHandle const *dbh, const Oid *oid,
     tro = (TRObject *)XM_ADDR(xmh, tro_off);
       
     eyedblib::MutexLocker trolock(tro->mut);
+#ifndef NO_INTERNAL_LOCK
     mtlock.unlock();
+#endif
 
 #ifdef TRS_SECURE
     ESM_ASSERT(!memcmp(&tro->oid, oid, sizeof(Oid)), 0, 0);
@@ -2197,7 +2207,10 @@ ESM_transactionDeleteRealize(DbHandle const *dbh,
 #ifndef NO_INTERNAL_LOCK
   eyedblib::MutexLocker mtlock(trs->mut);
 #endif
-
+  /*
+  std::cout << getpid() << ":" << pthread_self() <<
+    " transaction delete mut " << XM_OFFSET(xmh, &trs->mut) << std::endl;
+  */
   time(&t);
 
   IDB_LOG(IDB_LOG_TRANSACTION, ("transaction delete xid=%d\n", xid));

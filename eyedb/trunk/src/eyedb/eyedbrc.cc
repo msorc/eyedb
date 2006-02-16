@@ -37,13 +37,17 @@
 using namespace eyedb;
 using namespace std;
 
+namespace eyedb {
+  extern void printVersion();
+}
+
 static int
 usage(const char *prog)
 {
   cerr << "usage: " << prog << " ";
+  cerr << "[-h|--help|-v|--version] [start|stop|status] [-f] [--creating-dbm] ";
   print_common_usage(cerr, true);
-  cerr << " start|stop|status [-f] [--creating-dbm] [-h|--help]\n";
-
+  cerr << endl;
   return 1;
 }
 
@@ -51,9 +55,10 @@ static void help(const char *prog)
 {
   usage(prog);
   cerr << "\nProgram Options:\n";
-  cerr << "  start [-f] Launch the server. Set -f to force launch\n";
-  cerr << "  stop [-f]  Stop the server. Set -f to force stop\n";
-  cerr << "  status     Display status on the running server\n";
+  cerr << "  start [-f]     Launch the server. Set -f to force launch\n";
+  cerr << "  stop [-f]      Stop the server. Set -f to force stop\n";
+  cerr << "  status         Display status on the running server\n";
+  cerr << "  --creating-dbm Bootstrap option for DBM database creation\n";
   cerr << "\nCommon Options:\n";
   print_common_help(cerr, true);
 }
@@ -252,14 +257,8 @@ main(int argc, char *argv[])
 
   string sv_listen;
   try {
-    eyedb::init(argc, argv, &sv_listen, false);
-
-    listen = sv_listen.c_str();
-
     if (argc < 2)
       return usage(argv[0]);
-
-    eyedb::Exception::setMode(eyedb::Exception::StatusMode);
 
     Command cmd;
 
@@ -273,8 +272,18 @@ main(int argc, char *argv[])
       help(argv[0]);
       return 0;
     }
+    else if (!strcmp(argv[1], "-v") || !strcmp(argv[1], "--version")) {
+      eyedb::printVersion();
+      return 0;
+    }
     else
       return usage(argv[0]);
+
+    eyedb::init(argc, argv, &sv_listen, false);
+
+    listen = sv_listen.c_str();
+
+    eyedb::Exception::setMode(eyedb::Exception::StatusMode);
 
     for (int i = 2; i < argc; i++) {
       char *s = argv[i];
@@ -282,10 +291,12 @@ main(int argc, char *argv[])
 	force = True;
       else if (!strcmp(s, "--creating-dbm"))
 	creatingDbm = True;
+      /*
       else if (!strcmp(s, "-h") || !strcmp(s, "--help")) {
 	help(argv[0]);
 	return 0;
       }
+      */
     }
 
     if (!*listen && (s = eyedb::Config::getServerValue("listen")))

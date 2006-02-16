@@ -98,7 +98,7 @@ namespace eyedb {
   void
   printVersion()
   {
-    printf("EyeDB Copyright (c) SYSRA 1995-2005\n");
+    printf("EyeDB Copyright (C) 1994-1999,2004-2006 SYSRA\n");
     printf(" Version      V%s\n", eyedb_version);
     printf(" Compiled     %s\n", getCompilationTime());
     printf(" Architecture %s\n", Architecture::getArchitecture()->getArch());
@@ -153,10 +153,14 @@ do { \
     static const char *opt_sv_prefix = "-eyedbsv";
     static int len_opt_sv_prefix = strlen(opt_sv_prefix);
 
-    if (listen) { // means : server mode
+    // disconnect this condition because it should work also for
+    // local opening mode
+    /*if (listen)*/ { // means : server mode
+#if 0
       const char *smdport = Config::getServerValue("smdport");
       if (smdport)
 	smd_set_port(smdport);
+#endif
     }
 
     if (getenv("RPC_MIN_SIZE")) {
@@ -185,6 +189,7 @@ do { \
     static const std::string granted_dbm_opt = "granted-dbm";
     static const std::string default_dbm_opt = "default-dbm";
     static const std::string conf_opt = "conf";
+    static const std::string server_conf_opt = "server-conf";
     static const std::string logdev_opt = "logdev";
     static const std::string logmask_opt = "logmask";
     static const std::string logdate_opt = "logdate";
@@ -214,9 +219,6 @@ do { \
 	Option(listen_opt, OptionStringType(),
 	       Option::MandatoryValue,
 	       OptionDesc("listen host and ports", "[<host>:]<port>"));
-      opts[opt_cnt++] = 
-	Option(prefix + smd_port_opt, OptionStringType(), Option::MandatoryValue,
-	       OptionDesc("eyedbsmd port", "<port>"));
 
       opts[opt_cnt++] = 
 	Option(prefix + granted_dbm_opt, OptionStringType(),
@@ -246,10 +248,24 @@ do { \
 	       OptionDesc("EYEDBDBM database file", "<dbmfile>"));
     }
 
+
     opts[opt_cnt++] = 
       Option(prefix + conf_opt, OptionStringType(), Option::MandatoryValue,
-	     OptionDesc("Configuration file", "<conffile>"));
+	     OptionDesc("Client Configuration file", "<conffile>"));
 
+    opts[opt_cnt++] = 
+      Option(prefix + server_conf_opt, OptionStringType(),
+	     Option::MandatoryValue,
+	     OptionDesc(std::string("Server Configuration file") +
+			(listen ? "" : " (used for local opening)"),
+			"<conffile>"));
+
+    opts[opt_cnt++] = 
+      Option(prefix + smd_port_opt, OptionStringType(), Option::MandatoryValue,
+	     OptionDesc(std::string("eyedbsmd port") +
+			(listen ? "" : " (used for local opening)"),
+			"<port>"));
+    
     opts[opt_cnt++] = 
       Option(prefix + logdev_opt, OptionStringType(), Option::MandatoryValue,
 	     OptionDesc("Output log file", "<logfile>"));
@@ -322,6 +338,22 @@ do { \
       exit(0);
     }
 
+    if (map.find(conf_opt) != map.end()) {
+      Status s = Config::setClientConfigFile(map[conf_opt].value.c_str());
+      if (s) {
+	s->print(stderr);
+	exit(1);
+      }
+    }
+
+    if (map.find(server_conf_opt) != map.end()) {
+      Status s = Config::setServerConfigFile(map[server_conf_opt].value.c_str());
+      if (s) {
+	s->print(stderr);
+	exit(1);
+      }
+    }
+
     if (map.find(port_opt) != map.end())
       Connection::setDefaultIDBPort(map[port_opt].value.c_str());
     else if (map.find(inet_opt) != map.end())
@@ -336,10 +368,10 @@ do { \
 	*listen = map[listen_opt].value;
       else
 	getopt.usage("\n");
-    }
 
-    if (map.find(smd_port_opt) != map.end())
-      smd_set_port(map[smd_port_opt].value.c_str());
+      Config::getServerConfig()->setValue("listen",
+					  map[listen_opt].value.c_str());
+    }
 
     if (map.find(granted_dbm_opt) != map.end())
       Config::getServerConfig()->setValue("granted_dbm",
@@ -420,8 +452,15 @@ do { \
       }
     }
 
-    if (map.find(conf_opt) != map.end())
-      Config::getServerConfig()->add(map[conf_opt].value.c_str());
+    const char *smdport = Config::getServerValue("smdport");
+    if (smdport)
+      smd_set_port(smdport);
+
+    if (map.find(smd_port_opt) != map.end()) {
+      smd_set_port(map[smd_port_opt].value.c_str());
+      Config::getServerConfig()->setValue("smdport",
+					  map[smd_port_opt].value.c_str());
+    }
 
     if (map.find(trans_def_mag_opt) != map.end())
       TransactionParams::setGlobalDefaultMagOrder(atoi(map[trans_def_mag_opt].value.c_str()));
@@ -442,6 +481,8 @@ do { \
       else
 	exit(1);
     }
+
+    Connection::init();
   }
 
    void print_standard_usage(GetOpt &getopt, const std::string &append,
@@ -675,7 +716,7 @@ do { \
     Basic::init();
     AgregatClass::init();
     RecMode::init();
-    Connection::init();
+    //Connection::init();
     Exception::init();
     Database::init();
     //DBM_Database::init();

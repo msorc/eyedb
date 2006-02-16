@@ -76,6 +76,9 @@ namespace eyedb {
     static Config* getClientConfig();
     static Config* getServerConfig();
 
+    static Status setClientConfigFile(const std::string &);
+    static Status setServerConfigFile(const std::string &);
+
     void add(const char *file, int quietFileNotFoundError = 0);
 
     const char *getValue(const char *name);
@@ -101,6 +104,9 @@ namespace eyedb {
 
     static Config *theClientConfig;
     static Config *theServerConfig;
+
+    static std::string client_config_file;
+    static std::string server_config_file;
 
     LinkedList list;
   };
