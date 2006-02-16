@@ -31,28 +31,26 @@
 #include <fcntl.h>
 #include <eyedblib/filelib.h>
 
-
-/*
-14/02/05: was :
-//@@@@ Id rather discard solaris specific, non-standard code
-#if defined(LINUX) || defined(LINUX64) || defined(LINUX_IA64) || defined(LINUX_PPC64) || defined(ORIGIN) || defined(ALPHA) || defined(AIX)  || defined(CYGWIN)
-instead of HAS_FLOCK_T
-*/
-
 #ifdef HAS_FLOCK_T
-static flock_t flock;
+#define FLOCK_DECL flock_t
 #else
-static struct flock flock;
+#define FLOCK_DECL struct flock
 #endif
 
 int ut_file_lock(int fd, ut_Lock excl, ut_Block block)
 {
-  flock.l_type = (excl == ut_LOCKX ? F_WRLCK : F_RDLCK);
-  return fcntl(fd, (block == ut_BLOCK ? F_SETLKW : F_SETLK), &flock);
+  FLOCK_DECL flk;
+
+  flk.l_type = (excl == ut_LOCKX ? F_WRLCK : F_RDLCK);
+
+  return fcntl(fd, (block == ut_BLOCK ? F_SETLKW : F_SETLK), &flk);
 }
 
 int ut_file_unlock(int fd)
 {
-  flock.l_type = F_UNLCK;
-  return fcntl(fd, F_SETLK, &flock);
+  FLOCK_DECL flk;
+
+  flk.l_type = F_UNLCK;
+
+  return fcntl(fd, F_SETLK, &flk);
 }

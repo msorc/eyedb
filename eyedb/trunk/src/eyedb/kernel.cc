@@ -36,6 +36,9 @@ using namespace std;
 #include <limits.h>
 #include <assert.h>
 #include <pthread.h>
+#ifdef HAS_SYS_STAT_H
+#include <sys/stat.h>
+#endif
 #include "eyedb_p.h"
 #include "eyedb/DBM_Database.h"
 #include <eyedbsm/eyedbsm.h>

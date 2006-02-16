@@ -128,7 +128,7 @@ AM_PROG_LEX
 AC_PROG_YACC
 
 # check for headers
-AC_CHECK_HEADERS( sys/time.h unistd.h sys/types.h regex.h libgen.h)
+AC_CHECK_HEADERS( sys/time.h unistd.h sys/types.h regex.h libgen.h sys/stat.h)
 AC_HEADER_TIME
 
 # check for flock structure
