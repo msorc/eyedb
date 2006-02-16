@@ -22,8 +22,11 @@
 */
 
 
-//#include <eyedbconfig.h>
+#include <eyedbconfig.h>
 #include <fcntl.h>
+#ifdef HAS_SYS_STAT_H
+#include <sys/stat.h>
+#endif
 
 #include "eyedb_p.h"
 
