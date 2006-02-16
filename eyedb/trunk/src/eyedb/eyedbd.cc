@@ -323,5 +323,8 @@ main(int argc, char *argv[])
     cerr << e << flush;
     return 1;
   }
+  catch(int status) {
+    return status;
+  }
   return 0;
 }

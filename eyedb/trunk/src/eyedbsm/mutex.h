@@ -47,48 +47,48 @@
 namespace eyedbsm {
 #define MAXCLS  0
 
-struct CondWaitP {
-  eyedblib::uint32 magic;
-  union {
-    int key; /* semaphore version */
-    pthread_cond_t cond; /* mutex version */
-  } u;
-};
+  struct CondWaitP {
+    eyedblib::uint32 magic;
+    union {
+      int key; /* semaphore version */
+      pthread_cond_t cond; /* mutex version */
+    } u;
+  };
 
-struct CondWait {
-  CondWaitP *pcond;
-  int id; /* semaphore version */
-};
+  struct CondWait {
+    CondWaitP *pcond;
+    int id; /* semaphore version */
+  };
 
-struct MutexP {
-  eyedblib::uint32 magic;
-  union {
-    int key; /* semaphore version */
-    pthread_mutex_t mp; /* mutex version */
-  } u;
-  char mtname[16];
-  unsigned int xid;
-  int locked;
-  int wait_cnt;
-  CondWaitP pcond;
-};
+  struct MutexP {
+    eyedblib::uint32 magic;
+    union {
+      int key; /* semaphore version */
+      pthread_mutex_t mp; /* mutex version */
+    } u;
+    char mtname[16];
+    unsigned int xid;
+    int locked;
+    int wait_cnt;
+    CondWaitP pcond;
+  };
 
-struct Mutex {
-  MutexP *pmp;
-  CondWait cond;
+  struct Mutex {
+    MutexP *pmp;
+    CondWait cond;
 #ifdef UT_SEM
-  int id;
-  int *plocked;
+    int id;
+    int *plocked;
 #endif
-};
+  };
 
-struct CondWaitLink;
+  struct CondWaitLink;
 
-struct CondWaitList {
-  int link_cnt;
-  CondWaitLink *first;
-  CondWaitLink *last;
-};
+  struct CondWaitList {
+    int link_cnt;
+    CondWaitLink *first;
+    CondWaitLink *last;
+  };
 
 #define MUTEX_LOCK_TRACE(MP, XID)\
  utlog("XLOCK %s, %d\n", __FILE__, __LINE__); \
@@ -112,40 +112,39 @@ struct CondWaitList {
 #define COND_WAIT_R(C, MP, XID, TIMEOUT) condWait_r(C, MP, XID, TIMEOUT)
 #define COND_SIGNAL(C)        condSignal(C)
 
-struct DbDescription;
+  struct DbDescription;
 
-extern void
-  mutexLightInit(DbDescription *vd, Mutex *mp, MutexP *pmp);
+  extern void mutexLightInit(DbDescription *vd, Mutex *mp, MutexP *pmp),
+    mutexLightInit(int semkeys[], int *plocked, Mutex *mp, MutexP *pmp);
 
-extern int
-  mutexInit(DbDescription *vd, Mutex *, MutexP *, const char *),
-  mutexCheckNotLock(Mutex *_mp, unsigned int xid);
+  extern int mutexInit(DbDescription *vd, Mutex *, MutexP *, const char *),
+    mutexInit(int semkeys[], int *plocked, Mutex *, MutexP *, const char *),
+    mutexCheckNotLock(Mutex *_mp, unsigned int xid);
 
-extern Status
-  mutexLock(Mutex *, unsigned int),
-  mutexUnlock(Mutex *, unsigned int);
+  extern Status mutexLock(Mutex *, unsigned int),
+    mutexUnlock(Mutex *, unsigned int);
 
-extern int
-  condInit(DbDescription *, CondWait *, CondWaitP *),
-  condSignal(CondWait *),
-  condWait(CondWait *, Mutex *, unsigned int, unsigned int timeout),
-  condWait_r(CondWait *, Mutex *, unsigned int, unsigned int timeout);
+  extern int condInit(DbDescription *, CondWait *, CondWaitP *),
+    condInit(int semkeys[], CondWait *, CondWaitP *),
+    condSignal(CondWait *),
+    condWait(CondWait *, Mutex *, unsigned int, unsigned int timeout),
+    condWait_r(CondWait *, Mutex *, unsigned int, unsigned int timeout);
 
-extern void
-  condLightInit(DbDescription *, CondWait *, CondWaitP *);
+  extern void condLightInit(DbDescription *, CondWait *, CondWaitP *),
+    condLightInit(int semkeys[], CondWait *, CondWaitP *);
 
-extern XMOffset
+  extern XMOffset
   condNew(DbDescription *, XMHandle *, CondWait *);
 
-extern void
+  extern void
   condDelete(DbDescription *, XMHandle *, XMOffset);
 
-extern CondWait *
+  extern CondWait *
   condMake(DbDescription *, XMHandle *, XMOffset, CondWait *);
 
-extern void
+  extern void
   mutexes_init(),
-  mutexes_release();
+    mutexes_release();
 
 }
 

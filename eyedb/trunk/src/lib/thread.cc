@@ -121,6 +121,15 @@ namespace eyedblib {
   Mutex::unlock()
   {
 #ifndef NO_MTX
+#if 1
+    if (!locked) {
+      fprintf(stderr, "eyedblib::Mutex::unlock(): Assertion `locked' failed\n");
+      fprintf(stderr, "dbgserv %d\n", getpid());
+      fflush(stderr);
+      sleep(1000);
+      abort();
+    }
+#endif
     assert (locked);
     locked = false;
     return pthread_mutex_unlock(&mut);

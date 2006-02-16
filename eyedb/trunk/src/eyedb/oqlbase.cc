@@ -35,7 +35,8 @@
 //9/02/06: does not work
 //#define SYNC_SYM_GARB
 
-#define GARB_TRACE
+//#define GARB_TRACE
+//#define GARB_TRACE_DETAIL
 
 #include "oql_p.h"
 
@@ -4060,7 +4061,7 @@ namespace eyedb {
 
     unsigned int idx = (unsigned int)objCacheObj->getObject(OBJ2OID(o),
 							    true);
-#ifdef GARB_TRACE
+#ifdef GARB_TRACE_DETAIL
     printf("register %p: %u\n", o, idx);
 #endif
     if (idx) {
@@ -4086,7 +4087,7 @@ namespace eyedb {
     static const char fmt[] = "object '%p' is not registered #1";
     unsigned int idx = (unsigned int)objCacheObj->getObject(OBJ2OID(o));
 
-#ifdef GARB_TRACE
+#ifdef GARB_TRACE_DETAIL
     printf("unregister %p: %u\n", o, idx);
 #endif
     if (!idx)

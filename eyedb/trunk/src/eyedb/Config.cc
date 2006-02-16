@@ -18,7 +18,7 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
+  Author: Eric Viara <viara@sysra.com>
 */
 
 
@@ -35,6 +35,8 @@ namespace eyedb {
 
   Config *Config::theClientConfig = 0;
   Config *Config::theServerConfig = 0;
+  std::string Config::client_config_file = std::string(eyedblib::CompileBuiltin::getSysconfdir()) + "/eyedb/eyedb.conf";
+  std::string Config::server_config_file = std::string(eyedblib::CompileBuiltin::getSysconfdir()) + "/eyedb/eyedbd.conf";
 
   static Bool initialized = False;
 
@@ -68,21 +70,19 @@ namespace eyedb {
   static int
   skip_spaces()
   {
-    for (;;)
-      {
-	char c = fgetc(fd);
-	if (c == EOF)
-	  return 0;
+    for (;;) {
+      char c = fgetc(fd);
+      if (c == EOF)
+	return 0;
 
-	if (c != ' ' && c != '\t' && c != '\n')
-	  {
-	    ungetc(c, fd);
-	    break;
-	  }
-
-	if (c == '\n')
-	  (*pline)++;
+      if (c != ' ' && c != '\t' && c != '\n') {
+	ungetc(c, fd);
+	break;
       }
+
+      if (c == '\n')
+	(*pline)++;
+    }
 
     return 1;
   }
@@ -92,18 +92,16 @@ namespace eyedb {
   {
     char c = fgetc(fd);
     if (c == '#')
-      for (;;)
-	{
-	  c = fgetc(fd);
-	  if (c == EOF)
-	    return 0;
+      for (;;) {
+	c = fgetc(fd);
+	if (c == EOF)
+	  return 0;
 	
-	  if (c == '\n')
-	    {
-	      ungetc(c, fd);
-	      break;
-	    }
+	if (c == '\n') {
+	  ungetc(c, fd);
+	  break;
 	}
+      }
     else
       ungetc(c, fd);
 
@@ -123,16 +121,14 @@ namespace eyedb {
     if (c == EOF)
       return 0;
 
-    if (c == ';')
-      {
-	is_spe = 1;
-	return 1;
-      }
-    else if (c == '=')
-      {
-	is_spe = 2;
-	return 1;
-      }
+    if (c == ';') {
+      is_spe = 1;
+      return 1;
+    }
+    else if (c == '=') {
+      is_spe = 2;
+      return 1;
+    }
 
     ungetc(c, fd);
     return 1;
@@ -152,16 +148,19 @@ namespace eyedb {
   static void
   error(const char *msg)
   {
-    std::string s = std::string("file \"") + file_sp[fd_w-1] + "\", " + line_str() +
-      "syntax error: " + msg;
+    std::string s;
+    //if (fd_w > 0)
+    //s = std::string("file \"") + file_sp[fd_w-1] + "\", " + line_str() + " ";
+    s = line_str();
 
-    if (initialized)
-      {
-	Exception::Mode mode = Exception::setMode(Exception::ExceptionMode);
-	(void)Exception::make(IDB_ERROR, s.c_str());
-	Exception::setMode(mode);
-	return;
-      }
+    s += std::string("syntax error: ") + msg;
+
+    if (initialized) {
+      Exception::Mode mode = Exception::setMode(Exception::ExceptionMode);
+      (void)Exception::make(IDB_ERROR, s.c_str());
+      Exception::setMode(mode);
+      return;
+    }
 
     fprintf(stderr, "%s\n", s.c_str());
     exit(1);
@@ -176,13 +175,12 @@ namespace eyedb {
   static void
   error(const char *fmt, const char *x1, const char *x2 = 0, const char *x3 = 0)
   {
-    if (initialized)
-      {
-	Exception::Mode mode = Exception::setMode(Exception::ExceptionMode);
-	(void)Exception::make(IDB_ERROR, fmt, x1, x2, x3);
-	Exception::setMode(mode);
-	return;
-      }
+    if (initialized) {
+      Exception::Mode mode = Exception::setMode(Exception::ExceptionMode);
+      (void)Exception::make(IDB_ERROR, fmt, x1, x2, x3);
+      Exception::setMode(mode);
+      return;
+    }
 
     fprintf(stderr, fmt, x1, x2, x3);
     fprintf(stderr, "\n");
@@ -192,28 +190,26 @@ namespace eyedb {
   static int
   push_file(const char *file, int quietFileNotFoundError)
   {
-    if (strlen(file) > 2 && file[0] == '/' && file[1] == '/')
-      {
-	file += 2;
-	std::string s =  std::string( eyedblib::CompileBuiltin::getSysconfdir()) + "/" + file;
-	fd = fopen( s.c_str(), "r");
-      }
+    if (strlen(file) > 2 && file[0] == '/' && file[1] == '/') {
+      file += 2;
+      std::string s =  std::string( eyedblib::CompileBuiltin::getSysconfdir()) + "/" + file;
+      fd = fopen( s.c_str(), "r");
+    }
     else
       fd = fopen(file, "r");
 
-    if (!fd)
-      {
-	if (quietFileNotFoundError)
-	  return 0;
-	else
-	  error("%scannot open file '%s' for reading",
-	        line_str(), file);
-      }
+    if (!fd) {
+      if (quietFileNotFoundError)
+	return 0;
+      else
+	error("%scannot open file '%s' for reading",
+	      line_str(), file);
+    }
 
     pline = &line[fd_w];
     fd_sp[fd_w] = fd;
     file_sp[fd_w] = strdup(file);
-    pfile = file;
+    pfile = file_sp[fd_w];
     *pline = 1;
     fd_w++;
 
@@ -245,113 +241,100 @@ namespace eyedb {
     char svar[128];
     char *var = 0;
 
-    for (;;)
-      {
-	if (!force && !skip_comments())
-	  return 0;
+    for (;;) {
+      if (!force && !skip_comments())
+	return 0;
 
-	c = fgetc(fd);
-	if (c == EOF)
-	  return 0;
+      c = fgetc(fd);
+      if (c == EOF)
+	return 0;
 
-	if (c == '%')
-	  {
-	    if (!var)
-	      {
-		var = svar;
-		continue;
-	      }
+      if (c == '%') {
+	if (!var) {
+	  var = svar;
+	  continue;
+	}
 
-	    *var = 0;
-	    *p = 0;
+	*var = 0;
+	*p = 0;
 
-	    if (!*svar)
-	      strcat(tok, "%");
-	    else
-	      {
-		const char *val = config->getValue(svar);
-		if (!val)
-		  error("%sunknown configuration variable '%s'", line_str(), svar);
-		strcat(tok, val);
-	      }
+	if (!*svar)
+	  strcat(tok, "%");
+	else {
+	  const char *val = config->getValue(svar);
+	  if (!val)
+	    error("%sunknown configuration variable '%s'", line_str(), svar);
+	  strcat(tok, val);
+	}
 
-	    p = tok + strlen(tok);
-	    var = 0;
-	    hasvar = 1;
-	    continue;
-	  }
-
-	if (var)
-	  {
-	    if (var - svar >= sizeof(svar))
-	      {
-		svar[sizeof(svar)-1] = 0;
-		error("%sconfiguration variable too long: '%s' "
-		      "(maximum size is %s)", line_str(), svar,
-		      str_convert((long)sizeof(svar)-1).c_str());
-	      }
-
-	    *var++ = c;
-	    continue;
-	  }
-
-	if (c == '"' && !force)
-	  {
-	    force = 1;
-	    continue;
-	  }
-
-	if (force && c == '\\')
-	  {
-	    backslash = 1;
-	    continue;
-	  }
-
-	if (c == '\n')
-	  {
-	    (*pline)++;
-	    if (!force)
-	      break;
-	  }
-	else if (!force)
-	  {
-	    if (c == ' ' || c == '\t')
-	      break;
-	    else if (c == ';' || c == '=')
-	      {
-		ungetc(c, fd);
-		break;
-	      }
-	  }
-	else
-	  {
-	    if (backslash)
-	      {
-		if (c == 'n')
-		  c = '\n';
-		else if (c == 'a')
-		  c = '\a';
-		else if (c == 'b')
-		  c = '\b';
-		else if (c == 'f')
-		  c = '\f';
-		else if (c == 'r')
-		  c = '\r';
-		else if (c == 't')
-		  c = '\t';
-		else if (c == 'v')
-		  c = '\v';
-		else if (c == '\\')
-		  c = '\\';
-
-		backslash = 0;
-	      }
-	    else if (c == '"')
-	      break;
-	  }
-
-	*p++ = c;
+	p = tok + strlen(tok);
+	var = 0;
+	hasvar = 1;
+	continue;
       }
+
+      if (var) {
+	if (var - svar >= sizeof(svar)) {
+	  svar[sizeof(svar)-1] = 0;
+	  error("%sconfiguration variable too long: '%s' "
+		"(maximum size is %s)", line_str(), svar,
+		str_convert((long)sizeof(svar)-1).c_str());
+	}
+
+	*var++ = c;
+	continue;
+      }
+
+      if (c == '"' && !force) {
+	force = 1;
+	continue;
+      }
+
+      if (force && c == '\\') {
+	backslash = 1;
+	continue;
+      }
+
+      if (c == '\n') {
+	(*pline)++;
+	if (!force)
+	  break;
+      }
+      else if (!force) {
+	if (c == ' ' || c == '\t')
+	  break;
+	else if (c == ';' || c == '=') {
+	  ungetc(c, fd);
+	  break;
+	}
+      }
+      else {
+	if (backslash) {
+	  if (c == 'n')
+	    c = '\n';
+	  else if (c == 'a')
+	    c = '\a';
+	  else if (c == 'b')
+	    c = '\b';
+	  else if (c == 'f')
+	    c = '\f';
+	  else if (c == 'r')
+	    c = '\r';
+	  else if (c == 't')
+	    c = '\t';
+	  else if (c == 'v')
+	    c = '\v';
+	  else if (c == '\\')
+	    c = '\\';
+
+	  backslash = 0;
+	}
+	else if (c == '"')
+	  break;
+      }
+
+      *p++ = c;
+    }
 
     *p = 0;
 
@@ -363,31 +346,28 @@ namespace eyedb {
   {
     const char *p = nexttoken_realize(config);
 
-    if (!p)
-      {
-	if (fd_w > 0 && --fd_w > 0)
-	  {
-	    fd = fd_sp[fd_w-1];
-	    pline = &line[fd_w-1];
-	    pfile = file_sp[fd_w-1];
-	    return nexttoken(config);
-	  }
+    if (!p) {
+      if (fd_w > 0 && --fd_w > 0)
+	{
+	  fd = fd_sp[fd_w-1];
+	  pline = &line[fd_w-1];
+	  pfile = file_sp[fd_w-1];
+	  return nexttoken(config);
+	}
 
+      return 0;
+    }
+
+    if (!strcmp(p, "include")) {
+      const char *file = nexttoken_realize(config);
+      if (!file) {
+	error("file name expected after include");
 	return 0;
       }
 
-    if (!strcmp(p, "include"))
-      {
-	const char *file = nexttoken_realize(config);
-	if (!file)
-	  {
-	    error("file name expected after include");
-	    return 0;
-	  }
-
-	push_file(file, 0);
-	return nexttoken(config);
-      }
+      push_file(file, 0);
+      return nexttoken(config);
+    }
 
     return p;
   }
@@ -400,47 +380,51 @@ namespace eyedb {
     int state = 0;
     char *name = 0, *value = 0;
 
-    for (;;)
-      {
-	const char *p = nexttoken(this);
+    bool last = false;
 
-	if (!p)
-	  return;
+    while (!last) {
+      const char *p = nexttoken(this);
 
-	switch(state)
-	  {
-	  case 0:
-	    if (!strcmp(p, assign) || !strcmp(p, term))
-	      error(std::string("unexpected '") + p + "'");
-	    name = strdup(p);
-	    state = 1;
-	    break;
-
-	  case 1:
-	    if (strcmp(p, assign))
-	      error(std::string("'") + assign + "' expected, got '" + p + "'");
-	    state = 2;
-	    break;
-
-	  case 2:
-	    if (!strcmp(p, assign) || !strcmp(p, term))
-	      error(std::string("unexpected '") + p + "'");
-	    value = strdup(p);
-	    state = 3;
-	    break;
-
-	  case 3:
-	    if (strcmp(p, term))
-	      error(std::string("'") + term + "' expected, got '" + p + "'");
-	    setValue( name, value);
-	    free(name);
-	    free(value);
-	    name = 0;
-	    value = 0;
-	    state = 0;
-	    break;
-	  }
+      if (!p) {
+	p = "\n";
+	last = true;
       }
+
+      switch(state) {
+      case 0:
+	if (!strcmp(p, term))
+	  break;
+	if (!strcmp(p, assign))
+	  error(std::string("unexpected '") + p + "'");
+	name = strdup(p);
+	state = 1;
+	break;
+
+      case 1:
+	if (strcmp(p, assign))
+	  error(std::string("'") + assign + "' expected, got '" + p + "'");
+	state = 2;
+	break;
+
+      case 2:
+	if (!strcmp(p, assign) || !strcmp(p, term))
+	  error(std::string("unexpected '") + p + "'");
+	value = strdup(p);
+	state = 3;
+	break;
+
+      case 3:
+	if (strcmp(p, term))
+	  error(std::string("'") + term + "' expected, got '" + p + "'");
+	setValue( name, value);
+	free(name);
+	free(value);
+	name = 0;
+	value = 0;
+	state = 0;
+	break;
+      }
+    }
   }
 
 
@@ -554,10 +538,9 @@ namespace eyedb {
     LinkedListCursor c(config.list);
     Config::Item *item;
 
-    while (c.getNext((void *&)item))
-      {
-	os << "name= " << item->name << " value= " << item->value << std::endl;
-      }
+    while (c.getNext((void *&)item)) {
+      os << "name= " << item->name << " value= " << item->value << std::endl;
+    }
 
     return os;
   }
@@ -624,19 +607,17 @@ namespace eyedb {
     LinkedListCursor c(list);
 
     int n;
-    for (n = 0; c.getNext((void *&)item); )
-      {
-	int _not = 0;
-	for (int i = 0; i < n; i++)
-	  if (!strcmp(items[i].name, item->name))
-	    {
-	      _not = 1;
-	      break;
-	    }
+    for (n = 0; c.getNext((void *&)item); ) {
+      int _not = 0;
+      for (int i = 0; i < n; i++)
+	if (!strcmp(items[i].name, item->name)) {
+	  _not = 1;
+	  break;
+	}
 
-	if (!_not)
-	  items[n++] = *item;
-      }
+      if (!_not)
+	items[n++] = *item;
+    }
 
     item_cnt = n;
     return items;
@@ -656,7 +637,8 @@ namespace eyedb {
     if (realname)
       return realname;
 
-    return std::string(eyedblib::CompileBuiltin::getSysconfdir()) + "/eyedb/" + configFilename;
+    //return std::string(eyedblib::CompileBuiltin::getSysconfdir()) + "/eyedb/" + configFilename;
+    return configFilename;
   }
 
   static const std::string tcp_port = "6240";
@@ -725,6 +707,16 @@ namespace eyedb {
     setValue( "oqlpath", (libdir + "/eyedb/oql").c_str());
   }
 
+  Status
+  Config::setClientConfigFile(const std::string &file)
+  {
+    if (theClientConfig)
+      return Exception::make(IDB_INTERNAL_ERROR, "Cannot set client config file after configuration");
+
+    client_config_file = file;
+    return Success;
+  }
+
   Config* 
   Config::getClientConfig()
   {
@@ -735,13 +727,23 @@ namespace eyedb {
 
     theClientConfig->setClientDefaults();
 
-    std::string configFile = getConfigFile( "EYEDBCONF", "eyedb.conf");
+    std::string configFile = getConfigFile( "EYEDBCONF", client_config_file.c_str());
 
     theClientConfig->add( configFile.c_str(), 1);
 
     return theClientConfig;
   }
   
+  Status
+  Config::setServerConfigFile(const std::string &file)
+  {
+    if (theServerConfig)
+      return Exception::make(IDB_INTERNAL_ERROR, "Cannot set server config file after configuration");
+
+    server_config_file = file;
+    return Success;
+  }
+
   Config* 
   Config::getServerConfig()
   {
@@ -752,7 +754,7 @@ namespace eyedb {
     
     theServerConfig->setServerDefaults();
 
-    std::string configFile = getConfigFile( "EYEDBDCONF", "eyedbd.conf");
+    std::string configFile = getConfigFile( "EYEDBCONF", server_config_file.c_str());
 
     theServerConfig->add( configFile.c_str(), 1);
 

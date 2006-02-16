@@ -1380,7 +1380,7 @@ ESM_dbOpen(const char *dbfile, int flags,
   if (!conn)
     {
       free(vd);
-      return statusMake(ERROR, "cannot connect to smd daemon on port "
+      return statusMake(ERROR, "cannot connect to eyedbsmd on port "
 			   "%s", smd_get_port());
     }
 
@@ -1389,7 +1389,7 @@ ESM_dbOpen(const char *dbfile, int flags,
     {
       free(vd);
       free(conn);
-      return statusMake(ERROR, "protocol error with smd daemon on port "
+      return statusMake(ERROR, "protocol error with eyedbsmd on port "
 			   "%s", smd_get_port());
     }
 #else
@@ -1397,7 +1397,7 @@ ESM_dbOpen(const char *dbfile, int flags,
     {
       free(vd);
       free(conn);
-      return statusMake(ERROR, "protocol error with smd daemon on port "
+      return statusMake(ERROR, "protocol error with eyedbsmd on port "
 			   "%s", smd_get_port());
     }
 #endif

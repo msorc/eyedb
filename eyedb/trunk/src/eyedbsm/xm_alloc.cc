@@ -659,6 +659,7 @@ void *XMAlloc(XMHandle *xmh, unsigned int nbytes)
       if (XMExtendMap(xmh, nbytes))
 	return XMAlloc(xmh, nbytes);
       utlog("LOG_ALLOC allocation failed for byte count = %d\n", nbytes);
+      printf("LOG_ALLOC allocation failed for byte count = %d\n", nbytes);
       XMCheckMap(xmh, 0);
       return 0;
     }

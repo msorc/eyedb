@@ -97,6 +97,13 @@ namespace eyedb {
     int file_cnt;
     char **files;
     eyedbsm::Mutex mp;
+#ifdef UT_SEM
+    int locked;
+    int semkeys[4]; // must be ESM_NSEMS (== 2 for now)
+    Status init_sems();
+    bool valid_sems() const;
+    static const int INVALID_SEMKEY;
+#endif
 
     Status openRealize(const char *host, const char *port, const char *logdir,
 		       Bool create);

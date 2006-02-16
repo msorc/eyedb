@@ -27,14 +27,20 @@
 #include <signal.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <GetOpt.h>
 #include <sys/stat.h>
 
 using namespace eyedb;
+
+Bool _server = False;
 
 static int
 usage(const char *prog)
 {
   fprintf(stderr, "usage: %s [--server] [--config|--csh|--sh [--export]] [--expand-user] [<variables>]\n", prog);
+  std::cerr << "\nCommon Options:\n";
+  print_common_help(std::cerr, _server ? true : false);
+  std::cerr << "\n";
   return 1;
 }
 
@@ -55,131 +61,169 @@ capstring(const char *s)
 int
 main(int argc, char *argv[])
 {
-  eyedb::init(argc, argv);
-
-  if (argc < 2)
-    return usage(argv[0]);
-
-  LinkedList list;
-  Bool shell, C_shell, _export, _server, conf, expand_user;
-
-  shell = C_shell =  _export = _server = False, conf = False, expand_user = False;
-
-  int n;
-  for (n = 1; n < argc; n++) {
+  for (int n = 1; n < argc; n++) {
     const char *s = argv[n];
 
-    if (!strcmp(s, "--sh")) {
-      if (C_shell || shell)
-	return usage(argv[0]);
-      shell = True;
-    }
-    else if (!strcmp(s, "--csh")) {
-      if (C_shell || shell)
-	return usage(argv[0]);
-      C_shell = True;
-    }
-    else if (!strcmp(s, "--export"))
-      _export = True;
-    else if (!strcmp(s, "--server"))
+    if (!strcmp(s, "--server")) {
       _server = True;
-    else if (!strcmp(s, "--config"))
-      conf = True;
-    else if (!strcmp(s, "--expand-user"))
-      expand_user = True;
-    else if (*s == '-')
-      return usage(argv[0]);
-    else
-      list.insertObject((void *)s);
-  }
-
-  if (_export && !shell && !C_shell)
-    return usage(argv[0]);
-
-  if (!list.getCount() && !shell && !C_shell && !conf)
-    return usage(argv[0]);
-
-  if (shell + C_shell + conf > 1)
-    return usage(argv[0]);
-
-  int item_cnt;
-  Config::Item *items;
-
-  Config *cfg = (_server ? Config::getServerConfig() : Config::getClientConfig());
-
-  if (!list.getCount())
-    items = cfg->getValues(item_cnt);
-  else  {
-    item_cnt = list.getCount();
-    items = new Config::Item[list.getCount()];
-    LinkedListCursor c(list);
-    const char *s;
-    for (n = 0; c.getNext((void *&)s); n++) {
-      const char *v = cfg->getValue(s);
-      items[n] = Config::Item(strdup(s), strdup(v ? v : ""));
+      break;
     }
   }
 
-  if (expand_user) {
-    for (n = 0; n < item_cnt; n++) {
-      if (!strcmp(items[n].name, "user")) {
-	items[n].value = strdup(Connection::makeUser(items[n].value).c_str());
-	break;
+  try {
+    if (_server) {
+      std::string sv_listen;
+      eyedb::init(argc, argv, &sv_listen, true);
+    }
+    else
+      eyedb::init(argc, argv);
+
+    if (argc < 2)
+      return usage(argv[0]);
+
+    LinkedList list;
+    Bool shell, C_shell, _export, conf, expand_user;
+
+    shell = C_shell =  _export = _server = False, conf = False, expand_user = False;
+
+    std::string value;
+
+    for (int n = 1; n < argc; n++) {
+      const char *s = argv[n];
+
+      if (!strcmp(s, "--sh")) {
+	if (C_shell || shell)
+	  return usage(argv[0]);
+	shell = True;
+      }
+      else if (!strcmp(s, "--csh")) {
+	if (C_shell || shell)
+	  return usage(argv[0]);
+	C_shell = True;
+      }
+      else if (!strcmp(s, "--export"))
+	_export = True;
+      /*
+	else if (GetOpt::parseLongOpt(s, "conf", &value)) {
+	Status s = Config::setClientConfigFile(value.c_str());
+	if (s) {
+	s->print(stderr);
+	return 1;
+	}
+	}
+	else if (GetOpt::parseLongOpt(s, "server-conf", &value)) {
+	Status s = Config::setServerConfigFile(value.c_str());
+	if (s) {
+	s->print(stderr);
+	return 1;
+	}
+	}
+      */
+      else if (!strcmp(s, "--server"))
+	_server = True;
+      else if (!strcmp(s, "--config"))
+	conf = True;
+      else if (!strcmp(s, "--expand-user"))
+	expand_user = True;
+      else if (*s == '-')
+	return usage(argv[0]);
+      else
+	list.insertObject((void *)s);
+    }
+
+    if (_export && !shell && !C_shell)
+      return usage(argv[0]);
+
+    if (!list.getCount() && !shell && !C_shell && !conf)
+      return usage(argv[0]);
+
+    if (shell + C_shell + conf > 1)
+      return usage(argv[0]);
+
+    int item_cnt;
+    Config::Item *items;
+
+    Config *cfg = (_server ? Config::getServerConfig() : Config::getClientConfig());
+
+    if (!list.getCount())
+      items = cfg->getValues(item_cnt);
+    else  {
+      item_cnt = list.getCount();
+      items = new Config::Item[list.getCount()];
+      LinkedListCursor c(list);
+      const char *s;
+      for (int n = 0; c.getNext((void *&)s); n++) {
+	const char *v = cfg->getValue(s);
+	items[n] = Config::Item(strdup(s), strdup(v ? v : ""));
       }
     }
-  }
 
-  if (shell) {
-    fprintf(stdout, "#\n");
-    fprintf(stdout, "# Bourne Shell EyeDB Environment\n");
-    fprintf(stdout, "#\n\n");
-
-    for (n = 0; n < item_cnt; n++) {
-      std::string var = std::string("EYEDB") + capstring(items[n].name);
-      fprintf(stdout, "%s=%s", var.c_str(), items[n].value);
-      if (_export)
-	fprintf(stdout, "; export %s", var.c_str());
-      fprintf(stdout, "\n");
+    if (expand_user) {
+      for (int n = 0; n < item_cnt; n++) {
+	if (!strcmp(items[n].name, "user")) {
+	  items[n].value = strdup(Connection::makeUser(items[n].value).c_str());
+	  break;
+	}
+      }
     }
 
-    delete [] items;
-    return 0;
-  }
+    if (shell) {
+      fprintf(stdout, "#\n");
+      fprintf(stdout, "# Bourne Shell EyeDB Environment\n");
+      fprintf(stdout, "#\n\n");
 
-  if (C_shell) {
-    fprintf(stdout, "#\n");
-    fprintf(stdout, "# C-Shell EyeDB Environment\n");
-    fprintf(stdout, "#\n\n");
+      for (int n = 0; n < item_cnt; n++) {
+	std::string var = std::string("EYEDB") + capstring(items[n].name);
+	fprintf(stdout, "%s=%s", var.c_str(), items[n].value);
+	if (_export)
+	  fprintf(stdout, "; export %s", var.c_str());
+	fprintf(stdout, "\n");
+      }
 
-    for (n = 0; n < item_cnt; n++) {
-      std::string var = std::string("EYEDB") + capstring(items[n].name);
-      if (_export)
-	fprintf(stdout, "setenv %s %s\n", var.c_str(),
-		items[n].value);
-      else
-	fprintf(stdout, "set %s=%s\n", var.c_str(), items[n].value);
+      delete [] items;
+      return 0;
     }
 
+    if (C_shell) {
+      fprintf(stdout, "#\n");
+      fprintf(stdout, "# C-Shell EyeDB Environment\n");
+      fprintf(stdout, "#\n\n");
+
+      for (int n = 0; n < item_cnt; n++) {
+	std::string var = std::string("EYEDB") + capstring(items[n].name);
+	if (_export)
+	  fprintf(stdout, "setenv %s %s\n", var.c_str(),
+		  items[n].value);
+	else
+	  fprintf(stdout, "set %s=%s\n", var.c_str(), items[n].value);
+      }
+
+      delete [] items;
+      return 0;
+    }
+
+    if (conf) {
+      fprintf(stdout, "#\n");
+      fprintf(stdout, "# EyeDB %s Configuration File\n",
+	      _server ? "Server" : "Client");
+      fprintf(stdout, "#\n\n");
+
+      for (int n = 0; n < item_cnt; n++)
+	fprintf(stdout, "%s = %s;\n", items[n].name, items[n].value);
+
+      delete [] items;
+      return 0;
+    }
+
+    for (int n = 0; n < item_cnt; n++)
+      fprintf(stdout, "%s\n", items[n].value);
+
     delete [] items;
-    return 0;
+  }
+  catch(Exception &e) {
+    std::cerr << e << std::flush;
+    return 1;
   }
 
-  if (conf) {
-    fprintf(stdout, "#\n");
-    fprintf(stdout, "# EyeDB %s Configuration File\n",
-	    _server ? "Server" : "Client");
-    fprintf(stdout, "#\n\n");
-
-    for (n = 0; n < item_cnt; n++)
-      fprintf(stdout, "%s = %s;\n", items[n].name, items[n].value);
-
-    delete [] items;
-    return 0;
-  }
-
-  for (n = 0; n < item_cnt; n++)
-    fprintf(stdout, "%s\n", items[n].value);
-
-  delete [] items;
   return 0;
 }
