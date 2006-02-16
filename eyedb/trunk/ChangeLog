@@ -1,5 +1,9 @@
 2006-02-16 Francois  <francois@dechelle.net>
 
+	* Changed src/eyedb/Config.cc and include/eyedb/Config.h: read $HOME/.eyedb/eyedb[d].conf file if this file exists
+
+2006-02-16 Francois  <francois@dechelle.net>
+
 	* Fixed examples/Makefile.am w.r.t. Makefile.eyedb, to get rid of Makefile variables that are not prefixed with EYEDB_
 
 2006-02-16  Francois  <francois@dechelle.net>

@@ -24,7 +24,7 @@
 
 #include <eyedbconfig.h>
 #include <fcntl.h>
-#ifdef HAS_SYS_STAT_H
+#ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>
 #endif
 

@@ -79,7 +79,9 @@ namespace eyedb {
     static Status setClientConfigFile(const std::string &);
     static Status setServerConfigFile(const std::string &);
 
-    void add(const char *file, int quietFileNotFoundError = 0);
+    bool add(const char *file, bool quietFileNotFoundError = false);
+
+    void loadConfigFile( const std::string& configFilename, const char* envVariable, const char* defaultFilename);
 
     const char *getValue(const char *name);
     void setValue(const char *name, const char *value);

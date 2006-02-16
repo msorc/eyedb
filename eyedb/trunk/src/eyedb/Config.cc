@@ -21,10 +21,21 @@
   Author: Eric Viara <viara@sysra.com>
 */
 
+#include <eyedbconfig.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#ifdef HAVE_PWD_H
+#include <pwd.h>
+#endif
+
 #include <eyedb/eyedb.h>
 #include "eyedblib/strutils.h"
 #include "lib/compile_builtin.h"
@@ -35,10 +46,11 @@ namespace eyedb {
 
   Config *Config::theClientConfig = 0;
   Config *Config::theServerConfig = 0;
-  std::string Config::client_config_file = std::string(eyedblib::CompileBuiltin::getSysconfdir()) + "/eyedb/eyedb.conf";
-  std::string Config::server_config_file = std::string(eyedblib::CompileBuiltin::getSysconfdir()) + "/eyedb/eyedbd.conf";
 
-  static Bool initialized = False;
+  std::string Config::client_config_file;
+  std::string Config::server_config_file;
+
+  static bool initialized = false;
 
   /*
    * Config file parser
@@ -187,8 +199,11 @@ namespace eyedb {
     exit(1);
   }
 
-  static int
-  push_file(const char *file, int quietFileNotFoundError)
+  // Returns true if file is found
+  // false if file not found and quietFileNotFoundError == true
+  // generates an exception if file not found and quietFileNotFoundError == false
+  static bool
+  push_file(const char *file, bool quietFileNotFoundError)
   {
     if (strlen(file) > 2 && file[0] == '/' && file[1] == '/') {
       file += 2;
@@ -200,7 +215,7 @@ namespace eyedb {
 
     if (!fd) {
       if (quietFileNotFoundError)
-	return 0;
+	return false;
       else
 	error("%scannot open file '%s' for reading",
 	      line_str(), file);
@@ -372,10 +387,10 @@ namespace eyedb {
     return p;
   }
 
-  void Config::add(const char *file, int quietFileNotFoundError)
+  bool Config::add(const char *file, bool quietFileNotFoundError)
   {
     if (!push_file(file, quietFileNotFoundError))
-      return;
+      return false;
 
     int state = 0;
     char *name = 0, *value = 0;
@@ -425,6 +440,8 @@ namespace eyedb {
 	break;
       }
     }
+
+    return true;
   }
 
 
@@ -438,7 +455,7 @@ namespace eyedb {
     if (initialized) 
       return;
 
-    initialized = True;
+    initialized = true;
   }
 
   /*
@@ -450,9 +467,6 @@ namespace eyedb {
   {
   }
 
-  // @@@ FIXME: this constructor does not set the defaults
-  // But it should not!!! You don't know which default to set, the
-  // client one or the server one.
   Config::Config(const char *file)
   {
     add(file);
@@ -628,19 +642,6 @@ namespace eyedb {
    * Client and server config management
    */
 
-  static std::string
-  getConfigFile( const char* environmentVariable, const char* configFilename)
-  {
-    const char* realname;
-
-    realname = getenv( environmentVariable);
-    if (realname)
-      return realname;
-
-    //return std::string(eyedblib::CompileBuiltin::getSysconfdir()) + "/eyedb/" + configFilename;
-    return configFilename;
-  }
-
   static const std::string tcp_port = "6240";
 
   void
@@ -707,6 +708,30 @@ namespace eyedb {
     setValue( "oqlpath", (libdir + "/eyedb/oql").c_str());
   }
 
+  void
+  Config::loadConfigFile( const std::string& configFilename, const char* envVariable, const char* defaultFilename)
+  {
+    const char* envFileName;
+
+    if (configFilename.length() != 0) {
+      add( configFilename.c_str(), false);
+    } else if ((envFileName = getenv( envVariable))) {
+      add( envFileName, false);
+    } else {
+      struct passwd* pw = getpwuid( getuid());
+
+      if (pw) {
+	std::string homeConfigFile = std::string( pw->pw_dir) + "/.eyedb/" + defaultFilename;
+	if (add( homeConfigFile.c_str(), true))
+	  return;
+      }
+
+      std::string sysConfigFile = std::string(eyedblib::CompileBuiltin::getSysconfdir()) + "/eyedb/" + defaultFilename;
+
+      add( sysConfigFile.c_str(), true);
+    }
+  }
+
   Status
   Config::setClientConfigFile(const std::string &file)
   {
@@ -714,6 +739,7 @@ namespace eyedb {
       return Exception::make(IDB_INTERNAL_ERROR, "Cannot set client config file after configuration");
 
     client_config_file = file;
+
     return Success;
   }
 
@@ -727,9 +753,7 @@ namespace eyedb {
 
     theClientConfig->setClientDefaults();
 
-    std::string configFile = getConfigFile( "EYEDBCONF", client_config_file.c_str());
-
-    theClientConfig->add( configFile.c_str(), 1);
+    theClientConfig->loadConfigFile( client_config_file, "EYEDBCONF", "eyedb.conf");
 
     return theClientConfig;
   }
@@ -754,9 +778,7 @@ namespace eyedb {
     
     theServerConfig->setServerDefaults();
 
-    std::string configFile = getConfigFile( "EYEDBCONF", server_config_file.c_str());
-
-    theServerConfig->add( configFile.c_str(), 1);
+    theServerConfig->loadConfigFile( server_config_file, "EYEDBDCONF", "eyedbd.conf");
 
     return theServerConfig;
   }
