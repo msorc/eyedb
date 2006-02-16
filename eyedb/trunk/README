@@ -104,7 +104,7 @@ eyedbrc status
 
 To check that EyeDB runs, after starting the server, you can run the
 following command:
-eyedboql -U eyedbroot -P eyedbroot -c "select schema" --print
+eyedboql -c "select schema" --print
 This should print a number of EyeDB base structures.
 
 You can then try some examples, such as examples/GettingStarted, that 
