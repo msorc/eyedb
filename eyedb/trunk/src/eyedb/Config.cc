@@ -205,21 +205,25 @@ namespace eyedb {
   static bool
   push_file(const char *file, bool quietFileNotFoundError)
   {
+    FILE *try_fd;
+
     if (strlen(file) > 2 && file[0] == '/' && file[1] == '/') {
       file += 2;
       std::string s =  std::string( eyedblib::CompileBuiltin::getSysconfdir()) + "/" + file;
-      fd = fopen( s.c_str(), "r");
+      try_fd = fopen( s.c_str(), "r");
     }
     else
-      fd = fopen(file, "r");
+      try_fd = fopen(file, "r");
 
-    if (!fd) {
+    if (!try_fd) {
       if (quietFileNotFoundError)
 	return false;
       else
 	error("%scannot open file '%s' for reading",
 	      line_str(), file);
     }
+
+    fd = try_fd;
 
     pline = &line[fd_w];
     fd_sp[fd_w] = fd;
@@ -228,7 +232,7 @@ namespace eyedb {
     *pline = 1;
     fd_w++;
 
-    return 1;
+    return true;
   }
 
   static const char *
@@ -373,14 +377,17 @@ namespace eyedb {
       return 0;
     }
 
-    if (!strcmp(p, "include")) {
+    if (!strcmp(p, "include") || !strcmp(p, "@include")) {
+      bool quiet = !strcmp(p, "@include");
+
       const char *file = nexttoken_realize(config);
       if (!file) {
 	error("file name expected after include");
 	return 0;
       }
 
-      push_file(file, 0);
+      push_file(file, quiet);
+
       return nexttoken(config);
     }
 

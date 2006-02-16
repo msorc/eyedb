@@ -7,7 +7,7 @@
 
 2006-02-16 Francois  <francois@dechelle.net>
 
-	* Changed src/eyedb/Config.cc and include/eyedb/Config.h: read $HOME/.eyedb/eyedb[d].conf file if this file exists
+	* Changed src/eyedb/Config.cc and include/eyedb/Config.h: read $HOME/.eyedb/eyedb[d].conf file if this file exists, @include to include a file without error if file not found.
 
 2006-02-16 Francois  <francois@dechelle.net>
 
