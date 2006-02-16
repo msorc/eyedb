@@ -1,3 +1,10 @@
+2006-02-16  Eric Viara  <viara@sysra.com>
+
+	* Improved configuration parsing and error reporting
+	* Added --server-conf option
+	* Fixed concurrency problems in SessionLog
+	* Suppressed pending eyedbd
+
 2006-02-16 Francois  <francois@dechelle.net>
 
 	* Changed src/eyedb/Config.cc and include/eyedb/Config.h: read $HOME/.eyedb/eyedb[d].conf file if this file exists
