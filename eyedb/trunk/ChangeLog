@@ -1,3 +1,7 @@
+2006-02-16 Francois  <francois@dechelle.net>
+
+	* Fixed examples/Makefile.am w.r.t. Makefile.eyedb, to get rid of Makefile variables that are not prefixed with EYEDB_
+
 2006-02-16  Francois  <francois@dechelle.net>
 
 	* Moved all configuration files in install/etc to "sample" configuration files, installed in pkgdatadir. Removed Makefile.am test to not overwrite the configuration files.

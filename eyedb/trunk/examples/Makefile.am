@@ -12,6 +12,29 @@ eyedbexamplesdir=$(datadir)/doc/$(PACKAGE)/examples
 dist_eyedbexamples_DATA=README
 #eyedbexamples_DATA= Makefile.eyedb-examples 
 
+EYEDB_ARCH_CPPFLAGS=@EYEDB_ARCH_CPPFLAGS@
+EYEDB_ARCH_CXXFLAGS=@EYEDB_ARCH_CXXFLAGS@
+EYEDB_ARCH_SO_FLAGS=@EYEDB_ARCH_SO_FLAGS@
+
+EDIT = sed \
+        -e 's,@bindir\@,$(bindir),g' \
+        -e 's,@includedir\@,$(includedir),g' \
+        -e 's,@exec_prefix\@,$(exec_prefix),g' \
+        -e 's,@datadir\@,$(pkgdatadir),g' \
+        -e 's,@libdir\@,$(libdir),g' \
+        -e 's,@LIBS\@,$(LIBS),g' \
+        -e 's,@localstatedir\@,$(localstatedir),g' \
+        -e 's,@prefix\@,$(prefix),g' \
+        -e 's,@sysconfdir\@,$(sysconfdir),g' \
+	-e 's,@EYEDB_ARCH_CPPFLAGS\@,$(EYEDB_ARCH_CPPFLAGS),g' \
+	-e 's,@EYEDB_ARCH_CXXFLAGS\@,$(EYEDB_ARCH_CXXFLAGS),g' \
+	-e 's,@EYEDB_ARCH_SO_FLAGS\@,$(EYEDB_ARCH_SO_FLAGS),g'
+
+Makefile.eyedb: Makefile $(srcdir)/Makefile.eyedb.in
+	rm -f $@ $@.tmp
+	$(EDIT) $(srcdir)/$@.in >$@.tmp
+	mv $@.tmp $@
+
 install-data-hook:
 	cd $(DESTDIR)/$(eyedbexamplesdir) ; \
 	for f in `find . -name Makefile.eyedb-examples` ; \
