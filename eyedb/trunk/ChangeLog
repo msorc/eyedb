@@ -1,3 +1,7 @@
+2006-02-16  Francois  <francois@dechelle.net>
+
+	* Moved all configuration files in install/etc to "sample" configuration files, installed in pkgdatadir. Removed Makefile.am test to not overwrite the configuration files.
+
 2006-02-13  Francois  <francois@dechelle.net>
 
 	* Fixed src/www/Makefile.am and src/www/html/Makefile.am to not overwrite existing files (Apache config file, cgi scripts, html files)
