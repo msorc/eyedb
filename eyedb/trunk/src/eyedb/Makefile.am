@@ -198,18 +198,30 @@ EXTRA_DIST= odl.l odl.y oql.l oql.y DBM.odl syscls.odl oqlctb.odl utils.odl comp
 
 somthdir=$(pkglibdir)
 somth_LTLIBRARIES=oqlctbmthbe.la oqlctbmthfe.la utilsmthbe.la utilsmthfe.la sysclsmthbe.la sysclsmthfe.la 
+
 oqlctbmthbe_la_SOURCES=oqlctbmthbe.cc oqlctbstubsbe.cc
 oqlctbmthbe_la_LDFLAGS=-module -release $(EYEDB_VERSION)
+oqlctbmthbe_la_DEPENDENCIES= $(top_srcdir)/VERSION
+
 oqlctbmthfe_la_SOURCES=oqlctbmthfe.cc oqlctbstubsfe.cc
 oqlctbmthfe_la_LDFLAGS=-module -release $(EYEDB_VERSION)
+oqlctbmthfe_la_DEPENDENCIES= $(top_srcdir)/VERSION
+
 utilsmthbe_la_SOURCES=utilsmthbe.cc utilsstubsbe.cc
 utilsmthbe_la_LDFLAGS=-module -release $(EYEDB_VERSION)
+utilsmthbe_la_LDEPENDENCIES= $(top_srcdir)/VERSION
+
 utilsmthfe_la_SOURCES=utilsmthfe.cc utilsstubsfe.cc
 utilsmthfe_la_LDFLAGS=-module -release $(EYEDB_VERSION)
+utilsmthfe_la_LDEPENDENCIES= $(top_srcdir)/VERSION
+
 sysclsmthbe_la_SOURCES=sysclsmthbe.cc sysclsstubsbe.cc
 sysclsmthbe_la_LDFLAGS=-module -release $(EYEDB_VERSION)
+sysclsmthbe_la_DEPENDENCIES= $(top_srcdir)/VERSION
+
 sysclsmthfe_la_SOURCES=sysclsmthfe.cc sysclsstubsfe.cc
 sysclsmthfe_la_LDFLAGS=-module -release $(EYEDB_VERSION)
+sysclsmthfe_la_DEPENDENCIES= $(top_srcdir)/VERSION
 
 bin_PROGRAMS=					\
 eyedbd						\
