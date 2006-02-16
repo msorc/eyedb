@@ -1,6 +1,4 @@
-prefix = @prefix@
-exec_prefix = @exec_prefix@
-bindir = @bindir@
+EYEDB_BINDIR = @bindir@
 EYEDB_INCLUDEDIR = @includedir@
 EYEDB_NUMVERSION = @EYEDB_NUMVERSION@
 
@@ -13,7 +11,7 @@ EYEDB_LIBDIR = @libdir@
 EYEDB_LDFLAGS = -L$(EYEDB_LIBDIR)
 EYEDB_LDLIBS = -leyedb -leyedbrpcfe -leyedbsm -leyedbutils $(EYEDB_SYSLIBS)
 
-EYEDB_ODL = $(bindir)/eyedbodl
+EYEDB_ODL = $(EYEDB_BINDIR)/eyedbodl
 
 EYEDB_CLASSPATH = $(EYEDB_LIBDIR)/eyedb/java/eyedb.jar
 

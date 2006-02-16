@@ -325,7 +325,6 @@ examples/JavaBinding/schema-oriented/store/Makefile
 examples/JavaBinding/schema-oriented/store/Makefile.eyedb-examples
 examples/Makefile
 examples/Makefile.eyedb-examples
-examples/Makefile.eyedb
 examples/oql/Makefile
 include/Makefile
 include/eyedb/Makefile
