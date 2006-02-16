@@ -4004,7 +4004,7 @@ namespace eyedb {
   }
 
 #define IDX2OID(IDX) (Oid(IDX, 0, 0))
-#define OBJ2OID(O)   (Oid((unsigned int)o, 0, 0))
+#define OBJ2OID(O)   (Oid((unsigned long)o, 0, 0))
 
   oqmlStatus *
   oqmlObjectManager::getObject(oqmlNode *node, const char *s,
@@ -4059,14 +4059,14 @@ namespace eyedb {
     if (!o)
       return new oqmlAtom_obj(o, 0);
 
-    unsigned int idx = (unsigned int)objCacheObj->getObject(OBJ2OID(o),
-							    true);
+    unsigned long idx = (unsigned long)objCacheObj->getObject(OBJ2OID(o),
+							      true);
 #ifdef GARB_TRACE_DETAIL
     printf("register %p: %u\n", o, idx);
 #endif
     if (idx) {
-      unsigned int idx2 = (unsigned int)objCacheIdx->getObject(IDX2OID(idx),
-							       true);
+      unsigned long idx2 = (unsigned long)objCacheIdx->getObject(IDX2OID(idx),
+								 true);
       assert(idx2);
       return new oqmlAtom_obj(o, idx, o->getClass());
     }
@@ -4085,7 +4085,7 @@ namespace eyedb {
       return oqmlSuccess;
 
     static const char fmt[] = "object '%p' is not registered #1";
-    unsigned int idx = (unsigned int)objCacheObj->getObject(OBJ2OID(o));
+    unsigned long idx = (unsigned long)objCacheObj->getObject(OBJ2OID(o));
 
 #ifdef GARB_TRACE_DETAIL
     printf("unregister %p: %u\n", o, idx);
