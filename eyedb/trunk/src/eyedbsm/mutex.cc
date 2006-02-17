@@ -318,9 +318,11 @@ do { \
       if (!(*mp->plocked)++) {
 	// NOTE THAT: timedlock take a lot of times!!!
 	//r = ut_sem_timedlock(sid, lockTimeout*1000);
+	//if (r < 0)
+	//return statusMake(FATAL_MUTEX_LOCK_TIMEOUT, "mutex %s", mp->pmp->mtname);
 	r = ut_sem_lock(sid);
-	if (r < 0)
-	  return statusMake(FATAL_MUTEX_LOCK_TIMEOUT, "mutex %s", mp->pmp->mtname);
+	if (r)
+	  RETURN_ERROR(r, "Lock");
       }
     }
 #else

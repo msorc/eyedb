@@ -28,15 +28,11 @@
 #include <pthread.h>
 #include <sys/time.h>
 
-#ifdef __cplusplus
-
-
 #include <iostream>
 
 #ifdef ULTRASOL7
 #include <ostream>
 #endif
-
 
 namespace eyedblib {
 
@@ -236,5 +232,4 @@ namespace eyedblib {
   };
 }
 
-#endif
 #endif

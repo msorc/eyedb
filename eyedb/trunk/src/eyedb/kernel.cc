@@ -32,6 +32,8 @@ using namespace std;
 
 #include <eyedbconfig.h>
 
+#define private public
+
 #include <stdlib.h>
 #include <limits.h>
 #include <assert.h>
@@ -1093,9 +1095,12 @@ namespace eyedb {
 
   /* administration */
 
+  static SessionLog *sesslogTempl;
+
   void setConnInfo(rpc_ConnInfo *ci)
   {
     conn_ctx.ci = ci;
+    conn_ctx.sesslog = new SessionLog(*sesslogTempl);
     //rpc_print_tcpip(stdout, &conn_ctx.ci->u.tcpip);
   }
 
@@ -6785,7 +6790,8 @@ do { \
 	   const char *dummy, // was  _passwdfile,
 	   void *xsesslog, int _timeout)
   {
-    conn_ctx.sesslog = (SessionLog *)xsesslog;
+    //conn_ctx.sesslog = (SessionLog *)xsesslog;
+    sesslogTempl = (SessionLog *)xsesslog;
     set_new_handler(new_handler);
 
 #ifdef PASSWD_FILE

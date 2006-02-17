@@ -1458,7 +1458,7 @@ rpc_garbClientInfo(rpc_Server *server, int which, int fd)
 
   FD_CLR(fd, &server->fds_used);
 #ifdef TRACE
-  utlog("rpc_garbClientInfo: close(%d)\n", fd);
+  //utlog("rpc_garbClientInfo: close(%d)\n", fd);
 #endif
   close(fd);
 

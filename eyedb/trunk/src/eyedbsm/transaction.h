@@ -34,6 +34,8 @@
 #define TRY_DATA
 #define KEEP_ORDER
 
+//#define TRS_INTER_MUT
+
 namespace eyedbsm {
   enum TransactionOP {
     /* object operations */
@@ -114,7 +116,12 @@ namespace eyedbsm {
     char dl;                /* deadlock avoid recursion */
     Boolean prot_update; /* to update protections runtime list */
     XMOffset prev, next;    /* double links */
+#ifdef TRS_INTER_MUT
+    eyedbsm::Mutex mut;
+    eyedbsm::MutexP mp;
+#else
     eyedblib::Mutex mut; // warning: non process shared data
+#endif
   };
   /*@@@@ eyedblib::Mutex is a class*/
   //#endif
@@ -158,7 +165,12 @@ namespace eyedbsm {
 #endif
     Boolean prot_oid_set;
     Oid prot_oid;
+#ifdef TRS_INTER_MUT
+    eyedbsm::Mutex mut;
+    eyedbsm::MutexP mp;
+#else
     eyedblib::Mutex mut; // warning: non process shared data
+#endif
   };
 
   struct TransOwner {

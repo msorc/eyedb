@@ -35,6 +35,7 @@
 #include <eyedblib/strutils.h>
 #include "comp_time.h"
 #include <lib/m_mem_p.h>
+#include <eyedbsm/eyedbsm_p.h>
 
 #define MAXPORTS 8
 #define PORTLEN 127
@@ -107,37 +108,43 @@ namespace eyedb {
   }
 
 #define SE_CONNLOG_MAGIC ((unsigned int)0x3f1920ab)
-  //#define CONNLOG_SIZE 0x10000
+//#define CONNLOG_SIZE 0x10000
 #define CONNLOG_SIZE (sizeof(SessionHead) + 128 * sizeof(ClientInfo))
 
 #ifdef UT_SEM
-  const int SessionLog::INVALID_SEMKEY = -1;
-
-  bool SessionLog::valid_sems() const
-  {
-    return semkeys[0] != INVALID_SEMKEY;
-  }
 
   Status
   SessionLog::init_sems()
   {
-    for (int n = 0; n < sizeof(semkeys)/sizeof(semkeys[0]); n++)
-      semkeys[0] = INVALID_SEMKEY;
-    locked = 0;
+    vd = (void *)calloc(sizeof(eyedbsm::DbDescription), 1);
+    int *semkeys = (int *)((eyedbsm::DbDescription *)vd)->semkeys;
     smdcli_conn_t *conn = smdcli_open(smd_get_port());
     if (!conn)
       return Exception::make(IDB_ERROR, "sessionlog: cannot connect to eyedbsmd ");
     smdcli_init_getsems(conn, Config::getServerValue("default_dbm"), semkeys);
-    //printf("init_sems(%d, %d)\n", semkeys[0], semkeys[1]);
-    //smdcli_close(conn);
-    if (!valid_sems())
+    if (semkeys[0] <= 0)
       return Exception::make(IDB_ERROR, "sessionlog: cannot create semaphores ");
     return Success;
   }
 #endif
 
+  SessionLog::SessionLog(const SessionLog &sesslog)
+  {
+    init(sesslog.host, sesslog.port, sesslog.logdir);
+  }
+
   SessionLog::SessionLog(const char *host, const char *port, const char *logdir)
   {
+    init(host, port, logdir);
+  }
+
+  void SessionLog::init(const char *host, const char *port, const char *logdir)
+  {
+#ifdef UT_SEM
+    status = init_sems();
+    if (status)
+      return;
+#endif
     islocked = False;
     addr_connlog = 0;
     status = openRealize(host, port, logdir, False);
@@ -145,16 +152,6 @@ namespace eyedb {
       return;
 
     sesslog = this;
-#ifdef UT_SEM
-    status = init_sems();
-    if (status)
-      return;
-
-
-    eyedbsm::mutexLightInit(semkeys, &locked, &mp, (connhead ? &connhead->mp : 0));
-#else
-    eyedbsm::mutexLightInit(0, &mp, (connhead ? &connhead->mp : 0));
-#endif
   }
 
   // create constructor
@@ -165,6 +162,11 @@ namespace eyedb {
   {
     int i;
 
+#ifdef UT_SEM
+    status = init_sems();
+    if (status)
+      return;
+#endif
     islocked = False;
     addr_connlog = 0;
     status = openRealize(hosts[0], ports[0], logdir, True);
@@ -211,34 +213,11 @@ namespace eyedb {
 
     connhead->loglevel = loglevel;
     connhead->conn_first = XM_NULLOFFSET;
-
-#ifdef UT_SEM
-    status = init_sems();
-    if (status)
-      return;
-    eyedbsm::mutexInit(semkeys, &locked, &mp, &connhead->mp, "CONNLOG");
-#else
-    eyedbsm::mutexInit(0, &mp, &connhead->mp, "CONNLOG");
-#endif
   }
 
   static char *truedir(const char *rs)
   {
     char *s, *os;
-    /*
-    if (rpc_portIsAddress(rs))
-      return strdup(rs);
-
-    if (*rs != '/') {
-      char path[512];
-      getcwd(path, (sizeof path)-1);
-      s = (char *)malloc(strlen(path)+strlen(rs)+2);
-      strcpy(s, path);
-      strcat(s, "/");
-      strcat(s, rs);
-    }
-    else
-    */
     s = strdup(rs);
 
     os = s;
@@ -301,7 +280,6 @@ namespace eyedb {
     static const char conn_prefix[] = ".eyedb_";
     static const char conn_suffix[] = ".con";
     char hostname[256];
-    char *logdir;
     char *file;
 
     if (!_logdir || !_port)
@@ -310,7 +288,6 @@ namespace eyedb {
     port = strdup(_port);
     host = strdup(_host);
 
-    //    char *port_file = truedir((_port + std::string("@") + host).c_str());
     char *port_file = truedir((std::string(host) + ":" + _port).c_str());
       
     char *p = port_file;
@@ -415,9 +392,9 @@ namespace eyedb {
 
     if (create)
       xm_connlog = eyedbsm::XMCreate(addr_connlog + sizeof(SessionHead),
-				     CONNLOG_SIZE - sizeof(SessionHead), 0);
+				     CONNLOG_SIZE - sizeof(SessionHead), vd);
     else
-      xm_connlog = eyedbsm::XMOpen(addr_connlog + sizeof(SessionHead), 0);
+      xm_connlog = eyedbsm::XMOpen(addr_connlog + sizeof(SessionHead), vd);
 
     if (!xm_connlog)
       return Exception::make(err,
@@ -453,7 +430,7 @@ namespace eyedb {
 #ifdef TRACE
     fprintf(stderr, "SessionLog %d tries to locked\n", getpid());
 #endif
-    eyedbsm_mutexLock(&mp, 0);
+    eyedbsm_mutexLock(xm_connlog->mp, 0);
 #ifdef TRACE
     fprintf(stderr, "SessionLog %d is locked\n", getpid());
 #endif
@@ -471,7 +448,7 @@ namespace eyedb {
     connhead->conn_first = XM_OFFSET(xm_connlog, conninfo);
     connhead->nconns++;
 
-    eyedbsm_mutexUnlock(&mp, 0);
+    eyedbsm_mutexUnlock(xm_connlog->mp, 0);
 #ifdef TRACE
     fprintf(stderr, "SessionLog %d is UNlocked\n", getpid());
 #endif
@@ -495,7 +472,7 @@ namespace eyedb {
 #ifdef TRACE
     fprintf(stderr, "SessionLog %d tries to locked\n", getpid());
 #endif
-    eyedbsm_mutexLock(&mp, 0);
+    eyedbsm_mutexLock(xm_connlog->mp, 0);
 #ifdef TRACE
     fprintf(stderr, "SessionLog %d is locked\n", getpid());
 #endif
@@ -518,7 +495,7 @@ namespace eyedb {
 #endif
 
     connhead->nconns--;
-    eyedbsm_mutexUnlock(&mp, 0);
+    eyedbsm_mutexUnlock(xm_connlog->mp, 0);
 #ifdef TRACE
     fprintf(stderr, "SessionLog %d is UNlocked\n", getpid());
 #endif
@@ -573,7 +550,7 @@ namespace eyedb {
 #ifdef TRACE
       fprintf(stderr, "SessionLog %d tries to locked\n", getpid());
 #endif
-      eyedbsm_mutexLock(&mp, 0);
+      eyedbsm_mutexLock(xm_connlog->mp, 0);
 #ifdef TRACE
       fprintf(stderr, "SessionLog %d is locked\n", getpid());
 #endif
@@ -590,7 +567,7 @@ namespace eyedb {
       fprintf(fd, "EyeDB Server %s:%s is down from %s", host, port,
 	      ctime(&connhead->start));
       if (!nolock) {
-	eyedbsm_mutexUnlock(&mp, 0);
+	eyedbsm_mutexUnlock(xm_connlog->mp, 0);
 #ifdef TRACE
 	fprintf(stderr, "SessionLog %d is UNlocked\n", getpid());
 #endif
@@ -638,7 +615,7 @@ namespace eyedb {
     if (!nb_clients) {
       fprintf(fd, "  No Clients connected.\n");
       if (!nolock) {
-	eyedbsm_mutexUnlock(&mp, 0);
+	eyedbsm_mutexUnlock(xm_connlog->mp, 0);
 #ifdef TRACE
 	fprintf(stderr, "SessionLog %d is UNlocked\n", getpid());
 #endif
@@ -694,7 +671,7 @@ namespace eyedb {
     }
 
     if (!nolock) {
-      eyedbsm_mutexUnlock(&mp, 0);
+      eyedbsm_mutexUnlock(xm_connlog->mp, 0);
 #ifdef TRACE
       fprintf(stderr, "SessionLog %d is UNlocked\n", getpid());
 #endif
@@ -736,7 +713,7 @@ namespace eyedb {
 	 (nb_clients > 1 ? "are" : "is"));
     }
 
-    // eyedbsm_mutexLock(&mp, 0);
+    // eyedbsm_mutexLock(xm_connlog->mp, 0);
 
     ClientInfo *conninfo =
       (ClientInfo *)XM_ADDR(xm_connlog, connhead->conn_first);
@@ -753,19 +730,22 @@ namespace eyedb {
     fprintf(stderr, "Killing EyeDB Server Pid %d\n", connhead->pid);
     kill(connhead->pid, SIGTERM);
 
-    // eyedbsm_mutexUnlock(&mp, 0);
+    // eyedbsm_mutexUnlock(xm_connlog->mp, 0);
     return Success;
   }
 
   void
   SessionLog::release()
   {
+    /*
     if (sesslog && sesslog->islocked)
       eyedbsm_mutexUnlock(&sesslog->mp, 0);
+    */
   }
 
   SessionLog::~SessionLog()
   {
+    free(vd);
   }
 
   ClientSessionLog::ClientSessionLog(ClientInfo *_clinfo)
@@ -810,4 +790,3 @@ namespace eyedb {
       }
   }
 }
-

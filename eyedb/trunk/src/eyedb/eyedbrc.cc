@@ -33,6 +33,7 @@
 #include <eyedbsm/smd.h>
 #include <eyedblib/strutils.h>
 #include "comp_time.h"
+#include "lib/compile_builtin.h"
 
 using namespace eyedb;
 using namespace std;
@@ -304,8 +305,12 @@ main(int argc, char *argv[])
 
     smdport = smd_get_port();
 
+#if 1
+    bindir = eyedblib::CompileBuiltin::getBindir();
+#else
     if (!bindir)
       bindir = eyedb::Config::getServerValue("bindir");
+#endif
 
     int ac;
     char **av;

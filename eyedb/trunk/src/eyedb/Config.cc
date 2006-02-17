@@ -681,13 +681,13 @@ namespace eyedb {
     std::string sysconfdir = eyedblib::CompileBuiltin::getSysconfdir();
 
     // Executables directory
-    setValue( "bindir", eyedblib::CompileBuiltin::getBindir());
+    //setValue( "bindir", eyedblib::CompileBuiltin::getBindir());
 
     // Bases directory
     setValue( "data_dir", (localstatedir + "/lib/eyedb/db").c_str());
 
     // pipes:
-    setValue( "pipedir", (localstatedir + "/lib/eyedb/pipes").c_str());
+    // setValue( "pipedir", (localstatedir + "/lib/eyedb/pipes").c_str());
 
     // tmpdir
     setValue( "tmpdir", (localstatedir + "/lib/eyedb/tmp").c_str());

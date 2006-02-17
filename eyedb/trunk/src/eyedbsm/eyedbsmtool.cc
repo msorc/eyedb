@@ -485,6 +485,7 @@ shmem_cleanup_realize(int argc, char *argv[])
     {
       char s[128];
       fgets(s, sizeof s, stdin);
+      s[strlen(s)-1] = 0;
       if (!strcasecmp(s, "y") || !strcasecmp(s, "yes"))
 	{
 	  Status status = dbCleanup(argv[0]);
