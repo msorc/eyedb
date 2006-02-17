@@ -131,7 +131,7 @@ inline oqmlAtom_oid::oqmlAtom_oid(const Oid &_oid, Class *_class) :
   oid = _oid;
 }
 
-inline oqmlAtom_obj::oqmlAtom_obj(Object *_o, unsigned int _idx,
+inline oqmlAtom_obj::oqmlAtom_obj(Object *_o, eyedblib::pointer_int _idx,
 				  const Class *_class) : oqmlAtom()
 {
   type.type = oqmlATOM_OBJ;

@@ -1463,11 +1463,6 @@ ESM_dbOpen(const char *dbfile, int flags,
 
   version = x2h_u32(((DbShmHeader *)shm_addr)->version);
 
-#if 0
-  if (pversion && *pversion)
-    ((DbShmHeader *)shm_addr)->version = h2x_u32(*pversion);
-#endif
-
   if (pversion && *pversion && version > *pversion)
     {
       char str_version[32];

@@ -3505,51 +3505,50 @@ userlist_realize(int n, char *str[], DBM_Database *dbm)
 {
   int i;
 
-  if (!n)
-    {
-      dbm->transactionBegin();
-      OQL q(dbm, "select user_entry");
-
-      ObjectArray obj_arr;
-      Status s = q.execute(obj_arr);
-      CHECK(s);
-
-      for (i = 0; i < obj_arr.getCount(); i++)
-	{
-	  if (i)
-	    printf("\n");
-	  print_user(dbm, (UserEntry *)obj_arr[i]);
-	}
-
-      obj_arr.garbage();
-      dbm->transactionCommit();
-      return 0;
+  if (!n) {
+    dbm->transactionBegin();
+    OQL q(dbm, "select user_entry");
+    
+    ObjectArray obj_arr;
+    Status s = q.execute(obj_arr);
+    CHECK(s);
+    
+    for (i = 0; i < obj_arr.getCount(); i++) {
+      if (i)
+	printf("\n");
+      print_user(dbm, (UserEntry *)obj_arr[i]);
     }
+    
+    obj_arr.garbage();
+    dbm->transactionCommit();
+    return 0;
+  }
   
+  int error = 0;
   dbm->transactionBegin();
-  for (i = 0; i < n; i++)
-    {
-      UserEntry *user;
-      Status s = dbm->getUser(str[i], user);
-      CHECK(s);
-
-      if (!user) {
-	print_prog();
-	fprintf(stderr, "user '%s' not found\n", str[i]);
-      }
-      else
-	{
-	  if (i)
-	    printf("\n");
-	  print_user(dbm, user);
-	}
-      
-      if (user) user->release();
+  for (i = 0; i < n; i++) {
+    UserEntry *user;
+    Status s = dbm->getUser(str[i], user);
+    CHECK(s);
+    
+    if (!user) {
+      print_prog();
+      fprintf(stderr, "user '%s' not found\n", str[i]);
+      error++;
     }
-
+    else {
+      if (i)
+	printf("\n");
+      print_user(dbm, user);
+    }
+    
+    if (user)
+      user->release();
+  }
+  
   dbm->transactionCommit();
 
-  return 0;
+  return error;
 }
 
 static char list_indent[] = "  ";
@@ -3562,12 +3561,11 @@ get_dbinfo(DBEntry *dbentry, Database *&db)
   DbInfoDescription *dbdesc = new DbInfoDescription();
   Status status = db->getInfo(conn, 0, 0, dbdesc);
 
-  if (status)
-    {
-      delete dbdesc;
-      status->print(stdout);
-      return 0;
-    }
+  if (status) {
+    delete dbdesc;
+    status->print(stdout);
+    return 0;
+  }
 
   return dbdesc;
 }
