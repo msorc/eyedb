@@ -1479,7 +1479,7 @@ oqmlMethodCall::applyOQL(Database *db, oqmlContext *ctx,
     }
 
 #ifdef NEW_THIS
-  unsigned long idx;
+  eyedblib::pointer_int idx;
   if (o && oqmlObjectManager::isRegistered(o, idx)) {
     oqmlAtom_obj * obj_x;
     obj_x = new oqmlAtom_obj(o, idx, o->getClass());
@@ -1509,7 +1509,7 @@ oqmlMethodCall::applyOQL(Database *db, oqmlContext *ctx,
   if (s) return s;
 
   oqmlAtom_obj * obj_x;
-  unsigned long idx;
+  pointer_int idx;
 
   if (o && oqmlObjectManager::isRegistered(o, idx))
     obj_x = new oqmlAtom_obj(o, idx, o->getClass());

@@ -22,6 +22,7 @@
 */
 
 
+#include <eyedblib/machtypes.h>
 #include <eyedb/eyedb.h>
 #include <eyedb/eyedb_p.h>
 #include <string>
@@ -447,9 +448,9 @@ namespace eyedb {
 
   public:
     Object *o;
-    unsigned int idx;
+    eyedblib::pointer_int idx;
 
-    oqmlAtom_obj(Object *, unsigned int, const Class * = 0);
+    oqmlAtom_obj(Object *, eyedblib::pointer_int, const Class * = 0);
 
     virtual oqmlBool isEqualTo(oqmlAtom &);
     oqmlNode *toNode();
@@ -1150,14 +1151,14 @@ namespace eyedb {
 				 Object *&, oqmlBool addToFreeList,
 				 oqmlBool errorIfNull = oqml_True);
     static oqmlStatus *getObject(oqmlNode *, const char *, Object *&,
-				 unsigned int &);
+				 eyedblib::pointer_int &);
     static void releaseObject(Object *, oqmlBool = oqml_False);
     static oqmlStatus *getIndex(oqmlNode *node, const Object *o,
-				unsigned long &idx);
+				eyedblib::pointer_int &idx);
 
     static oqmlAtom *registerObject(Object *);
     static oqmlStatus *unregisterObject(oqmlNode *node, Object *o);
-    static oqmlBool isRegistered(const Object *, unsigned long &);
+    static oqmlBool isRegistered(const Object *, eyedblib::pointer_int &);
 
     static void garbageObjects();
 
@@ -1474,7 +1475,7 @@ namespace eyedb {
   class oqmlObject : public oqmlNode {
     Object *o;
     char *s;
-    unsigned int idx;
+    eyedblib::pointer_int idx;
     oqmlNode *ql;
 
   public:

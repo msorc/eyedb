@@ -18,7 +18,7 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
+  Author: Eric Viara <viara@sysra.com>
 */
 
 
@@ -222,80 +222,79 @@ namespace eyedb {
     if (n >= 4)
       n = 0;
 
-    switch(type)
-      {
-      case oqmlATOM_BOOL:
-	strcpy(typestr[n], "bool");
-	break;
+    switch(type) {
+    case oqmlATOM_BOOL:
+      strcpy(typestr[n], "bool");
+      break;
 
-      case oqmlATOM_OID:
-	strcpy(typestr[n], "oid");
-	break;
+    case oqmlATOM_OID:
+      strcpy(typestr[n], "oid");
+      break;
 
-      case oqmlATOM_INT:
-	strcpy(typestr[n], "integer");
-	break;
+    case oqmlATOM_INT:
+      strcpy(typestr[n], "integer");
+      break;
 
-      case oqmlATOM_DOUBLE:
-	strcpy(typestr[n], "float");
-	break;
+    case oqmlATOM_DOUBLE:
+      strcpy(typestr[n], "float");
+      break;
 
-      case oqmlATOM_CHAR:
-	strcpy(typestr[n], char_class_name);
-	break;
+    case oqmlATOM_CHAR:
+      strcpy(typestr[n], char_class_name);
+      break;
 
-      case oqmlATOM_STRING:
-	strcpy(typestr[n], "string");
-	break;
+    case oqmlATOM_STRING:
+      strcpy(typestr[n], "string");
+      break;
 
-      case oqmlATOM_IDENT:
-	strcpy(typestr[n], "ident");
-	break;
+    case oqmlATOM_IDENT:
+      strcpy(typestr[n], "ident");
+      break;
 
-      case oqmlATOM_LIST:
-	strcpy(typestr[n], "list");
-	break;
+    case oqmlATOM_LIST:
+      strcpy(typestr[n], "list");
+      break;
 
-      case oqmlATOM_BAG:
-	strcpy(typestr[n], "bag");
-	break;
+    case oqmlATOM_BAG:
+      strcpy(typestr[n], "bag");
+      break;
 
-      case oqmlATOM_SET:
-	strcpy(typestr[n], "set");
-	break;
+    case oqmlATOM_SET:
+      strcpy(typestr[n], "set");
+      break;
 
-      case oqmlATOM_ARRAY:
-	strcpy(typestr[n], "array");
-	break;
+    case oqmlATOM_ARRAY:
+      strcpy(typestr[n], "array");
+      break;
 
-      case oqmlATOM_STRUCT:
-	strcpy(typestr[n], "struct");
-	break;
+    case oqmlATOM_STRUCT:
+      strcpy(typestr[n], "struct");
+      break;
 
-      case oqmlATOM_OBJ:
-	strcpy(typestr[n], "object");
-	break;
+    case oqmlATOM_OBJ:
+      strcpy(typestr[n], "object");
+      break;
 
-      case oqmlATOM_NODE:
-	strcpy(typestr[n], "node");
-	break;
+    case oqmlATOM_NODE:
+      strcpy(typestr[n], "node");
+      break;
 
-      case oqmlATOM_SELECT:
-	strcpy(typestr[n], "select");
-	break;
+    case oqmlATOM_SELECT:
+      strcpy(typestr[n], "select");
+      break;
 
-      case oqmlATOM_NULL:
-	strcpy(typestr[n], NullString);
-	break;
+    case oqmlATOM_NULL:
+      strcpy(typestr[n], NullString);
+      break;
 
-      case oqmlATOM_NIL:
-	strcpy(typestr[n], "nil");
-	break;
+    case oqmlATOM_NIL:
+      strcpy(typestr[n], "nil");
+      break;
 
-      default:
-	strcpy(typestr[n], "<unknown>");
-	break;
-      }
+    default:
+      strcpy(typestr[n], "<unknown>");
+      break;
+    }
 
     return typestr[n++];
   }
@@ -403,11 +402,10 @@ namespace eyedb {
 
     idx = -1;
 
-    if (alist->cnt == 1 && alist->first->as_ident())
-      {
-	*a = alist->first->as_ident();
-	return oqmlSuccess;
-      }
+    if (alist->cnt == 1 && alist->first->as_ident()) {
+      *a = alist->first->as_ident();
+      return oqmlSuccess;
+    }
 
     if (alist->cnt == 1)
       return new oqmlStatus(this, "%s is not a left value.",
@@ -483,24 +481,22 @@ namespace eyedb {
   oqml_List::~oqml_List()
   {
     oqml_Link *l = first;
-    while (l)
-      {
-	oqml_Link *next = l->next;
-	delete l;
-	l = next;
-      }
+    while (l) {
+      oqml_Link *next = l->next;
+      delete l;
+      l = next;
+    }
   }
 
   oqmlBool
   oqml_List::hasIdent(const char *_ident)
   {
     oqml_Link *l = first;
-    while (l)
-      {
-	if (l->ql->hasIdent(_ident))
-	  return oqml_True;
-	l = l->next;
-      }
+    while (l) {
+      if (l->ql->hasIdent(_ident))
+	return oqml_True;
+      l = l->next;
+    }
 
     return oqml_False;
   }
@@ -528,22 +524,20 @@ namespace eyedb {
   oqml_List::lock()
   {
     oqml_Link *l = first;
-    while (l)
-      {
-	l->ql->lock();
-	l = l->next;
-      }
+    while (l) {
+      l->ql->lock();
+      l = l->next;
+    }
   }
 
   void
   oqml_List::unlock()
   {
     oqml_Link *l = first;
-    while (l)
-      {
-	l->ql->unlock();
-	l = l->next;
-      }
+    while (l) {
+      l->ql->unlock();
+      l = l->next;
+    }
   }
 
   std::string
@@ -575,11 +569,10 @@ namespace eyedb {
   void oqml_List::add(oqmlNode *ql)
   {
     oqml_Link *l = new oqml_Link(ql);
-    if (last)
-      {
-	last->next = l;
-	last = l;
-      }
+    if (last) {
+      last->next = l;
+      last = l;
+    }
     else
       first = last = l;
 
@@ -634,43 +627,39 @@ namespace eyedb {
   oqml_IdentList::lock()
   {
     oqml_IdentLink *l = first;
-    while (l)
-      {
-	l->lock();
-	l = l->next;
-      }
+    while (l) {
+      l->lock();
+      l = l->next;
+    }
   }
 
   void
   oqml_IdentList::unlock()
   {
     oqml_IdentLink *l = first;
-    while (l)
-      {
-	l->unlock();
-	l = l->next;
-      }
+    while (l) {
+      l->unlock();
+      l = l->next;
+    }
   }
 
   oqml_IdentList::~oqml_IdentList()
   {
     oqml_IdentLink *l = first;
-    while (l)
-      {
-	oqml_IdentLink *next = l->next;
-	delete l;
-	l = next;
-      }
+    while (l) {
+      oqml_IdentLink *next = l->next;
+      delete l;
+      l = next;
+    }
   }
 
   void oqml_IdentList::add(const char *ident, oqmlNode *ql)
   {
     oqml_IdentLink *l = new oqml_IdentLink(ident, ql);
-    if (last)
-      {
-	last->next = l;
-	last = l;
-      }
+    if (last) {
+      last->next = l;
+      last = l;
+    }
     else
       first = last = l;
 
@@ -680,11 +669,10 @@ namespace eyedb {
   void oqml_IdentList::add(oqmlNode *left, oqmlNode *right)
   {
     oqml_IdentLink *l = new oqml_IdentLink(left, right);
-    if (last)
-      {
-	last->next = l;
-	last = l;
-      }
+    if (last) {
+      last->next = l;
+      last = l;
+    }
     else
       first = last = l;
 
@@ -701,42 +689,41 @@ namespace eyedb {
   oqmlAtom::make_atom(const IteratorAtom &atom, Class *cls)
   {
     // 12/09/05: for backward compatibility !
-    switch(atom.type)
-      {
-      case IteratorAtom_INT16:
-	return new oqmlAtom_int(atom.i16);
+    switch(atom.type) {
+    case IteratorAtom_INT16:
+      return new oqmlAtom_int(atom.i16);
       
-      case IteratorAtom_INT32:
-	return new oqmlAtom_int(atom.i32);
+    case IteratorAtom_INT32:
+      return new oqmlAtom_int(atom.i32);
       
-      case IteratorAtom_INT64:
-	return new oqmlAtom_int(atom.i64);
+    case IteratorAtom_INT64:
+      return new oqmlAtom_int(atom.i64);
       
-      case IteratorAtom_STRING:
-	return new oqmlAtom_string(atom.str);
+    case IteratorAtom_STRING:
+      return new oqmlAtom_string(atom.str);
       
-      case IteratorAtom_OID:
-	return new oqmlAtom_oid(atom.oid, cls);
+    case IteratorAtom_OID:
+      return new oqmlAtom_oid(atom.oid, cls);
       
-      case IteratorAtom_CHAR:
-	return new oqmlAtom_char(atom.c);
+    case IteratorAtom_CHAR:
+      return new oqmlAtom_char(atom.c);
       
-      case IteratorAtom_DOUBLE:
-	return new oqmlAtom_double(atom.d);
+    case IteratorAtom_DOUBLE:
+      return new oqmlAtom_double(atom.d);
       
 #ifndef NEW_ITER_ATOM
-      case IteratorAtom_BOOL:
-	return new oqmlAtom_bool((oqmlBool)atom.b);
+    case IteratorAtom_BOOL:
+      return new oqmlAtom_bool((oqmlBool)atom.b);
       
-      case IteratorAtom_IDENT:
-	return new oqmlAtom_ident(atom.ident);
+    case IteratorAtom_IDENT:
+      return new oqmlAtom_ident(atom.ident);
 #endif
       
-      case IteratorAtom_IDR:
-      default:
-	assert(0);
-	return 0;
-      }
+    case IteratorAtom_IDR:
+    default:
+      assert(0);
+      return 0;
+    }
   }
 
   static void
@@ -745,11 +732,10 @@ namespace eyedb {
     if (!o)
       return;
 
-    if (o->getMasterObject())
-      {
-	incr_ref_count(o->getMasterObject());
-	return;
-      }
+    if (o->getMasterObject()) {
+      incr_ref_count(o->getMasterObject());
+      return;
+    }
 
     o->incrRefCount();
   }
@@ -757,69 +743,61 @@ namespace eyedb {
   oqmlAtom *
   oqmlAtom::make_atom(Data data, oqmlATOMTYPE type, const Class *cls)
   {
-    switch(type)
-      {
-      case oqmlATOM_OID:
-	{
-	  Oid noid;
-	  memcpy(&noid, data, sizeof(Oid));
-	  return new oqmlAtom_oid(noid, (Class *)cls);
-	}
+    switch(type) {
+    case oqmlATOM_OID: {
+      Oid noid;
+      memcpy(&noid, data, sizeof(Oid));
+      return new oqmlAtom_oid(noid, (Class *)cls);
+    }
 
-      case oqmlATOM_OBJ:
-	{
-	  Object *o;
-	  mcp(&o, data, sizeof(Object *));
-	  // added the 5/11/99
-	  incr_ref_count(o);
-	  return oqmlObjectManager::registerObject(o);
-	}
+    case oqmlATOM_OBJ: {
+      Object *o;
+      mcp(&o, data, sizeof(Object *));
+      // added the 5/11/99
+      incr_ref_count(o);
+      return oqmlObjectManager::registerObject(o);
+    }
 
-      case oqmlATOM_STRING:
-	return new oqmlAtom_string((char *)data);
+    case oqmlATOM_STRING:
+      return new oqmlAtom_string((char *)data);
 
-      case oqmlATOM_IDENT:
-	return new oqmlAtom_ident((char *)data);
+    case oqmlATOM_IDENT:
+      return new oqmlAtom_ident((char *)data);
 
-      case oqmlATOM_INT:
-	{
-	  if (!cls || cls->asInt64Class())
-	    {
-	      eyedblib::int64 ni;
-	      memcpy(&ni, data, sizeof(eyedblib::int64));
-	      return new oqmlAtom_int(ni);
-	    }
-
-	  if (cls->asInt32Class() || cls->asEnumClass())
-	    {
-	      eyedblib::int32 ni;
-	      memcpy(&ni, data, sizeof(eyedblib::int32));
-	      return new oqmlAtom_int(ni);
-	    }
-
-	  if (cls->asInt16Class())
-	    {
-	      eyedblib::int16 ni;
-	      memcpy(&ni, data, sizeof(eyedblib::int16));
-	      return new oqmlAtom_int(ni);
-	    }
-
-	  return new oqmlAtom_int(0);
-	}
-
-      case oqmlATOM_DOUBLE:
-	{
-	  double nd;
-	  memcpy(&nd, data, sizeof(double));
-	  return new oqmlAtom_double(nd);
-	}
-
-      case oqmlATOM_CHAR:
-	return new oqmlAtom_char((char)data[0]);
-
-      default:
-	assert(0);
+    case oqmlATOM_INT: {
+      if (!cls || cls->asInt64Class()) {
+	eyedblib::int64 ni;
+	memcpy(&ni, data, sizeof(eyedblib::int64));
+	return new oqmlAtom_int(ni);
       }
+
+      if (cls->asInt32Class() || cls->asEnumClass()) {
+	eyedblib::int32 ni;
+	memcpy(&ni, data, sizeof(eyedblib::int32));
+	return new oqmlAtom_int(ni);
+      }
+
+      if (cls->asInt16Class()) {
+	eyedblib::int16 ni;
+	memcpy(&ni, data, sizeof(eyedblib::int16));
+	return new oqmlAtom_int(ni);
+      }
+
+      return new oqmlAtom_int(0);
+    }
+
+    case oqmlATOM_DOUBLE: {
+      double nd;
+      memcpy(&nd, data, sizeof(double));
+      return new oqmlAtom_double(nd);
+    }
+
+    case oqmlATOM_CHAR:
+      return new oqmlAtom_char((char)data[0]);
+
+    default:
+      assert(0);
+    }
   }
 
   oqmlAtom::oqmlAtom(const oqmlAtom&)
@@ -856,106 +834,94 @@ namespace eyedb {
 
   char *oqmlAtom_oid::makeString(FILE *fd) const
   {
-    if (fd)
-      {
-	fprintf(fd, "%s", oid.getString());
-	return 0;
-      }
+    if (fd) {
+      fprintf(fd, "%s", oid.getString());
+      return 0;
+    }
     else if (string)
       return string;
-    else
-      {
-	char buf[64];
-	sprintf(buf, "%s", oid.getString());
-	((oqmlAtom *)this)->string = strdup(buf);
-	return string;
-      }
+    else {
+      char buf[64];
+      sprintf(buf, "%s", oid.getString());
+      ((oqmlAtom *)this)->string = strdup(buf);
+      return string;
+    }
   }
 
   char *oqmlAtom_int::makeString(FILE *fd) const
   {
-    if (fd)
-      {
-	fprintf(fd, "%lld", i);
-	return 0;
-      }
+    if (fd) {
+      fprintf(fd, "%lld", i);
+      return 0;
+    }
     else if (string)
       return string;
-    else
-      {
-	char buf[32];
-	sprintf(buf, "%lld", i);
-	((oqmlAtom *)this)->string = strdup(buf);
-	return string;
-      }
+    else {
+      char buf[32];
+      sprintf(buf, "%lld", i);
+      ((oqmlAtom *)this)->string = strdup(buf);
+      return string;
+    }
   }
 
   char *oqmlAtom_double::makeString(FILE *fd) const
   {
-    if (fd)
-      {
-	fprintf(fd, "%f", d);
-	return 0;
-      }
+    if (fd) {
+      fprintf(fd, "%f", d);
+      return 0;
+    }
     else if (string)
       return string;
-    else
-      {
-	char buf[16];
-	sprintf(buf, "%f", d);
-	((oqmlAtom *)this)->string = strdup(buf);
-	return string;
-      }
+    else {
+      char buf[16];
+      sprintf(buf, "%f", d);
+      ((oqmlAtom *)this)->string = strdup(buf);
+      return string;
+    }
   }
 
   char *oqmlAtom_bool::makeString(FILE *fd) const
   {
-    if (fd)
-      {
-	fprintf(fd, "%s", (b ? "true" : "false"));
-	return 0;
-      }
+    if (fd) {
+      fprintf(fd, "%s", (b ? "true" : "false"));
+      return 0;
+    }
     else if (string)
       return string;
-    else
-      {
-	char buf[16];
-	sprintf(buf, "%s", (b ? "true" : "false"));
-	((oqmlAtom *)this)->string = strdup(buf);
-	return string;
-      }
+    else {
+      char buf[16];
+      sprintf(buf, "%s", (b ? "true" : "false"));
+      ((oqmlAtom *)this)->string = strdup(buf);
+      return string;
+    }
   }
 
   char *oqmlAtom_nil::makeString(FILE *fd) const
   {
-    if (fd)
-      {
-	fprintf(fd, NilString);
-	return 0;
-      }
+    if (fd) {
+      fprintf(fd, NilString);
+      return 0;
+    }
     else if (string)
       return string;
-    else
-      {
-	((oqmlAtom *)this)->string = strdup(NilString);
-	return string;
-      }
+    else {
+      ((oqmlAtom *)this)->string = strdup(NilString);
+      return string;
+    }
   }
 
   char *oqmlAtom_null::makeString(FILE *fd) const
   {
-    if (fd)
-      {
-	fprintf(fd, NullString);
-	return 0;
-      }
+    if (fd) {
+      fprintf(fd, NullString);
+      return 0;
+    }
     else if (string)
       return string;
-    else
-      {
-	((oqmlAtom *)this)->string = strdup(NullString);
-	return string;
-      }
+    else {
+      ((oqmlAtom *)this)->string = strdup(NullString);
+      return string;
+    }
   }
 
   char *oqmlAtom_char::makeString(FILE *fd) const
@@ -963,85 +929,76 @@ namespace eyedb {
     static const char cfmt[] = "'%c'";
     static const char ofmt[] = "'\\%03o'";
 
-    if (fd)
-      {
-	if (iswprint(c)) fprintf(fd, cfmt, c);
-	else             fprintf(fd, ofmt, c);
-	return 0;
-      }
+    if (fd) {
+      if (iswprint(c)) fprintf(fd, cfmt, c);
+      else             fprintf(fd, ofmt, c);
+      return 0;
+    }
     else if (string)
       return string;
-    else
-      {
-	char buf[8];
-	if (iswprint(c)) sprintf(buf, cfmt, c);
-	else             sprintf(buf, ofmt, c);
-	((oqmlAtom *)this)->string = strdup(buf);
-	return string;
-      }
+    else {
+      char buf[8];
+      if (iswprint(c)) sprintf(buf, cfmt, c);
+      else             sprintf(buf, ofmt, c);
+      ((oqmlAtom *)this)->string = strdup(buf);
+      return string;
+    }
   }
 
   char *oqmlAtom_string::makeString(FILE *fd) const
   {
-    if (fd)
-      {
-	fprintf(fd, "\"%s\"", shstr->s);
-	return 0;
-      }
+    if (fd) {
+      fprintf(fd, "\"%s\"", shstr->s);
+      return 0;
+    }
     else if (string)
       return string;
-    else
-      {
-	char *buf = (char *)malloc(strlen(shstr->s)+3);
-	sprintf(buf, "\"%s\"", shstr->s);
-	((oqmlAtom *)this)->string = buf;
-	return string;
-      }
+    else {
+      char *buf = (char *)malloc(strlen(shstr->s)+3);
+      sprintf(buf, "\"%s\"", shstr->s);
+      ((oqmlAtom *)this)->string = buf;
+      return string;
+    }
   }
 
 
   char *oqmlAtom_ident::makeString(FILE *fd) const
   {
-    if (fd)
-      {
-	fprintf(fd, "%s", shstr->s);
-	return 0;
-      }
+    if (fd) {
+      fprintf(fd, "%s", shstr->s);
+      return 0;
+    }
     else if (string)
       return string;
-    else
-      {
-	((oqmlAtom *)this)->string = strdup(shstr->s);
-	return string;
-      }
+    else {
+      ((oqmlAtom *)this)->string = strdup(shstr->s);
+      return string;
+    }
   }
 
   char *oqmlAtom_obj::makeString(FILE *fd) const
   {
-    if (fd)
-      {
-	fprintf(fd, "%x:obj", idx);
-	return 0;
-      }
+    if (fd) {
+      fprintf(fd, "%lx:obj", idx);
+      return 0;
+    }
 
     if (string)
       return string;
-    else
-      {
-	char buf[12];
-	sprintf(buf, "%x:obj", idx);
-	((oqmlAtom *)this)->string = strdup(buf);
-	return string;
-      }
+    else {
+      char buf[12];
+      sprintf(buf, "%lx:obj", idx);
+      ((oqmlAtom *)this)->string = strdup(buf);
+      return string;
+    }
   }
 
   char *oqmlAtom_node::makeString(FILE *fd) const
   {
-    if (fd)
-      {
-	fprintf(fd, "%s", node->toString().c_str());
-	return 0;
-      }
+    if (fd) {
+      fprintf(fd, "%s", node->toString().c_str());
+      return 0;
+    }
 
     if (!string)
       ((oqmlAtom *)this)->string = strdup(node->toString().c_str());
@@ -1072,11 +1029,10 @@ namespace eyedb {
 
   char *oqmlAtom_select::makeString(FILE *fd) const
   {
-    if (fd)
-      {
-	fprintf(fd, "%s", (node ? node->toString() : std::string("")).c_str());
-	return 0;
-      }
+    if (fd) {
+      fprintf(fd, "%s", (node ? node->toString() : std::string("")).c_str());
+      return 0;
+    }
 
     if (!string)
       ((oqmlAtom *)this)->string = strdup((node ? node->toString() : std::string("")).c_str());
@@ -1107,24 +1063,22 @@ namespace eyedb {
 
   char *oqmlAtom_coll::makeString(FILE *fd) const
   {
-    if (fd)
-      {
-	fprintf(fd, getTypeName());
-	if (list)
-	  list->print(fd);
-	else
-	  fprintf(fd, "()");
-	return 0;
-      }
+    if (fd) {
+      fprintf(fd, getTypeName());
+      if (list)
+	list->print(fd);
+      else
+	fprintf(fd, "()");
+      return 0;
+    }
 
     if (string)
       return string;
 
-    if (!list)
-      {
-	((oqmlAtom_coll *)this)->string = strdup("()");
-	return string;
-      }
+    if (!list) {
+      ((oqmlAtom_coll *)this)->string = strdup("()");
+      return string;
+    }
 
     char *buf = list->getString();
     ((oqmlAtom_coll *)this)->string = (char *)malloc(strlen(buf)+20);
@@ -1190,11 +1144,10 @@ namespace eyedb {
   oqmlAtom_struct::getAtom(const char *name, int &idx)
   {
     for (int i = 0; i < attr_cnt; i++)
-      if (!strcmp(attr[i].name, name))
-	{
-	  idx = i;
-	  return attr[i].value;
-	}
+      if (!strcmp(attr[i].name, name)) {
+	idx = i;
+	return attr[i].value;
+      }
 
     idx = -1;
     return 0;
@@ -1224,24 +1177,21 @@ namespace eyedb {
   {
     unsigned int psize;
 
-    if (!cls || cls->asInt64Class())
-      {
-	psize = sizeof(eyedblib::int64);
-	eyedblib::int64 v = (eyedblib::int64)i;
-	memcpy(data, &v, psize);
-      }
-    else if (cls->asInt32Class() || cls->asEnumClass())
-      {
-	psize = sizeof(eyedblib::int32);
-	eyedblib::int32 v = (eyedblib::int32)i;
-	memcpy(data, &v, psize);
-      }
-    else if (cls->asInt16Class())
-      {
-	psize = sizeof(eyedblib::int16);
-	eyedblib::int16 v = (eyedblib::int16)i;
-	memcpy(data, &v, psize);
-      }
+    if (!cls || cls->asInt64Class()) {
+      psize = sizeof(eyedblib::int64);
+      eyedblib::int64 v = (eyedblib::int64)i;
+      memcpy(data, &v, psize);
+    }
+    else if (cls->asInt32Class() || cls->asEnumClass()) {
+      psize = sizeof(eyedblib::int32);
+      eyedblib::int32 v = (eyedblib::int32)i;
+      memcpy(data, &v, psize);
+    }
+    else if (cls->asInt16Class()) {
+      psize = sizeof(eyedblib::int16);
+      eyedblib::int16 v = (eyedblib::int16)i;
+      memcpy(data, &v, psize);
+    }
     else
       psize = ~0;
 
@@ -1468,25 +1418,22 @@ namespace eyedb {
     oqmlAtom *a = first;
 
     n = 0;
-    while (a)
-      {
-	arr[n++] = a;
-	a = a->next;
-      }
+    while (a) {
+      arr[n++] = a;
+      a = a->next;
+    }
 
     for (i = 0; i < cnt; i++)
       for (j = 0; j < i; j++)
-	if (arr[j] && arr[i] && arr[j]->isEqualTo(*arr[i]))
-	  {
-	    arr[i] = 0;
-	    noDoubles = oqml_False;
-	  }
+	if (arr[j] && arr[i] && arr[j]->isEqualTo(*arr[i])) {
+	  arr[i] = 0;
+	  noDoubles = oqml_False;
+	}
 
-    if (noDoubles)
-      {
-	delete [] arr;
-	return;
-      }
+    if (noDoubles) {
+      delete [] arr;
+      return;
+    }
 
     first = last = 0;
     int xcnt = cnt;
@@ -1508,20 +1455,18 @@ namespace eyedb {
   static oqmlBool
   checkNull(oqmlAtom *aleft, oqmlAtom *aright, oqmlTYPE type)
   {
-    if (aleft->type.type == oqmlATOM_NULL)
-      {
-	if (aright->type.type == oqmlATOM_OID)
-	  {
-	    if (!((oqmlAtom_oid *)aright)->oid.isValid())
-	      return (type == oqmlEQUAL ? oqml_True : oqml_False);
-	    return (type == oqmlEQUAL ? oqml_False : oqml_True);
-	  }
-
-	if (aright->type.type == oqmlATOM_NULL)
+    if (aleft->type.type == oqmlATOM_NULL) {
+      if (aright->type.type == oqmlATOM_OID) {
+	if (!((oqmlAtom_oid *)aright)->oid.isValid())
 	  return (type == oqmlEQUAL ? oqml_True : oqml_False);
-
 	return (type == oqmlEQUAL ? oqml_False : oqml_True);
       }
+
+      if (aright->type.type == oqmlATOM_NULL)
+	return (type == oqmlEQUAL ? oqml_True : oqml_False);
+
+      return (type == oqmlEQUAL ? oqml_False : oqml_True);
+    }
 
     return checkNull(aright, aleft, type);
   }
@@ -1535,14 +1480,13 @@ namespace eyedb {
     Data val;
     size = sizeof(data);
   
-    if (a_int->getData(data, &val, size, len))
-      {
-	eyedblib::int64 i;
-	memcpy(&i, data, sizeof(eyedblib::int64));
-	double d = (double)i;
-	memcpy(data, &d, sizeof(double));
-	return a_double->compare(data, sizeof(double), False, type);
-      }
+    if (a_int->getData(data, &val, size, len)) {
+      eyedblib::int64 i;
+      memcpy(&i, data, sizeof(eyedblib::int64));
+      double d = (double)i;
+      memcpy(data, &d, sizeof(double));
+      return a_double->compare(data, sizeof(double), False, type);
+    }
     return oqml_False;
   }
 
@@ -1570,30 +1514,26 @@ namespace eyedb {
   {
     oqmlStatus *s;
 
-    if (type == oqmlDIFF)
-      {
-	s = compare(node, ctx, al, opstr, oqmlEQUAL, b);
-	if (!s) b = (oqmlBool)!b;
-	return s;
-      }
+    if (type == oqmlDIFF) {
+      s = compare(node, ctx, al, opstr, oqmlEQUAL, b);
+      if (!s) b = (oqmlBool)!b;
+      return s;
+    }
 
-    if (al->cnt != cnt && type == oqmlEQUAL)
-      {
-	b = oqml_False;
-	return oqmlSuccess;
-      }
+    if (al->cnt != cnt && type == oqmlEQUAL) {
+      b = oqml_False;
+      return oqmlSuccess;
+    }
 
     oqmlAtom *aleft = first, *aright = al->first;
-    if (!aleft && !aright)
-      {
-	b = oqml_True;
-	return oqmlSuccess;
-      }
-    else if (!aleft || !aright)
-      {
-	b = oqml_False;
-	return oqmlSuccess;
-      }
+    if (!aleft && !aright) {
+      b = oqml_True;
+      return oqmlSuccess;
+    }
+    else if (!aleft || !aright) {
+      b = oqml_False;
+      return oqmlSuccess;
+    }
 
     oqmlATOMTYPE left_type = aleft->type.type;
     oqmlATOMTYPE right_type = aright->type.type;
@@ -1604,169 +1544,146 @@ namespace eyedb {
     if (right_type == oqmlATOM_RANGE)
       right_type = aright->as_range()->from->type.type;
 
-    for (int i = 0; i < cnt && i < al->cnt; i++)
-      {
-	if (left_type == oqmlATOM_NIL &&
-	    right_type == oqmlATOM_NIL)
-	  {
-	    b = ((type == oqmlEQUAL || type == oqmlINFEQ || type == oqmlSUPEQ) ?
-		 oqml_True : oqml_False);
-	    if (!b)
-	      return oqmlSuccess;
-	  }
-	else if (left_type == oqmlATOM_NULL ||
-		 right_type == oqmlATOM_NULL)
-	  {
-	    b = checkNull(aleft, aright, type);
-	    if (!b)
-	      return oqmlSuccess;
-	  }
-	else if (OQML_IS_SET(aleft) || OQML_IS_BAG(aleft))
-	  {
-	    extern oqmlStatus *
-	      oqml_set_compare(oqmlNode *node, oqmlTYPE type, const char *,
-			       oqmlAtom *aleft, oqmlAtom *aright, oqmlBool &b);
-	    s = oqml_set_compare(node, type, opstr, aleft, aright, b);
-	    if (s || !b)
-	      return s;
-	  }
-	else if (left_type != right_type)
-	  {
-	    if (left_type == oqmlATOM_DOUBLE &&
-		right_type == oqmlATOM_INT)
-	      {
-		if (type == oqmlSUPEQ)
-		  type = oqmlINFEQ;
-		else if (type == oqmlSUP)
-		  type = oqmlINF;
-		else if (type == oqmlINFEQ)
-		  type = oqmlSUPEQ;
-		else if (type == oqmlINF)
-		  type = oqmlSUP;
+    for (int i = 0; i < cnt && i < al->cnt; i++) {
+      if (left_type == oqmlATOM_NIL &&
+	  right_type == oqmlATOM_NIL) {
+	b = ((type == oqmlEQUAL || type == oqmlINFEQ || type == oqmlSUPEQ) ?
+	     oqml_True : oqml_False);
+	if (!b)
+	  return oqmlSuccess;
+      }
+      else if (left_type == oqmlATOM_NULL ||
+	       right_type == oqmlATOM_NULL) {
+	b = checkNull(aleft, aright, type);
+	if (!b)
+	  return oqmlSuccess;
+      }
+      else if (OQML_IS_SET(aleft) || OQML_IS_BAG(aleft)) {
+	extern oqmlStatus *
+	  oqml_set_compare(oqmlNode *node, oqmlTYPE type, const char *,
+			   oqmlAtom *aleft, oqmlAtom *aright, oqmlBool &b);
+	s = oqml_set_compare(node, type, opstr, aleft, aright, b);
+	if (s || !b)
+	  return s;
+      }
+      else if (left_type != right_type) {
+	if (left_type == oqmlATOM_DOUBLE &&
+	    right_type == oqmlATOM_INT) {
+	  if (type == oqmlSUPEQ)
+	    type = oqmlINFEQ;
+	  else if (type == oqmlSUP)
+	    type = oqmlINF;
+	  else if (type == oqmlINFEQ)
+	    type = oqmlSUPEQ;
+	  else if (type == oqmlINF)
+	    type = oqmlSUP;
 
-		b = compare_double_int(aright, aleft, type);
-		if (!b)
-		  return oqmlSuccess;
-	      }
+	  b = compare_double_int(aright, aleft, type);
+	  if (!b)
+	    return oqmlSuccess;
+	}
 
-	    else if (right_type == oqmlATOM_DOUBLE &&
-		     left_type == oqmlATOM_INT)
-	      {
-		b = compare_double_int(aleft, aright, type);
-		if (!b)
-		  return oqmlSuccess;
-	      }
+	else if (right_type == oqmlATOM_DOUBLE &&
+		 left_type == oqmlATOM_INT) {
+	  b = compare_double_int(aleft, aright, type);
+	  if (!b)
+	    return oqmlSuccess;
+	}
 #define TRUSS_JOIN
 #define JOIN_TRACE
-	    else if (ctx->isWhereContext() &&
-		     (OQML_IS_COLL(aleft) || OQML_IS_COLL(aright)))
-	      {
-		// this has been added to support construction in
-		// where clause such as: xxx.y[?].ss == "soso"
-		// 27/09/99
-		b = oqml_False;
-		if (OQML_IS_COLL(aleft))
-		  {
-		    oqmlAtom *left = OQML_ATOM_COLLVAL(aleft)->first;
-		    while (left)
-		      {
-			if (compare_atoms(left, aright, type))
-			  {
-			    b = oqml_True;
-			    break;
-			  }
-			left = left->next;
-		      }
-
-		  }
-		else
-		  {
-		    oqmlAtom *right = OQML_ATOM_COLLVAL(aright)->first;
-		    while (right)
-		      {
-			if (compare_atoms(right, aleft, type))
-			  {
-			    b = oqml_True;
-			    break;
-			  }
-			right = right->next;
-		      }
-		  }
-
-		if (!b)
-		  return oqmlSuccess;
+	else if (ctx->isWhereContext() &&
+		 (OQML_IS_COLL(aleft) || OQML_IS_COLL(aright))) {
+	  // this has been added to support construction in
+	  // where clause such as: xxx.y[?].ss == "soso"
+	  // 27/09/99
+	  b = oqml_False;
+	  if (OQML_IS_COLL(aleft)) {
+	    oqmlAtom *left = OQML_ATOM_COLLVAL(aleft)->first;
+	    while (left) {
+	      if (compare_atoms(left, aright, type)) {
+		b = oqml_True;
+		break;
 	      }
-	    else 
-	      {
-		if (type == oqmlEQUAL)
-		  {
-		    b = oqml_False;
-		    return oqmlSuccess;
-		  }
+	      left = left->next;
+	    }
 
-		if (type != oqmlDIFF)
-		  return new oqmlStatus(node,
-					"operation '%s %s %s' is not valid",
-					aleft->type.getString(), opstr,
-					aright->type.getString());
-	      }
 	  }
-	else if (OQML_IS_LIST(aleft) || OQML_IS_ARRAY(aleft))
-	  {
-	    oqmlTYPE xtype;
-	    if (type == oqmlSUP)      xtype = oqmlSUPEQ;
-	    else if (type == oqmlINF) xtype = oqmlINFEQ;
-	    else                      xtype = type;
-
-	    if (left_type != right_type && type == oqmlDIFF)
-	      {
-		b = oqml_True; return oqmlSuccess;
+	  else {
+	    oqmlAtom *right = OQML_ATOM_COLLVAL(aright)->first;
+	    while (right) {
+	      if (compare_atoms(right, aleft, type)) {
+		b = oqml_True;
+		break;
 	      }
-
-	    if (left_type != right_type && type == oqmlEQUAL)
-	      {
-		b = oqml_False; return oqmlSuccess;
-	      }
-
-	    s = OQML_ATOM_COLLVAL(aleft)->
-	      compare(node, ctx, OQML_ATOM_COLLVAL(aright), opstr, xtype, b);
-
-	    if (s || !b)
-	      return s;
-
-	    if (type == oqmlSUP || type == oqmlINF)
-	      {
-		s = OQML_ATOM_COLLVAL(aleft)->
-		  compare(node, ctx, OQML_ATOM_COLLVAL(aright), opstr, oqmlDIFF, b);
-
-		if (s || !b)
-		  return s;
-	      }
+	      right = right->next;
+	    }
 	  }
-	else if (!compare_atoms(aleft, aright, type))
-	  {
+
+	  if (!b)
+	    return oqmlSuccess;
+	}
+	else {
+	  if (type == oqmlEQUAL) {
 	    b = oqml_False;
 	    return oqmlSuccess;
 	  }
-	  
-	aleft = aleft->next;
-	aright = aright->next;
+
+	  if (type != oqmlDIFF)
+	    return new oqmlStatus(node,
+				  "operation '%s %s %s' is not valid",
+				  aleft->type.getString(), opstr,
+				  aright->type.getString());
+	}
       }
+      else if (OQML_IS_LIST(aleft) || OQML_IS_ARRAY(aleft)) {
+	oqmlTYPE xtype;
+	if (type == oqmlSUP)      xtype = oqmlSUPEQ;
+	else if (type == oqmlINF) xtype = oqmlINFEQ;
+	else                      xtype = type;
 
-    if (al->cnt != cnt)
-      {
-	int c = al->cnt < cnt;
-	int d = (type == oqmlSUP || type == oqmlSUPEQ);
+	if (left_type != right_type && type == oqmlDIFF) {
+	  b = oqml_True; return oqmlSuccess;
+	}
 
-	if ((c && d) || (!c && !d))
-	  {
-	    b = oqml_True;
-	    return oqmlSuccess;
-	  }
+	if (left_type != right_type && type == oqmlEQUAL) {
+	  b = oqml_False; return oqmlSuccess;
+	}
 
+	s = OQML_ATOM_COLLVAL(aleft)->
+	  compare(node, ctx, OQML_ATOM_COLLVAL(aright), opstr, xtype, b);
+
+	if (s || !b)
+	  return s;
+
+	if (type == oqmlSUP || type == oqmlINF) {
+	  s = OQML_ATOM_COLLVAL(aleft)->
+	    compare(node, ctx, OQML_ATOM_COLLVAL(aright), opstr, oqmlDIFF, b);
+
+	  if (s || !b)
+	    return s;
+	}
+      }
+      else if (!compare_atoms(aleft, aright, type)) {
 	b = oqml_False;
 	return oqmlSuccess;
       }
+	  
+      aleft = aleft->next;
+      aright = aright->next;
+    }
+
+    if (al->cnt != cnt) {
+      int c = al->cnt < cnt;
+      int d = (type == oqmlSUP || type == oqmlSUPEQ);
+
+      if ((c && d) || (!c && !d)) {
+	b = oqml_True;
+	return oqmlSuccess;
+      }
+
+      b = oqml_False;
+      return oqmlSuccess;
+    }
 
     b = oqml_True;
     return oqmlSuccess;
@@ -1818,65 +1735,59 @@ namespace eyedb {
 
     if (type != oqmlATOM_UNKNOWN_TYPE &&
 	at_right.type != oqmlATOM_UNKNOWN_TYPE &&
-	type != oqmlATOM_IDENT && at_right.type != oqmlATOM_IDENT)
-      {
-	if (!(binopType & oqmlDoubleOK) &&
-	    (type == oqmlATOM_DOUBLE || at_right.type == oqmlATOM_DOUBLE))
-	  return invalidBinop(this, opstr, &at_left, &at_right);
+	type != oqmlATOM_IDENT && at_right.type != oqmlATOM_IDENT) {
+      if (!(binopType & oqmlDoubleOK) &&
+	  (type == oqmlATOM_DOUBLE || at_right.type == oqmlATOM_DOUBLE))
+	return invalidBinop(this, opstr, &at_left, &at_right);
 
-	if (!(binopType & oqmlConcatOK) &&
-	    (type == oqmlATOM_STRING || at_right.type == oqmlATOM_STRING ||
-	     type == oqmlATOM_LIST || at_right.type == oqmlATOM_LIST ||
-	     type == oqmlATOM_SET || at_right.type == oqmlATOM_SET ||
-	     type == oqmlATOM_BAG || at_right.type == oqmlATOM_BAG ||
-	     type == oqmlATOM_ARRAY || at_right.type == oqmlATOM_ARRAY))
-	  return invalidBinop(this, opstr, &at_left, &at_right);
+      if (!(binopType & oqmlConcatOK) &&
+	  (type == oqmlATOM_STRING || at_right.type == oqmlATOM_STRING ||
+	   type == oqmlATOM_LIST || at_right.type == oqmlATOM_LIST ||
+	   type == oqmlATOM_SET || at_right.type == oqmlATOM_SET ||
+	   type == oqmlATOM_BAG || at_right.type == oqmlATOM_BAG ||
+	   type == oqmlATOM_ARRAY || at_right.type == oqmlATOM_ARRAY))
+	return invalidBinop(this, opstr, &at_left, &at_right);
       
-	if (type == oqmlATOM_INT && at_right.type == oqmlATOM_DOUBLE)
-	  {
-	    _eval_type = at_right;
-	    iscts = OQMLBOOL(cstleft && cstright);
-	    return oqmlSuccess;
-	  }
-	else if (type == oqmlATOM_DOUBLE &&
-		 (at_right.type == oqmlATOM_INT ||
-		  at_right.type == oqmlATOM_CHAR))
-	  {
-	    _eval_type = at_left;
-	    iscts = OQMLBOOL(cstleft && cstright);
-	    return oqmlSuccess;
-	  }
-	else if (at_right.type == oqmlATOM_DOUBLE &&
-		 (type == oqmlATOM_INT ||
-		  type == oqmlATOM_CHAR))
-	  {
-	    _eval_type = at_right;
-	    iscts = OQMLBOOL(cstleft && cstright);
-	    return oqmlSuccess;
-	  }
-	else if (type == oqmlATOM_INT && at_right.type == oqmlATOM_CHAR)
-	  {
-	    _eval_type = at_left;
-	    iscts = OQMLBOOL(cstleft && cstright);
-	    return oqmlSuccess;
-	  }
-	else if (at_right.type == oqmlATOM_INT && type == oqmlATOM_CHAR)
-	  {
-	    _eval_type = at_right;
-	    iscts = OQMLBOOL(cstleft && cstright);
-	    return oqmlSuccess;
-	  }
-
-	else if (type != oqmlATOM_INT && type != oqmlATOM_CHAR &&
-		 type != oqmlATOM_DOUBLE &&
-		 type != oqmlATOM_STRING &&
-		 type != oqmlATOM_LIST &&
-		 type != oqmlATOM_BAG &&
-		 type != oqmlATOM_SET &&
-		 type != oqmlATOM_ARRAY)
-	  return invalidBinop(this, opstr, &at_left, &at_right);
-	_eval_type = at_left;
+      if (type == oqmlATOM_INT && at_right.type == oqmlATOM_DOUBLE) {
+	_eval_type = at_right;
+	iscts = OQMLBOOL(cstleft && cstright);
+	return oqmlSuccess;
       }
+      else if (type == oqmlATOM_DOUBLE &&
+	       (at_right.type == oqmlATOM_INT ||
+		at_right.type == oqmlATOM_CHAR)) {
+	_eval_type = at_left;
+	iscts = OQMLBOOL(cstleft && cstright);
+	return oqmlSuccess;
+      }
+      else if (at_right.type == oqmlATOM_DOUBLE &&
+	       (type == oqmlATOM_INT ||
+		type == oqmlATOM_CHAR)) {
+	_eval_type = at_right;
+	iscts = OQMLBOOL(cstleft && cstright);
+	return oqmlSuccess;
+      }
+      else if (type == oqmlATOM_INT && at_right.type == oqmlATOM_CHAR) {
+	_eval_type = at_left;
+	iscts = OQMLBOOL(cstleft && cstright);
+	return oqmlSuccess;
+      }
+      else if (at_right.type == oqmlATOM_INT && type == oqmlATOM_CHAR) {
+	_eval_type = at_right;
+	iscts = OQMLBOOL(cstleft && cstright);
+	return oqmlSuccess;
+      }
+
+      else if (type != oqmlATOM_INT && type != oqmlATOM_CHAR &&
+	       type != oqmlATOM_DOUBLE &&
+	       type != oqmlATOM_STRING &&
+	       type != oqmlATOM_LIST &&
+	       type != oqmlATOM_BAG &&
+	       type != oqmlATOM_SET &&
+	       type != oqmlATOM_ARRAY)
+	return invalidBinop(this, opstr, &at_left, &at_right);
+      _eval_type = at_left;
+    }
 
     iscts = OQMLBOOL(cstleft && cstright);
     return oqmlSuccess;
@@ -1939,43 +1850,37 @@ namespace eyedb {
       return oqmlSuccess;
 
     // (int -> double) promotion
-    if (OQML_IS_INT(aleft) && OQML_IS_DOUBLE(aright))
-      {
-	(*al_left)->setAtom(new oqmlAtom_double(OQML_ATOM_INTVAL(aleft)), 0, this);
-	return oqmlSuccess;
-      }
+    if (OQML_IS_INT(aleft) && OQML_IS_DOUBLE(aright)) {
+      (*al_left)->setAtom(new oqmlAtom_double(OQML_ATOM_INTVAL(aleft)), 0, this);
+      return oqmlSuccess;
+    }
   
-    if (OQML_IS_DOUBLE(aleft) && OQML_IS_INT(aright))
-      {
-	(*al_right)->setAtom(new oqmlAtom_double(OQML_ATOM_INTVAL(aright)), 0, this);
-	return oqmlSuccess;
-      }
+    if (OQML_IS_DOUBLE(aleft) && OQML_IS_INT(aright)) {
+      (*al_right)->setAtom(new oqmlAtom_double(OQML_ATOM_INTVAL(aright)), 0, this);
+      return oqmlSuccess;
+    }
   
     // (char -> double) promotion
-    if (OQML_IS_DOUBLE(aleft) && OQML_IS_CHAR(aright))
-      {
-	(*al_right)->setAtom(new oqmlAtom_double(OQML_ATOM_CHARVAL(aright)), 0, this);
-	return oqmlSuccess;
-      }
+    if (OQML_IS_DOUBLE(aleft) && OQML_IS_CHAR(aright)) {
+      (*al_right)->setAtom(new oqmlAtom_double(OQML_ATOM_CHARVAL(aright)), 0, this);
+      return oqmlSuccess;
+    }
   
-    if (OQML_IS_CHAR(aleft) && OQML_IS_DOUBLE(aright))
-      {
-	(*al_left)->setAtom(new oqmlAtom_double(OQML_ATOM_CHARVAL(aleft)), 0, this);
-	return oqmlSuccess;
-      }
+    if (OQML_IS_CHAR(aleft) && OQML_IS_DOUBLE(aright)) {
+      (*al_left)->setAtom(new oqmlAtom_double(OQML_ATOM_CHARVAL(aleft)), 0, this);
+      return oqmlSuccess;
+    }
   
     // (char -> int) promotion
-    if (OQML_IS_INT(aleft) && OQML_IS_CHAR(aright))
-      {
-	(*al_right)->setAtom(new oqmlAtom_int(OQML_ATOM_CHARVAL(aright)), 0, this);
-	return oqmlSuccess;
-      }
+    if (OQML_IS_INT(aleft) && OQML_IS_CHAR(aright)) {
+      (*al_right)->setAtom(new oqmlAtom_int(OQML_ATOM_CHARVAL(aright)), 0, this);
+      return oqmlSuccess;
+    }
   
-    if (OQML_IS_CHAR(aleft) && OQML_IS_INT(aright))
-      {
-	(*al_left)->setAtom(new oqmlAtom_int(OQML_ATOM_CHARVAL(aleft)), 0, this);
-	return oqmlSuccess;
-      }
+    if (OQML_IS_CHAR(aleft) && OQML_IS_INT(aright)) {
+      (*al_left)->setAtom(new oqmlAtom_int(OQML_ATOM_CHARVAL(aleft)), 0, this);
+      return oqmlSuccess;
+    }
   
     return invalidBinop(this, opstr, &aleft->type, &aright->type);
   }
@@ -2042,38 +1947,34 @@ namespace eyedb {
     qleft->evalType(db, ctx, &at);
 
     if (at.type != oqmlATOM_UNKNOWN_TYPE &&
-	at_right.type != oqmlATOM_UNKNOWN_TYPE && !at.cmp(at_right, True))
-      {
-	// changed 12/03/99:
-	//      if (comp->getType() != oqmlEQUAL && comp->getType() != oqmlDIFF)
+	at_right.type != oqmlATOM_UNKNOWN_TYPE && !at.cmp(at_right, True)) {
+      // changed 12/03/99:
+      //      if (comp->getType() != oqmlEQUAL && comp->getType() != oqmlDIFF)
 
-	// changed 24/02/00
-	if (comp->getType() != oqmlEQUAL && comp->getType() != oqmlDIFF &&
-	    comp->getType() != oqmlBETWEEN &&
-	    comp->getType() != oqmlNOTBETWEEN)
-	  return new oqmlStatus(this, "operation '%s %s %s' "
-				"is not valid",
-				at.getString(), opstr, at_right.getString());
-      }
+      // changed 24/02/00
+      if (comp->getType() != oqmlEQUAL && comp->getType() != oqmlDIFF &&
+	  comp->getType() != oqmlBETWEEN &&
+	  comp->getType() != oqmlNOTBETWEEN)
+	return new oqmlStatus(this, "operation '%s %s %s' "
+			      "is not valid",
+			      at.getString(), opstr, at_right.getString());
+    }
 
-    if (qleft->asDot())
-      {
-	oqmlDot *dot = (oqmlDot *)qleft;
+    if (qleft->asDot()) {
+      oqmlDot *dot = (oqmlDot *)qleft;
 
-	if (dot->boolean_dot)
-	  _eval_type->type = oqmlATOM_BOOL;
+      if (dot->boolean_dot)
+	_eval_type->type = oqmlATOM_BOOL;
+      else {
+	if (ctx->isSelectContext()) {
+	  _eval_type->type = oqmlATOM_OID;
+	  oqmlDotContext *dot_ctx = qleft->asDot()->getDotContext();
+	  _eval_type->cls = (dot_ctx ? (Class *)dot_ctx->desc[0].cls : 0);
+	}
 	else
-	  {
-	    if (ctx->isSelectContext())
-	      {
-		_eval_type->type = oqmlATOM_OID;
-		oqmlDotContext *dot_ctx = qleft->asDot()->getDotContext();
-		_eval_type->cls = (dot_ctx ? (Class *)dot_ctx->desc[0].cls : 0);
-	      }
-	    else
-	      _eval_type->type = oqmlATOM_UNKNOWN_TYPE;
-	  }
+	  _eval_type->type = oqmlATOM_UNKNOWN_TYPE;
       }
+    }
     else
       _eval_type->type = oqmlATOM_BOOL;
 
@@ -2090,12 +1991,11 @@ namespace eyedb {
     if (a->as_coll())
       a = a->as_coll()->list->first;
 
-    while (a)
-      {
-	oqmlAtom *next = a->next;
-	list->append(a);
-	a = next;
-      }
+    while (a) {
+      oqmlAtom *next = a->next;
+      list->append(a);
+      a = next;
+    }
   }
 
   oqmlStatus *
@@ -2105,36 +2005,33 @@ namespace eyedb {
   {
     oqmlStatus *s;
 
-    if (!ctx->isSelectContext())
-      {
-	oqmlAtomList *al_left = 0, *al_right = 0;
+    if (!ctx->isSelectContext()) {
+      oqmlAtomList *al_left = 0, *al_right = 0;
 
-	if (comp->evalDone)
-	  {
-	    *alist = new oqmlAtomList(new oqmlAtom_bool(oqml_True));
-	    return oqmlSuccess;
-	  }
-
-	if (comp->needReinit)
-	  {
-	    s = comp->reinit(db, ctx);
-	    if (s) return s;
-	    comp->needReinit = oqml_False;
-	  }
-
-	s = qleft->eval(db, ctx, &al_left);
-	if (s) return s;
-
-	s = qright->eval(db, ctx, &al_right);
-	if (s) return s;
-
-	s = comp->compare(db, ctx, al_left, al_right, alist);
-#ifdef SYNC_GARB
-	delete al_left;
-	delete al_right;
-#endif
-	return s;
+      if (comp->evalDone) {
+	*alist = new oqmlAtomList(new oqmlAtom_bool(oqml_True));
+	return oqmlSuccess;
       }
+
+      if (comp->needReinit) {
+	s = comp->reinit(db, ctx);
+	if (s) return s;
+	comp->needReinit = oqml_False;
+      }
+
+      s = qleft->eval(db, ctx, &al_left);
+      if (s) return s;
+
+      s = qright->eval(db, ctx, &al_right);
+      if (s) return s;
+
+      s = comp->compare(db, ctx, al_left, al_right, alist);
+#ifdef SYNC_GARB
+      delete al_left;
+      delete al_right;
+#endif
+      return s;
+    }
 
     oqmlBool done;
     unsigned int cnt;
@@ -2165,11 +2062,10 @@ namespace eyedb {
     oqmlStatus *s = qleft->asDot()->reinit(db, ctx);
     if (s) return s;
 
-    if (qright->asDot())
-      {
-	s = qright->asDot()->reinit(db, ctx);
-	return s;
-      }
+    if (qright->asDot()) {
+      s = qright->asDot()->reinit(db, ctx);
+      return s;
+    }
 
     return oqmlSuccess;
   }
@@ -2181,18 +2077,17 @@ namespace eyedb {
   {
     // JE PENSE que ce n'est pas le bon test!
     // le bon test est 'ctx->getSelectContext()->usesFromIdent(this))'
-    if (hasDotIdent(ident))
-      {
-	oqmlAtomList *al;
-	oqmlStatus *s = preEvalSelectRealize(db, ctx, ident, done, &al,
-					     firstPass);
-	if (s) return s;
-	cnt = (al && al->first &&
-	       al->first->as_coll() ?
-	       al->first->as_coll()->list->cnt : 0);
+    if (hasDotIdent(ident)) {
+      oqmlAtomList *al;
+      oqmlStatus *s = preEvalSelectRealize(db, ctx, ident, done, &al,
+					   firstPass);
+      if (s) return s;
+      cnt = (al && al->first &&
+	     al->first->as_coll() ?
+	     al->first->as_coll()->list->cnt : 0);
 
-	return firstPass ? reinit(db, ctx) : oqmlSuccess;
-      }
+      return firstPass ? reinit(db, ctx) : oqmlSuccess;
+    }
 
     done = oqml_False;
     cnt = 0;
@@ -2205,17 +2100,15 @@ namespace eyedb {
     oqmlBool idx_right = oqml_False, idx_left = oqml_False;
     oqmlStatus *s;
 
-    if (qleft->asDot())
-      {
-	s = qleft->asDot()->hasIndex(db, ctx, idx_left);
-	if (s) return s;
-      }
+    if (qleft->asDot()) {
+      s = qleft->asDot()->hasIndex(db, ctx, idx_left);
+      if (s) return s;
+    }
 
-    if (qright->asDot())
-      {
-	s = qright->asDot()->hasIndex(db, ctx, idx_right);
-	if (s) return s;
-      }
+    if (qright->asDot()) {
+      s = qright->asDot()->hasIndex(db, ctx, idx_right);
+      if (s) return s;
+    }
 
     if (idx_left)
       qleft->asDot()->setIndexHint(ctx, oqml_True);
@@ -2247,26 +2140,20 @@ namespace eyedb {
     // CE N'EST PAS LE BON TEST!
     // le bon test est:
     // if (qright->hasIdent(one of the from list!) && !needReinit)
-    if (!needReinit && ctx->getSelectContext()->usesFromIdent(qright))
-      /*
-	if ((qright->asDot() && qright->asDot()->boolean_node) ||
-	(!needReinit && ctx->getSymbol("oql$usepass2")))
-      */
-      {
-	if (firstPass)
-	  {
-	    s = optimize(db, ctx);
-	    if (s) return s;
-
-	    *alist = new oqmlAtomList();
-	    done = oqml_False;
-	    return oqmlSuccess;
-	  }
-
-	s = reinit(db, ctx);
+    if (!needReinit && ctx->getSelectContext()->usesFromIdent(qright)) {
+      if (firstPass) {
+	s = optimize(db, ctx);
 	if (s) return s;
-	needReinit = oqml_True;
+
+	*alist = new oqmlAtomList();
+	done = oqml_False;
+	return oqmlSuccess;
       }
+
+      s = reinit(db, ctx);
+      if (s) return s;
+      needReinit = oqml_True;
+    }
 
     oqmlAtomList *al;
     oqmlAtomList *al_left = 0;
@@ -2298,28 +2185,26 @@ namespace eyedb {
     delete al_left;
 #endif
 
-    if (iter)
-      {
-	s = iter->eval(this, ctx, alist);
-	if (s) return s;
+    if (iter) {
+      s = iter->eval(this, ctx, alist);
+      if (s) return s;
       
-	if (ctx->isOverMaxAtoms())
-	  return oqmlSuccess;
-
-	if (qleft_x->asDot())
-	  {
-	    s = qleft_x->asDot()->populate(db, ctx, *alist,
-					   OQMLBOOL(!firstPass));
-
-	    if (s) return s;
-	  }
-
-	// 8/3/00: commented the following line!
-	if (firstPass) 
-	  evalDone = oqml_True;
-	done = oqml_True;
+      if (ctx->isOverMaxAtoms())
 	return oqmlSuccess;
+
+      if (qleft_x->asDot()) {
+	s = qleft_x->asDot()->populate(db, ctx, *alist,
+				       OQMLBOOL(!firstPass));
+
+	if (s) return s;
       }
+
+      // 8/3/00: commented the following line!
+      if (firstPass) 
+	evalDone = oqml_True;
+      done = oqml_True;
+      return oqmlSuccess;
+    }
   
     // the following query come here: select class = "User"
     //assert(0);
@@ -2338,17 +2223,16 @@ namespace eyedb {
 		   unsigned int r0, unsigned int &r)
   {
     //printf("making estimation of %s\n", (const char *)qleft->toString());
-    if (qleft->asDot())
-      {
-	oqmlBool hasOne;
-	oqmlStatus *s = qleft->asDot()->hasIndex(db, ctx, hasOne);
-	if (s) return s;
-	//printf("has %s index\n", hasOne ? "an" : "NO");
-	if (hasOne) {
-	  r = r0;
-	  return oqmlSuccess;
-	}
+    if (qleft->asDot()) {
+      oqmlBool hasOne;
+      oqmlStatus *s = qleft->asDot()->hasIndex(db, ctx, hasOne);
+      if (s) return s;
+      //printf("has %s index\n", hasOne ? "an" : "NO");
+      if (hasOne) {
+	r = r0;
+	return oqmlSuccess;
       }
+    }
 
     r = oqml_ESTIM_MAX;
     return oqmlSuccess;
@@ -2424,11 +2308,10 @@ namespace eyedb {
 
     if (s) return s;
 
-    if (b)
-      {
-	*alist = new oqmlAtomList(new oqmlAtom_bool(oqml_True));
-	return oqmlSuccess;
-      }
+    if (b) {
+      *alist = new oqmlAtomList(new oqmlAtom_bool(oqml_True));
+      return oqmlSuccess;
+    }
 
     *alist = new oqmlAtomList(new oqmlAtom_bool(oqml_False));
     return oqmlSuccess;
@@ -2485,29 +2368,26 @@ namespace eyedb {
       (const char *)node->toString(), (const char *)ql->toString());
     */
 
-    if (ql->asIdent())
-      {
-	if (!strcmp(ql->asIdent()->getName(), ident))
-	  {
-	    done = oqml_True;
-	    node->back = ql;
-	    ql = node;
-	    if (isLocked())
-	      ql->lock();
-	  }
-
-	return oqmlSuccess;
+    if (ql->asIdent()) {
+      if (!strcmp(ql->asIdent()->getName(), ident)) {
+	done = oqml_True;
+	node->back = ql;
+	ql = node;
+	if (isLocked())
+	  ql->lock();
       }
+
+      return oqmlSuccess;
+    }
 
     ql->back = ql;
 
-    if (ql->asDot())
-      {
-	const char *dotident = ql->asDot()->getLeftIdent();
-	if (dotident && !strcmp(dotident, ident))
-	  ql->asDot()->replaceLeftIdent(ident, node, done);
-	return oqmlSuccess;
-      }
+    if (ql->asDot()) {
+      const char *dotident = ql->asDot()->getLeftIdent();
+      if (dotident && !strcmp(dotident, ident))
+	ql->asDot()->replaceLeftIdent(ident, node, done);
+      return oqmlSuccess;
+    }
 
     return ql->requalify(db, ctx, ident, node, done);
   }
@@ -2552,12 +2432,11 @@ namespace eyedb {
 
     if (xident)
       for (int i = 0; i < attr_cnt; i++)
-	if (!strcmp(xident, attrs[i]->getName()))
-	  {
-	    ql = new oqmlDot(new oqmlIdent(ident), ql, oqml_False);
-	    if (isLocked()) ql->lock();
-	    return oqmlSuccess;
-	  }
+	if (!strcmp(xident, attrs[i]->getName())) {
+	  ql = new oqmlDot(new oqmlIdent(ident), ql, oqml_False);
+	  if (isLocked()) ql->lock();
+	  return oqmlSuccess;
+	}
 
     return oqmlSuccess;
   }
@@ -2742,11 +2621,10 @@ namespace eyedb {
   void oqmlSymbolEntry::releaseEntries()
   {
     oqmlAtom *x = list->first;
-    while(x)
-      {
-	x->as_ident()->releaseEntry();
-	x = x->next;
-      }
+    while(x) {
+      x->as_ident()->releaseEntry();
+      x = x->next;
+    }
   }
 
   oqmlSymbolEntry::~oqmlSymbolEntry()
@@ -2805,12 +2683,11 @@ namespace eyedb {
 #if defined(SYMB_TRACE) || defined(LOCAL_TRACE)
     printf("pushLocalTable(level=#%d)\n", local_cnt);
 #endif
-    if (local_cnt >= local_alloc)
-      {
-	local_alloc += 64;
-	locals = (LinkedList **)
-	  realloc(locals, local_alloc * sizeof(LinkedList *));
-      }
+    if (local_cnt >= local_alloc) {
+      local_alloc += 64;
+      locals = (LinkedList **)
+	realloc(locals, local_alloc * sizeof(LinkedList *));
+    }
 
     locals[local_cnt++] = new LinkedList();
     return oqmlSuccess;
@@ -2829,17 +2706,15 @@ namespace eyedb {
     printf("popLocalTable(level=#%d) starting\n", local_cnt-1);
 #endif
     is_popping = oqml_True;
-    while (c.getNext((void *&)symb))
-      {
-	assert(!symb->global);
-	if (symb->popped)
-	  delete symb;
-	else if (symb->ident)
-	  {
-	    s = popSymbolRealize(symb->ident, oqml_False);
-	    if (s) return s;
-	  }
+    while (c.getNext((void *&)symb)) {
+      assert(!symb->global);
+      if (symb->popped)
+	delete symb;
+      else if (symb->ident) {
+	s = popSymbolRealize(symb->ident, oqml_False);
+	if (s) return s;
       }
+    }
 
     is_popping = oqml_False;
 #if defined(SYMB_TRACE) || defined(LOCAL_TRACE)
@@ -2864,27 +2739,26 @@ namespace eyedb {
     // 29/12/99
     // I guess that this loop should occurs if and only if symbol
     // is global!
-    while (s)
-      {
-	// changed test the 19/06/01
-	/*
-	  if (!strcmp(s->ident, ident) && s->global == global &&
-	  s->level == local_cnt)
-	*/
-	if (!strcmp(s->ident, ident) &&
-	    (s->global ||
-	     (!global && !s->global && s->level == local_cnt))) {
-	  if (s->system && !system)
-	    return new oqmlStatus("'%s' is a system variable: "
-				  "it cannot be modified.", ident);
+    while (s) {
+      // changed test the 19/06/01
+      /*
+	if (!strcmp(s->ident, ident) && s->global == global &&
+	s->level == local_cnt)
+      */
+      if (!strcmp(s->ident, ident) &&
+	  (s->global ||
+	   (!global && !s->global && s->level == local_cnt))) {
+	if (s->system && !system)
+	  return new oqmlStatus("'%s' is a system variable: "
+				"it cannot be modified.", ident);
 	
-	  s->set(type, at, oqml_True, tofree);
+	s->set(type, at, oqml_True, tofree);
 
-	  return oqmlSuccess;
-	}
-      
-	s = (global ? s->next : s->prev);
+	return oqmlSuccess;
       }
+      
+      s = (global ? s->next : s->prev);
+    }
   
     return pushSymbolRealize(ident, type, at, global, system);
   }
@@ -2930,33 +2804,31 @@ namespace eyedb {
 	   (global ? "global" : "local"), local_cnt-1, this);
 #endif
 
-    while (s)
-      {
-	if (!strcmp(s->ident, ident) && s->global == global &&
-	    (s->global || s->level == local_cnt))
-	  {
+    while (s) {
+      if (!strcmp(s->ident, ident) && s->global == global &&
+	  (s->global || s->level == local_cnt)) {
 #ifdef SYNC_SYM_GARB
-	    oqmlLock(s->at, oqml_False, oqml_True);
-	    s->at = 0;
+	oqmlLock(s->at, oqml_False, oqml_True);
+	s->at = 0;
 #endif
-	    if (s->prev)
-	      s->prev->next = s->next;
-	    if (s->next)
-	      s->next->prev = s->prev;
+	if (s->prev)
+	  s->prev->next = s->next;
+	if (s->next)
+	  s->next->prev = s->prev;
 
-	    if (s == symtab->slast)
-	      symtab->slast = s->prev;
-	    if (s == symtab->sfirst)
-	      symtab->sfirst = s->next;
+	if (s == symtab->slast)
+	  symtab->slast = s->prev;
+	if (s == symtab->sfirst)
+	  symtab->sfirst = s->next;
 
-	    if (getLocalTable() && !is_popping)
-	      s->popped = oqml_True;
-	    else
-	      delete s;
-	    return oqmlSuccess;
-	  }
-	s = s->prev;
+	if (getLocalTable() && !is_popping)
+	  s->popped = oqml_True;
+	else
+	  delete s;
+	return oqmlSuccess;
       }
+      s = s->prev;
+    }
 
     assert(0);
     return new oqmlStatus(oqml_uninit_fmt, ident);
@@ -2998,24 +2870,21 @@ namespace eyedb {
   oqmlContext::pushSymbol(const char *ident, oqmlAtomType *type, oqmlAtom *at,
 			  oqmlBool global, oqmlBool system)
   {
-    if (global)
-      {
-	oqmlStatus *s;
-	if (oqml_is_global_ident(ident))
-	  {
-	    s = pushSymbolRealize(&ident[oqml_global_scope_len], type, at,
-				  oqml_True, system);
-	    if (s) return s;
-	  }
-	else if (!getLocalTable())
-	  {
-	    s = pushSymbolRealize((std::string(oqml_global_scope) + ident).c_str(), type, at,
-				  oqml_True, system);
-	    if (s) return s;
-	  }
-	else
-	  global = oqml_False;
+    if (global) {
+      oqmlStatus *s;
+      if (oqml_is_global_ident(ident)) {
+	s = pushSymbolRealize(&ident[oqml_global_scope_len], type, at,
+			      oqml_True, system);
+	if (s) return s;
       }
+      else if (!getLocalTable()) {
+	s = pushSymbolRealize((std::string(oqml_global_scope) + ident).c_str(), type, at,
+			      oqml_True, system);
+	if (s) return s;
+      }
+      else
+	global = oqml_False;
+    }
 
     return pushSymbolRealize(ident, type, at, global, system);
   }
@@ -3023,23 +2892,20 @@ namespace eyedb {
   oqmlStatus *
   oqmlContext::popSymbol(const char *ident, oqmlBool global)
   {
-    if (global)
-      {
-	oqmlStatus *s;
-	if (oqml_is_global_ident(ident))
-	  {
-	    s = popSymbolRealize(&ident[oqml_global_scope_len], oqml_True);
-	    if (s) return s;
-	  }
-	else if (!getLocalTable())
-	  {
-	    s = popSymbolRealize((std::string(oqml_global_scope) + ident).c_str(),
-				 oqml_True);
-	    if (s) return s;
-	  }
-	else
-	  global = oqml_False;
+    if (global) {
+      oqmlStatus *s;
+      if (oqml_is_global_ident(ident)) {
+	s = popSymbolRealize(&ident[oqml_global_scope_len], oqml_True);
+	if (s) return s;
       }
+      else if (!getLocalTable()) {
+	s = popSymbolRealize((std::string(oqml_global_scope) + ident).c_str(),
+			     oqml_True);
+	if (s) return s;
+      }
+      else
+	global = oqml_False;
+    }
 
     return popSymbolRealize(ident, global);
   }
@@ -3072,24 +2938,22 @@ namespace eyedb {
 #endif
     oqmlSymbolEntry *s = symtab->slast;
 
-    while (s)
-      {
+    while (s) {
 #ifdef SYMB_TRACE
-	printf("s->ident %s global %d level %d\n",
-	       s->ident, s->global, s->level);
+      printf("s->ident %s global %d level %d\n",
+	     s->ident, s->global, s->level);
 #endif
-	if (!strcmp(s->ident, ident) &&
-	    (s->global || s->level == local_cnt ||
-	     (arg_level && s->level < local_cnt)))
-	  {
+      if (!strcmp(s->ident, ident) &&
+	  (s->global || s->level == local_cnt ||
+	   (arg_level && s->level < local_cnt))) {
 #ifdef SYMB_TRACE  
-	    printf("symbol %s found\n", ident);
+	printf("symbol %s found\n", ident);
 #endif
-	    return s;
-	  }
-
-	s = s->prev;
+	return s;
       }
+
+      s = s->prev;
+    }
 
 #ifdef SYMB_TRACE  
     printf("symbol %s *not* found\n", ident);
@@ -3102,13 +2966,12 @@ namespace eyedb {
   {
     oqmlSymbolEntry *s = symtab->slast;
 
-    while (s)
-      {
-	printf("%s [%d, value=%s, %s]\n",
-	       s->ident, s->type.type, (s->at ? s->at->getString() : ""),
-	       s->global ? "global" : "local");
-	s = s->prev;
-      }
+    while (s) {
+      printf("%s [%d, value=%s, %s]\n",
+	     s->ident, s->type.type, (s->at ? s->at->getString() : ""),
+	     s->global ? "global" : "local");
+      s = s->prev;
+    }
   }
 
   void oqmlContext::setDotContext(oqmlDotContext *pc)
@@ -3222,12 +3085,11 @@ namespace eyedb {
 
     oqmlStatus *s;
     oqmlAtom *a = list->first;
-    while (a)
-      {
-	if (a->as_list() && (s = checkRecursion(node, a->as_list()->list, this_list)))
-	  return s;
-	a = a->next;
-      }
+    while (a) {
+      if (a->as_list() && (s = checkRecursion(node, a->as_list()->list, this_list)))
+	return s;
+      a = a->next;
+    }
 
     return oqmlSuccess;
   }
@@ -3238,13 +3100,12 @@ namespace eyedb {
     if (olda == newa)
       return oqml_True;
 
-    if (olda)
-      {
-	for (int i = 0; i < olda->refcnt; i++)
-	  oqmlLock(newa, oqml_True);
+    if (olda) {
+      for (int i = 0; i < olda->refcnt; i++)
+	oqmlLock(newa, oqml_True);
 
-	oqmlLock(olda, oqml_False);
-      }
+      oqmlLock(olda, oqml_False);
+    }
 
     return oqml_False;
   }
@@ -3252,34 +3113,32 @@ namespace eyedb {
   oqmlStatus *
   oqmlAtomList::setAtom(oqmlAtom *ia, int idx, oqmlNode *node)
   {
-    if (ia && ia->as_list())
-      {
-	oqmlStatus *s = checkRecursion(node, ia->as_list()->list, this);
-	if (s) return s;
-      }
+    if (ia && ia->as_list()) {
+      oqmlStatus *s = checkRecursion(node, ia->as_list()->list, this);
+      if (s) return s;
+    }
 
-    if (idx == 0)
-      {
-	if (!ia) {
-	  if (last == first)
-	    last = first = first->next;
-	  else
-	    first = first->next;
-	  cnt--;
-	  return oqmlSuccess;
-	}
-
-	if (set_atom(first, ia))
-	  return oqmlSuccess;
-
+    if (idx == 0) {
+      if (!ia) {
 	if (last == first)
-	  last = ia;
-
-	oqmlAtom *next = first->next;
-	first = ia;
-	ia->next = next;
+	  last = first = first->next;
+	else
+	  first = first->next;
+	cnt--;
 	return oqmlSuccess;
       }
+
+      if (set_atom(first, ia))
+	return oqmlSuccess;
+
+      if (last == first)
+	last = ia;
+
+      oqmlAtom *next = first->next;
+      first = ia;
+      ia->next = next;
+      return oqmlSuccess;
+    }
 
     oqmlAtom *a = first;
     for (int i = 0; i < idx-1; i++)
@@ -3304,11 +3163,10 @@ namespace eyedb {
 
     a->next = ia;
 
-    if (last == next)
-      {
-	ia->next = 0;
-	last = ia;
-      }
+    if (last == next) {
+      ia->next = 0;
+      last = ia;
+    }
     else
       ia->next = next->next;
 
@@ -3320,16 +3178,15 @@ namespace eyedb {
     //const char *sx = x->getString();
     oqmlAtom *a = first;
 
-    while (a)
-      {
-	/*
-	  if (!strcmp(sx, a->getString()))
-	  return oqml_True;
-	*/
-	if (a->isEqualTo(*x))
-	  return oqml_True;
-	a = a->next;
-      }
+    while (a) {
+      /*
+	if (!strcmp(sx, a->getString()))
+	return oqml_True;
+      */
+      if (a->isEqualTo(*x))
+	return oqml_True;
+      a = a->next;
+    }
 
     return oqml_False;
   }
@@ -3339,24 +3196,22 @@ namespace eyedb {
     const char *sx = x->getString();
     oqmlAtom *a = first, *prev = 0;
 
-    while (a)
-      {
-	if (!strcmp(sx, a->getString()))
-	  {
-	    if (prev)
-	      prev->next = a->next;
-	    else
-	      first = a->next;
+    while (a) {
+      if (!strcmp(sx, a->getString())) {
+	if (prev)
+	  prev->next = a->next;
+	else
+	  first = a->next;
 	  
-	    if (a == last)
-	      last = prev;
+	if (a == last)
+	  last = prev;
 
-	    return oqmlSuccess;
-	  }
-
-	prev = a;
-	a = a->next;
+	return oqmlSuccess;
       }
+
+      prev = a;
+      a = a->next;
+    }
 
     return new oqmlStatus("atom %s not found in list", x->getString());
   }
@@ -3373,11 +3228,10 @@ namespace eyedb {
     oqmlAtomList *list = new oqmlAtomList();
     oqmlAtom *a = first;
 
-    while (a)
-      {
-	list->append(a->copy());
-	a = a->next;
-      }
+    while (a) {
+      list->append(a->copy());
+      a = a->next;
+    }
 
     return list;
   }
@@ -3389,11 +3243,10 @@ namespace eyedb {
     oqmlAtom *a = first;
     int n = 0;
 
-    while(a)
-      {
-	arr[n++] = a;
-	a = a->next;
-      }
+    while(a) {
+      arr[n++] = a;
+      a = a->next;
+    }
 
     return arr;
   }
@@ -3417,23 +3270,20 @@ namespace eyedb {
     oqmlAtomList *alist = new oqmlAtomList();
 
     aleft = l1->first;
-    while (aleft)
-      {
-	if (OQML_IS_OID(aleft))
-	  {
-	    Oid oid = OQML_ATOM_OIDVAL(aleft);
-	    aright = l2->first;
-	    while (aright)
-	      {
-		oqmlAtom *next = aright->next;
-		if (OQML_IS_OID(aright))
-		  if (oid.compare(OQML_ATOM_OIDVAL(aright)))
-		    alist->append(aright);
-		aright = next;
-	      }
-	  }
-	aleft = aleft->next;
+    while (aleft) {
+      if (OQML_IS_OID(aleft)) {
+	Oid oid = OQML_ATOM_OIDVAL(aleft);
+	aright = l2->first;
+	while (aright) {
+	  oqmlAtom *next = aright->next;
+	  if (OQML_IS_OID(aright))
+	    if (oid.compare(OQML_ATOM_OIDVAL(aright)))
+	      alist->append(aright);
+	  aright = next;
+	}
       }
+      aleft = aleft->next;
+    }
 
     return alist;
 #else
@@ -3450,23 +3300,20 @@ namespace eyedb {
     oqmlAtomList *alist = new oqmlAtomList();
 
     aleft = ll1->first;
-    while (aleft)
-      {
-	if (OQML_IS_OID(aleft))
-	  {
-	    Oid oid = OQML_ATOM_OIDVAL(aleft);
-	    aright = ll2->first;
-	    while (aright)
-	      {
-		oqmlAtom *next = aright->next;
-		if (OQML_IS_OID(aright))
-		  if (oid.compare(OQML_ATOM_OIDVAL(aright)))
-		    alist->append(aright);
-		aright = next;
-	      }
-	  }
-	aleft = aleft->next;
+    while (aleft) {
+      if (OQML_IS_OID(aleft)) {
+	Oid oid = OQML_ATOM_OIDVAL(aleft);
+	aright = ll2->first;
+	while (aright) {
+	  oqmlAtom *next = aright->next;
+	  if (OQML_IS_OID(aright))
+	    if (oid.compare(OQML_ATOM_OIDVAL(aright)))
+	      alist->append(aright);
+	  aright = next;
+	}
       }
+      aleft = aleft->next;
+    }
 
     return alist;
 #endif
@@ -3540,11 +3387,10 @@ namespace eyedb {
   {
     oqml_List *l = new oqml_List();
     oqmlAtom *a = list->first;
-    while (a)
-      {
-	l->add(a->toNode());
-	a = a->next;
-      }
+    while (a) {
+      l->add(a->toNode());
+      a = a->next;
+    }
     return l;
   }
 
@@ -3650,26 +3496,24 @@ namespace eyedb {
     const char *sf = from_incl ? "[" : "]";
     const char *st = to_incl   ? "]" : "[";
 
-    if (fd)
-      {
-	fprintf(fd, sf);
-	from->makeString(fd);
-	fprintf(fd, ",");
-	to->makeString(fd);
-	fprintf(fd, st);
-	return 0;
-      }
+    if (fd) {
+      fprintf(fd, sf);
+      from->makeString(fd);
+      fprintf(fd, ",");
+      to->makeString(fd);
+      fprintf(fd, st);
+      return 0;
+    }
     else if (string)
       return string;
-    else
-      {
-	const char *f = from->makeString(fd);
-	const char *t = to->makeString(fd);
-	char *buf = (char *)malloc(strlen(f) + strlen(t) + 4);
-	sprintf(buf, "%s%s,%s%s", sf, f, t, st);
-	((oqmlAtom *)this)->string = buf;
-	return string;
-      }
+    else {
+      const char *f = from->makeString(fd);
+      const char *t = to->makeString(fd);
+      char *buf = (char *)malloc(strlen(f) + strlen(t) + 4);
+      sprintf(buf, "%s%s,%s%s", sf, f, t, st);
+      ((oqmlAtom *)this)->string = buf;
+      return string;
+    }
   }
 
   oqmlBool oqmlAtom_range::getData(unsigned char[], Data *val, Size&, int&,
@@ -3775,47 +3619,43 @@ namespace eyedb {
   {
     if (!db) return;
 
-    if (!db->isOQLInit())
-      {
-	Bool isInTrans = True;
-	if (!db->isInTransaction())
-	  {
-	    db->transactionBegin();
-	    isInTrans = False;
-	  }
-
-	db->setOQLInit();
-	oqmlContext ctx;
-	oqmlIdent::initEnumValues(db, &ctx);
-	(void)OQL::initDatabase(db);
-	if (!isInTrans)
-	  db->transactionAbort();
+    if (!db->isOQLInit()) {
+      Bool isInTrans = True;
+      if (!db->isInTransaction()) {
+	db->transactionBegin();
+	isInTrans = False;
       }
 
-    if (curdb != db)
-      {
-	const Class *clsdb = db->getSchema()->getClass("database");
-	if (clsdb)
-	  {
-	    OqlCtbDatabase *tdb;
+      db->setOQLInit();
+      oqmlContext ctx;
+      oqmlIdent::initEnumValues(db, &ctx);
+      (void)OQL::initDatabase(db);
+      if (!isInTrans)
+	db->transactionAbort();
+    }
 
-	    if (!oqml_default_db) {
-	      tdb = new OqlCtbDatabase(db);
-	      tdb->setDbname(db->getName());
-	      tdb->setDbid(db->getDbid());
-	      tdb->setDbmdb(db->getDBMDB());
-	      tdb->xdb = db;
-	      db->setOQLInfo(tdb);
-	    }	    
-	    else
-	      tdb = oqml_default_db;
+    if (curdb != db) {
+      const Class *clsdb = db->getSchema()->getClass("database");
+      if (clsdb) {
+	OqlCtbDatabase *tdb;
 
-	    oqmlAtom *adb = oqmlObjectManager::registerObject(tdb);
-	    oqml_db_entry->set(&adb->type, adb, oqml_True);
-	  }
+	if (!oqml_default_db) {
+	  tdb = new OqlCtbDatabase(db);
+	  tdb->setDbname(db->getName());
+	  tdb->setDbid(db->getDbid());
+	  tdb->setDbmdb(db->getDBMDB());
+	  tdb->xdb = db;
+	  db->setOQLInfo(tdb);
+	}	    
+	else
+	  tdb = oqml_default_db;
 
-	curdb = db;
+	oqmlAtom *adb = oqmlObjectManager::registerObject(tdb);
+	oqml_db_entry->set(&adb->type, adb, oqml_True);
       }
+
+      curdb = db;
+    }
   }
 
   oqmlBool
@@ -3824,26 +3664,24 @@ namespace eyedb {
     oqmlAtom *prev = 0;
     oqmlAtom *r = list->first;
 
-    while (r)
-      {
-	if (r->as_ident() && !strcmp(OQML_ATOM_IDENTVAL(r), ident))
-	  {
-	    if (!prev)
-	      list->first = r->next;
-	    else
-	      prev->next = r->next;
+    while (r) {
+      if (r->as_ident() && !strcmp(OQML_ATOM_IDENTVAL(r), ident)) {
+	if (!prev)
+	  list->first = r->next;
+	else
+	  prev->next = r->next;
 
-	    if (list->last == r)
-	      list->last = prev;
+	if (list->last == r)
+	  list->last = prev;
 
-	    //printf("suppressed! %s\n", ident);
-	    oqmlLock(r, oqml_False);
-	    return oqml_True;
-	  }
-
-	prev = r;
-	r = r->next;
+	//printf("suppressed! %s\n", ident);
+	oqmlLock(r, oqml_False);
+	return oqml_True;
       }
+
+      prev = r;
+      r = r->next;
+    }
 
     return oqml_False;
   }
@@ -3905,21 +3743,20 @@ namespace eyedb {
     oqmlAtom *action = list->first;
     oqmlAtom_string *statstr = new oqmlAtom_string(s ? s->msg : "");
 
-    while (action)
-      {
-	oqmlAtom *next = action->next;
+    while (action) {
+      oqmlAtom *next = action->next;
 
-	if (!OQML_IS_IDENT(action))
-	  return new oqmlStatus("postactions: ident expected in "
-				"oql$postactions list, "
-				"got %s.", action->type.getString());
+      if (!OQML_IS_IDENT(action))
+	return new oqmlStatus("postactions: ident expected in "
+			      "oql$postactions list, "
+			      "got %s.", action->type.getString());
 
-	oqmlStatus *rs;
-	rs = oqml_realize_postaction(db, &ctx, OQML_ATOM_IDENTVAL(action),
-				     statstr, ra, alist);
-	if (rs) return rs;
-	action = next;
-      }
+      oqmlStatus *rs;
+      rs = oqml_realize_postaction(db, &ctx, OQML_ATOM_IDENTVAL(action),
+				   statstr, ra, alist);
+      if (rs) return rs;
+      action = next;
+    }
 
 #endif
     return oqmlSuccess;
@@ -3928,21 +3765,6 @@ namespace eyedb {
   void
   oqmlObjectManager::addToFreeList(Object *o)
   {
-    /*
-      printf("adding %p [%s] to freeList [cnt=%d]\n", o, o->getOid().toString(),
-      freeList.getCount());
-    */
-
-    // WARNING: disconnected the 4/9/99 because of the cost of this
-    // function. Anyhow, is this code really necessary!?
-#if 0
-    if (freeList.getPos(o) >= 0)
-      {
-	//printf("warning object already exists in freelist!\n");
-	return;
-      }
-#endif
-    //  freeList.insertObjectLast(o);
     freeList.insertObjectFirst(o);
   }
 
@@ -3976,13 +3798,12 @@ namespace eyedb {
 			       oqmlBool add_to_free_list,
 			       oqmlBool errorIfNull)
   {
-    if (!oid->isValid())
-      {
-	if (errorIfNull)
-	  return new oqmlStatus(node, "invalid null oid");
-	o = 0;
-	return oqmlSuccess;
-      }
+    if (!oid->isValid()) {
+      if (errorIfNull)
+	return new oqmlStatus(node, "invalid null oid");
+      o = 0;
+      return oqmlSuccess;
+    }
   
     Status is = db->loadObject(oid, &o);
   
@@ -4003,21 +3824,41 @@ namespace eyedb {
     return getObject(node, db, &oid, o, add_to_free_list, errorIfNull);
   }
 
-#define IDX2OID(IDX) (Oid(IDX, 0, 0))
-#define OBJ2OID(O)   (Oid((unsigned long)o, 0, 0))
+  static Oid IDX2OID(eyedblib::pointer_int idx)
+  {
+    Oid oid;
+    memcpy(&oid, &idx, sizeof(idx));
+    return oid;
+  }
+
+  static Oid OBJ2OID(const Object *o)
+  {
+    Oid oid;
+    memcpy(&oid, &o, sizeof(o));
+    return oid;
+  }
+
+  /*
+    #ifdef LINUX_X86_64
+    #define IDX2OID(IDX) Oid((IDX) & 0xffffffff, 0, (IDX) >> 32)
+    #define OBJ2OID(O)  Oid(((eyedblib::pointer_int)O) & 0xffffffff, 0, ((eyedblib::pointer_int)O)>>32)
+    #else
+    #define IDX2OID(IDX) Oid(IDX, 0, 0)
+    #define OBJ2OID(O)   Oid((eyedblib::pointer_int)O, 0, 0)
+    #endif
+  */
 
   oqmlStatus *
   oqmlObjectManager::getObject(oqmlNode *node, const char *s,
-			       Object *&o, unsigned int &idx)
+			       Object *&o, eyedblib::pointer_int &idx)
   {
-    if (sscanf(s, "%x:obj", &idx) != 1)
+    if (sscanf(s, "%lx:obj", &idx) != 1)
       return new oqmlStatus(node, "invalid object format '%s'", s);
 
-    if (!idx)
-      {
-	o = 0;
-	return oqmlSuccess;
-      }
+    if (!idx) {
+      o = 0;
+      return oqmlSuccess;
+    }
 
     o = (Object *)objCacheIdx->getObject(IDX2OID(idx));
     if (!o)
@@ -4027,29 +3868,28 @@ namespace eyedb {
 
   oqmlStatus *
   oqmlObjectManager::getIndex(oqmlNode *node, const Object *o,
-			      unsigned long &idx)
+			      eyedblib::pointer_int &idx)
   {
-    if (!o)
-      {
-	idx = 0;
-	return oqmlSuccess;
-      }
+    if (!o) {
+      idx = 0;
+      return oqmlSuccess;
+    }
 
-    idx = (unsigned long)objCacheObj->getObject(OBJ2OID(o));
+    idx = (eyedblib::pointer_int)objCacheObj->getObject(OBJ2OID(o));
 
     if (!idx)
-      return new oqmlStatus(node, "invalid object '%x:obj'", o);
+      return new oqmlStatus(node, "invalid object '%lx:obj'", o);
 
     return oqmlSuccess;
   }
 
   oqmlBool
-  oqmlObjectManager::isRegistered(const Object *o, unsigned long &idx)
+  oqmlObjectManager::isRegistered(const Object *o, eyedblib::pointer_int &idx)
   {
     if (!o)
       return oqml_True;
 
-    idx = (unsigned long)objCacheObj->getObject(OBJ2OID(o));
+    idx = (eyedblib::pointer_int)objCacheObj->getObject(OBJ2OID(o));
     return OQMLBOOL(idx);
   }
 
@@ -4059,20 +3899,21 @@ namespace eyedb {
     if (!o)
       return new oqmlAtom_obj(o, 0);
 
-    unsigned long idx = (unsigned long)objCacheObj->getObject(OBJ2OID(o),
-							      true);
+    eyedblib::pointer_int idx = (eyedblib::pointer_int)objCacheObj->getObject(OBJ2OID(o), true);
 #ifdef GARB_TRACE_DETAIL
-    printf("register %p: %u\n", o, idx);
+    printf("register get %p: %lu\n", o, idx);
 #endif
     if (idx) {
-      unsigned long idx2 = (unsigned long)objCacheIdx->getObject(IDX2OID(idx),
-								 true);
-      assert(idx2);
+      // to increase reference count
+      (void)objCacheIdx->getObject(IDX2OID(idx), true);
       return new oqmlAtom_obj(o, idx, o->getClass());
     }
 
-    static unsigned int stidx = 1000;
+    static eyedblib::pointer_int stidx = 1000;
 
+#ifdef GARB_TRACE_DETAIL
+    printf("register %p: %lu\n", o, stidx);
+#endif
     objCacheIdx->insertObject(IDX2OID(stidx), o);
     objCacheObj->insertObject(OBJ2OID(o), (void *)stidx);
     return new oqmlAtom_obj(o, stidx++, o->getClass());
@@ -4085,10 +3926,10 @@ namespace eyedb {
       return oqmlSuccess;
 
     static const char fmt[] = "object '%p' is not registered #1";
-    unsigned long idx = (unsigned long)objCacheObj->getObject(OBJ2OID(o));
+    eyedblib::pointer_int idx = (eyedblib::pointer_int)objCacheObj->getObject(OBJ2OID(o));
 
 #ifdef GARB_TRACE_DETAIL
-    printf("unregister %p: %u\n", o, idx);
+    printf("unregister %p: %lu\n", o, idx);
 #endif
     if (!idx)
       return new oqmlStatus(node, fmt, o);
@@ -4108,20 +3949,18 @@ namespace eyedb {
 			       oqmlBool add_to_free_list,
 			       oqmlBool errorIfNull)
   {
-    if (x)
-      {
-	if (OQML_IS_OID(x))
-	  return getObject(node, db, OQML_ATOM_OIDVAL(x), o, add_to_free_list,
-			   errorIfNull);
+    if (x) {
+      if (OQML_IS_OID(x))
+	return getObject(node, db, OQML_ATOM_OIDVAL(x), o, add_to_free_list,
+			 errorIfNull);
 
-	if (OQML_IS_OBJ(x))
-	  {
-	    o = OQML_ATOM_OBJVAL(x);
-	    if (o)
-	      o->incrRefCount();
-	    return oqmlSuccess;
-	  }
+      if (OQML_IS_OBJ(x)) {
+	o = OQML_ATOM_OBJVAL(x);
+	if (o)
+	  o->incrRefCount();
+	return oqmlSuccess;
       }
+    }
     
     return oqmlStatus::expected(node, "oid or object", x->type.getString());
   }
@@ -4259,11 +4098,10 @@ namespace eyedb {
     LinkedList *l = new LinkedList();
     oqmlAtom *x = list->first;
 
-    while (x)
-      {
-	l->insertObjectLast(x->toValue());
-	x = x->next;
-      }
+    while (x) {
+      l->insertObjectLast(x->toValue());
+      x = x->next;
+    }
 
     return new Value(l, getValueType());
   }
@@ -4324,16 +4162,15 @@ namespace eyedb {
     }
 
     // or there ?
-    if (!al->cnt || !OQML_IS_OBJECT(al->first))
-      {
-	// kludge for old databases!
-	if (location->getType() == oqmlIDENT &&
-	    !strcmp(((oqmlIdent *)location)->getName(), "oql$db"))
-	  return oqmlSuccess;
-	return new oqmlStatus(location,
-			      (std::string("database expected")+
-			       (al->first ? std::string(", got ") + al->first->type.getString() : std::string(""))).c_str());
-      }
+    if (!al->cnt || !OQML_IS_OBJECT(al->first)) {
+      // kludge for old databases!
+      if (location->getType() == oqmlIDENT &&
+	  !strcmp(((oqmlIdent *)location)->getName(), "oql$db"))
+	return oqmlSuccess;
+      return new oqmlStatus(location,
+			    (std::string("database expected")+
+			     (al->first ? std::string(", got ") + al->first->type.getString() : std::string(""))).c_str());
+    }
 #if 1
     return oqml_get_location_db(db, ctx, location, al->first, db);
 #else
@@ -4516,13 +4353,12 @@ namespace eyedb {
 
     oqmlAtom *a = list.first;
     oqmlAtom *x = first;
-    while (a)
-      {
-	if (!a->isEqualTo(*x))
-	  return oqml_False;
-	a = a->next;
-	x = x->next;
-      }
+    while (a) {
+      if (!a->isEqualTo(*x))
+	return oqml_False;
+      a = a->next;
+      x = x->next;
+    }
 
     return oqml_True;
   }
