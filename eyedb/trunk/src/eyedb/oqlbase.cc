@@ -3824,10 +3824,15 @@ namespace eyedb {
     return getObject(node, db, &oid, o, add_to_free_list, errorIfNull);
   }
 
+#if 1
+#define IDX2OID(IDX) Oid(IDX, 0, 0)
+#define OBJ2OID(O)   Oid((eyedblib::pointer_int)O, 0, 0)
+#else
   static Oid IDX2OID(eyedblib::pointer_int idx)
   {
     Oid oid;
     memcpy(&oid, &idx, sizeof(idx));
+    //printf("IDX2OID %u.%d.%d\n", oid.getNX(), oid.getDbid(), oid.getUnique());
     return oid;
   }
 
@@ -3835,16 +3840,16 @@ namespace eyedb {
   {
     Oid oid;
     memcpy(&oid, &o, sizeof(o));
+    //printf("OBJ2OID %u.%d.%d\n", oid.getNX(), oid.getDbid(), oid.getUnique());
     return oid;
   }
+#endif
 
   /*
     #ifdef LINUX_X86_64
     #define IDX2OID(IDX) Oid((IDX) & 0xffffffff, 0, (IDX) >> 32)
     #define OBJ2OID(O)  Oid(((eyedblib::pointer_int)O) & 0xffffffff, 0, ((eyedblib::pointer_int)O)>>32)
     #else
-    #define IDX2OID(IDX) Oid(IDX, 0, 0)
-    #define OBJ2OID(O)   Oid((eyedblib::pointer_int)O, 0, 0)
     #endif
   */
 
@@ -3925,7 +3930,7 @@ namespace eyedb {
     if (!o)
       return oqmlSuccess;
 
-    static const char fmt[] = "object '%p' is not registered #1";
+    static const char fmt[] = "object '%p' is not registered";
     eyedblib::pointer_int idx = (eyedblib::pointer_int)objCacheObj->getObject(OBJ2OID(o));
 
 #ifdef GARB_TRACE_DETAIL

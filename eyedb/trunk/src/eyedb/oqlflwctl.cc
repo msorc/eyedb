@@ -211,7 +211,7 @@ namespace eyedb {
     int level = ++oqmlLoopLevel;
 
     oqmlAtomList *tal;
-    if (OQML_IS_COLL(a)) {
+    if (a && OQML_IS_COLL(a)) {
       oqmlAtomList *list = OQML_ATOM_COLLVAL(a);
       oqmlAtom *x = list->first;
       while(x) {
@@ -242,7 +242,7 @@ namespace eyedb {
 	x = next;
       }
     }
-    else if (action) {
+    else if (action && a) {
       ctx->pushSymbol(ident, &a->type, a);
 #ifdef SYNC_GARB
       tal = 0;

@@ -115,7 +115,6 @@ namespace eyedb {
 
     delete obj_cache;
     rescaling = false;
-    //printf("rescale done %u\n", (char *)sbrk(0)-p);
   }
 
   Bool ObjCache::insertObject(const Oid &oid, void *o, unsigned int _refcnt)
