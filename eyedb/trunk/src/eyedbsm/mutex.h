@@ -105,8 +105,7 @@ namespace eyedbsm {
  } while(0)
 
 #define MUTEX_UNLOCK(MP, XID) mutexUnlock(MP, XID)
-
-#define MUTEX_LOCK_VOID(MP, XID)   mutexLock(MP, XID)
+#define MUTEX_LOCK_VOID(MP, XID)  mutexLock(MP, XID)
 
 #define COND_WAIT(C, MP, XID, TIMEOUT)   condWait(C, MP, XID, TIMEOUT)
 #define COND_WAIT_R(C, MP, XID, TIMEOUT) condWait_r(C, MP, XID, TIMEOUT)
@@ -146,6 +145,50 @@ namespace eyedbsm {
   mutexes_init(),
     mutexes_release();
 
+
+  class MutexLocker {
+
+  public:
+    MutexLocker(Mutex &_mut) : mut(&_mut) {
+#ifdef UT_SEM
+      MUTEX_LOCK_VOID(mut, mut->id);
+#else
+      MUTEX_LOCK(mut, 0);
+#endif
+      locked = true;
+    }
+    void lock() {
+#ifdef UT_SEM
+      MUTEX_LOCK_VOID(mut, mut->id);
+#else
+      MUTEX_LOCK(mut, 0);
+#endif
+      locked = true;
+    }
+
+    void unlock() {
+      locked = false;
+#ifdef UT_SEM
+      MUTEX_UNLOCK(mut, mut->id);
+#else
+      MUTEX_UNLOCK(mut, 0);
+#endif
+    }
+
+    ~MutexLocker() {
+      if (locked) {
+#ifdef UT_SEM
+	MUTEX_UNLOCK(mut, mut->id);
+#else
+	MUTEX_UNLOCK(mut, 0);
+#endif
+      }
+    }
+
+  private:
+    Mutex *mut;
+    bool locked;
+  };
 }
 
 #endif

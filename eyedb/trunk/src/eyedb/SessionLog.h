@@ -64,6 +64,8 @@ namespace eyedb {
 	       const char *voldir,
 	       const char *logdev, int loglevel);
 
+    SessionLog(const SessionLog &);
+
     Status add(const char *hostname, const char *portname,
 	       const char *username, const char *progname, int pid,
 	       ClientSessionLog *&);
@@ -85,8 +87,10 @@ namespace eyedb {
     ~SessionLog();
 
   private:
+    void init(const char *host, const char *port, const char *logdir);
     char *host;
     char *port;
+    char *logdir;
     eyedbsm::XMHandle *xm_connlog;
     m_Map *m_connlog;
     char *addr_connlog;
@@ -96,13 +100,9 @@ namespace eyedb {
     static SessionLog *sesslog;
     int file_cnt;
     char **files;
-    eyedbsm::Mutex mp;
 #ifdef UT_SEM
-    int locked;
-    int semkeys[4]; // must be ESM_NSEMS (== 2 for now)
+    void *vd;
     Status init_sems();
-    bool valid_sems() const;
-    static const int INVALID_SEMKEY;
 #endif
 
     Status openRealize(const char *host, const char *port, const char *logdir,
