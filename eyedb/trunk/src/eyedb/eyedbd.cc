@@ -86,7 +86,7 @@ get_opts(int argc, char *argv[],
 #endif
 
   static const std::string access_file_opt = "access-file";
-  static const std::string datdir_opt = "data-dir";
+  static const std::string datdir_opt = "datadir";
   static const std::string nod_opt = "nod";
   static const std::string sesslogdev_opt = "sesslogdev";
   static const std::string sessloglevel_opt = "sessloglevel";

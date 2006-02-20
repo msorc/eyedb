@@ -292,12 +292,8 @@ main(int argc, char *argv[])
 	force = True;
       else if (!strcmp(s, "--creating-dbm"))
 	creatingDbm = True;
-      /*
-      else if (!strcmp(s, "-h") || !strcmp(s, "--help")) {
-	help(argv[0]);
-	return 0;
-      }
-      */
+      else
+	break;
     }
 
     if (!*listen && (s = eyedb::ServerConfig::getSValue("listen")))
@@ -305,12 +301,7 @@ main(int argc, char *argv[])
 
     smdport = smd_get_port();
 
-#if 1
     bindir = eyedblib::CompileBuiltin::getBindir();
-#else
-    if (!bindir)
-      bindir = eyedb::ServerConfig::getSValue("bindir");
-#endif
 
     int ac;
     char **av;
