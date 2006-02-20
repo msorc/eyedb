@@ -197,13 +197,26 @@ read_access_file_realize()
   char buf[256];
   int line = 0;
 
+  /*
   if (!(fd = fopen(rpc_access_file, "r"))) {
     fprintf(stderr, "cannot open access file '%s' for reading\n",
 	    rpc_access_file);
     return 1;
   }
+  */
 
   free_access();
+
+  if (!(fd = fopen(rpc_access_file, "r"))) {
+    if (!hostname2addr("localhost", &rpc_access[access_cnt].addr)) {
+      rpc_access[access_cnt].tcpip.users = (rpc_User *)calloc(sizeof(rpc_User), 1);
+      rpc_access[access_cnt].tcpip.users[0].mode = rpc_User::ALL;
+      rpc_access[access_cnt].tcpip.users[0].user = strdup("");
+      rpc_access[access_cnt++].tcpip.user_cnt = 1;
+      return 0;
+    }
+    return 1;
+  }
 
   while ((nw = line_parse(fd, buf, words, &line)) >= 0) {
     if (!nw)
@@ -260,10 +273,12 @@ read_access_file()
   if (!rpc_access_file)
     return 0;
 
+  /*
   if (stat(rpc_access_file, &st) < 0) {
     fprintf(stderr, "cannot stat access file '%s'\n", rpc_access_file);
     return 1;
   }
+  */
 
   if (st.st_mtime <= last_read)
     return 0;
