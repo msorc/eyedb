@@ -922,7 +922,8 @@ do { \
     dimArgsGen(fd, ndims, True);
 
     if (isoid)
-      fprintf(fd, "%s) %s\n{\n", (ndims ? stargcom : starg), _const);
+      //      fprintf(fd, "%s) %s\n{\n", (ndims ? stargcom : starg), _const);
+      fprintf(fd, "%s) %s\n{\n", (ndims ? stargcom : starg), "const");
     else
       fprintf(fd, "%seyedb::Bool *isnull%s) %s\n{\n", (ndims ? ", " : ""),
 	      stargcom, (!not_basic ? "const" : _const));
@@ -2127,7 +2128,7 @@ do { \
       fprintf(fdh, "%seyedb::Oid %s(",
 	      ctxH->get(), ATTRNAME(name, GETOID, hints));
       dimArgsGen(fdh, ndims);
-      fprintf(fdh, "%s);\n", (ndims ? stargcom : starg));
+      fprintf(fdh, "%s) const;\n", (ndims ? stargcom : starg));
       fprintf(fdh, "%seyedb::Status %s(",
 	      ctxH->get(), ATTRNAME(name, SETOID, hints));
       dimArgsGen(fdh, ndims);

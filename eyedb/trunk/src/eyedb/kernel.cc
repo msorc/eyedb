@@ -650,7 +650,7 @@ namespace eyedb {
 
     std::string dbs;
     if (*dbfile != '/') {
-      dbs = string(Config::getServerValue("data_dir")) + "/" + dbfile;
+      dbs = string(ServerConfig::getSValue("datadir")) + "/" + dbfile;
       dbfile = dbs.c_str();
     }
 
@@ -6757,7 +6757,7 @@ do { \
 	  settimeout(timeout);
 	else
 	  {
-	    const char *x = eyedb::Config::getServerValue("timeout");
+	    const char *x = eyedb::ServerConfig::getSValue("timeout");
 	    if (x)
 	      settimeout(atoi(x));
 	  }
@@ -6769,7 +6769,7 @@ do { \
 
     /*
     // kludge
-    s = eyedb::Config::getServerValue("coll_hidx_oid");
+    s = eyedb::ServerConfig::getSValue("coll_hidx_oid");
     if (s) {
       if (!strcasecmp(s, "no")) {
 	coll_hidx_oid = False;
@@ -6786,7 +6786,7 @@ do { \
   }
 
   void
-  IDB_init(const char *data_dir,
+  IDB_init(const char *datadir,
 	   const char *dummy, // was  _passwdfile,
 	   void *xsesslog, int _timeout)
   {
@@ -6802,8 +6802,8 @@ do { \
     eyedb::init();
     config_init();
 
-    if (data_dir)
-      Config::getServerConfig()->setValue("data_dir", data_dir);
+    if (datadir)
+      ServerConfig::getInstance()->setValue("datadir", datadir);
   }
 
   RPCStatus

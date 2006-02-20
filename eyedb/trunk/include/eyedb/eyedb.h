@@ -112,6 +112,8 @@
 
 #include <eyedb/Architecture.h>
 #include <eyedb/Config.h>
+#include <eyedb/ClientConfig.h>
+#include <eyedb/ServerConfig.h>
 #include <eyedb/GenHashTable.h>
 
 #include <eyedb/DBM.h>

@@ -157,7 +157,7 @@ do { \
     // local opening mode
     /*if (listen)*/ { // means : server mode
 #if 0
-      const char *smdport = Config::getServerValue("smdport");
+      const char *smdport = ServerConfig::getSValue("smdport");
       if (smdport)
 	smd_set_port(smdport);
 #endif
@@ -339,7 +339,7 @@ do { \
     }
 
     if (map.find(conf_opt) != map.end()) {
-      Status s = Config::setClientConfigFile(map[conf_opt].value.c_str());
+      Status s = ClientConfig::setConfigFile(map[conf_opt].value.c_str());
       if (s) {
 	s->print(stderr);
 	exit(1);
@@ -347,7 +347,7 @@ do { \
     }
 
     if (map.find(server_conf_opt) != map.end()) {
-      Status s = Config::setServerConfigFile(map[server_conf_opt].value.c_str());
+      Status s = ServerConfig::setConfigFile(map[server_conf_opt].value.c_str());
       if (s) {
 	s->print(stderr);
 	exit(1);
@@ -357,7 +357,7 @@ do { \
     if (map.find(port_opt) != map.end())
       Connection::setDefaultIDBPort(map[port_opt].value.c_str());
     else if (map.find(inet_opt) != map.end())
-      Connection::setDefaultIDBPort(Config::getClientValue("tcp_port"));
+      Connection::setDefaultIDBPort(ClientConfig::getCValue("tcp_port"));
 
     if (map.find(host_opt) != map.end())
       Connection::setDefaultHost(map[host_opt].value.c_str());
@@ -369,17 +369,17 @@ do { \
       else
 	getopt.usage("\n");
 
-      Config::getServerConfig()->setValue("listen",
-					  map[listen_opt].value.c_str());
+      ServerConfig::getInstance()->setValue("listen",
+					    map[listen_opt].value.c_str());
     }
 
     if (map.find(granted_dbm_opt) != map.end())
-      Config::getServerConfig()->setValue("granted_dbm",
-					  map[granted_dbm_opt].value.c_str());
+      ServerConfig::getInstance()->setValue("granted_dbm",
+					    map[granted_dbm_opt].value.c_str());
 
     if (map.find(default_dbm_opt) != map.end())
-      Config::getServerConfig()->setValue("default_dbm",
-					  map[default_dbm_opt].value.c_str());
+      ServerConfig::getInstance()->setValue("default_dbm",
+					    map[default_dbm_opt].value.c_str());
 
     if (map.find(dbm_opt) != map.end())
       Database::setDefaultDBMDB(map[dbm_opt].value.c_str());
@@ -452,14 +452,14 @@ do { \
       }
     }
 
-    const char *smdport = Config::getServerValue("smdport");
+    const char *smdport = ServerConfig::getSValue("smdport");
     if (smdport)
       smd_set_port(smdport);
 
     if (map.find(smd_port_opt) != map.end()) {
       smd_set_port(map[smd_port_opt].value.c_str());
-      Config::getServerConfig()->setValue("smdport",
-					  map[smd_port_opt].value.c_str());
+      ServerConfig::getInstance()->setValue("smdport",
+					    map[smd_port_opt].value.c_str());
     }
 
     if (map.find(trans_def_mag_opt) != map.end())
@@ -610,7 +610,7 @@ do { \
     if (fd_stream)
       return;
 
-    const char *tmpdir = Config::getServerValue("tmpdir");
+    const char *tmpdir = ServerConfig::getSValue("tmpdir");
     if (!tmpdir)
       tmpdir = "/tmp";
     char *s = tempnam(tmpdir, "eyedb_");

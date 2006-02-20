@@ -219,19 +219,19 @@ namespace eyedb {
     const char *s;
 
     if (!default_host)
-      default_host = strdup( (s = Config::getClientValue("host")) ?
+      default_host = strdup( (s = ClientConfig::getCValue("host")) ?
 			     s : "localhost" );
     if (!default_port)
-      default_port = strdup( (s = Config::getClientValue("port")) ?
+      default_port = strdup( (s = ClientConfig::getCValue("port")) ?
 				 s : DefaultIDBPortValue);
 
     if (!set_auth_required)
       {
 	if (!default_user)
-	  setDefaultUser(((s = Config::getClientValue("user")) ?
+	  setDefaultUser(((s = ClientConfig::getCValue("user")) ?
 			  strdup(s) : strdup("")));
 	if (!default_passwd)
-	  setDefaultPasswd(((s = Config::getClientValue("passwd")) ?
+	  setDefaultPasswd(((s = ClientConfig::getCValue("passwd")) ?
 			    strdup(s) : strdup("")));
       }
   }

@@ -21,9 +21,10 @@
    Author: Eric Viara <viara@sysra.com>
 */
 
-
 #ifndef _EYEDB_CONFIG_H
 #define _EYEDB_CONFIG_H
+
+#include <map>
 
 namespace eyedb {
 
@@ -33,34 +34,40 @@ namespace eyedb {
   */
 
   /**
-     A class storing the configuration variables values for the client and the server.
+     A class storing the configuration variables values
   */
   class Config {
 
-    friend std::ostream& operator<<( std::ostream&, const Config&);
-
   public:
-    /**
-       Get a client configuration variable value.
-
-       @param name the variable name
-       @return the variable value, or null if not mapped
-    */
-    static const char* getClientValue( const char *name);
+    typedef std::map<std::string, bool> VarMap;
 
     /**
-       Get a server configuration variable value.
-
-       @param name the variable name
-       @return the variable value, or null if not mapped
+       Not yet documented.
+       @param name
     */
-    static const char* getServerValue( const char *name);
 
-  public: // package level
+    Config::Config(const std::string &name);
+
+    /**
+       Not yet documented.
+       @param name
+       @param var_map
+    */
+
+    Config::Config(const std::string &name, const VarMap &var_map);
+
+    /**
+       Not yet documented.
+       @param config
+    */
 
     Config(const Config &config);
 
-    Config::Config(const char *file);
+    /**
+       Not yet documented.
+    */
+
+    std::string getName() const {return name;}
 
     struct Item {
       char *name;
@@ -73,22 +80,54 @@ namespace eyedb {
       ~Item();
     };
 
-    static Config* getClientConfig();
-    static Config* getServerConfig();
-
-    static Status setClientConfigFile(const std::string &);
-    static Status setServerConfigFile(const std::string &);
-
+    /**
+       Not yet documented.
+       @param file
+       @param quietFileNotFoundError
+    */
     bool add(const char *file, bool quietFileNotFoundError = false);
+
+    /**
+       Not yet documented.
+       @param configFileName
+       @param envVariable
+       @param defaultFilename
+    */
 
     void loadConfigFile( const std::string& configFilename, const char* envVariable, const char* defaultFilename);
 
+    /**
+       Not yet documented.
+       @param name
+    */
+
     const char *getValue(const char *name);
+
+    /**
+       Not yet documented.
+       @param name
+       @param value
+    */
+
     void setValue(const char *name, const char *value);
+
+    /**
+       Not yet documented.
+       @param item_cnt
+    */
 
     Item *getValues(int &item_cnt) const;
 
+    /**
+       Not yet documented.
+    */
+
     static void init();
+
+    /**
+       Not yet documented.
+    */
+
     static void _release();
 
     ~Config();
@@ -99,24 +138,24 @@ namespace eyedb {
     Config();
     Config& operator=(const Config &config);
 
-    void setClientDefaults();
-    void setServerDefaults();
+    VarMap *var_map;
+
+    std::string name;
 
     void garbage();
 
-    static Config *theClientConfig;
-    static Config *theServerConfig;
-
-    static std::string client_config_file;
-    static std::string server_config_file;
-
     LinkedList list;
+
+    friend std::ostream& operator<< (std::ostream&, const Config&);
+
+    void checkIsIn(const char *name);
   };
 
   /**
      @}
   */
 
+  std::ostream& operator<< (std::ostream&os, const Config &config);
 }
 
 #endif

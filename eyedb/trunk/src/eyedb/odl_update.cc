@@ -223,12 +223,12 @@ odlUpdateComponent::display()
     fprintf(odl_fd, "Creating ");
 
   if (cls_comp) {
-    fprintf(odl_fd, "[%s] ", cls_comp->getOid().toString());
+    //fprintf(odl_fd, "[%s] ", cls_comp->getOid().toString());
     fprintf(odl_fd, "%s '", cls_comp->getClass()->getCanonicalName());
     cls_comp->m_trace(odl_fd, 0, 0, NoRecurs);
   }
   else {
-    fprintf(odl_fd, "[%s] ", attr_comp->getOid().toString());
+    //fprintf(odl_fd, "[%s] ", attr_comp->getOid().toString());
     fprintf(odl_fd, "%s '", attr_comp->getClass()->getCanonicalName());
     attr_comp->m_trace(odl_fd, 0, AttrCompDetailTrace, NoRecurs);
   }

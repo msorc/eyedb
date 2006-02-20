@@ -103,22 +103,6 @@ main(int argc, char *argv[])
       }
       else if (!strcmp(s, "--export"))
 	_export = True;
-      /*
-	else if (GetOpt::parseLongOpt(s, "conf", &value)) {
-	Status s = Config::setClientConfigFile(value.c_str());
-	if (s) {
-	s->print(stderr);
-	return 1;
-	}
-	}
-	else if (GetOpt::parseLongOpt(s, "server-conf", &value)) {
-	Status s = Config::setServerConfigFile(value.c_str());
-	if (s) {
-	s->print(stderr);
-	return 1;
-	}
-	}
-      */
       else if (!strcmp(s, "--server"))
 	_server = True;
       else if (!strcmp(s, "--config"))
@@ -143,7 +127,11 @@ main(int argc, char *argv[])
     int item_cnt;
     Config::Item *items;
 
-    Config *cfg = (_server ? Config::getServerConfig() : Config::getClientConfig());
+    Config *cfg;
+    if (_server)
+      cfg = ServerConfig::getInstance();
+    else
+      cfg = ClientConfig::getInstance();
 
     if (!list.getCount())
       items = cfg->getValues(item_cnt);

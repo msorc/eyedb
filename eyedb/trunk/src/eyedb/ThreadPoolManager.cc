@@ -78,13 +78,13 @@ ThreadPoolManager::getThrPool()
 #else
   if (thrpool) return thrpool;
   unsigned int thrcnt;
-  const char *thrcnt_str = eyedb::Config::getServerValue("thread_count");
+  const char *thrcnt_str = eyedb::ServerConfig::getSValue("thread_count");
   thrcnt = thrcnt_str ? atoi(thrcnt_str) : 1;
 
   eyedblib::Thread::initCallingThread();
   thrpool = new eyedblib::ThreadPool(thrcnt);
 
-  const char *thrprofile_str = eyedb::Config::getServerValue("thread_profile");
+  const char *thrprofile_str = eyedb::ServerConfig::getSValue("thread_profile");
   bool thrprofile = (thrprofile_str && !strcasecmp(thrprofile_str, "true"));
     
   if (thrprofile)

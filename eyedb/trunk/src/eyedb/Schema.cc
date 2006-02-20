@@ -2191,7 +2191,7 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
     */
     time_t t;
     time(&t);
-    const char *sopath = eyedb::Config::getServerValue("sopath");
+    const char *sopath = eyedb::ServerConfig::getSValue("sopath");
     if (!sopath)
       return Exception::make("Configuration variable sopath is not set");
 

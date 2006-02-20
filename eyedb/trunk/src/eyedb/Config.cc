@@ -44,11 +44,11 @@
 
 namespace eyedb {
 
-  Config *Config::theClientConfig = 0;
-  Config *Config::theServerConfig = 0;
+  ClientConfig *ClientConfig::instance = 0;
+  std::string ClientConfig::config_file;
 
-  std::string Config::client_config_file;
-  std::string Config::server_config_file;
+  ServerConfig *ServerConfig::instance = 0;
+  std::string ServerConfig::config_file;
 
   static bool initialized = false;
 
@@ -158,34 +158,7 @@ namespace eyedb {
   }
 
   static void
-  error(const char *msg)
-  {
-    std::string s;
-    //if (fd_w > 0)
-    //s = std::string("file \"") + file_sp[fd_w-1] + "\", " + line_str() + " ";
-    s = line_str();
-
-    s += std::string("syntax error: ") + msg;
-
-    if (initialized) {
-      Exception::Mode mode = Exception::setMode(Exception::ExceptionMode);
-      (void)Exception::make(IDB_ERROR, s.c_str());
-      Exception::setMode(mode);
-      return;
-    }
-
-    fprintf(stderr, "%s\n", s.c_str());
-    exit(1);
-  }
-
-  static void
-  error(const std::string &s)
-  {
-    error(s.c_str());
-  }
-
-  static void
-  error(const char *fmt, const char *x1, const char *x2 = 0, const char *x3 = 0)
+  error(const char *fmt, const char *x1 = 0, const char *x2 = 0, const char *x3 = 0)
   {
     if (initialized) {
       Exception::Mode mode = Exception::setMode(Exception::ExceptionMode);
@@ -199,6 +172,18 @@ namespace eyedb {
     exit(1);
   }
 
+  static void
+  syntax_error(const char *msg)
+  {
+    error((line_str() + std::string("syntax error: ") + msg).c_str());
+  }
+
+  static void
+  syntax_error(const std::string &s)
+  {
+    syntax_error(s.c_str());
+  }
+
   // Returns true if file is found
   // false if file not found and quietFileNotFoundError == true
   // generates an exception if file not found and quietFileNotFoundError == false
@@ -206,21 +191,22 @@ namespace eyedb {
   push_file(const char *file, bool quietFileNotFoundError)
   {
     FILE *try_fd;
+    std::string sfile;
 
     if (strlen(file) > 2 && file[0] == '/' && file[1] == '/') {
       file += 2;
-      std::string s =  std::string( eyedblib::CompileBuiltin::getSysconfdir()) + "/" + file;
-      try_fd = fopen( s.c_str(), "r");
+      sfile =  std::string( eyedblib::CompileBuiltin::getSysconfdir()) + "/eyedb/" + file;
     }
-    else
-      try_fd = fopen(file, "r");
+    else 
+      sfile = file;
 
+    try_fd = fopen(sfile.c_str(), "r");
     if (!try_fd) {
       if (quietFileNotFoundError)
 	return false;
       else
 	error("%scannot open file '%s' for reading",
-	      line_str(), file);
+	      line_str(), sfile.c_str());
     }
 
     fd = try_fd;
@@ -382,7 +368,7 @@ namespace eyedb {
 
       const char *file = nexttoken_realize(config);
       if (!file) {
-	error("file name expected after include");
+	syntax_error("file name expected after include");
 	return 0;
       }
 
@@ -417,27 +403,27 @@ namespace eyedb {
 	if (!strcmp(p, term))
 	  break;
 	if (!strcmp(p, assign))
-	  error(std::string("unexpected '") + p + "'");
+	  syntax_error(std::string("unexpected '") + p + "'");
 	name = strdup(p);
 	state = 1;
 	break;
 
       case 1:
 	if (strcmp(p, assign))
-	  error(std::string("'") + assign + "' expected, got '" + p + "'");
+	  syntax_error(std::string("'") + assign + "' expected, got '" + p + "'");
 	state = 2;
 	break;
 
       case 2:
 	if (!strcmp(p, assign) || !strcmp(p, term))
-	  error(std::string("unexpected '") + p + "'");
+	  syntax_error(std::string("unexpected '") + p + "'");
 	value = strdup(p);
 	state = 3;
 	break;
 
       case 3:
 	if (strcmp(p, term))
-	  error(std::string("'") + term + "' expected, got '" + p + "'");
+	  syntax_error(std::string("'") + term + "' expected, got '" + p + "'");
 	setValue( name, value);
 	free(name);
 	free(value);
@@ -459,10 +445,12 @@ namespace eyedb {
   void
   Config::init()
   {
+    /*
     if (initialized) 
       return;
 
     initialized = true;
+    */
   }
 
   /*
@@ -470,13 +458,28 @@ namespace eyedb {
    */
 
   Config::Config()
-    : list()
+    : list(), var_map(0)
   {
   }
 
-  Config::Config(const char *file)
+  /*
+  Config::Config(const char *file, const VarMap &_var_map)
   {
+    var_map = new VarMap(_var_map);
     add(file);
+  }
+  */
+
+  Config::Config(const std::string &name) :
+    name(name)
+  {
+    var_map = 0;
+  }
+
+  Config::Config(const std::string &name, const VarMap &_var_map) :
+    name(name)
+  {
+    var_map = new VarMap(_var_map);
   }
 
   Config::Config(const Config &config)
@@ -505,6 +508,7 @@ namespace eyedb {
     while(c.getNext((void *&)item))
       list.insertObjectFirst(new Item(*item));
 
+    var_map = config.var_map ? new VarMap(*config.var_map) : 0;
     return *this;
   }
 
@@ -574,24 +578,54 @@ namespace eyedb {
   void
   Config::_release()
   {
-    if (theClientConfig)
-      delete theClientConfig;
-
-    if (theServerConfig)
-      delete theServerConfig;
-
-    theClientConfig = 0;
-    theServerConfig = 0;
+    ClientConfig::_release();
+    ServerConfig::_release();
   }
 
+  void ClientConfig::_release()
+  {
+    delete instance;
+    instance = 0;
+  }
+
+  void ServerConfig::_release()
+  {
+    delete instance;
+    instance = 0;
+  }
 
   /*
    * Config variable set and get
    */
 
+  void
+  Config::checkIsIn(const char *name)
+  {
+    if (!var_map)
+      return;
+
+    if (var_map->find(name) != var_map->end())
+      return;
+
+    VarMap::const_iterator begin = var_map->begin();
+    VarMap::const_iterator end = var_map->end();
+    std::string msg = "Granted variables are: ";
+    for (int n = 0; begin != end; n++) {
+      if (n)
+	msg += ", ";
+      msg += (*begin).first;
+      ++begin;
+    }
+    
+    error("Invalid variable name '%s' in %s configuration.\n%s",
+	  name, getName().c_str(), msg.c_str());
+  }
+
   void 
   Config::setValue(const char *name, const char *value)
   {
+    checkIsIn(name);
+
     Item *item = new Item(name, value);
     list.insertObjectFirst(item);
   }
@@ -652,7 +686,7 @@ namespace eyedb {
   static const std::string tcp_port = "6240";
 
   void
-  Config::setClientDefaults()
+  ClientConfig::setDefaults()
   {
     std::string localstatedir = eyedblib::CompileBuiltin::getLocalstatedir();
 
@@ -674,7 +708,7 @@ namespace eyedb {
   }
 
   void
-  Config::setServerDefaults()
+  ServerConfig::setDefaults()
   {
     std::string libdir = eyedblib::CompileBuiltin::getLibdir();
     std::string localstatedir = eyedblib::CompileBuiltin::getLocalstatedir();
@@ -684,7 +718,7 @@ namespace eyedb {
     //setValue( "bindir", eyedblib::CompileBuiltin::getBindir());
 
     // Bases directory
-    setValue( "data_dir", (localstatedir + "/lib/eyedb/db").c_str());
+    setValue( "datadir", (localstatedir + "/lib/eyedb/db").c_str());
 
     // pipes:
     // setValue( "pipedir", (localstatedir + "/lib/eyedb/pipes").c_str());
@@ -740,70 +774,85 @@ namespace eyedb {
   }
 
   Status
-  Config::setClientConfigFile(const std::string &file)
+  ClientConfig::setConfigFile(const std::string &file)
   {
-    if (theClientConfig)
+    if (instance)
       return Exception::make(IDB_INTERNAL_ERROR, "Cannot set client config file after configuration");
 
-    client_config_file = file;
-
+    config_file = file;
+    
     return Success;
   }
 
-  Config* 
-  Config::getClientConfig()
+  static Config::VarMap client_map;
+  static Config::VarMap server_map;
+
+  static struct C {
+
+    C() {
+      client_map["port"] = true;
+      client_map["tcp_port"] = true;
+      client_map["host"] = true;
+      client_map["user"] = true;
+      client_map["dbm"] = true;
+
+      server_map["datadir"] = true;
+      server_map["tmpdir"] = true;
+      server_map["sopath"] = true;
+      server_map["granted_dbm"] = true;
+      server_map["default_dbm"] = true;
+      server_map["access_file"] = true;
+      server_map["smdport"] = true;
+      server_map["listen"] = true;
+      server_map["oqlpath"] = true;
+    }
+  } _;
+
+  ClientConfig::ClientConfig() : Config("client", client_map)
   {
-    if (theClientConfig)
-      return theClientConfig;
+  }
 
-    theClientConfig = new Config();
+  ClientConfig* 
+  ClientConfig::getInstance()
+  {
+    if (instance)
+      return instance;
 
-    theClientConfig->setClientDefaults();
+    instance = new ClientConfig();
 
-    theClientConfig->loadConfigFile( client_config_file, "EYEDBCONF", "eyedb.conf");
+    instance->setDefaults();
 
-    return theClientConfig;
+    instance->loadConfigFile(config_file, "EYEDBCONF", "eyedb.conf");
+
+    return instance;
   }
   
-  Status
-  Config::setServerConfigFile(const std::string &file)
+  ServerConfig::ServerConfig() : Config("server", server_map)
   {
-    if (theServerConfig)
+  }
+
+  Status
+  ServerConfig::setConfigFile(const std::string &file)
+  {
+    if (instance)
       return Exception::make(IDB_INTERNAL_ERROR, "Cannot set server config file after configuration");
 
-    server_config_file = file;
+    config_file = file;
     return Success;
   }
 
-  Config* 
-  Config::getServerConfig()
+  ServerConfig* 
+  ServerConfig::getInstance()
   {
-    if (theServerConfig)
-      return theServerConfig;
+    if (instance)
+      return instance;
 
-    theServerConfig = new Config();
+    instance = new ServerConfig();
     
-    theServerConfig->setServerDefaults();
+    instance->setDefaults();
 
-    theServerConfig->loadConfigFile( server_config_file, "EYEDBDCONF", "eyedbd.conf");
+    instance->loadConfigFile(config_file, "EYEDBDCONF", "eyedbd.conf");
 
-    return theServerConfig;
-  }
-
-
-  /*
-   * Config public static methods
-   */
-
-  const char *
-  Config::getServerValue(const char *name)
-  {
-    return Config::getServerConfig()->getValue(name);
-  }
-
-  const char *
-  Config::getClientValue(const char *name)
-  {
-    return Config::getClientConfig()->getValue(name);
+    return instance;
   }
 }

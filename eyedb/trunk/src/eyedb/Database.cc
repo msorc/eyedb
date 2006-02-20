@@ -67,7 +67,7 @@ LinkedList *Database::dbopen_list;
       const char *voldir = default_voldir;
 
       if (!voldir)
-	voldir = Config::getClientValue("data_dir");
+	voldir = ClientConfig::getCValue("datadir");
 
       if (voldir)
 	strcpy(dirname, voldir);
@@ -216,7 +216,7 @@ LinkedList *Database::dbopen_list;
     if (granted_dbm.size())
       return granted_dbm;
 
-    const char *path = Config::getServerValue("granted_dbm");
+    const char *path = ServerConfig::getSValue("granted_dbm");
     if (!path) {
       const char *default_dbm = getDefaultServerDBMDB();
       if (default_dbm)
@@ -243,7 +243,7 @@ LinkedList *Database::dbopen_list;
 
   const char *Database::getDefaultServerDBMDB()
   {
-    return Config::getServerValue("default_dbm");
+    return ServerConfig::getSValue("default_dbm");
     /*
     const std::vector<std::string> & granted_dbm = getGrantedDBMDB();
     if (granted_dbm.size())
@@ -257,7 +257,7 @@ LinkedList *Database::dbopen_list;
   {
     if (!defaultDBMDB) {
       static char buff[256];
-      const char *path = Config::getClientValue("dbm");
+      const char *path = ClientConfig::getCValue("dbm");
       if (!path)
 	return DBM_Database::defaultDBMDB;
       strcpy(buff, path);

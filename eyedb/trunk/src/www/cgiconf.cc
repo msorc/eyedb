@@ -1090,7 +1090,7 @@ init()
   idbW_db_config->release();
 
   delete idbW_configuration ;
-  idbW_configuration = new Config(*Config::getClientConfig());
+  idbW_configuration = new Config(*ClientConfig::getInstance());
 }
 
 static int
