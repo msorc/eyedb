@@ -60,10 +60,10 @@ namespace eyedb {
   Status Log::init(const char *_progName, const char *_logName)
   {
     progName = _progName;
-    logName = (_logName ? _logName : eyedb::Config::getServerValue(logdev_var));
+    logName = (_logName ? _logName : eyedb::ServerConfig::getSValue(logdev_var));
 
     if (!logName)
-      logName = eyedb::Config::getClientValue(logdev_var);
+      logName = eyedb::ClientConfig::getCValue(logdev_var);
 
     utlogInit(progName, logName);
 
@@ -75,9 +75,9 @@ namespace eyedb {
     if (getLogMask())
       return Success;
 
-    const char *s = eyedb::Config::getServerValue(logmask_var);
+    const char *s = eyedb::ServerConfig::getSValue(logmask_var);
     if (!s)
-      s = eyedb::Config::getClientValue(logmask_var);
+      s = eyedb::ClientConfig::getCValue(logmask_var);
 
     if (s)
       return Log::setLogMask(s);

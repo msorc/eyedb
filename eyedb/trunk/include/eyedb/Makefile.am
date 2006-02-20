@@ -28,6 +28,8 @@ CollList.h \
 CollSetClass.h \
 CollSet.h \
 Config.h \
+ClientConfig.h \
+ServerConfig.h \
 Connection.h \
 Database.h \
 Datafile.h \

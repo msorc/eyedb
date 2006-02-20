@@ -86,7 +86,7 @@ ld_libpath_manage()
   char *ld_library_path = getenv(ld_libpath_env);
   char env[2048];
   sprintf(env, "%s=%s%s%s", ld_libpath_env,
-	  eyedb::Config::getServerValue("sopath"),
+	  eyedb::ServerConfig::getSValue("sopath"),
 	  (ld_library_path ? ":" : ""),
 	  (ld_library_path ? ld_library_path : ""));
   putenv(strdup(env));
@@ -300,7 +300,7 @@ main(int argc, char *argv[])
       */
     }
 
-    if (!*listen && (s = eyedb::Config::getServerValue("listen")))
+    if (!*listen && (s = eyedb::ServerConfig::getSValue("listen")))
       listen = s;
 
     smdport = smd_get_port();
@@ -309,7 +309,7 @@ main(int argc, char *argv[])
     bindir = eyedblib::CompileBuiltin::getBindir();
 #else
     if (!bindir)
-      bindir = eyedb::Config::getServerValue("bindir");
+      bindir = eyedb::ServerConfig::getSValue("bindir");
 #endif
 
     int ac;
@@ -328,7 +328,7 @@ main(int argc, char *argv[])
     const char *host, *port;
     make_host_port(listen, host, port);
     
-    SessionLog sesslog(host, port, eyedb::Config::getServerValue("tmpdir"));
+    SessionLog sesslog(host, port, eyedb::ServerConfig::getSValue("tmpdir"));
 
     if (sesslog.getStatus()) {
       if (cmd == Start)

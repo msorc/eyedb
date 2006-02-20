@@ -110,6 +110,28 @@ namespace eyedb {
     reserve("synchonized");
 
     // eyedb methods (non exhaustive list)
+    reserve("gbxObject");
+    reserve("getRefCount");
+    reserve("isLocked");
+    reserve("incrRefCount");
+    reserve("decrRefCount");
+    reserve("lock");
+    reserve("unlock");
+    reserve("isOnStack");
+    reserve("release");
+    reserve("setTag");
+    reserve("getTag");
+    reserve("userGarbage");
+    reserve("keep");
+    reserve("unkeep");
+    reserve("getObjectCount");
+    reserve("getHeapSize");
+    reserve("isValidObject");
+    reserve("setObjMapped");
+    reserve("isObjMapped");
+    reserve("getObjMap");
+
+    reserve("Object");
     reserve("clone");
     reserve("getClass");
     reserve("getIDR");
@@ -145,12 +167,16 @@ namespace eyedb {
     reserve("isRemoved");
     reserve("getDatabase");
 
+    reserve("Agregat");
     reserve("getValue");
     reserve("setItemSize");
     reserve("getItemSize");
     reserve("setItemValue");
     reserve("setItemOid");
     reserve("getItemOid");
+
+    reserve("Struct");
+    reserve("Union");
   }
 
   GenCodeHints::GenCodeHints()

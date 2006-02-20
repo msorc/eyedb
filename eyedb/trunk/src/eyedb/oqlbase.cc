@@ -3824,10 +3824,8 @@ namespace eyedb {
     return getObject(node, db, &oid, o, add_to_free_list, errorIfNull);
   }
 
-#if 1
-#define IDX2OID(IDX) Oid(IDX, 0, 0)
-#define OBJ2OID(O)   Oid((eyedblib::pointer_int)O, 0, 0)
-#else
+  //#define IDX2OID(IDX) Oid(IDX, 0, 0)
+  //#define OBJ2OID(O)   Oid((eyedblib::pointer_int)O, 0, 0)
   static Oid IDX2OID(eyedblib::pointer_int idx)
   {
     Oid oid;
@@ -3843,7 +3841,6 @@ namespace eyedb {
     //printf("OBJ2OID %u.%d.%d\n", oid.getNX(), oid.getDbid(), oid.getUnique());
     return oid;
   }
-#endif
 
   /*
     #ifdef LINUX_X86_64
