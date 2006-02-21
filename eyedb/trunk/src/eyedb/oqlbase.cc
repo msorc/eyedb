@@ -2695,7 +2695,8 @@ namespace eyedb {
 #ifdef SYNC_SYM_GARB_1
   static bool possibleAutoAssign(oqmlAtom *at1, oqmlAtom *at2)
   {
-    return at1 && at2 && OQML_IS_COLL(at1) && OQML_IS_COLL(at2);
+    return at1 && at2 && ((OQML_IS_COLL(at1) && OQML_IS_COLL(at2)) ||
+			  at1 == at2);
   }
 #endif
 

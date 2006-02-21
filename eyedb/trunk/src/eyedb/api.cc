@@ -83,6 +83,7 @@ namespace eyedb {
  \
   if (r) \
     { \
+      perror("server"); printf("r = %d\n", r); \
       return rpcStatusMake(IDB_SERVER_FAILURE, SERVER_CRASH_MSG); \
     } \
 }

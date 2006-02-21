@@ -122,6 +122,7 @@ namespace eyedb {
     if (!conn)
       return Exception::make(IDB_ERROR, "sessionlog: cannot connect to eyedbsmd ");
     smdcli_init_getsems(conn, ServerConfig::getSValue("default_dbm"), semkeys);
+
     if (semkeys[0] <= 0)
       return Exception::make(IDB_ERROR, "sessionlog: cannot create semaphores ");
     return Success;

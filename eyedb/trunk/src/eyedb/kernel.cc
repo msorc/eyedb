@@ -676,9 +676,11 @@ namespace eyedb {
 	    (rpc_status = IDB_userDBAccessSet(ch, dbmdb, (char *)0, (char *)0,
 					      dbname, userauth,
 					      AdminDBAccessMode)) !=
-	    RPCSuccess)
+	    RPCSuccess) {
+	  printf("rpc_status %p\n", rpc_status);
 	  return rpc_status;
-      
+	}
+
 	int rdbid;
 	char *rname;
 	int xflags = _DBRW|_DBOpenLocal;
@@ -1573,8 +1575,9 @@ namespace eyedb {
     if ((rpc_status = IDB_checkDBAuth(ch, dbmdb, dbname, userauth, passwdauth,
 				      AdminDBAccessMode, True, NULL, &dbm,
 				      "setting user db access")) !=
-	RPCSuccess)
+	RPCSuccess) {
       return rpc_status;
+    }
 
     status = dbm->user_db_access_set(dbname, username, (DBAccessMode)mode);
 

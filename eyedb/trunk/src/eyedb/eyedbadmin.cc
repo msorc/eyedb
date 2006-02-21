@@ -3857,6 +3857,7 @@ dblist_realize(int n, char *str[], DBM_Database *dbm)
 	}
 
       obj_arr.garbage();
+      //dbm->transactionCommit();
       return 0;
     }
   
