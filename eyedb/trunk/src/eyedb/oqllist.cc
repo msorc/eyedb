@@ -358,16 +358,14 @@ oqmlStructOf::toString(void) const
 static void
 oqml_flatten_realize(oqmlAtom *a, int flat, oqmlAtomList *alist)
 {
-  if (a->type.type == oqmlATOM_LIST && flat)
-    {
-      oqmlAtom *ta = ((oqmlAtom_list *)a)->list->first;
-      while (ta)
-	{
-	  oqmlAtom *next = ta->next;
-	  oqml_flatten_realize(ta, flat, alist);
-	  ta = next;
-	}
+  if (a->type.type == oqmlATOM_LIST && flat) {
+    oqmlAtom *ta = ((oqmlAtom_list *)a)->list->first;
+    while (ta) {
+      oqmlAtom *next = ta->next;
+      oqml_flatten_realize(ta, flat, alist);
+      ta = next;
     }
+  }
   else
     alist->append(a);
 }

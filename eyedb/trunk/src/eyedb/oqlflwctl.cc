@@ -224,7 +224,7 @@ namespace eyedb {
 	oqmlAtom * next = x->next;
 
 	if (action) {
-	  gbLink *curLink = oqmlGarbManager::peek();
+	  gbContext *gbctx = oqmlGarbManager::peek();
 	  ctx->pushSymbol(ident, &x->type, x);
 	  tal = 0;
 	  s = action->eval(db, ctx, &tal);
@@ -232,7 +232,7 @@ namespace eyedb {
 	  delete tal;
 #endif
 	  ctx->popSymbol(ident);
-	  oqmlGarbManager::garbage(curLink);
+	  oqmlGarbManager::garbage(gbctx);
 	  if (s)
 	    break;
 	}
@@ -365,9 +365,9 @@ namespace eyedb {
 
 	if (qright)
 	  {
-	    gbLink *curLink = oqmlGarbManager::peek();
+	    gbContext *gbctx = oqmlGarbManager::peek();
 	    s = qright->eval(db, ctx, &al);
-	    oqmlGarbManager::garbage(curLink);
+	    oqmlGarbManager::garbage(gbctx);
 	    if (s) break;
 	  }
       }
@@ -455,9 +455,9 @@ namespace eyedb {
     
       if (qright)
 	{
-	  gbLink *curLink = oqmlGarbManager::peek();
+	  gbContext *gbctx = oqmlGarbManager::peek();
 	  s = qright->eval(db, ctx, &al);
-	  oqmlGarbManager::garbage(curLink);
+	  oqmlGarbManager::garbage(gbctx);
 	  if (s) break;
 	}
 
@@ -615,9 +615,9 @@ namespace eyedb {
 
 	if (body)
 	  {
-	    gbLink *curLink = oqmlGarbManager::peek();
+	    gbContext *gbctx = oqmlGarbManager::peek();
 	    s = body->eval(db, ctx, &al);
-	    oqmlGarbManager::garbage(curLink);
+	    oqmlGarbManager::garbage(gbctx);
 	    if (s) break;
 	  }
 

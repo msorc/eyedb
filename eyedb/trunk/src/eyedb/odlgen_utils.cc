@@ -132,7 +132,7 @@ namespace eyedb {
     reserve("getObjMap");
 
     reserve("Object");
-    reserve("clone");
+    //reserve("clone");
     reserve("getClass");
     reserve("getIDR");
     reserve("getIDRSize");

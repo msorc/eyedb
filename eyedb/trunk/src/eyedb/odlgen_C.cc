@@ -2918,21 +2918,22 @@ do { \
 
     fprintf(fdh, "%s%s(eyedb::Database * = 0, const eyedb::Dataspace * = 0);\n", ctxH->get(), name);
 
-    /*
-      fprintf(fdh, "%s%s(const %s& x) : %s(x) {attrCacheEmpty();}\n",
-      ctxH->get(), name, name, parent->getCName());
-
-      fprintf(fdh, "%s%s& operator=(const %s& x) {\n", ctxH->get(), name, name);
-      fprintf(fdh, "%s  *(%s *)this = %s::operator=((const %s &)x);\n",
-      ctxH->get(),parent->getCName(), parent->getCName());
-      fprintf(fdh, "%s  attrCacheEmpty();\n", ctxH->get());
-      fprintf(fdh, "%s  return *this;\n", ctxH->get());
-      fprintf(fdh, "%s}\n\n", ctxH->get());
-    */
-
     fprintf(fdh, "%s%s(const %s& x);\n\n", ctxH->get(), name, name);
-    fprintf(fdh, "%svirtual eyedb::Object *clone() const "
-	    "{return new %s(*this);};\n\n", ctxH->get(), name);
+
+    if (isRootClass()) {
+      fprintf(fdh, "%svirtual eyedb::Object *clone() const "
+	      "{return _clone();};\n", ctxH->get(), name);
+      fprintf(fdh, "%svirtual eyedb::Object *_clone() const "
+	      "{return new %s(*this);};\n\n", ctxH->get(), name);
+    }
+    else if (odl_rootclass) { // ctxC->getRootclass()) {
+      fprintf(fdh, "%svirtual eyedb::Object *_clone() const "
+	      "{return new %s(*this);};\n\n", ctxH->get(), name);
+    }
+    else {
+      fprintf(fdh, "%svirtual eyedb::Object *clone() const "
+	      "{return new %s(*this);};\n\n", ctxH->get(), name);
+    }
 
     fprintf(fdh, "%s%s& operator=(const %s& x);\n\n", ctxH->get(), name, name);
 

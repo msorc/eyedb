@@ -27,9 +27,9 @@
 #include <eyedb/eyedb_p.h>
 #include <string>
 #include <time.h>
-//#include <eyedb/oqlctb.h>
 
 #include <sys/types.h>
+#include <list>
 #include <regex.h>
 
 #define OQML_MAX_CPS 6
@@ -844,12 +844,18 @@ namespace eyedb {
 
   /* end atom declarations */
 
+  struct gbContext {
+    gbLink *link;
+    gbContext(gbLink *link) : link(link) {}
+  };
+
   class oqmlGarbManager {
     static gbLink *first, *last;
     static gbLink *add_realize(gbLink *);
     static oqmlBool garbaging;
     static unsigned int count;
     static LinkedList str_list;
+    static std::list<gbContext *> ctx_l;
 
   public:
     static void garbage();
@@ -859,9 +865,9 @@ namespace eyedb {
     static void add(char *);
     static unsigned int getCount() {return count;}
 
-    // 8/02/06: idea ???
     static void oqmlGarbManager::garbage(gbLink *l, bool full = false);
-    static gbLink *oqmlGarbManager::peek();
+    static gbContext *oqmlGarbManager::peek();
+    static void oqmlGarbManager::garbage(gbContext *ctx);
   };
 
   class oqml_Location {

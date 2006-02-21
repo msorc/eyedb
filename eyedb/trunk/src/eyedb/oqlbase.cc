@@ -32,8 +32,10 @@
 //#define SUPPORT_OQLRESULT
 //#define SUPPORT_POSTACTIONS
 
-//9/02/06: does not work
+// work, but very slow !
 //#define SYNC_SYM_GARB
+#define SYNC_SYM_GARB_1
+#define SYNC_SYM_GARB_2
 
 //#define GARB_TRACE
 //#define GARB_TRACE_DETAIL
@@ -64,9 +66,30 @@ namespace eyedb {
   //
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-  gbLink *oqmlGarbManager::peek()
+  std::list<gbContext *> oqmlGarbManager::ctx_l;
+
+  gbContext *oqmlGarbManager::peek()
   {
-    return last;
+    gbContext *ctx = new gbContext(last);
+    ctx_l.push_back(ctx);
+    return ctx;
+  }
+
+  void oqmlGarbManager::garbage(gbContext *ctx)
+  {
+    garbage(ctx->link, false);
+
+    delete ctx;
+
+    std::list<gbContext *>::iterator begin = ctx_l.begin();
+    std::list<gbContext *>::iterator end = ctx_l.end();
+    while (begin != end) {
+      if ((*begin) == ctx) {
+	ctx_l.erase(begin);
+	return;
+      }
+      ++begin;
+    }
   }
 
   void oqmlGarbManager::garbage(gbLink *l, bool full)
@@ -85,7 +108,6 @@ namespace eyedb {
 	   oqmlObjectManager::objCacheIdx->getObjectCount(),
 	   oqmlObjectManager::objCacheObj->getObjectCount());
 #endif
-
     garbaging = oqml_True;
     int toDel_cnt = 0;
     gbLink **links = new gbLink*[count];
@@ -2584,6 +2606,61 @@ namespace eyedb {
   //#define SYMB_TRACE
   //#define LOCAL_TRACE
 
+#ifdef SYNC_SYM_GARB
+  static void a2vect(oqmlAtom *a, std::vector<oqmlAtom *> &v)
+  {
+    if (OQML_IS_COLL(a)) {
+      oqmlAtom *ta = OQML_ATOM_COLLVAL(a)->first;
+      while (ta) {
+	oqmlAtom *next = ta->next;
+	a2vect(ta, v);
+	ta = next;
+      }
+    }
+  else
+    v.push_back(a);
+  }
+
+  static void checkAutoAssign(oqmlAtom *at1, oqmlAtom *at2)
+  {
+    if (!at1 || !at2)
+      return;
+
+    if (!OQML_IS_COLL(at1) || !OQML_IS_COLL(at2))
+      return;
+
+    std::vector<oqmlAtom *> v1;
+    std::vector<oqmlAtom *> v2;
+    a2vect(at1, v1);
+    a2vect(at2, v2);
+
+    std::vector<oqmlAtom *>::iterator b1 = v1.begin();
+    std::vector<oqmlAtom *>::iterator e1 = v1.end();
+    while (b1 != e1) {
+      std::vector<oqmlAtom *>::iterator b2 = v2.begin();
+      std::vector<oqmlAtom *>::iterator e2 = v2.end();
+      bool found = false;
+      while (b2 != e2) {
+	if ((*b1) == (*b2)) {
+	  assert(!found);
+	  oqmlLock(*b1, oqml_True, oqml_False);
+	  found = true;
+	  // should done a insert
+	}
+	++b2;
+      }
+      ++b1;
+    }
+  }
+#endif
+
+#ifdef SYNC_SYM_GARB_1
+  static bool possibleAutoAssign(oqmlAtom *at1, oqmlAtom *at2)
+  {
+    return at1 && at2 && OQML_IS_COLL(at1) && OQML_IS_COLL(at2);
+  }
+#endif
+
   void oqmlSymbolEntry::set(oqmlAtomType *_type, oqmlAtom *_at, oqmlBool force,
 			    oqmlBool tofree)
   {
@@ -2594,19 +2671,23 @@ namespace eyedb {
 
     type = (_type ? *_type : st_atom_type);
     if (_at || force) {
-#ifdef SYNC_SYM_GARB
+#ifdef SYNC_SYM_GARB_1
       if (at) {
-	printf("at %p %p %d %d\n", at, _at, tofree,
-	       oqml_is_global_ident(ident));
-	//if (tofree || !oqml_is_global_ident(ident))
+	if (tofree && possibleAutoAssign(_at, at))
+	  tofree = oqml_False;
 	oqmlLock(at, oqml_False, tofree); // 8/02/06
-	printf("eof\n");
+      }
+
+#elif defined(SYNC_SYM_GARB)
+      if (at) {
+	if (tofree)
+	  checkAutoAssign(_at, at);
+	oqmlLock(at, oqml_False, tofree); // 8/02/06
       }
 #else
-      // 9/02/06
-      //if (at && !oqml_is_global_ident(ident))
-      if (at)
+      if (at) {
 	oqmlLock(at, oqml_False);
+      }
 #endif
       at = _at;
       oqmlLock(at, oqml_True);
@@ -2807,7 +2888,7 @@ namespace eyedb {
     while (s) {
       if (!strcmp(s->ident, ident) && s->global == global &&
 	  (s->global || s->level == local_cnt)) {
-#ifdef SYNC_SYM_GARB
+#ifdef SYNC_SYM_GARB_2
 	oqmlLock(s->at, oqml_False, oqml_True);
 	s->at = 0;
 #endif

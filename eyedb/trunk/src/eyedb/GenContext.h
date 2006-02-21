@@ -21,26 +21,30 @@
    Author: Eric Viara <viara@sysra.com>
 */
 
-
 #ifndef _EYEDB_GENCONTEXT_H
 #define _EYEDB_GENCONTEXT_H
 
 namespace eyedb {
 
   class GenContext {
-    char *buff;
-    int buff_len;
-    int buff_alloc;
-    FILE *fd;
-
   public:
-    GenContext(FILE *);
+    GenContext(FILE *, const char *package = 0, const char *rootclass = 0);
     void push();
     void pop();
     const char *get() const;
     void print();
     FILE *getFile();
+    const char *getPackage() const {return package;}
+    const char *getRootclass() const {return rootclass;}
     ~GenContext();
+
+  private:
+    char *buff;
+    int buff_len;
+    int buff_alloc;
+    FILE *fd;
+    char *package;
+    char *rootclass;
   };
 
 }

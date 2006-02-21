@@ -1888,7 +1888,7 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
     if (status = make_java_file(hints.dirname, package, prefix, "Database", fd))
       return status;
 
-    GenContext ctx(fd);
+    GenContext ctx(fd, package, odl_rootclass);
     ctx.push();
 
     fprintf(fd, "public class %sDatabase extends org.eyedb.Database {\n\n", prefix);
@@ -2223,7 +2223,7 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
 	true_prefix[len] = 0;
       }
 
-    GenContext ctxH(fdh);
+    GenContext ctxH(fdh, package, odl_rootclass);
 
     if (true_prefix)
       {
@@ -2324,7 +2324,7 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
 
     fprintf(fdh, "%s};\n\n", ctxH.get());
 
-    GenContext ctx(fdc);
+    GenContext ctx(fdc, package, odl_rootclass);
 
     curs = _class->startScan();
     while (_class->getNextObject(curs, (void *&)cl))
@@ -2708,10 +2708,12 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
 	while (c.getNext((void *&)cl))
 	  if (cl->getUserData(odlGENCODE) && cl->asAgregatClass())
 	    {
+	      /*
 	      fprintf(fdh, "#define %s(X) ((%s *)(X))\n\n",
 		      hints.style->getString(GenCodeHints::CAST,
 					     cl->getCanonicalName(), prefix),
 		      cl->getName());
+	      */
 
 	      if (!hints.gen_down_casting || !superclass)
 		continue;
