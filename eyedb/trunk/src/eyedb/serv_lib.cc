@@ -680,7 +680,7 @@ namespace eyedb {
 
 	// disconnected 15/02/06 because of a freeze
 	// question : these calls were really necessary !?
-#if 0
+#if 1
 	for (i = 0; i < RPCDB_MAX_DBH; i++)
 	  rpcDB_close_do(server, &ci->dbhclientinfo[i], close_realize, (void **)&status);
 #endif

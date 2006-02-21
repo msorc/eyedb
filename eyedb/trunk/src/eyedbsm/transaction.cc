@@ -2124,7 +2124,7 @@ do { \
 #ifdef SECURE_FREE
   struct SecureFree {
     SecureFree(XMHandle *xmh, void *trs) : xmh(xmh), trs(trs) {}
-    ~SecureFree() {XMFree(xmh, trs);}
+    ~SecureFree() { XMFree(xmh, trs); }
     XMHandle *xmh;
     void *trs;
   };
