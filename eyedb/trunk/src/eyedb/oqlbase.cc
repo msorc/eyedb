@@ -28,6 +28,7 @@
 #include <assert.h>
 #include <wctype.h>
 #include <eyedb/oqlctb.h>
+#include <set>
 
 //#define SUPPORT_OQLRESULT
 //#define SUPPORT_POSTACTIONS
@@ -39,6 +40,8 @@
 
 //#define GARB_TRACE
 //#define GARB_TRACE_DETAIL
+
+#define NEW_SUPPRESS_DOUBLES
 
 #include "oql_p.h"
 
@@ -1431,9 +1434,43 @@ namespace eyedb {
     return this;
   }
 
+#ifdef NEW_SUPPRESS_DOUBLES
+  struct oqmlAtom_x {
+    oqmlAtom_x(oqmlAtom *a) : a(a) {}
+    oqmlAtom *a;
+  };
+
+  struct less_atom {
+    bool operator() (const oqmlAtom_x& x, const oqmlAtom_x& y) const {
+      return strcmp(x.a->getString(), y.a->getString()) < 0;
+    }
+  };
+#endif
+
   void
   oqmlAtomList::suppressDoubles()
   {
+#ifdef NEW_SUPPRESS_DOUBLES
+    std::set<oqmlAtom_x, less_atom> set;
+
+    oqmlAtom *a = first;
+    while (a) {
+      set.insert(a);
+      a = a->next;
+    }
+
+    if (set.size() == cnt)
+      return;
+
+    first = last = 0;
+    cnt = 0;
+    std::set<oqmlAtom_x, less_atom>::iterator begin = set.begin();
+    std::set<oqmlAtom_x, less_atom>::iterator end = set.end();
+    while (begin != end) {
+      append((*begin).a, false);
+      ++begin;
+    }
+#else
     int n, i, j;
     oqmlBool noDoubles = oqml_True;
     oqmlAtom **arr = new oqmlAtom*[cnt];
@@ -1463,9 +1500,10 @@ namespace eyedb {
 
     for (i = 0; i < xcnt; i++)
       if (arr[i])
-	append(arr[i]);
+	append(arr[i], false);
 
     delete [] arr;
+#endif
   }
 
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

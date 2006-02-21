@@ -1,3 +1,10 @@
+2006-02-21  Eric Viara  <viara@sysra.com>
+
+	* Improved OQL GC
+	* Added std::map var_map in class Config
+	* Added ClientConfig and ServerConfig classes
+	* Updated ODL C++ generator : suppressed #define Class_c, clone method, const behind GETOID methods
+
 2006-02-19 Francois  <francois@dechelle.net>
 
 	* Changed configure.in to reintroduce --enable-java flag

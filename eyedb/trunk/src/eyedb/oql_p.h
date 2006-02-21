@@ -791,7 +791,7 @@ namespace eyedb {
     oqmlStatus *setAtom(oqmlAtom *, int idx, oqmlNode *);
     int getFlattenCount() const;
 
-    void append(oqmlAtom *);
+    void append(oqmlAtom *, bool incref = true);
     oqmlBool isIn(oqmlAtom *);
     oqmlStatus *suppress(oqmlAtom *);
     void empty();
