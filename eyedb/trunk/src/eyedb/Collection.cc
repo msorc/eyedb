@@ -2656,22 +2656,22 @@ do { \
 #ifdef COLLTRACE
     printf("collection make idx_data_size=%d\n", idx_data_size);
 #endif
-    if (is_type(*hdr, _CollSet_Type))
+    if (eyedb_is_type(*hdr, _CollSet_Type))
       *o = (Object *)CollectionPeer::collSet
 	(name, (Class *)_class, idx1_oid, idx2_oid, items_cnt,
 	 bottom, top, idximpl, card, is_literal, idx_data, idx_data_size);
 
-    else if (is_type(*hdr, _CollBag_Type))
+    else if (eyedb_is_type(*hdr, _CollBag_Type))
       *o = (Object *)CollectionPeer::collBag
 	(name, (Class *)_class, idx1_oid, idx2_oid, items_cnt,
 	 bottom, top, idximpl, card, is_literal, idx_data, idx_data_size);
 
-    else if (is_type(*hdr, _CollList_Type))
+    else if (eyedb_is_type(*hdr, _CollList_Type))
       *o = (Object *)CollectionPeer::collList
 	(name, (Class *)_class, idx1_oid, idx2_oid, items_cnt,
 	 bottom, top, idximpl, card, is_literal, idx_data, idx_data_size);
 
-    else if (is_type(*hdr, _CollArray_Type))
+    else if (eyedb_is_type(*hdr, _CollArray_Type))
       *o = (Object *)CollectionPeer::collArray
 	(name, (Class *)_class, idx1_oid, idx2_oid, items_cnt,
 	 bottom, top, idximpl, card, is_literal, idx_data, idx_data_size);

@@ -26,24 +26,30 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include <string.h>
 #include "GenContext.h"
 
 #define GENCONTEXT_INC 2
 
 namespace eyedb {
 
-  GenContext::GenContext(FILE *_fd)
+  GenContext::GenContext(FILE *_fd, const char *_package,
+			 const char *_rootclass)
   {
     buff_alloc = 32;
     buff = (char *)malloc(buff_alloc);
     buff_len = 0;
     buff[buff_len] = 0;
     fd = _fd;
+    package = (_package ? strdup(_package) : 0);
+    rootclass = (_rootclass ? strdup(_rootclass) : 0);
   }
 
   GenContext::~GenContext()
   {
     free(buff);
+    free(package);
+    free(rootclass);
   }
 
   void GenContext::push()

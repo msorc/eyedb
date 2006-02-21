@@ -32,7 +32,7 @@
 typedef unsigned int TransactionId;
 
 #define RPCSuccess ((RPCStatus)0)
-#define clear(X) memset(&(X), 0, sizeof(X))
-#define is_type(h, t) (((h).type & (t)) == (t))
+#define eyedb_clear(X) memset(&(X), 0, sizeof(X))
+#define eyedb_is_type(h, t) (((h).type & (t)) == (t))
 
 #endif

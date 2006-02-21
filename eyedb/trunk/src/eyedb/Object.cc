@@ -388,7 +388,7 @@ namespace eyedb {
 
     object_header_code_head(idr->getIDR(), &hdr);
 
-    if (is_type(hdr, _Class_Type))
+    if (eyedb_is_type(hdr, _Class_Type))
       memset(idr->getIDR() + IDB_CLASS_COLL_START, 0,
 	     IDB_CLASS_COLLS_CNT * sizeof(eyedbsm::Oid));
   }

@@ -2139,12 +2139,12 @@ namespace eyedb {
 
     if (mprot_oid.isValid() && moid.compare(mprot_oid))
       rpc_status = IDB_protectionCreate(dbh, dspid, idr, &hdr, oid, xdata, True);
-    else if (is_type(hdr, _Class_Type))
+    else if (eyedb_is_type(hdr, _Class_Type))
       rpc_status = IDB_classCreate(dbh, dspid, idr, &hdr, oid, xdata);
-    else if (is_type(hdr, _Struct_Type) ||
-	     is_type(hdr, _Union_Type))
+    else if (eyedb_is_type(hdr, _Struct_Type) ||
+	     eyedb_is_type(hdr, _Union_Type))
       rpc_status = IDB_agregatCreate(dbh, dspid, idr, &hdr, oid, xdata);
-    else if (is_type(hdr, _Collection_Type))
+    else if (eyedb_is_type(hdr, _Collection_Type))
       rpc_status = IDB_collectionCreate(dbh, dspid, idr, &hdr, oid, xdata);
     else
       rpc_status = IDB_instanceCreate(dbh, dspid, idr, &hdr, oid, xdata, True);
@@ -2208,12 +2208,12 @@ namespace eyedb {
 
     if (mprot_oid.isValid() && moid.compare(mprot_oid))
       rpc_status = IDB_protectionDelete(dbh, idr, &hdr, oid);
-    else if (is_type(hdr, _Class_Type))
+    else if (eyedb_is_type(hdr, _Class_Type))
       rpc_status = IDB_classDelete(dbh, idr, &hdr, oid, flags);
-    else if (is_type(hdr, _Struct_Type) ||
-	     is_type(hdr, _Union_Type))
+    else if (eyedb_is_type(hdr, _Struct_Type) ||
+	     eyedb_is_type(hdr, _Union_Type))
       rpc_status = IDB_agregatDelete(dbh, idr, &hdr, oid);
-    else if (is_type(hdr, _Collection_Type))
+    else if (eyedb_is_type(hdr, _Collection_Type))
       rpc_status = IDB_collectionDelete(dbh, idr, &hdr, oid);
     else
       rpc_status = IDB_instanceDelete(dbh, idr, &hdr, oid);
@@ -2527,12 +2527,12 @@ namespace eyedb {
 
     if (mprot_oid.isValid() && moid.compare(mprot_oid))
       rpc_status = IDB_protectionWrite(dbh, idr, &hdr, oid, xdata);
-    else if (is_type(hdr, _Class_Type))
+    else if (eyedb_is_type(hdr, _Class_Type))
       rpc_status = IDB_classWrite(dbh, idr, &hdr, oid, xdata);
-    else if (is_type(hdr, _Struct_Type) ||
-	     is_type(hdr, _Union_Type))
+    else if (eyedb_is_type(hdr, _Struct_Type) ||
+	     eyedb_is_type(hdr, _Union_Type))
       rpc_status = IDB_agregatWrite(dbh, idr, &hdr, oid, xdata);
-    else if (is_type(hdr, _Collection_Type))
+    else if (eyedb_is_type(hdr, _Collection_Type))
       rpc_status = IDB_collectionWrite(dbh, idr, &hdr, oid, xdata);
     else
       rpc_status = IDB_instanceWrite(dbh, idr, &hdr, oid, xdata);
@@ -4017,8 +4017,8 @@ namespace eyedb {
     if (idx1->status())
       return rpcStatusMake_se(idx1->status());
 
-    if (is_type(*hdr, _CollList_Type) ||
-	is_type(*hdr, _CollArray_Type)) {
+    if (eyedb_is_type(*hdr, _CollList_Type) ||
+	eyedb_is_type(*hdr, _CollArray_Type)) {
 
 #ifdef COLLBE_BTREE
       if (1) {
@@ -4348,8 +4348,8 @@ namespace eyedb {
     eyedblib::int32 oid_cnt;
     int32_decode (idr, &offset, &oid_cnt);
 
-    int is_idx2 = (is_type(*hdr, _CollList_Type) ||
-		   is_type(*hdr, _CollArray_Type));
+    int is_idx2 = (eyedb_is_type(*hdr, _CollList_Type) ||
+		   eyedb_is_type(*hdr, _CollArray_Type));
 
     Data temp = collbe->getTempBuff();
     eyedblib::int16 item_size = collbe->getItemSize();
@@ -5211,7 +5211,7 @@ namespace eyedb {
 			   "schema already created");
 
     // must swap sch->oid
-    clear(hdr);
+    eyedb_clear(hdr);
     hdr.magic = IDB_OBJ_HEAD_MAGIC;
     hdr.type = _Schema_Type;
     hdr.size = sizeof temp;

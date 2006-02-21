@@ -90,6 +90,15 @@ inline void oqmlGarbManager::remove(gbLink *link)
     return;
 
   if (!garbaging) {
+
+    std::list<gbContext *>::iterator begin = ctx_l.begin();
+    std::list<gbContext *>::iterator end = ctx_l.end();
+    while (begin != end) {
+      if ((*begin)->link == link)
+	(*begin)->link = link->next;	
+      ++begin;
+    }
+
     if (link->prev)
       link->prev->next = link->next;
     if (link->next)

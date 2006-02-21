@@ -436,7 +436,7 @@ LinkedList *Database::dbopen_list;
   {
     if (!*pdbdesc)
       {
-	clear(dbdesc);
+	eyedb_clear(dbdesc);
 
 	eyedbsm::DbCreateDescription *d = &dbdesc.sedbdesc;
 	if (!strcmp(name, DBM_Database::getDbName()))
