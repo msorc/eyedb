@@ -432,7 +432,7 @@ inline oqmlAtom *oqmlAtom_list::copy()
 
 inline oqmlAtom *oqmlAtom_set::copy()
 {
-  return new oqmlAtom_set(list);
+  return new oqmlAtom_set(list, oqml_False);
 }
 
 inline oqmlAtom *oqmlAtom_bag::copy()
@@ -857,7 +857,7 @@ inline char *oqmlAtomList::getString() const
   return b;
 }
 
-inline void oqmlAtomList::append(oqmlAtom *a)
+inline void oqmlAtomList::append(oqmlAtom *a, bool incref)
 {
   a->next = 0;
   if (last)
@@ -868,10 +868,12 @@ inline void oqmlAtomList::append(oqmlAtom *a)
   else
     first = last = a;
 
-  if (refcnt)
-    oqmlLock(a, oqml_True);
-  else if (a->refcnt)
-    oqmlLock(this, oqml_True);
+  if (incref) {
+    if (refcnt)
+      oqmlLock(a, oqml_True);
+    else if (a->refcnt)
+      oqmlLock(this, oqml_True);
+  }
 
   cnt++;
 }

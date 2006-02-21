@@ -1039,6 +1039,9 @@ namespace eyedb {
 	     const char *userauth, const char *passwdauth, const char *dbname,
 	     const DbCreateDescription *dbdesc)
   {
+    if (!strcmp(dbmdb, DBM_Database::getDbName()))
+      return rpcStatusMake(Exception::make(IDB_ERROR, "cannot move %s database, use the unix tool 'mv' and update your configuration file",
+					   DBM_Database::getDbName()));  
     return IDB_dbMoveCopy(ch, dbmdb, userauth, passwdauth, dbname, dbname, dbdesc, False);
   }
 
