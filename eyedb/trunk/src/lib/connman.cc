@@ -267,7 +267,7 @@ static int
 read_access_file()
 {
   static time_t last_read;
-  struct stat st;
+  //struct stat st;
   int r;
 
   if (!rpc_access_file)
@@ -278,10 +278,10 @@ read_access_file()
     fprintf(stderr, "cannot stat access file '%s'\n", rpc_access_file);
     return 1;
   }
-  */
 
   if (st.st_mtime <= last_read)
     return 0;
+  */
 
   r = read_access_file_realize();
   time(&last_read);
