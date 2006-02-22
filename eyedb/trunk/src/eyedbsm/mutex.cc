@@ -49,6 +49,8 @@
 #endif
 #endif
 
+#define OLD_IF
+
 #include <unistd.h>
 #include <stdlib.h>
 
@@ -179,6 +181,7 @@ namespace eyedbsm {
   void
   mutexLightInit(DbDescription *vd, Mutex *mp, MutexP *pmp)
   {
+#ifndef OLD_IF
     mutexLightInit((vd ? vd->semkeys : 0), (vd ? &vd->locked : 0),
 		   mp, pmp);
   }
@@ -186,6 +189,7 @@ namespace eyedbsm {
   void
   mutexLightInit(int semkeys[], int *plocked, Mutex *mp, MutexP *pmp)
   {
+#endif
     assert(pmp);
     if (!mp)
       return;
@@ -207,13 +211,19 @@ namespace eyedbsm {
 	    ("mutexLightInit(mp=%p, name=%s)\n", mp, mp->pmp->mtname));
 #endif
 #endif
+
+#ifndef OLD_IF
     condLightInit(semkeys, &mp->cond, &mp->pmp->pcond);
+#else
+    condLightInit(vd, &mp->cond, &mp->pmp->pcond);
+#endif
   }
 
   int
   mutexInit(DbDescription *vd, Mutex *mp, MutexP *pmp,
 	    const char *mtname)
   {
+#ifndef OLD_IF
     return mutexInit((vd ? vd->semkeys : 0), (vd ? &vd->locked : 0),
 		     mp, pmp, mtname);
   }
@@ -223,6 +233,9 @@ namespace eyedbsm {
 	    const char *mtname)
   {
     mutexLightInit(semkeys, plocked, mp, pmp);
+#else
+    mutexLightInit(vd, mp, pmp);
+#endif
 #ifdef THR_TRACE
     IDB_LOG(IDB_LOG_MTX,
 	    ("mutexInit(mp=%p, pmp=%p, name=%s)\n", mp, pmp, mtname));
@@ -249,7 +262,11 @@ namespace eyedbsm {
     pmp->locked = 0;
 
     pmp->wait_cnt = 0;
+#ifndef OLD_IF
     condInit(semkeys, (mp ? &mp->cond : 0), &pmp->pcond);
+#else
+    condInit(vd, (mp ? &mp->cond : 0), &pmp->pcond);
+#endif
 
 #ifndef UT_SEM
     IDB_LOG(IDB_LOG_MTX,
@@ -555,12 +572,14 @@ do { \
   void
   condLightInit(DbDescription *vd, CondWait *cond, CondWaitP *pcond)
   {
+#ifndef OLD_IF
     condLightInit((vd ? vd->semkeys : 0), cond, pcond);
   }
 
   void
   condLightInit(int semkeys[], CondWait *cond, CondWaitP *pcond)
   {
+#endif
     assert(pcond);
     if (!cond)
       return;
@@ -579,6 +598,7 @@ do { \
   int
   condInit(DbDescription *vd, CondWait *cond, CondWaitP *pcond)
   {
+#ifndef OLD_IF
     return condInit(vd ? vd->semkeys : 0, cond, pcond);
   }
 
@@ -586,6 +606,10 @@ do { \
   condInit(int semkeys[], CondWait *cond, CondWaitP *pcond)
   {
     condLightInit(semkeys, cond, pcond);
+#else
+    condLightInit(vd, cond, pcond);
+#endif
+
 #ifdef THR_TRACE
     IDB_LOG(IDB_LOG_MTX,
 	    ("condInit(cond = %p, pcond = %p, cid = %d)\n",
