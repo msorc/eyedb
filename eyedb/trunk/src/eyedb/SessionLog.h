@@ -100,8 +100,8 @@ namespace eyedb {
     static SessionLog *sesslog;
     int file_cnt;
     char **files;
-#ifdef UT_SEM
     void *vd;
+#ifdef UT_SEM
     Status init_sems();
 #endif
 

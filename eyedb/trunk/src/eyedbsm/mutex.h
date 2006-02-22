@@ -113,24 +113,24 @@ namespace eyedbsm {
 
   struct DbDescription;
 
-  extern void mutexLightInit(DbDescription *vd, Mutex *mp, MutexP *pmp),
-    mutexLightInit(int semkeys[], int *plocked, Mutex *mp, MutexP *pmp);
+  extern void mutexLightInit(DbDescription *vd, Mutex *mp, MutexP *pmp);
+  //  mutexLightInit(int semkeys[], int *plocked, Mutex *mp, MutexP *pmp);
 
   extern int mutexInit(DbDescription *vd, Mutex *, MutexP *, const char *),
-    mutexInit(int semkeys[], int *plocked, Mutex *, MutexP *, const char *),
+  //mutexInit(int semkeys[], int *plocked, Mutex *, MutexP *, const char *),
     mutexCheckNotLock(Mutex *_mp, unsigned int xid);
 
   extern Status mutexLock(Mutex *, unsigned int),
     mutexUnlock(Mutex *, unsigned int);
 
   extern int condInit(DbDescription *, CondWait *, CondWaitP *),
-    condInit(int semkeys[], CondWait *, CondWaitP *),
+    //condInit(int semkeys[], CondWait *, CondWaitP *),
     condSignal(CondWait *),
     condWait(CondWait *, Mutex *, unsigned int, unsigned int timeout),
     condWait_r(CondWait *, Mutex *, unsigned int, unsigned int timeout);
 
-  extern void condLightInit(DbDescription *, CondWait *, CondWaitP *),
-    condLightInit(int semkeys[], CondWait *, CondWaitP *);
+  extern void condLightInit(DbDescription *, CondWait *, CondWaitP *);
+    //condLightInit(int semkeys[], CondWait *, CondWaitP *);
 
   extern XMOffset
   condNew(DbDescription *, XMHandle *, CondWait *);
@@ -153,7 +153,7 @@ namespace eyedbsm {
 #ifdef UT_SEM
       MUTEX_LOCK_VOID(mut, mut->id);
 #else
-      MUTEX_LOCK(mut, 0);
+      MUTEX_LOCK_VOID(mut, 0);
 #endif
       locked = true;
     }
@@ -161,7 +161,7 @@ namespace eyedbsm {
 #ifdef UT_SEM
       MUTEX_LOCK_VOID(mut, mut->id);
 #else
-      MUTEX_LOCK(mut, 0);
+      MUTEX_LOCK_VOID(mut, 0);
 #endif
       locked = true;
     }

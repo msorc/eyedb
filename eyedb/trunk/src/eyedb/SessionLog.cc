@@ -112,7 +112,6 @@ namespace eyedb {
 #define CONNLOG_SIZE (sizeof(SessionHead) + 128 * sizeof(ClientInfo))
 
 #ifdef UT_SEM
-
   Status
   SessionLog::init_sems()
   {
@@ -145,6 +144,8 @@ namespace eyedb {
     status = init_sems();
     if (status)
       return;
+#else
+    vd = (void *)calloc(sizeof(eyedbsm::DbDescription), 1);
 #endif
     islocked = False;
     addr_connlog = 0;
@@ -167,6 +168,8 @@ namespace eyedb {
     status = init_sems();
     if (status)
       return;
+#else
+    vd = (void *)calloc(sizeof(eyedbsm::DbDescription), 1);
 #endif
     islocked = False;
     addr_connlog = 0;

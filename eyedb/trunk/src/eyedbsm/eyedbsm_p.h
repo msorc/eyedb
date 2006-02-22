@@ -36,6 +36,7 @@
 #include <eyedbsm/eyedbsm.h>
 #include "eyedbsm/mutex.h"
 #include <eyedblib/log.h>
+#include <unistd.h>
 
 namespace eyedbsm {
 
