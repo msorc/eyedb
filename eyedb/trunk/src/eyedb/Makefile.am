@@ -209,11 +209,11 @@ oqlctbmthfe_la_DEPENDENCIES= $(top_srcdir)/VERSION
 
 utilsmthbe_la_SOURCES=utilsmthbe.cc utilsstubsbe.cc
 utilsmthbe_la_LDFLAGS=-module -release $(EYEDB_VERSION)
-utilsmthbe_la_LDEPENDENCIES= $(top_srcdir)/VERSION
+utilsmthbe_la_DEPENDENCIES= $(top_srcdir)/VERSION
 
 utilsmthfe_la_SOURCES=utilsmthfe.cc utilsstubsfe.cc
 utilsmthfe_la_LDFLAGS=-module -release $(EYEDB_VERSION)
-utilsmthfe_la_LDEPENDENCIES= $(top_srcdir)/VERSION
+utilsmthfe_la_DEPENDENCIES= $(top_srcdir)/VERSION
 
 sysclsmthbe_la_SOURCES=sysclsmthbe.cc sysclsstubsbe.cc
 sysclsmthbe_la_LDFLAGS=-module -release $(EYEDB_VERSION)
