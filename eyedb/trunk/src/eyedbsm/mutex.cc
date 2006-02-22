@@ -197,8 +197,8 @@ namespace eyedbsm {
     mp->pmp = pmp;
     mp->cond.pcond = &pmp->pcond;
 #ifdef UT_SEM
-    mp->id = (semkeys ? ut_sem_open(semkeys[0]) : -1);
-    mp->plocked = plocked;
+    mp->id = (vd ? ut_sem_open(vd->semkeys[0]) : -1);
+    mp->plocked = &vd->locked;
 #endif
 #ifdef THR_TRACE
 #ifdef UT_SEM
@@ -242,7 +242,7 @@ namespace eyedbsm {
 #endif
     memset(pmp, 0, sizeof(*pmp));
 #ifdef UT_SEM
-    pmp->u.key = (semkeys ? semkeys[0] : 0);
+    pmp->u.key = (vd ? vd->semkeys[0] : 0);
 #else
     pthread_mutexattr_t mattr;
 
@@ -586,7 +586,7 @@ do { \
 
     cond->pcond = pcond;
 #ifdef UT_SEM
-    cond->id = (semkeys ? ut_sem_open(semkeys[1]) : -1);
+    cond->id = (vd ? ut_sem_open(vd->semkeys[1]) : -1);
 #endif
 #ifdef THR_TRACE
     IDB_LOG(IDB_LOG_MTX,
@@ -617,7 +617,7 @@ do { \
 #endif
     memset(pcond, 0, sizeof(*pcond));
 #ifdef UT_SEM
-    pcond->u.key = (semkeys ? semkeys[1] : 0);
+    pcond->u.key = (vd ? vd->semkeys[1] : 0);
 #else
     pthread_condattr_t cattr;
 
