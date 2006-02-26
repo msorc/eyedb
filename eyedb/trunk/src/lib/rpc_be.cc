@@ -18,7 +18,7 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
+  Author: Eric Viara <viara@sysra.com>
 */
 
 
@@ -182,10 +182,10 @@ close_clients(void)
     if (clientInfo[fd])
       rpc_garbClientInfo(rpc_mainServer, 0, fd);
 
-/*
-  if (unixname)
+  /*
+    if (unixname)
     unlink(unixname);
-*/
+  */
 }
 
 static char *rpc_unixPort;
@@ -244,21 +244,20 @@ signal_handler(int sig)
   if (getenv("EYEDBDEBUG_"))
     sleep(1000);
 
-  if (sig == SIGBUS || sig == SIGSEGV || sig == SIGABRT)
-    {
-      IDB_LOG(IDB_LOG_CONN, ("backend fatal signal...\n"));
+  if (sig == SIGBUS || sig == SIGSEGV || sig == SIGABRT) {
+    IDB_LOG(IDB_LOG_CONN, ("backend fatal signal...\n"));
 
-      rpc_quit(DO_NOT_EXIT, 1);
+    rpc_quit(DO_NOT_EXIT, 1);
 
-      /* the following code implies sometimes a loop! */
-      /* disconnected it the 27/10/00 */
-      /*
+    /* the following code implies sometimes a loop! */
+    /* disconnected it the 27/10/00 */
+    /*
       IDB_LOG(IDB_LOG_CONN, ("backend tries to abort and core dumped\n"));
 
       raise(sig);
       return;
-      */
-    }
+    */
+  }
 
   rpc_quit(0, 0);
   raise(sig);
@@ -268,8 +267,8 @@ signal_handler(int sig)
 static void
 sig_h(int sig, siginfo_t *info, void *any)
 {
-/*  utlog(msg_make("Got %s [sigaction=%d]\n", _sys_siglistp[sig], sig)); */
-//  printf("Got %s [sigaction=%d]\n", _sys_siglistp[sig], sig);
+  /*  utlog(msg_make("Got %s [sigaction=%d]\n", _sys_siglistp[sig], sig)); */
+  //  printf("Got %s [sigaction=%d]\n", _sys_siglistp[sig], sig);
   if (info) {
     int fd, i;
     rpc_ClientInfo *ci;
@@ -335,49 +334,29 @@ rpc_ServerInit()
 {
   static rpc_Boolean init = rpc_False;;
 
-  if (!init)
-    {
-      struct rlimit rlp;
+  if (!init) {
+    struct rlimit rlp;
 
-      if (!getrlimit(RLIMIT_NOFILE, &rlp))
-	{
-	  rlp.rlim_cur = rlp.rlim_max;
-	  setrlimit(RLIMIT_NOFILE, &rlp);
-	}
-
-      msg_init();
-
-      signal(SIGHUP,  signal_handler);
-      signal(SIGTERM, signal_handler);
-      signal(SIGINT,  signal_handler);
-      signal(SIGQUIT, signal_handler);
-      signal(SIGSEGV, signal_handler);
-      signal(SIGBUS,  signal_handler);
-      signal(SIGABRT,  signal_handler);
-
-      signal(SIGPIPE, SIG_IGN);
-
-      set_sigaction();
-#if 0
-      {
-	struct sigaction act;
-
-	act.sa_handler = 0;
-	act.sa_sigaction = sig_h;
-
-	/*@@@@*/
-#if defined(LINUX) || defined(LINUX64) || defined(LINUX_IA64) || defined(LINUX_PPC64) || defined(ORIGIN) || defined(ALPHA) || defined(CYGWIN)
-	act.sa_flags = SA_SIGINFO | SA_NOCLDSTOP;
-#else
-	act.sa_flags = SA_SIGINFO | SA_NOCLDWAIT;
-#endif
-
-	memset(&act.sa_mask, 0, sizeof(act.sa_mask));
-	sigaction(SIGCHLD, &act, 0);
-      }
-#endif
-      init = rpc_True;
+    if (!getrlimit(RLIMIT_NOFILE, &rlp)) {
+      rlp.rlim_cur = rlp.rlim_max;
+      setrlimit(RLIMIT_NOFILE, &rlp);
     }
+
+    msg_init();
+
+    signal(SIGHUP,  signal_handler);
+    signal(SIGTERM, signal_handler);
+    signal(SIGINT,  signal_handler);
+    signal(SIGQUIT, signal_handler);
+    signal(SIGSEGV, signal_handler);
+    signal(SIGBUS,  signal_handler);
+    signal(SIGABRT,  signal_handler);
+
+    signal(SIGPIPE, SIG_IGN);
+
+    set_sigaction();
+    init = rpc_True;
+  }
 }
 
 #define RPC_MAXARGS 32
@@ -402,11 +381,10 @@ rpc_newClientInfo(rpc_Server *server, int fd[], int fd_cnt)
   ci->ua        = (char **)malloc(server->conn_cnt * sizeof(rpc_ServerArg));
   ci->comm_buff = (char **)malloc(server->conn_cnt * sizeof(char *));
 
-  for (i = 0; i < server->conn_cnt; i++)
-    {
-      ci->comm_buff[i] = (char *)calloc(server->comm_size * sizeof(char), 1);
-      ci->ua[i]        = (char *)calloc(server->args_size * RPC_MAXARGS, 1);
-    }
+  for (i = 0; i < server->conn_cnt; i++) {
+    ci->comm_buff[i] = (char *)calloc(server->comm_size * sizeof(char), 1);
+    ci->ua[i]        = (char *)calloc(server->args_size * RPC_MAXARGS, 1);
+  }
 
   return ci;
 }
@@ -422,30 +400,29 @@ rpc_Server *rpc_serverCreate(rpc_ServerMode mode, unsigned long magic,
   if (mode != rpc_MonoProc && mode != rpc_MultiProcs &&
       mode != rpc_MultiThreaded && mode != rpc_FrontThreaded)
     return 0;
-  else
-    {
-      rpc_Server *server = rpc_new(rpc_Server);
+  else {
+    rpc_Server *server = rpc_new(rpc_Server);
 
-      server->last_type = rpc_NBaseType;
-      server->conn_cnt  = conn_cnt;
-      if (!comm_size)
-	comm_size = RPC_COMM_SIZE;
-      server->comm_size = comm_size;
-      server->mode      = mode;
-      server->magic     = magic;
-      server->init      = init;
-      server->release   = release;
-      server->begin     = begin;
-      server->end       = end;
-      server->user_data = user_data;
+    server->last_type = rpc_NBaseType;
+    server->conn_cnt  = conn_cnt;
+    if (!comm_size)
+      comm_size = RPC_COMM_SIZE;
+    server->comm_size = comm_size;
+    server->mode      = mode;
+    server->magic     = magic;
+    server->init      = init;
+    server->release   = release;
+    server->begin     = begin;
+    server->end       = end;
+    server->user_data = user_data;
 
 #ifdef TRACE
-      utlog(msg_make("serverCreate conn_cnt = %d\n", conn_cnt));
+    utlog(msg_make("serverCreate conn_cnt = %d\n", conn_cnt));
 #endif
-      rpc_ServerInit();
+    rpc_ServerInit();
       
-      return server;
-    }
+    return server;
+  }
 }
 
 rpc_ArgType rpc_makeServerUserType(rpc_Server *server, int size,
@@ -499,37 +476,32 @@ rpc_serverOptionsGet(int argc, char *argv[], char **portname, char **unixname)
   *portname = 0;
   *unixname = 0;
 
-  for (i = 1; i < argc; )
-    {
-      char *s = argv[i];
-      if (s[0] == '-')
-	{
-	  if (!strcmp(s, "-inetd"))
-	    {
-	      if (i+1 >= argc)
-		return;
+  for (i = 1; i < argc; ) {
+    char *s = argv[i];
+    if (s[0] == '-') {
+      if (!strcmp(s, "-inetd")) {
+	if (i+1 >= argc)
+	  return;
 
-	      *portname = argv[++i];
-	      i++;
-	    }
-	  else if (!strcmp(s, "-unixd"))
-	    {
-	      if (i+1 >= argc)
-		return;
+	*portname = argv[++i];
+	i++;
+      }
+      else if (!strcmp(s, "-unixd")) {
+	if (i+1 >= argc)
+	  return;
 
-	      *unixname = argv[++i];
-	      if (strlen(*unixname) >= sizeof(((struct sockaddr_un *)0)->sun_path))
-		{
-		  utlog(msg_make("eyedb fatal error: unix filename too long (must be < %d\n"),
-			  sizeof(((struct sockaddr_un *)0)->sun_path));
-		  return;
-		}
-	      i++;
-	    }
+	*unixname = argv[++i];
+	if (strlen(*unixname) >= sizeof(((struct sockaddr_un *)0)->sun_path)) {
+	  utlog(msg_make("eyedb fatal error: unix filename too long (must be < %d\n"),
+		sizeof(((struct sockaddr_un *)0)->sun_path));
+	  return;
 	}
-      else
-	return;
+	i++;
+      }
     }
+    else
+      return;
+  }
 }
 
 /*extern int gethostname(const char *, int);*/
@@ -571,151 +543,138 @@ rpc_portOpen(rpc_Server *server, const char *servname, const char *portname,
   const char *t_portname;
 
   t_portname = rpc_getPortAttr(portname, &port->domain, &port->type);
-  if (!t_portname)
-    {
-      fprintf(stderr, "invalid port '%s'", portname);
-      return rpc_Error;
-    }
+  if (!t_portname) {
+    fprintf(stderr, "invalid port '%s'", portname);
+    return rpc_Error;
+  }
   portname = t_portname;
   port->server = server;
   port->portname = strdup(portname);
 
   *pport = port;
 
-  if (port->domain == AF_INET)
-    {
-      if ((port->u.in.sockin_fd = socket(AF_INET, port->type, 0)) < 0)
-	{
-	  PERROR(msg_make("eyedb fatal error: unable to create inet socket port '%s'", port->portname) );
-	  return rpc_Error;
-	}
-
-      rpc_socket_reuse_addr(port->u.in.sockin_fd);
-      rpc_socket_nodelay(port->u.in.sockin_fd);
-      
-      port->u.in.sock_in_name.sin_family = AF_INET;
-      port->u.in.sock_in_name.sin_port   = htons(atoi(portname));
-      
-      /* get host name */
-      if (servname == 0)
-	{
-	  if (gethostname(hname, sizeof(hname)-1) < 0)
-	    {
-	      PERROR(msg_make("eyedb fatal error: gethostname failed") );
-	      return rpc_Error;
-	    }
-	  hname[sizeof(hname)-1] = 0;
-	}
-      else
-	strcpy(hname, servname);
-
-      if (!rpc_hostNameToAddr(hname, &port->u.in.sock_in_name.sin_addr))
-	{
-	  utlog(msg_make("eyedb fatal error: unknown host '%s'\n", hname));
-	  fprintf(stderr, msg_make("unknown host '%s'\n", hname));
-	  return rpc_Error;
-	}
-      
-      if (bind(port->u.in.sockin_fd, (struct sockaddr *)&port->u.in.sock_in_name,
-	       sizeof(port->u.in.sock_in_name)) < 0 )
-	{
-	  PERROR(msg_make("eyedb fatal error: bind (naming the socket) failed port '%s'", port->portname));
-	  bind_error(port->portname, true);
-	  return rpc_Error;
-	}
-
-      if (rpc_isSocketValid(port->u.in.sockin_fd) &&
-	  (port->type == SOCK_STREAM && listen(port->u.in.sockin_fd, 2) < 0))
-	{
-	  PERROR(msg_make("eyedb fatal error: listen for inet socket port '%s'", port->portname) );
-	  return rpc_Error;
-	}
+  if (port->domain == AF_INET) {
+    if ((port->u.in.sockin_fd = socket(AF_INET, port->type, 0)) < 0) {
+      PERROR(msg_make("eyedb fatal error: unable to create inet socket port '%s'", port->portname) );
+      return rpc_Error;
     }
 
-  if (port->domain == AF_UNIX)
-    {
-#ifdef HAS_FATTACH
-      int pfd[2];
-      int fd;
-      int created = 0;
-
-      if ((fd = open(portname, O_RDONLY)) < 0) {
-	if ((fd = creat(portname, 0666)) < 0) {
-	  PERROR(msg_make("eyedb fatal error: cannot create file '%s'",
-			  portname));
-	  return rpc_Error;
-	}
-	created = 1;
-      }
+    rpc_socket_reuse_addr(port->u.in.sockin_fd);
+    rpc_socket_nodelay(port->u.in.sockin_fd);
       
-      if (fchmod(fd, 0666) < 0)	{
-	if (created) unlink(portname);
-	PERROR(msg_make("eyedb fatal error: cannot change file '%s' mode",
+    port->u.in.sock_in_name.sin_family = AF_INET;
+    port->u.in.sock_in_name.sin_port   = htons(atoi(portname));
+      
+    /* get host name */
+    if (servname == 0) {
+      if (gethostname(hname, sizeof(hname)-1) < 0) {
+	PERROR(msg_make("eyedb fatal error: gethostname failed") );
+	return rpc_Error;
+      }
+      hname[sizeof(hname)-1] = 0;
+    }
+    else
+      strcpy(hname, servname);
+
+    if (!rpc_hostNameToAddr(hname, &port->u.in.sock_in_name.sin_addr)) {
+      utlog(msg_make("eyedb fatal error: unknown host '%s'\n", hname));
+      fprintf(stderr, msg_make("unknown host '%s'\n", hname));
+      return rpc_Error;
+    }
+      
+    if (bind(port->u.in.sockin_fd, (struct sockaddr *)&port->u.in.sock_in_name,
+	     sizeof(port->u.in.sock_in_name)) < 0 ) {
+      PERROR(msg_make("eyedb fatal error: bind (naming the socket) failed port '%s'", port->portname));
+      bind_error(port->portname, true);
+      return rpc_Error;
+    }
+
+    if (rpc_isSocketValid(port->u.in.sockin_fd) &&
+	(port->type == SOCK_STREAM && listen(port->u.in.sockin_fd, 2) < 0)) {
+      PERROR(msg_make("eyedb fatal error: listen for inet socket port '%s'", port->portname) );
+      return rpc_Error;
+    }
+  }
+
+  if (port->domain == AF_UNIX) {
+#ifdef HAS_FATTACH
+    int pfd[2];
+    int fd;
+    int created = 0;
+
+    if ((fd = open(portname, O_RDONLY)) < 0) {
+      if ((fd = creat(portname, 0666)) < 0) {
+	PERROR(msg_make("eyedb fatal error: cannot create file '%s'",
 			portname));
 	return rpc_Error;
       }
-      
-      close(fd);
-
-      if (pipe(pfd) < 0) {
-	if (created) unlink(portname);
-	PERROR(msg_make("eyedb fatal error: unable to create pipe"));
-	return rpc_Error;
-      }
-      /*@@@@#if !defined(LINUX) && !defined(CYGWIN)*/
-#if defined(SOLARIS) || defined(ULTRASOL7)
-      if (ioctl(pfd[0], I_PUSH, "connld") < 0)
-	{
-	  if (created) unlink(portname);
-	  PERROR(msg_make("eyedb fatal error: unable to configure pipe"));
-	  return rpc_Error;
-	}
-#endif
-
-      if (fattach(pfd[0], port->portname) < 0) {
-	if (created) unlink(portname);
-	PERROR(msg_make("eyedb fatal error: unable to attach stream to file '%s'", port->portname) );
-	return rpc_Error;
-      }
-
-      port->u.un.sockun_fd = pfd[1];
-#else
-      if ((port->u.un.sockun_fd = socket(AF_UNIX, port->type, 0)) < 0)
-	{
-	  PERROR(msg_make("eyedb fatal error: unable to create unix socket port '%s'", port->portname) );
-	  return rpc_Error;
-	}
-
-      port->u.un.sock_un_name.sun_family = AF_UNIX;
-      strcpy(port->u.un.sock_un_name.sun_path, portname);
-
-      if (bind(port->u.un.sockun_fd,
-	       (struct sockaddr *)&port->u.un.sock_un_name,
-	       sizeof(port->u.un.sock_un_name)) < 0 )
-	{
-	  PERROR(msg_make("eyedb fatal error: bind (naming the socket) failed port '%s'", port->portname));
-	  bind_error(port->portname, false);
-	  /*
-	  fprintf(stderr, "\nPerharps another eyedbd is running on port:\n%s\n",
-		  port->portname);
-	  fprintf(stderr, "\nYou may check this by launching:\n");
-	  fprintf(stderr, "eyedbrc status --port=%s\n", port->portname);
-	  fprintf(stderr, "\nIf no, unlink this port as follows:\n");
-	  fprintf(stderr, "rm -f %s\n", port->portname);
-	  fprintf(stderr, "and relaunch the server.\n");
-	  */
-	  return rpc_Error;
-	}
-
-      chmod(portname, 0777);
-      if (rpc_isSocketValid(port->u.un.sockun_fd) &&
-	  listen(port->u.un.sockun_fd, 2) < 0 )
-	{
-	  PERROR(msg_make("eyedb fatal error: listen for unix socket port '%s'", port->portname) );
-	  return rpc_Error;
-	}
-#endif
+      created = 1;
     }
+      
+    if (fchmod(fd, 0666) < 0)	{
+      if (created) unlink(portname);
+      PERROR(msg_make("eyedb fatal error: cannot change file '%s' mode",
+		      portname));
+      return rpc_Error;
+    }
+      
+    close(fd);
+
+    if (pipe(pfd) < 0) {
+      if (created) unlink(portname);
+      PERROR(msg_make("eyedb fatal error: unable to create pipe"));
+      return rpc_Error;
+    }
+    /*@@@@#if !defined(LINUX) && !defined(CYGWIN)*/
+#if defined(SOLARIS) || defined(ULTRASOL7)
+    if (ioctl(pfd[0], I_PUSH, "connld") < 0) {
+      if (created) unlink(portname);
+      PERROR(msg_make("eyedb fatal error: unable to configure pipe"));
+      return rpc_Error;
+    }
+#endif
+
+    if (fattach(pfd[0], port->portname) < 0) {
+      if (created) unlink(portname);
+      PERROR(msg_make("eyedb fatal error: unable to attach stream to file '%s'", port->portname) );
+      return rpc_Error;
+    }
+
+    port->u.un.sockun_fd = pfd[1];
+#else
+    if ((port->u.un.sockun_fd = socket(AF_UNIX, port->type, 0)) < 0) {
+      PERROR(msg_make("eyedb fatal error: unable to create unix socket port '%s'", port->portname) );
+      return rpc_Error;
+    }
+
+    port->u.un.sock_un_name.sun_family = AF_UNIX;
+    strcpy(port->u.un.sock_un_name.sun_path, portname);
+
+    if (bind(port->u.un.sockun_fd,
+	     (struct sockaddr *)&port->u.un.sock_un_name,
+	     sizeof(port->u.un.sock_un_name)) < 0 ) {
+      PERROR(msg_make("eyedb fatal error: bind (naming the socket) failed port '%s'", port->portname));
+      bind_error(port->portname, false);
+      /*
+	fprintf(stderr, "\nPerharps another eyedbd is running on port:\n%s\n",
+	port->portname);
+	fprintf(stderr, "\nYou may check this by launching:\n");
+	fprintf(stderr, "eyedbrc status --port=%s\n", port->portname);
+	fprintf(stderr, "\nIf no, unlink this port as follows:\n");
+	fprintf(stderr, "rm -f %s\n", port->portname);
+	fprintf(stderr, "and relaunch the server.\n");
+      */
+      return rpc_Error;
+    }
+
+    chmod(portname, 0777);
+    if (rpc_isSocketValid(port->u.un.sockun_fd) &&
+	listen(port->u.un.sockun_fd, 2) < 0 ) {
+      PERROR(msg_make("eyedb fatal error: listen for unix socket port '%s'", port->portname) );
+      return rpc_Error;
+    }
+#endif
+  }
 
   return rpc_Success;
 }
@@ -726,20 +685,19 @@ typedef struct {
   int which;
 } rpc_ThreadArg;
 
-static void
-check_fd(int fd, const char *msg)
+static void check_fd(int fd, const char *msg)
 {
   struct stat stat;
   if (fstat(fd, &stat) < 0)
     utlog(msg_make("%s: error fd=%d is not a valid file descriptor\n",
-			     msg, fd));
+		   msg, fd));
 }
 
 static char exiting = 0;
 
-eyedblib::Mutex exit_mp;
-eyedblib::Mutex wait_thr_mp;
-eyedblib::Condition *wait_thr_cond;
+static eyedblib::Mutex exit_mp;
+static eyedblib::Mutex wait_thr_mp;
+static eyedblib::Condition *wait_thr_cond;
 
 static void *wait_thr(void *arg)
 {
@@ -749,10 +707,14 @@ static void *wait_thr(void *arg)
   printf("%d:%d waiting for pid %d\n", getpid(), pthread_self(), pid);
 #endif
   int status;
-  errno = 0;
   wait_thr_cond->signal();
+  unsigned max_loop = 0;
   do {
+    if (max_loop > 100) // to avoid infinite loop
+      break;
+    errno = 0;
     waitpid(pid, &status, 0);
+    max_loop++;
   } while(errno);
 
 #ifdef TRACE2
@@ -772,36 +734,34 @@ static void *serv_thr(void *arg)
 
   rpc_setConnFd(fd);
   IDB_LOG(IDB_LOG_CONN, ("new thread %d [fd = %d, which=%d], stack = 0x%x\n", pthread_self(),
-	 fd, which, &server));
+			 fd, which, &server));
 
   rpc_client_id = (rpc_ClientId)fd;
 
   for (;;)
-    if (!rpc_inputHandle(server, which, fd)) /* for now */
-      {
-	if (server->mode == rpc_MultiThreaded || server->conn_cnt > 1)
-	  {
-	    eyedblib::MutexLocker _(exit_mp);
-	    void *status = 0;
+    if (!rpc_inputHandle(server, which, fd)) /* for now */ {
+      if (server->mode == rpc_MultiThreaded || server->conn_cnt > 1) {
+	eyedblib::MutexLocker _(exit_mp);
+	void *status = 0;
 #ifdef TRACE
-	    utlog(msg_make("%d thread EXIT\n", pthread_self()));
+	utlog(msg_make("%d thread EXIT\n", pthread_self()));
 #endif
 #ifdef TRACE2
-	    fprintf(stderr, "%d:%d thread EXIT\n", getpid(), pthread_self());
-	    fflush(stderr);
+	fprintf(stderr, "%d:%d thread EXIT\n", getpid(), pthread_self());
+	fflush(stderr);
 #endif
-	    //	    rpc_garbClientInfo(server, which, fd);
-	    rpc_garbClientInfo(server, 0, fd); // force which
-	    exit(0);
+	//	    rpc_garbClientInfo(server, which, fd);
+	rpc_garbClientInfo(server, 0, fd); // force which
+	exit(0);
 #ifdef THR_POSIX
-	    pthread_exit(&status);
+	pthread_exit(&status);
 #else
-	    thr_exit(&status);
+	thr_exit(&status);
 #endif
-	  }
-	else
-	  break;
       }
+      else
+	break;
+    }
   return 0;
 }
 
@@ -850,26 +810,6 @@ rpc_makeThread(rpc_Server *server, int which, int fd, rpc_ClientInfo *ci)
 #endif
 }
 
-/*
-static void
-check_peer(int fd, const char *msg)
-{
-  struct sockaddr_in in;
-  int len = sizeof(in);
-  memset(&in, 0, sizeof(in));
-  if (getpeername(fd, (struct sockaddr *)&in, &len))
-      perror("getpeername");
-
-  printf("%s: family = %d, port = %d addr = %d.%d.%d.%d\n",
-	 msg,
-	 in.sin_family, in.sin_port,
-	 in.sin_addr._S_un._S_un_b.s_b1,
-	 in.sin_addr._S_un._S_un_b.s_b2,
-	 in.sin_addr._S_un._S_un_b.s_b3,
-	 in.sin_addr._S_un._S_un_b.s_b4);
-}
-*/
-
 static void
 rpc_makeNewConnection(rpc_Server *server, int new_fd[], int fd_cnt,
 		      int *pmax_fd, rpc_ConnInfo *rpc_ci)
@@ -886,109 +826,99 @@ rpc_makeNewConnection(rpc_Server *server, int new_fd[], int fd_cnt,
   {
     char buf[128];
     strcpy(buf, "new connection : ");
-    for (i = 0; i < fd_cnt; i++)
-      {
-	char tok[32];
-	if (i)
-	  strcat(buf, ", ");
+    for (i = 0; i < fd_cnt; i++) {
+      char tok[32];
+      if (i)
+	strcat(buf, ", ");
 
-	sprintf(tok, "fd = %d", new_fd[i]);
-	strcat(buf, tok);
-      }
+      sprintf(tok, "fd = %d", new_fd[i]);
+      strcat(buf, tok);
+    }
     strcat(buf, "\n");
 
     utlog(buf);
   }
 #endif
 
-  if (server->mode == rpc_MonoProc)
-    {
-      for (i = 0; i < fd_cnt; i++)
-	{
-	  if (new_fd[i] > *pmax_fd)
-	    *pmax_fd = new_fd[i];
-	  FD_SET(new_fd[i], &server->fds_used);
-	}
+  if (server->mode == rpc_MonoProc) {
+    for (i = 0; i < fd_cnt; i++)
+      {
+	if (new_fd[i] > *pmax_fd)
+	  *pmax_fd = new_fd[i];
+	FD_SET(new_fd[i], &server->fds_used);
+      }
+    rpc_serverStart(server, new_fd, fd_cnt, rpc_ci);
+    rpc_serverEnd(server, rpc_ci);
+  }
+  else {
+    if (server->mode == rpc_MultiThreaded) {
       rpc_serverStart(server, new_fd, fd_cnt, rpc_ci);
+      for (i = 0; i < fd_cnt; i++)
+	rpc_makeThread(server, i, new_fd[i], ci);
       rpc_serverEnd(server, rpc_ci);
     }
-  else
-    {
-      if (server->mode == rpc_MultiThreaded)
-	{
-	  rpc_serverStart(server, new_fd, fd_cnt, rpc_ci);
+    else if (server->mode == rpc_MultiProcs) {
+      suspend_sigaction();
+
+      if ((ci->tid[0] = fork()) == 0) {
+	const char *w;
+	if ((w = getenv("EYEDBWAIT"))) {
+	  int sec = atoi(w);
+	  if (!sec)
+	    sec = 30;
+	  printf("Pid %d waiting for %d seconds\n", getpid(), sec);
+	  sleep(sec);
+	  printf("Continuing...\n");
+	}
+
+	rpc_serverStart(server, new_fd, fd_cnt, rpc_ci);
+	if (fd_cnt > 1) {
 	  for (i = 0; i < fd_cnt; i++)
 	    rpc_makeThread(server, i, new_fd[i], ci);
-	  rpc_serverEnd(server, rpc_ci);
-	}
-      else if (server->mode == rpc_MultiProcs)
-	{
-	  suspend_sigaction();
 
-	  if ((ci->tid[0] = fork()) == 0)
-	    {
-	      const char *w;
-	      if ((w = getenv("EYEDBWAIT")))
-		{
-		  int sec = atoi(w);
-		  if (!sec)
-		    sec = 30;
-		  printf("Pid %d waiting for %d seconds\n", getpid(), sec);
-		  sleep(sec);
-		  printf("Continuing...\n");
-		}
-
-	      rpc_serverStart(server, new_fd, fd_cnt, rpc_ci);
-	      if (fd_cnt > 1)
-		{
-		  for (i = 0; i < fd_cnt; i++)
-		    rpc_makeThread(server, i, new_fd[i], ci);
-
-		  for (i = 0; i < fd_cnt; i++)
-		    {
-		      void *status;
+	  for (i = 0; i < fd_cnt; i++) {
+	    void *status;
 #ifdef THR_POSIX
-		      pthread_join(ci->tid[i], &status);
+	    pthread_join(ci->tid[i], &status);
 #else
-		      thr_join(ci->tid[i], NULL, &status);
+	    thr_join(ci->tid[i], NULL, &status);
 #endif
-		    }
+	  }
 
-		  free(ci->tid);
-		  free(ci);
+	  free(ci->tid);
+	  free(ci);
 #ifdef TRACE
-		  utlog(msg_make("all threads terminated\n"));
+	  utlog(msg_make("all threads terminated\n"));
 #endif
-		}
-	      else
-		{
-		  thr_arg = rpc_new(rpc_ThreadArg);
-		  thr_arg->server = server;
-		  thr_arg->fd     = new_fd[0];
-		  thr_arg->which  = 0;
-		  serv_thr(thr_arg);
-		}
-
-	      rpc_serverEnd(server, rpc_ci);
-	      rpc_quit(0, 0);
-	    }
-
-	  wait_thr_cond = new eyedblib::Condition();
-	  pthread_t wait_thr_p;
-	  pid_t *pid = new pid_t(ci->tid[0]);
-	  errno = 0;
-	  if (!pthread_create(&wait_thr_p, 0, wait_thr, pid))
-	    wait_thr_cond->wait();
-	  else
-	    IDB_LOG(IDB_LOG_CONN, ("cannot create waiting thread\n"));
-
-	  delete wait_thr_cond;
-	  set_sigaction();
-
-	  rpc_garbRealize(server, ci, 1);
-	  free(rpc_ci);
 	}
+	else {
+	  thr_arg = rpc_new(rpc_ThreadArg);
+	  thr_arg->server = server;
+	  thr_arg->fd     = new_fd[0];
+	  thr_arg->which  = 0;
+	  serv_thr(thr_arg);
+	}
+
+	rpc_serverEnd(server, rpc_ci);
+	rpc_quit(0, 0);
+      }
+
+      wait_thr_cond = new eyedblib::Condition();
+      pthread_t wait_thr_p;
+      pid_t *pid = new pid_t(ci->tid[0]);
+      errno = 0;
+      if (!pthread_create(&wait_thr_p, 0, wait_thr, pid))
+	wait_thr_cond->wait();
+      else
+	IDB_LOG(IDB_LOG_CONN, ("cannot create waiting thread\n"));
+
+      delete wait_thr_cond;
+      set_sigaction();
+
+      rpc_garbRealize(server, ci, 1);
+      free(rpc_ci);
     }
+  }
 }
 
 typedef struct {
@@ -1021,17 +951,14 @@ rpc_multiConnSuppress(rpc_Server *server, rpc_MultiConnEntry *mce,
 {
   int i;
 
-  for (i = 0; i < mce->fd_cnt; i++)
-    {
-      int fd = mce->fd[i];
-      if (do_close)
-	{
-	  close(fd);
-/*	  utlog("rpc_multiConnSuppress: close(%d)\n", fd); */
-	}
-      multiConn[fd] = rpc_False;
-      FD_CLR(fd, &server->fds_used);
+  for (i = 0; i < mce->fd_cnt; i++) {
+    int fd = mce->fd[i];
+    if (do_close) {
+      close(fd);
     }
+    multiConn[fd] = rpc_False;
+    FD_CLR(fd, &server->fds_used);
+  }
 
   free(mce->fd);
   mce->fd = (int *)0;
@@ -1056,11 +983,10 @@ rpc_multiConnAddEntry(rpc_Server *server, int new_fd)
   time_t now;
 
   for (i = 0; i < MAX_MULTICONN_ENTRIES; i++, mce++)
-    if (!mce->fd_cnt)
-      {
-	rpc_addRealize(mce, fd_cnt, new_fd);
-	return i;
-      }
+    if (!mce->fd_cnt) {
+      rpc_addRealize(mce, fd_cnt, new_fd);
+      return i;
+    }
 
 #ifdef TRACE
   utlog(msg_make("multiConnAddEntry: TRIES GARBAGE!\n"));
@@ -1070,12 +996,11 @@ rpc_multiConnAddEntry(rpc_Server *server, int new_fd)
   time(&now);
   mce = multiConnEntry;
   for (i = 0; i < MAX_MULTICONN_ENTRIES; i++, mce++)
-    if ((now - mce->begin) > 10)
-      {
-	rpc_multiConnSuppress(server, mce, rpc_True);
-	rpc_addRealize(mce, fd_cnt, new_fd);
-	return i;
-      }
+    if ((now - mce->begin) > 10) {
+      rpc_multiConnSuppress(server, mce, rpc_True);
+      rpc_addRealize(mce, fd_cnt, new_fd);
+      return i;
+    }
 
   return -1;
 }
@@ -1179,155 +1104,136 @@ rpc_serverMainLoop(rpc_Server *server, rpc_PortHandle **ports, int nports)
 
   FD_ZERO(&server->fds_used);
 
-  for (n = 0; n < nports; n++)
-    {
-      rpc_PortHandle *port = ports[n];
+  for (n = 0; n < nports; n++) {
+    rpc_PortHandle *port = ports[n];
 
-      if (port->domain == AF_INET)
-	{
-	  fd = port->u.in.sockin_fd;
-	  rpc_serverPort = atoi(port->portname);
-	}
-      else if (port->domain == AF_UNIX)
-	{
-	  fd = port->u.un.sockun_fd;
-	  rpc_unixPort = port->portname;
-	}
-
-      if (fd > max_fd)
-	max_fd = fd;
-
-      portdb[fd] = port;
-
-      FD_SET(fd, &server->fds_used);
+    if (port->domain == AF_INET) {
+      fd = port->u.in.sockin_fd;
+      rpc_serverPort = atoi(port->portname);
+    }
+    else if (port->domain == AF_UNIX) {
+      fd = port->u.un.sockun_fd;
+      rpc_unixPort = port->portname;
     }
 
-  for (;;)
-    {
-#ifdef HAS_FATTACH
-      struct strrecvfd info;
-#endif
-      fds_ready_to_read = server->fds_used;
-    
-      /* select sets those which are ready to read */
-      n = select (max_fd+1, &fds_ready_to_read, 0, 0, 0);
+    if (fd > max_fd)
+      max_fd = fd;
 
-      if (n < 0)
+    portdb[fd] = port;
+
+    FD_SET(fd, &server->fds_used);
+  }
+
+  for (;;) {
+#ifdef HAS_FATTACH
+    struct strrecvfd info;
+#endif
+    fds_ready_to_read = server->fds_used;
+    
+    /* select sets those which are ready to read */
+    n = select (max_fd+1, &fds_ready_to_read, 0, 0, 0);
+
+    if (n < 0) {
+      if (errno == EINTR) {
+	continue;
+      }
+      else {
+	PERROR(msg_make("error in select"));
+	/*
+	  utlog("fds_ready_to_read %p, max_fd = %d\n",
+	  fds_ready_to_read, max_fd);
+	*/
+	/* workaround! */
 	{
-	  if (errno == EINTR)
-	    {
-/*	      utlog(msg_make("receives a system call, continuing...\n"));*/
+	  int ifd;
+	  struct stat stat;
+	  for (ifd = 0; ifd <= max_fd; ifd++)
+	    if (FD_ISSET(ifd, &server->fds_used) && fstat(ifd, &stat)<0) {
+	      utlog("warning, fd is invalid %d\n", ifd);
+	      FD_CLR(ifd, &server->fds_used);
+	    }
+	  continue;
+	}
+	/*return rpc_Error;*/
+      }
+    }
+
+    for (fd = 0; fd <= max_fd; fd++)
+      if (FD_ISSET(fd, &fds_ready_to_read)) {
+	rpc_PortHandle *port;
+	if (port = portdb[fd]) {
+	  /* we have a new connection */
+	  struct sockaddr *sock_addr;
+	  socklen_t length;
+
+	  if (port->domain == AF_INET) {
+	    sock_addr = (struct sockaddr *)&port->u.in.sock_in_name;
+	    length = sizeof(port->u.in.sock_in_name);
+	  }
+	  else {
+	    sock_addr = (struct sockaddr *)&port->u.un.sock_un_name;
+	    length = sizeof(port->u.un.sock_un_name);
+	  }
+
+#ifdef HAS_FATTACH
+	  if (port->domain == AF_UNIX) {
+	    if (ioctl(fd, I_RECVFD, &info) < 0) {
+	      PERROR("ioctl");
 	      continue;
 	    }
-	  else
-	    {
-	      PERROR(msg_make("error in select"));
-	      /*
-	      utlog("fds_ready_to_read %p, max_fd = %d\n",
-		    fds_ready_to_read, max_fd);
-		    */
-	      /* workaround! */
-	      {
-		int ifd;
-		struct stat stat;
-		for (ifd = 0; ifd <= max_fd; ifd++)
-		  if (FD_ISSET(ifd, &server->fds_used) && fstat(ifd, &stat)<0)
-		    {
-		      utlog("warning, fd is invalid %d\n", ifd);
-		      FD_CLR(ifd, &server->fds_used);
-		    }
-		continue;
-	      }
-	      /*return rpc_Error;*/
-	    }
-	}
 
-      for (fd = 0; fd <= max_fd; fd++)
-	if (FD_ISSET(fd, &fds_ready_to_read))
-	  {
-	    rpc_PortHandle *port;
-	    if (port = portdb[fd])
-	      {
-		/* we have a new connection */
-		struct sockaddr *sock_addr;
-		socklen_t length;
+	    IDB_LOG(IDB_LOG_CONN,
+		    ("connection from %s %s\n",
+		     getpwuid(info.uid)->pw_name,
+		     (getgrgid(info.gid) ?
+		      getgrgid(info.gid)->gr_name : "")));
 
-		if (port->domain == AF_INET)
-		  {
-		    sock_addr = (struct sockaddr *)&port->u.in.sock_in_name;
-		    length = sizeof(port->u.in.sock_in_name);
-		  }
-		else
-		  {
-		    sock_addr = (struct sockaddr *)&port->u.un.sock_un_name;
-		    length = sizeof(port->u.un.sock_un_name);
-		  }
-
-#ifdef HAS_FATTACH
-		if (port->domain == AF_UNIX)
-		  {
-		    if (ioctl(fd, I_RECVFD, &info) < 0)
-		      {
-			PERROR("ioctl");
-			continue;
-		      }
-
-		    IDB_LOG(IDB_LOG_CONN,
-			    ("connection from %s %s\n",
-			     getpwuid(info.uid)->pw_name,
-			     (getgrgid(info.gid) ?
-			      getgrgid(info.gid)->gr_name : "")));
-
-		    new_fd = info.fd;
-		  }
-		else
-#endif
-		if ((new_fd = accept(fd, sock_addr, &length)) < 0)
-		  PERROR("accept connection");
-
-		if (new_fd >= 0)
-		  {
-		    rpc_ConnInfo *ci;
-		    if (port->domain == AF_UNIX) {
-#ifdef HAS_FATTACH
-		      ci = rpc_make_stream_conninfo(new_fd, &info);
-#else
-		      ci = rpc_make_unix_conninfo(new_fd);
-#endif
-		    }
-		    else {
-		      rpc_socket_nodelay(new_fd);
-		      ci = rpc_make_tcpip_conninfo(new_fd);
-		    }
-
-		    if (!ci)
-		      {
-			close(new_fd);
-			continue;
-		      }
-
-		    if (server->conn_cnt > 1)
-		      {
-			FD_SET(new_fd, &server->fds_used);
-			if (new_fd > max_fd)
-			  max_fd = new_fd;
-			multiConn[new_fd] = rpc_True;
-			multiConnInfo[new_fd] = ci;
-		      }
-		    else
-		      rpc_makeNewConnection(server, &new_fd, 1, &max_fd, ci);
-		  }
-	      }
-	    else if (multiConn[fd])
-	      rpc_multiConnManage(server, fd, &max_fd);
-	    else 
-	      {
-		if (!rpc_inputHandle(server, 0, fd)) {
-		  rpc_garbClientInfo(server, 0, fd);
-		}
-	      }
+	    new_fd = info.fd;
 	  }
-    }
+	  else
+#endif
+	    if ((new_fd = accept(fd, sock_addr, &length)) < 0)
+	      PERROR("accept connection");
+
+	  if (new_fd >= 0) {
+	    rpc_ConnInfo *ci;
+	    if (port->domain == AF_UNIX) {
+#ifdef HAS_FATTACH
+	      ci = rpc_make_stream_conninfo(new_fd, &info);
+#else
+	      ci = rpc_make_unix_conninfo(new_fd);
+#endif
+	    }
+	    else {
+	      rpc_socket_nodelay(new_fd);
+	      ci = rpc_make_tcpip_conninfo(new_fd);
+	    }
+
+	    if (!ci) {
+	      close(new_fd);
+	      continue;
+	    }
+
+	    if (server->conn_cnt > 1) {
+	      FD_SET(new_fd, &server->fds_used);
+	      if (new_fd > max_fd)
+		max_fd = new_fd;
+	      multiConn[new_fd] = rpc_True;
+	      multiConnInfo[new_fd] = ci;
+	    }
+	    else
+	      rpc_makeNewConnection(server, &new_fd, 1, &max_fd, ci);
+	  }
+	}
+	else if (multiConn[fd])
+	  rpc_multiConnManage(server, fd, &max_fd);
+	else {
+	  if (!rpc_inputHandle(server, 0, fd)) {
+	    rpc_garbClientInfo(server, 0, fd);
+	  }
+	}
+      }
+  }
 
   return rpc_Success;
 }
@@ -1387,19 +1293,17 @@ rpc_garbRealize(rpc_Server *server, rpc_ClientInfo *ci, int force)
 {
   int i;
   
-  for (i = 0; i < server->conn_cnt; i++)
-    {
-      free(ci->comm_buff[i]);
-      free(ci->ua[i]);
-    }
+  for (i = 0; i < server->conn_cnt; i++) {
+    free(ci->comm_buff[i]);
+    free(ci->ua[i]);
+  }
   
   free(ci->comm_buff);
   free(ci->ua);
-  if (force)
-    {
-      free(ci->tid);
-      free(ci);
-    }
+  if (force) {
+    free(ci->tid);
+    free(ci);
+  }
 
   for (i = 0; i < sizeof(clientInfo)/sizeof(clientInfo[0]); i++)
     if (clientInfo[i] == ci)
@@ -1416,7 +1320,7 @@ rpc_garbClientInfo(rpc_Server *server, int which, int fd)
 #endif
 #ifdef TRACE
   utlog(msg_make("rpc_garbClientInfo(which = %d, fd = %d, ci = %p)\n",
-			   which, fd, ci));
+		 which, fd, ci));
 #endif
   if (!ci)
     return;
@@ -1425,7 +1329,7 @@ rpc_garbClientInfo(rpc_Server *server, int which, int fd)
   //pthread_mutex_lock(&gen_mp);
 #ifdef TRACE
   utlog(msg_make("refcnt = %d, fd_cnt = %d\n",
-			   ci->refcnt, ci->fd_cnt));
+		 ci->refcnt, ci->fd_cnt));
 #endif
 
   if (!which && server->connh)
@@ -1532,370 +1436,344 @@ int rpc_serverArgsMake(rpc_Server *server, int which, int fd,
   buff = commb + sizeof(rhd);
 #endif
 
-  if (fromto == rpc_From)
-    {
-      /* lecture de l'header */
+  if (fromto == rpc_From) {
+    /* lecture de l'header */
 #ifdef USE_RPC_MIN_SIZE
 #ifdef RPC_TIMEOUT
-      if (rpc_socketReadTimeout(fd, buff, RPC_MIN_SIZE, rpc_timeout) !=
-	  RPC_MIN_SIZE)
-	return 0;
+    if (rpc_socketReadTimeout(fd, buff, RPC_MIN_SIZE, rpc_timeout) !=
+	RPC_MIN_SIZE)
+      return 0;
 #else
-      if (rpc_socketRead(fd, buff, RPC_MIN_SIZE) != RPC_MIN_SIZE)
-	return 0;
+    if (rpc_socketRead(fd, buff, RPC_MIN_SIZE) != RPC_MIN_SIZE)
+      return 0;
 #endif
 
-      memcpy(&rhd, buff, sizeof(rhd));
-      x2h_rpc_hd(&rhd);
-      buff += sizeof(rhd);
+    memcpy(&rhd, buff, sizeof(rhd));
+    x2h_rpc_hd(&rhd);
+    buff += sizeof(rhd);
 #else
 
 #ifdef RPC_TIMEOUT
-      if (rpc_socketReadTimeout(fd, buff, sizeof(rhd), rpc_timeout) !=
-	  sizeof(rhd))
-	return 0;
+    if (rpc_socketReadTimeout(fd, buff, sizeof(rhd), rpc_timeout) !=
+	sizeof(rhd))
+      return 0;
 #else
-      if (rpc_socketRead(fd, buff, sizeof(rhd)) != sizeof(rhd))
-	return 0;
+    if (rpc_socketRead(fd, buff, sizeof(rhd)) != sizeof(rhd))
+      return 0;
 #endif
 
-      memcpy(&rhd, buff, sizeof(rhd));
-      x2h_rpc_hd(&rhd);
-      buff += sizeof(rhd);
+    memcpy(&rhd, buff, sizeof(rhd));
+    x2h_rpc_hd(&rhd);
+    buff += sizeof(rhd);
 
 #endif
-      if (rhd.magic != server->magic)
-	{
-	  IDB_LOG_FX(("Server Error #1: invalid magic=%p, expected=%d, "
-		     "serial=%d\n", rhd.magic, server->magic, rhd.serial));
-	  /*rpc_quit(1, 0);*/
-	  return 0;
-	}
-
-      func = rpc_rpcGet(server, rhd.code);
-
-      if (!func)
-	{
-	  IDB_LOG_FX(("Server Error #2: invalid function code=%d\n", rhd.code));
-	  /*rpc_quit(1, 0);*/
-	  return 0;
-	}
-
-#ifdef USE_RPC_MIN_SIZE
-      if (rhd.size-RPC_MIN_SIZE > 0)
-	if (rpc_socketRead(fd, buff+RPC_MIN_SIZE-sizeof(rhd),
-			   rhd.size-RPC_MIN_SIZE) != rhd.size-RPC_MIN_SIZE)
-	  {
-	    IDB_LOG_FX(("Server Error #3: read failed for %d bytes\n",
-		       rhd.size-sizeof(rhd)));
-	    /*rpc_quit(1, 0);*/
-	    return 0;
-	  }
-#else
-      if (rhd.size-sizeof(rhd))
-	if (rpc_socketRead(fd, buff, rhd.size-sizeof(rhd)) !=
-	    rhd.size-sizeof(rhd))
-	  {
-	    IDB_LOG_FX(("Server Error #3: read failed for %d bytes\n",
-		       rhd.size-sizeof(rhd)));
-	    /*rpc_quit(1, 0);*/
-	    return 0;
-	  }
-#endif
-      *pfunc = func;
+    if (rhd.magic != server->magic) {
+      IDB_LOG_FX(("Server Error #1: invalid magic=%p, expected=%d, "
+		  "serial=%d\n", rhd.magic, server->magic, rhd.serial));
+      /*rpc_quit(1, 0);*/
+      return 0;
     }
-  else
-    {
-      func = *pfunc;
+
+    func = rpc_rpcGet(server, rhd.code);
+
+    if (!func) {
+      IDB_LOG_FX(("Server Error #2: invalid function code=%d\n", rhd.code));
+      /*rpc_quit(1, 0);*/
+      return 0;
+    }
+
+#ifdef USE_RPC_MIN_SIZE
+    if (rhd.size-RPC_MIN_SIZE > 0)
+      if (rpc_socketRead(fd, buff+RPC_MIN_SIZE-sizeof(rhd),
+			 rhd.size-RPC_MIN_SIZE) != rhd.size-RPC_MIN_SIZE) {
+	IDB_LOG_FX(("Server Error #3: read failed for %d bytes\n",
+		    rhd.size-sizeof(rhd)));
+	/*rpc_quit(1, 0);*/
+	return 0;
+      }
+#else
+    if (rhd.size-sizeof(rhd))
+      if (rpc_socketRead(fd, buff, rhd.size-sizeof(rhd)) !=
+	  rhd.size-sizeof(rhd)) {
+	IDB_LOG_FX(("Server Error #3: read failed for %d bytes\n",
+		    rhd.size-sizeof(rhd)));
+	/*rpc_quit(1, 0);*/
+	return 0;
+      }
+#endif
+    *pfunc = func;
+  }
+  else {
+    func = *pfunc;
 #ifdef TRACE2
-      utlog(msg_make("[%d] serverArgsMake code #%d, TO\n", pthread_self(), func->rd->code));
+    utlog(msg_make("[%d] serverArgsMake code #%d, TO\n", pthread_self(), func->rd->code));
 #endif
-    }
+  }
 
   rd = func->rd;
 
   for (i = 0, arg = rd->args, pua = ua; i < rd->nargs; i++, arg++, pua += args_size)
-    switch(arg->type)
-      {
-      case rpc_Int16Type:
-	rpc_copy_fast_xdr(arg, buff, pua, sizeof(eyedblib::int16), send_rcv, fromto, x2h_16_cpy, h2x_16_cpy);
-	break;
+    switch(arg->type) {
+    case rpc_Int16Type:
+      rpc_copy_fast_xdr(arg, buff, pua, sizeof(eyedblib::int16), send_rcv, fromto, x2h_16_cpy, h2x_16_cpy);
+      break;
 	
-      case rpc_Int32Type:
-	rpc_copy_fast_xdr(arg, buff, pua, sizeof(eyedblib::int32), send_rcv, fromto, x2h_32_cpy, h2x_32_cpy);
-	break;
+    case rpc_Int32Type:
+      rpc_copy_fast_xdr(arg, buff, pua, sizeof(eyedblib::int32), send_rcv, fromto, x2h_32_cpy, h2x_32_cpy);
+      break;
 	
-      case rpc_Int64Type:
-	rpc_copy_fast_xdr(arg, buff, pua, sizeof(eyedblib::int64), send_rcv, fromto, x2h_64_cpy, h2x_64_cpy);
-	break;
+    case rpc_Int64Type:
+      rpc_copy_fast_xdr(arg, buff, pua, sizeof(eyedblib::int64), send_rcv, fromto, x2h_64_cpy, h2x_64_cpy);
+      break;
 	
-      case rpc_StatusType:
-	if ((arg->send_rcv & rpc_Rcv) && fromto == rpc_To) {
-	  eyedblib_mcp(&rstatus, pua, sizeof(rstatus));
-        }
-
-	/* assuming that the 'err' field is of sizeof(eyedblib::int32) and that
-	   it is the first field in the rpc_StatusRec structure */
-	rpc_copy_fast_xdr(arg, buff, pua, sizeof(eyedblib::int32), send_rcv, fromto, x2h_32_cpy, h2x_32_cpy);
-
-	break;
-
-      case rpc_StringType:
-	if ((arg->send_rcv & rpc_Send) && fromto == rpc_From)
-	  {
-	    int len;
-	    x2h_32_cpy(&len, buff);
-
-	    buff += sizeof(len);
-	    if (len)
-	      *(char **)pua = buff; /* oups? */
-	    else
-	      *(char **)pua = "";
-	    buff += len;
-	  }
-	else if ((arg->send_rcv & rpc_Rcv) && fromto == rpc_To)
-	  {
-	    int len;
-
-	    if (*(char **)pua)
-	      len = strlen(*(char **)pua)+1;
-	    else
-	      len = 0;
-	    h2x_32_cpy(buff, &len);
-	    buff += sizeof(len);
-	    if (len)
-	      memcpy(buff, *(char **)pua, len);
-	    buff += len;
-	  }
-	break;
-	
-      case rpc_DataType:
-	if ((arg->send_rcv & rpc_Send) && fromto == rpc_From)
-	  {
-	    int status;
-	    rpc_ServerData *a_data = (rpc_ServerData *)pua;
-
-	    a_data->garbage_fun = 0;
-	    a_data->garbage_data = 0;
-
-	    x2h_32_cpy(&a_data->data, buff);
-
-	    buff += 8;
-	    x2h_32_cpy(&a_data->size, buff);
-	    buff += sizeof(a_data->size);
-	    x2h_32_cpy(&status, buff);
-	    buff += sizeof(status);
-	    if (status == rpc_SyncData)
-	      {
-		a_data->data = buff;
-		buff += a_data->size;
-		a_data->fd = -1;
-	      }
-	    else
-	      a_data->fd = fd;
-	  }
-	else if ((arg->send_rcv & rpc_Rcv) && fromto == rpc_To)
-	  {
-	    int status, offset;
-	    rpc_ServerData *a_data = (rpc_ServerData *)pua;
-
-	    h2x_32_cpy(buff, &a_data->size);
-	    buff += sizeof(a_data->size);
-
-	    if (a_data->status == rpc_BuffUsed)
-	      {
-		status = rpc_SyncData;
-		h2x_32_cpy(buff, &status);
-		buff += sizeof(status);
-		offset = (char *)a_data->data - buff;
-		h2x_32_cpy(buff, &offset);
-		buff += sizeof(offset);
-		buff_size += a_data->size;
-	      }
-	    else if (a_data->status == rpc_TempDataUsed ||
-		     a_data->status == rpc_PermDataUsed)
-	      {
-		status = rpc_ASyncData;
-		h2x_32_cpy(buff, &status);
-		buff += sizeof(status);
-		offset = 0;
-		h2x_32_cpy(buff, &offset);
-		buff += sizeof(offset);
-		p_data[ndata++] = a_data;
-	      }
-	  }
-	else if ((arg->send_rcv & rpc_Rcv) && fromto == rpc_From)
-	  {
-	    char *pbuff = commb + sizeof(rhd);
-	    int j;
-	    rpc_Arg *parg;
-	    rpc_Boolean cant = rpc_False;
-	    rpc_ServerData *a_data = (rpc_ServerData *)pua;
-
-	    a_data->garbage_fun = 0;
-	    a_data->garbage_data = 0;
-
-	    for (j = 0, parg = rd->args; j < rd->nargs; j++, parg++)
-	      switch(parg->type)
-		{
-		case rpc_ByteType:
-		  if (parg->send_rcv & rpc_Rcv)
-		    pbuff += sizeof(char);
-		  break;
-
-		case rpc_Int16Type:
-		  if (parg->send_rcv & rpc_Rcv)
-		    pbuff += sizeof(eyedblib::int16);
-		  break;
-	
-		case rpc_Int32Type:
-		  if (parg->send_rcv & rpc_Rcv)
-		    pbuff += sizeof(eyedblib::int32);
-		  break;
-	
-		case rpc_Int64Type:
-		  if (parg->send_rcv & rpc_Rcv)
-		    pbuff += sizeof(eyedblib::int64);
-		  break;
-	
-		case rpc_StatusType:
-		  if (parg->send_rcv & rpc_Rcv)
-		    pbuff += sizeof(eyedblib::int32);
-		  break;
-
-		case rpc_StringType:
-		  if (parg->send_rcv & rpc_Rcv)
-		    cant = rpc_True;
-		  break; 
-
-		case rpc_DataType:
-		  if (parg->send_rcv & rpc_Rcv)
-		    if (j != i)
-		      cant = rpc_True;
-		  break;
-		  
-		case rpc_VoidType:
-		  break;
-
-		default:
-		  rpc_assert(parg->type >= rpc_NBaseType &&
-			     parg->type < server->last_type);
-		  if (parg->send_rcv & rpc_Rcv)
-		    {
-		      utyp = rpc_getUTyp(server, parg->type);
-
-		      if (utyp->size == rpc_SizeVariable)
-			cant = rpc_True;
-		      else
-			pbuff += utyp->size;
-		      break;
-		    }
-		}
-
-	    a_data->fd = fd;
-
-	    if (cant)
-	      {
-		a_data->data = 0;
-		a_data->buff_size = 0;
-	      }
-	    else
-	      {
-		/* data size + status + offset */
-		a_data->data = pbuff + 3*sizeof(int);
-		a_data->buff_size = rpc_buff_size(commsz, commb, pbuff);
-	      }
-	    buff += 3*sizeof(int);
-	  }
-	break;
-	
-      case rpc_VoidType:
-	break;
-
-      default:
-	rpc_assert(arg->type >= rpc_NBaseType && arg->type < server->last_type);
-	utyp = rpc_getUTyp(server, arg->type);
-
-	if (utyp->func)
-	  utyp->func(arg, &buff, pua, send_rcv, fromto);
-	else
-	  rpc_copy(arg, buff, pua, utyp->size, send_rcv, fromto);
+    case rpc_StatusType:
+      if ((arg->send_rcv & rpc_Rcv) && fromto == rpc_To) {
+	eyedblib_mcp(&rstatus, pua, sizeof(rstatus));
       }
-  
-  if (fromto == rpc_From)
-    {
-      if (rhd.ndata)
-	{
-	  int d[RPC_NDATA], i;
 
-	  if (rpc_socketRead(fd, d, rhd.ndata*sizeof(int)) != rhd.ndata*sizeof(int))
-	    return 0;
+      /* assuming that the 'err' field is of sizeof(eyedblib::int32) and that
+	 it is the first field in the rpc_StatusRec structure */
+      rpc_copy_fast_xdr(arg, buff, pua, sizeof(eyedblib::int32), send_rcv, fromto, x2h_32_cpy, h2x_32_cpy);
+
+      break;
+
+    case rpc_StringType:
+      if ((arg->send_rcv & rpc_Send) && fromto == rpc_From) {
+	int len;
+	x2h_32_cpy(&len, buff);
+
+	buff += sizeof(len);
+	if (len)
+	  *(char **)pua = buff; /* oups? */
+	else
+	  *(char **)pua = "";
+	buff += len;
+      }
+      else if ((arg->send_rcv & rpc_Rcv) && fromto == rpc_To) {
+	int len;
+
+	if (*(char **)pua)
+	  len = strlen(*(char **)pua)+1;
+	else
+	  len = 0;
+	h2x_32_cpy(buff, &len);
+	buff += sizeof(len);
+	if (len)
+	  memcpy(buff, *(char **)pua, len);
+	buff += len;
+      }
+      break;
+	
+    case rpc_DataType:
+      if ((arg->send_rcv & rpc_Send) && fromto == rpc_From) {
+	int status;
+	rpc_ServerData *a_data = (rpc_ServerData *)pua;
+
+	a_data->garbage_fun = 0;
+	a_data->garbage_data = 0;
+
+	x2h_32_cpy(&a_data->data, buff);
+
+	buff += 8;
+	x2h_32_cpy(&a_data->size, buff);
+	buff += sizeof(a_data->size);
+	x2h_32_cpy(&status, buff);
+	buff += sizeof(status);
+	if (status == rpc_SyncData) {
+	  a_data->data = buff;
+	  buff += a_data->size;
+	  a_data->fd = -1;
 	}
+	else
+	  a_data->fd = fd;
+      }
+      else if ((arg->send_rcv & rpc_Rcv) && fromto == rpc_To) {
+	int status, offset;
+	rpc_ServerData *a_data = (rpc_ServerData *)pua;
+
+	h2x_32_cpy(buff, &a_data->size);
+	buff += sizeof(a_data->size);
+
+	if (a_data->status == rpc_BuffUsed) {
+	  status = rpc_SyncData;
+	  h2x_32_cpy(buff, &status);
+	  buff += sizeof(status);
+	  offset = (char *)a_data->data - buff;
+	  h2x_32_cpy(buff, &offset);
+	  buff += sizeof(offset);
+	  buff_size += a_data->size;
+	}
+	else if (a_data->status == rpc_TempDataUsed ||
+		 a_data->status == rpc_PermDataUsed) {
+	  status = rpc_ASyncData;
+	  h2x_32_cpy(buff, &status);
+	  buff += sizeof(status);
+	  offset = 0;
+	  h2x_32_cpy(buff, &offset);
+	  buff += sizeof(offset);
+	  p_data[ndata++] = a_data;
+	}
+      }
+      else if ((arg->send_rcv & rpc_Rcv) && fromto == rpc_From) {
+	char *pbuff = commb + sizeof(rhd);
+	int j;
+	rpc_Arg *parg;
+	rpc_Boolean cant = rpc_False;
+	rpc_ServerData *a_data = (rpc_ServerData *)pua;
+
+	a_data->garbage_fun = 0;
+	a_data->garbage_data = 0;
+
+	for (j = 0, parg = rd->args; j < rd->nargs; j++, parg++)
+	  switch(parg->type) {
+	  case rpc_ByteType:
+	    if (parg->send_rcv & rpc_Rcv)
+	      pbuff += sizeof(char);
+	    break;
+
+	  case rpc_Int16Type:
+	    if (parg->send_rcv & rpc_Rcv)
+	      pbuff += sizeof(eyedblib::int16);
+	    break;
+	
+	  case rpc_Int32Type:
+	    if (parg->send_rcv & rpc_Rcv)
+	      pbuff += sizeof(eyedblib::int32);
+	    break;
+	
+	  case rpc_Int64Type:
+	    if (parg->send_rcv & rpc_Rcv)
+	      pbuff += sizeof(eyedblib::int64);
+	    break;
+	
+	  case rpc_StatusType:
+	    if (parg->send_rcv & rpc_Rcv)
+	      pbuff += sizeof(eyedblib::int32);
+	    break;
+
+	  case rpc_StringType:
+	    if (parg->send_rcv & rpc_Rcv)
+	      cant = rpc_True;
+	    break; 
+
+	  case rpc_DataType:
+	    if (parg->send_rcv & rpc_Rcv)
+	      if (j != i)
+		cant = rpc_True;
+	    break;
+		  
+	  case rpc_VoidType:
+	    break;
+
+	  default:
+	    rpc_assert(parg->type >= rpc_NBaseType &&
+		       parg->type < server->last_type);
+	    if (parg->send_rcv & rpc_Rcv) {
+	      utyp = rpc_getUTyp(server, parg->type);
+
+	      if (utyp->size == rpc_SizeVariable)
+		cant = rpc_True;
+	      else
+		pbuff += utyp->size;
+	      break;
+	    }
+	  }
+
+	a_data->fd = fd;
+
+	if (cant) {
+	  a_data->data = 0;
+	  a_data->buff_size = 0;
+	}
+	else {
+	  /* data size + status + offset */
+	  a_data->data = pbuff + 3*sizeof(int);
+	  a_data->buff_size = rpc_buff_size(commsz, commb, pbuff);
+	}
+	buff += 3*sizeof(int);
+      }
+      break;
+	
+    case rpc_VoidType:
+      break;
+
+    default:
+      rpc_assert(arg->type >= rpc_NBaseType && arg->type < server->last_type);
+      utyp = rpc_getUTyp(server, arg->type);
+
+      if (utyp->func)
+	utyp->func(arg, &buff, pua, send_rcv, fromto);
+      else
+	rpc_copy(arg, buff, pua, utyp->size, send_rcv, fromto);
     }
-  else if (fromto == rpc_To)
-    {
-      rhd.code = rd->code;
+  
+  if (fromto == rpc_From) {
+    if (rhd.ndata)
+      {
+	int d[RPC_NDATA], i;
 
-      rhd.magic = server->magic;
-      rhd.serial = 0;
-      rhd.ndata = ndata;
-      rhd.status = 0;
+	if (rpc_socketRead(fd, d, rhd.ndata*sizeof(int)) != rhd.ndata*sizeof(int))
+	  return 0;
+      }
+  }
+  else if (fromto == rpc_To) {
+    rhd.code = rd->code;
 
-      rhd.size = (int)(buff-commb) + buff_size;
+    rhd.magic = server->magic;
+    rhd.serial = 0;
+    rhd.ndata = ndata;
+    rhd.status = 0;
+
+    rhd.size = (int)(buff-commb) + buff_size;
 
 #ifdef USE_RPC_MIN_SIZE
-      if (rhd.size < RPC_MIN_SIZE)
-	rhd.size = RPC_MIN_SIZE;
+    if (rhd.size < RPC_MIN_SIZE)
+      rhd.size = RPC_MIN_SIZE;
 #endif
-      h2x_rpc_hd(&xrhd, &rhd);
-      memcpy(commb, &xrhd, sizeof(xrhd));
+    h2x_rpc_hd(&xrhd, &rhd);
+    memcpy(commb, &xrhd, sizeof(xrhd));
       
-      if (rpc_socketWrite(fd, commb, rhd.size) <= 0)
+    if (rpc_socketWrite(fd, commb, rhd.size) <= 0)
+      return 0;
+      
+    if (ndata) {
+      int d[RPC_NDATA], i;
+      for (i = 0; i < ndata; i++)
+	d[i] = h2x_32(p_data[i]->size);
+      if (rpc_socketWrite(fd, d, ndata*sizeof(int)) <= 0)
 	return 0;
-      
-      if (ndata)
-	{
-	  int d[RPC_NDATA], i;
-	  for (i = 0; i < ndata; i++)
-	    d[i] = h2x_32(p_data[i]->size);
-	  if (rpc_socketWrite(fd, d, ndata*sizeof(int)) <= 0)
-	    return 0;
 
-	  for (i = 0; i < ndata; i++)
-	    {
-	      if (p_data[i]->size)
-		{
-		  int error = 0;
-		  if (rpc_socketWrite(fd, p_data[i]->data, p_data[i]->size) <= 0)
-		    error = 1;
-		  if (p_data[i]->status == rpc_TempDataUsed)
-		    {
-/*
-		      if (p_data[i]->garbage_fun)
-			p_data[i]->garbage_fun(p_data[i]->data,
-					       p_data[i]->garbage_data);
-		      else */
-			free((char *)p_data[i]->data);
-		    }
-		  if (error)
-		    return 0;
-		}
-	    }
-	}
-
-      if (rstatus.err)
-	{
-	  int len = strlen(rstatus.err_msg);
-	  int tmp = h2x_32(rstatus.err);
-	  if (rpc_socketWrite(fd, &tmp, sizeof(tmp)) != sizeof(tmp))
-	    return 0;
-	  tmp = h2x_32(len);
-	  if (rpc_socketWrite(fd, &tmp, sizeof(tmp)) != sizeof(tmp))
-	    return 0;
-	  if (rpc_socketWrite(fd, rstatus.err_msg, len+1) != len+1)
+      for (i = 0; i < ndata; i++) {
+	if (p_data[i]->size) {
+	  int error = 0;
+	  if (rpc_socketWrite(fd, p_data[i]->data, p_data[i]->size) <= 0)
+	    error = 1;
+	  if (p_data[i]->status == rpc_TempDataUsed) {
+	    /*
+	      if (p_data[i]->garbage_fun)
+	      p_data[i]->garbage_fun(p_data[i]->data,
+	      p_data[i]->garbage_data);
+	      else */
+	    free((char *)p_data[i]->data);
+	  }
+	  if (error)
 	    return 0;
 	}
+      }
     }
+
+    if (rstatus.err) {
+      int len = strlen(rstatus.err_msg);
+      int tmp = h2x_32(rstatus.err);
+      if (rpc_socketWrite(fd, &tmp, sizeof(tmp)) != sizeof(tmp))
+	return 0;
+      tmp = h2x_32(len);
+      if (rpc_socketWrite(fd, &tmp, sizeof(tmp)) != sizeof(tmp))
+	return 0;
+      if (rpc_socketWrite(fd, rstatus.err_msg, len+1) != len+1)
+	return 0;
+    }
+  }
 
   return 1;
 }
@@ -1911,28 +1789,25 @@ rpc_serverCheck(int port)
   sock_in_name.sin_family = AF_INET;
   sock_in_name.sin_port = htons(port);
   /* get host name */
-  if (gethostname(hname, sizeof(hname)-1) < 0)
-    {
-      PERROR(msg_make("gethostname failed") );
-      return rpc_False;
-    }
+  if (gethostname(hname, sizeof(hname)-1) < 0) {
+    PERROR(msg_make("gethostname failed") );
+    return rpc_False;
+  }
   hname[sizeof(hname)-1] = 0;
   if (!rpc_hostNameToAddr(hname, &sock_in_name.sin_addr))
     return rpc_False;
   sock_addr = (struct sockaddr *)&sock_in_name;
   length = sizeof(sock_in_name);
 
-  if ((sock_fd = socket(AF_INET, SOCK_STREAM, 0))  < 0)
-    {
-      PERROR(msg_make("unable to create socket"));
-      return rpc_False;
-    }
+  if ((sock_fd = socket(AF_INET, SOCK_STREAM, 0))  < 0) {
+    PERROR(msg_make("unable to create socket"));
+    return rpc_False;
+  }
 
-  if (connect(sock_fd, sock_addr, length) < 0)
-    {
-      PERROR(msg_make("unable to connect socket"));
-      return rpc_False;
-    }
+  if (connect(sock_fd, sock_addr, length) < 0) {
+    PERROR(msg_make("unable to connect socket"));
+    return rpc_False;
+  }
 
   close(sock_fd);
   return rpc_True;
@@ -1943,12 +1818,11 @@ rpc_ServerFunction *rpc_rpcGet(rpc_Server *server, rpc_RpcCode code)
 #ifdef RPC_FUN_CHAIN
   register rpc_ServerFunction *func = server->first;
 
-  while (func)
-    {
-      if (func->rd->code == code)
-	return func;
-      func = func->next;
-    }
+  while (func) {
+    if (func->rd->code == code)
+      return func;
+    func = func->next;
+  }
 
   return 0;
 #else
@@ -1957,7 +1831,7 @@ rpc_ServerFunction *rpc_rpcGet(rpc_Server *server, rpc_RpcCode code)
 }
 
 void
-idbAbort()
+eyedblib_abort()
 {
   time_t t;
   static int reentrant = 0;
@@ -1984,5 +1858,5 @@ idbAbort()
 void
 abort()
 {
-  idbAbort();
+  eyedblib_abort();
 }
