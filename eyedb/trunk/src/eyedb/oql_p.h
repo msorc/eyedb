@@ -22,6 +22,7 @@
 */
 
 
+#include <eyedbconfig.h>
 #include <eyedblib/machtypes.h>
 #include <eyedb/eyedb.h>
 #include <eyedb/eyedb_p.h>
@@ -31,6 +32,13 @@
 #include <sys/types.h>
 #include <list>
 #include <regex.h>
+
+// must be HAVE_POINTER64 or something like that
+#ifdef LINUX_X86_64
+  typedef unsigned long long pointer_int;
+#else
+  typedef unsigned int pointer_int;
+#endif
 
 #define OQML_MAX_CPS 6
 
@@ -448,9 +456,9 @@ namespace eyedb {
 
   public:
     Object *o;
-    eyedblib::pointer_int idx;
+    pointer_int idx;
 
-    oqmlAtom_obj(Object *, eyedblib::pointer_int, const Class * = 0);
+    oqmlAtom_obj(Object *, pointer_int, const Class * = 0);
 
     virtual oqmlBool isEqualTo(oqmlAtom &);
     oqmlNode *toNode();
@@ -1157,14 +1165,14 @@ namespace eyedb {
 				 Object *&, oqmlBool addToFreeList,
 				 oqmlBool errorIfNull = oqml_True);
     static oqmlStatus *getObject(oqmlNode *, const char *, Object *&,
-				 eyedblib::pointer_int &);
+				 pointer_int &);
     static void releaseObject(Object *, oqmlBool = oqml_False);
     static oqmlStatus *getIndex(oqmlNode *node, const Object *o,
-				eyedblib::pointer_int &idx);
+				pointer_int &idx);
 
     static oqmlAtom *registerObject(Object *);
     static oqmlStatus *unregisterObject(oqmlNode *node, Object *o);
-    static oqmlBool isRegistered(const Object *, eyedblib::pointer_int &);
+    static oqmlBool isRegistered(const Object *, pointer_int &);
 
     static void garbageObjects();
 
@@ -1481,7 +1489,7 @@ namespace eyedb {
   class oqmlObject : public oqmlNode {
     Object *o;
     char *s;
-    eyedblib::pointer_int idx;
+    pointer_int idx;
     oqmlNode *ql;
 
   public:

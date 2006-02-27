@@ -47,15 +47,9 @@ namespace eyedblib {
   typedef float              float32;
   typedef double             float64;
 
-#ifdef LINUX_X86_64
-  typedef unsigned long long pointer_int;
-#else
-  typedef unsigned int       pointer_int;
-#endif
   /**
      @}
   */
-
 }
 
 #endif
