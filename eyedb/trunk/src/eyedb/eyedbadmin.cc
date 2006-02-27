@@ -3130,6 +3130,12 @@ get_admin_opts(int s, int argc, char *argv[], char **username,
       else
 	user_type = EyeDBUser;
 
+      if (*username == '-') {
+	print_prog();
+	fprintf(stderr, "a user name cannot start with '-'\n");
+	return 1;
+      }
+
       if (user_type == StrictUnixUser)
 	*passwd = "";
       else if (check_argc(s+1, argc))
