@@ -3130,9 +3130,10 @@ get_admin_opts(int s, int argc, char *argv[], char **username,
       else
 	user_type = EyeDBUser;
 
-      if (*username == '-') {
+      if (**username == '-') {
 	print_prog();
-	fprintf(stderr, "a user name cannot start with '-'\n");
+	fprintf(stderr, "a user name cannot start with a '-': %s\n",
+		*username);
 	return 1;
       }
 
