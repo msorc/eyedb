@@ -3945,8 +3945,8 @@ namespace eyedb {
   }
 
   //#define IDX2OID(IDX) Oid(IDX, 0, 0)
-  //#define OBJ2OID(O)   Oid((eyedblib::pointer_int)O, 0, 0)
-  static Oid IDX2OID(eyedblib::pointer_int idx)
+  //#define OBJ2OID(O)   Oid((pointer_int)O, 0, 0)
+  static Oid IDX2OID(pointer_int idx)
   {
     Oid oid;
     memcpy(&oid, &idx, sizeof(idx));
@@ -3965,14 +3965,14 @@ namespace eyedb {
   /*
     #ifdef LINUX_X86_64
     #define IDX2OID(IDX) Oid((IDX) & 0xffffffff, 0, (IDX) >> 32)
-    #define OBJ2OID(O)  Oid(((eyedblib::pointer_int)O) & 0xffffffff, 0, ((eyedblib::pointer_int)O)>>32)
+    #define OBJ2OID(O)  Oid(((pointer_int)O) & 0xffffffff, 0, ((pointer_int)O)>>32)
     #else
     #endif
   */
 
   oqmlStatus *
   oqmlObjectManager::getObject(oqmlNode *node, const char *s,
-			       Object *&o, eyedblib::pointer_int &idx)
+			       Object *&o, pointer_int &idx)
   {
     if (sscanf(s, "%lx:obj", &idx) != 1)
       return new oqmlStatus(node, "invalid object format '%s'", s);
@@ -3990,14 +3990,14 @@ namespace eyedb {
 
   oqmlStatus *
   oqmlObjectManager::getIndex(oqmlNode *node, const Object *o,
-			      eyedblib::pointer_int &idx)
+			      pointer_int &idx)
   {
     if (!o) {
       idx = 0;
       return oqmlSuccess;
     }
 
-    idx = (eyedblib::pointer_int)objCacheObj->getObject(OBJ2OID(o));
+    idx = (pointer_int)objCacheObj->getObject(OBJ2OID(o));
 
     if (!idx)
       return new oqmlStatus(node, "invalid object '%lx:obj'", o);
@@ -4006,12 +4006,12 @@ namespace eyedb {
   }
 
   oqmlBool
-  oqmlObjectManager::isRegistered(const Object *o, eyedblib::pointer_int &idx)
+  oqmlObjectManager::isRegistered(const Object *o, pointer_int &idx)
   {
     if (!o)
       return oqml_True;
 
-    idx = (eyedblib::pointer_int)objCacheObj->getObject(OBJ2OID(o));
+    idx = (pointer_int)objCacheObj->getObject(OBJ2OID(o));
     return OQMLBOOL(idx);
   }
 
@@ -4021,7 +4021,7 @@ namespace eyedb {
     if (!o)
       return new oqmlAtom_obj(o, 0);
 
-    eyedblib::pointer_int idx = (eyedblib::pointer_int)objCacheObj->getObject(OBJ2OID(o), true);
+    pointer_int idx = (pointer_int)objCacheObj->getObject(OBJ2OID(o), true);
 #ifdef GARB_TRACE_DETAIL
     printf("register get %p: %lu\n", o, idx);
 #endif
@@ -4031,7 +4031,7 @@ namespace eyedb {
       return new oqmlAtom_obj(o, idx, o->getClass());
     }
 
-    static eyedblib::pointer_int stidx = 1000;
+    static pointer_int stidx = 1000;
 
 #ifdef GARB_TRACE_DETAIL
     printf("register %p: %lu\n", o, stidx);
@@ -4048,7 +4048,7 @@ namespace eyedb {
       return oqmlSuccess;
 
     static const char fmt[] = "object '%p' is not registered";
-    eyedblib::pointer_int idx = (eyedblib::pointer_int)objCacheObj->getObject(OBJ2OID(o));
+    pointer_int idx = (pointer_int)objCacheObj->getObject(OBJ2OID(o));
 
 #ifdef GARB_TRACE_DETAIL
     printf("unregister %p: %lu\n", o, idx);
