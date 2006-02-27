@@ -38,6 +38,9 @@ else
 	test "x$JAVAC" = x && AC_CHECK_PROGS(JAVAC, "gcj$EXEEXT -C" guavac$EXEEXT jikes$EXEEXT javac$EXEEXT, $JAVAPREFIX)
 fi
 dnl test "x$JAVAC" = x && AC_MSG_ERROR([no acceptable Java compiler found in \$PATH])
-test "x$JAVAC" != x && AC_PROG_JAVAC_WORKS
+echo JAVAC=$JAVAC
+if test "x$JAVAC" != x; then
+	AC_PROG_JAVAC_WORKS
+fi
 AC_PROVIDE([$0])dnl
 ])

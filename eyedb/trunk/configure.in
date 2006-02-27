@@ -387,3 +387,33 @@ do
 		(cd $srcdir/`dirname $f`; ln -s $srcdir/src/eyedb/`basename $f`)
 	fi
 done
+
+echo
+echo
+echo "  EyeDB ${PACKAGE_VERSION} configured for '${host}'."
+echo
+echo "  EyeDB will be compiled with the following options:"
+echo 
+echo "  *** EyeDB Core ***" 
+echo "  Prefix where EyeDB will be installed: ${prefix:-none}"
+echo "  C++ compiler: ${CXX:-none}"
+echo "  C++ compiler flags: ${CXXFLAGS:-none}"
+echo "  Compile with debug: ${enable_debug:-no}"
+echo "  Compile with optimization: ${enable_optimize:-no}"
+echo 
+echo "  *** EyeDB Java binding ***" 
+echo "  Compile Java binding: "`if test x"$COND_JAVA_TRUE" = "x" ; then echo yes ; else echo no; fi`
+echo "  Java compiler: ${JAVAC:-none}"
+echo "  Java compiler flags: ${JAVACFLAGS:-none}"
+echo "  Jar utility: ${JAR:-none}"
+echo 
+echo "  *** EyeDB Swig multi-languages binding ***" 
+echo "  Compile Swig bindings: "`if test x"$COND_SWIG_TRUE" = "x" ; then echo yes ; else echo no; fi`
+echo 
+echo "  *** EyeDB documentation ***" 
+echo "  Generate doxygen C++ api documentation: "`if test x"$COND_DOXYGEN_TRUE" = "x" ; then echo yes ; else echo no; fi`
+echo "  Generate javadoc Java api documentation: "`if test x"$COND_JAVADOC_TRUE" = "x" ; then echo yes ; else echo no; fi`
+echo "  Generate docbook man pages: "`if test x"$COND_XSLTPROC_TRUE" = "x" ; then echo yes ; else echo no; fi`
+echo "  Generate LaTEX manual: "`if test x"$COND_LATEX_TRUE" = "x" ; then echo yes ; else echo no; fi`
+echo "  Generate html LaTEX manual: "`if test x"$COND_LATEX2HTML_TRUE" = "x" ; then echo yes ; else echo no; fi`
+echo ""
