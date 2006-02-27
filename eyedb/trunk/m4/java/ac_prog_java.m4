@@ -71,7 +71,10 @@ if test x$JAVAPREFIX = x; then
 else
 	test x$JAVA = x && AC_CHECK_PROGS(JAVA, gij$EXEEXT kaffe$EXEEXT java$EXEEXT, $JAVAPREFIX)
 fi
+echo JAVA=$JAVA
 dnl test x$JAVA = x && AC_MSG_ERROR([no acceptable Java virtual machine found in \$PATH])
-test x$JAVA != x && AC_PROG_JAVA_WORKS
+if test x$JAVA != x; then
+	AC_PROG_JAVA_WORKS
+fi
 AC_PROVIDE([$0])dnl
 ])
