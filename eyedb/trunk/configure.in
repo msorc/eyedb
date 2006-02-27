@@ -181,7 +181,10 @@ then
 	fi
 fi
 
-AM_CONDITIONAL(COND_JAVA, test "$enable_java" = "yes" -a x"$JAVAC" != x -a x"$JAR" != x  )
+if test "$enable_java" = "yes" -a x"$JAVAC" != x -a x"$JAR" != x  ; then
+COND_JAVA="yes"
+fi
+AM_CONDITIONAL(COND_JAVA, test x"$COND_JAVA" = xyes)
 AC_SUBST(JAVACFLAGS)
 
 # ========================================
@@ -192,8 +195,6 @@ AC_ARG_ENABLE(swig,
   	[enable_swig="yes"],
 	[enable_swig="no"])
 
-AM_CONDITIONAL(COND_SWIG, test "$enable_swig" = "yes")
-
 if test "$enable_swig" = "yes"
 then
 	AC_PROG_SWIG
@@ -201,26 +202,46 @@ then
 	SWIG_PYTHON
 fi
 
+if test "$enable_swig" = "yes" ; then
+COND_SWIG="yes"
+fi
+AM_CONDITIONAL(COND_SWIG, test x"$COND_SWIG" = xyes)
+
 # ========================================
 # Documentation building
 # ========================================
 # check for needed programs
 AC_PATH_PROG(DOXYGEN, doxygen)
-AM_CONDITIONAL(COND_DOXYGEN, test x"$DOXYGEN" != x)
+if test x"$DOXYGEN" != x ; then
+COND_DOXYGEN="yes"
+fi
+AM_CONDITIONAL(COND_DOXYGEN, test x"$COND_DOXYGEN" = xyes)
 
 AC_PATH_PROG(JAVADOC, javadoc)
-AM_CONDITIONAL(COND_JAVADOC, test x"$JAVADOC" != x)
+if test x"$JAVADOC" != x ; then
+COND_JAVADOC="yes"
+fi
+AM_CONDITIONAL(COND_JAVADOC, test x"$COND_JAVADOC" = xyes)
 
 AC_PATH_PROG(XSLTPROC, xsltproc)
-AM_CONDITIONAL(COND_XSLTPROC, test x"$XSLTPROC" != x)
+if test x"$XSLTPROC" != x ; then
+COND_XSLTPROC="yes"
+fi
+AM_CONDITIONAL(COND_XSLTPROC, test x"$COND_XSLTPROC" = xyes)
 
 AC_PATH_PROG(LATEX, latex)
 AC_PATH_PROG(DVIPS, dvips)
 AC_PATH_PROG(PS2PDF, ps2pdf)
-AM_CONDITIONAL(COND_LATEX, test x"$LATEX" != x -a x"$DVIPS" != x -a x"$PS2PDF" != x)
+if test x"$LATEX" != x -a x"$DVIPS" != x -a x"$PS2PDF" != x ; then
+COND_LATEX="yes"
+fi
+AM_CONDITIONAL(COND_LATEX, test x"$COND_LATEX" = xyes)
 
 AC_PATH_PROG(LATEX2HTML, latex2html)
-AM_CONDITIONAL(COND_LATEX2HTML, test x"$LATEX2HTML" != x)
+if test x"$LATEX2HTML" != x ; then
+COND_LATEX2HTML="yes"
+fi
+AM_CONDITIONAL(COND_LATEX2HTML, test x"$COND_LATEX2HTML" = xyes)
 
 
 # ========================================
@@ -402,18 +423,18 @@ echo "  Compile with debug: ${enable_debug:-no}"
 echo "  Compile with optimization: ${enable_optimize:-no}"
 echo 
 echo "  *** EyeDB Java binding ***" 
-echo "  Compile Java binding: "`if test x"$COND_JAVA_TRUE" = "x" ; then echo yes ; else echo no; fi`
+echo "  Compile Java binding: ${COND_JAVA:-no}"
 echo "  Java compiler: ${JAVAC:-none}"
 echo "  Java compiler flags: ${JAVACFLAGS:-none}"
 echo "  Jar utility: ${JAR:-none}"
 echo 
 echo "  *** EyeDB Swig multi-languages binding ***" 
-echo "  Compile Swig bindings: "`if test x"$COND_SWIG_TRUE" = "x" ; then echo yes ; else echo no; fi`
+echo "  Compile Swig bindings: ${COND_SWIG:-no}"
 echo 
 echo "  *** EyeDB documentation ***" 
-echo "  Generate doxygen C++ api documentation: "`if test x"$COND_DOXYGEN_TRUE" = "x" ; then echo yes ; else echo no; fi`
-echo "  Generate javadoc Java api documentation: "`if test x"$COND_JAVADOC_TRUE" = "x" ; then echo yes ; else echo no; fi`
-echo "  Generate docbook man pages: "`if test x"$COND_XSLTPROC_TRUE" = "x" ; then echo yes ; else echo no; fi`
-echo "  Generate LaTEX manual: "`if test x"$COND_LATEX_TRUE" = "x" ; then echo yes ; else echo no; fi`
-echo "  Generate html LaTEX manual: "`if test x"$COND_LATEX2HTML_TRUE" = "x" ; then echo yes ; else echo no; fi`
+echo "  Generate doxygen C++ api documentation: ${COND_DOXYGEN:-no}"
+echo "  Generate javadoc Java api documentation: ${COND_JAVADOC:-no}"
+echo "  Generate docbook man pages: ${COND_XSLTPROC:-no}"
+echo "  Generate LaTEX manual: ${COND_LATEX:-no}"
+echo "  Generate html LaTEX manual: ${COND_LATEX2HTML:-no}"
 echo ""
