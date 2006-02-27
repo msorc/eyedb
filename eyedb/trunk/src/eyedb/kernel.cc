@@ -530,7 +530,7 @@ namespace eyedb {
     else {
       conn_ctx.challenge = "";
       conn_ctx.ctime = 0;
-      conn_ctx.uid = 0;
+      conn_ctx.uid = -1;
     }
 
     *challenge = (char *)conn_ctx.challenge.c_str();
@@ -1124,7 +1124,7 @@ namespace eyedb {
     if (!conn_ctx.ci || conn_ctx.ci->mode == rpc_ConnInfo::STREAM ||
 	conn_ctx.ci->mode == rpc_ConnInfo::UNIX) {
     */
-    if (conn_ctx.ci && conn_ctx.ci->auth.uid) {
+    if (conn_ctx.ci && conn_ctx.ci->auth.uid >= 0) {
 #ifdef STUART_AUTH
       int uid = (conn_ctx.ci ? conn_ctx.ci->auth.uid : getuid());
 #else
