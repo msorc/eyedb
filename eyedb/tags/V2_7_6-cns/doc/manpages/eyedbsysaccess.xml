@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+  "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+<!ENTITY eyedbsysaccess "<command>eyedbsysaccess</command>">
+]>
+
+<refentry id="eyedbsysaccess">
+  <refentryinfo>
+    <date>14 November 2005</date>
+  </refentryinfo>
+
+  <refmeta>
+    <refentrytitle>eyedbsysaccess</refentrytitle>
+    <manvolnum>1</manvolnum>
+    <refmiscinfo>eyedb database</refmiscinfo>
+  </refmeta>
+
+  <refnamediv>
+    <refname>&eyedbsysaccess;</refname>
+    <refpurpose>command purpose</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <!-- eyedbsysaccess <username> ['+' combination of] dbcreate|adduser|deleteuser|setuserpasswd|admin|superuser|no -->
+      eyedbsysaccess 
+      <arg choice="req"><replaceable>username</replaceable></arg>
+      <arg choice="opt">'+' combination of</arg> 
+      <arg choice="req">dbcreate|adduser|deleteuser|setuserpasswd|admin|superuser|no</arg>
+
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbsysaccess; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+      <varlistentry>
+	<term>--option</term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+
+  </refsect1>
+
+  <refsect1>
+    <title>Environment</title>
+    See eyedb-options
+  </refsect1>
+
+  <refsect1>
+    <title>Exit status</title>
+  </refsect1>
+
+  <refsect1>
+    <title>Examples</title>
+  </refsect1>
+
+  <refsect1>
+    <title>See also</title>
+  </refsect1>
+
+  <refsect1>
+    <title>Bugs</title>
+  </refsect1>
+
+  <refsect1>
+    <title>Authors</title>
+  </refsect1>
+
+</refentry>

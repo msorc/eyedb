@@ -1,0 +1,26 @@
+#
+# Makefile
+#
+# C++Binding/scheme-oriented/store package
+#
+
+prefix=@prefix@
+include @datadir@/@PACKAGE@/Makefile.eyedb
+
+EXTRA_CXXFLAGS= -I@datadir@/doc/@PACKAGE@/examples/C++Binding/schema-oriented/share
+
+EYEDBOPTS = -g
+
+all: store
+
+store: store.o ../share/person.o
+	$(CXX) -o $@ $+ $(LDXXFLAGS) $(LDXXLIBS)
+
+init:
+	@for i in person.h person.cc person.o; \
+	do \
+		if [ ! -h $$i ]; then ln -s ../../../common/$$i $$i; fi\
+	done	
+
+clean:
+	rm -f *.o store
