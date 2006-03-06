@@ -1082,7 +1082,7 @@ if (IS) \
 { \
   if (o) oqmlObjectManager::releaseObject(o); \
   Exception::setMode(omode); \
-  if (omode == Exception::ExceptionMode) throw IS; \
+  if (omode == Exception::ExceptionMode) throw *IS; \
   return new oqmlStatus(IS); \
 }
 

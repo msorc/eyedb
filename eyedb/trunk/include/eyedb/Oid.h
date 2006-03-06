@@ -118,6 +118,15 @@ namespace eyedb {
 
     /**
        Not yet documented
+       @param oid 
+       @return
+    */
+    bool operator <(const Oid &oid) {
+      return getNX() < oid.getNX();
+    }
+
+    /**
+       Not yet documented
        @return
     */
     const eyedbsm::Oid *getOid() const {return &oid;}

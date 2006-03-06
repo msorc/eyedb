@@ -303,13 +303,7 @@ namespace eyedb {
        Not yet documented
        @return
     */
-    Database *getDatabase() {return db;}
-
-    /**
-       Not yet documented
-       @return
-    */
-    const Database *getDatabase() const {return db;}
+    Database *getDatabase() const {return db;}
 
     /**
        Not yet documented

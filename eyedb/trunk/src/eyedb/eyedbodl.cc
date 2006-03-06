@@ -1097,10 +1097,10 @@ realize(int argc, char *argv[])
   try {
     if (update)
       s = db->updateSchema(odlfile, package, schname, db_prefix,
-			   stderr, cpp_cmd, cpp_flags.c_str());
+			   stdout, cpp_cmd, cpp_flags.c_str());
 
     else if (diff)
-      s = Schema::displaySchemaDiff(db, odlfile, package, db_prefix, stderr,
+      s = Schema::displaySchemaDiff(db, odlfile, package, db_prefix, stdout,
 				    cpp_cmd, cpp_flags.c_str());
 
 #ifdef SUPPORT_CORBA

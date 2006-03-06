@@ -870,7 +870,7 @@ function println(s) {
   print(s+"\n");
 }
 
-function bench(|cmd) {
+function bench(cmd) {
   t0 := time_stamp::local_time_stamp();
   r := eval cmd;
   t1 := time_stamp::local_time_stamp();

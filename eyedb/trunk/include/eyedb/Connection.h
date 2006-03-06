@@ -255,6 +255,7 @@ namespace eyedb {
   class ServerMessageDisplayer {
   public:
     virtual void display(const char *msg) const = 0;
+    virtual ~ServerMessageDisplayer() {}
   };
 
   class StdServerMessageDisplayer : public ServerMessageDisplayer {
@@ -264,6 +265,8 @@ namespace eyedb {
     StdServerMessageDisplayer(std::ostream &);
 
     virtual void display(const char *msg) const;
+
+    virtual ~StdServerMessageDisplayer() {}
 
   private:
     FILE *fd;
