@@ -742,6 +742,8 @@ do { \
       if (eyedb_probe_name)
       eyedb_probe_h = p_probeInit(eyedb_probe_name);
     */
+
+    ios::sync_with_stdio();
   }
 
   void release()

@@ -18,7 +18,7 @@
 */
 
 /*
-   Authors: Stuart Pook <stuart@acm.org>
+   Authors: Stuart Pook
             Eric Viara <viara@sysra.com>
 */
 

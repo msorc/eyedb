@@ -917,7 +917,7 @@ main(int argc, char *argv[])
   eyedb::init(argc, argv);
   schema::init();
 
-  if (argc != 2) {
+  if (argc < 2) {
     cerr << "usage: " << argv[0] << " <dbname>" << endl;
     return 1;
   }
@@ -933,14 +933,35 @@ main(int argc, char *argv[])
 
     conn.open();
 
-    //schemaDatabase db(dbname);
-    Database db(dbname);
+    schemaDatabase db(dbname);
+    //Database db(dbname);
     db.open(&conn, (getenv("EYEDBLOCAL") ?
 		    Database::DBRWLocal :
 		    Database::DBRW));
     
     db.transactionBegin();
     
+  try
+  {
+    char const *query = argv[2];
+    eyedb::OidArray oids;
+    eyedb::OQL(&db, query).execute(oids);
+    std::clog << query << ' ' << oids.getCount() << std::endl;
+  }
+  catch (eyedb::Exception const & e)
+  {
+    std::clog << "eyedb::Exception const & " << e.getString() << std::endl;
+  }
+  catch (eyedb::Exception const * e)
+  {
+    std::clog << "eyedb::Exception const * " << e->getString() << std::endl;
+  }
+  catch (...)
+  {
+    std::cerr << "unknown exception" << std::endl;
+  }
+  return 0;
+
     perform_list(db);
     perform_gbx(db);
 

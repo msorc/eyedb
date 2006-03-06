@@ -1542,9 +1542,15 @@ do { \
 	  fprintf(fd, "%sif (len) *len = %s();\n", ctx->get(),
 		  ATTRNAME(name, GETCOUNT, hints));
 	//fprintf(fd, "%sif (s && rs) *rs = s;\n", ctx->get());
-	if (attr_cache)
+	if (attr_cache) {
+#ifdef ODL_STD_STRING
+	  fprintf(fd, "%sreturn %s;\n", ctx->get(),
+		  atc_name(name));
+#else
 	  fprintf(fd, "%sreturn (const %s *)%s;\n", ctx->get(), sclass,
 		  atc_name(name));
+#endif
+	}
 	else
 	  fprintf(fd, "%sreturn (const %s *)data;\n", ctx->get(), sclass);
 	fprintf(fd, "}\n\n");
@@ -1657,7 +1663,8 @@ do { \
   void
   Attribute::genAttrCacheEmpty(GenContext *ctx)
   {
-    if (isNative()) return;
+    if (isNative())
+      return;
 
 #ifdef ATC_NOVD
     //  if (isVarDim() && !IS_STRING()) return;
@@ -1676,10 +1683,12 @@ do { \
 
     if (!typmod.ndims || is_string || is_raw) {
 #ifdef ODL_STD_STRING
+      /*
       if (is_string)
 	fprintf(fd, "%s%s = "";\n", ctx->get(), atc_set(name));
       else
-	fprintf(fd, "%s%s = 0;\n", ctx->get(), atc_set(name));
+      */
+      fprintf(fd, "%s%s = 0;\n", ctx->get(), atc_set(name));
 #else
       fprintf(fd, "%s%s = 0;\n", ctx->get(), atc_set(name));
 #endif
@@ -1925,7 +1934,8 @@ do { \
 
     if (optype == GenCodeHints::SETCOUNT)
       {
-	fprintf(fd, "%sif (!status) %s = size;\n", ctx->get(), atc_cnt(name));
+	//EV : 5/03/06: should be 'size' but 'from' or another variable !
+	//fprintf(fd, "%sif (!status) %s = size;\n", ctx->get(), atc_cnt(name));
 	return;
       }
 
