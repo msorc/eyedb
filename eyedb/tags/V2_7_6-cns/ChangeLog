@@ -1,0 +1,49 @@
+2006-02-27 Francois Dechelle <francois@dechelle.net>
+
+	* Changed Java m4 autoconf macros not to exit with error if javac
+	not found
+	* Added configure summary at end of configure.in
+
+2006-02-21  Eric Viara  <viara@sysra.com>
+
+	* Improved OQL GC
+	* Added std::map var_map in class Config
+	* Added ClientConfig and ServerConfig classes
+	* Updated ODL C++ generator : suppressed #define Class_c, clone method, const behind GETOID methods
+
+2006-02-19 Francois  <francois@dechelle.net>
+
+	* Changed configure.in to reintroduce --enable-java flag
+
+2006-02-16  Eric Viara  <viara@sysra.com>
+
+	* Improved configuration parsing and error reporting
+	* Added --server-conf option
+	* Fixed concurrency problems in SessionLog
+	* Suppressed pending eyedbd
+
+2006-02-16 Francois  <francois@dechelle.net>
+
+	* Changed src/eyedb/Config.cc and include/eyedb/Config.h: read $HOME/.eyedb/eyedb[d].conf file if this file exists, @include to include a file without error if file not found.
+
+2006-02-16 Francois  <francois@dechelle.net>
+
+	* Fixed examples/Makefile.am w.r.t. Makefile.eyedb, to get rid of Makefile variables that are not prefixed with EYEDB_
+
+2006-02-16  Francois  <francois@dechelle.net>
+
+	* Moved all configuration files in install/etc to "sample" configuration files, installed in pkgdatadir. Removed Makefile.am test to not overwrite the configuration files.
+
+2006-02-13  Francois  <francois@dechelle.net>
+
+	* Fixed src/www/Makefile.am and src/www/html/Makefile.am to not overwrite existing files (Apache config file, cgi scripts, html files)
+	
+2006-02-13  Francois  <francois@dechelle.net>
+
+	* Added install/etc/eyedb.conf.in and install/etc/eyedbd.conf.in, configuration file templates, plus substitution in Makefile.am instead of configure.in
+
+2006-01-29  Francois  <francois@dechelle.net>
+
+	* Release 2.7.5
+
+
