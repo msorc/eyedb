@@ -42,3 +42,4 @@ install-data-hook:
 		mv $$f `dirname $$f`/Makefile ; \
 	done
 
+EXTRA_DIST= Makefile.eyedb.in
