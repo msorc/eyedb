@@ -1,0 +1,18 @@
+#
+# Makefile
+#
+# C++Binding/generic/query package
+#
+
+prefix=@prefix@
+include @datadir@/@PACKAGE@/Makefile.eyedb
+
+EYEDBOPTS = -g
+
+all: query
+
+query: query.o
+	$(CXX) -o $@ $+ $(LDXXFLAGS) $(LDXXLIBS)
+
+clean:
+	rm -f *.o query
