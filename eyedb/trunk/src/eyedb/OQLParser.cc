@@ -1471,6 +1471,7 @@ print_oid(Database *db, const char *oidstr, unsigned int flags, const RecMode *r
     else if (!status) {
       std::string s = v.str;
       percent_manage(s);
+      fflush(stdout);
       write(1, s.c_str(), strlen(s.c_str()));
     }
   }
