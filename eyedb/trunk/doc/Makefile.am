@@ -22,8 +22,8 @@ else
 MANUAL_DIR= 
 endif
 
-SUBDIRS=$(DOXYGEN_DIR) $(JAVADOC_DIR) $(MANPAGES_DIR) $(MANUAL_DIR) images
-DIST_SUBDIRS=doxygen javadoc manpages manual images
+SUBDIRS=$(DOXYGEN_DIR) $(JAVADOC_DIR) $(MANPAGES_DIR) $(MANUAL_DIR) images release-notes
+DIST_SUBDIRS=doxygen javadoc manpages manual images release-notes
 
 htmldir=$(datadir)/doc/$(PACKAGE)
 dist_html_DATA=index.html eyedbdoc.css
