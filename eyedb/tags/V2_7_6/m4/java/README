@@ -1,0 +1,24 @@
+$Id$
+
+These files are autoconf macros intended to be submitted to the
+autoconf archive <http://peti.cys.de/autoconf-archive/>.
+
+They are in separate files because of the archive's requirments but
+they are made to be used together.
+
+The Web page for this work is:
+http://www.internatif.org/bortzmeyer/autoconf-Java/
+
+A CVS snapshot of the latest release is at:
+ftp://ftp.internatif.org/pub/unix/autoconf-Java/
+
+The documentation is in ac_prog_java.m4.
+
+The licence is the GPL <http://www.gnu.org/copyleft/gpl.html>.
+
+Many thanks to Devin Weaver <ktohg@tritarget.com> for a lot
+of work on the macros.
+
+
+--
+Stephane Bortzmeyer <bortzmeyer@pasteur.fr>

@@ -1,0 +1,22 @@
+
+#
+# Makefile, EyeDB Package
+#
+# Eric Viara Copyright (c) SYSRA 2001
+#
+
+JAVAC = CLASSPATH=$(EYEDBCLASSPATH) javac
+
+all: classes/Collections.class
+
+classes/%.class: %.java
+	$(JAVAC) $<
+
+classes/Collections.class: Collections.java
+	$(JAVAC) *.java
+
+clean:
+	rm -f classes/*.class
+
+init:
+	@if [ ! -d classes ]; then mkdir classes; fi

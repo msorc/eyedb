@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <title>EyeDB release notes</title>
+  </head>
+
+  <body>
+    <h1>EyeDB release notes</h1>
+
+    <p>
+    <ul>
+      <li><a href="#2.7.6">Release notes for EyeDB 2.7.6</a></li>
+    </ul>
+    </p>
+
+    <h2>Release notes for EyeDB 2.7.6</h2><a name="2.7.6"></a>
+
+    <p>
+    <ul>
+      <li>Added const Oid::operator<(const Oid &) const method</li>
+      <li>Support --attr-cache=yes eyedbodl option</li>
+      <li>Sync stdio, iostream and write in eyedboql</li>
+      <li>Changed Java m4 autoconf macros not to exit with error if javac not found</li>
+      <li>Added configure summary at end of configure.in</li>
+      <li>Improved OQL GC</li>
+      <li>Added std::map var_map in class Config</li>
+      <li>Added ClientConfig and ServerConfig classes</li>
+      <li>Updated ODL C++ generator : suppressed #define Class_c, clone method, const behind GETOID methods</li>
+      <li>Changed configure.in to reintroduce --enable-java flag</li>
+      <li>Improved configuration parsing and error reporting</li>
+      <li>Added --server-conf option</li>
+      <li>Fixed concurrency problems in SessionLog</li>
+      <li>Suppressed pending eyedbd</li>
+      <li>Changed src/eyedb/Config.cc and include/eyedb/Config.h: read $HOME/.eyedb/eyedb[d].conf file if this file exists, @include to include a file without error if file not found.</li>
+      <li>Fixed examples/Makefile.am w.r.t. Makefile.eyedb, to get rid of Makefile variables that are not prefixed with EYEDB_</li>
+      <li>Moved all configuration files in install/etc to "sample" configuration files, installed in pkgdatadir. Removed Makefile.am test to not overwrite the configuration files.</li>
+      <li>Fixed src/www/Makefile.am and src/www/html/Makefile.am to not overwrite existing files (Apache config file, cgi scripts, html files)</li>
+      <li>Added install/etc/eyedb.conf.in and install/etc/eyedbd.conf.in, configuration file templates, plus substitution in Makefile.am instead of configure.in</li>
+    </ul>
+    </p>
+
+  </body>
+</html>
