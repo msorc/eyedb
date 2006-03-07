@@ -1077,12 +1077,14 @@ if (S) \
     return S; \
 }
   
+//  if (omode == Exception::ExceptionMode) throw *IS; \
+
 #define ICHECK(IS) \
 if (IS) \
 { \
   if (o) oqmlObjectManager::releaseObject(o); \
   Exception::setMode(omode); \
-  if (omode == Exception::ExceptionMode) throw *IS; \
+  if (omode == Exception::ExceptionMode) Exception::make(IDB_OQL_ERROR, (IS)->getDesc()); \
   return new oqmlStatus(IS); \
 }
 

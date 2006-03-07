@@ -121,7 +121,7 @@ namespace eyedb {
        @param oid 
        @return
     */
-    bool operator <(const Oid &oid) {
+    bool operator <(const Oid &oid) const {
       return getNX() < oid.getNX();
     }
 

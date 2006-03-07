@@ -1,3 +1,9 @@
+2006-03-07  Eric Viara  <viara@sysra.com>
+
+	* Added const Oid::operator<(const Oid &) const method
+	* Support --attr-cache=yes eyedbodl option
+	* Sync stdio, iostream and write in eyedboql
+
 2006-02-27 Francois Dechelle <francois@dechelle.net>
 
 	* Changed Java m4 autoconf macros not to exit with error if javac
