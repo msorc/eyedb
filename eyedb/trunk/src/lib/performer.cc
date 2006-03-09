@@ -23,23 +23,15 @@
 
 #include "eyedbconfig.h"
 
-#if defined(ULTRASOL7)
 #include <iostream>
 #include <streambuf>
-#endif
-
-#include <eyedblib/performer.h>
-
 #include <assert.h>
-#ifdef SOLARIS
-#include "/usr/include/thread.h"
-#endif
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-
-
 #include <iomanip>
+
+#include <eyedblib/performer.h>
 
 using namespace std;
 

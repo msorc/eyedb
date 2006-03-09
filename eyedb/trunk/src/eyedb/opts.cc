@@ -47,7 +47,6 @@ p_ProbeHandle *eyedb_probe_h;
 static const char *eyedb_probe_name = getenv("EYEDBPROBE");
 */
 
-extern void *edb_edata;
 extern void (*rpc_release_all)(void);
 
 // EYEDB_VERSION defined in eyedbversion.h
@@ -700,9 +699,6 @@ do { \
 
     if (init)
       return;
-
-    if (!::edb_edata)
-      ::edb_edata = sbrk(0);
 
     rpc_release_all = release_all;
     init = 1;

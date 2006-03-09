@@ -29,7 +29,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
-#if defined(SOLARIS) || defined(ULTRASOL7)
+#ifdef HAVE_STROPTS_H
 #include <stropts.h>
 #endif
 #include <sys/uio.h>
@@ -37,11 +37,11 @@
 #include <netdb.h>
 #include <netinet/in.h>
 #include <unistd.h>
-
 #include <assert.h>
 #include <errno.h>
 #include <sys/select.h>
 #include <time.h>
+
 #include <eyedblib/connman.h>
 #include <eyedblib/log.h>
 #include <eyedblib/rpc_lib.h>
@@ -402,13 +402,3 @@ rpc_make_unix_conninfo(int fd)
 
 #endif
 
-#if 0
-int
-main(int argc, char *argv[])
-{
-  rpc_connman_init(argv[1]);
-  read_access_file_realize();
-  read_access_file_realize();
-  return 0;
-}
-#endif

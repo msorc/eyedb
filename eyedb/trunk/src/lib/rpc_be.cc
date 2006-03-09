@@ -46,7 +46,7 @@ extern int RPC_MIN_SIZE;
 /* disconnected the 21/08/01 */
 /*#define RPC_TIMEOUT 7200*/
 
-#ifdef HAVE_FATTACH
+#ifdef HAVE_STROPTS
 #include <stropts.h>
 #endif
 #include <grp.h>

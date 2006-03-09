@@ -25,7 +25,6 @@
 
 #include <sys/types.h>
 #include <sys/time.h>
-#include <sys/resource.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
@@ -38,11 +37,6 @@
 #include <eyedblib/log.h>
 #include <eyedblib/iassert.h>
 #include <lib/m_mem_p.h>
-
-/*@@@@ clash define*/
-#define min(x,y) ((x)<(y)?(x):(y))
-
-void *edb_edata;
 
 struct m_Map {
   caddr_t *p;
@@ -62,17 +56,8 @@ struct m_Map {
 };
 
 static pthread_mutex_t m_mp;
-
-#ifndef RLIMIT_VMEM
-/*@@@@ */
-#if 0 && defined(LINUX) || defined(LINUX64) || defined(LINUX_IA64) || defined(LINUX_PPC64) || defined(ORIGIN) || defined(ALPHA) || defined(AIX) || defined(CYGWIN)
-/*@@@@/*typedef unsigned long rlim_t;*/
-#endif
-#endif
-static rlim_t rlim_vmem;
-
+static int init_done;
 static m_Map *m_head;
-/*static u_int m_tmsize, m_ref = 0x100, m_data_margin = 0x4000000;*/
 static u_int m_tmsize, m_ref = 0x100, m_data_margin = 0x8000000;
 
 static int
@@ -93,37 +78,13 @@ m_getunlocked()
   return cnt;
 }
 
-#if 0
-static u_int
-data_size_used()
-{
-  return (u_int)sbrk(0) - (u_int)edata;
-}
-
-static int
-is_enough_place(size_t size)
-{
-  u_int ds = data_size_used(), ms = m_tmsize;
-  int enough = (rlim_vmem - m_data_margin) > (size + ds + ms);
-
-  if (!enough)
-    IDB_LOG(IDB_LOG_MMAP_DETAIL,
-	    ("not enough place for size %u, data_size_used 0x%x, "
-	     "m_tmsize 0x%x, m_data_margin 0x%x, rlim_vmem 0x%x, "
-	     "missing 0x%x\n",
-	     size, ds, m_tmsize, m_data_margin, rlim_vmem,
-	     (size + ds + ms) - (rlim_vmem - m_data_margin)));
-  
-  return enough;
-}
-#endif
-
 /*#define TRACE*/
 
 static int
 m_garbage(m_Map *rm)
 {
   m_Map *km = rm;
+
   pthread_mutex_lock(&m_mp);
 
   if (!rm)
@@ -197,6 +158,7 @@ m_garbage(m_Map *rm)
 
   pthread_mutex_unlock(&m_mp);
   IDB_LOG(IDB_LOG_MMAP_DETAIL, ("m_garbage failed!\n"));
+
   return 1;
 }
 
@@ -204,6 +166,7 @@ static void
 m_insert(m_Map *m)
 {
   pthread_mutex_lock(&m_mp);
+
   m->next = m_head;
   m->prev = 0;
 
@@ -214,6 +177,7 @@ m_insert(m_Map *m)
   m_head = m;
   
   m_tmsize += m->size;
+
   pthread_mutex_unlock(&m_mp);
 }
 
@@ -231,17 +195,14 @@ static int must_madvise;
 void
 m_init(void)
 {
-  struct rlimit r;
   pthread_mutexattr_t mattr;
 
-  if (rlim_vmem)
+  if (init_done)
     return;
 
   pthread_mutexattr_init(&mattr);
 
-#if defined(SOLARIS) || defined(ULTRASOL7)
   pthread_mutexattr_setpshared(&mattr, PTHREAD_PROCESS_PRIVATE);
-#endif
 
   pthread_mutex_init(&m_mp, &mattr);
 
@@ -249,36 +210,7 @@ m_init(void)
   must_madvise = getenv("EYEDB_MADVISE") ? 1 : 0;
 #endif
 
-  if (!edb_edata)
-    edb_edata = sbrk(0);
-
-#ifdef RLIMIT_VMEM
-  if ( getrlimit(RLIMIT_VMEM, &r) >= 0 )
-    {
-#if defined(SOLARIS) || defined(ULTRASOL7)
-      /*      rlim_t vmem = 0xed800000;*/
-      rlim_t vmem = 0xC8000000;
-#else
-      rlim_t vmem = r.rlim_cur;
-#endif
-
-#else
-    {
-      rlim_t vmem = RLIM_INFINITY;
-#endif
-      if (getrlimit(RLIMIT_STACK, &r) >= 0)
-	{
-	  off_t range = (off_t)&r - r.rlim_cur - (off_t)edb_edata;
-	  rlim_vmem = min(range, vmem - (off_t)edb_edata - r.rlim_cur);
-
-	  /*
-	  printf("RLIM_VMEM = range=%x rlim_vmem=%x vmem=%x &r=%x cur=%x edb_edata=%x sbrk(0)=%x %x %x\n",
-		 range, rlim_vmem, vmem, &r, r.rlim_cur, edb_edata, sbrk(0),
-		 sbrk(4096), sbrk(4096));
-		 */
-	  IDB_LOG(IDB_LOG_MMAP_DETAIL, ("rlim_vmem = %x\n", rlim_vmem));
-	}
-    }
+  init_done = 1;
 }
 
 u_int
@@ -304,7 +236,7 @@ m_Map
   int n;
   int ntries;
 
-  if (!rlim_vmem)
+  if (!init_done)
     m_init();
 
   IDB_LOG(IDB_LOG_MMAP_DETAIL,
@@ -422,28 +354,6 @@ m_Map
   return 0;
 }
 
-#if 0
-m_Map *
-m_remap(m_Map *m)
-{
-  if (!*m->p)
-    {
-      while (!is_enough_place(m->size))
-	if (m_garbage(0))
-	  return 0;
-
-      if ( (*m->p = (caddr_t)mmap(m->addr, m->size, m->prot, m->flags, m->fildes,
-				  m->off)) != (caddr_t)-1 )
-	{
-	  m_insert(m);
-	  return m;
-	}
-      else
-	return 0;
-    }
-}
-#endif
-
 void
 m_lock(m_Map *m)
 {
@@ -499,7 +409,8 @@ void
 *m_malloc(size_t size)
 {
   void *p;
-  if (!rlim_vmem)
+
+  if (!init_done)
     m_init();
 
   /* added: 21/12/04 */
@@ -517,7 +428,8 @@ void
 *m_calloc(size_t nelem, size_t elsize)
 {
   void *p;
-  if (!rlim_vmem)
+
+  if (!init_done)
     m_init();
 
   while ( !(p = calloc(nelem, elsize)) )
@@ -532,7 +444,8 @@ void
 *m_realloc(void *ptr, size_t size)
 {
   void *p;
-  if (!rlim_vmem)
+
+  if (!init_done)
     m_init();
 
   while ( !(p = realloc(ptr, size)) )
@@ -597,6 +510,4 @@ m_maptrace(FILE *fd)
 	  data_size_used()/1024);
   */
   fprintf(fd, " mmap used 0x%x [%lu Kb]\n", m_tmsize, m_tmsize/1024);
-  fprintf(fd, " total avalaible size 0x%x [%d Kb]\n", rlim_vmem,
-	  rlim_vmem/1024);
 }
