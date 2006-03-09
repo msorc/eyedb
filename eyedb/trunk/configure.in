@@ -128,13 +128,16 @@ AM_PROG_LEX
 AC_PROG_YACC
 
 # check for headers
-AC_CHECK_HEADERS( sys/time.h unistd.h sys/types.h regex.h libgen.h sys/stat.h pwd.h)
+AC_CHECK_HEADERS( time.h sys/time.h unistd.h sys/types.h regex.h libgen.h sys/stat.h pwd.h)
 AC_HEADER_TIME
 
 # check for flock structure
 AC_CHECK_TYPE(flock_t, AC_DEFINE([HAS_FLOCK_T], 1, [Defined if flock_t is defined in fcntl.h]),,[#include <fcntl.h>])
 # check for union semun
 AC_CHECK_MEMBER( union semun.val, AC_DEFINE([HAS_UNION_SEMUN], 1, [Defined if union semun is defined]),, [#include <sys/sem.h>])
+
+# check for unsigned long long type
+AC_CHECK_TYPES( unsigned long long)
 
 # check for pthread
 ACX_PTHREAD
@@ -146,6 +149,7 @@ AC_CHECK_FUNC(pthread_kill_other_threads_np, AC_DEFINE([HAS_PTHREAD_KILL_OTHER_T
 AC_CHECK_FUNC(fattach, AC_DEFINE([HAS_FATTACH], 1, [Defined if function fattach exists]))
 # check if function ctime_r exists and has 2 or 3 arguments
 AC_FUNC_CTIME_R_3_ARGS
+AC_CHECK_FUNCS( strsignal)
 
 # check for X11
 AC_PATH_XTRA
