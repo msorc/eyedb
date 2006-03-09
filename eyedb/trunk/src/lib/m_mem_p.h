@@ -32,8 +32,6 @@ extern m_Map *m_mmap(caddr_t addr, size_t len, int prot, int flags,
 		     int fildes, off_t off, caddr_t *p, const char *file,
 		     off_t startns, off_t endns);
 
-extern m_Map *m_remap(m_Map *m);
-
 extern int m_munmap(m_Map *map, caddr_t addr, size_t len);
 
 extern u_int m_data_margin_set(u_int data_margin);
