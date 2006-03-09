@@ -23,9 +23,14 @@
 
 #include "eyedbconfig.h"
 
+#ifdef HAVE_TIME_H
+#include <time.h>
+#endif
+#include <stdio.h>
+#include <stdlib.h>
+
 #include <eyedblib/butils.h>
 #include <eyedblib/thread.h>
-#include <stdlib.h>
 
 #define IS_INT(c) (c == 'D' || c == 'I' || c == 'O' || c == 'X')
 
@@ -175,20 +180,16 @@ namespace eyedblib {
     return buffer[which++];
   }
 
-  /*@@@@*/
-#if defined(LINUX) || defined(LINUX64) || defined(LINUX_IA64) || defined(LINUX_PPC64) || defined(ORIGIN) || defined(ALPHA) || defined(CYGWIN)
-#include <time.h>
-#include <stdio.h>
-
   void display_time(const char *fmt, ...)
   {
     va_list ap;
     struct timeval tp;
-    unsigned long long ms;
 
     gettimeofday(&tp, NULL);
 
-    ms = (unsigned long long)tp.tv_sec * 1000 + tp.tv_usec/1000;
+#ifdef HAVE_UNSIGNED_LONG_LONG
+    unsigned long long ms = (unsigned long long)tp.tv_sec * 1000 + tp.tv_usec/1000;
+#endif
 
     va_start(ap, fmt);
 
@@ -196,7 +197,6 @@ namespace eyedblib {
     fprintf(stdout, ": %lld ms\n", ms);
     va_end(ap);
   }
-#endif
 
   int
   is_number(const char *s)

@@ -25,14 +25,6 @@
 #ifndef _EYEDBLIB_XDR_H
 #define _EYEDBLIB_XDR_H
 
-/*@@@@ A.W. adding this to globally patch porting */
-
-#if defined(LINUX) || defined(LINUX64) || defined(LINUX_IA64) || defined(LINUX_PPC64) || defined (SOLARIS) || defined(ULTRASOL7) || defined(AIX) 
-#define M_strsignal(sig) strsignal(sig)
-#else
-#define M_strsignal(sig) "signal_" #sig
-#endif
-
 #include <netinet/in.h>
 #include <eyedblib/machtypes.h>
 #include <eyedblib/endian.h>
