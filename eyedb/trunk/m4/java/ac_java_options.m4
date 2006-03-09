@@ -14,7 +14,7 @@ dnl
 dnl @author Devin Weaver <ktohg@tritarget.com>
 dnl @version $Id$
 dnl
-AC_DEFUN(AC_JAVA_OPTIONS,[
+AC_DEFUN([AC_JAVA_OPTIONS],[
 AC_ARG_WITH(java-prefix,
 			[  --with-java-prefix=PFX  prefix where Java runtime is installed (optional)])
 AC_ARG_WITH(javac-flags,

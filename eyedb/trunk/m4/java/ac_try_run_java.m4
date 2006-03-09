@@ -16,7 +16,7 @@ dnl
 dnl @author Devin Weaver <ktohg@tritarget.com>
 dnl @version $Id$
 dnl
-AC_DEFUN(AC_TRY_RUN_JAVA,[
+AC_DEFUN([AC_TRY_RUN_JAVA],[
 AC_REQUIRE([AC_PROG_JAVAC])dnl
 AC_REQUIRE([AC_PROG_JAVA])dnl
 cat << \EOF > Test.java

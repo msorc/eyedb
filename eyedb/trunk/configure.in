@@ -1,30 +1,6 @@
-
-#
-# /* needpad.c */
-#
-# struct TestAlign {
-#   short i1;
-#   long long i2;
-# };
-# 
-# #define OFFSET(T, X) (unsigned int)(&((T *)0)->X)
-# 
-# int main(int argc, char *argv[])
-# {
-#   unsigned int offset = OFFSET(struct TestAlign, i2);
-#   
-#   /*
-#     offset == 4: needs pad
-#     offset == 8: does not need pad
-#   */
-# 
-#   return offset;
-# }
-
-
 # 
 # configure.in for eyedb
-#
+# 
 
 AC_INIT(include/eyedb/eyedb.h)
 
@@ -145,11 +121,15 @@ LIBS="$LIBS $PTHREAD_LIBS"
 CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
 
 # check for functions
-AC_CHECK_FUNC(pthread_kill_other_threads_np, AC_DEFINE([HAS_PTHREAD_KILL_OTHER_THREADS_NP], 1, [Defined if function pthread_kill_other_threads_np exists]),,[#include <pthread.h>])
-AC_CHECK_FUNC(fattach, AC_DEFINE([HAS_FATTACH], 1, [Defined if function fattach exists]))
+AC_CHECK_FUNCS(strsignal)
+AC_CHECK_FUNCS(fattach)
 # check if function ctime_r exists and has 2 or 3 arguments
 AC_FUNC_CTIME_R_3_ARGS
-AC_CHECK_FUNCS( strsignal)
+# check for regular expressions functions
+AC_CHECK_FUNC(regcomp,AC_DEFINE([HAVE_REGCOMP],1,[Defined if function regcomp exists]),,[#include <regex.h])
+AC_CHECK_FUNC(regexec,AC_DEFINE([HAVE_REGEXEC],1,[Defined if function regexec exists]),,[#include <regex.h])
+AC_CHECK_FUNC(regcmp,AC_DEFINE([HAVE_REGCMP],1,[Defined if function regcmp exists]),,[#include <libgen.h])
+AC_CHECK_FUNC(regex,AC_DEFINE([HAVE_REGEX],1,[Defined if function regex exists]),,[#include <libgen.h])
 
 # check for X11
 AC_PATH_XTRA

@@ -21,9 +21,6 @@
    Author: Laurent Pereira
 */
 
-
-#ifndef NOCONTRIB
-
 #include <eyedb/syscls.h>
 #include "ClockConverter.h"
 #include "CalendarConverter.h"
@@ -644,5 +641,3 @@ namespace eyedb {
     return gmt_usec;
   }
 }
-
-#endif

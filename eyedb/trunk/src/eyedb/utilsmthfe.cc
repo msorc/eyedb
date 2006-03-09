@@ -38,7 +38,7 @@ using namespace eyedb;
 #define IdbTimeInterval_c(X) ((TimeInterval *)(X))
 #define IdbOString_c(X) ((OString *)(X))
 
-//
+#//
 // int32 Date::year() [datemthfe.cc]
 //
 
@@ -2481,19 +2481,12 @@ __method_static_OUT_string_toLower_ostring__IN_string(Database *_db, FEMethod_C 
   //
   // User Implementation
   //
-
-
-#ifdef SOLARIS
   char * s2  = OString::toLower(s);
   retarg = Argument::dup(s2);
 
   delete s2;
 
   return Success;
-#endif
-#if defined(LINUX) || defined(CYGWIN)
-  return Exception::make(IDB_ERROR, "Not implemented on this platform");
-#endif
 }
 
 //
@@ -2509,17 +2502,12 @@ __method_static_OUT_string_toUpper_ostring__IN_string(Database *_db, FEMethod_C 
   // User Implementation
   //
 
-#ifdef SOLARIS
   char * s2  = OString::toUpper(s);
   retarg = Argument::dup(s2);
 
   delete s2;
 
   return Success;
-#endif
-#if defined(LINUX) || defined(CYGWIN)
-  return Exception::make(IDB_ERROR, "Not implemented on this platform");
-#endif
 }
 
 //
@@ -2535,17 +2523,12 @@ __method_static_OUT_string_rtrim_ostring__IN_string(Database *_db, FEMethod_C *_
   // User Implementation
   //
 
-#ifdef SOLARIS
   char * s2 = OString::rtrim(s);
   retarg = Argument::dup(s2);
   
   delete s2;
 
   return Success;
-#endif
-#if defined(LINUX) || defined(CYGWIN)
-  return Exception::make(IDB_ERROR, "Not implemented on this platform");
-#endif
 }
 
 //
@@ -3072,7 +3055,6 @@ __method__OUT_ostring_REF__toLower_ostring(Database *_db, FEMethod_C *_m, Object
   // User Implementation
   //
 
-#ifdef SOLARIS
   OString * os = IdbOString_c(_o);
   
   os->toLower();
@@ -3080,10 +3062,6 @@ __method__OUT_ostring_REF__toLower_ostring(Database *_db, FEMethod_C *_m, Object
   retarg = os;
 
   return Success;
-#endif
-#if defined(LINUX) || defined(CYGWIN)
-  return Exception::make(IDB_ERROR, "Not implemented on this platform");
-#endif
 }
 
 //
@@ -3099,7 +3077,6 @@ __method__OUT_ostring_REF__toUpper_ostring(Database *_db, FEMethod_C *_m, Object
   // User Implementation
   //
 
-#ifdef SOLARIS
   OString * os = IdbOString_c(_o);
   
   os->toUpper();
@@ -3107,10 +3084,6 @@ __method__OUT_ostring_REF__toUpper_ostring(Database *_db, FEMethod_C *_m, Object
   retarg = os;
 
   return Success;
-#endif
-#if defined(LINUX) || defined(CYGWIN)
-  return Exception::make(IDB_ERROR, "Not implemented on this platform");
-#endif
 }
 
 //
@@ -3126,7 +3099,6 @@ __method__OUT_ostring_REF__rtrim_ostring(Database *_db, FEMethod_C *_m, Object *
   // User Implementation
   //
   
-#ifdef SOLARIS
   OString * os = IdbOString_c(_o);
 
   os->rtrim();
@@ -3134,10 +3106,6 @@ __method__OUT_ostring_REF__rtrim_ostring(Database *_db, FEMethod_C *_m, Object *
   retarg = os;
 
   return Success;
-#endif
-#if defined(LINUX) || defined(CYGWIN)
-  return Exception::make(IDB_ERROR, "Not implemented on this platform");
-#endif
 }
 
 //
