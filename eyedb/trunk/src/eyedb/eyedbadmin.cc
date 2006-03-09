@@ -338,13 +338,8 @@ usage(const char *prog)
 	    "%sdspgetcurdat <dbname> <dspname> \n", str());
 
   if (!mode || mode == mUserAdd)
-#if 1 //def HAS_FATTACH
     fprintf(pipe,
 	    "%suseradd [--unix|--strict-unix=]<user>|@ [<passwd>]\n", str());
-#else
-    fprintf(pipe,
-	    "%suseradd <user> [<passwd>]\n", str());
-#endif
 
   if (!mode || mode == mUserDelete)
     fprintf(pipe,

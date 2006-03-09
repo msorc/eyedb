@@ -1,3 +1,13 @@
+2006-03-09 Francois Dechelle <francois@dechelle.net>
+
+	* Removed #ifdef LINUX|SOLARIS in src/eyedb/OString.cc and src/eyedb/utilsmthfe.cc. Added necessary tests in configure.in
+	* Changed HAS_FATTACH to standard HAVE_FATTACH
+	* Remove M_strsignal (assumed that all platforms have strsignal, if not we'll see)
+	
+2006-03-07 Francois Dechelle <francois@dechelle.net>
+
+	* Release 2.7.6
+
 2006-03-07  Eric Viara  <viara@sysra.com>
 
 	* Added const Oid::operator<(const Oid &) const method

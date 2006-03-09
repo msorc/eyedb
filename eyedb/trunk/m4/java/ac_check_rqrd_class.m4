@@ -17,7 +17,7 @@ dnl @author Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
 dnl @version $Id$
 dnl
 
-AC_DEFUN(AC_CHECK_RQRD_CLASS,[
+AC_DEFUN([AC_CHECK_RQRD_CLASS],[
 CLASS=`echo $1|sed 's/\./_/g'`
 AC_CHECK_CLASS($1)
 if test "$HAVE_LAST_CLASS" = "no"; then

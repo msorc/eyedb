@@ -70,8 +70,8 @@ signal_handler(int sig)
       raise(sig);
       return;
     }
-  /*@@@@ M_strsignal*/
-  IDB_LOG(IDB_LOG_CONN, ("got %s [signal=%d]\n", M_strsignal(sig), sig));
+
+  IDB_LOG(IDB_LOG_CONN, ("got %s [signal=%d]\n", strsignal(sig), sig));
 
   if (rpc_quit_handler)
     rpc_quit_handler(rpc_quit_data, 0);
@@ -193,7 +193,7 @@ rpc_connOpen(rpc_Client *client, const char *hostname, const char *portname,
   for (i = 0; i < conn_cnt; i++) {
     rpc_MultiConnInfo info;
     rpc_MultiConnInfo xinfo;
-#ifdef HAS_FATTACH
+#ifdef HAVE_FATTACH
     if (domain == AF_UNIX) {
       sock_fd = open(portname, O_RDWR);
       if (sock_fd  < 0)
@@ -215,7 +215,7 @@ rpc_connOpen(rpc_Client *client, const char *hostname, const char *portname,
       if (connect(sock_fd, sock_addr, length) < 0)
 	goto failure;
 
-#ifdef HAS_FATTACH
+#ifdef HAVE_FATTACH
     }
 #endif
     conn->fd[i] = sock_fd;

@@ -25,7 +25,7 @@
 #ifndef _EYEDBLIB_CONNMAN_H
 #define _EYEDBLIB_CONNMAN_H
 
-#ifdef HAS_FATTACH
+#ifdef HAVE_FATTACH
 #include <stropts.h>
 #endif
 
@@ -102,7 +102,7 @@ extern rpc_ConnInfo *
 rpc_make_tcpip_conninfo(int fd);
 
 
-#ifdef HAS_FATTACH
+#ifdef HAVE_FATTACH
 extern rpc_ConnInfo *
 rpc_make_stream_conninfo(int fd, struct strrecvfd *);
 #else

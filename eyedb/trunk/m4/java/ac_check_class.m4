@@ -17,7 +17,7 @@ dnl
 dnl @author Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
 dnl @version $Id$
 dnl
-AC_DEFUN(AC_CHECK_CLASS,[
+AC_DEFUN([AC_CHECK_CLASS],[
 AC_REQUIRE([AC_PROG_JAVA])
 ac_var_name=`echo $1 | sed 's/\./_/g'`
 dnl Normaly I'd use a AC_CACHE_CHECK here but since the variable name is

@@ -13,7 +13,7 @@ dnl
 dnl @author Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
 dnl @version $Id$
 dnl
-AC_DEFUN(AC_PROG_JAVA_WORKS, [
+AC_DEFUN([AC_PROG_JAVA_WORKS], [
 AC_CHECK_PROG(uudecode, uudecode$EXEEXT, yes)
 if test x$uudecode = xyes; then
 AC_CACHE_CHECK([if uudecode can decode base 64 file], ac_cv_prog_uudecode_base64, [

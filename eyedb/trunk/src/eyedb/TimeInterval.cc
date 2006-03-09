@@ -21,9 +21,6 @@
    Author: Laurent Pereira
 */
 
-
-#ifndef NOCONTRIB
-
 #include <eyedb/syscls.h>
 #include "ClockConverter.h"
 #include "datelib.h"
@@ -278,5 +275,3 @@ namespace eyedb {
   }
 
 }
-
-#endif

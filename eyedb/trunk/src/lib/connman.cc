@@ -360,7 +360,7 @@ rpc_check_localhost(struct in_addr *addr)
   return rpc_check_addr(addr);
 }
 
-#ifdef HAS_FATTACH
+#ifdef HAVE_FATTACH
 rpc_ConnInfo *
 rpc_make_stream_conninfo(int fd, struct strrecvfd *info)
 {

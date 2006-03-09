@@ -30,7 +30,7 @@ dnl
 dnl @author Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
 dnl @version $Id$
 dnl
-AC_DEFUN(AC_PROG_JAVAC,[
+AC_DEFUN([AC_PROG_JAVAC],[
 AC_REQUIRE([AC_EXEEXT])dnl
 if test "x$JAVAPREFIX" = x; then
 	test "x$JAVAC" = x && AC_CHECK_PROGS(JAVAC, "gcj$EXEEXT -C" guavac$EXEEXT jikes$EXEEXT javac$EXEEXT)

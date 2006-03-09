@@ -24,11 +24,7 @@
 
 #include <eyedbconfig.h>
 
-#if defined(LINUX) || defined(LINUX64) || defined(LINUX_IA64) || defined(LINUX_PPC64)
-/*@@@@ this is for exotic function strsignal */
-// #define _GNU_SOURCE
 #include <string.h>
-#endif
 
 #define THR_POSIX
 
@@ -50,7 +46,7 @@ extern int RPC_MIN_SIZE;
 /* disconnected the 21/08/01 */
 /*#define RPC_TIMEOUT 7200*/
 
-#ifdef HAS_FATTACH
+#ifdef HAVE_FATTACH
 #include <stropts.h>
 #endif
 #include <grp.h>
@@ -235,11 +231,7 @@ signal_handler(int sig)
   int s;
   for (s = 0; s < NSIG; s++)
     signal(s, SIG_DFL);
-  //printf("thead %d:%d got signal %d\n", getpid(), pthread_self());
-  /*@@@@ M_strsignal*/
-  IDB_LOG(IDB_LOG_CONN, ("backend got %s [signal=%d]\n", M_strsignal(sig), sig));
-  /*@@@@ M_strsignal*/
-  //fprintf(stderr, msg_make("Got %s [#%d]\n", M_strsignal(sig), sig));
+  IDB_LOG(IDB_LOG_CONN, ("backend got %s [signal=%d]\n", strsignal(sig), sig));
 
   if (getenv("EYEDBDEBUG_"))
     sleep(1000);
@@ -597,7 +589,7 @@ rpc_portOpen(rpc_Server *server, const char *servname, const char *portname,
   }
 
   if (port->domain == AF_UNIX) {
-#ifdef HAS_FATTACH
+#ifdef HAVE_FATTACH
     int pfd[2];
     int fd;
     int created = 0;
@@ -1125,7 +1117,7 @@ rpc_serverMainLoop(rpc_Server *server, rpc_PortHandle **ports, int nports)
   }
 
   for (;;) {
-#ifdef HAS_FATTACH
+#ifdef HAVE_FATTACH
     struct strrecvfd info;
 #endif
     fds_ready_to_read = server->fds_used;
@@ -1175,7 +1167,7 @@ rpc_serverMainLoop(rpc_Server *server, rpc_PortHandle **ports, int nports)
 	    length = sizeof(port->u.un.sock_un_name);
 	  }
 
-#ifdef HAS_FATTACH
+#ifdef HAVE_FATTACH
 	  if (port->domain == AF_UNIX) {
 	    if (ioctl(fd, I_RECVFD, &info) < 0) {
 	      PERROR("ioctl");
@@ -1198,7 +1190,7 @@ rpc_serverMainLoop(rpc_Server *server, rpc_PortHandle **ports, int nports)
 	  if (new_fd >= 0) {
 	    rpc_ConnInfo *ci;
 	    if (port->domain == AF_UNIX) {
-#ifdef HAS_FATTACH
+#ifdef HAVE_FATTACH
 	      ci = rpc_make_stream_conninfo(new_fd, &info);
 #else
 	      ci = rpc_make_unix_conninfo(new_fd);
@@ -1334,26 +1326,6 @@ rpc_garbClientInfo(rpc_Server *server, int which, int fd)
 
   if (!which && server->connh)
     (*server->connh)(server, (rpc_ClientId)fd, rpc_False);
-
-  /*@@@@ #if !defined(LINUX) && !defined(CYGWIN)*/
-
-#if 0
-#if 0 /*def HAS_PTHREAD_KILL_OTHER_THREADS_NP*/
-  pthread_kill_other_threads_np();
-#else
-  int i = 0;
-  for (i = 0; i < ci->fd_cnt; i++) {
-    if (ci->tid[i] == pthread_self())
-      break;
-  }
-
-  for (++i; i < ci->fd_cnt; i++) {
-    printf("%d:%d killing thread %d:%d\n", getpid(),
-	   pthread_self(), getpid(), ci->tid[i]);
-    pthread_kill(ci->tid[i], SIGTERM);
-  }
-#endif
-#endif
 
   if (!--ci->refcnt)
     rpc_garbRealize(server, ci, 0);

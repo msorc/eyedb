@@ -21,19 +21,18 @@
    Author: Eric Viara <viara@sysra.com>
 */
 
-
-#ifndef NOCONTRIB
-
 #include <eyedbconfig.h>
 
-#if HAVE_LIBGEN_H
-#include <libgen.h>
-#endif
-#if HAVE_SYS_TYPES_H
+#include <ctype.h>
+#ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
-#if HAVE_REGEX_H
+#ifdef HAVE_REGEX_H
 #include <regex.h>
+#elif defined(HAVE_LIBGEN_H)
+#include <libgen.h>
+#else
+#error No regular expression implementation available on this platform
 #endif
 
 #include <eyedb/syscls.h>
@@ -46,9 +45,6 @@ using namespace std;
 //
 
 namespace eyedb {
-
-  const char UPPERCASE_LETTERS[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  const char LOWERCASE_LETTERS[] = "abcdefghijklmnopqrstuvwxyz";
 
   //
   // OString user methods
@@ -135,26 +131,6 @@ namespace eyedb {
     return os;
   }
 
-  /*
-    int
-    OString::strlen(const char * s)
-    {
-    return 0;
-    }
-
-    int
-    OString::strcmp(const char * s1, const char * s2)
-    {
-    return 0;
-    }
-
-    int
-    OString::strstr(const char * s1, const char * s2)
-    {
-    return 0;
-    }
-  */
-
   char *
   OString::substr(const char * s, int offset, int len)
   {
@@ -184,52 +160,47 @@ namespace eyedb {
   char *
   OString::toLower(const char * s)
   {
-#ifdef SOLARIS
     char * s2 = new char[strlen(s) + 1];
-    s2 = strtrns(s, UPPERCASE_LETTERS, LOWERCASE_LETTERS, s2);
-  
+    char * p = s2;
+
+    while (*s++)
+      *p++ = (char)tolower( *s);
+
+    *p = '\0';
+
     return s2;
-#endif
-#if defined(LINUX) || defined(CYGWIN)
-    cerr << "Not implemented on this platform" << endl;
-    return 0;
-#endif
   }
 
   char *
   OString::toUpper(const char * s)
   {
-#ifdef SOLARIS
     char * s2 = new char[strlen(s) + 1];
-    s2 = strtrns(s, LOWERCASE_LETTERS, UPPERCASE_LETTERS, s2);
-  
+    char * p = s2;
+
+    while (*s++)
+      *p++ = (char)toupper( *s);
+
+    *p = '\0';
+
     return s2;
-#endif
-#if defined(LINUX) || defined(CYGWIN)
-    cerr << "Not implemented on this platform" << endl;
-    return 0;
-#endif
   }
 
   char *
   OString::rtrim(const char * s)
   {
-#ifdef SOLARIS
-    const char * s_rtrimmed = strrspn(s, "\n\r\t\v ");
+    const char * s_rtrimmed = s + strlen(s) - 1;
 
-    int return_value_size = s_rtrimmed - s;
+    while (s_rtrimmed >= s 
+	   && ((*s_rtrimmed=='\n') || (*s_rtrimmed=='\r') || (*s_rtrimmed=='\t') || (*s_rtrimmed=='\v')))
+      s_rtrimmed--;
+
+    int return_value_size = s_rtrimmed - s + 1;
     char * return_value = new char[return_value_size + 1];
     strncpy(return_value, s, return_value_size);
     return_value[return_value_size] = '\0';
 
     return return_value;
-#endif
-#if defined(LINUX) || defined(CYGWIN)
-    cerr << "Not implemented on this platform" << endl;
-    return 0;
-#endif
   }
-
 
   char *
   OString::ltrim(const char * s)
@@ -241,8 +212,6 @@ namespace eyedb {
 
     return return_value;
   }
-
-
 
   Status
   OString::setChar(char c, int offset)
@@ -429,18 +398,7 @@ namespace eyedb {
   
       
     // Apply the regular expresion pattern
-#ifdef SOLARIS
-    char * compiled_regexp = regcmp(regexp, (char *)0);
-
-    if(compiled_regexp == 0) 
-      {
-	return OString::ostring(0);
-      }
-
-    const char * end_match = regex(compiled_regexp, regexp_subject + offset);
-    const char * start_match = __loc1;
-#endif
-#if defined(LINUX) || defined(CYGWIN)
+#ifdef HAVE_REGCOMP
     regex_t * compiled_regexp = (regex_t *)malloc(sizeof(regex_t));
 
     int reg_status = regcomp(compiled_regexp, regexp, REG_EXTENDED);
@@ -460,6 +418,16 @@ namespace eyedb {
   
     const char * start_match = regexp_subject + offset + match[0].rm_so;
     const char * end_match = regexp_subject + offset + match[0].rm_eo;
+#elif defined(HAVE_REGCMP)
+    char * compiled_regexp = regcmp(regexp, (char *)0);
+
+    if(compiled_regexp == 0) 
+      {
+	return OString::ostring(0);
+      }
+
+    const char * end_match = regex(compiled_regexp, regexp_subject + offset);
+    const char * start_match = __loc1;
 #endif
 
     free(compiled_regexp);
@@ -643,14 +611,6 @@ namespace eyedb {
     return setS("");
   }
 
-  /*
-    OString & 
-    OString::resize(int len)
-    {
-    return *this;
-    }
-  */
-
   OString &
   OString::toLower()
   {
@@ -728,18 +688,8 @@ namespace eyedb {
   OString::match(const char * regexp) const
   {
     const char * regexp_subject = getS().c_str();
-#ifdef SOLARIS
-    char * compiled_regexp = regcmp(regexp, (char *)0);
 
-    if(compiled_regexp == 0)
-      {
-	return False;
-      }
-
-    char * end_match = regex(compiled_regexp, regexp_subject);
-    char * start_match = __loc1;
-#endif
-#if defined(LINUX) || defined(CYGWIN)
+#ifdef HAVE_REGCOMP
     regex_t * compiled_regexp = (regex_t *)malloc(sizeof(regex_t));
 
     int reg_status = regcomp(compiled_regexp, regexp, REG_EXTENDED);
@@ -759,7 +709,16 @@ namespace eyedb {
   
     const char * start_match = regexp_subject + match[0].rm_so;
     const char * end_match = regexp_subject + match[0].rm_eo;
+#elif defined(HAVE_REGCMP)
+    char * compiled_regexp = regcmp(regexp, (char *)0);
 
+    if(compiled_regexp == 0)
+      {
+	return False;
+      }
+
+    char * end_match = regex(compiled_regexp, regexp_subject);
+    char * start_match = __loc1;
 #endif
 
     free(compiled_regexp);
@@ -832,14 +791,7 @@ namespace eyedb {
     char * s_copy = strdup(getS().c_str());
 
     // prepare the regular expression
-#ifdef SOLARIS
-    char * compiled_separator = regcmp(regexp_separator, (char*)0);
-    if( compiled_separator == 0 )
-      {
-	return 0;
-      }
-#endif
-#if defined(LINUX) || defined(CYGWIN)
+#ifdef HAVE_REGCOMP
     regex_t * compiled_separator = (regex_t *)malloc(sizeof(regex_t));
 
     int reg_status = regcomp(compiled_separator, regexp_separator, REG_EXTENDED);
@@ -848,7 +800,12 @@ namespace eyedb {
 	free(compiled_separator);
 	return 0;      
       }
-
+#elif defined(HAVE_REGCMP)
+    char * compiled_separator = regcmp(regexp_separator, (char*)0);
+    if( compiled_separator == 0 )
+      {
+	return 0;
+      }
 #endif
 
     // break the copy into tokens
@@ -861,47 +818,48 @@ namespace eyedb {
     char * cursor1 = s_copy;
     char * cursor2 = s_copy;
  
-#ifdef SOLARIS
+#ifdef HAVE_REGEXEC
+    regmatch_t match[1];
+    while( regexec( compiled_separator, cursor1, 1, match, 0) == 0)
+#elif defined(HAVE_REGEX)
     while( (cursor2 = regex(compiled_separator, cursor1)) != 0 )
+#endif
+      // NB: the #ifdef and the loop body are breaked out this way 
+      // to save automatic indentation under emacs
       {
+#ifdef HAVE_REGEXEC
+	char * separator = cursor1 + match[0].rm_so;
+	char * cursor2 = cursor1 + match[0].rm_eo;
+#elif defined(HAVE_REGEX)
 	char * separator = __loc1;
 #endif
-#if defined(LINUX) || defined(CYGWIN)
-	regmatch_t match[1];
-	while( regexec( compiled_separator, cursor1, 1, match, 0) == 0)
-	  {
-	    char * separator = cursor1 + match[0].rm_so;
-	    char * cursor2 = cursor1 + match[0].rm_eo;
-#endif
 
-	    int separator_len = cursor2 - separator;
+	int separator_len = cursor2 - separator;
       
-	    int token_len = separator - cursor1;
-	    char * current_token = new char[ token_len + 1];
-	    current_token[0] = '\0';
-	    strncat(current_token, cursor1, token_len);
-	    return_value[nb_pieces] = current_token;
+	int token_len = separator - cursor1;
+	char * current_token = new char[ token_len + 1];
+	current_token[0] = '\0';
+	strncat(current_token, cursor1, token_len);
+	return_value[nb_pieces] = current_token;
      
       
-	    ++nb_pieces;
-	    cursor1 = cursor2;
-	  }
-
-	// add the last token
-	char * current_token = new char[ strlen(cursor1) + 1];
-	strcpy(current_token, cursor1);
-	return_value[nb_pieces] = current_token;
 	++nb_pieces;
- 
-
-	// return
-	free(s_copy);
-	free(compiled_separator);
-
-	return return_value;
-
+	cursor1 = cursor2;
       }
 
-#endif
+    // add the last token
+    char * current_token = new char[ strlen(cursor1) + 1];
+    strcpy(current_token, cursor1);
+    return_value[nb_pieces] = current_token;
+    ++nb_pieces;
+ 
+
+    // return
+    free(s_copy);
+    free(compiled_separator);
+
+    return return_value;
+
   }
+}
     

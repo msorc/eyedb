@@ -64,7 +64,7 @@ dnl
 dnl @author Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
 dnl @version $Id$
 dnl
-AC_DEFUN(AC_PROG_JAVA,[
+AC_DEFUN([AC_PROG_JAVA],[
 AC_REQUIRE([AC_EXEEXT])dnl
 if test x$JAVAPREFIX = x; then
 	test x$JAVA = x && AC_CHECK_PROGS(JAVA, gij$EXEEXT kaffe$EXEEXT java$EXEEXT)

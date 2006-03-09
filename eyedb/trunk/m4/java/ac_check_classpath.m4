@@ -14,7 +14,7 @@ dnl
 dnl @author Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
 dnl @version $Id$
 dnl
-AC_DEFUN(AC_CHECK_CLASSPATH,[
+AC_DEFUN([AC_CHECK_CLASSPATH],[
 if test "x$CLASSPATH" = x; then
         echo "You have no CLASSPATH, I hope it is good"
 else
