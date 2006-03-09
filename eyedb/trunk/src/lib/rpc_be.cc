@@ -25,14 +25,7 @@
 #include <eyedbconfig.h>
 
 #include <string.h>
-
-#define THR_POSIX
-
-#ifdef THR_POSIX
 #include <pthread.h>
-#else
-#include <thread.h>
-#endif
 
 #include <eyedblib/thread.h>
 
@@ -259,8 +252,8 @@ signal_handler(int sig)
 static void
 sig_h(int sig, siginfo_t *info, void *any)
 {
-  /*  utlog(msg_make("Got %s [sigaction=%d]\n", _sys_siglistp[sig], sig)); */
-  //  printf("Got %s [sigaction=%d]\n", _sys_siglistp[sig], sig);
+  //   utlog(msg_make("Got %s [sigaction=%d]\n", _sys_siglistp[sig], sig));
+  //   printf("Got %s [sigaction=%d]\n", _sys_siglistp[sig], sig);
   if (info) {
     int fd, i;
     rpc_ClientInfo *ci;
@@ -268,10 +261,18 @@ sig_h(int sig, siginfo_t *info, void *any)
     pid_t pid =  info->si_pid;
     for (fd = 0; fd < sizeof(clientInfo)/sizeof(clientInfo[0]); fd++)
       if (ci = clientInfo[fd]) {
+
+// The following code is disabled:
+// comparaison between ci->tid[i] (of type pthread_t) and info->si_pid (of type pid_t)
+// will never be true (except on platforms where pthread_t is equivalent to pid_t, which
+// was the cas on Linux with old threads implementations.
+#if 0
 	for (i = 0; i < ci->fd_cnt; i++)
 	  if (ci->tid[i] == info->si_pid) {
 	    rpc_garbClientInfo(rpc_mainServer, i, fd);
 	  }
+#endif
+
 	break;
       }
   }
@@ -365,11 +366,7 @@ rpc_newClientInfo(rpc_Server *server, int fd[], int fd_cnt)
   ci->fd_cnt = fd_cnt;
   ci->refcnt = fd_cnt;
 
-#ifdef THR_POSIX
   ci->tid       = (pthread_t *)malloc(server->conn_cnt * sizeof(pthread_t));
-#else
-  ci->tid       = malloc(server->conn_cnt * sizeof(thread_t));
-#endif
   ci->ua        = (char **)malloc(server->conn_cnt * sizeof(rpc_ServerArg));
   ci->comm_buff = (char **)malloc(server->conn_cnt * sizeof(char *));
 
@@ -745,11 +742,7 @@ static void *serv_thr(void *arg)
 	//	    rpc_garbClientInfo(server, which, fd);
 	rpc_garbClientInfo(server, 0, fd); // force which
 	exit(0);
-#ifdef THR_POSIX
 	pthread_exit(&status);
-#else
-	thr_exit(&status);
-#endif
       }
       else
 	break;
@@ -795,11 +788,7 @@ rpc_makeThread(rpc_Server *server, int which, int fd, rpc_ClientInfo *ci)
   utlog(msg_make("rpc_makeThread which=%d, fd=%d\n", which, fd));
 #endif
 
-#ifdef THR_POSIX
   pthread_create(&ci->tid[which], NULL, serv_thr, thr_arg);
-#else
-  thr_create(NULL, 0, serv_thr, thr_arg, 0, &ci->tid[which]);
-#endif
 }
 
 static void
@@ -870,11 +859,7 @@ rpc_makeNewConnection(rpc_Server *server, int new_fd[], int fd_cnt,
 
 	  for (i = 0; i < fd_cnt; i++) {
 	    void *status;
-#ifdef THR_POSIX
 	    pthread_join(ci->tid[i], &status);
-#else
-	    thr_join(ci->tid[i], NULL, &status);
-#endif
 	  }
 
 	  free(ci->tid);

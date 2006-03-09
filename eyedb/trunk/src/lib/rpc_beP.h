@@ -31,11 +31,7 @@ typedef char *rpc_ServerArg;
 
 typedef struct {
   rpc_ServerArg *ua;
-#ifdef THR_POSIX
   pthread_t *tid;
-#else
-  thread_t *tid;
-#endif
   char **comm_buff;
   rpc_Boolean dead;
   int refcnt;
