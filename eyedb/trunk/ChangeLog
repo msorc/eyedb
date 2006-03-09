@@ -3,6 +3,7 @@
 	* Removed #ifdef LINUX|SOLARIS in src/eyedb/OString.cc and src/eyedb/utilsmthfe.cc. Added necessary tests in configure.in
 	* Changed HAS_FATTACH to standard HAVE_FATTACH
 	* Remove M_strsignal (assumed that all platforms have strsignal, if not we'll see)
+	* Remove non-posix thread code in src/lib/rpcdb.cc (assume that all platforms have Posix threads)
 	
 2006-03-07 Francois Dechelle <francois@dechelle.net>
 
