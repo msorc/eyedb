@@ -155,7 +155,7 @@ case "$ac_semaphore_policy" in
 posix)
 	AC_PTHREAD_PROCESS_SHARED
 	if test "$ac_pthread_process_shared" = "no"; then
-	   AC_MSG_ERROR( "this platform does not support PTHREAD_PROCESS_SHARED and cannot use Posix semaphore policy")
+	   AC_MSG_ERROR( this platform does not support PTHREAD_PROCESS_SHARED and cannot use Posix semaphore policy)
 	fi
 	;;
 sysv)
