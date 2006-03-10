@@ -1,3 +1,7 @@
+2006-03-10 Francois Dechelle <francois@dechelle.net>
+
+	* Added m4 macro to check whether PTHREAD_PROCESS_SHARED is supported
+
 2006-03-09 Francois Dechelle <francois@dechelle.net>
 
 	* Removed #ifdef LINUX|SOLARIS in src/eyedb/OString.cc and src/eyedb/utilsmthfe.cc. Added necessary tests in configure.in
