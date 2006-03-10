@@ -147,13 +147,16 @@ AC_SEARCH_LIBS( socket, socket)
 
 # determine the semaphore implementation for this platform
 AC_ARG_WITH( semaphore-policy, 
-	     AS_HELP_STRING([--with-semaphore-policy=(posix|sysv)],[give semaphore implementation (default is guessed)]),
+	     AS_HELP_STRING([--with-semaphore-policy=(posix|sysv)],[force semaphore implementation (if not given, is found by configure.in)]),
 	     ac_semaphore_policy="$withval",
 	     ac_semaphore_policy="guess")
 
 case "$ac_semaphore_policy" in
 posix)
 	AC_PTHREAD_PROCESS_SHARED
+	if test "$ac_pthread_process_shared" = "no"; then
+	   AC_MSG_ERROR( "this platform does not support PTHREAD_PROCESS_SHARED and cannot use Posix semaphore policy")
+	fi
 	;;
 sysv)
 	;;
