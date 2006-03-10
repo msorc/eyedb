@@ -42,13 +42,8 @@
 #define DATDIRLEN 511
 #define LOGDEVLEN 511
 
-#ifdef UT_SEM
 #define eyedbsm_mutexLock(X, Y) eyedbsm::mutexLock(X, Y)
 #define eyedbsm_mutexUnlock(X, Y) eyedbsm::mutexUnlock(X, Y)
-#else
-#define eyedbsm_mutexLock(X, Y) eyedbsm::mutexLock(X, Y)
-#define eyedbsm_mutexUnlock(X, Y) eyedbsm::mutexUnlock(X, Y)
-#endif
 
 namespace eyedb {
 

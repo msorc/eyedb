@@ -23,6 +23,7 @@
 
 
 #define NO_IDB_LINKED_LIST
+#define USE_STL_LIST
 
 #include <eyedbconfig.h>
 
@@ -52,21 +53,16 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <errno.h>
+// #include <limits.h>
 
 #include <eyedblib/rpc_lib.h>
-
-#define USE_STL_LIST
-
 #include <eyedblib/stdlist.h>
-
 #include <eyedblib/semlib.h>
 #include <eyedblib/filelib.h>
 #include <eyedblib/filelib.h>
-
-#include <kern_p.h>
 #include <eyedbsm/smd.h>
-
 #include <eyedblib/log.h>
+#include <kern_p.h>
 
 using namespace eyedbsm;
 
@@ -812,11 +808,12 @@ notice(int status)
   return status;
 }
 
-#include <limits.h>
-
 static void
 init()
 {
+  // It looks like that this code is useless: 
+  // after calling setrlimit and before calling setrlimit, rlp.rlim_cur == rlp.rlim_max == 64
+#if 0
   /*@@@@ #if !defined(LINUX) && !defined(CYGWIN) */
 #if defined(SOLARIS) || defined(ULTRASOL7)  
   struct rlimit rlp;
@@ -825,6 +822,7 @@ init()
     rlp.rlim_cur = rlp.rlim_max;
     setrlimit(RLIMIT_NOFILE, &rlp);
   }
+#endif
 #endif
 
   signal(SIGHUP,  SIG_IGN);

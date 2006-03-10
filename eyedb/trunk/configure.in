@@ -145,6 +145,27 @@ AC_CHECK_LIB( dl, dlopen)
 AC_CHECK_LIB( crypt, crypt)
 AC_SEARCH_LIBS( socket, socket)
 
+# determine the semaphore implementation for this platform
+AC_ARG_WITH( semaphore-policy, 
+	     AS_HELP_STRING([--with-semaphore-policy=(posix|sysv)],[give semaphore implementation (default is guessed)]),
+	     ac_semaphore_policy="$withval",
+	     ac_semaphore_policy="guess")
+
+case "$ac_semaphore_policy" in
+posix)
+	AC_PTHREAD_PROCESS_SHARED
+	;;
+sysv)
+	;;
+guess)
+	AC_PTHREAD_PROCESS_SHARED
+	;;
+*)
+	AC_MSG_ERROR( "--with-semaphore-policy must be one of posix or sysv")
+	;;
+esac
+
+
 # ========================================
 # JAVA compilation
 # ========================================
