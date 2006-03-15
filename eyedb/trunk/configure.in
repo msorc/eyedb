@@ -146,25 +146,38 @@ AC_CHECK_LIB( crypt, crypt)
 AC_SEARCH_LIBS( socket, socket)
 
 # determine the semaphore implementation for this platform
+AC_PTHREAD_PROCESS_SHARED
 AC_ARG_WITH( semaphore-policy, 
-	     AS_HELP_STRING([--with-semaphore-policy=(posix|sysv)],[force semaphore implementation (if not given, is found by configure.in)]),
+	     AS_HELP_STRING([--with-semaphore-policy=(posix|sysv_ipc)],[force semaphore implementation (if none given, is found by configure.in)]),
 	     ac_semaphore_policy="$withval",
 	     ac_semaphore_policy="guess")
 
+AC_MSG_CHECKING(for semaphore policy)
 case "$ac_semaphore_policy" in
 posix)
-	AC_PTHREAD_PROCESS_SHARED
 	if test "$ac_pthread_process_shared" = "no"; then
 	   AC_MSG_ERROR( this platform does not support PTHREAD_PROCESS_SHARED and cannot use Posix semaphore policy)
 	fi
+	AC_MSG_RESULT(Posix)
+	AC_DEFINE(HAVE_SEMAPHORE_POLICY_POSIX, 1, [Define if semaphore policy is Posix (must support PTHREAD_PROCESS_SHARED)])
 	;;
-sysv)
+sysv_ipc)
+	AC_MSG_RESULT(Sys V IPC)
+	AC_DEFINE(HAVE_SEMAPHORE_POLICY_SYSV_IPC, 1, [Define if semaphore policy is Sys V IPC])
 	;;
 guess)
-	AC_PTHREAD_PROCESS_SHARED
+	if test "$ac_pthread_process_shared" = "yes"; then
+	   AC_MSG_RESULT(Posix)
+	   ac_semaphore_policy="posix"
+	   AC_DEFINE(HAVE_SEMAPHORE_POLICY_POSIX, 1, [Define if semaphore policy is Posix (must support PTHREAD_PROCESS_SHARED)])
+	else
+	   ac_semaphore_policy="sysv_ipc"
+	   AC_MSG_RESULT(Sys V IPC)
+	   AC_DEFINE(HAVE_SEMAPHORE_POLICY_SYSV_IPC, 1, [Define if semaphore policy is Sys V IPC])
+	fi
 	;;
 *)
-	AC_MSG_ERROR( "--with-semaphore-policy must be one of posix or sysv")
+	AC_MSG_ERROR( "--with-semaphore-policy must be one of posix or sysv_ipc")
 	;;
 esac
 
@@ -430,6 +443,7 @@ echo "  C++ compiler: ${CXX:-none}"
 echo "  C++ compiler flags: ${CXXFLAGS:-none}"
 echo "  Compile with debug: ${enable_debug:-no}"
 echo "  Compile with optimization: ${enable_optimize:-no}"
+echo "  Semaphore policy: ${ac_semaphore_policy}"
 echo 
 echo "  *** EyeDB Java binding ***" 
 echo "  Compile Java binding: ${COND_JAVA:-no}"

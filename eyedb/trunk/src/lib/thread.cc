@@ -65,17 +65,14 @@ namespace eyedblib {
     init(_lock);
   }
 
-  //#define NO_MTX
-
   int
   Mutex::init(bool _lock)
   {
-#ifndef NO_MTX
     pthread_mutexattr_t mattr;
     int r = pthread_mutexattr_init(&mattr);
     if (r) return r;
-    /*@@@@#if !defined(LINUX) && !defined(CYGWIN)*/
-#if defined(SOLARIS) || defined(ULTRASOL7)
+
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
     if (type == PROCESS_SHARED) {
       r = pthread_mutexattr_setpshared(&mattr, PTHREAD_PROCESS_SHARED);
       if (r) return r;
@@ -93,34 +90,25 @@ namespace eyedblib {
       lock();
 
     return pthread_mutexattr_destroy(&mattr);
-#endif
   }
 
   int
   Mutex::lock()
   {
-#ifndef NO_MTX
     int r = pthread_mutex_lock(&mut);
     locked = true;
     return r;
-#endif
-    return 0;
   }
 
   bool
   Mutex::trylock()
   {
-#ifndef NO_MTX
     return !pthread_mutex_trylock(&mut);
-#else
-    return true;
-#endif
   }
 
   int
   Mutex::unlock()
   {
-#ifndef NO_MTX
 #if 1
     if (!locked) {
       fprintf(stderr, "eyedblib::Mutex::unlock(): Assertion `locked' failed\n");
@@ -133,7 +121,6 @@ namespace eyedblib {
     assert (locked);
     locked = false;
     return pthread_mutex_unlock(&mut);
-#endif
   }
 
   Mutex::~Mutex()
@@ -156,8 +143,8 @@ namespace eyedblib {
     pthread_condattr_t cattr;
     int r = pthread_condattr_init(&cattr);
     if (r) return r;
-    /*@@@@#if !defined(LINUX) && !defined(CYGWIN) */
-#if defined(SOLARIS) || defined(ULTRASOL7)
+
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
     if (type == PROCESS_SHARED) {
       r = pthread_condattr_setpshared(&cattr, PTHREAD_PROCESS_SHARED);
       if (r) return r;
@@ -627,11 +614,4 @@ namespace eyedblib {
   }
 
 }
-
-#if 0 && defined(ORIGIN) 
-/* example of Mispro CC compiler instantiate pramgma
-#pragma instantiate basic_ostream<char,std::char_traits<char> >& basic_ostream<char,std::char_traits<char> >::_M_put_num(long)
-*/
-#endif
-
 
