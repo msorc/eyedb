@@ -17,7 +17,7 @@ exit(0);
 		[ac_pthread_process_shared="no"]
 		)
 	if test "$ac_pthread_process_shared" = "yes"; then
-		AC_DEFINE(HAS_PTHREAD_PROCESS_SHARED, 1, [Define if Posix threads implementation supports PTHREAD_PROCESS_SHARED])
+		AC_DEFINE(HAVE_PTHREAD_PROCESS_SHARED, 1, [Define if Posix threads implementation supports PTHREAD_PROCESS_SHARED])
 		AC_MSG_RESULT(yes)
 	else
 		AC_MSG_RESULT(no)
