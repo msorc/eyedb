@@ -66,7 +66,7 @@ namespace eyedb {
        Not yet documented.
        @return
     */
-    Bool isBigEndian() const {return is_big_endian;}
+    bool isBigEndian() const {return is_big_endian;}
 
     /**
        Not yet documented.
@@ -79,7 +79,7 @@ namespace eyedb {
     char *mach;
     char *os;
     char *cc;
-    Bool is_big_endian;
+    bool is_big_endian;
 
     Architecture(const Architecture &);
     Architecture& operator=(const Architecture &);
@@ -99,7 +99,7 @@ namespace eyedb {
 
     Architecture(const char *_arch, const char *_mach,
 		 const char *_os, const char *_cc,
-		 Bool _is_big_endian) :
+		 bool _is_big_endian) :
       arch(strdup(_arch)), mach(strdup(_mach)), os(strdup(_os)),
       cc(strdup(_cc)), is_big_endian(_is_big_endian) { }
   };
