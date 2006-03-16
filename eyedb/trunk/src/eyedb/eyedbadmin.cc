@@ -38,10 +38,6 @@
 using namespace eyedb;
 using namespace std;
 
-#ifdef LINUX
-#define  _sys_siglistp  _sys_siglist
-#endif
-
 #define KEEP_MAX_INFO
 
 static Connection *conn;
@@ -398,13 +394,8 @@ usage(const char *prog)
 #define DEF_SIZESLOT_STR "16"
 #define DEF_DATTYPE_STR "log"
 
-// on 32-bit architectures, DEF_NBOBJS must be equals to 10 M objects
-// (instead of 100 M) because of memory map limitations:
-#if defined(LINUX) || defined(SPARCV7) || defined(CYGWIN)
-#define DEF_NBOBJS    10000000
-#else
-#define DEF_NBOBJS   100000000
-#endif
+// DEF_NBOBJS is equal to 10 M objects
+const int DEF_NBOBJS = 10000000;
 
 #ifdef DATSZ_IN_M
 #define DEF_DATSIZE_STR "2000"

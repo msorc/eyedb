@@ -2,6 +2,7 @@
 
 	* Changed configure.in to find automatically the integer type that has the same size as a void *; fixed files using pointer_int, that is now pointer_int_t.
 	* Changed configure.in to guess the semaphore policy, added a configure argument to force the semaphore policy, plus some sanity check
+	* Changed src/eyedb/Architecture.cc to get the architecture from compile builtins.
 
 2006-03-10 Francois Dechelle <francois@dechelle.net>
 
