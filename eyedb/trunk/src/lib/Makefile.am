@@ -16,6 +16,9 @@ libeyedbutils_la_LIBADD=compile_builtin.lo
 compile_builtin.lo: $(srcdir)/compile_builtin.cc
 	$(LTCXXCOMPILE) \
 		-DARCH=\"$(host)\" \
+		-DCPU=\"$(host_cpu)\" \
+		-DOS=\"$(host_os)\" \
+		-DCXX=\"$(CXX)\" \
 		-DBINDIR=\"$(bindir)\" \
 		-DDATADIR=\"$(datadir)\" \
 		-DLIBDIR=\"$(libdir)\" \

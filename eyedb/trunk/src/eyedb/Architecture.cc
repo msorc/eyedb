@@ -22,7 +22,10 @@
 */
 
 
-#include "eyedb/eyedb.h"
+#include <eyedbconfig.h>
+
+#include <eyedb/eyedb.h>
+#include "lib/compile_builtin.h"
 
 namespace eyedb {
 
@@ -30,65 +33,16 @@ static Architecture *arch_;
 
 void Architecture::init()
 {
-#if defined(SOLARIS_SPARCV7_CC)
-  arch_ = new Architecture("solaris-sparcv7-cc",
-			     "sparcv7", "Solaris", "CC", True);
-
-#elif defined(SOLARIS_SPARCV7_GCC)
-  arch_ = new Architecture("solaris-sparcv7-gcc",
-			     "sparcv7", "Solaris", "gcc", True);
-
-#elif defined(SOLARIS_SPARCV9_CC)
-  arch_ = new Architecture("solaris-sparcv9-cc",
-			     "sparcv9", "Solaris", "CC", True);
-
-#elif defined(SOLARIS_SPARCV9_GCC)
-  arch_ = new Architecture("solaris-sparcv9-gcc",
-			     "sparcv9", "Solaris", "gcc", True);
-
-#elif defined(DEBUG_SOLARIS_SPARCV7_CC)
-  arch_ = new Architecture("debug-solaris-sparcv7-cc",
-			     "sparcv7", "Solaris", "CC", True);
-
-#elif defined(DEBUG_SOLARIS_SPARCV7_GCC)
-  arch_ = new Architecture("debug-solaris-sparcv7-gcc",
-			     "sparcv7", "Solaris", "gcc", True);
-
-#elif defined(DEBUG_SOLARIS_SPARCV9_CC)
-  arch_ = new Architecture("debug-solaris-sparcv9-cc",
-			     "sparcv9", "Solaris", "CC", True);
-
-#elif defined(DEBUG_SOLARIS_SPARCV9_GCC)
-  arch_ = new Architecture("debug-solaris-sparcv9-gcc",
-			     "sparcv9", "Solaris", "gcc", True);
-
-#elif defined(LINUX_X86)
-  arch_ = new Architecture("linux-x86",
-			     "x86", "Linux", "gcc", False);
-
-#elif defined(DEBUG_LINUX_X86)
-  arch_ = new Architecture("debug-linux-x86",
-			     "x86", "Linux", "gcc", False);
-
-#elif defined(CYGWIN_X86)
-  arch_ = new Architecture("cygwin-x86",
-			     "x86", "Cygwin", "gcc", False);
-
-#elif defined(DEBUG_CYGWIN_X86)
-  arch_ = new Architecture("debug-cygwin-x86",
-			     "x86", "Cygwin", "gcc", False);
-
-#elif defined(LINUX_X86_64)
-  arch_ = new Architecture("linux-x86-64",
-			     "x86_64", "Linux", "gcc", False);
-
-#elif defined(DEBUG_LINUX_X86_64)
-  arch_ = new Architecture("debug-linux-x86-64",
-			     "x86_64", "Linux", "gcc", False);
-
+  arch_ = new Architecture(eyedblib::CompileBuiltin::getArch(),
+			   eyedblib::CompileBuiltin::getCpu(),
+			   eyedblib::CompileBuiltin::getOs(),
+			   eyedblib::CompileBuiltin::getCompiler(),
+#ifdef WORDS_BIGENDIAN
+			   true
 #else
-#error "UNKNOWN ARCHITECTURE"
+			   false
 #endif
+			   );
 }
 
 void Architecture::_release()
@@ -101,10 +55,3 @@ Architecture *Architecture::getArchitecture()
   return arch_;
 }
 }
-/*
-
-eyedb::Architecture eyedb::getArchitecture()
-{
-  return eyedb::Architecture::getArchitecture();
-}
-*/

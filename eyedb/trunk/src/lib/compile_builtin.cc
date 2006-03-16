@@ -25,6 +25,21 @@ namespace eyedblib {
     return ARCH;
   }
 
+  const char* CompileBuiltin::getCpu()
+  {
+    return CPU;
+  }
+
+  const char* CompileBuiltin::getCompiler()
+  {
+    return CXX;
+  }
+
+  const char* CompileBuiltin::getOs()
+  {
+    return OS;
+  }
+
   const char* CompileBuiltin::getBindir()
   {
     return BINDIR;

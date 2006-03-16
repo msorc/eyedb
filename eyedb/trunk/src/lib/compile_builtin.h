@@ -21,6 +21,9 @@ namespace eyedblib {
   class CompileBuiltin {
   public:
     static const char* getArch();
+    static const char* getCpu();
+    static const char* getOs();
+    static const char* getCompiler();
     static const char* getBindir();
     static const char* getDatadir();
     static const char* getLibdir();

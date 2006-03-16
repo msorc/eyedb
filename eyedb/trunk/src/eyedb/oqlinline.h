@@ -140,7 +140,7 @@ inline oqmlAtom_oid::oqmlAtom_oid(const Oid &_oid, Class *_class) :
   oid = _oid;
 }
 
-inline oqmlAtom_obj::oqmlAtom_obj(Object *_o, pointer_int _idx,
+inline oqmlAtom_obj::oqmlAtom_obj(Object *_o, pointer_int_t _idx,
 				  const Class *_class) : oqmlAtom()
 {
   type.type = oqmlATOM_OBJ;

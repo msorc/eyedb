@@ -1479,7 +1479,7 @@ oqmlMethodCall::applyOQL(Database *db, oqmlContext *ctx,
     }
 
 #ifdef NEW_THIS
-  pointer_int idx;
+  pointer_int_t idx;
   if (o && oqmlObjectManager::isRegistered(o, idx)) {
     oqmlAtom_obj * obj_x;
     obj_x = new oqmlAtom_obj(o, idx, o->getClass());
@@ -1509,7 +1509,7 @@ oqmlMethodCall::applyOQL(Database *db, oqmlContext *ctx,
   if (s) return s;
 
   oqmlAtom_obj * obj_x;
-  pointer_int idx;
+  pointer_int_t idx;
 
   if (o && oqmlObjectManager::isRegistered(o, idx))
     obj_x = new oqmlAtom_obj(o, idx, o->getClass());
