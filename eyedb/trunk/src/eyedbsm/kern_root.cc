@@ -27,10 +27,19 @@
 
 #define ROOT_ENTRY_BEGIN_SCAN(dbr) \
 {\
-   register DbRootEntry *dbr, \
+   DbHeader _dbh(DBSADDR(dbh)); \
+   for (int j = 0; j < MAX_ROOT_ENTRIES; j++) { \
+     DbRootEntry _dbr = _dbh.vre(j); \
+     DbRootEntry *dbr = &_dbr; \
+
+       /*
+#define ROOT_ENTRY_BEGIN_SCAN(dbr) \
+{\
+   DbRootEntry *dbr, \
    *dbrend = &dbh->vd->dbs_addr->vre[MAX_ROOT_ENTRIES]; \
    for (dbr = dbh->vd->dbs_addr->vre; dbr < dbrend; dbr++) \
      {
+*/
 
 #define ROOT_ENTRY_END_SCAN(dbr) \
      } \
@@ -57,21 +66,21 @@ ESM_rootEntrySet(DbHandle const *dbh, char const *const key,
   else
     {
       ROOT_ENTRY_BEGIN_SCAN(dbr)
-	if (!strcmp(dbr->key, key))
+	if (!strcmp(dbr->key(), key))
           {
             if (create)
 	      return statusMake(ROOT_ENTRY_EXISTS, PR "root entry already exists: '%s'", key);
-	    memcpy(dbr->data, data, size);
+	    memcpy(dbr->data(), data, size);
 	    return Success;
 	  }
 
       ROOT_ENTRY_END_SCAN(dbr)
 
       ROOT_ENTRY_BEGIN_SCAN(dbr)
-	if (!dbr->key[0])
+	if (!dbr->key()[0])
 	  {
-	    strcpy(dbr->key, key);
-	    memcpy(dbr->data, data, size);
+	    strcpy(dbr->key(), key);
+	    memcpy(dbr->data(), data, size);
 	    return Success;
 	  }
       ROOT_ENTRY_END_SCAN(dbr)
@@ -97,9 +106,9 @@ ESM_rootEntryGet(DbHandle const *dbh, char const *const key,
   else
     {
       ROOT_ENTRY_BEGIN_SCAN(dbr)
-	if (strcmp(dbr->key, key) == 0)
+	if (strcmp(dbr->key(), key) == 0)
 	  {
-	    memcpy(data, dbr->data, MIN(maxsize, MAX_ROOT_DATA));
+	    memcpy(data, dbr->data(), MIN(maxsize, MAX_ROOT_DATA));
 	    return Success;
 	  }
       ROOT_ENTRY_END_SCAN(dbr)
@@ -121,9 +130,9 @@ ESM_rootEntryDelete(DbHandle const *dbh, char const *const key)
   else
     {
       ROOT_ENTRY_BEGIN_SCAN(dbr)
-	if (strcmp(dbr->key, key) == 0)
+	if (strcmp(dbr->key(), key) == 0)
 	  {
-	    dbr->key[0] = 0;
+	    dbr->key()[0] = 0;
 	    return Success;
 	  }
       ROOT_ENTRY_END_SCAN(dbr)

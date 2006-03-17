@@ -62,6 +62,7 @@ namespace eyedbsm {
 
   static void check_alignments()
   {
+#if 0
     CHECK_ALIGN(OFFSET(MapStat, u) == 8);
     CHECK_ALIGN(OFFSET(MapHeader, sizeslot) == 4);
     CHECK_ALIGN(OFFSET(MapHeader, mstat) == 24);
@@ -94,6 +95,7 @@ namespace eyedbsm {
     CHECK_ALIGN(OFFSET(HIdx::_Idx, keytype) == 20);
     CHECK_ALIGN(OFFSET(HIdx::_Idx, keysz) == 24);
     CHECK_ALIGN(OFFSET(HIdx::_Idx, datasz) == 28);
+#endif
   }
 
   Status init()

@@ -33,8 +33,9 @@ const Protection p_all = { ReadAll, WriteAll },
 Status
 ESM_protectionDelete(DbHandle const *dbh, Oid const *const oid)
 {
-  register DbDescription *vd = dbh->vd;
-  register DbHeader *h = vd->dbs_addr;
+  DbDescription *vd = dbh->vd;
+  DbHeader _dbh(vd->dbs_addr);
+  DbHeader *h = &_dbh;
   Status se;
   Oid *oid_array, *o;
   int i, j;
@@ -55,7 +56,6 @@ ESM_protectionDelete(DbHandle const *dbh, Oid const *const oid)
 	{
 	  Oid xoid;
 	  h2x_oid(&xoid, oid);
-	  // SEXDR ERROR: should convert oid to
 	  for (o = oid_array, i = 0; i < vd->nprot_list; o++, i++)
 	    if (!memcmp(o, &xoid, sizeof(Oid)))
 	      {
@@ -89,8 +89,9 @@ ESM_protectionCreate(DbHandle const *dbh,
 		    ProtectionDescription const *desc,
 		    Oid *oid)
 {
-  register DbDescription *vd = dbh->vd;
-  register DbHeader *h = vd->dbs_addr;
+  DbDescription *vd = dbh->vd;
+  DbHeader _dbh(vd->dbs_addr);
+  DbHeader *h = &_dbh;
   int i, j;
   unsigned int size = protectionDescriptionInternalSize(vd->nprot_uid);
   DbProtectionDescription *u;
@@ -197,8 +198,8 @@ ESM_protectionModify(DbHandle const *dbh,
 		    ProtectionDescription const *desc,
 		    Oid const *oid)
 {
-  register DbDescription *vd = dbh->vd;
-  register DbHeader *h = vd->dbs_addr;
+  DbDescription *vd = dbh->vd;
+  //  DbHeader *h = vd->dbs_addr;
   int i, j, size = protectionDescriptionInternalSize(vd->nprot_uid);
   DbProtectionDescription *u;
   ProtectionDescriptionInternal *dbi, **l;
@@ -252,7 +253,7 @@ protectionGet_realize(DbHandle const *dbh,
 			 ProtectionDescription **desc)
 {
   int nprot_uid = dbh->vd->nprot_uid;
-  register ProtectionDescription *dest;
+  ProtectionDescription *dest;
   int j;
 
   dest = *desc = (ProtectionDescription *)
@@ -274,8 +275,8 @@ ESM_protectionGetByName(DbHandle const *dbh,
 		       char const *name, ProtectionDescription **desc,
 		       Oid *oid)
 {
-  register DbDescription *vd = dbh->vd;
-  register DbHeader *h = vd->dbs_addr;
+  DbDescription *vd = dbh->vd;
+  //DbHeader *h = vd->dbs_addr;
   ProtectionDescriptionInternal **l;
   int i;
   Oid *o;
@@ -296,8 +297,8 @@ ESM_protectionListGet(DbHandle const *dbh,
 		     Oid **oid, ProtectionDescription ***desc,
 		      unsigned int *nprot)
 {
-  register DbDescription *vd = dbh->vd;
-  register DbHeader *h = vd->dbs_addr;
+  DbDescription *vd = dbh->vd;
+  //DbHeader *h = vd->dbs_addr;
   ProtectionDescriptionInternal **l;
   Oid *o;
   int i;
@@ -322,8 +323,8 @@ ESM_protectionGetByOid(DbHandle const *dbh,
 		      Oid const *oid,
 		      ProtectionDescription **desc)
 {
-  register DbDescription *vd = dbh->vd;
-  register DbHeader *h = vd->dbs_addr;
+  DbDescription *vd = dbh->vd;
+  //DbHeader *h = vd->dbs_addr;
   ProtectionDescriptionInternal **l;
   int i;
   Oid *o;
@@ -340,8 +341,10 @@ ESM_protectionGetByOid(DbHandle const *dbh,
  Status
 dbProtectionCheck(DbHandle const *dbh, int flag)
 {
-  register DbDescription *vd = dbh->vd;
-  register DbHeader *h = vd->dbs_addr;
+  DbHeader _dbh(DBSADDR(dbh));
+  DbHeader *h = &_dbh;
+  DbDescription *vd = dbh->vd;
+  //DbHeader *h = vd->dbs_addr;
   Status se;
   int uid = getUid(0), i;
   DbProtectionDescription *u;
@@ -354,11 +357,11 @@ dbProtectionCheck(DbHandle const *dbh, int flag)
 
   if (vd->uid_ind == INVALID)
     {
-      if (x2h_32(vd->dbs_addr->__guest_uid) == INVALID_UID)
+      if (x2h_32(_dbh.__guest_uid()) == INVALID_UID)
 	return statusMake_s(DATABASE_ACCESS_DENIED);
       else
 	{
-	  uid = x2h_32(vd->dbs_addr->__guest_uid);
+	  uid = x2h_32(_dbh.__guest_uid());
 	  vd->uid = uid;
 	  vd->uid_ind = uidIndGet(dbh, uid);
 	}
@@ -381,8 +384,9 @@ dbProtectionCheck(DbHandle const *dbh, int flag)
 Status
 protectionRunTimeUpdate(DbHandle const *dbh)
 {
-  register DbDescription *vd = dbh->vd;
-  register DbHeader *h = vd->dbs_addr;
+  DbDescription *vd = dbh->vd;
+  DbHeader _dbh(DBSADDR(dbh));
+  DbHeader *h = &_dbh;
   Status se;
   unsigned int size;
   
@@ -391,8 +395,8 @@ protectionRunTimeUpdate(DbHandle const *dbh)
 
   if (!(se = ESM_objectSizeGet(dbh, &size, LockS, &prot_list_oid, OPDefault)))
     {
-      register Oid *o;
-      register ProtectionDescriptionInternal **v;
+      Oid *o;
+      ProtectionDescriptionInternal **v;
       int i;
       Oid roid;
       Oid *vol_prot_list_oid;
@@ -451,8 +455,9 @@ protectionRunTimeUpdate(DbHandle const *dbh)
 Status
 dbProtectionRunTimeUpdate(DbHandle const *dbh)
 {
-  register DbDescription *vd = dbh->vd;
-  register DbHeader *h = vd->dbs_addr;
+  DbDescription *vd = dbh->vd;
+  DbHeader _dbh(DBSADDR(dbh));
+  DbHeader *h = &_dbh;
   Status se;
   unsigned int size;
   
@@ -499,8 +504,8 @@ Status
 ESM_dbProtectionGet(DbHandle const *dbh,
 		    DbProtectionDescription **desc, unsigned int *nprot)
 {
-  register DbDescription *vd = dbh->vd;
-  register DbHeader *h = vd->dbs_addr;
+  DbDescription *vd = dbh->vd;
+  //DbHeader *h = vd->dbs_addr;
   unsigned int size = sizeof(DbProtectionDescription) * vd->nprot_uid;
   
   *nprot = vd->nprot_uid;
@@ -514,10 +519,11 @@ Status
 ESM_dbProtectionAdd(DbHandle const *dbh,
 		   DbProtectionDescription const *desc, int nprot)
 {
-  register DbDescription *vd = dbh->vd;
-  register DbHeader *h = vd->dbs_addr;
+  DbDescription *vd = dbh->vd;
+  DbHeader _dbh(DBSADDR(dbh));
+  DbHeader *h = &_dbh;
   Status se;
-  register DbProtectionDescription const *u, *v;
+  DbProtectionDescription const *u, *v;
   int i, j, n;
 
   /*
@@ -569,7 +575,7 @@ ESM_dbProtectionAdd(DbHandle const *dbh,
   else
     {
       unsigned int size = sizeof(DbProtectionDescription) * (vd->nprot_uid + nprot);
-      register DbProtectionDescription *vol_uid =
+      DbProtectionDescription *vol_uid =
 	(DbProtectionDescription *)m_malloc(size), *v;
 
       memcpy(vol_uid, vd->vol_uid, sizeof(DbProtectionDescription) *
@@ -620,7 +626,8 @@ protectionInit(DbHandle const *dbh)
 {
   Status status;
 
-  register DbHeader *h = dbh->vd->dbs_addr;
+  DbHeader _dbh(DBSADDR(dbh));
+  DbHeader *h = &_dbh;
   Oid prot_lock_oid, prot_list_oid, prot_uid_oid;
   x2h_protoids(&prot_lock_oid, &prot_list_oid, &prot_uid_oid, h);
 
@@ -644,15 +651,15 @@ protectionInit(DbHandle const *dbh)
 const Protection *
 protGet(DbHandle const *dbh, Oid const *oid, int uid)
 {
-  register DbDescription *vd = dbh->vd;
+  DbDescription *vd = dbh->vd;
   if (vd->suser || !uid || !oid->getUnique()) /* adds !uid 20/08/97 */
     return &p_all;
   else
     {
-      register Oid *o;
-      register ProtectionDescriptionInternal **v;
-      register ProtectionAtom *u;
-      register DbHeader *h = vd->dbs_addr;
+      Oid *o;
+      ProtectionDescriptionInternal **v;
+      ProtectionAtom *u;
+      //DbHeader *h = vd->dbs_addr;
 
       /*      printf("protGet(%s)\n", getOidString(oid)); */
       if (ESM_protectionsMustUpdate(dbh))
@@ -707,7 +714,7 @@ ESM_guestUidSet(DbHandle *dbh, int uid)
     return statusMake_s(PROTECTION_INVALID_UID);
   else
     {
-      dbh->vd->dbs_addr->__guest_uid = h2x_32(uid);
+      DbHeader(DBSADDR(dbh)).__guest_uid() = h2x_32(uid);
       return Success;
     }
 }
@@ -715,7 +722,7 @@ ESM_guestUidSet(DbHandle *dbh, int uid)
 Status
 ESM_guestUidGet(DbHandle const *dbh, int *uid)
 {
-  *uid = x2h_32(dbh->vd->dbs_addr->__guest_uid);
+  *uid = x2h_32(DbHeader(DBSADDR(dbh)).__guest_uid());
   return Success;
 }
 
@@ -743,8 +750,8 @@ uidIndGet(DbHandle const *dbh, int uid)
     return dbh->vd->uid_ind;
   else
     {
-      register DbDescription *vd = dbh->vd;
-      register DbHeader *h = vd->dbs_addr;
+      DbDescription *vd = dbh->vd;
+      //DbHeader *h = vd->dbs_addr;
 
       DbProtectionDescription *u;
       int i;
@@ -760,8 +767,8 @@ uidIndGet(DbHandle const *dbh, int uid)
 int
 indUidGet(DbHandle const *dbh, int ind)
 {
-  register DbDescription *vd = dbh->vd;
-  register DbHeader *h = vd->dbs_addr;
+  DbDescription *vd = dbh->vd;
+  //DbHeader *h = vd->dbs_addr;
 
   return vd->vol_uid[ind].uid;
 }

@@ -48,6 +48,7 @@
 #include <lock.h>
 #include <eyedblib/iassert.h>
 #include <xdr_p.h>
+#include <xdr_off.h>
 
 #define _ESM_C_
 
@@ -425,24 +426,68 @@ namespace eyedbsm {
 #define OIDDBIDGET(oid) ((oid)->getDbID())
 #define OIDDBIDMAKE(oid, _dbid) (oid)->setDbID(_dbid)
 
-#define DBSADDR(dbh) ((dbh)->vd->dbs_addr)
 #define check_dbh(dbh) (1)
 
 #define MAX(x,y) ((int)(x) > (int)(y) ? (x) : (y))
 #define MIN(x,y) ((x) < (y) ? (x) : (y))
 
+#define DBSADDR(dbh) ((dbh)->vd->dbs_addr)
+
+// macros to be redefined
+#ifdef XDR_DBS
+
+  // the 2 following macros are not good !
+  /*
+#define DAT2MP(dbh, datid) (MapHeader *)(DBSADDR(dbh) + DbHeader_dat_OFF(datid) + DatafileDesc_mp_OFF)
+
+#define DAT2MP_(vd, datid) (MapHeader *)(vd->dbs_addr + DbHeader_dat_OFF(datid) + DatafileDesc_mp_OFF)
+  */
+
+  //#define DAT2MP(dbh, datid) MapHeader__(DbHeader_dat_ref(DBSADDR(dbh), datid))
+
+  //#define DAT2MP_(vd, datid) MapHeader__(DbHeader_dat_ref(vd->dbs_addr, datid))
+#define DAT2MP(dbh, datid) MapHeader(DbHeader_dat_ref(DBSADDR(dbh), datid) + DatafileDesc_mp_OFF)
+
+#define DAT2MP_(vd, datid) MapHeader(DbHeader_dat_ref(vd->dbs_addr, datid) + DatafileDesc_mp_OFF)
+
+  /*
+#define LASTIDXBUSY(dbh) (*(Oid::NX *)(DBSADDR(dbh) + DbHeader___lastidxbusy_OFF))
+
+#define CURIDXBUSY(dbh) (*(Oid::NX *)(DBSADDR(dbh) + DbHeader___curidxbusy_OFF))
+
+#define LASTIDXBLKALLOC(dbh) (*(Oid::NX *)(DBSADDR(dbh) + DbHeader___lastidxblkalloc_OFF))
+
+#define LASTNSBLKALLOC(dbh, datid) (*(Oid::NX *)(DBSADDR(dbh) + DbHeader___lastnsblkalloc_OFF(datid)))
+  */
+
+#define LASTIDXBUSY(dbh) DbHeader___lastidxbusy(DBSADDR(dbh))
+
+#define CURIDXBUSY(dbh) DbHeader___curidxbusy(DBSADDR(dbh))
+
+#define LASTIDXBLKALLOC(dbh) DbHeader___lastidxblkalloc(DBSADDR(dbh))
+
+#define LASTNSBLKALLOC(dbh, datid) DbHeader___lastnsblkalloc(DBSADDR(dbh), datid)
+
+#define SZ2NS(sz, mp) ((((sz)-1)>>(mp)->pow2())+1)
+#define SZ2NS_XDR(sz, mp) ((((sz)-1)>>x2h_u32((mp)->pow2()))+1)
+
+#else
+
 #define DAT2MP(dbh, datid) (&(DBSADDR(dbh)->dat[datid].mp))
 #define DAT2MP_(vd, datid) (&(vd->dbs_addr->dat[datid].mp))
-#define NEXT_OIDLOC(omp_addr) (void *)((char *)omp_addr + OIDLOCSIZE)
-#define OIDLOC(omp_addr, nx) (void *)((char *)omp_addr + ((unsigned long long)nx)*OIDLOCSIZE)
 #define LASTIDXBUSY(dbh) (DBSADDR(dbh)->__lastidxbusy)
-
 #define CURIDXBUSY(dbh) (DBSADDR(dbh)->__curidxbusy)
 #define LASTIDXBLKALLOC(dbh) (DBSADDR(dbh)->__lastidxblkalloc)
 #define LASTNSBLKALLOC(dbh, datid) (DBSADDR(dbh)->__lastnsblkalloc[datid])
-
 #define SZ2NS(sz, mp) ((((sz)-1)>>(mp)->pow2)+1)
 #define SZ2NS_XDR(sz, mp) ((((sz)-1)>>x2h_u32((mp)->pow2))+1)
+
+
+#endif
+
+
+#define NEXT_OIDLOC(omp_addr) (void *)((char *)omp_addr + OIDLOCSIZE)
+#define OIDLOC(omp_addr, nx) (void *)((char *)omp_addr + ((unsigned long long)nx)*OIDLOCSIZE)
 
 #define oid2addr_(ns, datid, dbh, size, pt, hdl, up) \
         slot2addr(dbh, ns, datid, size, (char **)pt, hdl, up)
@@ -484,10 +529,16 @@ namespace eyedbsm {
 #define SLOT2KB(NS, SZSLOT) \
      ((((NS) * (SZSLOT)) / ONE_K) + 1)
 
+  /*
 #define DMP_SIZE(MTYPE, NSLOTS) \
     ((MTYPE == BitmapType) ? \
      ((size_t)NSLOTS / BITS_PER_BYTE) : \
      (MAX_FREE_CELLS * sizeof(LinkmapCell)))
+  */
+
+#define DMP_SIZE(MTYPE, NSLOTS) \
+    ((MTYPE == BitmapType) ? \
+     ((size_t)NSLOTS / BITS_PER_BYTE) : 0)
 
 #define CHECK_X(dbh, msg) \
  if (!ESM_isExclusive(dbh)) \

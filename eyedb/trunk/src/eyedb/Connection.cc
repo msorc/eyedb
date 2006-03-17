@@ -361,9 +361,9 @@ namespace eyedb {
     for (;;) {
       int type = IDB_SERVER_MESSAGE;
       unsigned int size;
-      Data data;
+      Data data = (Data)0x111;
       RPCStatus rpc_status = getServerOutOfBandData(connh, &type, &data,
-							&size);
+						    &size);
       if (rpc_status) {
 	std::string msg =
 	  std::string("Thread for echoing server messages got an "
@@ -376,7 +376,7 @@ namespace eyedb {
       assert(type == IDB_SERVER_MESSAGE);
       if (data) {
 	srv_msg_ctx->dsp.display((const char *)data);
-	delete [] data;
+	free(data);
       }
     }
     return 0;

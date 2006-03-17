@@ -125,15 +125,17 @@ namespace eyedb {
 
   SessionLog::SessionLog(const SessionLog &sesslog)
   {
-    init(sesslog.host, sesslog.port, sesslog.logdir);
+    init(sesslog.host, sesslog.port, sesslog.logdir, True);
   }
 
-  SessionLog::SessionLog(const char *host, const char *port, const char *logdir)
+  SessionLog::SessionLog(const char *host, const char *port,
+			 const char *logdir, Bool writing)
   {
-    init(host, port, logdir);
+    init(host, port, logdir, writing);
   }
 
-  void SessionLog::init(const char *host, const char *port, const char *logdir)
+  void SessionLog::init(const char *host, const char *port, const char *logdir,
+			Bool writing)
   {
 #ifdef UT_SEM
     status = init_sems();
@@ -144,7 +146,7 @@ namespace eyedb {
 #endif
     islocked = False;
     addr_connlog = 0;
-    status = openRealize(host, port, logdir, False);
+    status = openRealize(host, port, logdir, False, writing);
     if (status)
       return;
 
@@ -168,7 +170,7 @@ namespace eyedb {
 #endif
     islocked = False;
     addr_connlog = 0;
-    status = openRealize(hosts[0], ports[0], logdir, True);
+    status = openRealize(hosts[0], ports[0], logdir, True, True);
 
     if (status)
       return;
@@ -313,8 +315,9 @@ namespace eyedb {
   }
 
   Status
-  SessionLog::openRealize(const char *host, const char *port, const char *logdir,
-			  Bool create)
+  SessionLog::openRealize(const char *host, const char *port,
+			  const char *logdir, Bool create,
+			  Bool writing)
   {
     Error err = (create ? IDB_SESSION_LOG_CREATION_ERROR :
 		 IDB_SESSION_LOG_OPEN_ERROR);
@@ -332,16 +335,26 @@ namespace eyedb {
       fd = open(files[0], O_CREAT | O_TRUNC | O_RDWR,
 		0644 /*SE_DEFAULT_CREATION_MODE*/);
     else {
-      if (access(files[0], F_OK) < 0) {
+      if (access(files[0], F_OK) < 0)
 	return Exception::make(IDB_CONNECTION_LOG_FILE_ERROR,
 			       "cannot access connection file '%s'",
 			       files[0]);
-      }
+
       if (access(files[0], R_OK) < 0)
-	return Exception::make(IDB_CONNECTION_LOG_FILE_ERROR,
+	return Exception::make(IDB_SESSION_LOG_OPEN_ERROR,
 			       "cannot open connection file '%s' "
 			       "for reading", files[0]);
-      fd = open(files[0], O_RDWR);
+
+      if (writing) {
+	if (access(files[0], W_OK) < 0)
+	  return Exception::make(IDB_SESSION_LOG_OPEN_ERROR,
+				 "cannot open connection file '%s' "
+				 "for writing", files[0]);
+	
+	fd = open(files[0], O_RDWR);
+      }
+      else
+	fd = open(files[0], O_RDONLY);
     }
     
     if (fd < 0 && create)
@@ -350,8 +363,9 @@ namespace eyedb {
 			     (create ? "create" :
 			      "open"), files[0]);
     if (fd < 0)
-      return Success;
-
+      return Exception::make(IDB_SESSION_LOG_OPEN_ERROR,
+			     "cannot open connection file '%s'",
+			     files[0]);
 
     if (create && ftruncate(fd, CONNLOG_SIZE) < 0) {
       close(fd);
@@ -359,7 +373,10 @@ namespace eyedb {
 			     "cannot create connection file '%s'", files[0]);
     }
 
-    if (!(m_connlog = m_mmap(0, CONNLOG_SIZE, PROT_READ|PROT_WRITE,
+    unsigned int prot = PROT_READ;
+    if (writing)
+      prot |= PROT_WRITE;
+    if (!(m_connlog = m_mmap(0, CONNLOG_SIZE, prot,
 			     MAP_SHARED, fd, 0, (char **)&addr_connlog,
 			     files[0], 0, 0))) {
       close(fd);
@@ -423,6 +440,7 @@ namespace eyedb {
     strncpy(conninfo->username, username, sizeof(conninfo->username)-1);
     strncpy(conninfo->progname, progname, sizeof(conninfo->progname)-1);
 
+    printf("SessionLog adding %d\n", getpid());
     conninfo->prog_pid = pid;
     conninfo->backend_pid = getpid();
 

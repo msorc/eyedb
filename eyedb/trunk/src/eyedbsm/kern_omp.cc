@@ -43,17 +43,10 @@ oidCopySlot_(DbHandle const *dbh, Oid::NX nx, const OidLoc &oidloc,
 		 sizeof(ObjectHeader), (char **)&objh, &hdl, 0);
   oid->setNX(nx);
 
-#ifdef SEXDR
   oid->setUnique(x2h_u32(objh->unique));
 
   if (psize)
     *psize = x2h_u32(objh->size);
-#else
-  oid->setUnique(objh->unique);
-
-  if (psize)
-    *psize = objh->size;
-#endif
 
   /*
   printf("UNIQUE %u %u size=%d ns=%d datid=%d\n", oid->unique, objh->unique,
@@ -65,13 +58,15 @@ oidCopySlot_(DbHandle const *dbh, Oid::NX nx, const OidLoc &oidloc,
 
 void oidCopySlot(DbHandle const *dbh, Oid::NX nx, Oid *oid, unsigned int *psize)
 {
-  /*@@@@ return */ oidCopySlot_(dbh, nx, oidLocGet_(dbh, nx), oid, psize);
+  oidCopySlot_(dbh, nx, oidLocGet_(dbh, nx), oid, psize);
 }
 
 NS
 oidLastSlotGet(DbHandle const *dbh, const OidLoc &oidloc)
 {
-  MapHeader *mp = DAT2MP(dbh, oidloc.datid);
+  MapHeader t_mp = DAT2MP(dbh, oidloc.datid);
+  MapHeader *mp = &t_mp;
+
   MmapH hdl;
   ObjectHeader *objh;
 
@@ -97,7 +92,7 @@ nxAlloc(DbHandle const *const dbh, const OidLoc &oidloc_, Oid::NX *pnx)
     MUTEX_LOCK_VOID(mt, xid);
 
   start = x2h_u32(CURIDXBUSY(dbh));
-  end = x2h_u32(DBSADDR(dbh)->__nbobjs);
+  end = x2h_u32(DbHeader(DBSADDR(dbh)).__nbobjs());
 
   for (;;) {
     void *omp_addr = OIDLOC(dbh->vd->omp_addr, start);
@@ -172,16 +167,9 @@ nxFree(DbHandle const *const dbh, Oid::NX nx)
 
   oidloc.ns = 0;
   oidloc.datid = -1;
-#ifdef SEXDR
-  /*
-  printf("h2x_oidloc #2 -> %p 0x%x %d nx = %d\n",
-	 dbh->vd->omp_addr, oidloc.ns, oidloc.datid,
-	 nx);
-  */
+
   h2x_oidloc(OIDLOC(dbh->vd->omp_addr, nx), &oidloc);
-#else
-  memcpy(OIDLOC(dbh->vd->omp_addr, nx), &oidloc, OIDLOCSIZE);
-#endif
+
 #ifdef NX_TRACE
   printf("nxFree(%d)\n", nx);
 #endif
@@ -208,16 +196,9 @@ nxSet(DbHandle const *const dbh, Oid::NX nx, NS ns, short datid)
 
   oidloc.ns = ns+NS_OFFSET;
   oidloc.datid = datid;
-#ifdef SEXDR
-  /*
-  printf("h2x_oidloc #3 -> %p 0x%x %d nx = %d\n",
-	 dbh->vd->omp_addr, oidloc.ns, oidloc.datid,
-	 nx);
-  */
+
   h2x_oidloc(OIDLOC(dbh->vd->omp_addr, nx), &oidloc);
-#else
-  memcpy(OIDLOC(dbh->vd->omp_addr, nx), &oidloc, OIDLOCSIZE);
-#endif
+
 #ifdef NX_TRACE
   printf("nxSet(%d) -> %d %d\n", nx, ns, datid);
 #endif
@@ -245,11 +226,7 @@ nxNextBusyGet(DbHandle const *const dbh, Oid::NX nx)
   for (i = nx; i < lastidxbusy; i++)
     {
       OidLoc oidloc;
-#ifdef SEXDR
       x2h_oidloc(&oidloc, omp_addr);
-#else
-      memcpy(&oidloc, omp_addr, OIDLOCSIZE);
-#endif
 
       if (oidloc.ns)
 	{
@@ -274,14 +251,13 @@ ESM_objectLocationGet(DbHandle const *dbh, const Oid *oid,
     return statusMake(INVALID_OID, "oid %s is invalid",
 			 getOidString(oid));
   unsigned int size;
-  Status s = ESM_objectSizeGet(dbh, &size, LockS, oid, OPDefault);
+  // EV : 9/03/06 changed LockS to DefaultLock
+  //Status s = ESM_objectSizeGet(dbh, &size, LockS, oid, OPDefault);
+  Status s = ESM_objectSizeGet(dbh, &size, DefaultLock, oid, OPDefault);
   if (s) return s;
 
-#ifdef SEXDR
-  unsigned int sizeslot = x2h_u32(DBSADDR(dbh)->dat[oidloc.datid].mp.sizeslot);
-#else
-  unsigned int sizeslot = DBSADDR(dbh)->dat[oidloc.datid].mp.sizeslot;
-#endif
+  DbHeader _dbh(DBSADDR(dbh));
+  unsigned int sizeslot = x2h_u32(_dbh.dat(oidloc.datid).mp()->sizeslot());
   unsigned long long offset = oidloc.ns * sizeslot;
 
   objloc->is_valid = isValidObject(size) ? True : False;
@@ -292,7 +268,7 @@ ESM_objectLocationGet(DbHandle const *dbh, const Oid *oid,
     objloc->size = size;
   size += sizeof(ObjectHeader); // added the 26/07/01
   objloc->datid = oidloc.datid;
-  objloc->dspid = getDataspace(DBSADDR(dbh), oidloc.datid);
+  objloc->dspid = getDataspace(&_dbh, oidloc.datid);
   objloc->slot_start_num = oidloc.ns;
   objloc->slot_end_num = oidloc.ns + (size-1)/sizeslot;
   unsigned int nsize = (objloc->slot_end_num - objloc->slot_start_num + 1) * sizeslot;
@@ -362,11 +338,7 @@ oidLocGet_(DbHandle const *const dbh, Oid::NX nx)
       return oidloc;
     }
 
-#ifdef SEXDR
   x2h_oidloc(&oidloc, OIDLOC(dbh->vd->omp_addr, nx));
-#else
-  memcpy(&oidloc, OIDLOC(dbh->vd->omp_addr, nx), OIDLOCSIZE);
-#endif
 
   oidloc.ns -= NS_OFFSET;
 
@@ -399,7 +371,7 @@ oidLocGet_(DbHandle const *const dbh, Oid::NX nx)
 void
 ESM_oidsTrace(DbHandle const *const dbh, ESM_oidsTraceAction action, FILE *fd)
 {
-  DbHeader *h = dbh->vd->dbs_addr;
+  //DbHeader *h = dbh->vd->dbs_addr;
   void *omp_addr = dbh->vd->omp_addr;
   int cnt = 0;
   Oid oid, nextoid;
@@ -439,7 +411,8 @@ Status
 ESM_firstOidDatGet(DbHandle const *dbh, short datid, Oid *oid,
 		  Boolean *found)
 {
-  if (getDatType(DBSADDR(dbh), datid) == PhysicalOidType)
+  DbHeader _dbh(DBSADDR(dbh));
+  if (getDatType(&_dbh, datid) == PhysicalOidType)
     return ESM_firstOidGet_map(dbh, datid, oid, found);
   
   Status s = ESM_firstOidGet_omp(dbh, oid, found);
@@ -452,7 +425,8 @@ ESM_nextOidDatGet(DbHandle const *dbh, short datid,
 		 Oid const *const baseoid,
 		 Oid *nextoid, Boolean *found)
 {
-  if (getDatType(DBSADDR(dbh), datid) == PhysicalOidType)
+  DbHeader _dbh(DBSADDR(dbh));
+  if (getDatType(&_dbh, datid) == PhysicalOidType)
     return ESM_nextOidGet_map(dbh, datid, baseoid, nextoid, found);
 
   Status s = ESM_nextOidGet_omp(dbh, baseoid, nextoid, found);
@@ -542,11 +516,7 @@ oid2objh(const Oid *oid, const DbHandle *dbh, ObjectHeader **objh,
 
   *oid2addr_failed = (xobjh ? False : True);
 
-#ifdef SEXDR
   hdr = (!xobjh || (x2h_u32(xobjh->unique) != oid->getUnique()) ? 0 : xobjh);
-#else
-  hdr = (!xobjh || (xobjh->unique != oid->unique) ? 0 : xobjh);
-#endif
 
 #ifdef DSP_INVALID_OID
   if (!hdr)

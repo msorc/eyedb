@@ -43,7 +43,7 @@ namespace eyedbsm {
 void
 hdl_release(MmapH *hdl)
 {
-  register MmapDesc *mmd = hdl->mmd;
+  MmapDesc *mmd = hdl->mmd;
 
   if (mmd && mmd->locked)
     {
@@ -73,7 +73,7 @@ garb_trig(void *arg)
 }
 
 static void
-check_dmd(register DatDesc *dmd)
+check_dmd(DatDesc *dmd)
 {
   MmapDesc *mmd, *mmd1, *fmmd = 0, *mmend = &dmd->mmd[MAX_MMAP_SEGMENTS];
   int n;
@@ -187,14 +187,11 @@ slot2addr(const DbHandle *dbh, off_t ws_start, short datid,
   if (ws_start == (off_t) (-NS_OFFSET))
     return (char *)0;
 
-  const MapHeader *mp = DAT2MP(dbh, datid);
+  MapHeader t_mp = DAT2MP(dbh, datid);
+  MapHeader *mp = &t_mp;
   DatDesc *dmd = &dbh->vd->dmd[datid];
 
-#ifdef SEXDR
-  unsigned int sizeslot = x2h_u32(mp->sizeslot);
-#else
-  unsigned int sizeslot = mp->sizeslot;
-#endif
+  unsigned int sizeslot = x2h_u32(mp->sizeslot());
 
   if (dmd->m_dat) {
     hdl->mmd = 0;
@@ -203,16 +200,12 @@ slot2addr(const DbHandle *dbh, off_t ws_start, short datid,
   }
 
   off_t delta_left = 0xffffffff, delta_right = 0xffffffff;
-  register MmapDesc *mmd, *mmend, *fmmd = 0, *mmd_left, *mmd_right;
+  MmapDesc *mmd, *mmend, *fmmd = 0, *mmd_left, *mmd_right;
   int fop, inc, inc1, v, wide, wide2, n;
   off_t startslot, ws_end, start, end, wa_start, wa_end, dum, uv,
     t_start, t_end;
   int nreloc=0;
-#ifdef SEXDR
-  int pow2 = x2h_u32(mp->pow2);
-#else
-  int pow2 = mp->pow2;
-#endif
+  int pow2 = x2h_u32(mp->pow2());
   MmapDesc *mmd_reloc[MAX_MMAP_SEGMENTS];
   Mutex *mt = SLT_MTX(dbh);
   unsigned int xid = dbh->vd->xid;

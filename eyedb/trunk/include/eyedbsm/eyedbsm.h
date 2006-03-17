@@ -200,35 +200,6 @@ namespace eyedbsm {
 
   typedef DbMoveDescription DbCopyDescription;
 
-  struct BitmapStat {
-    Oid::NX obj_count;
-    NS busy_slots;
-    unsigned long long busy_size, hole_size;
-  };
-
-  struct LinkmapStat {
-    unsigned int nfreecells;
-  };
-
-  struct MapStat {
-    short mtype; /* was eyedbsm::MapType */
-#ifdef X86
-    char pad[4];
-#endif
-    union {
-      eyedbsm::BitmapStat bmstat;
-      eyedbsm::LinkmapStat lmstat;
-    } u;
-  };
-
-  struct MapInfo {
-    NS nslots;
-    unsigned int sizeslot;
-    eyedbsm::MapStat mstat;
-    NS lastbusy;
-    NS firstfree;
-  };
-
   struct Protection {
     unsigned short r, w;
   };
