@@ -23,21 +23,11 @@
 
 #include <eyedbconfig.h>
 
-#include "eyedbsm_p.h"
-#include "mutex.h"
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
 #include <signal.h>
 #include <errno.h>
-#include <eyedblib/performer.h>
-
-#include <eyedbconfig.h>
-
-#if defined(SOLARIS) 
-#include <synch.h>
-#endif
-
 #if TIME_WITH_SYS_TIME
 #include <sys/time.h>
 #include <time.h>
@@ -48,17 +38,18 @@
 #include <time.h>
 #endif
 #endif
-
-#define OLD_IF
-
 #include <unistd.h>
 #include <stdlib.h>
-
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
+#include <sys/sem.h>
 /* SEM_FAST could not work because in this case we need as many semaphores
    as mutex! */
 #define UT_SEM_FAST
 #endif
+
+#include "eyedbsm_p.h"
+#include "mutex.h"
+#include <eyedblib/performer.h>
 
 #define NMT 10
 
@@ -74,10 +65,6 @@ namespace eyedbsm {
 
   static Mutex *sleeping_mp;
 
-#ifdef UT_SEM
-#include <sys/sem.h>
-#endif
-
   //#undef IDB_LOG
   //#define IDB_LOG(X, MSG) printf MSG
 
@@ -91,7 +78,7 @@ namespace eyedbsm {
   {
     int idx = g_mutex_idx;
 
-#ifndef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_POSIX
     if (sleeping_mp) {
       pthread_mutex_unlock(&sleeping_mp->pmp->u.mp);
       IDB_LOG(IDB_LOG_MTX, ("found a sleeping mutex"));
@@ -104,7 +91,7 @@ namespace eyedbsm {
       GMutex *gm = &g_mutex[i];
       if (gm->mp) {
 	// added the 16/01/99
-#ifndef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_POSIX
 	pthread_mutex_unlock((pthread_mutex_t *)&gm->mp->pmp);
 #endif
 	mutexUnlock(gm->mp, gm->xid);
@@ -181,27 +168,19 @@ namespace eyedbsm {
   void
   mutexLightInit(DbDescription *vd, Mutex *mp, MutexP *pmp)
   {
-#ifndef OLD_IF
-    mutexLightInit((vd ? vd->semkeys : 0), (vd ? &vd->locked : 0),
-		   mp, pmp);
-  }
-
-  void
-  mutexLightInit(int semkeys[], int *plocked, Mutex *mp, MutexP *pmp)
-  {
-#endif
     assert(pmp);
     if (!mp)
       return;
 
     mp->pmp = pmp;
     mp->cond.pcond = &pmp->pcond;
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
     mp->id = (vd ? ut_sem_open(vd->semkeys[0]) : -1);
     mp->plocked = &vd->locked;
 #endif
+
 #ifdef THR_TRACE
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
     IDB_LOG(IDB_LOG_MTX,
 	    ("mutexLightInit(mp=%p, name=%s, id=%d, key=%d)\n", mp,
 	     pmp->mtname, mp->id,
@@ -212,43 +191,27 @@ namespace eyedbsm {
 #endif
 #endif
 
-#ifndef OLD_IF
-    condLightInit(semkeys, &mp->cond, &mp->pmp->pcond);
-#else
     condLightInit(vd, &mp->cond, &mp->pmp->pcond);
-#endif
   }
 
   int
   mutexInit(DbDescription *vd, Mutex *mp, MutexP *pmp,
 	    const char *mtname)
   {
-#ifndef OLD_IF
-    return mutexInit((vd ? vd->semkeys : 0), (vd ? &vd->locked : 0),
-		     mp, pmp, mtname);
-  }
-
-  int
-  mutexInit(int semkeys[], int *plocked, Mutex *mp, MutexP *pmp,
-	    const char *mtname)
-  {
-    mutexLightInit(semkeys, plocked, mp, pmp);
-#else
     mutexLightInit(vd, mp, pmp);
-#endif
 #ifdef THR_TRACE
     IDB_LOG(IDB_LOG_MTX,
 	    ("mutexInit(mp=%p, pmp=%p, name=%s)\n", mp, pmp, mtname));
 #endif
     memset(pmp, 0, sizeof(*pmp));
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
     pmp->u.key = (vd ? vd->semkeys[0] : 0);
 #else
     pthread_mutexattr_t mattr;
 
     assert (!pthread_mutexattr_init(&mattr));
 
-#ifdef _POSIX_THREAD_PROCESS_SHARED
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
     assert (!pthread_mutexattr_setpshared(&mattr, PTHREAD_PROCESS_SHARED));
 #endif
 
@@ -262,13 +225,9 @@ namespace eyedbsm {
     pmp->locked = 0;
 
     pmp->wait_cnt = 0;
-#ifndef OLD_IF
-    condInit(semkeys, (mp ? &mp->cond : 0), &pmp->pcond);
-#else
     condInit(vd, (mp ? &mp->cond : 0), &pmp->pcond);
-#endif
 
-#ifndef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_POSIX
     IDB_LOG(IDB_LOG_MTX,
 	    ("mutexInit(%p [mp=%p], \"%s\")\n", mp, &pmp->u.mp,
 	     pmp->mtname));
@@ -289,7 +248,7 @@ do { \
 
   // added the 10/01/02 to improve high concurrency programs:
   // MIND: currently not fully validated !
-#ifndef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_POSIX
 #define MUTEX_FAST
 #endif
 
@@ -322,7 +281,7 @@ do { \
     return Success;
 #endif
 
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
     ESM_ASSERT_ABORT(mp->id>=0, 0, 0);
     ESM_ASSERT_ABORT(mp->plocked, 0, 0);
     int sid = mp->id;
@@ -345,7 +304,7 @@ do { \
 #else
 
     if (!reentrant) {
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
       r = ut_sem_lock(sid);
 #else
       r = pthread_mutex_lock((pthread_mutex_t *)&mp->pmp->u.mp);
@@ -364,7 +323,7 @@ do { \
 #ifdef THR_TRACE
 	IDB_LOG(IDB_LOG_MTX, ("locking %s %p\n", mp->pmp->mtname, mp));
 #endif
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
 	r = ut_sem_unlock(sid);
 #else
 	r = pthread_mutex_unlock((pthread_mutex_t *)&mp->pmp->u.mp);
@@ -388,7 +347,7 @@ do { \
       mp->pmp->wait_cnt--;
 
       if (r) {
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
 	r1 = ut_sem_unlock(sid);
 #else
 	r1 = pthread_mutex_unlock((pthread_mutex_t *)&mp->pmp->u.mp);
@@ -441,7 +400,7 @@ do { \
     return releaseGMutex(mp, xid);
 #endif
 
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
     //  assert(mp->pmp->u.key || mp->id);
     ESM_ASSERT_ABORT(mp->id>=0, 0, 0);
     ESM_ASSERT_ABORT(mp->plocked, 0, 0);
@@ -461,7 +420,7 @@ do { \
 
     ESM_ASSERT_ABORT(mp->pmp->locked, 0, 0);
 
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
     r = ut_sem_lock(sid);
 #else
     r = pthread_mutex_lock((pthread_mutex_t *)&mp->pmp->u.mp);
@@ -482,7 +441,7 @@ do { \
 #endif
 
     if (!reentrant) {
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
       r = ut_sem_unlock(sid);
 #else
       r = pthread_mutex_unlock((pthread_mutex_t *)&mp->pmp->u.mp);
@@ -555,7 +514,7 @@ do { \
   {
     CondWaitP *pcond = (CondWaitP *)XM_ADDR(xmh, pcond_off);
     XMFree(xmh, pcond);
-#ifndef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_POSIX
     pthread_cond_destroy(&pcond->u.cond);
 #endif
   }
@@ -572,20 +531,12 @@ do { \
   void
   condLightInit(DbDescription *vd, CondWait *cond, CondWaitP *pcond)
   {
-#ifndef OLD_IF
-    condLightInit((vd ? vd->semkeys : 0), cond, pcond);
-  }
-
-  void
-  condLightInit(int semkeys[], CondWait *cond, CondWaitP *pcond)
-  {
-#endif
     assert(pcond);
     if (!cond)
       return;
 
     cond->pcond = pcond;
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
     cond->id = (vd ? ut_sem_open(vd->semkeys[1]) : -1);
 #endif
 #ifdef THR_TRACE
@@ -598,17 +549,7 @@ do { \
   int
   condInit(DbDescription *vd, CondWait *cond, CondWaitP *pcond)
   {
-#ifndef OLD_IF
-    return condInit(vd ? vd->semkeys : 0, cond, pcond);
-  }
-
-  int
-  condInit(int semkeys[], CondWait *cond, CondWaitP *pcond)
-  {
-    condLightInit(semkeys, cond, pcond);
-#else
     condLightInit(vd, cond, pcond);
-#endif
 
 #ifdef THR_TRACE
     IDB_LOG(IDB_LOG_MTX,
@@ -616,7 +557,7 @@ do { \
 	     cond, pcond, (cond ? cond->id : -1)));
 #endif
     memset(pcond, 0, sizeof(*pcond));
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
     pcond->u.key = (vd ? vd->semkeys[1] : 0);
 #else
     pthread_condattr_t cattr;
@@ -640,7 +581,7 @@ do { \
 		   unsigned int timeout, Boolean reentrant)
   {
     int r;
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
     ESM_ASSERT_ABORT(mp->id>=0, 0, 0);
     int sid = mp->id;
     if (cond->id < 0)
@@ -666,7 +607,7 @@ do { \
 #ifdef WK_TIMEDWAIT_BUG
     for (;;) { // 10/01/02: workaround problem false timeout return
 #endif
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
       if (reentrant) {
 	Status s = mutexUnlock_r(mp, xid);
 	if (s) {
@@ -777,7 +718,7 @@ do { \
   condSignal(CondWait *cond)
   {
     int r;
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
     if (cond->id < 0)
       cond->id = ut_sem_open(cond->pcond->u.key);
     int cid = cond->id;
@@ -795,7 +736,7 @@ do { \
 #endif
     //printf("condSignal [cond = 0x%x]\n", cond);
 
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
     r = ut_sem_signal(cid);
 #else
     r = pthread_cond_signal(&cond->pcond->u.cond);

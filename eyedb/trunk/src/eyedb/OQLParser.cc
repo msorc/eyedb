@@ -1013,15 +1013,14 @@ static int
 help_command(OQLParser *parser, int argc, char *argv[])
 {
   OQLCommand *cmd = parser->get_first_command();
-#ifdef SOLARIS
-  FILE *pipe = popen("/usr/bin/more", "w");
-#elif defined(LINUX) || defined(CYGWIN)
-  FILE *pipe = popen("/bin/more", "w");
-#endif
+  FILE *pipe = popen(PATH_TO_MORE, "w");
   
-#if 1
-  if (pipe) {pclose(pipe); pipe = 0;}
-#endif
+  if (pipe) 
+    {
+      pclose(pipe); 
+      pipe = 0;
+    }
+
   if (!pipe)
     pipe = stderr;
 

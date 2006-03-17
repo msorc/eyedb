@@ -45,10 +45,6 @@ extern int RPC_MIN_SIZE;
 #include <grp.h>
 #include <pwd.h>
 #include <fcntl.h>
-/*@@@@*/
-#if defined(SOLARIS) || defined(ULTRASOL7)
-#include <synch.h>
-#endif
 #include <sys/resource.h>
 
 #include <sys/wait.h>
@@ -614,7 +610,6 @@ rpc_portOpen(rpc_Server *server, const char *servname, const char *portname,
       PERROR(msg_make("eyedb fatal error: unable to create pipe"));
       return rpc_Error;
     }
-    /*@@@@#if !defined(LINUX) && !defined(CYGWIN)*/
 #if defined(SOLARIS) || defined(ULTRASOL7)
     if (ioctl(pfd[0], I_PUSH, "connld") < 0) {
       if (created) unlink(portname);

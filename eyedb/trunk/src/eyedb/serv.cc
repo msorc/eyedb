@@ -25,10 +25,6 @@
 #include <eyedbconfig.h>
 
 #include <assert.h>
-#if !defined(LINUX) && !defined(CYGWIN)
-#include <synch.h>
-#endif
-
 #include <stdlib.h>
 
 #define _IDB_KERN_

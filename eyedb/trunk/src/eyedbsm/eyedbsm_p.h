@@ -294,7 +294,7 @@ namespace eyedbsm {
 
 #define OIDLOCSIZE 6
 
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
 #define ESM_NSEMS 2
 #else
 #define ESM_NSEMS 0
@@ -364,7 +364,7 @@ namespace eyedbsm {
     XMHandle *trs_mh;
     Mutex mp[MTX_CNT+1];
     CondWaitList cdw_list;
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
     int locked;
     int semkeys[ESM_NSEMS];
 #endif

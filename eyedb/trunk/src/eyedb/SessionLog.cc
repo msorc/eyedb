@@ -106,7 +106,7 @@ namespace eyedb {
 //#define CONNLOG_SIZE 0x10000
 #define CONNLOG_SIZE (sizeof(SessionHead) + 128 * sizeof(ClientInfo))
 
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
   Status
   SessionLog::init_sems()
   {
@@ -137,7 +137,7 @@ namespace eyedb {
   void SessionLog::init(const char *host, const char *port, const char *logdir,
 			Bool writing)
   {
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
     status = init_sems();
     if (status)
       return;
@@ -161,7 +161,7 @@ namespace eyedb {
   {
     int i;
 
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
     status = init_sems();
     if (status)
       return;
