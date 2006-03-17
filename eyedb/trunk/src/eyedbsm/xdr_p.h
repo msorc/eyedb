@@ -42,27 +42,11 @@ namespace eyedbsm {
   extern void x2h_dbHeader(DbHeader *hdbh, const DbHeader *xdbh);
   extern void h2x_dbHeader(DbHeader *xdbh, const DbHeader *hdbh);
 
-  /*
-  extern void x2h_mapHeader(MapHeader *hmap, const unsigned char *xmap);
-  extern void h2x_mapHeader(unsigned char *xmap, const MapHeader *hmap);
-
-  extern void x2h_dbHeader(DbHeader *hdbh, const unsigned char *xdbh);
-  extern void h2x_dbHeader(unsigned char *xdbh, const DbHeader *hdbh);
-  */
-
-  extern void x2h_protoids(Oid *prot_lock_oid, Oid *prot_list_oid,
-			   Oid *prot_uid_oid, unsigned char *xdbh);
-
-  extern void h2x_protoids(const Oid *prot_lock_oid, const Oid *prot_list_oid,
-			   const Oid *prot_uid_oid, unsigned char *xdbh);
-
   extern void x2h_protoids(Oid *prot_lock_oid, Oid *prot_list_oid,
 			   Oid *prot_uid_oid, DbHeader *dbh);
 
   extern void h2x_protoids(Oid *prot_lock_oid, Oid *prot_list_oid,
 			   Oid *prot_uid_oid, DbHeader *dbh);
-
-#ifdef XDR_DBS
 
 #define x2h_prologue(XMP, MP) \
   unsigned char buf_[MapHeader_SIZE]; \
@@ -71,16 +55,6 @@ namespace eyedbsm {
 
 #define h2x_epilogue(XMP, MP) \
   h2x_mapHeader(XMP, MP)
-
-#else
-
-#define x2h_prologue(XMP, MP) \
-  MapHeader _tmp_, *MP = &_tmp_; \
-  x2h_mapHeader(MP, XMP)
-
-#define h2x_epilogue(XMP, MP) \
-  h2x_mapHeader(XMP, MP)
-#endif
-
 }
+
 #endif

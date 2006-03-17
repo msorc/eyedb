@@ -440,7 +440,7 @@ namespace eyedb {
     strncpy(conninfo->username, username, sizeof(conninfo->username)-1);
     strncpy(conninfo->progname, progname, sizeof(conninfo->progname)-1);
 
-    printf("SessionLog adding %d\n", getpid());
+    //printf("SessionLog adding %d\n", getpid());
     conninfo->prog_pid = pid;
     conninfo->backend_pid = getpid();
 

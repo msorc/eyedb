@@ -230,6 +230,10 @@ signal_handler(int sig)
 
     rpc_quit(DO_NOT_EXIT, 1);
 
+    if (getenv("EYEDBDBG")) {
+      for (;;) sleep(1000);
+    }
+
     /* the following code implies sometimes a loop! */
     /* disconnected it the 27/10/00 */
     /*
