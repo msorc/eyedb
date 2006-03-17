@@ -7,7 +7,7 @@ AC_DEFUN([AC_PTHREAD_PROCESS_SHARED],[
 pthread_mutex_t mut;
 pthread_mutexattr_t mattr;
 int r;
-if ((r=pthread_mutexattr_init(&mattr)) != 0) exit(r);
+if ((r = pthread_mutexattr_init(&mattr)) != 0) exit(r);
 if ((r = pthread_mutexattr_setpshared(&mattr, PTHREAD_PROCESS_SHARED)) != 0) exit(r);
 if ((r = pthread_mutex_init(&mut, &mattr)) != 0) exit(r);
 if ((r = pthread_mutexattr_destroy(&mattr)) != 0) exit(r);

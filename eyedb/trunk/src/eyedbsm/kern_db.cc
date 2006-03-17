@@ -33,20 +33,12 @@
 
 #include "eyedbconfig.h"
 
+#include <iostream>
 #include <sys/types.h>
 
 #include "eyedblib/filelib.h"
 #include "kern_p.h"
 #include <eyedbsm/smd.h>
-
-#include <iostream>
-
-#if defined(ALPHA)
-/*@@@@ defined in unistd.h but _XOPENSOURCE>=500 dependent, shortcut */
-//extern "C" {
-extern long int gethostid(void);
-//}
-#endif
 
 static const char defDsp[] = "DEFAULT";
 
@@ -1404,7 +1396,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 			  "%s", smd_get_port());
       }
 
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
     if (smdcli_init_getsems(conn, dbfile, vd->semkeys))
       {
 	free(vd);

@@ -1400,7 +1400,7 @@ mutex_display_realize(int argc, char *argv[])
   MutexP *mt = sm_shmh->mtx.mp;
   for (i = 0; i < MTX_CNT; i++, mt++)
     {
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
       printf("  Mutex %-4s ", mt->mtname);
 #else
       int r = pthread_mutex_trylock(&mt->u.mp);
@@ -1431,7 +1431,7 @@ static void
 unlock_mutex_realize(int which, const char *mtname)
 {
   /*
-#ifndef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_POSIX
   Status se;
   se = mutexLock(&sm_shmh->mtx.mp[which], 0);
   if (se && se->err == LOCK_TIMEOUT)

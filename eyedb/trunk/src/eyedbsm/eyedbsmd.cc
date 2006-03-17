@@ -21,10 +21,6 @@
    Author: Eric Viara <viara@sysra.com>
 */
 
-
-#define NO_IDB_LINKED_LIST
-#define USE_STL_LIST
-
 #include <eyedbconfig.h>
 
 #if TIME_WITH_SYS_TIME
@@ -95,15 +91,11 @@ private:
   int refcnt;
 };
 
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
 class Semaphore : public Reference {
   int key;
   int excl;
-#ifdef USE_STL_LIST
   static std::list<Semaphore *> sem_list;
-#else
-  static LinkedList sem_list;
-#endif
 
   Semaphore(int _key, int _excl) : Reference() {
     key = _key;
@@ -113,11 +105,7 @@ class Semaphore : public Reference {
     trace();
     fprintf(stderr, "\n");
 #endif
-#ifdef USE_STL_LIST
     sem_list.push_back(this);
-#else
-    sem_list.insertObject(this);
-#endif
   }
 
 public:
@@ -134,13 +122,9 @@ public:
     fprintf(stderr, "releasing semaphore 0x%08x [refcnt:%d]\n", key, getRefCount());
 #endif
     if (!decrRefCount()) {
-#ifdef USE_STL_LIST
       bool r = std_list_erase(sem_list, this);
       if (!r)
 	std::cerr << "Warning: semaphore::release " << key << "not found\n";
-#else
-      sem_list.deleteObject(this);
-#endif
       delete this;
     }
   }
@@ -163,7 +147,6 @@ public:
     if (ut_sem_find(&key, excl) >= 0)
       return new Semaphore(key, excl);
 
-#ifdef USE_STL_LIST
     std::list<Semaphore *>::const_iterator begin = sem_list.begin();
     std::list<Semaphore *>::const_iterator end = sem_list.end();
 
@@ -175,15 +158,6 @@ public:
       }
       ++begin;
     }
-#else
-    LinkedListCursor c(sem_list);
-
-    while (c.getNext((void *&)sem))
-      if (!sem->isExcl()) {
-	sem->incrRefCount();
-	return sem;
-      }
-#endif
 
 #ifdef TRACE
     fprintf(stderr, "cannot find any semaphore\n");
@@ -192,7 +166,6 @@ public:
   }
 
   static void traceList() {
-#ifdef USE_STL_LIST
     std::list<Semaphore *>::const_iterator begin = sem_list.begin();
     std::list<Semaphore *>::const_iterator end = sem_list.end();
 
@@ -201,41 +174,24 @@ public:
       sem->trace();
       ++begin;
     }
-#else
-    LinkedListCursor c(sem_list);
-    Semaphore *sem;
-
-    while (c.getNext((void *&)sem)) {
-      sem->trace();
-      fprintf(stderr, "\n");
-    }
-#endif
   }
 };
 #endif
 
 class DbFile : public Reference {
   char *dbfile;
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
   Semaphore *sm[ESM_NSEMS];
 #endif
-#ifdef USE_STL_LIST
   static std::list<DbFile *> dbfile_list;
-#else
-  static LinkedList dbfile_list;
-#endif
 
   DbFile(const char *_dbfile) : Reference() {
     dbfile = strdup(_dbfile);
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
     sm[0] = Semaphore::find(1);
     sm[1] = Semaphore::find(0);
 #endif
-#ifdef USE_STL_LIST
     dbfile_list.push_back(this);
-#else
-    dbfile_list.insertObject(this);
-#endif
 #ifdef TRACE
     fprintf(stderr, "creating dbfile ");
     trace();
@@ -247,7 +203,7 @@ class DbFile : public Reference {
 #ifdef TRACE
     fprintf(stderr, "deleting dbfile %s\n", dbfile);
 #endif
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
     for (int i = 0; i < ESM_NSEMS; i++)
       if (sm[i]) sm[i]->release();
 #endif
@@ -255,7 +211,7 @@ class DbFile : public Reference {
 
 public:
 
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
   int getSemaphores(int sx[]) const {
     for (int i = 0; i < ESM_NSEMS; i++)
       sx[i] = (sm[i] ? sm[i]->getKey() : 0);
@@ -273,21 +229,16 @@ public:
     fprintf(stderr, "releasing dbfile %s [refcnt:%d]\n", dbfile, getRefCount());
 #endif
     if (!decrRefCount()) {
-#ifdef USE_STL_LIST
       bool r = std_list_erase(dbfile_list, this);
 #ifdef TRACE
       if (!r)
 	std::cerr << "Warning: DbFile::release " << dbfile << "not found\n";
-#endif
-#else
-      dbfile_list.deleteObject(this);
 #endif
       delete this;
     }
   }
 
   static DbFile *find(const char *dbfile, int get_sems, int &found) {
-#ifdef USE_STL_LIST
     std::list<DbFile *>::const_iterator begin = dbfile_list.begin();
     std::list<DbFile *>::const_iterator end = dbfile_list.end();
     DbFile *dbf;
@@ -302,18 +253,6 @@ public:
       }
       ++begin;
     }
-#else
-    LinkedListCursor c(dbfile_list);
-    DbFile *dbf;
-
-    while (c.getNext((void *&)dbf))
-      if (!strcmp(dbf->dbfile, dbfile)) {
-	if (get_sems)
-	  dbf->incrRefCount();
-	found = 1;
-	return dbf;
-      }
-#endif
 
     found = 0;
     if (get_sems) {
@@ -338,7 +277,7 @@ public:
 
   void trace() {
     fprintf(stderr, "%s, ", dbfile);
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
     for (int i = 0; i < ESM_NSEMS; i++) {
       if (i) fprintf(stderr, ", ");
       if (!sm[i]) fprintf(stderr, "*");
@@ -348,7 +287,6 @@ public:
   }
 
   static void traceList() {
-#ifdef USE_STL_LIST
     std::list<DbFile *>::const_iterator begin = dbfile_list.begin();
     std::list<DbFile *>::const_iterator end = dbfile_list.end();
     DbFile *dbf;
@@ -359,27 +297,13 @@ public:
       fprintf(stderr, "\n");
       ++begin;
     }
-#else
-    LinkedListCursor c(dbfile_list);
-    DbFile *dbf;
-
-    while (c.getNext((void *&)dbf)) {
-      dbf->trace();
-      fprintf(stderr, "\n");
-    }
-#endif
   }
 };
 
 class Client {
   int fd;
-#ifdef USE_STL_LIST
   static std::list<Client *> client_list;
   std::list<DbFile *> dbfile_list;
-#else
-  static LinkedList client_list;
-  LinkedList dbfile_list;
-#endif
 
 public:
   Client(int _fd) {
@@ -387,19 +311,11 @@ public:
 #ifdef TRACE
     fprintf(stderr, "creating client %d\n", fd);
 #endif
-#ifdef USE_STL_LIST
     client_list.push_back(this);
-#else
-    client_list.insertObject(this);
-#endif
   }
 
   void addDbFile(DbFile *dbf) {
-#ifdef USE_STL_LIST
     dbfile_list.push_back(dbf);
-#else
-    dbfile_list.insertObject(dbf);
-#endif
 
 #ifdef TRACE
     fprintf(stderr, "adding dbfile %s to client %d [refcnt:%d]\n", dbf->getDbfile(), fd,
@@ -411,7 +327,6 @@ public:
 #ifdef TRACE
     fprintf(stderr, "removing dbfile %s from client %d\n", dbf->getDbfile(), fd);
 #endif
-#ifdef USE_STL_LIST
     std::list<DbFile *>::iterator db_begin = dbfile_list.begin();
     std::list<DbFile *>::iterator db_end = dbfile_list.end();
     while (db_begin != db_end) {
@@ -427,16 +342,6 @@ public:
       }
       ++db_begin;
     }
-#else
-    LinkedListCursor c(dbfile_list);
-    DbFile *xdbf;
-    while (c.getNext((void *&)xdbf))
-      if (xdbf == dbf) {
-	dbf->release();
-	dbfile_list.deleteObject(dbf);
-	return;
-      }
-#endif
 
 #ifdef TRACE
     fprintf(stderr, "dbfile %s not found in client %d\n", dbf->getDbfile(), fd);
@@ -447,7 +352,6 @@ public:
 #ifdef TRACE
     fprintf(stderr, "releasing client %d\n", fd);
 #endif
-#ifdef USE_STL_LIST
     std::list<DbFile *>::iterator db_begin = dbfile_list.begin();
     std::list<DbFile *>::iterator db_end = dbfile_list.end();
     while (db_begin != db_end) {
@@ -460,18 +364,9 @@ public:
     if (!r)
       std::cerr << "Warning: Client not found\n";
 #endif
-#else
-    LinkedListCursor c(dbfile_list);
-    DbFile *dbf;
-    while (c.getNext((void *&)dbf))
-      dbf->release();
-
-    client_list.deleteObject(this);
-#endif
   }
 
   static void clean_all() {
-#ifdef USE_STL_LIST
     std::list<Client *>::iterator cl_begin = client_list.begin();
     std::list<Client *>::iterator cl_end = client_list.end();
 
@@ -486,21 +381,9 @@ public:
       }
       ++cl_begin;
     }
-#else
-    LinkedListCursor c(client_list);
-    Client *client;
-
-    while (c.getNext((void *&)client)) {
-      LinkedListCursor c(client->dbfile_list);
-      DbFile *dbf;
-      while (c.getNext((void *&)dbf))
-	dbf->release();
-    }
-#endif
   }
 
   static Client *find(int fd) {
-#ifdef USE_STL_LIST
     std::list<Client *>::iterator begin = client_list.begin();
     std::list<Client *>::iterator end = client_list.end();
     while (begin != end) {
@@ -509,39 +392,18 @@ public:
 	return client;
       ++begin;
     }
-#else
-    LinkedListCursor c(client_list);
-    Client *client;
 
-    while (c.getNext((void *&)client))
-      if (client->fd == fd)
-	return client;
-
-#endif
     return 0;
   }
 };
 
-#ifdef USE_STL_LIST
 std::list<DbFile *> DbFile::dbfile_list;
-#else
-LinkedList DbFile::dbfile_list;
-#endif
 
-#ifdef UT_SEM
-
-#ifdef USE_STL_LIST
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
 std::list<Semaphore *> Semaphore::sem_list;
-#else
-LinkedList Semaphore::sem_list;
 #endif
 
-#endif
-#ifdef USE_STL_LIST
 std::list<Client *> Client::client_list;
-#else
-LinkedList Client::client_list;
-#endif
 
 static void
 unit_test()
@@ -677,7 +539,7 @@ manage_message(int fd)
     delete [] dbfile;
     
     if (msg == SMD_INIT_GETSEMS) {
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
       client->addDbFile(dbf);
 
       int sm[ESM_NSEMS];
@@ -701,7 +563,7 @@ manage_message(int fd)
   else if (msg == SMD_STATUS) {
     fprintf(stderr, "Reference Count: %d\n", smd_refcnt);
     DbFile::traceList();
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
     Semaphore::traceList();
 #endif
   }
@@ -814,7 +676,6 @@ init()
   // It looks like that this code is useless: 
   // after calling setrlimit and before calling setrlimit, rlp.rlim_cur == rlp.rlim_max == 64
 #if 0
-  /*@@@@ #if !defined(LINUX) && !defined(CYGWIN) */
 #if defined(SOLARIS) || defined(ULTRASOL7)  
   struct rlimit rlp;
 

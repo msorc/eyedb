@@ -25,6 +25,8 @@
 #ifndef _eyedb_sesslog_
 #define _eyedb_sesslog_
 
+#include <eyedbconfig.h>
+
 #include <eyedb/eyedb.h>
 #include <eyedbsm/eyedbsm.h>
 #include "eyedbsm/transaction.h"
@@ -103,7 +105,7 @@ namespace eyedb {
     int file_cnt;
     char **files;
     void *vd;
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
     Status init_sems();
 #endif
 

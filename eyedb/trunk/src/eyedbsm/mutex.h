@@ -24,24 +24,12 @@
 
 #ifndef _EYEDBSM_MUTEX_H
 #define _EYEDBSM_MUTEX_H
-/*@@@@ adding*/
 
 #include "xm_alloc.h"
-
-/*@@@@ can we unify i.e. UT_SEM everywhere */
-#if defined(LINUX) || defined(LINUX64) || defined(LINUX_IA64) || defined(LINUX_PPC64) || defined(AIX) ||  defined(ALPHA) || defined(ORIGIN) || defined(CYGWIN) 
-#define UT_SEM
-#elif defined(SOLARIS) || defined(ULTRASOL7)
-#else
-#error "unspecified semaphore or mutex policy for architecture"
-#endif
-
 #include <eyedblib/machtypes.h>
-
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
 #include <eyedblib/semlib.h>
 #endif
-
 #include <pthread.h>
 
 namespace eyedbsm {
@@ -76,7 +64,7 @@ namespace eyedbsm {
   struct Mutex {
     MutexP *pmp;
     CondWait cond;
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
     int id;
     int *plocked;
 #endif
@@ -150,7 +138,7 @@ namespace eyedbsm {
 
   public:
     MutexLocker(Mutex &_mut) : mut(&_mut) {
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
       MUTEX_LOCK_VOID(mut, mut->id);
 #else
       MUTEX_LOCK_VOID(mut, 0);
@@ -158,7 +146,7 @@ namespace eyedbsm {
       locked = true;
     }
     void lock() {
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
       MUTEX_LOCK_VOID(mut, mut->id);
 #else
       MUTEX_LOCK_VOID(mut, 0);
@@ -168,7 +156,7 @@ namespace eyedbsm {
 
     void unlock() {
       locked = false;
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
       MUTEX_UNLOCK(mut, mut->id);
 #else
       MUTEX_UNLOCK(mut, 0);
@@ -177,7 +165,7 @@ namespace eyedbsm {
 
     ~MutexLocker() {
       if (locked) {
-#ifdef UT_SEM
+#ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
 	MUTEX_UNLOCK(mut, mut->id);
 #else
 	MUTEX_UNLOCK(mut, 0);

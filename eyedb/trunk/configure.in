@@ -177,6 +177,10 @@ AC_PATH_XTRA
 AC_SYS_LARGEFILE
 AC_FUNC_FSEEKO
 
+# check for more executable
+AC_PATH_PROG(PATH_TO_MORE,more)
+AC_DEFINE_UNQUOTED([PATH_TO_MORE], "$PATH_TO_MORE", [Define to the absolute path of the more command])
+
 # check for libraries
 dnl AC_CHECK_LIB( nsl, ??) # -lnsl is not necessary apparently
 AC_CHECK_LIB( pthread, pthread_create)

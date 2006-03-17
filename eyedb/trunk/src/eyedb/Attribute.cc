@@ -41,11 +41,6 @@ static void stop_imm2() { }
 //#define TRACK_BUG1
 
 #define _64BITS_PORTAGE
-/*
-#if defined(SPARCV7) || defined(SPARCV9)
-#define _64BITS_PORTAGE
-#endif
-*/
 
 #ifdef _64BITS_PORTAGE
 #define SIZEOFOBJECT 8

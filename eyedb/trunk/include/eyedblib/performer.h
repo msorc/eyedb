@@ -25,17 +25,7 @@
 #ifndef _EYEDBLIB_PERFORMER_H
 #define _EYEDBLIB_PERFORMER_H
 
-/*@@@@*/
-#if 0 && !defined(ORIGIN)
-#include <stdio.h>
-#endif
-
 #include <eyedblib/thread.h>
-
-#if 0 && !defined(ORIGIN)
-@@@
-#include <stdio.h>
-#endif
 
 namespace eyedblib {
   struct ThreadPerformerArg {
