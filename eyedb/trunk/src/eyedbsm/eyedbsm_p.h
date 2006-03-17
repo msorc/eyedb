@@ -38,8 +38,6 @@
 #include <eyedblib/log.h>
 #include <unistd.h>
 
-#define XDR_DBS
-
 namespace eyedbsm {
 
   struct ObjectHeader {
@@ -61,130 +59,6 @@ namespace eyedbsm {
 
   //static const int DBID_L_MASK =  ((1 << Oid_DBID_L)-1);
   static const int MAX_FREE_CELLS = 1000000;
-
-  // XDR structures ------------------------------------------------------
-
-#ifndef XDR_DBS
-
-  struct DbRootEntry {
-    char key[MAX_ROOT_KEY];
-    char data[MAX_ROOT_DATA];
-  };
-
-  typedef DbRootEntry DbRootEntries[MAX_ROOT_ENTRIES];
-
-  struct LinkmapCell {
-    u_int size;
-    u_int ns;
-    u_int prev, next;
-  };
-
-  struct BitmapHeader {
-    unsigned int slot_cur;
-    unsigned int slot_lastbusy;
-    short retry; /* was Boolean */
-  };
-
-  struct LinkmapHeader {
-    int firstcell;
-  };
-
-  struct BitmapStat {
-    Oid::NX obj_count;
-    NS busy_slots;
-    unsigned long long busy_size, hole_size;
-  };
-
-  struct LinkmapStat {
-    unsigned int nfreecells;
-  };
-
-  struct MapStat {
-    short mtype; /* was eyedbsm::MapType */
-#ifdef X86
-    char pad[4];
-#endif
-    union {
-      eyedbsm::BitmapStat bmstat;
-      eyedbsm::LinkmapStat lmstat;
-    } u;
-  };
-
-  struct MapHeader {
-    short mtype; /* was MapType */
-#ifdef X86
-    // 3/12/05 
-    // char pad1[4];
-#endif
-    unsigned int sizeslot;
-    unsigned int pow2;
-    NS nslots;
-    Oid::NX nbobjs;
-#ifdef X86
-    // 3/12/05 
-    char pad3[4];
-#endif
-    MapStat mstat;
-    union {
-      BitmapHeader bmh;
-      LinkmapHeader lmh;
-    } u;
-#ifdef X86
-    // 3/12/05 
-    //char pad2[4];
-#endif
-  };
-
-  struct DatafileDesc {
-    char file[L_FILENAME];
-    char name[L_NAME+1];
-    unsigned int __maxsize;
-#ifdef X86
-    // 3/12/05
-    char pad[4];
-#endif
-    MapHeader mp;
-#ifdef X86
-    char pad1[4];
-#endif
-    unsigned int __lastslot;
-    unsigned short __dspid;
-  };
-
-  struct DataspaceDesc {
-    char name[L_NAME+1];
-    int __cur;
-    int __ndat;
-    short __datid[MAX_DAT_PER_DSP];
-  };
-
-  struct DbHeader {
-    unsigned int __magic;
-    int __dbid;
-    char state;
-    int __guest_uid;
-    Oid __prot_uid_oid;
-    Oid __prot_list_oid;
-    Oid __prot_lock_oid;
-    char shmfile[L_FILENAME];
-    Oid::NX __nbobjs;
-    unsigned int __ndat;
-    DatafileDesc dat[MAX_DATAFILES];
-    unsigned int __ndsp;
-    DataspaceDesc dsp[MAX_DATASPACES];
-    short __def_dspid;
-    DbRootEntries vre;
-    Oid::NX __lastidxbusy;
-    Oid::NX __curidxbusy;
-    Oid::NX __lastidxblkalloc;
-    Oid::NX __lastnsblkalloc[MAX_DATAFILES];
-#ifdef X86
-    char pad[4];
-#endif
-  };
-
-#endif
-  // end of XDR structures --------------------------------------------------
 
 #define LOCK_COND
 #define MAXCLIENTS_PERDB 128
@@ -319,12 +193,7 @@ namespace eyedbsm {
 
     /* dbs file */
     m_Map *m_dbs;
-#ifdef XDR_DBS
-    // EV 16/03/06
     unsigned char *dbs_addr;
-#else
-    DbHeader *dbs_addr;
-#endif
   
     /* shmg file */
     m_Map *m_shm;

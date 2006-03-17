@@ -181,11 +181,11 @@
 
 namespace eyedbsm {
 
-  class DbRootEntry__ {
+  class DbRootEntry {
     unsigned char *addr;
 
   public:
-    DbRootEntry__(unsigned char *addr) : addr(addr) { }
+    DbRootEntry(unsigned char *addr) : addr(addr) { }
 
     char *key() {
       return DbRootEntry_key(addr);
@@ -199,12 +199,12 @@ namespace eyedbsm {
 
   //typedef DbRootEntry DbRootEntries[MAX_ROOT_ENTRIES];
 
-  class MapHeader__ {
+  class MapHeader {
 
     unsigned char *addr;
 
   public:
-    MapHeader__(unsigned char *addr) : addr(addr) { }
+    MapHeader(unsigned char *addr) : addr(addr) { }
 
     unsigned char *_addr() {return addr;}
 
@@ -277,13 +277,13 @@ namespace eyedbsm {
     }
   };
 
-  class DatafileDesc__ {
+  class DatafileDesc {
 
     unsigned char *addr;
 
   public:
-    MapHeader__ _mp;
-    DatafileDesc__(unsigned char *addr) :
+    MapHeader _mp;
+    DatafileDesc(unsigned char *addr) :
       addr(addr), _mp(addr + DatafileDesc_mp_OFF) { }
 
     char *file() {
@@ -298,7 +298,7 @@ namespace eyedbsm {
       return DatafileDesc___maxsize(addr);
     }
 
-    MapHeader__ *mp() {
+    MapHeader *mp() {
       return &_mp;
     }
 
@@ -311,12 +311,12 @@ namespace eyedbsm {
     }
   };
 
-  class DataspaceDesc__ {
+  class DataspaceDesc {
 
     unsigned char *addr;
 
   public:
-    DataspaceDesc__(unsigned char *addr) : addr(addr) { }
+    DataspaceDesc(unsigned char *addr) : addr(addr) { }
 
     char *name() {
       return DataspaceDesc_name(addr);
@@ -339,12 +339,12 @@ namespace eyedbsm {
     }
   };
 
-  class DbHeader__ {
+  class DbHeader {
 
     unsigned char *addr;
 
   public:
-    DbHeader__(unsigned char *addr) : addr(addr) { }
+    DbHeader(unsigned char *addr) : addr(addr) { }
 
     void memzero() {
       memset(addr, 0, DbHeader_SIZE);
@@ -396,8 +396,8 @@ namespace eyedbsm {
       return DbHeader___ndat(addr);
     }
 
-    DatafileDesc__ dat(short datid) const {
-      return DatafileDesc__(dat_addr(datid));
+    DatafileDesc dat(short datid) const {
+      return DatafileDesc(dat_addr(datid));
     }
 
     unsigned char *dat_addr(short datid) const {
@@ -408,8 +408,8 @@ namespace eyedbsm {
       return DbHeader___ndsp(addr);
     }
 
-    DataspaceDesc__ dsp(short datid) const {
-      return DataspaceDesc__(dsp_addr(datid));
+    DataspaceDesc dsp(short datid) const {
+      return DataspaceDesc(dsp_addr(datid));
     }
 
     unsigned char *dsp_addr(short dspid) const {
@@ -420,8 +420,8 @@ namespace eyedbsm {
       return DbHeader___def_dspid(addr);
     }
 
-    DbRootEntry__ vre(int idx) {
-      return DbRootEntry__(vre_addr(idx));
+    DbRootEntry vre(int idx) {
+      return DbRootEntry(vre_addr(idx));
     }
 
     unsigned char *vre_addr(int idx) {
@@ -444,15 +444,6 @@ namespace eyedbsm {
       return DbHeader___lastnsblkalloc(addr, datid);
     }
   };
-
-#ifdef XDR_DBS
-  typedef DbRootEntry__  DbRootEntry;
-  typedef MapHeader__  MapHeader;
-  typedef DatafileDesc__  DatafileDesc;
-  typedef DataspaceDesc__  DataspaceDesc;
-  typedef DbHeader__  DbHeader;
-#endif
-
 }
 
 #endif
