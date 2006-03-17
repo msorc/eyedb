@@ -883,37 +883,9 @@ perform_gbx(Database &db)
   }
 }
 
-struct X {
-  unsigned long long l;
-  unsigned int i;
-};
-
-struct X1 {
-  unsigned long long l;
-  unsigned int i;
-  unsigned int j;
-};
-
-struct Y {
-  unsigned int l;
-  unsigned int i;
-};
-
-struct Z {
-  unsigned int l;
-  unsigned int i;
-  unsigned int j;
-};
-
 int
 main(int argc, char *argv[])
 {
-  cout << sizeof(X) << endl;
-  cout << sizeof(X[2]) << endl;
-  cout << sizeof(X1) << endl;
-  cout << sizeof(Y) << endl;
-  cout << sizeof(Z) << endl;
-
   eyedb::init(argc, argv);
   schema::init();
 
@@ -939,29 +911,22 @@ main(int argc, char *argv[])
 		    Database::DBRWLocal :
 		    Database::DBRW));
     
+#if 1
+    TransactionParams params;
+
+    //params.lockmode = ReadNWriteSX;
+    params.trsmode = eyedb::TransactionOff;
+    params.recovmode = eyedb::RecoveryOff;
+    db.transactionBegin(params);
+    OQL oql(&db, argv[2]);
+    ObjectArray obj_arr;
+    oql.execute(obj_arr);
+    for (int i = 0; i < obj_arr.getCount(); i++)
+      cout << obj_arr[i] << endl;
+    sleep(1000);
+#else
     db.transactionBegin();
     
-  try
-  {
-    char const *query = argv[2];
-    eyedb::OidArray oids;
-    eyedb::OQL(&db, query).execute(oids);
-    std::clog << query << ' ' << oids.getCount() << std::endl;
-  }
-  catch (eyedb::Exception const & e)
-  {
-    std::clog << "eyedb::Exception const & " << e.getString() << std::endl;
-  }
-  catch (eyedb::Exception const * e)
-  {
-    std::clog << "eyedb::Exception const * " << e->getString() << std::endl;
-  }
-  catch (...)
-  {
-    std::cerr << "unknown exception" << std::endl;
-  }
-  return 0;
-
     perform_list(db);
     perform_gbx(db);
 
@@ -971,7 +936,7 @@ main(int argc, char *argv[])
 
     // EV : 18/01/06
     // when opening database in local mode, exit() cause server freeze
-#if 1
+#if 0
     //sleep(1000);
     exit(1);
 #endif
@@ -984,6 +949,7 @@ main(int argc, char *argv[])
 
     //perform_err(db);
     db.transactionCommit();
+#endif
   }
 
   catch(Exception &e) {

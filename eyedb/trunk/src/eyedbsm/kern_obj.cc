@@ -32,7 +32,7 @@
 #define SLOT_INC 400
 #define CHECK_NS_OID(DBH, NS, DATID, OID) \
 ((DATID) >= 0 && (NS) >= 0 && \
- (NS) <= x2h_u32(DBSADDR(DBH)->dat[DATID].__lastslot) && \
+ (NS) <= x2h_u32(DbHeader(DBSADDR(DBH)).dat(DATID).__lastslot()) && \
  OIDDBIDGET(OID) == (DBH)->vd->dbid)
 
 namespace eyedbsm {
@@ -214,8 +214,10 @@ namespace eyedbsm {
     MmapH hdl;
     const MapHeader *mp;
 
+    DbHeader _dbh(DBSADDR(dbh));
     for (;;) {
-      mp = DAT2MP(dbh, datid);
+      MapHeader t_mp = DAT2MP(dbh, datid);
+      mp = &t_mp;
       oidloc.datid = datid;
 
       se = mapAlloc(dbh, datid, rsize, &oidloc.ns);
@@ -229,7 +231,7 @@ namespace eyedbsm {
 			  dbh->dbfile,
 			  (dspid != DefaultDspid ?
 			   std::string("dataspace ") +
-			   DBSADDR(dbh)->dsp[dspid].name :
+			   _dbh.dsp(dspid).name() :
 			   std::string("unspecified dataspace")).c_str());
     }
 
@@ -240,15 +242,11 @@ namespace eyedbsm {
 
     ObjectHeader objh;
     char *addr;
-#ifdef SEXDR
-    unsigned int sizeslot = x2h_u32(mp->sizeslot);
-#else
-    unsigned int sizeslot = mp->sizeslot;
-#endif
+    unsigned int sizeslot = x2h_u32(mp->sizeslot());
     int ls = oidloc.ns + SZ2NS_XDR(rsize, mp);
     Mutex *mt = LSL_MTX(dbh);
     unsigned int xid = dbh->vd->xid;
-    DatType dtype = getDatType(DBSADDR(dbh), datid);
+    DatType dtype = getDatType(&_dbh, datid);
     if (dtype == LogicalOidType) {
       Oid::NX nx;
       Status se = nxAlloc(dbh, oidloc, &nx);
@@ -268,16 +266,8 @@ namespace eyedbsm {
     if (se = ESM_objectLock(dbh, oid, OCREATE, 0, 0))
       return se;
 
-#ifdef SEXDR
-
     objh.unique = h2x_u32(oid->getUnique());
     objh.size = h2x_u32(makeInvalid(rsize));
-
-#else
-
-    objh.unique = oid->getUnique();
-    objh.size = makeInvalid(rsize);
-#endif
 
     memset(&objh.prot_oid, 0, sizeof(Oid));
 
@@ -285,7 +275,7 @@ namespace eyedbsm {
       MUTEX_LOCK(mt, xid);
 
     // was: if (ls >= dbh->vd->dbhead->lastslot)
-    if (ls >= x2h_u32(DBSADDR(dbh)->dat[datid].__lastslot))
+    if (ls >= x2h_u32(_dbh.dat(datid).__lastslot()))
       {
 	static char zero = 0;
 	int ls1 = ls + SLOT_INC;
@@ -306,7 +296,7 @@ namespace eyedbsm {
 	    return se;
 	  }
 
-	DBSADDR(dbh)->dat[datid].__lastslot = h2x_u32(ls1);
+	_dbh.dat(datid).__lastslot() = h2x_u32(ls1);
       }
 
     if (NEED_LOCK(trctx))
@@ -389,11 +379,7 @@ namespace eyedbsm {
 	  }
 
 	OidLoc oidloc = oidLocGet(dbh, oid);
-#ifdef SEXDR
 	mapFree(dbh->vd, oidloc.ns, oidloc.datid, x2h_getSize(objh->size));
-#else
-	mapFree(dbh->vd, oidloc.ns, oidloc.datid, getSize(objh->size));
-#endif
 
 	if (!isPhy(dbh, oid))
 	  nxFree(dbh, oid->getNX());
@@ -428,11 +414,7 @@ namespace eyedbsm {
     objh = oid2objh(oid, dbh, &objh, &hdl, &dummy);
 
     OidLoc oidloc = oidLocGet(dbh, oid);
-#ifdef SEXDR
     mapFree(dbh->vd, oidloc.ns, oidloc.datid, x2h_getSize(objh->size));
-#else
-    mapFree(dbh->vd, oidloc.ns, oidloc.datid, getSize(objh->size));
-#endif
 
     nxSet(dbh, oid->getNX(), oidloc_o.ns, oidloc_o.datid);
     memset(objh, 0, sizeof(ObjectHeader));
@@ -486,11 +468,7 @@ namespace eyedbsm {
 		return statusMake(INVALID_OID, PR "invalid oid '%s'", getOidString(oid));
 	      }
 
-#ifdef SEXDR
 	    *size = x2h_getSize(objh->size) - sizeof(ObjectHeader);
-#else
-	    *size = getSize(objh->size) - sizeof(ObjectHeader);
-#endif
 	  
 	    ESM_REGISTER(dbh, SizeGetOP, ESM_addToRegisterSizeGet(dbh, oid));
 	    hdl_release(&hdl);
@@ -515,11 +493,7 @@ namespace eyedbsm {
 	return statusMake(INVALID_OID, PR "invalid oid '%s'", getOidString(oid));
       }
 
-#ifdef SEXDR
     objh->size = h2x_u32(x2h_makeValid(objh->size));
-#else
-    objh->size = makeValid(objh->size);
-#endif
 
     hdl_release(&hdl);
     return Success;
@@ -552,11 +526,7 @@ namespace eyedbsm {
 	   oidloc1.ns, oidloc2.ns);
 #endif
 
-#ifdef SEXDR
     objh->unique = h2x_u32(o_oid->getUnique());
-#else
-    objh->unique = o_oid->getUnique();
-#endif
 
     hdl_release(&hdl0);
   
@@ -588,6 +558,7 @@ namespace eyedbsm {
     Boolean opsync = False;
     char *buf = 0;
     Boolean oid2addr_failed;
+    DbHeader _dbh(DBSADDR(dbh));
 
     if (isPhy(dbh, oid))
       return statusMake(INVALID_OID, PR "cannot change the size of a "
@@ -612,11 +583,7 @@ namespace eyedbsm {
 	return statusMake(INVALID_OID, PR "invalid oid '%s'", getOidString(oid));
       }
 
-#ifdef SEXDR
     osize = x2h_getSize(objh->size) - sizeof(ObjectHeader);
-#else
-    osize = getSize(objh->size) - sizeof(ObjectHeader);
-#endif
   
     hdl_release(&hdl0);
   
@@ -634,7 +601,7 @@ namespace eyedbsm {
 	  if (se = ESM_objectCreate_server(dbh, 0, size, oidloc.datid, DefaultDspid, &noid, 0, OPDefault))
 	  goto error;
 	*/
-	if (se = ESM_objectCreate(dbh, 0, size, getDataspace(DBSADDR(dbh), oidloc.datid), &noid, OPDefault))
+	if (se = ESM_objectCreate(dbh, 0, size, getDataspace(&_dbh, oidloc.datid), &noid, OPDefault))
 	  goto error;
 
 	if (copy)
@@ -859,11 +826,7 @@ namespace eyedbsm {
 			"is not specified", pre);
     }
 
-#ifdef SEXDR
     size = x2h_getSize(pobjh->size) - sizeof(ObjectHeader);
-#else
-    size = getSize(pobjh->size) - sizeof(ObjectHeader);
-#endif
 
     /*
     // 4/07/01: this should be in the argument of the function instead
@@ -881,14 +844,10 @@ namespace eyedbsm {
     else
       {
 	char *addr, *dbaddr = 0, *traddr = 0;
-	const MapHeader *mp = DAT2MP(dbh, oidloc.datid);
-#ifdef SEXDR
-	unsigned int pow2 = x2h_u32(mp->pow2);
-	unsigned int sizeslot = x2h_u32(mp->sizeslot);
-#else
-	unsigned int pow2 = mp->pow2;
-	unsigned int sizeslot = mp->sizeslot;
-#endif
+	MapHeader t_mp = DAT2MP(dbh, oidloc.datid);
+	MapHeader *mp = &t_mp;
+	unsigned int pow2 = x2h_u32(mp->pow2());
+	unsigned int sizeslot = x2h_u32(mp->sizeslot());
 	const Protection *prot;
       
 	length = ((length == 0) ? size : length);
@@ -1080,10 +1039,10 @@ namespace eyedbsm {
   Boolean
   isDatInDsp(DbHandle const *dbh, short dspid, short datid)
   {
-    DataspaceDesc *dsp = &DBSADDR(dbh)->dsp[dspid];
-    unsigned int ndat = x2h_u32(dsp->__ndat);
+    DataspaceDesc dsp = DbHeader(DBSADDR(dbh)).dsp(dspid);
+    unsigned int ndat = x2h_u32(dsp.__ndat());
     for (int i = 0; i < ndat; i++)
-      if (x2h_16(dsp->__datid[i]) == datid)
+      if (x2h_16(dsp.__datid(i)) == datid)
 	return True;
     return False;
   }
@@ -1108,6 +1067,7 @@ namespace eyedbsm {
       return statusMake(INVALID_OID, PR "cannot move a physical oid");
     */
 
+    DbHeader _dbh(DBSADDR(dbh));
 #ifndef SHR_SECURE
     if (opmode != OPShrinkingPhase)
 #endif
@@ -1130,7 +1090,7 @@ namespace eyedbsm {
 	  return statusMake(INVALID_OID, PR "invalid oid '%s'", getOidString(oid));
 
 	if (datid >= 0 &&
-	    getDatType(DBSADDR(dbh), datid) == PhysicalOidType)
+	    getDatType(&_dbh, datid) == PhysicalOidType)
 	  return statusMake(INVALID_OID, PR "cannot move an oid to a "
 			    "physical oid type based datafile");
 
@@ -1145,11 +1105,7 @@ namespace eyedbsm {
 	return statusMake(INVALID_OID, PR "invalid oid '%s'", getOidString(oid));
       }
 
-#ifdef SEXDR
     size = x2h_getSize(objh->size) - sizeof(ObjectHeader);
-#else
-    size = getSize(objh->size) - sizeof(ObjectHeader);
-#endif
   
     hdl_release(&hdl0);
   

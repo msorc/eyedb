@@ -319,7 +319,8 @@ main(int argc, char *argv[])
     const char *host, *port;
     make_host_port(listen, host, port);
     
-    SessionLog sesslog(host, port, eyedb::ServerConfig::getSValue("tmpdir"));
+    SessionLog sesslog(host, port, eyedb::ServerConfig::getSValue("tmpdir"),
+		       (cmd == CStatus ? False : True));
 
     if (sesslog.getStatus()) {
       if (cmd == Start)

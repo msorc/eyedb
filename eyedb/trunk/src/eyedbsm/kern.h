@@ -141,7 +141,7 @@ extern Status
 		    Oid const *const baseoid, Oid *nextoid,
 		    Boolean *found),
 
-  ESM_mapInfoGet(DbHandle const *dbh, MapInfo *mpi),
+  //  ESM_mapInfoGet(DbHandle const *dbh, MapInfo *mpi),
 
   ESM_suserUnset(DbHandle *dbh),
 

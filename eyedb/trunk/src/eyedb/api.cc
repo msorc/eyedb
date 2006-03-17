@@ -269,9 +269,13 @@ getServerOutOfBandData(ConnHandle *ch, int * type, Data * data,
     
     *type = ua[0].a_int;
     
-    if (!status_r.err) {
+    if (!r) {
       *data = (unsigned char *)ua[1].a_data.data;
       *size = ua[1].a_data.size;
+    }
+    else {
+      *data = 0;
+      *size = 0;
     }
     
     status_copy(status_r, ua[2].a_status);

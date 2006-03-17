@@ -56,7 +56,8 @@ namespace eyedb {
 
   public:
     // open constructor
-    SessionLog(const char *host, const char *port, const char *logdir);
+    SessionLog(const char *host, const char *port, const char *logdir,
+	       Bool writing);
 
     // create constructor
     SessionLog(const char *logdir, const char *version,
@@ -87,7 +88,8 @@ namespace eyedb {
     ~SessionLog();
 
   private:
-    void init(const char *host, const char *port, const char *logdir);
+    void init(const char *host, const char *port, const char *logdir,
+	      Bool writing);
     char *host;
     char *port;
     char *logdir;
@@ -106,7 +108,7 @@ namespace eyedb {
 #endif
 
     Status openRealize(const char *host, const char *port, const char *logdir,
-		       Bool create);
+		       Bool create, Bool writing);
     char *makeFile(const char *host, const char *port, const char *_logdir);
     int get_nb_clients();
   };

@@ -30,8 +30,9 @@ namespace eyedbsm {
 Boolean
 isDspValid(DbHandle const *dbh, short dspid)
 {
-  return (dspid >= 0 && dspid < x2h_u32(DBSADDR(dbh)->__ndsp) &&
-	  *DBSADDR(dbh)->dsp[dspid].name) ?
+  DbHeader _dbh(DBSADDR(dbh));
+  return (dspid >= 0 && dspid < x2h_u32(_dbh.__ndsp()) &&
+	  *_dbh.dsp(dspid).name()) ?
     True : False;
 }
 
@@ -47,14 +48,15 @@ ESM_dspGet(DbHandle const *dbh, const char *dataspace, short *dspid)
       return Success;
     }
 
+  DbHeader _dbh(DBSADDR(dbh));
   for (int i = 0; i < MAX_DATASPACES; i++)
-    if (!strcmp(DBSADDR(dbh)->dsp[i].name, dataspace)) {
+    if (!strcmp(_dbh.dsp(i).name(), dataspace)) {
       *dspid = i;
       return Success;
     }
 
   return statusMake(INVALID_DATASPACE, "dataspace %s not found",
-		       dataspace);
+		    dataspace);
 }
 
 Status
@@ -69,8 +71,8 @@ ESM_getDatafile(DbHandle const *dbh, short &dspid, short &datid)
   if (!isDspValid(dbh, dspid))
     return statusMake(INVALID_DATASPACE, "invalid dataspace #%d", dspid);
 
-  DataspaceDesc *dsp = &DBSADDR(dbh)->dsp[dspid];
-  datid = x2h_16(dsp->__datid[x2h_32(dsp->__cur)]);
+  DataspaceDesc dsp = DbHeader(DBSADDR(dbh)).dsp(dspid);
+  datid = x2h_16(dsp.__datid(x2h_32(dsp.__cur())));
 
   /*
   if (!isDatValid(dbh, datid))
@@ -83,28 +85,28 @@ ESM_getDatafile(DbHandle const *dbh, short &dspid, short &datid)
 Boolean
 ESM_getNextDatafile(DbHandle const *dbh, short dspid, short &datid)
 {
-  DataspaceDesc *dsp = &DBSADDR(dbh)->dsp[dspid];
-  int cur = x2h_32(dsp->__cur);
+  DataspaceDesc dsp = DbHeader(DBSADDR(dbh)).dsp(dspid);
+  int cur = x2h_32(dsp.__cur());
 
   // 07/01/05: see below
   // could be: if (datid != x2h_16(dsp->__datid[cur])) return False; ??
   //assert(datid == x2h_16(dsp->__datid[cur]));
-  if (datid != x2h_16(dsp->__datid[cur])) {
+  if (datid != x2h_16(dsp.__datid(cur))) {
     fprintf(stderr, "*WARNING*: ESM_getNextDataFile : "
 	    "datid != x2h_16(dsp->__datid[cur]): %d != %d\n", datid,
-	    x2h_16(dsp->__datid[cur]));
+	    x2h_16(dsp.__datid(cur)));
   }
 
-  int ndat = x2h_32(dsp->__ndat);
+  int ndat = x2h_32(dsp.__ndat());
   if (cur == ndat - 1)
     return False;
 
   // 07/01/05: corrected this bug (see tests/dataspace/bug_dsp.sh)
   //datid = x2h_16(dsp->__datid[cur]);
   //cur++;
-  datid = x2h_16(dsp->__datid[++cur]);
+  datid = x2h_16(dsp.__datid(++cur));
 
-  dsp->__cur = h2x_32(cur);
+  dsp.__cur() = h2x_32(cur);
   return True;
 }
 
@@ -119,14 +121,14 @@ ESM_dspSetDefault(DbHandle const *dbh, const char *dataspace,
   short dspid;
   Status s = ESM_dspGet(dbh, dataspace, &dspid);
   if (s) return s;
-  DBSADDR(dbh)->__def_dspid = h2x_16(dspid);
+  DbHeader(DBSADDR(dbh)).__def_dspid() = h2x_16(dspid);
   return Success;
 }
 
 Status
 ESM_dspGetDefault(DbHandle const *dbh, short *dspid)
 {
-  *dspid = x2h_16(DBSADDR(dbh)->__def_dspid);
+  *dspid = x2h_16(DbHeader(DBSADDR(dbh)).__def_dspid());
   return Success;
 }
 
@@ -141,6 +143,7 @@ ESM_dspCreateRealize(DbHandle const *dbh, const char *op,
 			 datfile_cnt);
 
   short *datid = new short[datfile_cnt];
+  DbHeader _dbh(DBSADDR(dbh));
   DatType dtype;
   for (int i = 0; i < datfile_cnt; i++) {
     short xdspid;
@@ -154,33 +157,33 @@ ESM_dspCreateRealize(DbHandle const *dbh, const char *op,
       delete [] datid;
       return statusMake(INVALID_DATASPACE, "datafile %s is already "
 			   "tied to the dataspace %s",
-			   datfiles[i], DBSADDR(dbh)->dsp[xdspid].name);
+			   datfiles[i], _dbh.dsp(xdspid).name());
     }
 
     if (!i)
-      dtype = getDatType(DBSADDR(dbh), datid[i]);
-    else if (dtype != getDatType(DBSADDR(dbh), datid[i])) {
+      dtype = getDatType(&_dbh, datid[i]);
+    else if (dtype != getDatType(&_dbh, datid[i])) {
       delete [] datid;
       return statusMake(INVALID_DATASPACE, "cannot gather different "
 			   "oid type based datafiles into a dataspace");
     }
   }
 
-  DataspaceDesc *dsp = &DBSADDR(dbh)->dsp[dspid];
-  strcpy(dsp->name, dataspace);
-  dsp->__cur = 0;
-  dsp->__ndat = h2x_u32(datfile_cnt);
+  DataspaceDesc dsp = _dbh.dsp(dspid);
+  strcpy(dsp.name(), dataspace);
+  dsp.__cur() = 0;
+  dsp.__ndat() = h2x_u32(datfile_cnt);
   //memcpy(dsp->__datid, datid, sizeof(short) * datfile_cnt);
   for (int i = 0; i < datfile_cnt; i++) {
-    dsp->__datid[i] = h2x_16(datid[i]);
+    dsp.__datid(i) = h2x_16(datid[i]);
     //DBSADDR(dbh)->dat[datid[i]].__dspid = h2x_16(dspid);
-    setDataspace(DBSADDR(dbh), datid[i], dspid);
+    setDataspace(&_dbh, datid[i], dspid);
   }
 
-  unsigned int ndsp = x2h_32(DBSADDR(dbh)->__ndsp);
+  unsigned int ndsp = x2h_32(_dbh.__ndsp());
   if (dspid == ndsp) {
     ndsp++;
-    DBSADDR(dbh)->__ndsp = h2x_32(ndsp);
+    _dbh.__ndsp() = h2x_32(ndsp);
   }
 
   delete [] datid;
@@ -200,19 +203,19 @@ ESM_dspSetCurDat(DbHandle const *dbh, const char *dataspace, const char *datfile
   s = ESM_datCheck(dbh, datfile, &datid, &xdspid);
   if (s) return s;
   
-  DataspaceDesc *dsp = &DBSADDR(dbh)->dsp[dspid];
+  DataspaceDesc dsp = DbHeader(DBSADDR(dbh)).dsp(dspid);
 
-  unsigned int ndat = x2h_u32(dsp->__ndat);
+  unsigned int ndat = x2h_u32(dsp.__ndat());
   for (int i = 0; i < ndat; i++) {
-    if (x2h_16(dsp->__datid[i]) == datid) {
-      dsp->__cur = h2x_32(i);
+    if (x2h_16(dsp.__datid(i)) == datid) {
+      dsp.__cur() = h2x_32(i);
       return Success;
     }
   }
 
   return statusMake(ERROR, "datafile %s is not tied to "
 		       "to dataspace #%d [%s]",
-		       datfile, dspid, dsp->name);
+		       datfile, dspid, dsp.name());
 }
 
 Status
@@ -222,9 +225,9 @@ ESM_dspGetCurDat(DbHandle const *dbh, const char *dataspace, short *datid)
   Status s = ESM_dspGet(dbh, dataspace, &dspid);
   if (s) return s;
 
-  DataspaceDesc *dsp = &DBSADDR(dbh)->dsp[dspid];
+  DataspaceDesc dsp = DbHeader(DBSADDR(dbh)).dsp(dspid);
 
-  *datid = x2h_16(dsp->__datid[x2h_32(dsp->__cur)]);
+  *datid = x2h_16(dsp.__datid(x2h_32(dsp.__cur())));
   return Success;
 }
 
@@ -236,12 +239,12 @@ ESM_dspCheck(DbHandle const *dbh, const char *dataspace, short *dspid,
   if (s) return s;
 
   if (ndat || datid) {
-    DataspaceDesc *dsp = &DBSADDR(dbh)->dsp[*dspid];
-    if (ndat) *ndat = x2h_u32(dsp->__ndat);
+    DataspaceDesc dsp = DbHeader(DBSADDR(dbh)).dsp(*dspid);
+    if (ndat) *ndat = x2h_u32(dsp.__ndat());
     if (datid) {
-      unsigned int _ndat = x2h_u32(dsp->__ndat);
+      unsigned int _ndat = x2h_u32(dsp.__ndat());
       for (int i = 0; i < _ndat; i++)
-	datid[i] = x2h_16(dsp->__datid[i]);
+	datid[i] = x2h_16(dsp.__datid(i));
     }
   }
 
@@ -277,7 +280,7 @@ ESM_dspCreate(DbHandle const *dbh, const char *dataspace,
   if (dspid == MAX_DATASPACES)
     return statusMake(INVALID_DATAFILE_CNT,
 			 PR " dataspace number too large: `%d'",
-			 x2h_u32(DBSADDR(dbh)->__ndsp));
+			 x2h_u32(DbHeader(DBSADDR(dbh)).__ndsp()));
 
   return ESM_dspCreateRealize(dbh, PR, dspid, dataspace, datfiles, datfile_cnt);
 }
@@ -294,7 +297,7 @@ ESM_dspUpdate(DbHandle const *dbh, const char *dataspace,
 
 #undef PR
 #define PR "dspUpdate: "
-  return ESM_dspCreateRealize(dbh, PR, dspid, DBSADDR(dbh)->dsp[dspid].name,
+  return ESM_dspCreateRealize(dbh, PR, dspid, DbHeader(DBSADDR(dbh)).dsp(dspid).name(),
 			     datfiles, datfile_cnt);
 }
 
@@ -311,29 +314,30 @@ ESM_dspDelete(DbHandle const *dbh, const char *dataspace)
   s = ESM_dspGetDefault(dbh, &dspid_def);
   if (s) return s;
 
-  DataspaceDesc *dsp = &DBSADDR(dbh)->dsp[dspid];
+  DataspaceDesc dsp = DbHeader(DBSADDR(dbh)).dsp(dspid);
 
   if (dspid == dspid_def)
     return statusMake(ERROR, "cannot delete default dataspace #%d [%s]",
-			 dspid, dsp->name);
+			 dspid, dsp.name());
 
-  unsigned int ndat = x2h_u32(dsp->__ndat);
+  unsigned int ndat = x2h_u32(dsp.__ndat());
   /*
   for (int i = 0; i < ndat; i++)
     DBSADDR(dbh)->dat[x2h_16(dsp->__datid[i])].__dspid =
       h2x_32(DefaultDspid);
   */
 
-  for (int i = 0; i < ndat; i++)
-    setDataspace(DBSADDR(dbh), dsp->__datid[i], DefaultDspid);
+  DbHeader _dbh(DBSADDR(dbh));
+  for (int i = 0; i < ndat; i++) 
+    setDataspace(&_dbh, dsp.__datid(i), DefaultDspid);
 
-  dsp->__ndat = 0;
-  *dsp->name = 0;
+  dsp.__ndat() = 0;
+  *dsp.name() = 0;
 
-  unsigned int ndsp = x2h_u32(DBSADDR(dbh)->__ndsp);
+  unsigned int ndsp = x2h_u32(_dbh.__ndsp());
   if (dspid == ndsp - 1) {
     ndsp--;
-    DBSADDR(dbh)->__ndsp = h2x_u32(ndsp);
+    DbHeader(DBSADDR(dbh)).__ndsp() = h2x_u32(ndsp);
   }
 
   return Success;
@@ -354,7 +358,7 @@ ESM_dspRename(DbHandle const *dbh, const char *dataspace,
 			 "large, maximum size is %d",
 			 dataspace_new, L_NAME);
 
-  strcpy(DBSADDR(dbh)->dsp[dspid].name, dataspace_new);
+  strcpy(DbHeader(DBSADDR(dbh)).dsp(dspid).name(), dataspace_new);
   return Success;
 }
 

@@ -83,7 +83,8 @@ static const TransactionParams params_X = {
   if (sm_CHECK(ESM_dbOpen(DBFILE, MODE, 0, 0, 0, 0, 0, 0, &sm_dbh), \
        "database open")) \
     return 1; \
-  sm_h = DBSADDR(sm_dbh)
+  DbHeader _dbh_(DBSADDR(sm_dbh)); \
+  sm_h = &_dbh_
 
 #define sm_SHMH_INIT(DBFILE, WRITE) \
   if (shmh_init(DBFILE, WRITE)) { \
@@ -506,12 +507,15 @@ shmem_cleanup_realize(int argc, char *argv[])
 }
 
 #define OFFSET(T, X) (unsigned long)(&((T *)0)->X)
-#define DSPSIZEOF(T) printf("sizeof " #T ": %d\n", sizeof(T))
-#define DSPOFFSET(T, X) printf("offset of " #T "::" #X ": %d\n", OFFSET(T, X))
+//#define DSPSIZEOF(T) printf("sizeof " #T ": %d\n", sizeof(T))
+//#define DSPOFFSET(T, X) printf("offset of " #T "::" #X ": %d\n", OFFSET(T, X))
+#define DSPSIZEOF(T) printf("#define " #T "_SIZE %d\n", sizeof(T))
+#define DSPOFFSET(T, X) printf("#define " #T "_" #X "_OFF %d\n", OFFSET(T, X))
 
 static void
 display_structs()
 {
+#if 0
   DSPSIZEOF(DatafileDesc);
   DSPSIZEOF(DataspaceDesc);
   DSPSIZEOF(DbHeader);
@@ -521,13 +525,66 @@ display_structs()
   DSPSIZEOF(MapStat);
 
   DSPOFFSET(MapStat, u);
+#endif
+
+#if 0
+  DSPSIZEOF(MapHeader);
+  DSPSIZEOF(DatafileDesc);
+  DSPSIZEOF(DataspaceDesc);
+  DSPSIZEOF(DbHeader);
+  DSPSIZEOF(DbRootEntry);
+  //DSPSIZEOF(DbRootEntries);
+  printf("\n");
+
+  DSPOFFSET(MapHeader, mtype);
   DSPOFFSET(MapHeader, sizeslot);
+  DSPOFFSET(MapHeader, pow2);
+  DSPOFFSET(MapHeader, nslots);
+
+  DSPOFFSET(MapHeader, nbobjs);
   DSPOFFSET(MapHeader, mstat);
-  DSPOFFSET(MapHeader, u);
-  DSPOFFSET(DatafileDesc, mp.mtype);
-  DSPOFFSET(DatafileDesc, mp.sizeslot);
+  DSPOFFSET(MapHeader, mstat.mtype);
+
+  DSPOFFSET(MapHeader, u.bmh);
+
+  DSPOFFSET(MapHeader, u.bmh.slot_cur);
+  DSPOFFSET(MapHeader, u.bmh.slot_lastbusy);
+  DSPOFFSET(MapHeader, u.bmh.retry);
+
+  DSPOFFSET(MapHeader, mstat.u.bmstat);
+  DSPOFFSET(MapHeader, mstat.u.bmstat.obj_count);
+  DSPOFFSET(MapHeader, mstat.u.bmstat.busy_slots);
+  DSPOFFSET(MapHeader, mstat.u.bmstat.busy_size);
+  DSPOFFSET(MapHeader, mstat.u.bmstat.hole_size);
+
+  DSPOFFSET(MapHeader, mstat.u.lmstat);
+  DSPOFFSET(MapHeader, mstat.u.lmstat.nfreecells);
+
+  DSPOFFSET(MapHeader, u.lmh);
+  DSPOFFSET(MapHeader, u.lmh.firstcell);
+
+  printf("\n");
+
+  DSPOFFSET(DatafileDesc, file);
+  DSPOFFSET(DatafileDesc, name);
+  DSPOFFSET(DatafileDesc, __maxsize);
+  DSPOFFSET(DatafileDesc, mp);
   DSPOFFSET(DatafileDesc, __lastslot);
   DSPOFFSET(DatafileDesc, __dspid);
+
+  printf("\n");
+
+  DSPOFFSET(DataspaceDesc, name);
+  DSPOFFSET(DataspaceDesc, __cur);
+  DSPOFFSET(DataspaceDesc, __ndat);
+  DSPOFFSET(DataspaceDesc, __datid);
+
+  printf("\n");
+
+  DSPOFFSET(DbRootEntry, key);
+  DSPOFFSET(DbRootEntry, data);
+
+  printf("\n");
 
   DSPOFFSET(DbHeader, __magic);
   DSPOFFSET(DbHeader, __dbid);
@@ -548,7 +605,9 @@ display_structs()
   DSPOFFSET(DbHeader, __curidxbusy);
   DSPOFFSET(DbHeader, __lastidxblkalloc);
   DSPOFFSET(DbHeader, __lastnsblkalloc);
+#endif
 
+#if 0
   DSPSIZEOF(HIdx::_Idx);
   DSPOFFSET(HIdx::_Idx, key_count);
   DSPOFFSET(HIdx::_Idx, dspid);
@@ -572,6 +631,7 @@ display_structs()
   DSPOFFSET(DbShmHeader, trs_hdr);
   DSPOFFSET(DbShmHeader, mtx);
   DSPOFFSET(DbShmHeader, stat);
+#endif
 }
 
 static int
@@ -585,8 +645,8 @@ databadisplay_realize(int argc, char *argv[])
 
   printf(" Database ID #%d\n", sm_dbh->vd->dbid);
   printf(" Version %d\n", x2h_u32(sm_shmh->version));
-  printf(" Max Object Count %d\n", x2h_u32(sm_h->__nbobjs));
-  printf(" Datafile Count %d\n", x2h_u32(sm_h->__ndat));
+  printf(" Max Object Count %d\n", x2h_u32(sm_h->__nbobjs()));
+  printf(" Datafile Count %d\n", x2h_u32(sm_h->__ndat()));
   printf(" Reference Count %d\n", sm_get_refcount());
   if (sm_shmh->hostid || *sm_shmh->hostname)
     printf(" Host Owner \"%s\", Host ID %p\n", 
@@ -737,9 +797,9 @@ datafile_rename_realize(int argc, char *argv[])
 static short
 datafile_get(const char *dat)
 {
-  int ndat = x2h_u32(sm_h->__ndat);
+  int ndat = x2h_u32(sm_h->__ndat());
   for (int i = 0; i < ndat; i++)
-    if (!strcmp(dat, sm_h->dat[i].file))
+    if (!strcmp(dat, sm_h->dat(i).file()))
       return i;
 
   return -1;
@@ -748,18 +808,14 @@ datafile_get(const char *dat)
 static void
 datafile_display_fragmentation(short datid)
 {
-#ifdef SEXDR
-  const MapHeader *xmp = &sm_h->dat[datid].mp;
+  MapHeader *xmp = sm_h->dat(datid).mp();
   x2h_prologue(xmp, mp);
-#else
-  const MapHeader *mp = &sm_h->dat[datid].mp;
-#endif
   char *mapaddr = sm_dbh->vd->dmp_addr[datid];
   char *s, *start, *end;
   int nfrags, nbusy, ns;
 
   start = mapaddr;
-  end = mapaddr + (mp->BMH.slot_lastbusy / 8);
+  end = mapaddr + (mp->u_bmh_slot_lastbusy() / 8);
   nfrags = 0;
   ns = 0;
 
@@ -773,18 +829,18 @@ datafile_display_fragmentation(short datid)
 	  if (!(v & (1 << b)))
 	    nfrags++;
 
-	  if (ns >= mp->BMH.slot_lastbusy)
+	  if (ns >= mp->u_bmh_slot_lastbusy())
 	    break;
 	}
     }
 
-  if (nfrags > mp->BMH.slot_lastbusy)
-    nfrags = mp->BMH.slot_lastbusy;
+  if (nfrags > mp->u_bmh_slot_lastbusy())
+    nfrags = mp->u_bmh_slot_lastbusy();
 
   printf("   Fragmentation        %d/%d slots [%2.2f%%]\n",
-	 nfrags, mp->BMH.slot_lastbusy,
-	 (mp->BMH.slot_lastbusy ?
-	  (double)(100.*nfrags)/mp->BMH.slot_lastbusy : 0));
+	 nfrags, mp->u_bmh_slot_lastbusy(),
+	 (mp->u_bmh_slot_lastbusy() ?
+	  (double)(100.*nfrags)/mp->u_bmh_slot_lastbusy() : 0));
 }	
 
 static void
@@ -810,24 +866,20 @@ display_size(unsigned long long sz)
 static void
 datafile_display_info(short datid, DatafileDesc *dfd)
 {
-#ifdef SEXDR
-  const MapHeader *xmp = &dfd->mp;
+  MapHeader *xmp = dfd->mp();
   x2h_prologue(xmp, mp);
-#else
-  const MapHeader *mp = &dfd->mp;
-#endif
   
   printf(" Datafile #%d\n", datid);
-  if (!*dfd->file)
+  if (!*dfd->file())
     {
       printf("   <empty slot>\n");
       return;
     }
 
   unsigned long Ksz;
-  printf("   File                 %s\n", dfd->file);
+  printf("   File                 %s\n", dfd->file());
   printf("   Name                 %s\n",
-	 (*dfd->name ? dfd->name : "<unnamed>"));
+	 (*dfd->name() ? dfd->name() : "<unnamed>"));
   if (getDatType(sm_h, datid) == LogicalOidType)
     printf("   Oid Type             Logical\n");
   else
@@ -835,45 +887,45 @@ datafile_display_info(short datid, DatafileDesc *dfd)
 
   short dspid = getDataspace(sm_h, datid);
   if (dspid != DefaultDspid)
-    printf("   Dataspace            %s\n", sm_h->dsp[dspid].name);
+    printf("   Dataspace            %s\n", sm_h->dsp(dspid).name());
   printf("   Maximum Size         ");
-  display_size((unsigned long long)x2h_u32(dfd->__maxsize)*ONE_K);
-  if (mp->mtype == BitmapType)
+  display_size((unsigned long long)x2h_u32(dfd->__maxsize())*ONE_K);
+  if (mp->mtype() == BitmapType)
     {
       printf("   Bitmap Allocator\n");
-      printf("     Max Slots          %u\n", mp->nslots);
-      printf("     Slot Size          %u\n\n", mp->sizeslot);
+      printf("     Max Slots          %u\n", mp->nslots());
+      printf("     Slot Size          %u\n\n", mp->sizeslot());
     }
   else
     printf("   Linkmap Allocator\n\n");
 
-  printf("   Object Number        %d\n", mp->BMSTAT.obj_count);
+  printf("   Object Number        %d\n", mp->mstat_u_bmstat_obj_count());
   printf("   Total Object Size    ");
-  display_size(mp->BMSTAT.busy_size);
+  display_size(mp->mstat_u_bmstat_busy_size());
       
   printf("   Average Object Size  ");
-  display_size(mp->BMSTAT.obj_count ?
-	       mp->BMSTAT.busy_size/mp->BMSTAT.obj_count : 0);
+  display_size(mp->mstat_u_bmstat_obj_count() ?
+	       mp->mstat_u_bmstat_busy_size()/mp->mstat_u_bmstat_obj_count() : 0);
 
   printf("\n");
-  printf("   Busy Slots           %d\n", mp->BMSTAT.busy_slots);
-  printf("   Last Busy Slot       %u\n", mp->BMH.slot_lastbusy);
-  printf("   Last Volume Slot     %u\n", x2h_u32(dfd->__lastslot));
+  printf("   Busy Slots           %d\n", mp->mstat_u_bmstat_busy_slots());
+  printf("   Last Busy Slot       %u\n", mp->u_bmh_slot_lastbusy());
+  printf("   Last Volume Slot     %u\n", x2h_u32(dfd->__lastslot()));
   printf("   Busy Slot Size       ");
-  display_size((unsigned long long)mp->BMSTAT.busy_slots * mp->sizeslot);
+  display_size((unsigned long long)mp->mstat_u_bmstat_busy_slots() * mp->sizeslot());
 
   printf("   Total File Size      ");
-  display_size((unsigned long long)mp->BMH.slot_lastbusy * mp->sizeslot);
+  display_size((unsigned long long)mp->u_bmh_slot_lastbusy() * mp->sizeslot());
 	 
-  printf("   Current Slot Pointer %u\n", mp->BMH.slot_cur);
+  printf("   Current Slot Pointer %u\n", mp->u_bmh_slot_cur());
   printf("   Defragmentable Size  ");
-  display_size((unsigned long long)(mp->BMH.slot_lastbusy+1 - mp->BMSTAT.busy_slots) * mp->sizeslot);
+  display_size((unsigned long long)(mp->u_bmh_slot_lastbusy()+1 - mp->mstat_u_bmstat_busy_slots()) * mp->sizeslot());
   //datafile_display_fragmentation(datid);
-  printf("   DMP Up Slot          %u\n", x2h_u32(sm_h->__lastnsblkalloc[datid]*BITS_PER_BYTE));
+  printf("   DMP Up Slot          %u\n", x2h_u32(sm_h->__lastnsblkalloc(datid)*BITS_PER_BYTE));
   printf("   DMP Allocated Size   ");
-  display_size(x2h_u32(sm_h->__lastnsblkalloc[datid]));
+  display_size(x2h_u32(sm_h->__lastnsblkalloc(datid)));
   printf("   Used                 %2.2f%%\n",
-	 ((double)mp->BMSTAT.busy_slots/(double)mp->nslots)*100.);
+	 ((double)mp->mstat_u_bmstat_busy_slots()/(double)mp->nslots())*100.);
 }
 
 static int
@@ -896,7 +948,7 @@ datafile_display_realize(int argc, char *argv[])
     dats[i] = argv[i+1];
 
   if (!datid_cnt) {
-    unsigned int ndat = x2h_u32(sm_h->__ndat);
+    unsigned int ndat = x2h_u32(sm_h->__ndat());
     printf(" Database %s contains %d Data File%s\n\n", sm_dbh->dbfile, ndat, (ndat > 1 ? "s" : ""));
   }
 
@@ -907,11 +959,12 @@ datafile_display_realize(int argc, char *argv[])
 
   if (!datid_cnt)
     {
-      unsigned int ndat = x2h_u32(sm_h->__ndat);
+      unsigned int ndat = x2h_u32(sm_h->__ndat());
       for (i = 0; i < ndat; i++)
 	{
 	  if (i) printf("\n");
-	  datafile_display_info(i, &sm_h->dat[i]);
+	  DatafileDesc d = sm_h->dat(i);
+	  datafile_display_info(i, &d);
 	}
       return 0;
     }
@@ -919,7 +972,8 @@ datafile_display_realize(int argc, char *argv[])
   for (i = 0; i < datid_cnt; i++)
     {
       if (i) printf("\n");
-      datafile_display_info(datids[i], &sm_h->dat[datids[i]]);
+      DatafileDesc d = sm_h->dat(datids[i]);
+      datafile_display_info(datids[i], &d);
     }
 
   return 0;
@@ -1014,32 +1068,29 @@ dataspace_rename_realize(int argc, char *argv[])
 static int
 dataspace_display_info(short dspid, DataspaceDesc *dsp)
 {
-  if (!*dsp->name)
+  if (!*dsp->name())
     return 0;
 
   printf(" Dataspace #%d\n", dspid);
-  printf(" Name %s\n", dsp->name);
-  printf(" Current datafile #%d\n", x2h_16(dsp->__datid[x2h_32(dsp->__cur)]));
-  unsigned int ndat = x2h_u32(dsp->__ndat);
+  printf(" Name %s\n", dsp->name());
+  printf(" Current datafile #%d\n", x2h_16(dsp->__datid(x2h_32(dsp->__cur()))));
+  unsigned int ndat = x2h_u32(dsp->__ndat());
   for (int i = 0; i < ndat; i++) {
-    printf("    Datafile #%d\n", x2h_16(dsp->__datid[i]));
-    DatafileDesc *dat = &sm_h->dat[x2h_16(dsp->__datid[i])];
-#ifdef SEXDR
-    const MapHeader *xmp = &dat->mp;
+    printf("    Datafile #%d\n", x2h_16(dsp->__datid(i)));
+    DatafileDesc _dat = sm_h->dat(x2h_16(dsp->__datid(i)));
+    DatafileDesc *dat = &_dat;
+    MapHeader *xmp = dat->mp();
     x2h_prologue(xmp, mp);
-#else
-    const MapHeader *mp = &dat->mp;
-#endif
-    if (*dat->name)
-      printf("      Name     %s\n", dat->name);
-    printf("      File     %s\n", dat->file);
-    if (getDatType(sm_h, x2h_16(dsp->__datid[i])) == LogicalOidType)
+    if (*dat->name())
+      printf("      Name     %s\n", dat->name());
+    printf("      File     %s\n", dat->file());
+    if (getDatType(sm_h, x2h_16(dsp->__datid(i))) == LogicalOidType)
       printf("      Oid Type Logical\n");
     else
       printf("      Oid Type Physical\n");
-    printf("      Maxsize  %d\n", x2h_u32(dat->__maxsize));
+    printf("      Maxsize  %d\n", x2h_u32(dat->__maxsize()));
     printf("      Used     %2.2f%%\n",
-	   ((double)mp->BMSTAT.busy_slots/(double)mp->nslots)*100.);
+	   ((double)mp->mstat_u_bmstat_busy_slots()/(double)mp->nslots())*100.);
   }
 
   return 1;
@@ -1065,7 +1116,7 @@ dataspace_display_realize(int argc, char *argv[])
     dsps[i] = argv[i+1];
 
   if (!dspid_cnt) {
-    unsigned int ndsp = x2h_u32(sm_h->__ndsp);
+    unsigned int ndsp = x2h_u32(sm_h->__ndsp());
     printf(" Database %s contains %d Dataspace%s\n\n", sm_dbh->dbfile, ndsp, (ndsp > 1 ? "s" : ""));
   }
 
@@ -1077,11 +1128,12 @@ dataspace_display_realize(int argc, char *argv[])
   int n = 0;
   if (!dspid_cnt)
     {
-      unsigned int ndsp = x2h_u32(sm_h->__ndsp);
+      unsigned int ndsp = x2h_u32(sm_h->__ndsp());
       for (i = 0, n = 0; i < ndsp; i++)
 	{
 	  if (n) printf("\n");
-	  n += dataspace_display_info(i, &sm_h->dsp[i]);
+	  DataspaceDesc d = sm_h->dsp(i);
+	  n += dataspace_display_info(i, &d);
 	}
       return 0;
     }
@@ -1089,7 +1141,8 @@ dataspace_display_realize(int argc, char *argv[])
   for (i = 0; i < dspid_cnt; i++)
     {
       if (n) printf("\n");
-      n += dataspace_display_info(dspids[i], &sm_h->dsp[dspids[i]]);
+      DataspaceDesc d = sm_h->dsp(dspids[i]);
+      n += dataspace_display_info(dspids[i], &d);
     }
 
   return 0;
@@ -1745,21 +1798,18 @@ struct PageStats {
   
   void setDatid(short _datid) {
     this->datid = _datid;
-    DatafileDesc *dfd = &sm_h->dat[datid]; 
-#ifdef SEXDR
-    const MapHeader *xmp = &dfd->mp;
+    DatafileDesc _dfd = sm_h->dat(datid); 
+    DatafileDesc *dfd = &_dfd;
+    MapHeader *xmp = dfd->mp();
     x2h_prologue(xmp, mp);
-#else
-    const MapHeader *mp = &dfd->mp;
-#endif
 
-    totaldatpages_max = (x2h_u32(dfd->__maxsize)*ONE_K>>pgsize_pow2)+1;
+    totaldatpages_max = (x2h_u32(dfd->__maxsize())*ONE_K>>pgsize_pow2)+1;
     totaldatpages = (char *)calloc(totaldatpages_max, 1);
 
-    totalomppages_max = (x2h_u32(sm_h->__nbobjs)*OIDLOCSIZE>>pgsize_pow2)+1;
+    totalomppages_max = (x2h_u32(sm_h->__nbobjs())*OIDLOCSIZE>>pgsize_pow2)+1;
     totalomppages = (char *)calloc(totalomppages_max, 1);
 
-    totaldmppages_max = (((x2h_u32(dfd->__maxsize)*ONE_K)/(mp->sizeslot*8))>>pgsize_pow2)+1;
+    totaldmppages_max = (((x2h_u32(dfd->__maxsize())*ONE_K)/(mp->sizeslot()*8))>>pgsize_pow2)+1;
     totaldmppages = (char *)calloc(totaldmppages_max, 1);
   }
 
@@ -1767,9 +1817,9 @@ struct PageStats {
     if (!objloc.is_valid)
       return;
     unsigned int size = objloc.size + sizeof(ObjectHeader);
-    NS ns = SZ2NS(size, &sm_h->dat[datid].mp);
+    NS ns = SZ2NS(size, sm_h->dat(datid).mp());
     totalsize += size;
-    totalsize_align += ns * sm_h->dat[datid].mp.sizeslot;
+    totalsize_align += ns * sm_h->dat(datid).mp()->sizeslot();
 
     assert(objloc.dat_start_pagenum < totaldatpages_max);
     if (!totaldatpages[objloc.dat_start_pagenum])
@@ -1829,14 +1879,14 @@ lastnx_action_realize(int argc, char *argv[], mAction action)
   sm_SHMH_INIT(argv[0], True);
 
   if (action == mOidGetCurLastNx) {
-    printf("current nx: %u\n", x2h_u32(sm_h->__curidxbusy));
-    printf("last nx: %u\n", x2h_u32(sm_h->__lastidxbusy));
-    printf("last nx blkalloc: %u\n", x2h_u32(sm_h->__lastidxblkalloc));
+    printf("current nx: %u\n", x2h_u32(sm_h->__curidxbusy()));
+    printf("last nx: %u\n", x2h_u32(sm_h->__lastidxbusy()));
+    printf("last nx blkalloc: %u\n", x2h_u32(sm_h->__lastidxblkalloc()));
     return 0;
   }
 
   if (action == mOidSyncCurLastNx) {
-    sm_h->__curidxbusy = sm_h->__lastidxbusy;
+    sm_h->__curidxbusy() = sm_h->__lastidxbusy();
     return 0;
   }
 
@@ -1845,22 +1895,22 @@ lastnx_action_realize(int argc, char *argv[], mAction action)
     return usage(action);
 
   if (action == mOidSetCurNx) {
-    sm_h->__curidxbusy = h2x_u32(idxbusy);
+    sm_h->__curidxbusy() = h2x_u32(idxbusy);
     return 0;
   }
 
-  if (x2h_u32(sm_h->__lastidxbusy) != idxbusy) {
-    if (x2h_u32(sm_h->__lastidxbusy) > idxbusy)
+  if (x2h_u32(sm_h->__lastidxbusy()) != idxbusy) {
+    if (x2h_u32(sm_h->__lastidxbusy()) > idxbusy)
       printf("\n** YOU ASK TO DECREASE lastnx PARAMETER: OPERATION STRICTLY NOT RECOMMENDED **\n");
     printf("\nDo you really want to change lastnx from %u to %u in "
-	   "database '%s'? ", x2h_u32(sm_h->__lastidxbusy), idxbusy, argv[0]);
+	   "database '%s'? ", x2h_u32(sm_h->__lastidxbusy()), idxbusy, argv[0]);
     for (;;)
       {
 	char s[128];
 	fgets(s, sizeof s, stdin);
 	if (!strcasecmp(s, "y") || !strcasecmp(s, "yes"))
 	  {
-	    sm_h->__lastidxbusy = h2x_u32(idxbusy);
+	    sm_h->__lastidxbusy() = h2x_u32(idxbusy);
 	    break;
 	  }
 	else if (!strcasecmp(s, "n") || !strcasecmp(s, "no"))
@@ -2022,7 +2072,7 @@ oid_action_realize(int argc, char *argv[], mAction action)
 
   if (action == mOidDspLocaStats)
     {
-      unsigned int ndat = x2h_u32(sm_h->__ndat);
+      unsigned int ndat = x2h_u32(sm_h->__ndat());
       page_stats = new PageStats[ndat];
       for (int i = 0; i < ndat; i++)
 	page_stats[i].setDatid(i);
@@ -2035,7 +2085,7 @@ oid_action_realize(int argc, char *argv[], mAction action)
   }
   else {
     s_datid = 0;
-    e_datid = x2h_u32(sm_h->__ndat);
+    e_datid = x2h_u32(sm_h->__ndat());
   }
 
   for (int datid = s_datid; datid < e_datid; datid++) {
@@ -2123,7 +2173,7 @@ oid_action_realize(int argc, char *argv[], mAction action)
   }
 
   if (action == mOidDspLocaStats) {
-    unsigned int ndat = x2h_u32(sm_h->__ndat);
+    unsigned int ndat = x2h_u32(sm_h->__ndat());
     for (int i = 0; i < ndat; i++)
       if (from_datid < 0 || i == from_datid)
 	{
@@ -2153,7 +2203,7 @@ oid_action_realize(int argc, char *argv[], mAction action)
 		 page_stats[i].totaldmppages_cnt);
 	  printf(" (Ideal Page Count %lld)\n",
 		 (page_stats[i].totalsize_align ?
-		  ((((page_stats[i].totalsize_align-1)/(sm_h->dat[i].mp.sizeslot*8))>>pgsize_pow2)+1) : 0));
+		  ((((page_stats[i].totalsize_align-1)/(sm_h->dat(i).mp()->sizeslot()*8))>>pgsize_pow2)+1) : 0));
 	  printf("\n");
 	}
   }
@@ -2219,8 +2269,10 @@ main(int argc, char *argv[])
     return 1;
 
   // for debug
-  if (getenv("EYEDBSM_DISPLAY_STRUCTS"))
+  if (getenv("EYEDBSM_DISPLAY_STRUCTS")) {
     display_structs();
+    return 0;
+  }
 
   prog = argv[0];
 
