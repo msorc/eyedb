@@ -226,6 +226,14 @@ esac
 # ========================================
 if test "$enable_java" = "yes"
 then
+	# On Mac OS X, if JAVAC is not set, we force it to be javac, because
+	# AC_PROG_JAVAC tests first jikes, which is currently broken on Mac OS X
+	case "$host" in
+	powerpc-apple-darwin*)
+		if test x"$JAVAC" = x ; then export JAVAC=javac ; fi
+		;;
+	esac
+
 	AC_PROG_JAVAC
 	AC_PROG_JAVA
 	AC_PATH_PROG(JAR, jar)
