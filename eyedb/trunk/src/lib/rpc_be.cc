@@ -249,77 +249,9 @@ signal_handler(int sig)
   exit(0x80|sig);
 }
 
-static void
-sig_h(int sig, siginfo_t *info, void *any)
-{
-  //   utlog(msg_make("Got %s [sigaction=%d]\n", _sys_siglistp[sig], sig));
-  //   printf("Got %s [sigaction=%d]\n", _sys_siglistp[sig], sig);
-  if (info) {
-    int fd, i;
-    rpc_ClientInfo *ci;
-
-    pid_t pid =  info->si_pid;
-    for (fd = 0; fd < sizeof(clientInfo)/sizeof(clientInfo[0]); fd++)
-      if (ci = clientInfo[fd]) {
-
-// The following code is disabled:
-// comparaison between ci->tid[i] (of type pthread_t) and info->si_pid (of type pid_t)
-// will never be true (except on platforms where pthread_t is equivalent to pid_t, which
-// was the cas on Linux with old threads implementations.
-#if 0
-	for (i = 0; i < ci->fd_cnt; i++)
-	  if (ci->tid[i] == info->si_pid) {
-	    rpc_garbClientInfo(rpc_mainServer, i, fd);
-	  }
-#endif
-
-	break;
-      }
-  }
-  //wait(0);
-}
-
 void rpc_setProgName(const char *name)
 {
   progName = strdup(name);
-}
-
-static void
-set_sigaction()
-{
-  struct sigaction act;
-  
-  act.sa_handler = 0;
-  act.sa_sigaction = sig_h;
-
-  /*@@@@*/
-#if defined(LINUX) || defined(LINUX64) || defined(LINUX_IA64) || defined(LINUX_PPC64) || defined(ORIGIN) || defined(ALPHA) || defined(CYGWIN)
-  act.sa_flags = SA_SIGINFO | SA_NOCLDSTOP;
-#else
-  act.sa_flags = SA_SIGINFO | SA_NOCLDWAIT;
-#endif
-
-  memset(&act.sa_mask, 0, sizeof(act.sa_mask));
-  int r = sigaction(SIGCHLD, &act, 0);
-}
-
-static void
-suspend_sigaction()
-{
-  struct sigaction act;
-  
-  act.sa_handler = 0;
-  act.sa_sigaction = 0;
-
-  /*@@@@*/
-#if defined(LINUX) || defined(LINUX64) || defined(LINUX_IA64) || defined(LINUX_PPC64) || defined(ORIGIN) || defined(ALPHA) || defined(CYGWIN)
-  act.sa_flags = SA_SIGINFO | SA_NOCLDSTOP;
-#else
-  act.sa_flags = SA_SIGINFO | SA_NOCLDWAIT;
-#endif
-
-  memset(&act.sa_mask, 0, sizeof(act.sa_mask));
-  int r = sigaction(SIGCHLD, &act, 0);
 }
 
 static void
@@ -347,7 +279,6 @@ rpc_ServerInit()
 
     signal(SIGPIPE, SIG_IGN);
 
-    set_sigaction();
     init = rpc_True;
   }
 }
@@ -838,8 +769,6 @@ rpc_makeNewConnection(rpc_Server *server, int new_fd[], int fd_cnt,
       rpc_serverEnd(server, rpc_ci);
     }
     else if (server->mode == rpc_MultiProcs) {
-      suspend_sigaction();
-
       if ((ci->tid[0] = fork()) == 0) {
 	const char *w;
 	if ((w = getenv("EYEDBWAIT"))) {
@@ -889,7 +818,6 @@ rpc_makeNewConnection(rpc_Server *server, int new_fd[], int fd_cnt,
 	IDB_LOG(IDB_LOG_CONN, ("cannot create waiting thread\n"));
 
       delete wait_thr_cond;
-      set_sigaction();
 
       rpc_garbRealize(server, ci, 1);
       free(rpc_ci);
