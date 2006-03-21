@@ -1774,7 +1774,7 @@ namespace eyedb {
 
     *rdbid = dbid; //eyedbsm::dataBaseIdGet((eyedbsm::DbHandle *)sedbh->u.dbh);
     *rname = (char *)dbname;
-    *pdbh = new(DbHandle);
+    *pdbh = NEW(DbHandle);
     memset(*pdbh, 0, sizeof(DbHandle));
     (*pdbh)->sedbh = sedbh;
     (*pdbh)->ch = ch;

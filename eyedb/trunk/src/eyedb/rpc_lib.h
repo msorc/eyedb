@@ -342,16 +342,13 @@ namespace eyedb {
   extern RPCStatus
   rpcStatusMake_se(eyedbsm::Status);
 
-#define IDB_MAXARGS 16
-
-#define new(X) (X *)calloc(sizeof(X), 1)
-
   extern RPCStatus _rpc_status__;
 
-#define IDB_CONN_COUNT 3
+  extern const int CONN_COUNT;
 
-#define IDB_RPC_PROTOCOL_MAGIC ((eyedblib::uint32)0x43f2e341)
+  const eyedblib::uint32 RPC_PROTOCOL_MAGIC  = 0x43f2e341;
 
+#define NEW(X) (X *) calloc(sizeof(X), 1)
 }
 
 #endif

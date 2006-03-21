@@ -367,12 +367,12 @@ rpc_newClientInfo(rpc_Server *server, int fd[], int fd_cnt)
   ci->refcnt = fd_cnt;
 
   ci->tid       = (pthread_t *)malloc(server->conn_cnt * sizeof(pthread_t));
-  ci->ua        = (char **)malloc(server->conn_cnt * sizeof(rpc_ServerArg));
+  ci->ua        = (rpc_ServerArg *)malloc(server->conn_cnt * sizeof(rpc_ServerArg));
   ci->comm_buff = (char **)malloc(server->conn_cnt * sizeof(char *));
 
   for (i = 0; i < server->conn_cnt; i++) {
-    ci->comm_buff[i] = (char *)calloc(server->comm_size * sizeof(char), 1);
-    ci->ua[i]        = (char *)calloc(server->args_size * RPC_MAXARGS, 1);
+    ci->comm_buff[i] = (char *)calloc(server->comm_size, 1);
+    ci->ua[i]        = (rpc_ServerArg)calloc(server->args_size * RPC_MAXARGS, 1);
   }
 
   return ci;
@@ -801,10 +801,10 @@ rpc_makeNewConnection(rpc_Server *server, int new_fd[], int fd_cnt,
   int i;
 
   ci = rpc_newClientInfo(server, new_fd, fd_cnt);
-  
+
 #ifdef TRACE
   {
-    char buf[128];
+    char buf[2048];
     strcpy(buf, "new connection : ");
     for (i = 0; i < fd_cnt; i++) {
       char tok[32];

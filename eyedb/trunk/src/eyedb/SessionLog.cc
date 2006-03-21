@@ -326,6 +326,9 @@ namespace eyedb {
     files = (char **)malloc(file_cnt * sizeof(char *));
     files[0] = makeFile(host, port, logdir);
 
+    // 21/03/06: must be writable for pthread_mutex version
+    writing = True;
+
     xm_connlog = 0;
 
     if (!files[0])
