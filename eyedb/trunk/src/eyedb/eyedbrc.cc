@@ -320,7 +320,9 @@ main(int argc, char *argv[])
     make_host_port(listen, host, port);
     
     SessionLog sesslog(host, port, eyedb::ServerConfig::getSValue("tmpdir"),
-		       (cmd == CStatus ? False : True));
+		       True);
+		       //(cmd == CStatus ? False : True));
+
 
     if (sesslog.getStatus()) {
       if (cmd == Start)

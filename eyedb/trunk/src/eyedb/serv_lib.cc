@@ -235,9 +235,9 @@ namespace eyedb {
     else
       mode = rpc_MultiProcs;
 
-    server = rpc_serverCreate(mode, IDB_RPC_PROTOCOL_MAGIC,
-				  IDB_CONN_COUNT, 0, b_init,
-				  b_release, begin, 0, 0);
+    server = rpc_serverCreate(mode, RPC_PROTOCOL_MAGIC,
+			      CONN_COUNT, 0, b_init,
+			      b_release, begin, 0, 0);
 
     STATUS_SZ = getenv("STATUS_SZ") ? atoi(getenv("STATUS_SZ")) :
       sizeof(RPCStatusRec);
@@ -666,7 +666,7 @@ namespace eyedb {
 	  //se_ConnHandle *conn;
 	  eyedbsm::Status status;
 	*/
-	ConnHandle *idbc =  new(ConnHandle);
+	ConnHandle *idbc =  NEW(ConnHandle);
 	//idbc->sech = conn;
 	ci->user_data = idbc;
       }

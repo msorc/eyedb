@@ -40,6 +40,8 @@
 #include "code.h"
 #include "eyedb/internals/kern_const.h"
 
+#define IDB_MAXARGS 16
+
 namespace eyedbsm {
   extern unsigned int import_xid;
 }
@@ -99,14 +101,16 @@ if (!(DBH)) return rpcStatusMake(IDB_ERROR, "operation " OP ": database must be 
 
 #define DBH_IS_LOCAL(DBH) ((DBH)->ldbctx.local)
 
+const int CONN_COUNT = 3; // 20/03/06: can be more for multi-threading
+
 RPCStatus
 connOpen(const char *hostname, const char *portname,
-	     ConnHandle **pch, int flags)
+	 ConnHandle **pch, int flags)
 {
-  *pch = new(ConnHandle);
+  *pch = NEW(ConnHandle);
 
   if (!rpc_connOpen(getRpcClient(), hostname, portname,
-		    &((*pch)->ch), IDB_RPC_PROTOCOL_MAGIC, IDB_CONN_COUNT, 0))
+		    &((*pch)->ch), RPC_PROTOCOL_MAGIC, CONN_COUNT, 0))
     return RPCSuccess;
   else {
     free(*pch);
@@ -173,7 +177,7 @@ dbOpen(ConnHandle *ch, const char *dbmdb,
 
 	  if (status == RPCSuccess)
 	    {
-	      *dbh = new(DbHandle);
+	      *dbh = NEW(DbHandle);
 	      (*dbh)->ch = (ConnHandle *)ch;
 #ifndef LOCKMTX
 	      if ((ldbctx->semid[0] = sem_openSX(ldbctx->semkey[0]))<0 || 
@@ -198,7 +202,7 @@ dbOpen(ConnHandle *ch, const char *dbmdb,
 
       if (status_r.err == IDB_SUCCESS)
 	{
-	  *dbh = new(DbHandle);
+	  *dbh = NEW(DbHandle);
 	  (*dbh)->u.rdbhid = ua[11].a_int;
 	  (*dbh)->ch = (ConnHandle *)ch;
 	  (*dbh)->flags = flags & ~_DBOpenLocal;
