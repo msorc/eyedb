@@ -39,32 +39,9 @@
 #include "eyedblib/filelib.h"
 #include "kern_p.h"
 #include <eyedbsm/smd.h>
+#include "lib/compile_builtin.h"
 
 static const char defDsp[] = "DEFAULT";
-
-static const char arch [] = 
-#if defined(SPARCV7)
-"sparcv7"
-#elif defined(SPARCV9)
-"sparcv9"
-#elif defined(LINUX64)
-"x86_64"
-#elif defined(LINUX)
-"x86"
-#elif defined(LINUX_IA64)
-"IA64"
-#elif defined(LINUX_PPC64)
-"PPC64"
-#elif defined(ALPHA)
-"ALPHA"
-#elif defined(AIX)
-"Power"
-#elif defined(ORIGIN)
-"Mips"
-#else
-#error "UNKNOWN ARCHITECTURE"
-#endif
-;
 
 //#define ESM_SOFT_MAX_OBJS (unsigned int)500000000, /* waiting for 64 bits */
 //#define ESM_SOFT_MAX_OBJS (unsigned int)~0
@@ -452,6 +429,20 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     delete [] datfiles;
   }
 
+#if 1
+  int
+  testbuf( unsigned char *buf, int size)
+  {
+    int s = 0;
+
+    for (int i = 0; i < size; i++)
+      s += buf[i];
+
+    return s;
+  }
+#endif
+
+#define BUF_WITH_MALLOC
   Status
   dbCreate(const char *dbfile, unsigned int version,
 	   const DbCreateDescription *dbc)
@@ -462,8 +453,18 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     //unsigned int nbobjs = (dbc->nbobjs ? dbc->nbobjs : ESM_DEF_NBOBJS);
     Oid::NX nbobjs = dbc->nbobjs;
     int n;
+#ifdef BUF_WITH_MALLOC
+    unsigned char *buf = (unsigned char *)malloc(DbHeader_SIZE);
+#else
     unsigned char buf[DbHeader_SIZE];
+#endif
     DbHeader dbh(buf);
+
+#if 1
+    std::cerr << "testbuf " << testbuf( buf, DbHeader_SIZE) << std::endl;
+    dbh.memzero();
+#endif
+
     DbHandle *pdbh;
     DbShmHeader dbhshm;
     char *p;
@@ -495,8 +496,10 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     if (status = syscheck(PR, close(dbfd.shmfd), "closing shm file: '%s'", shmfileGet(dbfile)))
       return dbcreate_error(status, dbfile, dbc, 0, &dbfd);
 
+#if 0
     dbh.memzero();
     //memset(&dbh, 0, sizeof(dbh));
+#endif
       
     char *pwd;
     status = push_dir(dbfile, &pwd);
@@ -1286,14 +1289,14 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 
     Boolean mustUnlock = True;
     if (x2h_u32((unsigned int)shmh->hostid) != (unsigned int)gethostid() ||
-	strcmp(shmh->arch, arch))
+	strncmp(shmh->arch, eyedblib::CompileBuiltin::getArch(), sizeof( shmh->arch)))
       {
 	//MUTEX_UNLOCK(mp, 0);
 	return statusMake(DATABASE_OPEN_FAILED,
 			  "cannot open database %s on "
 			  "computer %s [architecture %s]: "
 			  "database hold by computer %s [architecture %s]",
-			  dbfile, hostname, arch, shmh->hostname,
+			  dbfile, hostname, eyedblib::CompileBuiltin::getArch(), shmh->hostname,
 			  shmh->arch);
       }
 
@@ -1326,7 +1329,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     sm_shmh->hostid = x2h_u32(gethostid());
     strncpy(sm_shmh->hostname, hostname, sizeof(sm_shmh->hostname)-1);
     sm_shmh->hostname[sizeof(sm_shmh->hostname)-1] = 0;
-    strcpy(sm_shmh->arch, arch);
+    strncpy(sm_shmh->arch, eyedblib::CompileBuiltin::getArch(), sizeof( sm_shmh->arch));
   }
 
 #define ESM_MMAP_WIDE_SEGMENT   2000

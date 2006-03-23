@@ -63,7 +63,7 @@ main(int argc, char *argv[])
     // for each value returned in the query, display it:
     for (int i = 0; i < arr.getCount(); i++) {
       // in case of the returned value is an oid, load it first:
-      if (arr[i].type == eyedb::Value::OID) {
+      if (arr[i].type == eyedb::Value::tOid) {
 	eyedb::Object *o;
 	db.loadObject(arr[i].oid, &o);
 	cout << o;
@@ -84,7 +84,7 @@ main(int argc, char *argv[])
 
     while (iter.next(val)) {
       // in case of the returned value is an oid, load it first:
-      if (val.getType() == eyedb::Value::OID) {
+      if (val.getType() == eyedb::Value::tOid) {
 	eyedb::Object *o;
 	db.loadObject(val.oid, &o);
 	cout << o;

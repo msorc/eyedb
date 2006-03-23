@@ -21,6 +21,7 @@
    Author: Eric Viara <viara@sysra.com>
 */
 
+#include <eyedbconfig.h>
 
 #include "eyedbcgiP.h"
 #include "eyedblib/connman.h"
@@ -449,9 +450,9 @@ idbWCheckAccess(int input_fd)
   if (sscanf(idbW_ctx->raddr, "%d.%d.%d.%d", &b1, &b2, &b3, &b4) != 4)
     return 1;
 
-#ifdef LINUX
+#if defined(HAVE_STRUCT_IN_ADDR_S_ADDR)
   addr.s_addr = (b1 << 24) | (b3 << 16) | (b2 << 8) | b1;
-#else
+#elif defined(HAVE_STRUCT_IN_ADDR__S_UN)
   addr._S_un._S_un_b.s_b1 = b1;
   addr._S_un._S_un_b.s_b2 = b2;
   addr._S_un._S_un_b.s_b3 = b3;

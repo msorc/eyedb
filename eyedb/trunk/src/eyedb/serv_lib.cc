@@ -666,7 +666,7 @@ namespace eyedb {
 	  //se_ConnHandle *conn;
 	  eyedbsm::Status status;
 	*/
-	ConnHandle *idbc =  NEW(ConnHandle);
+	ConnHandle *idbc =  rpc_new(ConnHandle);
 	//idbc->sech = conn;
 	ci->user_data = idbc;
       }

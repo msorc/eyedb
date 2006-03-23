@@ -292,10 +292,10 @@ namespace eyedb {
     if (s)
       return s;
 
-    if (v.type == Value::OBJECT)
+    if (v.type == Value::tObject)
       return insertAt_p(id, v.o);
 
-    if (v.type == Value::OID)
+    if (v.type == Value::tOid)
       return insertAt_p(id, Oid(*v.oid));
 
     Size size;
@@ -383,7 +383,7 @@ namespace eyedb {
 	{
 	  if (item->getState() == added) {
 #ifdef USE_VALUE_CACHE
-	    if (item->getValue().type == Value::OID)
+	    if (item->getValue().type == Value::tOid)
 	      item_oid = *item->getValue().oid;
 	    else
 	      item_oid = Oid::nullOid;
@@ -441,7 +441,7 @@ namespace eyedb {
 	  if (item->getState() == added)
 	    {
 #ifdef USE_VALUE_CACHE
-	      if (item->getValue().type == Value::OBJECT)
+	      if (item->getValue().type == Value::tObject)
 		o = item->getValue().o;
 	      else
 		o = 0;
@@ -452,7 +452,7 @@ namespace eyedb {
 		return Success;
 
 #ifdef USE_VALUE_CACHE
-	      if (item->getValue().type == Value::OID)
+	      if (item->getValue().type == Value::tOid)
 		item_oid = *item->getValue().oid;
 	      else
 		item_oid = Oid::nullOid;

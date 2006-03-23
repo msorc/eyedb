@@ -39,10 +39,10 @@ namespace eyedb {
   (HINTS).style->getString(OPTYPE, NAME)
 
 #define ATTRGET(CL) ((CL)->asCollectionClass() ? \
-		     GenCodeHints::GETCOLL : GenCodeHints::GET)
+		     GenCodeHints::tGetColl : GenCodeHints::tGet)
 
 #define ATTRSET(CL) ((CL)->asCollectionClass() ? \
-		     GenCodeHints::SETCOLL : GenCodeHints::SET)
+		     GenCodeHints::tSetColl : GenCodeHints::tSet)
   static const char *
   getstr(const char *s)
   {
@@ -386,12 +386,12 @@ namespace eyedb {
       ((CollectionClass *)cls)->getCollClass(&_isref, &_dim);
     GenCodeHints::OpType acctype = (GenCodeHints::OpType)xacctype;
 #if 0
-    const char *etc = (acctype == GenCodeHints::ADD_ITEM_TO_COLL ?
+    const char *etc = (acctype == GenCodeHints::tAddItemToColl ?
 		       ", int mag_order" : "");
 #else
     const char *etc = "";
 #endif
-    const char *accmth = (acctype == GenCodeHints::ADD_ITEM_TO_COLL ? "insert" : "suppress");
+    const char *accmth = (acctype == GenCodeHints::tAddItemToColl ? "insert" : "suppress");
     const char *oclassname = _isref ?
       className(cl, True) : className(cl, False);
   
@@ -403,12 +403,12 @@ namespace eyedb {
     Bool ordered;
     get_info(const_cast<CollectionClass *>(cls->asCollectionClass()), classname, ordered);
 
-    const char *At = ((acctype == GenCodeHints::ADD_ITEM_TO_COLL ||
-		       acctype == GenCodeHints::RMV_ITEM_FROM_COLL)
+    const char *At = ((acctype == GenCodeHints::tAddItemToColl ||
+		       acctype == GenCodeHints::tRmvItemFromColl)
 		      && ordered ? "At" : "");
     const char *etc1 = "";
     const char *etc2 = "";
-    Bool rmv_from_array = (acctype == GenCodeHints::RMV_ITEM_FROM_COLL)
+    Bool rmv_from_array = (acctype == GenCodeHints::tRmvItemFromColl)
       && ordered ? True : False;
 
     if (rmv_from_array && isoid)
@@ -416,20 +416,20 @@ namespace eyedb {
 
     GenCodeHints::OpType nacctype;
     if (ordered)
-      nacctype = (acctype == GenCodeHints::RMV_ITEM_FROM_COLL ?
-		  GenCodeHints::UNSET_ITEM_IN_COLL :
-		  GenCodeHints::SET_ITEM_IN_COLL);
+      nacctype = (acctype == GenCodeHints::tRmvItemFromColl ?
+		  GenCodeHints::tUnsetItemInColl :
+		  GenCodeHints::tSetItemInColl);
     else
       nacctype = acctype;
 
     if (!*At)
       {
-	if (acctype == GenCodeHints::ADD_ITEM_TO_COLL)
+	if (acctype == GenCodeHints::tAddItemToColl)
 	  {
 	    etc1 = ", boolean noDup";
 	    etc2 = ", noDup";
 	  }
-	else if (acctype == GenCodeHints::RMV_ITEM_FROM_COLL)
+	else if (acctype == GenCodeHints::tRmvItemFromColl)
 	  {
 	    etc1 = ", boolean checkFirst";
 	    etc2 = ", checkFirst";
@@ -508,7 +508,7 @@ namespace eyedb {
     // ...
     fprintf(fd, "%sif (_coll == null)", ctx->get());
     ctx->push();
-    if (acctype == GenCodeHints::ADD_ITEM_TO_COLL)
+    if (acctype == GenCodeHints::tAddItemToColl)
       {
 	fprintf(fd, " {\n");
 	fprintf(fd, "%s  _coll = new %s(db, \"\", "
@@ -558,7 +558,7 @@ namespace eyedb {
   {
     return generateCollRealizeClassMethod_Java(own, ctx, hints,
 					       isoid,
-					       GenCodeHints::ADD_ITEM_TO_COLL);
+					       GenCodeHints::tAddItemToColl);
   }
 
   Status
@@ -569,7 +569,7 @@ namespace eyedb {
   {
     return generateCollRealizeClassMethod_Java(own, ctx, hints,
 					       isoid, 
-					       GenCodeHints::RMV_ITEM_FROM_COLL);
+					       GenCodeHints::tRmvItemFromColl);
   }
 
 #if 0
@@ -678,7 +678,7 @@ namespace eyedb {
   
     if (isoid)
       fprintf(fd, "%spublic void %s_oid(", ctx->get(),
-	      ATTRNAME(name, SETOID, hints));
+	      ATTRNAME(name, tSetOid, hints));
     //	    attrName(name, False, hints.attr_style));
     else
       fprintf(fd, "%spublic void %s(", ctx->get(),
@@ -753,7 +753,7 @@ namespace eyedb {
   
     if (isoid)
       fprintf(fd, "%spublic org.eyedb.Oid %s_oid(", ctx->get(),
-	      ATTRNAME(name, GETOID, hints));
+	      ATTRNAME(name, tGetOid, hints));
     //	    attrName(name, True, hints.attr_style));
     else
       fprintf(fd, "%spublic %s %s(", ctx->get(),
@@ -882,13 +882,13 @@ namespace eyedb {
 	  return Success;
 
 	fprintf(fd, "  public org.eyedb.Oid %s(int ind%s",
-		ATTRNAME_1(name, (ordered ? GenCodeHints::RETRIEVEOID_ITEM_AT : GenCodeHints::GETOID_ITEM_AT), hints), comma);
+		ATTRNAME_1(name, (ordered ? GenCodeHints::tRetrieveOidItemAt : GenCodeHints::tGetOidItemAt), hints), comma);
 	dimArgsGen(fd, ndims, True);
 	fprintf(fd, ") throws org.eyedb.Exception {\n");
 
 	fprintf(fd, "%sorg.eyedb.Oid tmp;\n", ctx->get());
 	fprintf(fd, "%sorg.eyedb.Collection coll = %s(", ctx->get(),
-		ATTRNAME(name, GETCOLL, hints));
+		ATTRNAME(name, tGetColl, hints));
 
 	for (i = 0; i < ndims; i++)
 	  fprintf(fd, "a%d, ", i);
@@ -912,12 +912,12 @@ namespace eyedb {
     if (!strcmp(cl->getName(), char_class_name) && _dim > 1)
       {
 	fprintf(fd, "String %s(int ind%s",
-		ATTRNAME_1(name, (ordered ? GenCodeHints::RETRIEVE_ITEM_AT : GenCodeHints::GET_ITEM_AT), hints), comma);
+		ATTRNAME_1(name, (ordered ? GenCodeHints::tRetrieveItemAt : GenCodeHints::tGetItemAt), hints), comma);
       }
     else if (_dim == 1)
       fprintf(fd, "  public %s %s(int ind%s",
 	      oclassname,
-	      ATTRNAME_1(name, (ordered ? GenCodeHints::RETRIEVE_ITEM_AT : GenCodeHints::GET_ITEM_AT), hints), comma);
+	      ATTRNAME_1(name, (ordered ? GenCodeHints::tRetrieveItemAt : GenCodeHints::tGetItemAt), hints), comma);
     else
       return Success;
 
@@ -926,7 +926,7 @@ namespace eyedb {
 
     ctx->push();
     fprintf(fd, "%sorg.eyedb.Collection coll = %s(", ctx->get(),
-	    ATTRNAME(name, GETCOLL, hints));
+	    ATTRNAME(name, tGetColl, hints));
 
     for (i = 0; i < ndims; i++)
       fprintf(fd, "a%d, ", i);
@@ -1070,11 +1070,11 @@ namespace eyedb {
     if (cls->asCollectionClass())
       {
 	fprintf(fd, "%spublic int %s(", ctx->get(),
-		ATTRNAME(name, GETCOUNT, hints));
+		ATTRNAME(name, tGetCount, hints));
 	dimArgsGen(fd, ndims);
 	fprintf(fd, ") throws org.eyedb.Exception {\n");
 	ctx->push();
-	fprintf(fd, "%sorg.eyedb.Collection _coll = %s(", ctx->get(), ATTRNAME(name, GETCOLL, hints));
+	fprintf(fd, "%sorg.eyedb.Collection _coll = %s(", ctx->get(), ATTRNAME(name, tGetColl, hints));
 	for (i = 0; i < ndims; i++)
 	  fprintf(fd, "a%d, ", i);
 	fprintf(fd, ");\n");

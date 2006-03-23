@@ -22,8 +22,6 @@
 */
 
 
-#include "ClockConverter.h"
-
 #include <eyedbconfig.h>
 
 #if TIME_WITH_SYS_TIME
@@ -36,6 +34,9 @@
 #include <time.h>
 #endif
 #endif
+#include <iostream>
+
+#include "ClockConverter.h"
 
 //
 // Constants
@@ -373,13 +374,13 @@ namespace eyedb {
   eyedblib::int16
   ClockConverter::local_timezone()
   {
-#ifdef CYGWIN
-    cerr << "ClockConverter::local_timezone() not implemented\n";
-    return 0;
-#else
+#if defined(HAVE_TZSET) && defined(HAVE_VAR_LONG_TIMEZONE)
     tzset();
 
     return -(timezone / 60);
+#else
+    std::cerr << "ClockConverter::local_timezone() not implemented\n";
+    return 0;
 #endif
   }
 

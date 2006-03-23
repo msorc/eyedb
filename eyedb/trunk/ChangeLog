@@ -1,3 +1,8 @@
+2006-03-21  Francois Dechelle <francois@dechelle.net>
+
+	* Added tests for timezone (Mac OS X porting)
+	* Changed some enum values because of conflicts with ODL and OQL flex/bison tokens
+
 2006-03-17 Francois Dechelle <francois@dechelle.net>
 
 	* Changed configure to use javac instead of jikes on Mac OS X

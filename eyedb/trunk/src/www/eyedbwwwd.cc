@@ -33,7 +33,7 @@
 #include <sys/uio.h>
 #include <sys/un.h>
 #include <netdb.h>
-#include <values.h>
+#include <limits.h>
 #include <netinet/in.h>
 #include <unistd.h>
 #include <sys/wait.h>
@@ -54,7 +54,7 @@ static fd_set fds;
 static idbWContext *ctx = &idbW_context;
 static int maxservers    = 6;
 static int sv_timeout = 300;
-static int ck_timeout = MAXINT;
+static int ck_timeout = INT_MAX;
 static Status status;
 static int sv_port;
 static idbWProcess *proc;

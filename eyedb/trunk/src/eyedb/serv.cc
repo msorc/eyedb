@@ -69,10 +69,10 @@ namespace eyedb {
   void
   be_init()
   {
-    RPCInvalidDbId = NEW(RPCStatusRec);
+    RPCInvalidDbId = rpc_new(RPCStatusRec);
     RPCInvalidDbId->err = IDB_INVALID_DB_ID;
 
-    RPCInvalidClientId = NEW(RPCStatusRec);
+    RPCInvalidClientId = rpc_new(RPCStatusRec);
     RPCInvalidClientId->err = IDB_INVALID_CLIENT_ID;
   }
 

@@ -22,13 +22,16 @@
 */
 
 
-#include "eyedb/eyedb.h"
-#include "eyedb/base_p.h"
-#include "eyedb/internals/ObjectHeader.h"
-#include "misc.h"
 #include <stdlib.h>
 #include <strings.h>
 #include <stdarg.h>
+#include <unistd.h>
+
+#include "eyedb/eyedb.h"
+
+#include "eyedb/base_p.h"
+#include "eyedb/internals/ObjectHeader.h"
+#include "misc.h"
 
 namespace eyedb {
 
@@ -253,12 +256,10 @@ namespace eyedb {
 
     if (cpp_cmd) {
       fclose(fd);
-      char tmpfile_1[256], tmpfile_2[256];
-#ifdef CYGWIN
-      (void)tmpnam(tmpfile_1);
-#else
-      (void)tmpnam_r(tmpfile_1);
-#endif
+
+      char *tmpfile_1, *tmpfile_2;
+
+      tmpfile_1 = mktemp( "/tmp/eyedb-cpp.XXXXXX");
 
       char cmd[512];
 
@@ -278,11 +279,8 @@ namespace eyedb {
 
       // second pass: to substitute the "<stdin>" file directive
       // to the true file directive
-#ifdef CYGWIN
-      (void)tmpnam(tmpfile_2);
-#else
-      (void)tmpnam_r(tmpfile_2);
-#endif
+      tmpfile_1 = mktemp( "/tmp/eyedb-cpp.out.XXXXXX");
+
       sprintf(cmd, "sed -e 's|<stdin>|%s|g' %s > %s",
 	      file, tmpfile_1, tmpfile_2);
 

@@ -330,7 +330,7 @@ int ut_sem_get(int id)
 
 int ut_sem_set(int id, int val)
 {
-#ifdef HAS_UNION_SEMUN
+#ifdef HAVE_UNION_SEMUN_VAL
   union semun s;
 #else
   union semun {

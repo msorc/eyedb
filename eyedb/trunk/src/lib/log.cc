@@ -42,7 +42,7 @@
 
 #include <eyedblib/log.h>
 
-#ifdef HAS_CTIME_R_3
+#ifdef HAVE_CTIME_R_3
 #define M_ctime_r(T,S,L) ctime_r(T,S,L)
 #else
 #define M_ctime_r(T,S,L) ctime_r(T,S)

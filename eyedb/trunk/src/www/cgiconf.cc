@@ -21,13 +21,16 @@
    Author: Eric Viara <viara@sysra.com>
 */
 
+#include <eyedbconfig.h>
 
 #include "eyedbcgiP.h"
-#ifdef SOLARIS
-#include <libgen.h>
-#endif
-#ifdef LINUX
+
+#ifdef HAVE_REGEX_H
 #include <regex.h>
+#elif defined(HAVE_LIBGEN_H)
+#include <libgen.h>
+#else
+#error No regular expression implementation available on this platform
 #endif
 
 static Config *idbW_configuration;
@@ -1627,11 +1630,11 @@ idbWItemList::idbWItemList(const char *s)
       if (*s == '~')
 	{
 	  bitems[item_cnt].isregex = True;
-#ifdef LINUX
+#if defined(HAVE_REGCOMP)
 	  regex_t *re = (regex_t *)malloc( sizeof( regex_t));
 	  if (!regcomp(re, s+1, 0))
 	    bitems[item_cnt].item = (char *)re;
-#else
+#elif defined(HAVE_REGCMP)
 	  bitems[item_cnt].item = regcmp(s+1, (char *)0);
 #endif
 	}
@@ -1651,10 +1654,10 @@ idbWItemList::BItem::compare(const char *s) const
 {
   if (isregex)
     {
-#ifdef LINUX
+#ifdef HAVE_REGEXEC
       if (regexec((regex_t *)item, s, 0, (regmatch_t *)0, 0))
 	return on;
-#else
+#elif defined(HAVE_REGEX)
       if (regex(item, s, 0))
 	return on;
 #endif

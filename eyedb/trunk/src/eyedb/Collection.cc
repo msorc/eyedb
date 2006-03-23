@@ -689,55 +689,55 @@ namespace eyedb {
 
   Status Collection::check(const Value &v, Error err) const
   {
-    if (v.type == Value::OBJECT)
+    if (v.type == Value::tObject)
       return check(v.o, err);
 
-    if (v.type == Value::OID)
+    if (v.type == Value::tOid)
       return check(Oid(*v.oid), err);
 
-    if (v.type == Value::STRING) {
+    if (v.type == Value::tString) {
       if (!string_coll)
 	return Exception::make(err, invalid_type_fmt,
 			       getStringType().c_str(), v.getStringType());
       return check((Data)v.str, strlen(v.str), err);
     }
 
-    if (v.type == Value::CHAR) {
+    if (v.type == Value::tChar) {
       if (!coll_class->asCharClass())
 	return Exception::make(err, invalid_type_fmt,
 			       getStringType().c_str(), v.getStringType());
       return check((Data)&v.c, sizeof(v.c), err);
     }
 
-    if (v.type == Value::SHORT) {
+    if (v.type == Value::tShort) {
       if (!coll_class->asInt16Class())
 	return Exception::make(err, invalid_type_fmt,
 			       getStringType().c_str(), v.getStringType());
       return check((Data)&v.s, sizeof(v.s), err);
     }
 
-    if (v.type == Value::INT) {
+    if (v.type == Value::tInt) {
       if (!coll_class->asInt32Class())
 	return Exception::make(err, invalid_type_fmt,
 			       getStringType().c_str(), v.getStringType());
       return check((Data)&v.i, sizeof(v.i), err);
     }
 
-    if (v.type == Value::LONG) {
+    if (v.type == Value::tLong) {
       if (!coll_class->asInt64Class())
 	return Exception::make(err, invalid_type_fmt,
 			       getStringType().c_str(), v.getStringType());
       return check((Data)&v.l, sizeof(v.l), err);
     }
 
-    if (v.type == Value::DOUBLE) {
+    if (v.type == Value::tDouble) {
       if (!coll_class->asFloatClass())
 	return Exception::make(err, invalid_type_fmt,
 			       getStringType().c_str(), v.getStringType());
       return check((Data)&v.d, sizeof(v.d), err);
     }
 
-    if (v.type == Value::DATA) {
+    if (v.type == Value::tData) {
       if (!coll_class->asByteClass())
 	return Exception::make(err, invalid_type_fmt,
 			       getStringType().c_str(), v.getStringType());
@@ -766,10 +766,10 @@ namespace eyedb {
     if (s)
       return s;
 
-    if (v.type == Value::OBJECT)
+    if (v.type == Value::tObject)
       return insert_p(v.o, noDup);
 
-    if (v.type == Value::OID)
+    if (v.type == Value::tOid)
       return insert_p(Oid(*v.oid), noDup);
 
     Size size;
@@ -785,10 +785,10 @@ namespace eyedb {
     if (s)
       return s;
 
-    if (v.type == Value::OBJECT)
+    if (v.type == Value::tObject)
       return suppress_p(v.o, checkFirst);
 
-    if (v.type == Value::OID)
+    if (v.type == Value::tOid)
       return suppress_p(Oid(*v.oid), checkFirst);
 
     Size size;
@@ -1216,10 +1216,10 @@ namespace eyedb {
     if (s)
       return s;
 
-    if (v.type == Value::OBJECT)
+    if (v.type == Value::tObject)
       return isIn_p(v.o, found, where);
 
-    if (v.type == Value::OID)
+    if (v.type == Value::tOid)
       return isIn_p(Oid(*v.oid), found, where);
 
     Size size;
@@ -1740,7 +1740,7 @@ namespace eyedb {
 	if (isidx)
 	  ind = array.values[i].l;
 
-	if (value.type == Value::OID)
+	if (value.type == Value::tOid)
 	  {
 	    Object *o;
 	    s = db->loadObject(value.oid, &o, rcm);
@@ -1953,7 +1953,7 @@ namespace eyedb {
       while (begin != end) {
 	item = (*begin).second;
 	const Value &v = item->getValue();
-	if (v.type == Value::OID) {
+	if (v.type == Value::tOid) {
 	  Oid item_oid = *v.oid;
 
 	  int s = item->getState();
@@ -2008,7 +2008,7 @@ namespace eyedb {
       int count = val_arr.getCount();
       obj_array.set(0, count);
       for (int n = 0; n < count; n++) {
-	if (val_arr[n].getType() != Value::OBJECT)
+	if (val_arr[n].getType() != Value::tObject)
 	  return Exception::make(IDB_ERROR, "unexpected value type");
 	obj_array[n] = val_arr[n].o;
       }
@@ -2069,14 +2069,14 @@ namespace eyedb {
 	item = (*begin).second;
 	const Value &v = item->getValue();
 	Object *item_o = 0;
-	if (v.type == Value::OID) {
+	if (v.type == Value::tOid) {
 	  Oid item_oid = *v.oid;
 	  if (item_oid.isValid() && db) {
 	    Status s = db->loadObject(item_oid, item_o);
 	    if (s) return s; // what about garbage??
 	  }
 	}
-	else if (v.type == Value::OBJECT)
+	else if (v.type == Value::tObject)
 	  item_o = v.o;
 
 	if (!item_o)
@@ -2221,7 +2221,7 @@ do { \
       /*
       int idx = (index ? 1 : 0);
       for (int i = idx; i < read_cache.val_arr->value_cnt; i += idx+1)
-	if (read_cache.val_arr->values[i].type == Value::OBJECT)
+	if (read_cache.val_arr->values[i].type == Value::tObject)
 	  read_cache.val_arr->values[i].o->incrRefCount();
       */
       return Success;
@@ -2247,7 +2247,7 @@ do { \
 	    value_list->suppressValue(item_value);
 	  else if (s == added) {
 	    if (!value_list->exists(item_value)) {
-	      if (item_value.type == Value::OBJECT)
+	      if (item_value.type == Value::tObject)
 		item_value.o->incrRefCount();
 	      value_list->insertValueLast(item_value);
 	    }
@@ -2286,7 +2286,7 @@ do { \
     if (isref) {
       /*
       for (int i = idx; i < read_cache.val_arr->value_cnt; i += idx+1)
-	if (read_cache.val_arr->values[i].type == Value::OBJECT)
+	if (read_cache.val_arr->values[i].type == Value::tObject)
 	  read_cache.val_arr->values[i].o->incrRefCount();
       */
       return Success;
@@ -2300,7 +2300,7 @@ do { \
     for (int i = idx; i < read_cache.val_arr->value_cnt; i += idx+1) {
       makeValue(read_cache.val_arr->values[i]);
       /*
-      if (read_cache.val_arr->values[i].type == Value::OBJECT)
+      if (read_cache.val_arr->values[i].type == Value::tObject)
 	read_cache.val_arr->values[i].o->incrRefCount();
       */
     }
@@ -2310,7 +2310,7 @@ do { \
   }
 
   void Collection::makeValue(Value &v) {
-    if (v.type == Value::DATA &&
+    if (v.type == Value::tData &&
 	!isref && !coll_class->asBasicClass() && !coll_class->asEnumClass()) {
       Database::consapp_t consapp = getDatabase()->getConsApp(coll_class);
       Object *o;
@@ -2466,7 +2466,7 @@ do { \
 	  Oid _oid;
 #ifdef USE_VALUE_CACHE
 	  Object *_o = 0;
-	  if (v.type == Value::OBJECT)
+	  if (v.type == Value::tObject)
 	    _o = v.o;
 #else
 	  Object *_o = (Object *)item->getObject();

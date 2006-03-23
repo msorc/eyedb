@@ -45,6 +45,7 @@
 #include <eyedblib/connman.h>
 #include <eyedblib/log.h>
 #include <eyedblib/rpc_lib.h>
+#include <lib/rpc_lib_p.h>
 
 static const char *rpc_access_file;
 

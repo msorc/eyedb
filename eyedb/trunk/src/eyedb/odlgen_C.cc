@@ -154,10 +154,10 @@ do { \
   (HINTS).style->getString(OPTYPE, NAME)
 
 #define ATTRGET(CL) ((CL)->asCollectionClass() ? \
-		     GenCodeHints::GETCOLL : GenCodeHints::GET)
+		     GenCodeHints::tGetColl : GenCodeHints::tGet)
 
 #define ATTRSET(CL) ((CL)->asCollectionClass() ? \
-		     GenCodeHints::SETCOLL : GenCodeHints::SET)
+		     GenCodeHints::tSetColl : GenCodeHints::tSet)
 
   static const GenCodeHints *phints;
 
@@ -377,9 +377,9 @@ do { \
     Class *cl =
       ((CollectionClass *)cls)->getCollClass(&_isref, &_dim);
     GenCodeHints::OpType acctype = (GenCodeHints::OpType)xacctype;
-    const char *etc = (acctype == GenCodeHints::ADD_ITEM_TO_COLL ?
+    const char *etc = (acctype == GenCodeHints::tAddItemToColl ?
 		       ", const eyedb::IndexImpl *idximpl" : "");
-    const char *accmth = (acctype == GenCodeHints::ADD_ITEM_TO_COLL ? "insert" : "suppress");
+    const char *accmth = (acctype == GenCodeHints::tAddItemToColl ? "insert" : "suppress");
     const char *oclassname = _isref ?
       className(cl, True) : className(cl, False);
 
@@ -412,13 +412,13 @@ do { \
 	ordered = True;
       }
 
-    const char *At = ((acctype == GenCodeHints::ADD_ITEM_TO_COLL ||
-		       acctype == GenCodeHints::RMV_ITEM_FROM_COLL)
+    const char *At = ((acctype == GenCodeHints::tAddItemToColl ||
+		       acctype == GenCodeHints::tRmvItemFromColl)
 		      && ordered ? "At" : "");
 
     const char *etc1 = "";
     const char *etc2 = "";
-    Bool rmv_from_array = (acctype == GenCodeHints::RMV_ITEM_FROM_COLL)
+    Bool rmv_from_array = (acctype == GenCodeHints::tRmvItemFromColl)
       && ordered ? True : False;
 
     if (rmv_from_array && isoid)
@@ -426,20 +426,20 @@ do { \
 
     GenCodeHints::OpType nacctype;
     if (ordered)
-      nacctype = (acctype == GenCodeHints::RMV_ITEM_FROM_COLL ?
-		  GenCodeHints::UNSET_ITEM_IN_COLL :
-		  GenCodeHints::SET_ITEM_IN_COLL);
+      nacctype = (acctype == GenCodeHints::tRmvItemFromColl ?
+		  GenCodeHints::tUnsetItemInColl :
+		  GenCodeHints::tSetItemInColl);
     else
       nacctype = acctype;
 
     if (!*At)
       {
-	if (acctype == GenCodeHints::ADD_ITEM_TO_COLL)
+	if (acctype == GenCodeHints::tAddItemToColl)
 	  {
 	    etc1 = ", eyedb::Bool noDup";
 	    etc2 = ", noDup";
 	  }
-	else if (acctype == GenCodeHints::RMV_ITEM_FROM_COLL)
+	else if (acctype == GenCodeHints::tRmvItemFromColl)
 	  {
 	    etc1 = ", eyedb::Bool checkFirst";
 	    etc2 = ", checkFirst";
@@ -518,7 +518,7 @@ do { \
     ctx->pop();
     fprintf(fd, "%s   }\n", ctx->get());
     fprintf(fd, "%s else\n", ctx->get());
-    if (acctype == GenCodeHints::ADD_ITEM_TO_COLL)
+    if (acctype == GenCodeHints::tAddItemToColl)
       {
 	fprintf(fd, "%s   {\n", ctx->get());
 	fprintf(fd, "%s     _coll = new %s(db, \"\", "
@@ -564,7 +564,7 @@ do { \
   {
     return generateCollRealizeClassMethod_C(own, ctx, hints,
 					    isoid,
-					    GenCodeHints::ADD_ITEM_TO_COLL);
+					    GenCodeHints::tAddItemToColl);
   }
 
   Status
@@ -575,7 +575,7 @@ do { \
   {
     return generateCollRealizeClassMethod_C(own, ctx, hints,
 					    isoid, 
-					    GenCodeHints::RMV_ITEM_FROM_COLL);
+					    GenCodeHints::tRmvItemFromColl);
   }
 
   Status
@@ -611,7 +611,7 @@ do { \
 
     if (isoid)
       fprintf(fd, "eyedb::Status %s::%s(", className(own),
-	      ATTRNAME(name, SETOID, hints));
+	      ATTRNAME(name, tSetOid, hints));
     else
       fprintf(fd, "eyedb::Status %s::%s(", className(own),
 	      ATTRNAME_1(name, ATTRSET(cls), hints));
@@ -626,8 +626,8 @@ do { \
     else
       fprintf(fd, "%s%s %s_%s)\n{\n", comma, classname, ref, name);
 
-    GenCodeHints::OpType optype = (isoid ? GenCodeHints::SETOID:
-				   GenCodeHints::SET);
+    GenCodeHints::OpType optype = (isoid ? GenCodeHints::tSetOid:
+				   GenCodeHints::tSet);
 
     if (attr_cache)
       genAttrCacheSetPrologue(ctx, optype);
@@ -789,7 +789,7 @@ do { \
       if (ordered) { // 24/09/05
 	fprintf(fd, "eyedb::Oid %s::%s(unsigned int ind, ",
 		own->getName(),
-		ATTRNAME_1(name, (ordered ? GenCodeHints::RETRIEVEOID_ITEM_AT : GenCodeHints::GETOID_ITEM_AT), hints));
+		ATTRNAME_1(name, (ordered ? GenCodeHints::tRetrieveOidItemAt : GenCodeHints::tGetOidItemAt), hints));
 	dimArgsGen(fd, ndims, True);
 	fprintf(fd, "%seyedb::Status *rs) const\n", comma);
 	fprintf(fd, "{\n");
@@ -802,7 +802,7 @@ do { \
 	fprintf(fd, "%seyedb::Status s;\n", ctx->get());
       
 	fprintf(fd, "%sconst eyedb::Collection *coll = %s(", ctx->get(),
-		ATTRNAME(name, GETCOLL, hints));
+		ATTRNAME(name, tGetColl, hints));
 
 	for (i = 0; i < ndims; i++)
 	  fprintf(fd, "a%d, ", i);
@@ -832,12 +832,12 @@ do { \
     if (!strcmp(cl->getName(), char_class_name) && _dim > 1) {
       fprintf(fd, "const char *%s::%s(unsigned int ind, ",
 	      own->getName(),
-	      ATTRNAME_1(name, (ordered ? GenCodeHints::RETRIEVE_ITEM_AT : GenCodeHints::GET_ITEM_AT), hints));
+	      ATTRNAME_1(name, (ordered ? GenCodeHints::tRetrieveItemAt : GenCodeHints::tGetItemAt), hints));
     }
     else if (_dim == 1)
       fprintf(fd, "%s%s %s%s::%s(unsigned int ind, ",
 	      _const, oclassname, ref, own->getName(),
-	      ATTRNAME_1(name, (ordered ? GenCodeHints::RETRIEVE_ITEM_AT : GenCodeHints::GET_ITEM_AT), hints));
+	      ATTRNAME_1(name, (ordered ? GenCodeHints::tRetrieveItemAt : GenCodeHints::tGetItemAt), hints));
     else {
       //fprintf(stderr, "collection of dimensional item is not implemented: %s::%s\n", class_owner->getName(), name);
       return Success;
@@ -854,7 +854,7 @@ do { \
     fprintf(fd, "%seyedb::Status s;\n", ctx->get());
 
     fprintf(fd, "%sconst eyedb::Collection *coll = %s(", ctx->get(),
-	    ATTRNAME(name, GETCOLL, hints));
+	    ATTRNAME(name, tGetColl, hints));
 
     for (i = 0; i < ndims; i++)
       fprintf(fd, "a%d, ", i);
@@ -914,7 +914,7 @@ do { \
 
     if (isoid)
       fprintf(fd, "eyedb::Oid %s::%s(", className(own),
-	      ATTRNAME(name, GETOID, hints));
+	      ATTRNAME(name, tGetOid, hints));
     else
       fprintf(fd, "%s%s %s%s::%s(", _const, classname, ref,
 	      className(own), ATTRNAME_1(name, ATTRGET(cls), hints));
@@ -930,8 +930,8 @@ do { \
 
     int const_obj = (!isoid && not_basic);
 
-    GenCodeHints::OpType optype = (isoid ? GenCodeHints::GETOID:
-				   GenCodeHints::GET);
+    GenCodeHints::OpType optype = (isoid ? GenCodeHints::tGetOid:
+				   GenCodeHints::tGet);
     if (attr_cache)
       genAttrCacheGetPrologue(ctx, optype);
 
@@ -1179,10 +1179,10 @@ do { \
     if (isVarDim() && !isoid && !*_const && !IS_STRING())
       {
 	fprintf(fd, "unsigned int %s::%s(%s) const\n{\n", className(own),
-		ATTRNAME(name, GETCOUNT, hints), starg);
+		ATTRNAME(name, tGetCount, hints), starg);
 
 	if (attr_cache)
-	  genAttrCacheGetPrologue(ctx, GenCodeHints::GETCOUNT);
+	  genAttrCacheGetPrologue(ctx, GenCodeHints::tGetCount);
 
 	if (odl_dynamic_attr)
 	  dynamic_attr_gen(fd, ctx, this, op_OTHER, isoid);
@@ -1208,7 +1208,7 @@ do { \
 	  fprintf(fd, "%sif (s) {if (rs) *rs = s; return 0;}\n", ctx->get());
 
 	if (attr_cache)
-	  genAttrCacheGetEpilogue(ctx, GenCodeHints::GETCOUNT);
+	  genAttrCacheGetEpilogue(ctx, GenCodeHints::tGetCount);
 
 	fprintf(fd, "%sreturn (int)size;\n", ctx->get());
 	fprintf(fd, "}\n\n");
@@ -1243,20 +1243,20 @@ do { \
 #ifdef ODL_STD_STRING
 	if (is_string)
 	  fprintf(fd, "eyedb::Status %s::%s(const std::string &_%s%s)\n{\n",
-		  className(own), ATTRNAME(name, SET, hints), name,
+		  className(own), ATTRNAME(name, tSet, hints), name,
 		  sarg);
 	else
 	  fprintf(fd, "eyedb::Status %s::%s(const %s *_%s%s)\n{\n",
-		  className(own), ATTRNAME(name, SET, hints), sclass, name,
+		  className(own), ATTRNAME(name, tSet, hints), sclass, name,
 		  sarg);
 #else
 	fprintf(fd, "eyedb::Status %s::%s(const %s *_%s%s)\n{\n",
-		className(own), ATTRNAME(name, SET, hints), sclass, name,
+		className(own), ATTRNAME(name, tSet, hints), sclass, name,
 		sarg);
 #endif
 
 	if (attr_cache)
-	  genAttrCacheSetPrologue(ctx, GenCodeHints::SET, True);
+	  genAttrCacheSetPrologue(ctx, GenCodeHints::tSet, True);
 
 	if (odl_dynamic_attr)
 	  dynamic_attr_gen(fd, ctx, this, op_SET);
@@ -1322,7 +1322,7 @@ do { \
 #endif
 
 	    if (attr_cache)
-	      genAttrCacheSetEpilogue(ctx, GenCodeHints::SET, True);
+	      genAttrCacheSetEpilogue(ctx, GenCodeHints::tSet, True);
 	    fprintf(fd, "%sreturn status;\n\n", ctx->get());
 	  }
 	else
@@ -1398,7 +1398,7 @@ do { \
 	    }
 
 	    if (attr_cache)
-	      genAttrCacheSetEpilogue(ctx, GenCodeHints::SET, True);
+	      genAttrCacheSetEpilogue(ctx, GenCodeHints::tSet, True);
 	    fprintf(fd, "%sreturn status;\n\n", ctx->get());
 	  }
 	fprintf(fd, "}\n\n");
@@ -1425,14 +1425,14 @@ do { \
       if (isVarDim() && !isIndirect() && !is_string) /*&& not_basic*/
 	{
 	  fprintf(fd, "eyedb::Status %s::%s(", className(own),
-		  ATTRNAME(name, SETCOUNT, hints));
+		  ATTRNAME(name, tSetCount, hints));
       
 	  dimArgsGen(fd, ndims, True);
       
 	  fprintf(fd, ")\n{\n");
 
 	  if (attr_cache)
-	    genAttrCacheSetPrologue(ctx, GenCodeHints::SETCOUNT);
+	    genAttrCacheSetPrologue(ctx, GenCodeHints::tSetCount);
 
 	  if (odl_dynamic_attr)
 	    dynamic_attr_gen(fd, ctx, this, op_SET);
@@ -1473,7 +1473,7 @@ do { \
 #endif
 
 	  if (attr_cache)
-	    genAttrCacheSetEpilogue(ctx, GenCodeHints::SETCOUNT);
+	    genAttrCacheSetEpilogue(ctx, GenCodeHints::tSetCount);
 
 	  fprintf(fd, "%sreturn status;\n", ctx->get(),
 		  ctx->get());
@@ -1491,20 +1491,20 @@ do { \
 #ifdef ODL_STD_STRING
 	if (is_string)
 	  fprintf(fd, "std::string %s::%s(%seyedb::Bool *isnull%s) const\n{\n", 
-		  className(own), ATTRNAME(name, GET, hints), sarg,
+		  className(own), ATTRNAME(name, tGet, hints), sarg,
 		  stargcom);
 	else
 	  fprintf(fd, "const %s *%s::%s(%seyedb::Bool *isnull%s) const\n{\n", 
-		  sclass, className(own), ATTRNAME(name, GET, hints), sarg,
+		  sclass, className(own), ATTRNAME(name, tGet, hints), sarg,
 		  stargcom);
 #else
 	fprintf(fd, "const %s *%s::%s(%seyedb::Bool *isnull%s) const\n{\n", 
-		sclass, className(own), ATTRNAME(name, GET, hints), sarg,
+		sclass, className(own), ATTRNAME(name, tGet, hints), sarg,
 		stargcom);
 #endif
 
 	if (attr_cache)
-	  genAttrCacheGetPrologue(ctx, GenCodeHints::GET, True);
+	  genAttrCacheGetPrologue(ctx, GenCodeHints::tGet, True);
 
 	if (odl_dynamic_attr)
 	  dynamic_attr_gen(fd, ctx, this, op_GET, False, IDBBOOL(is_string));
@@ -1536,11 +1536,11 @@ do { \
 	  fprintf(fd, "%sif (!data) data = nulldata;\n", ctx->get());
 
 	if (attr_cache)
-	  genAttrCacheGetEpilogue(ctx, GenCodeHints::GET, True);
+	  genAttrCacheGetEpilogue(ctx, GenCodeHints::tGet, True);
 
 	if (is_raw && isVarDim())
 	  fprintf(fd, "%sif (len) *len = %s();\n", ctx->get(),
-		  ATTRNAME(name, GETCOUNT, hints));
+		  ATTRNAME(name, tGetCount, hints));
 	//fprintf(fd, "%sif (s && rs) *rs = s;\n", ctx->get());
 	if (attr_cache) {
 #ifdef ODL_STD_STRING
@@ -1734,7 +1734,7 @@ do { \
 				     Bool is_raw_string)
   {
 #ifdef ATC_NOVD
-    if (optype != GenCodeHints::GETCOUNT)
+    if (optype != GenCodeHints::tGetCount)
       {
 	if (isVarDim() && !is_raw_string)
 	  return;
@@ -1743,13 +1743,13 @@ do { \
       }
 #endif
 
-    if (optype == GenCodeHints::GETOID && !isIndirect()) return;
+    if (optype == GenCodeHints::tGetOid && !isIndirect()) return;
 
-    if (optype == GenCodeHints::GETOID) return;
+    if (optype == GenCodeHints::tGetOid) return;
 
     FILE *fd = ctx->getFile();
 
-    if (optype == GenCodeHints::GETCOUNT)
+    if (optype == GenCodeHints::tGetCount)
       {
 	fprintf(fd, "%sif (%s != (unsigned int)~0) return %s;\n", ctx->get(), atc_cnt(name),
 		atc_cnt(name));
@@ -1792,7 +1792,7 @@ do { \
 				     Bool is_raw_string)
   {
 #ifdef ATC_NOVD
-    if (optype != GenCodeHints::GETCOUNT)
+    if (optype != GenCodeHints::tGetCount)
       {
 	if (isVarDim() && !is_raw_string)
 	  return;
@@ -1801,15 +1801,15 @@ do { \
       }
 #endif
 
-    if (optype == GenCodeHints::GETOID && !isIndirect()) return;
+    if (optype == GenCodeHints::tGetOid && !isIndirect()) return;
 
-    if (optype == GenCodeHints::GETOID) return;
+    if (optype == GenCodeHints::tGetOid) return;
 
     FILE *fd = ctx->getFile();
 
     const char *classname = className(class_owner);
 
-    if (optype == GenCodeHints::GETCOUNT)
+    if (optype == GenCodeHints::tGetCount)
       {
 	fprintf(fd, "%s%s->%s = size;\n", ctx->get(), atc_this(classname),
 		atc_cnt(name));
@@ -1826,7 +1826,7 @@ do { \
 #ifdef ATTR_CACHE_DIRECT
 	    if (isVarDim())
 	      {
-		const char *scnt = ATTRNAME(name, GETCOUNT, *phints);
+		const char *scnt = ATTRNAME(name, tGetCount, *phints);
 		fprintf(fd, "%s%s->%s = %s();\n", ctx->get(),
 			atc_this(classname), atc_cnt(name), scnt);
 	      }
@@ -1836,7 +1836,7 @@ do { \
 #else
 	    if (isVarDim())
 	      {
-		const char *scnt = ATTRNAME(name, GETCOUNT, *phints);
+		const char *scnt = ATTRNAME(name, tGetCount, *phints);
 		fprintf(fd, "%s%s->%s = rawdup(data, %s());\n", ctx->get(),
 			atc_this(classname), atc_name(name), scnt);
 		fprintf(fd, "%s%s->%s = %s();\n", ctx->get(),
@@ -1918,7 +1918,7 @@ do { \
 				     Bool is_raw_string)
   {
 #ifdef ATC_NOVD
-    if (optype != GenCodeHints::SETCOUNT)
+    if (optype != GenCodeHints::tSetCount)
       {
 	if (isVarDim() && !is_raw_string)
 	  return;
@@ -1926,13 +1926,13 @@ do { \
 	  return;
       }
 #endif
-    if (optype == GenCodeHints::SETOID && !isIndirect()) return;
+    if (optype == GenCodeHints::tSetOid && !isIndirect()) return;
 
-    if (optype == GenCodeHints::SETOID) return;
+    if (optype == GenCodeHints::tSetOid) return;
 
     FILE *fd = ctx->getFile();
 
-    if (optype == GenCodeHints::SETCOUNT)
+    if (optype == GenCodeHints::tSetCount)
       {
 	//EV : 5/03/06: should be 'size' but 'from' or another variable !
 	//fprintf(fd, "%sif (!status) %s = size;\n", ctx->get(), atc_cnt(name));
@@ -1964,7 +1964,7 @@ do { \
 #ifdef ATTR_CACHE_DIRECT
 	    fprintf(fd, "%s%s->%s = %s(%s);\n", ctx->get(),
 		    atc_this(classname), atc_name(name),
-		    ATTRNAME(name, GET, *phints),
+		    ATTRNAME(name, tGet, *phints),
 		    (isVarDim() ? "(unsigned int *)0" : ""));
 #else
 	    fprintf(fd, "%s%s->%s = rawdup(_%s, len);\n", ctx->get(),
@@ -1984,7 +1984,7 @@ do { \
 #ifdef ATTR_CACHE_DIRECT
 	    fprintf(fd, "%s%s->%s = %s();\n", ctx->get(),
 		    atc_this(classname), atc_name(name),
-		    ATTRNAME(name, GET, *phints));
+		    ATTRNAME(name, tGet, *phints));
 #else
 	    if (isVarDim())
 	      fprintf(fd, "%s%s->%s = strdup((const char *)_%s);\n", ctx->get(),
@@ -2052,13 +2052,13 @@ do { \
 #ifdef ODL_STD_STRING
       if (is_string)
 	fprintf(fdh, "%seyedb::Status %s(const std::string &%s);\n", ctxH->get(),
-		ATTRNAME(name, SET, hints), SARGIN());
+		ATTRNAME(name, tSet, hints), SARGIN());
       else
 	fprintf(fdh, "%seyedb::Status %s(const %s *%s);\n", ctxH->get(),
-		ATTRNAME(name, SET, hints), SCLASS(), SARGIN());
+		ATTRNAME(name, tSet, hints), SCLASS(), SARGIN());
 #else
       fprintf(fdh, "%seyedb::Status %s(const %s *%s);\n", ctxH->get(),
-	      ATTRNAME(name, SET, hints), SCLASS(), SARGIN());
+	      ATTRNAME(name, tSet, hints), SCLASS(), SARGIN());
 #endif
     }
 
@@ -2082,7 +2082,7 @@ do { \
       if (isVarDim() && !isIndirect() && !is_string) /*&& not_basic*/
 	{
 	  fprintf(fdh, "%seyedb::Status %s(",
-		  ctxH->get(), ATTRNAME(name, SETCOUNT, hints));
+		  ctxH->get(), ATTRNAME(name, tSetCount, hints));
 
 	  dimArgsGen(fdh, ndims);
 	  fprintf(fdh, ");\n");
@@ -2094,15 +2094,15 @@ do { \
 #ifdef ODL_STD_STRING
       if (is_string)
 	fprintf(fdh, "%sstd::string %s(%seyedb::Bool *isnull = 0%s) const;\n",
-		ctxH->get(), ATTRNAME(name, GET, hints), SARGOUT(),
+		ctxH->get(), ATTRNAME(name, tGet, hints), SARGOUT(),
 		stargcom);
       else
 	fprintf(fdh, "%sconst %s *%s(%seyedb::Bool *isnull = 0%s) const;\n",
-		ctxH->get(), SCLASS(), ATTRNAME(name, GET, hints), SARGOUT(),
+		ctxH->get(), SCLASS(), ATTRNAME(name, tGet, hints), SARGOUT(),
 		stargcom);
 #else
       fprintf(fdh, "%sconst %s *%s(%seyedb::Bool *isnull = 0%s) const;\n",
-	      ctxH->get(), SCLASS(), ATTRNAME(name, GET, hints), SARGOUT(),
+	      ctxH->get(), SCLASS(), ATTRNAME(name, tGet, hints), SARGOUT(),
 	      stargcom);
 #endif
     }
@@ -2115,10 +2115,10 @@ do { \
 
     if (cls->asCollectionClass()) {
       fprintf(fdh, "%sunsigned int %s(", ctxH->get(),
-	      ATTRNAME(name, GETCOUNT, hints));
+	      ATTRNAME(name, tGetCount, hints));
       dimArgsGen(fdh, ndims);
       fprintf(fdh, "%seyedb::Bool *isnull = 0, eyedb::Status *rs = 0) const "
-	      "{const eyedb::Collection *_coll = %s(", comma, ATTRNAME(name, GETCOLL, hints));
+	      "{const eyedb::Collection *_coll = %s(", comma, ATTRNAME(name, tGetColl, hints));
       for (i = 0; i < ndims; i++)
 	fprintf(fdh, "a%d, ", i);
       fprintf(fdh, "isnull, rs); ");
@@ -2136,11 +2136,11 @@ do { \
 
     if (isIndirect()) {
       fprintf(fdh, "%seyedb::Oid %s(",
-	      ctxH->get(), ATTRNAME(name, GETOID, hints));
+	      ctxH->get(), ATTRNAME(name, tGetOid, hints));
       dimArgsGen(fdh, ndims);
       fprintf(fdh, "%s) const;\n", (ndims ? stargcom : starg));
       fprintf(fdh, "%seyedb::Status %s(",
-	      ctxH->get(), ATTRNAME(name, SETOID, hints));
+	      ctxH->get(), ATTRNAME(name, tSetOid, hints));
       dimArgsGen(fdh, ndims);
       fprintf(fdh, "%sconst eyedb::Oid &);\n", comma);
     }
@@ -2163,7 +2163,7 @@ do { \
 
       if (_dim == 1) {
 	fprintf(fdh, "%seyedb::Status %s(%s", ctxH->get(),
-		ATTRNAME_1(name, (ordered ? GenCodeHints::SET_ITEM_IN_COLL : GenCodeHints::ADD_ITEM_TO_COLL), hints), where);
+		ATTRNAME_1(name, (ordered ? GenCodeHints::tSetItemInColl : GenCodeHints::tAddItemToColl), hints), where);
 	dimArgsGen(fdh, ndims);
 	fprintf(fdh, "%s%s%s%s, const eyedb::IndexImpl * = 0);\n", comma,
 		oclassname, (_isref || !cl->asBasicClass() ? "*" : ""),
@@ -2171,7 +2171,7 @@ do { \
 
 	if (ordered) {
 	  fprintf(fdh, "%seyedb::Status %s(int where%s", ctxH->get(),
-		  ATTRNAME(name, UNSET_ITEM_IN_COLL, hints),
+		  ATTRNAME(name, tUnsetItemInColl, hints),
 		  (ndims >= 1 ? ", " : ""));
 	  dimArgsGen(fdh, ndims);
 	  fprintf(fdh, ");\n");
@@ -2179,7 +2179,7 @@ do { \
 	else
 	  {
 	    fprintf(fdh, "%seyedb::Status %s(%s", ctxH->get(),
-		    ATTRNAME(name, RMV_ITEM_FROM_COLL, hints), where);
+		    ATTRNAME(name, tRmvItemFromColl, hints), where);
 	    dimArgsGen(fdh, ndims);
 	    fprintf(fdh, "%s%s%s%s);\n", comma, oclassname,
 		    (_isref || !cl->asBasicClass() ? "*" : ""),
@@ -2188,7 +2188,7 @@ do { \
       }
       else if (!strcmp(cl->getName(), char_class_name) && _dim > 1) {
 	fprintf(fdh, "%seyedb::Status %s(%s", ctxH->get(),
-		ATTRNAME_1(name, (ordered ? GenCodeHints::SET_ITEM_IN_COLL : GenCodeHints::ADD_ITEM_TO_COLL), hints), where);
+		ATTRNAME_1(name, (ordered ? GenCodeHints::tSetItemInColl : GenCodeHints::tAddItemToColl), hints), where);
 
 	dimArgsGen(fdh, ndims);
 	fprintf(fdh, "%sconst char *%s, const eyedb::IndexImpl * = 0);\n",
@@ -2196,10 +2196,10 @@ do { \
 		(!*where ? ", eyedb::Bool noDup = eyedb::False" : ""));
 	if (ordered)
 	  fprintf(fdh, "%seyedb::Status %s(", ctxH->get(),
-		  ATTRNAME(name, UNSET_ITEM_IN_COLL, hints));
+		  ATTRNAME(name, tUnsetItemInColl, hints));
 	else
 	  fprintf(fdh, "%seyedb::Status %s(", ctxH->get(),
-		  ATTRNAME(name, RMV_ITEM_FROM_COLL, hints));
+		  ATTRNAME(name, tRmvItemFromColl, hints));
 
 	dimArgsGen(fdh, ndims);
 	fprintf(fdh, "%sconst char *%s);\n", comma,
@@ -2208,12 +2208,12 @@ do { \
 
       if (!cl->asBasicClass()) {
 	fprintf(fdh, "%seyedb::Status %s(%s", ctxH->get(),
-		ATTRNAME_1(name, (ordered ? GenCodeHints::SET_ITEM_IN_COLL : GenCodeHints::ADD_ITEM_TO_COLL), hints), where);
+		ATTRNAME_1(name, (ordered ? GenCodeHints::tSetItemInColl : GenCodeHints::tAddItemToColl), hints), where);
 	dimArgsGen(fdh, ndims);
 	fprintf(fdh, "%sconst eyedb::Oid &, const eyedb::IndexImpl * = 0);\n",
 		comma);
 	fprintf(fdh, "%seyedb::Status %s(", ctxH->get(),
-		ATTRNAME_1(name, (ordered ? GenCodeHints::UNSET_ITEM_IN_COLL : GenCodeHints::RMV_ITEM_FROM_COLL), hints));
+		ATTRNAME_1(name, (ordered ? GenCodeHints::tUnsetItemInColl : GenCodeHints::tRmvItemFromColl), hints));
 	dimArgsGen(fdh, ndims);
 	fprintf(fdh, "%sconst eyedb::Oid &);\n", comma);
       }
@@ -2222,7 +2222,7 @@ do { \
 	if (!strcmp(cl->getName(), char_class_name) && _dim > 1) {
 	  fprintf(fdh, "%sconst char *%s(unsigned int ind, ",
 		  ctxH->get(),
-		  ATTRNAME_1(name, (ordered ? GenCodeHints::RETRIEVE_ITEM_AT : GenCodeHints::GET_ITEM_AT), hints));
+		  ATTRNAME_1(name, (ordered ? GenCodeHints::tRetrieveItemAt : GenCodeHints::tGetItemAt), hints));
 	  dimArgsGen(fdh, ndims);
 	  fprintf(fdh, "%seyedb::Bool *isnull = 0, eyedb::Status *rs = 0) const;\n", comma);
 	}
@@ -2230,7 +2230,7 @@ do { \
 	  fprintf(fdh, "%sconst %s %s%s(unsigned int ind, ",
 		  ctxH->get(),
 		  oclassname, (_isref || !cl->asBasicClass() ? "*" : ""), 
-		  ATTRNAME_1(name, (ordered ? GenCodeHints::RETRIEVE_ITEM_AT : GenCodeHints::GET_ITEM_AT), hints));
+		  ATTRNAME_1(name, (ordered ? GenCodeHints::tRetrieveItemAt : GenCodeHints::tGetItemAt), hints));
 	  dimArgsGen(fdh, ndims);
 	  fprintf(fdh, "%seyedb::Bool *isnull = 0, eyedb::Status *rs = 0) const;\n", comma);
 	  
@@ -2238,7 +2238,7 @@ do { \
 	    fprintf(fdh, "%s%s %s%s(unsigned int ind, ",
 		    ctxH->get(),
 		    oclassname, (_isref || !cl->asBasicClass() ? "*" : ""),
-		    ATTRNAME_1(name, (ordered ? GenCodeHints::RETRIEVE_ITEM_AT : GenCodeHints::GET_ITEM_AT), hints));
+		    ATTRNAME_1(name, (ordered ? GenCodeHints::tRetrieveItemAt : GenCodeHints::tGetItemAt), hints));
 	    dimArgsGen(fdh, ndims);
 	    fprintf(fdh, "%seyedb::Bool *isnull = 0, eyedb::Status *rs = 0);\n", comma);
 	  }
@@ -2247,7 +2247,7 @@ do { \
 	if (_isref) {
 	  fprintf(fdh, "%seyedb::Oid %s(unsigned int ind, ",
 		  ctxH->get(),
-		  ATTRNAME_1(name, (ordered ? GenCodeHints::RETRIEVEOID_ITEM_AT : GenCodeHints::GETOID_ITEM_AT) , hints));
+		  ATTRNAME_1(name, (ordered ? GenCodeHints::tRetrieveOidItemAt : GenCodeHints::tGetOidItemAt) , hints));
 	  dimArgsGen(fdh, ndims);
 	  fprintf(fdh, "%seyedb::Status *rs = 0) const;\n", comma);
 	}
@@ -2256,7 +2256,7 @@ do { \
 
     if (isVarDim() && !is_string)
       fprintf(fdh, "%sunsigned int %s(%s) const;\n", ctxH->get(),
-	      ATTRNAME(name, GETCOUNT, hints), starg);
+	      ATTRNAME(name, tGetCount, hints), starg);
 
     generateBody_C(own, ctxC, hints);
 

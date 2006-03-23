@@ -2710,7 +2710,7 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
 	    {
 	      /*
 	      fprintf(fdh, "#define %s(X) ((%s *)(X))\n\n",
-		      hints.style->getString(GenCodeHints::CAST,
+		      hints.style->getString(GenCodeHints::tCast,
 					     cl->getCanonicalName(), prefix),
 		      cl->getName());
 	      */
@@ -2720,7 +2720,7 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
 
 	      fprintf(fdh, "inline %s *%s(eyedb::Object *o)\n{\n",
 		      cl->getName(),
-		      hints.style->getString(GenCodeHints::SAFE_CAST,
+		      hints.style->getString(GenCodeHints::tSafeCast,
 					     cl->getCanonicalName(), prefix));
 	      fprintf(fdh, "  %s *x = %sDatabase::as%s(o);\n",
 		      superclass->getName(),
@@ -2732,7 +2732,7 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
 
 	      fprintf(fdh, "inline const %s *%s(const eyedb::Object *o)\n{\n",
 		      cl->getName(),
-		      hints.style->getString(GenCodeHints::SAFE_CAST,
+		      hints.style->getString(GenCodeHints::tSafeCast,
 					     cl->getCanonicalName(), prefix));
 	      fprintf(fdh, "  const %s *x = %sDatabase::as%s(o);\n",
 		      superclass->getName(),

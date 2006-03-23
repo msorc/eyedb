@@ -107,7 +107,7 @@ RPCStatus
 connOpen(const char *hostname, const char *portname,
 	 ConnHandle **pch, int flags)
 {
-  *pch = NEW(ConnHandle);
+  *pch = rpc_new(ConnHandle);
 
   if (!rpc_connOpen(getRpcClient(), hostname, portname,
 		    &((*pch)->ch), RPC_PROTOCOL_MAGIC, CONN_COUNT, 0))
@@ -177,7 +177,7 @@ dbOpen(ConnHandle *ch, const char *dbmdb,
 
 	  if (status == RPCSuccess)
 	    {
-	      *dbh = NEW(DbHandle);
+	      *dbh = rpc_new(DbHandle);
 	      (*dbh)->ch = (ConnHandle *)ch;
 #ifndef LOCKMTX
 	      if ((ldbctx->semid[0] = sem_openSX(ldbctx->semkey[0]))<0 || 
@@ -202,7 +202,7 @@ dbOpen(ConnHandle *ch, const char *dbmdb,
 
       if (status_r.err == IDB_SUCCESS)
 	{
-	  *dbh = NEW(DbHandle);
+	  *dbh = rpc_new(DbHandle);
 	  (*dbh)->u.rdbhid = ua[11].a_int;
 	  (*dbh)->ch = (ConnHandle *)ch;
 	  (*dbh)->flags = flags & ~_DBOpenLocal;

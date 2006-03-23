@@ -17,40 +17,15 @@
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA 
 */
 
-/*
-   Author: Eric Viara <viara@sysra.com>
-*/
-
-#include <eyedbconfig.h>
-
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/sem.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <eyedblib/filelib.h>
-
-#ifdef HAVE_FLOCK_T
-#define FLOCK_DECL flock_t
-#else
-#define FLOCK_DECL struct flock
+#if defined(HAVE_STRUCT_IN_ADDR_S_ADDR)
+#define RPC_BYTE1(addr) (addr->s_addr >> 24)
+#define RPC_BYTE2(addr) ((addr->s_addr >> 16) & 0xff)
+#define RPC_BYTE3(addr) ((addr->s_addr >> 8) & 0xff)
+#define RPC_BYTE4(addr) (addr->s_addr & 0xff)
+#elif defined(HAVE_STRUCT_IN_ADDR__S_UN)
+#define RPC_BYTE1(addr) (addr->_S_un._S_un_b.s_b1)
+#define RPC_BYTE2(addr) (addr->_S_un._S_un_b.s_b2)
+#define RPC_BYTE3(addr) (addr->_S_un._S_un_b.s_b3)
+#define RPC_BYTE4(addr) (addr->_S_un._S_un_b.s_b4)
 #endif
 
-int ut_file_lock(int fd, ut_Lock excl, ut_Block block)
-{
-  FLOCK_DECL flk;
-
-  flk.l_type = (excl == ut_LOCKX ? F_WRLCK : F_RDLCK);
-
-  return fcntl(fd, (block == ut_BLOCK ? F_SETLKW : F_SETLK), &flk);
-}
-
-int ut_file_unlock(int fd)
-{
-  FLOCK_DECL flk;
-
-  flk.l_type = F_UNLCK;
-
-  return fcntl(fd, F_SETLK, &flk);
-}

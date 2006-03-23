@@ -297,7 +297,7 @@ Status Iterator::scanNext(Bool &found, Value &value)
 #ifndef NEW_ITER_ATOM
     if (atom.type == IteratorAtom_LISTSEP) {
       if (atom.open) {
-	Value *list = new Value(new LinkedList(), Value::LIST);
+	Value *list = new Value(new LinkedList(), Value::tList);
 	if (depth-1 >= 0)
 	  lists[depth-1]->list->insertObjectLast(list);
 	lists[depth++] = list;

@@ -79,59 +79,59 @@ int Value::operator ==(const Value &val) const
 
   switch(type)
     {
-    case NIL:
+    case tNil:
       return 1;
 
-    case _NULL:
+    case tNull:
       return 1;
 
-    case BOOL:
+    case tBool:
       return val.b == b;
 
-    case BYTE:
+    case tByte:
       return val.by == by;
 
-    case CHAR:
+    case tChar:
       return val.c == c;
 
-    case SHORT:
+    case tShort:
       return val.s == s;
 
-    case INT:
+    case tInt:
       return val.i == i;
 
-    case LONG:
+    case tLong:
       return val.l == l;
 
-    case DOUBLE:
+    case tDouble:
       return val.d == d;
 
-    case IDENT:
-    case STRING:
+    case tIdent:
+    case tString:
       return !strcmp(val.str, str);
 
-    case DATA:
+    case tData:
       return val.data.data == data.data &&
 	val.data.size == data.size;
 
-    case OID:
+    case tOid:
       return *val.oid == *oid;
 
-    case OBJECT:
+    case tObject:
       return val.o == o;
 
-    case LIST:
-    case BAG:
-    case SET:
-    case ARRAY:
+    case tList:
+    case tBag:
+    case tSet:
+    case tArray:
       if (list->getCount() != val.list->getCount())
 	return 0;
       return val.list == list;
 
-    case POBJ:
+    case tPobj:
       return val.idx == idx;
 
-    case STRUCT:
+    case tStruct:
       return *val.stru == *stru;
 
     default:
@@ -148,46 +148,46 @@ int Value::operator<(const Value &val) const
 
   switch(type) {
 
-  case NIL:
-  case _NULL:
+  case tNil:
+  case tNull:
     return 0;
 
-  case BOOL:
+  case tBool:
     return b < val.b;
 
-  case BYTE:
+  case tByte:
     return by < val.by;
 
-  case CHAR:
+  case tChar:
     return c < val.c;
 
-  case SHORT:
+  case tShort:
     return s < val.s;
 
-  case INT:
+  case tInt:
     return i < val.i;
 
-  case LONG:
+  case tLong:
     return l < val.l;
 
-  case DOUBLE:
+  case tDouble:
     return d < val.d;
 
-  case IDENT:
-  case STRING:
+  case tIdent:
+  case tString:
     return strcmp(str, val.str) < 0 ? 1 : 0;
 
-  case DATA: {
+  case tData: {
     Size size = data.size;
     if (val.data.size < size)
       size = val.data.size;
     return memcmp(data.data, val.data.data, size) < 0 ? 1 : 0;
   }
 
-  case OID:
+  case tOid:
     return oid->getNX() < val.oid->getNX();
 
-  case OBJECT: {
+  case tObject: {
     Size o_size;
     Data o_idr = o->getIDR(o_size);
 
@@ -211,7 +211,7 @@ int Value::operator !=(const Value &val) const
 Value::Value(const Value &val)
 {
   bufstr = NULL;
-  type = NIL;
+  type = tNil;
   *this = val;
 }
 
@@ -219,7 +219,7 @@ Status
 Value::toOidObjectArray(Database *db, LinkedList &ll, Bool isobj,
 			   const RecMode *rcm)
 {
-  if (type == OID)
+  if (type == tOid)
     {
       if (isobj)
 	{
@@ -234,7 +234,7 @@ Value::toOidObjectArray(Database *db, LinkedList &ll, Bool isobj,
       else
 	ll.insertObjectLast(new Oid(*oid));
     }
-  else if (type == OBJECT)
+  else if (type == tObject)
     {
       if (isobj)
 	ll.insertObjectLast(o);
@@ -245,7 +245,7 @@ Value::toOidObjectArray(Database *db, LinkedList &ll, Bool isobj,
 	}
     }
 
-  else if (type == LIST || type == BAG || type == SET || type == ARRAY)
+  else if (type == tList || type == tBag || type == tSet || type == tArray)
     {
       LinkedListCursor cc(list);
       Value *v;
@@ -254,7 +254,7 @@ Value::toOidObjectArray(Database *db, LinkedList &ll, Bool isobj,
 	if (status = v->toOidObjectArray(db, ll, isobj, rcm))
 	  return status;
     }
-  else if (type == STRUCT)
+  else if (type == tStruct)
     {
       Status status;
       for (int ii = 0; ii < stru->attr_cnt; ii++)
@@ -268,7 +268,7 @@ Value::toOidObjectArray(Database *db, LinkedList &ll, Bool isobj,
 Status
 Value::toValueArray(LinkedList &ll)
 {
-  if (type == LIST || type == BAG || type == SET || type == ARRAY)
+  if (type == tList || type == tBag || type == tSet || type == tArray)
     {
       LinkedListCursor cc(list);
       Value *v;
@@ -277,7 +277,7 @@ Value::toValueArray(LinkedList &ll)
 	if (status = v->toValueArray(ll))
 	  return status;
     }
-  else if (type == STRUCT)
+  else if (type == tStruct)
     {
       Status status;
       for (int ii = 0; ii < stru->attr_cnt; ii++)
@@ -358,11 +358,11 @@ Value &Value::operator =(const Value &val)
 
   type = val.type;
 
-  if (type == STRING || type == IDENT)
+  if (type == tString || type == tIdent)
     str = strdup(val.str);
-  else if (type == OID)
+  else if (type == tOid)
     oid = new Oid(*val.oid);
-  else if (type == LIST || type == BAG || type == ARRAY || type == SET)
+  else if (type == tList || type == tBag || type == tArray || type == tSet)
     {
       list = new LinkedList();
       LinkedListCursor cursor(val.list);
@@ -370,7 +370,7 @@ Value &Value::operator =(const Value &val)
       for (int ii = 0; cursor.getNext((void *&)value); ii++)
 	if (value) list->insertObjectLast(new Value(*value));
     }
-  else if (type == STRUCT)
+  else if (type == tStruct)
     {
       stru = new Struct(val.stru->attr_cnt);
       for (int ii = 0; ii < stru->attr_cnt; ii++)
@@ -475,60 +475,60 @@ const char *Value::getString() const
 
   switch(type)
     {
-    case NIL:
+    case tNil:
       ((Value *)this)->bufstr = strdup(NilString);
       break;
 
-    case _NULL:
+    case tNull:
       ((Value *)this)->bufstr = strdup(NullString);
       break;
 
-    case BOOL:
+    case tBool:
       sprintf(tok, "%s", (b ? "true" : "false"));
       break;
 
-    case BYTE:
+    case tByte:
       sprintf(tok, "\\0%d", b);
       break;
 
-    case CHAR:
+    case tChar:
       sprintf(tok, "'%c'", c);
       break;
 
-    case SHORT:
+    case tShort:
       sprintf(tok, "%d", s);
       break;
 
-    case INT:
+    case tInt:
       sprintf(tok, "%d", i);
       break;
 
-    case LONG:
+    case tLong:
       sprintf(tok, "%lld", l);
       break;
 
-    case DOUBLE:
+    case tDouble:
       sprintf(tok, "%f", d);
       break;
 
-    case IDENT:
+    case tIdent:
       ((Value *)this)->bufstr = strdup(str);
       break;
 
-    case STRING:
+    case tString:
       ((Value *)this)->bufstr = (char *)malloc(strlen(str)+3);
       sprintf(((Value *)this)->bufstr, "\"%s\"", str);
       break;
 
-    case DATA:
+    case tData:
       sprintf(tok, "[0x%x, %u]", data.data, data.size);
       break;
 
-    case OID:
+    case tOid:
       ((Value *)this)->bufstr = strdup(oid->getString());
       break;
 
-    case OBJECT:
+    case tObject:
       {
 	ostringstream ostr;
 	ostr << o; // << ends;
@@ -536,30 +536,30 @@ const char *Value::getString() const
       }
       break;
 
-    case LIST:
+    case tList:
       ((Value *)this)->bufstr = strdup(getStringList(list, "list").c_str());
       break;
 
-    case SET:
+    case tSet:
       ((Value *)this)->bufstr = strdup(getStringList(list, "set").c_str());
       break;
 
-    case BAG:
+    case tBag:
       ((Value *)this)->bufstr = strdup(getStringList(list, "bag").c_str());
       break;
 
-    case ARRAY:
+    case tArray:
       ((Value *)this)->bufstr = strdup(getStringList(list, "array").c_str());
       break;
 
-    case POBJ:
+    case tPobj:
       {
 	std::string x = str_convert((long)idx, "%x:obj");
 	((Value *)this)->bufstr = strdup(x.c_str());
       }
       break;
 
-    case STRUCT:
+    case tStruct:
       ((Value *)this)->bufstr = strdup(stru->toString().c_str());
       break;
 
@@ -578,83 +578,83 @@ Value::print(FILE *fd) const
 {
   switch(type)
     {
-    case NIL:
+    case tNil:
       fprintf(fd, NilString);
       break;
 
-    case _NULL:
+    case tNull:
       fprintf(fd, NullString);
       break;
 
-    case BOOL:
+    case tBool:
       fprintf(fd, "%s", (b ? "true" : "false"));
       break;
 
-    case BYTE:
+    case tByte:
       fprintf(fd, "\\0%d", b);
       break;
 
-    case CHAR:
+    case tChar:
       fprintf(fd, "'%c'", c);
       break;
 
-    case SHORT:
+    case tShort:
       fprintf(fd, "%d", s);
       break;
 
-    case INT:
+    case tInt:
       fprintf(fd, "%d", i);
       break;
 
-    case LONG:
+    case tLong:
       fprintf(fd, "%lld", l);
       break;
 
-    case DOUBLE:
+    case tDouble:
       fprintf(fd, "%f", d);
       break;
 
-    case IDENT:
+    case tIdent:
       fprintf(fd, "%s", str);
       break;
 
-    case STRING:
+    case tString:
       fprintf(fd, "\"%s\"", str);
       break;
 
-    case DATA:
+    case tData:
       fprintf(fd, "0x%x", data);
       break;
 
-    case OID:
+    case tOid:
       fprintf(fd, oid->getString());
       break;
 
-    case OBJECT:
+    case tObject:
       o->trace(fd);
       break;
 
-    case LIST:
+    case tList:
       print_list(fd, list, "list");
       break;
 
-    case SET:
+    case tSet:
       print_list(fd, list, "set");
       break;
 
-    case BAG:
+    case tBag:
       print_list(fd, list, "bag");
       break;
 
-    case ARRAY:
+    case tArray:
       print_list(fd, list, "array");
       break;
 
-    case POBJ:
+    case tPobj:
       fprintf(fd, "%x:obj", idx);
       break;
 
-    case STRUCT:
+    case tStruct:
       fprintf(fd, "%s", stru->toString().c_str());
       break;
 
@@ -712,11 +712,11 @@ ostream& operator<<(ostream& os, const Value *value)
 void
 Value::garbage()
 {
-  if (type == STRING || type == IDENT)
+  if (type == tString || type == tIdent)
     free(str);
-  else if (type == OID)
+  else if (type == tOid)
     delete oid;
-  else if (type == LIST || type == BAG || type == SET || type == ARRAY)
+  else if (type == tList || type == tBag || type == tSet || type == tArray)
     {
       LinkedListCursor cursor(list);
       Value *value;
@@ -724,7 +724,7 @@ Value::garbage()
 	delete value;
       delete list;
     }
-  else if (type == STRUCT)
+  else if (type == tStruct)
     delete stru;
 
   free(bufstr);
@@ -741,64 +741,64 @@ Value::getStringType(Value::Type type)
 {
   switch(type)
     {
-    case NIL:
+    case tNil:
       return "nil";
 
-    case _NULL:
+    case tNull:
       return "null";
 
-    case BOOL:
+    case tBool:
       return "bool";
 
-    case BYTE:
+    case tByte:
       return "byte";
 
-    case CHAR:
+    case tChar:
       return "char";
 
-    case SHORT:
+    case tShort:
       return "int16";
 
-    case INT:
+    case tInt:
       return "int32";
 
-    case LONG:
+    case tLong:
       return "int64";
 
-    case DOUBLE:
+    case tDouble:
       return "double";
 
-    case IDENT:
+    case tIdent:
       return "ident";
 
-    case STRING:
+    case tString:
       return "string";
 
-    case DATA:
+    case tData:
       return "data";
 
-    case OID:
+    case tOid:
       return "oid";
 
-    case OBJECT:
+    case tObject:
       return "object";
 
-    case LIST:
+    case tList:
       return "list";
 
-    case SET:
+    case tSet:
       return "set";
 
-    case BAG:
+    case tBag:
       return "bag";
 
-    case ARRAY:
+    case tArray:
       return "array";
 
-    case POBJ:
+    case tPobj:
       return "pobject";
 
-    case STRUCT:
+    case tStruct:
       return "struct";
 
     default:
@@ -811,53 +811,53 @@ Value::getData(Size *psize) const
 {
   switch(type)
     {
-    case NIL:
-    case _NULL:
+    case tNil:
+    case tNull:
       if (psize)
 	*psize = 0;
       return 0;
 
-    case BYTE:
+    case tByte:
       if (psize)
 	*psize = sizeof(by);
       return (Data)&by;;
 
-    case CHAR:
+    case tChar:
       if (psize)
 	*psize = sizeof(c);
       return (Data)&c;;
 
-    case SHORT:
+    case tShort:
       if (psize)
 	*psize = sizeof(s);
       return (Data)&s;;
 
-    case INT:
+    case tInt:
       if (psize)
 	*psize = sizeof(i);
       return (Data)&i;
 
-    case LONG:
+    case tLong:
       if (psize)
 	*psize = sizeof(l);
       return (Data)&l;;
 
-    case DOUBLE:
+    case tDouble:
       if (psize)
 	*psize = sizeof(d);
       return (Data)&d;;
 
-    case STRING:
+    case tString:
       if (psize)
 	*psize = strlen(str)+1;
       return (Data)str;
 
-    case DATA:
+    case tData:
       if (psize)
 	*psize = data.size;
       return data.data;
 
-    case OID:
+    case tOid:
       if (psize)
 	*psize = sizeof(oid);
       return (Data)&oid;;
@@ -878,58 +878,58 @@ Value::code(Data &idr, Offset &offset, Size &alloc_size) const
 
   switch(type)
     {
-    case NIL:
-    case _NULL:
+    case tNil:
+    case tNull:
       break;
 
-    case BOOL:
+    case tBool:
       x = b;
       char_code(&idr, &offset, &alloc_size, &x);
       break;
 
-    case BYTE:
+    case tByte:
       char_code(&idr, &offset, &alloc_size, (char *)&by);
       break;
 
-    case CHAR:
+    case tChar:
       char_code(&idr, &offset, &alloc_size, &c);
       break;
 
-    case SHORT:
+    case tShort:
       int16_code(&idr, &offset, &alloc_size, &s);
       break;
 
-    case INT:
+    case tInt:
       int32_code(&idr, &offset, &alloc_size, &i);
       break;
 
-    case LONG:
+    case tLong:
       int64_code(&idr, &offset, &alloc_size, &l);
       break;
 
-    case DOUBLE:
+    case tDouble:
       double_code(&idr, &offset, &alloc_size, &d);
       break;
 
-    case IDENT:
-    case STRING:
+    case tIdent:
+    case tString:
       string_code(&idr, &offset, &alloc_size, str);
       break;
 
-    case DATA:
+    case tData:
       break;
 
-    case OID:
+    case tOid:
       oid_code(&idr, &offset, &alloc_size, oid->getOid());
       break;
 
-    case OBJECT:
+    case tObject:
       break;
 
-    case LIST:
-    case SET:
-    case BAG:
-    case ARRAY:
+    case tList:
+    case tSet:
+    case tBag:
+    case tArray:
       {
 	int cnt = list->getCount();
 	int32_code(&idr, &offset, &alloc_size, &cnt);
@@ -940,11 +940,11 @@ Value::code(Data &idr, Offset &offset, Size &alloc_size) const
       }
       break;
 
-    case POBJ:
+    case tPobj:
       int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&idx);
       break;
 
-    case STRUCT:
+    case tStruct:
       {
 	int32_code(&idr, &offset, &alloc_size, &stru->attr_cnt);
 	for (int ii = 0; ii < stru->attr_cnt; ii++)
@@ -1053,41 +1053,41 @@ Value::decode(Data idr, Offset &offset)
 
   switch(type)
     {
-    case NIL:
-    case _NULL:
+    case tNil:
+    case tNull:
       break;
 
-    case BOOL:
+    case tBool:
       char_decode(idr, &offset, &x);
       b = (Bool)x;
       break;
 
-    case BYTE:
+    case tByte:
       char_decode(idr, &offset, (char *)&by);
       break;
 
-    case CHAR:
+    case tChar:
       char_decode(idr, &offset, &c);
       break;
 
-    case SHORT:
+    case tShort:
       int16_decode(idr, &offset, &s);
       break;
 
-    case INT:
+    case tInt:
       int32_decode(idr, &offset, &i);
       break;
 
-    case LONG:
+    case tLong:
       int64_decode(idr, &offset, &l);
       break;
 
-    case DOUBLE:
+    case tDouble:
       double_decode(idr, &offset, &d);
       break;
 
-    case IDENT:
-    case STRING:
+    case tIdent:
+    case tString:
       {
 	char *y;
 	string_decode(idr, &offset, &y);
@@ -1095,10 +1095,10 @@ Value::decode(Data idr, Offset &offset)
       }
       break;
 
-    case DATA:
+    case tData:
       break;
 
-    case OID:
+    case tOid:
       {
 	eyedbsm::Oid xoid;
 	oid_decode(idr, &offset, &xoid);
@@ -1106,13 +1106,13 @@ Value::decode(Data idr, Offset &offset)
       }
       break;
 
-    case OBJECT:
+    case tObject:
       break;
 
-    case LIST:
-    case SET:
-    case BAG:
-    case ARRAY:
+    case tList:
+    case tSet:
+    case tBag:
+    case tArray:
       {
 	int cnt;
 	int32_decode(idr, &offset, &cnt);
@@ -1126,11 +1126,11 @@ Value::decode(Data idr, Offset &offset)
       }
       break;
 
-    case POBJ:
+    case tPobj:
       int32_decode(idr, &offset, (eyedblib::int32 *)&idx);
       break;
 
-    case STRUCT:
+    case tStruct:
       {
 	int cnt;
 	int32_decode(idr, &offset, &cnt);
