@@ -960,7 +960,7 @@ idbWOQLExec(Object *o, const char *oql, char *&str)
   ValueArray val_arr;
   idbW_status = q.execute(val_arr);
   if (!idbW_status &&
-      (val_arr.getCount() != 1 || val_arr[0].type != Value::STRING))
+      (val_arr.getCount() != 1 || val_arr[0].type != Value::tString))
     idbW_status =
       Exception::make("invalid result using the tag function"
 			 "'%s'", oql);
@@ -2125,7 +2125,7 @@ int get_obj_count(ValueArray &val_array)
 {
   int cnt = 0;
   for (int i = 0; i < val_array.getCount(); i++)
-    if (val_array[i].type == Value::OID)
+    if (val_array[i].type == Value::tOid)
       cnt++;
 
   return cnt;
@@ -2245,7 +2245,7 @@ idbWDumpGenRealize(idbWProcess *p, int fd)
 	  idbW_dest->push(); // ??
 	  for (int j = 0; j < count; j++)
 	    {
-	      if (val_array[j].type == Value::OID)
+	      if (val_array[j].type == Value::tOid)
 		{
 		  Object *o;
 		  status = idbW_ctx->db->loadObject(*val_array[j].oid, o);

@@ -33,7 +33,7 @@ namespace eyedb {
     o(o), state(state), v(v), id(id), refcnt(1)
   {
 
-    if (v.type == Value::OBJECT) {
+    if (v.type == Value::tObject) {
       //printf("construct: refcnt: %p=%d\n", v.o, v.o->getRefCount());
       ObjectPeer::incrRefCount(v.o);
     }
@@ -42,7 +42,7 @@ namespace eyedb {
   void ValueItem::release()
   {
     if (!--refcnt) {
-      if (v.type == Value::OBJECT) {
+      if (v.type == Value::tObject) {
 	//printf("release: refcnt: %p=%d\n", v.o, v.o->getRefCount());
 	v.o->release();
       }

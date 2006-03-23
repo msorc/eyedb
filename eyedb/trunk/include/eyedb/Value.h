@@ -35,27 +35,6 @@ namespace eyedb {
   class ValueArray;
   class ObjectArray;
 
-#undef NIL
-#undef _NULL
-#undef BOOL
-#undef BYTE
-#undef CHAR
-#undef SHORT
-#undef INT
-#undef LONG
-#undef DOUBLE
-#undef IDENT
-#undef STRING
-#undef DATA
-#undef OID
-#undef OBJECT
-#undef POBJ
-#undef LIST
-#undef SET
-#undef ARRAY
-#undef BAG
-#undef STRUCT
-
   /**
      Not yet documented.
   */
@@ -68,26 +47,26 @@ namespace eyedb {
   public:
 
     enum Type {
-      NIL = 0,
-      _NULL,
-      BOOL,
-      BYTE,
-      CHAR,
-      SHORT,
-      INT,
-      LONG,
-      DOUBLE,
-      IDENT,
-      STRING,
-      DATA,
-      OID,
-      OBJECT,
-      POBJ,
-      LIST,
-      SET,
-      ARRAY,
-      BAG,
-      STRUCT
+      tNil = 0,
+      tNull,
+      tBool,
+      tByte,
+      tChar,
+      tShort,
+      tInt,
+      tLong,
+      tDouble,
+      tIdent,
+      tString,
+      tData,
+      tOid,
+      tObject,
+      tPobj,
+      tList,
+      tSet,
+      tArray,
+      tBag,
+      tStruct
     } type;
 
     struct Attr {
@@ -326,7 +305,7 @@ namespace eyedb {
        Not yet documented
     */
     void set() {
-      type = NIL;
+      type = tNil;
       unvalid();
     }
 
@@ -336,7 +315,7 @@ namespace eyedb {
        @param b2
     */
     void set(Bool b1, Bool b2) {
-      type = _NULL;
+      type = tNull;
       unvalid();
     }
 
@@ -345,7 +324,7 @@ namespace eyedb {
        @param _b
     */
     void set(Bool _b) {
-      type = BOOL;
+      type = tBool;
       b = _b;
       unvalid();
     }
@@ -355,7 +334,7 @@ namespace eyedb {
        @param _by
     */
     void set (unsigned char _by) {
-      type = BYTE;
+      type = tByte;
       by = _by;
       unvalid();
     }
@@ -365,7 +344,7 @@ namespace eyedb {
        @param _c
     */
     void set(char _c) {
-      type = CHAR;
+      type = tChar;
       c = _c;
       unvalid();
     }
@@ -375,7 +354,7 @@ namespace eyedb {
        @param _s
     */
     void set(short _s) {
-      type = SHORT;
+      type = tShort;
       s = _s;
       unvalid();
     }
@@ -385,7 +364,7 @@ namespace eyedb {
        @param _d
     */
     void set(double _d) {
-      type = DOUBLE;
+      type = tDouble;
       d = _d;
       unvalid();
     }
@@ -395,7 +374,7 @@ namespace eyedb {
        @param _i
     */
     void set(eyedblib::int32 _i) {
-      type = INT;
+      type = tInt;
       i = _i;
       unvalid();
     }
@@ -405,7 +384,7 @@ namespace eyedb {
        @param _l
     */
     void set(eyedblib::int64 _l) {
-      type = LONG;
+      type = tLong;
       l = _l;
       unvalid();
     }
@@ -415,7 +394,7 @@ namespace eyedb {
        @param *_str
     */
     void set(const char *_str) {
-      type = STRING;
+      type = tString;
       str = _str ? strdup(_str) : NULL;
       unvalid();
     }
@@ -426,7 +405,7 @@ namespace eyedb {
        @param isident
     */
     void set(const char *_str, Bool isident) {
-      type = (isident ? IDENT : STRING);
+      type = (isident ? tIdent : tString);
       str = _str ? strdup(_str) : NULL;
       unvalid();
     }
@@ -436,7 +415,7 @@ namespace eyedb {
        @param _data
     */
     void set(Data _data, Size _size) {
-      type = DATA;
+      type = tData;
       data.data = _data;
       data.size = _size;
       unvalid();
@@ -447,7 +426,7 @@ namespace eyedb {
        @param &_oid
     */
     void set(const Oid &_oid) {
-      type = OID;
+      type = tOid;
       oid = new Oid(_oid);
       unvalid();
     }
@@ -457,7 +436,7 @@ namespace eyedb {
        @param *_o
     */
     void set(const Object *_o) {
-      type = OBJECT;
+      type = tObject;
       o = (Object *)_o;
       unvalid();
     }
@@ -468,7 +447,7 @@ namespace eyedb {
        @param _idx
     */
     void set(const Object *_o, unsigned int _idx) {
-      type = POBJ;
+      type = tPobj;
       idx = _idx;
       unvalid();
     }
@@ -478,7 +457,7 @@ namespace eyedb {
        @param *_o
     */
     void set(Object *_o) {
-      type = OBJECT;
+      type = tObject;
       o = _o;
       unvalid();
     }
@@ -489,10 +468,10 @@ namespace eyedb {
        @param _type
     */
     void set(LinkedList *_list, Value::Type _type) {
-      if (_type != LIST && _type != SET && _type != ARRAY && _type != BAG)
+      if (_type != tList && _type != tSet && _type != tArray && _type != tBag)
 	{
 	  (void)Exception::make("setting collection value: type must be "
-				"LIST, SET, ARRAY or BAG");
+				"tList, tSet, tArray or tBag");
 	  return;
 	}
 
@@ -506,7 +485,7 @@ namespace eyedb {
        @param *_stru
     */
     void set(Value::Struct *_stru) {
-      type = STRUCT;
+      type = tStruct;
       stru = _stru;
       unvalid();
     }
@@ -628,7 +607,7 @@ namespace eyedb {
     */
     void init() {
       bufstr = NULL;
-      type = NIL;
+      type = tNil;
     }
 
     /**

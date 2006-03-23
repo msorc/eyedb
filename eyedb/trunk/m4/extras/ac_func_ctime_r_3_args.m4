@@ -10,7 +10,7 @@ else
    ctime_r3="yes"
    AC_COMPILE_IFELSE(
      [AC_LANG_PROGRAM([[#include <sys/time.h>]],[[char buf[26]; time_t t; ctime_r(&t,buf,26);]])],
-     [AC_DEFINE(HAS_CTIME_R_3, 1, [Define if you have ctime_r(time_t*,char *buf,size_t s)])],
+     [AC_DEFINE(HAVE_CTIME_R_3, 1, [Define if you have ctime_r(time_t*,char *buf,size_t s)])],
      [ctime_r3="no"]
      )
    if test "$ctime_r3" = "yes"

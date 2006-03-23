@@ -31,28 +31,28 @@ namespace eyedb {
 
   public:
     enum OpType {
-      GET = 0,
-      SET,
-      GETOID,
-      SETOID,
+      tGet = 0,
+      tSet,
+      tGetOid,
+      tSetOid,
       // variable dimension attribute
-      GETCOUNT,
-      SETCOUNT,
+      tGetCount,
+      tSetCount,
       // collections
-      GETCOLL,
-      SETCOLL,
-      ADD_ITEM_TO_COLL,
-      RMV_ITEM_FROM_COLL,
-      SET_ITEM_IN_COLL,
-      UNSET_ITEM_IN_COLL,
-      GET_ITEM_AT,
-      GETOID_ITEM_AT,
-      RETRIEVE_ITEM_AT,
-      RETRIEVEOID_ITEM_AT,
+      tGetColl,
+      tSetColl,
+      tAddItemToColl,
+      tRmvItemFromColl,
+      tSetItemInColl,
+      tUnsetItemInColl,
+      tGetItemAt,
+      tGetOidItemAt,
+      tRetrieveItemAt,
+      tRetrieveOidItemAt,
       // casting methods
-      CAST,
-      SAFE_CAST,
-      LASTOP
+      tCast,
+      tSafeCast,
+      tLastOp
     };
 
     class Style {
@@ -82,7 +82,7 @@ namespace eyedb {
 	  ~CompDesc() {free(cfmt);}
 	} comp;
 	~Desc() {free(fmt);}
-      } desc[LASTOP];
+      } desc[tLastOp];
       Status compile();
       void parse_file(const char *);
       Status compile(Desc *);

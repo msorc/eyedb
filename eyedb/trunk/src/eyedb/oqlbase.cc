@@ -4178,31 +4178,31 @@ namespace eyedb {
   Value::Type
   oqmlAtom_coll::getValueType() const
   {
-    return Value::NIL;
+    return Value::tNil;
   }
 
   Value::Type
   oqmlAtom_list::getValueType() const
   {
-    return Value::LIST;
+    return Value::tList;
   }
 
   Value::Type
   oqmlAtom_set::getValueType() const
   {
-    return Value::SET;
+    return Value::tSet;
   }
 
   Value::Type
   oqmlAtom_array::getValueType() const
   {
-    return Value::ARRAY;
+    return Value::tArray;
   }
 
   Value::Type
   oqmlAtom_bag::getValueType() const
   {
-    return Value::BAG;
+    return Value::tBag;
   }
 
   Value *oqmlAtom_coll::toValue() const

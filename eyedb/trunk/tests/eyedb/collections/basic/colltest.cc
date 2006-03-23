@@ -869,7 +869,7 @@ perform_gbx(Database &db)
   for (int n = 0; n < 2; n++) {
     printf("time #%d\n", n);
     for (int j = 0; j < val_arr.getCount(); j++) {
-      if (val_arr[j].type == Value::OID) {
+      if (val_arr[j].type == Value::tOid) {
 	Object *o;
 	db.loadObject(*val_arr[j].oid, o);
 	printf("TRACE #%d %s\n", j, (o->asClass() ?

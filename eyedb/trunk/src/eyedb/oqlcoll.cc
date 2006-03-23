@@ -136,21 +136,21 @@ namespace eyedb {
 
       oqmlAtom *x;
       Value::Type type = v.getType();
-      if (type == Value::OID)
+      if (type == Value::tOid)
 	x = new oqmlAtom_oid(*v.oid, (Class *)cls);
-      else if (type == Value::OBJECT) {
+      else if (type == Value::tObject) {
 	v.o->trace();
 	x = oqmlObjectManager::registerObject(v.o->clone());
       }
-      else if (type == Value::STRING)
+      else if (type == Value::tString)
 	x = new oqmlAtom_string(v.str);
-      else if (type == Value::INT)
+      else if (type == Value::tInt)
 	x = new oqmlAtom_int(v.i);
-      else if (type == Value::LONG)
+      else if (type == Value::tLong)
 	x = new oqmlAtom_int(v.l);
-      else if (type == Value::CHAR)
+      else if (type == Value::tChar)
 	x = new oqmlAtom_char(v.c);
-      else if (type == Value::DOUBLE)
+      else if (type == Value::tDouble)
 	x = new oqmlAtom_double(v.d);
       else {
 	oqmlObjectManager::releaseObject(o);
@@ -176,19 +176,19 @@ namespace eyedb {
     for (int n = 0; n < count; n++) {
       Value &v = val_arr[n];
       Value::Type type = v.getType();
-      if (type == Value::OID)
+      if (type == Value::tOid)
 	rlist->append(new oqmlAtom_oid(*v.oid, (Class *)cls));
-      else if (type == Value::OBJECT)
+      else if (type == Value::tObject)
 	rlist->append(oqmlObjectManager::registerObject(v.o));
-      else if (type == Value::STRING)
+      else if (type == Value::tString)
 	rlist->append(new oqmlAtom_string(v.str));
-      else if (type == Value::INT)
+      else if (type == Value::tInt)
 	rlist->append(new oqmlAtom_int(v.i));
-      else if (type == Value::LONG)
+      else if (type == Value::tLong)
 	rlist->append(new oqmlAtom_int(v.l));
-      else if (type == Value::CHAR)
+      else if (type == Value::tChar)
 	rlist->append(new oqmlAtom_char(v.c));
-      else if (type == Value::DOUBLE)
+      else if (type == Value::tDouble)
 	rlist->append(new oqmlAtom_double(v.d));
       else {
 	oqmlObjectManager::releaseObject(o);

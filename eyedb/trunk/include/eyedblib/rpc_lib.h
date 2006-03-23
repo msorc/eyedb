@@ -171,18 +171,6 @@ extern void rpc_setConnFd(int fd);
 /* 24/09/04: disconnected for test */
 /*#define RPC_MIN_SIZE 128*/
 
-#if defined(SOLARIS) || defined(ULTRASOL7)
-#define RPC_BYTE1(addr) (addr->_S_un._S_un_b.s_b1)
-#define RPC_BYTE2(addr) (addr->_S_un._S_un_b.s_b2)
-#define RPC_BYTE3(addr) (addr->_S_un._S_un_b.s_b3)
-#define RPC_BYTE4(addr) (addr->_S_un._S_un_b.s_b4)
-#else
-#define RPC_BYTE1(addr) (addr->s_addr >> 24)
-#define RPC_BYTE2(addr) ((addr->s_addr >> 16) & 0xff)
-#define RPC_BYTE3(addr) ((addr->s_addr >> 8) & 0xff)
-#define RPC_BYTE4(addr) (addr->s_addr & 0xff)
-#endif
-
 extern void
 print_addr(FILE *fd, struct in_addr *addr);
 extern int

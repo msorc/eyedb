@@ -310,44 +310,44 @@ namespace eyedb {
     memset(desc, 0, sizeof(desc));
 
     if (!strcasecmp(file, "implicit")) {
-      desc[GET].fmt = strdup("%IN");
-      desc[SET].fmt = strdup("%IN");
-      desc[GETOID].fmt = strdup("%IN_oid");
-      desc[SETOID].fmt = strdup("%IN_oid");
-      desc[GETCOUNT].fmt = strdup("%IN_cnt");
-      desc[SETCOUNT].fmt = strdup("%IN_cnt");
-      desc[GETCOLL].fmt = strdup("%IN");
-      desc[SETCOLL].fmt = strdup("%IN");
-      desc[ADD_ITEM_TO_COLL].fmt = strdup("addto_%IN");
-      desc[RMV_ITEM_FROM_COLL].fmt = strdup("rmvfrom_%IN");
-      desc[SET_ITEM_IN_COLL].fmt = strdup("setin_%IN_at");
-      desc[UNSET_ITEM_IN_COLL].fmt = strdup("unsetin_%IN_at");
-      desc[GET_ITEM_AT].fmt = strdup("%IN_at");
-      desc[GETOID_ITEM_AT].fmt = strdup("%IN_oidat");
-      desc[RETRIEVE_ITEM_AT].fmt = strdup("%IN_at");
-      desc[RETRIEVEOID_ITEM_AT].fmt = strdup("%IN_oidat");
-      desc[CAST].fmt = strdup("%IP%CN_");
-      desc[SAFE_CAST].fmt = strdup("%IP%CN_c");
+      desc[tGet].fmt = strdup("%IN");
+      desc[tSet].fmt = strdup("%IN");
+      desc[tGetOid].fmt = strdup("%IN_oid");
+      desc[tSetOid].fmt = strdup("%IN_oid");
+      desc[tGetCount].fmt = strdup("%IN_cnt");
+      desc[tSetCount].fmt = strdup("%IN_cnt");
+      desc[tGetColl].fmt = strdup("%IN");
+      desc[tSetColl].fmt = strdup("%IN");
+      desc[tAddItemToColl].fmt = strdup("addto_%IN");
+      desc[tRmvItemFromColl].fmt = strdup("rmvfrom_%IN");
+      desc[tSetItemInColl].fmt = strdup("setin_%IN_at");
+      desc[tUnsetItemInColl].fmt = strdup("unsetin_%IN_at");
+      desc[tGetItemAt].fmt = strdup("%IN_at");
+      desc[tGetOidItemAt].fmt = strdup("%IN_oidat");
+      desc[tRetrieveItemAt].fmt = strdup("%IN_at");
+      desc[tRetrieveOidItemAt].fmt = strdup("%IN_oidat");
+      desc[tCast].fmt = strdup("%IP%CN_");
+      desc[tSafeCast].fmt = strdup("%IP%CN_c");
     }
     else if (!strcasecmp(file, "explicit")) {
-      desc[GET].fmt = strdup("get%CN");
-      desc[SET].fmt = strdup("set%CN");
-      desc[GETOID].fmt = strdup("get%CNOid");
-      desc[SETOID].fmt = strdup("set%CNOid");
-      desc[GETCOUNT].fmt = strdup("get%CNCount");
-      desc[SETCOUNT].fmt = strdup("set%CNCount");
-      desc[GETCOLL].fmt = strdup("get%CNColl");
-      desc[SETCOLL].fmt = strdup("set%CNColl");
-      desc[ADD_ITEM_TO_COLL].fmt = strdup("addTo%CNColl");
-      desc[RMV_ITEM_FROM_COLL].fmt = strdup("rmvFrom%CNColl");
-      desc[SET_ITEM_IN_COLL].fmt = strdup("setIn%CNCollAt");
-      desc[UNSET_ITEM_IN_COLL].fmt = strdup("unsetIn%CNCollAt");
-      desc[GET_ITEM_AT].fmt = strdup("get%CNAt");
-      desc[GETOID_ITEM_AT].fmt = strdup("get%CNOidAt");
-      desc[RETRIEVE_ITEM_AT].fmt = strdup("retrieve%CNAt");
-      desc[RETRIEVEOID_ITEM_AT].fmt = strdup("retrieve%CNOidAt");
-      desc[CAST].fmt = strdup("%UP%CN_");
-      desc[SAFE_CAST].fmt = strdup("%UP%CN_c");
+      desc[tGet].fmt = strdup("get%CN");
+      desc[tSet].fmt = strdup("set%CN");
+      desc[tGetOid].fmt = strdup("get%CNOid");
+      desc[tSetOid].fmt = strdup("set%CNOid");
+      desc[tGetCount].fmt = strdup("get%CNCount");
+      desc[tSetCount].fmt = strdup("set%CNCount");
+      desc[tGetColl].fmt = strdup("get%CNColl");
+      desc[tSetColl].fmt = strdup("set%CNColl");
+      desc[tAddItemToColl].fmt = strdup("addTo%CNColl");
+      desc[tRmvItemFromColl].fmt = strdup("rmvFrom%CNColl");
+      desc[tSetItemInColl].fmt = strdup("setIn%CNCollAt");
+      desc[tUnsetItemInColl].fmt = strdup("unsetIn%CNCollAt");
+      desc[tGetItemAt].fmt = strdup("get%CNAt");
+      desc[tGetOidItemAt].fmt = strdup("get%CNOidAt");
+      desc[tRetrieveItemAt].fmt = strdup("retrieve%CNAt");
+      desc[tRetrieveOidItemAt].fmt = strdup("retrieve%CNOidAt");
+      desc[tCast].fmt = strdup("%UP%CN_");
+      desc[tSafeCast].fmt = strdup("%UP%CN_c");
     }
     else {
       parse_file(file);
@@ -411,14 +411,14 @@ namespace eyedb {
       }
       
       int i;
-      for (i = 0; i < LASTOP; i++)
+      for (i = 0; i < tLastOp; i++)
 	if (!strcasecmp(optype_str, opTypeStr((OpType)i))) {
 	  desc[i].fmt = strdup(make_fmt(fmt_str));
 	  desc[i].op = (OpType)i; // added the 10/3/00
 	  break;
 	}
       
-      if (i == LASTOP) {
+      if (i == tLastOp) {
 	status =
 	  Exception::make(IDB_ERROR,
 			  "syntax error in user file style '%s' "
@@ -432,41 +432,41 @@ namespace eyedb {
   const char *
   GenCodeHints::Style::opTypeStr(OpType op)
   {
-    if (op == GET)
+    if (op == tGet)
       return "GET";
-    if (op == SET)
+    if (op == tSet)
       return "SET";
-    if (op == GETOID)
-      return "GETOID";
-    if (op == SETOID)
+    if (op == tGetOid)
+      return "tGetOid";
+    if (op == tSetOid)
       return "SETOID";
-    if (op == GETCOUNT)
+    if (op == tGetCount)
       return "GETCOUNT";
-    if (op == SETCOUNT)
+    if (op == tSetCount)
       return "SETCOUNT";
-    if (op == GETCOLL)
+    if (op == tGetColl)
       return "GETCOLL";
-    if (op == SETCOLL)
+    if (op == tSetColl)
       return "SETCOLL";
-    if (op == ADD_ITEM_TO_COLL)
+    if (op == tAddItemToColl)
       return "ADD_ITEM_TO_COLL";
-    if (op == RMV_ITEM_FROM_COLL)
+    if (op == tRmvItemFromColl)
       return "RMV_ITEM_FROM_COLL";
-    if (op == SET_ITEM_IN_COLL)
+    if (op == tSetItemInColl)
       return "SET_ITEM_IN_COLL";
-    if (op == UNSET_ITEM_IN_COLL)
+    if (op == tUnsetItemInColl)
       return "UNSET_ITEM_IN_COLL";
-    if (op == GET_ITEM_AT)
+    if (op == tGetItemAt)
       return "GET_ITEM_AT";
-    if (op == GETOID_ITEM_AT)
+    if (op == tGetOidItemAt)
       return "GETOID_ITEM_AT";
-    if (op == RETRIEVE_ITEM_AT)
+    if (op == tRetrieveItemAt)
       return "RETRIEVE_ITEM_AT";
-    if (op == RETRIEVEOID_ITEM_AT)
+    if (op == tRetrieveOidItemAt)
       return "RETRIEVEOID_ITEM_AT";
-    if (op == CAST)
+    if (op == tCast)
       return "CAST";
-    if (op == SAFE_CAST)
+    if (op == tSafeCast)
       return "SAFE_CAST";
     abort();
   }
@@ -535,7 +535,7 @@ namespace eyedb {
 
   Status GenCodeHints::Style::compile()
   {
-    for (int i = 0; i < LASTOP; i++) {
+    for (int i = 0; i < tLastOp; i++) {
       Desc *d = &desc[i];
       if (!d->fmt)
 	return Exception::make(IDB_ERROR,

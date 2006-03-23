@@ -54,7 +54,7 @@ namespace eyedb {
 	if (!next(v))
 	  return False;
 
-	if (v.getType() == Value::OID) {
+	if (v.getType() == Value::tOid) {
 	  oid = *v.oid;
 	  return True;
 	}

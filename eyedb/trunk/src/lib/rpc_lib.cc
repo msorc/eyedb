@@ -21,15 +21,18 @@
    Author: Eric Viara <viara@sysra.com>
 */
 
-#include "eyedbconfig.h"
+#include <eyedbconfig.h>
 
 #include <assert.h>
 #include <string.h>
 #include <errno.h>
 #include <sys/select.h>
 #include <time.h>
-
-#include <eyedbconfig.h>
+// @@@ ???
+#ifdef AIX
+#define _NO_BITFIELDS
+#endif
+#include <netinet/tcp.h>
 
 #if TIME_WITH_SYS_TIME
 #include <sys/time.h>
@@ -46,12 +49,7 @@
 
 #include <eyedblib/rpc_lib.h>
 #include <eyedblib/xdr.h>
-
-
-#ifdef AIX
-#define _NO_BITFIELDS
-#endif
-#include <netinet/tcp.h>
+#include <lib/rpc_lib_p.h>
 
 int RPC_MIN_SIZE = 256;
 

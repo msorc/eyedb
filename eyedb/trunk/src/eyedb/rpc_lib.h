@@ -347,8 +347,6 @@ namespace eyedb {
   extern const int CONN_COUNT;
 
   const eyedblib::uint32 RPC_PROTOCOL_MAGIC  = 0x43f2e341;
-
-#define NEW(X) (X *) calloc(sizeof(X), 1)
 }
 
 #endif

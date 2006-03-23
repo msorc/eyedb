@@ -1627,8 +1627,8 @@ print_command(OQLParser *parser, int argc, char *argv[])
       int cnt = value_arr.getCount();
       transactionBegin(db);
       for (int j = 0; j < cnt && !oql_interrupt; j++)
-	if (value_arr[j].getType() == Value::OID ||
-	    value_arr[j].getType() == Value::POBJ) {
+	if (value_arr[j].getType() == Value::tOid ||
+	    value_arr[j].getType() == Value::tPobj) {
 	  print_oid(db, value_arr[j].getString(), flags, rcm);
 	  if (oql_interrupt) {
 	    oql_sig_h(0);
@@ -1719,7 +1719,7 @@ show_command(OQLParser *parser, int argc, char *argv[])
 	return 1;
 
       for (int j = 0; j < cnt; j++)
-	if (value_arr[j].getType() == Value::OID) {
+	if (value_arr[j].getType() == Value::tOid) {
 	  buffer.append("&");
 	  eyedbsm::Oid *xoid = value_arr[j].oid->getOid();
 	  char oidstr[64];
@@ -2606,15 +2606,15 @@ rvalue_manage(const Value &v)
 {
   bool done = false;
 
-  if (v.type == Value::STRUCT) {
+  if (v.type == Value::tStruct) {
     Value::Struct *stru = v.stru;
     if (stru->attr_cnt == 2) {
       Value::Attr *content_type_a = stru->attrs[0];
       Value::Attr *content_a = stru->attrs[1];
       if (!strcasecmp(content_type_a->name, "content_type") &&
 	  !strcasecmp(content_a->name, "content") &&
-	  content_type_a->value->getType() == Value::STRING &&
-	  content_a->value->getType() == Value::STRING &&
+	  content_type_a->value->getType() == Value::tString &&
+	  content_a->value->getType() == Value::tString &&
 	  !strcasecmp(content_type_a->value->str, "text/html")) {
 	const char *file = TempFileManager::getInstance().getTempFile();
 	int fd = creat(file, 0666);
@@ -2637,7 +2637,7 @@ rvalue_manage(const Value &v)
     }
   }
 
-  if (!done && v.type != Value::NIL) { // added the 12/01/00
+  if (!done && v.type != Value::tNil) { // added the 12/01/00
     printf("= ");
     v.print(stdout);
     printf("\n");
