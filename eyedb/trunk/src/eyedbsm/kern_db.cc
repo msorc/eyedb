@@ -429,20 +429,6 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     delete [] datfiles;
   }
 
-#if 1
-  int
-  testbuf( unsigned char *buf, int size)
-  {
-    int s = 0;
-
-    for (int i = 0; i < size; i++)
-      s += buf[i];
-
-    return s;
-  }
-#endif
-
-#define BUF_WITH_MALLOC
   Status
   dbCreate(const char *dbfile, unsigned int version,
 	   const DbCreateDescription *dbc)
@@ -453,17 +439,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     //unsigned int nbobjs = (dbc->nbobjs ? dbc->nbobjs : ESM_DEF_NBOBJS);
     Oid::NX nbobjs = dbc->nbobjs;
     int n;
-#ifdef BUF_WITH_MALLOC
-    unsigned char *buf = (unsigned char *)malloc(DbHeader_SIZE);
-#else
-    unsigned char buf[DbHeader_SIZE];
-#endif
-    DbHeader dbh(buf);
-
-#if 1
-    // std::cerr << "testbuf " << testbuf( buf, DbHeader_SIZE) << std::endl;
-    dbh.memzero();
-#endif
+    DbHeader dbh;
 
     DbHandle *pdbh;
     DbShmHeader dbhshm;
@@ -496,10 +472,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     if (status = syscheck(PR, close(dbfd.shmfd), "closing shm file: '%s'", shmfileGet(dbfile)))
       return dbcreate_error(status, dbfile, dbc, 0, &dbfd);
 
-#if 0
     dbh.memzero();
-    //memset(&dbh, 0, sizeof(dbh));
-#endif
       
     char *pwd;
     status = push_dir(dbfile, &pwd);
@@ -532,9 +505,10 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     dbh.__nbobjs() = nbobjs;
 
     dbh.state() = OPENING_STATE;
-    unsigned char _xdbh[DbHeader_SIZE];
-    DbHeader xdbh(_xdbh);
+
+    DbHeader xdbh;
     h2x_dbHeader(&xdbh, &dbh);
+
     if ((n = write(dbfd.dbsfd, xdbh._addr(), DbHeader_SIZE)) != DbHeader_SIZE) {
       pop_dir(pwd);
       return dbcreate_error(statusMake(DATABASE_CREATION_ERROR, PR "unexpected error reported by write on database file: '%s'", dbfile), dbfile, dbc, ndat, &dbfd);
@@ -643,8 +617,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
   Status
   dbInfo(const char *dbfile, DbInfoDescription *info)
   {
-    unsigned char _xdbh[DbHeader_SIZE];
-    DbHeader xdbh(_xdbh);
+    DbHeader xdbh;
     int fd;
     Status se;
 
@@ -661,8 +634,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 		       "reading database file: '%s'", dbfile))
       return se;
 
-    unsigned char buf[DbHeader_SIZE];
-    DbHeader dbh(buf);
+    DbHeader dbh;
     x2h_dbHeader(&dbh, &xdbh);
 
     if (dbh.__magic() != MAGIC)
@@ -1050,8 +1022,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
   {
     DbMoveDescription dmv = *xdmv;
     DbHandle *dbh;
-    unsigned char buf[DbHeader_SIZE];
-    DbHeader db_header(buf);
+    DbHeader db_header;
     Status s;
     DbCreateDescription *dbc = &dmv.dcr;
     int i, fd;
@@ -1129,8 +1100,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
   Status
   dbRelocate(const char *dbfile, const DbRelocateDescription *rel)
   {
-    unsigned char _xdbh[DbHeader_SIZE];
-    DbHeader xdbh(_xdbh);
+    DbHeader xdbh;
     int fd, i;
     Status se;
 
@@ -1142,8 +1112,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     if (se = syscheckn(PR, read(fd, xdbh._addr(), DbHeader_SIZE), DbHeader_SIZE, ""))
       return se;
 
-    unsigned char buf[DbHeader_SIZE];
-    DbHeader dbh(buf);
+    DbHeader dbh;
     x2h_dbHeader(&dbh, &xdbh);
     if (dbh.__magic() != MAGIC)
       return statusMake(INVALID_DBFILE, PR "database file '%s' is not a valid eyedbsm database file", dbfile);
@@ -1457,8 +1426,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 	return se;
       }
 
-    unsigned char _xdbh[DbHeader_SIZE];
-    DbHeader xdbh(_xdbh);
+    DbHeader xdbh;
     if (se = syscheckn(PR, read(hdfd, xdbh._addr(), DbHeader_SIZE), DbHeader_SIZE, ""))
       {
 	free(vd);
