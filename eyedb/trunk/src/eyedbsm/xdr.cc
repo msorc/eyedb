@@ -172,8 +172,8 @@ namespace eyedbsm {
 
       hmap->mstat_u_bmstat_obj_count() = x2h_u32(xmap->mstat_u_bmstat_obj_count());
       hmap->mstat_u_bmstat_busy_slots() = x2h_u32(xmap->mstat_u_bmstat_busy_slots());
-      hmap->mstat_u_bmstat_busy_size() = x2h_u32(xmap->mstat_u_bmstat_busy_size());
-      hmap->mstat_u_bmstat_hole_size() = x2h_u32(xmap->mstat_u_bmstat_hole_size());
+      hmap->mstat_u_bmstat_busy_size() = x2h_u64(xmap->mstat_u_bmstat_busy_size());
+      hmap->mstat_u_bmstat_hole_size() = x2h_u64(xmap->mstat_u_bmstat_hole_size());
     }
     else if (hmap->mtype() == LinkmapType) {
       abort();
@@ -200,8 +200,8 @@ namespace eyedbsm {
 
       xmap->mstat_u_bmstat_obj_count() = h2x_u32(hmap->mstat_u_bmstat_obj_count());
       xmap->mstat_u_bmstat_busy_slots() = h2x_u32(hmap->mstat_u_bmstat_busy_slots());
-      xmap->mstat_u_bmstat_busy_size() = h2x_u32(hmap->mstat_u_bmstat_busy_size());
-      xmap->mstat_u_bmstat_hole_size() = h2x_u32(hmap->mstat_u_bmstat_hole_size());
+      xmap->mstat_u_bmstat_busy_size() = h2x_u64(hmap->mstat_u_bmstat_busy_size());
+      xmap->mstat_u_bmstat_hole_size() = h2x_u64(hmap->mstat_u_bmstat_hole_size());
     }
     else if (mtype == LinkmapType) {
       abort();
