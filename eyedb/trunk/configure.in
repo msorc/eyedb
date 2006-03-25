@@ -95,11 +95,20 @@ EYEDB_CONFIG_BYTE_ORDER=EYEDBLIB_LITTLE_ENDIAN
 fi
 AC_SUBST(EYEDB_CONFIG_BYTE_ORDER)
 
+# check for unsigned long long type
+AC_CHECK_TYPES( unsigned long long)
+if test x"$ac_cv_type_unsigned_long_long" != xyes ; then
+   AC_MSG_ERROR( "this platform does not support type unsigned long long")
+fi
+
 # check for type sizes
 AC_CHECK_SIZEOF(void *)
 AC_CHECK_SIZEOF(unsigned int)
 AC_CHECK_SIZEOF(unsigned long)
 AC_CHECK_SIZEOF(unsigned long long)
+if test "$ac_cv_sizeof_unsigned_long_long" -lt 8 ; then
+   AC_MSG_ERROR( "this platform has an unsigned long long type with sizeof(unsigned long long) < 8")
+fi
 
 AC_MSG_CHECKING(for integer type of same size as void *)
 case $ac_cv_sizeof_void_p in
@@ -148,9 +157,6 @@ AC_CHECK_MEMBERS(union semun.val,,,[#include <sys/sem.h>])
 # check for struct in_addr
 AC_CHECK_MEMBERS(struct in_addr.s_addr,,,[#include <netinet/in.h>])
 AC_CHECK_MEMBERS(struct in_addr._S_un,,,[#include <netinet/in.h>])
-
-# check for unsigned long long type
-AC_CHECK_TYPES( unsigned long long)
 
 # check for functions
 AC_CHECK_FUNCS(strsignal)

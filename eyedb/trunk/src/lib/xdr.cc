@@ -55,6 +55,7 @@ eyedblib::int64
 h2x_64(eyedblib::int64 x)
 {
 #ifdef EYEDBLIB_BIG_ENDIAN
+#error __FILE__ __LINE__ EYEDBLIB_BIG_ENDIAN is defined
   return x;
 #else
   return ((unsigned long long)htonl(l)) << 32 | htonl((x >> 32) & 0xffffffff);
@@ -95,6 +96,7 @@ eyedblib::int64
 x2h_64(eyedblib::int64 x)
 {
 #ifdef EYEDBLIB_BIG_ENDIAN
+#error __FILE__ __LINE__ EYEDBLIB_BIG_ENDIAN is defined
   return x;
 #else
   return ((unsigned long long)ntohl(l)) << 32 | ntohl((x >> 32) & 0xffffffff);
@@ -156,6 +158,7 @@ void
 h2x_16_cpy(void *to, const void *from)
 {
 #ifdef EYEDBLIB_BIG_ENDIAN
+#error __FILE__ __LINE__ EYEDBLIB_BIG_ENDIAN is defined
   if (from)
     eyedblib_mcp(to, from, sizeof(eyedblib::int16));
 #else
@@ -171,6 +174,7 @@ void
 h2x_32_cpy(void *to, const void *from)
 {
 #ifdef EYEDBLIB_BIG_ENDIAN
+#error __FILE__ __LINE__ EYEDBLIB_BIG_ENDIAN is defined
   if (from)
     eyedblib_mcp(to, from, sizeof(eyedblib::int32));
 #else
@@ -186,6 +190,7 @@ void
 h2x_64_cpy(void *to, const void *from)
 {
 #ifdef EYEDBLIB_BIG_ENDIAN
+#error __FILE__ __LINE__ EYEDBLIB_BIG_ENDIAN is defined
   if (from)
     eyedblib_mcp(to, from, sizeof(eyedblib::int64));
 #else
@@ -202,6 +207,7 @@ void
 x2h_16_cpy(void *to, const void *from)
 {
 #ifdef EYEDBLIB_BIG_ENDIAN
+#error __FILE__ __LINE__ EYEDBLIB_BIG_ENDIAN is defined
   if (from)
     eyedblib_mcp(to, from, sizeof(eyedblib::int16));
 #else
@@ -217,6 +223,7 @@ void
 x2h_32_cpy(void *to, const void *from)
 {
 #ifdef EYEDBLIB_BIG_ENDIAN
+#error __FILE__ __LINE__ EYEDBLIB_BIG_ENDIAN is defined
   if (from)
     eyedblib_mcp(to, from, sizeof(eyedblib::int32));
 #else
@@ -232,6 +239,7 @@ void
 x2h_64_cpy(void *to, const void *from)
 {
 #ifdef EYEDBLIB_BIG_ENDIAN
+#error __FILE__ __LINE__ EYEDBLIB_BIG_ENDIAN is defined
   if (from)
     eyedblib_mcp(to, from, sizeof(eyedblib::int64));
 #else

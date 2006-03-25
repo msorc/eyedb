@@ -342,9 +342,14 @@ namespace eyedbsm {
   class DbHeader {
 
     unsigned char *addr;
+    bool toFree;
 
   public:
-    DbHeader(unsigned char *addr) : addr(addr) { }
+    DbHeader() {addr = (unsigned char *)(new long long[DbHeader_SIZE / sizeof(unsigned long long)]); toFree = true;}
+    
+    DbHeader(unsigned char *addr) : addr(addr) { toFree = false;}
+
+    ~DbHeader() { if (toFree) delete [] addr;}
 
     void memzero() {
       memset(addr, 0, DbHeader_SIZE);
