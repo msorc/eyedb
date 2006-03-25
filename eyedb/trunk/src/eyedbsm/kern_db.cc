@@ -461,7 +461,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     DbHeader dbh(buf);
 
 #if 1
-    std::cerr << "testbuf " << testbuf( buf, DbHeader_SIZE) << std::endl;
+    // std::cerr << "testbuf " << testbuf( buf, DbHeader_SIZE) << std::endl;
     dbh.memzero();
 #endif
 
