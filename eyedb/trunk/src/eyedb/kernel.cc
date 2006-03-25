@@ -32,7 +32,8 @@ using namespace std;
 
 #include <eyedbconfig.h>
 
-#define private public
+// @@@ ???????????????
+// #define private public
 
 #include <stdlib.h>
 #include <limits.h>
@@ -41,6 +42,10 @@ using namespace std;
 #ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>
 #endif
+#ifdef HAVE_CRYPT_H
+#include <crypt.h>
+#endif
+
 #include "eyedb_p.h"
 #include "eyedb/DBM_Database.h"
 #include <eyedbsm/eyedbsm.h>

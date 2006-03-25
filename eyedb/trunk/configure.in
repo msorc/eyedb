@@ -75,32 +75,16 @@ fi
 # check for architecture
 AC_CANONICAL_HOST
 
-# must disappear
+# special settings on Solaris 64 bits
 case "$host" in
-i*86-*-linux*)
-	DEFINES="-DLINUX -DX86"
-	;;
-
-x86_64-*-linux*)
-	DEFINES="-DLINUX"
-	;;
-
 sparc-sun-solaris2.9)
-	if test "$ac_cv_cxx_compiler_gnu" = "yes"
+	if test "$ac_cv_cxx_compiler_gnu" != "yes"
 	then
-		DEFINES="-DSOLARIS -DSPARCV9"
-	else
 		CFLAGS="-xtarget=ultra -xarch=v9"
 		CXXFLAGS="$CXXFLAGS -xtarget=ultra -xarch=v9"
-		LDFLAGS="-XCClinker -xtarget=ultra -XCClinker -xarch=v9"
-		DEFINES="-DSOLARIS -DSPARCV9"
 	fi
 	;;
 esac
-
-# -D are taken verbatim for now. Later, may use autodetection and/or command line flags
-DEFINES="$DEFINES -DOPTOPEN -DMOZILLA -DNEW_COLL_XDR -DNEW_COLL_XDR2 -DSUPPORT_NON_BASIC_LITERAL_COLL -DSTUART_AUTH"
-CXXFLAGS="$CXXFLAGS $DEFINES"
 
 # check for endianism
 AC_C_BIGENDIAN
@@ -142,8 +126,17 @@ AC_PROG_LIBTOOL
 AM_PROG_LEX
 AC_PROG_YACC
 
+# check for pthread
+ACX_PTHREAD
+LIBS="$LIBS $PTHREAD_LIBS"
+CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
+CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+
+echo CFLAGS=$CFLAGS
+echo CXXFLAGS=$CXXFLAGS
+
 # check for headers
-AC_CHECK_HEADERS( time.h sys/time.h unistd.h sys/types.h regex.h libgen.h sys/stat.h pwd.h stropts.h)
+AC_CHECK_HEADERS( time.h sys/time.h unistd.h sys/types.h regex.h libgen.h sys/stat.h pwd.h stropts.h crypt.h)
 AC_HEADER_TIME
 
 # check for flock structure
@@ -158,11 +151,6 @@ AC_CHECK_MEMBERS(struct in_addr._S_un,,,[#include <netinet/in.h>])
 
 # check for unsigned long long type
 AC_CHECK_TYPES( unsigned long long)
-
-# check for pthread
-ACX_PTHREAD
-LIBS="$LIBS $PTHREAD_LIBS"
-CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
 
 # check for functions
 AC_CHECK_FUNCS(strsignal)
@@ -191,8 +179,8 @@ AC_PATH_PROG(PATH_TO_MORE,more)
 AC_DEFINE_UNQUOTED([PATH_TO_MORE], "$PATH_TO_MORE", [Define to the absolute path of the more command])
 
 # check for libraries
-dnl AC_CHECK_LIB( nsl, ??) # -lnsl is not necessary apparently
-AC_CHECK_LIB( pthread, pthread_create)
+# this library is necessary on Solaris
+AC_CHECK_LIB( nsl, gethostbyname)
 AC_CHECK_LIB( dl, dlopen)
 AC_CHECK_LIB( crypt, crypt)
 AC_SEARCH_LIBS( socket, socket)
@@ -233,6 +221,32 @@ guess)
 	;;
 esac
 
+# must disappear
+case "$host" in
+i*86-*-linux*)
+	DEFINES="-DLINUX -DX86"
+	;;
+
+x86_64-*-linux*)
+	DEFINES="-DLINUX"
+	;;
+
+sparc-sun-solaris2.9)
+	if test "$ac_cv_cxx_compiler_gnu" = "yes"
+	then
+		DEFINES="-DSOLARIS -DSPARCV9"
+	else
+		CFLAGS="-xtarget=ultra -xarch=v9"
+		CXXFLAGS="$CXXFLAGS -xtarget=ultra -xarch=v9"
+		LDFLAGS="-XCClinker -xtarget=ultra -XCClinker -xarch=v9"
+		DEFINES="-DSOLARIS -DSPARCV9"
+	fi
+	;;
+esac
+
+# -D are taken verbatim for now. Later, may use autodetection and/or command line flags
+DEFINES="$DEFINES -DOPTOPEN -DMOZILLA -DNEW_COLL_XDR -DNEW_COLL_XDR2 -DSUPPORT_NON_BASIC_LITERAL_COLL -DSTUART_AUTH"
+CXXFLAGS="$CXXFLAGS $DEFINES"
 
 # ========================================
 # JAVA compilation
