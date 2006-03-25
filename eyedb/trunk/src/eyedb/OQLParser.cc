@@ -2255,6 +2255,8 @@ copyright_command(OQLParser *parser, int argc, char *argv[])
   printf("You should have received a copy of the GNU Lesser General Public\n");
   printf("License along with this library; if not, write to the Free Software\n");
   printf("Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA \n");
+
+  return 1;
 }
 
 static int

@@ -641,6 +641,8 @@ static void *wait_thr(void *arg)
 #endif
   pthread_detach(pthread_self());
   pthread_exit(&status);
+
+  return 0;
 }
 
 static void *serv_thr(void *arg)
