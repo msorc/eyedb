@@ -236,9 +236,11 @@ namespace eyedb {
   static void
   clean(const char *tmpfile_1, const char *tmpfile_2)
   {
+    /*
     unlink(tmpfile_1);
     if (*tmpfile_2)
       unlink(tmpfile_2);
+    */
   }
 
   FILE *
@@ -259,11 +261,12 @@ namespace eyedb {
 
       char *tmpfile_1, *tmpfile_2;
 
-      tmpfile_1 = mktemp( "/tmp/eyedb-cpp.XXXXXX");
+      char templ1[] =  "/tmp/eyedb-cpp.XXXXXX";
+      tmpfile_1 = mktemp(templ1);
 
       char cmd[512];
 
-      // 12/01/99 all those command are rather fragile!!!
+      // 12/01/99 all those commands are rather fragile!!!
       
       // first pass: because the C preprocessor does not
       // deal well with C++ the comments '//'
@@ -279,7 +282,8 @@ namespace eyedb {
 
       // second pass: to substitute the "<stdin>" file directive
       // to the true file directive
-      tmpfile_1 = mktemp( "/tmp/eyedb-cpp.out.XXXXXX");
+      char templ2[] = "/tmp/eyedb-cpp.out.XXXXXX";
+      tmpfile_2 = mktemp(templ2);
 
       sprintf(cmd, "sed -e 's|<stdin>|%s|g' %s > %s",
 	      file, tmpfile_1, tmpfile_2);
@@ -294,7 +298,7 @@ namespace eyedb {
       sprintf(cmd, "sed -e 's/ ## //g' -e 's/## //g' -e 's/ ##//g' "
 	      "-e 's/# \\([a-zA-Z_][a-zA-Z_0-9]*\\)/\"\\1\"/g' "
 	      "-e 's/^\\\\#/#/' -e 's/##//g' -e 's/: :/::/g' %s | "
-	      "grep -v \"^#ident\" > %s",
+	      "grep -v \"^#ident\" | grep -v \"^#pragma\" > %s",
 	      tmpfile_2, tmpfile_1);
 	      
       if (system(cmd)) {

@@ -45,6 +45,8 @@
 #define eyedbsm_mutexLock(X, Y) eyedbsm::mutexLock(X, Y)
 #define eyedbsm_mutexUnlock(X, Y) eyedbsm::mutexUnlock(X, Y)
 
+//#define TRACE
+
 namespace eyedb {
 
   struct SessionHead {
@@ -527,12 +529,16 @@ namespace eyedb {
   static Bool
   check_server(ClientInfo *conninfo)
   {
+#if 1
+    return True;
+#else
     // solaris only?
     if (access((std::string("/proc/") +
 		str_convert((long)conninfo->backend_pid)).
 	       c_str(), F_OK) >= 0)
       return True;
     return False;
+#endif
   }
 
   int

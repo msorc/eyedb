@@ -1125,24 +1125,21 @@ namespace eyedb {
     need_passwd = True;
     superuser = False;
 
-    /*
-    if (!conn_ctx.ci || conn_ctx.ci->mode == rpc_ConnInfo::STREAM ||
-	conn_ctx.ci->mode == rpc_ConnInfo::UNIX) {
-    */
     if (conn_ctx.ci && conn_ctx.ci->auth.uid >= 0) {
 #ifdef STUART_AUTH
       int uid = (conn_ctx.ci ? conn_ctx.ci->auth.uid : getuid());
 #else
       int uid = (conn_ctx.ci ? conn_ctx.ci->u.stream.uid : getuid());
 #endif
-      const char *authusername = getpwuid(uid)->pw_name;
+      passwd *pwd = getpwuid(uid);
+      const char *authusername = (pwd ? pwd->pw_name : "");
       if (!*username || !strcmp(username, authusername)) {
 	need_passwd = False;
 #ifdef STUART_SUGGESTION
 	if (uid == getuid())
 	  superuser = True;
 #endif
-	return authusername;
+	return strdup(authusername); // memory leak (not important)
       }
       
       return username;
