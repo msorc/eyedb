@@ -854,7 +854,8 @@ namespace eyedb {
   std::string
   AttributeComponent::makeAttrpath(const Class *cls)
   {
-    const char *p = strchr(getAttrpath().c_str(), '.');
+    std::string attrpath = getAttrpath();
+    const char *p = strchr(attrpath.c_str(), '.');
     assert(p);
     return std::string(cls->getName()) + "." + std::string(p+1);
   }
@@ -981,7 +982,8 @@ namespace eyedb {
   AttributeComponent *
   NotNullConstraint::xclone(Database *db, const Class *cls)
   {
-    return new NotNullConstraint(db, (Class *)cls, makeAttrpath(cls).c_str(),
+    std::string str = makeAttrpath(cls);
+    return new NotNullConstraint(db, (Class *)cls, str.c_str(),
 				 getPropagate());
   }
 
@@ -1071,7 +1073,8 @@ namespace eyedb {
   AttributeComponent *
   UniqueConstraint::xclone(Database *db, const Class *cls)
   {
-    return new UniqueConstraint(db, (Class *)cls, makeAttrpath(cls).c_str(),
+    std::string str = makeAttrpath(cls);
+    return new UniqueConstraint(db, (Class *)cls, str.c_str(),
 				getPropagate());
   }
 
@@ -1768,7 +1771,8 @@ namespace eyedb {
     Status s = makeDataspace(db, dataspace);
     if (s) throw *s;
 
-    return new HashIndex(db, (Class *)cls, makeAttrpath(cls).c_str(),
+    std::string str = makeAttrpath(cls);
+    return new HashIndex(db, (Class *)cls, str.c_str(),
 			 getPropagate(), getIsString(),
 			 dataspace, getKeyCount(), getHashMethod(),
 			 impl_hints, impl_hints_cnt);
@@ -2036,7 +2040,8 @@ namespace eyedb {
     Status s = makeDataspace(db, dataspace);
     if (s) throw *s;
 
-    return new BTreeIndex(db, (Class *)cls, makeAttrpath(cls).c_str(),
+    std::string str = makeAttrpath(cls);
+    return new BTreeIndex(db, (Class *)cls, str.c_str(),
 			  getPropagate(), getIsString(),
 			  dataspace, getDegree(), 0, 0);
   }
@@ -2212,7 +2217,8 @@ namespace eyedb {
     Status s = makeDataspace(db, dataspace);
     if (s) throw *s;
 
-    return new CollAttrImpl(db, (Class *)cls, makeAttrpath(cls).c_str(),
+    std::string str = makeAttrpath(cls);
+    return new CollAttrImpl(db, (Class *)cls, str.c_str(),
 			    getPropagate(),
 			    dataspace, (IndexImpl::Type)getIdxtype(),
 			    getKeyCountOrDegree(),
