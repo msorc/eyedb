@@ -1434,9 +1434,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 	return se;
       }
 
-    //dbh = (DbHeader *)malloc(sizeof(DbHeader));
-    unsigned char buf[DbHeader_SIZE];
-    dbh = new DbHeader(buf);
+    dbh = new DbHeader();
     x2h_dbHeader(dbh, &xdbh);
 
     if (dbh->__magic() != MAGIC)
