@@ -202,15 +202,20 @@ namespace eyedbsm {
   class MapHeader {
 
     unsigned char *addr;
+    bool toFree;
 
   public:
-    MapHeader(unsigned char *addr) : addr(addr) { }
+    MapHeader() {addr = (unsigned char *)(new long long[MapHeader_SIZE / sizeof(unsigned long long)]); toFree = true;}
 
-    unsigned char *_addr() {return addr;}
+    MapHeader(unsigned char *addr) : addr(addr) { toFree = false;}
+
+    ~MapHeader() { if (toFree) delete [] addr;}
 
     void memzero() {
       memset(addr, 0, MapHeader_SIZE);
     }
+
+    unsigned char *_addr() {return addr;}
 
     short &mtype() {
       return MapHeader_mtype(addr);
