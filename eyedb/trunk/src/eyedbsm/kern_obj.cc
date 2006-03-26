@@ -109,7 +109,7 @@ namespace eyedbsm {
   static double ratio_n_log = (float)(0xfffff - UNIQUE_BASE)/RAND_COEF;
   static double ratio_n_phy = (float)(0x1fff - UNIQUE_BASE)/RAND_COEF;
 
-  //int rand() {return 1;}
+  int rand() {return 1;}
 
   static unsigned int
   uniqueGet_logical(DbHandle const *dbh)
