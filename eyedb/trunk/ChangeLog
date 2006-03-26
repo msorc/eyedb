@@ -1,3 +1,7 @@
+2006-03-26  Francois Dechelle <francois@dechelle.net>
+
+	* Fixed stack allocation problems on Mac OS X
+
 2006-03-21  Francois Dechelle <francois@dechelle.net>
 
 	* Added tests for timezone (Mac OS X porting)
