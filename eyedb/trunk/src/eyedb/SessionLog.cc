@@ -529,15 +529,13 @@ namespace eyedb {
   static Bool
   check_server(ClientInfo *conninfo)
   {
-#if 1
-    return True;
-#else
-    // solaris only?
-    if (access((std::string("/proc/") +
-		str_convert((long)conninfo->backend_pid)).
-	       c_str(), F_OK) >= 0)
+#ifdef HAVE_SLASH_PROC
+    if (access((std::string("/proc/") +	str_convert((long)conninfo->backend_pid)).c_str(), 
+	       F_OK) >= 0)
       return True;
     return False;
+#else
+    return True;
 #endif
   }
 

@@ -1,3 +1,7 @@
+2006-03-28  Francois Dechelle <francois@dechelle.net>
+
+	* Fixed some remaining problems w.r.t Mac OS X. Now, runs the 'Getting Started' example.
+
 2006-03-26  Francois Dechelle <francois@dechelle.net>
 
 	* Fixed stack allocation problems on Mac OS X
