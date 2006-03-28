@@ -15,6 +15,7 @@ dist_eyedbexamples_DATA=README
 EYEDB_ARCH_CPPFLAGS=@EYEDB_ARCH_CPPFLAGS@
 EYEDB_ARCH_CXXFLAGS=@EYEDB_ARCH_CXXFLAGS@
 EYEDB_ARCH_SO_FLAGS=@EYEDB_ARCH_SO_FLAGS@
+EYEDB_ARCH_LIBS=@EYEDB_ARCH_LIBS@
 
 EDIT = sed \
         -e 's,@bindir\@,$(bindir),g' \
@@ -22,10 +23,10 @@ EDIT = sed \
         -e 's,@exec_prefix\@,$(exec_prefix),g' \
         -e 's,@datadir\@,$(pkgdatadir),g' \
         -e 's,@libdir\@,$(libdir),g' \
-        -e 's,@LIBS\@,$(LIBS),g' \
         -e 's,@localstatedir\@,$(localstatedir),g' \
         -e 's,@prefix\@,$(prefix),g' \
         -e 's,@sysconfdir\@,$(sysconfdir),g' \
+        -e 's,@EYEDB_ARCH_LIBS\@,$(EYEDB_ARCH_LIBS),g' \
 	-e 's,@EYEDB_ARCH_CPPFLAGS\@,$(EYEDB_ARCH_CPPFLAGS),g' \
 	-e 's,@EYEDB_ARCH_CXXFLAGS\@,$(EYEDB_ARCH_CXXFLAGS),g' \
 	-e 's,@EYEDB_ARCH_SO_FLAGS\@,$(EYEDB_ARCH_SO_FLAGS),g'

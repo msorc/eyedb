@@ -353,13 +353,13 @@ case "$host" in
 i*86-*-linux*)
 	EYEDB_ARCH_CPPFLAGS="-D_REENTRANT -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
 	EYEDB_ARCH_CXXFLAGS=-fPIC
-	EYEDB_ARCH_SO_FLAGS=-shared
+	EYEDB_ARCH_SOFLAGS=-shared
 	;;
 
 x86_64-*-linux*)
 	EYEDB_ARCH_CPPFLAGS="-D_REENTRANT -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
 	EYEDB_ARCH_CXXFLAGS=-fPIC
-	EYEDB_ARCH_SO_FLAGS=-shared
+	EYEDB_ARCH_SOFLAGS=-shared
 	;;
 
 sparc-sun-solaris2.9)
@@ -367,11 +367,11 @@ sparc-sun-solaris2.9)
 	then
 		EYEDB_ARCH_CPPFLAGS="-D_REENTRANT -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
 		EYEDB_ARCH_CXXFLAGS=-fPIC
-		EYEDB_ARCH_SO_FLAGS=-shared
+		EYEDB_ARCH_SOFLAGS=-shared
 	else
 		EYEDB_ARCH_CPPFLAGS="-mt -xtarget=ultra -xarch=v9"
 		EYEDB_ARCH_CXXFLAGS=-KPIC
-		EYEDB_ARCH_SO_FLAGS=-G
+		EYEDB_ARCH_SOFLAGS=-G
 	fi
 	;;
 
@@ -381,9 +381,13 @@ sparc-sun-solaris2.9)
 
 esac
 
+EYEDB_ARCH_LIBS=$LIBS
+
 AC_SUBST(EYEDB_ARCH_CPPFLAGS)
 AC_SUBST(EYEDB_ARCH_CXXFLAGS)
-AC_SUBST(EYEDB_ARCH_SO_FLAGS)
+AC_SUBST(EYEDB_ARCH_SOFLAGS)
+AC_SUBST(EYEDB_ARCH_LIBS)
+
 # ========================================
 # End of Examples building
 # ========================================
@@ -523,6 +527,7 @@ echo "  C++ compiler flags: ${CXXFLAGS:-none}"
 echo "  Compile with debug: ${enable_debug:-no}"
 echo "  Compile with optimization: ${enable_optimize:-no}"
 echo "  Semaphore policy: ${ac_semaphore_policy}"
+echo "  Libraries: ${LIBS}"
 echo 
 echo "  *** EyeDB Java binding ***" 
 echo "  Compile Java binding: ${COND_JAVA:-no}"
