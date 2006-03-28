@@ -19,7 +19,7 @@ $(noinst_html_DATA): eyedb-doxygen.cfg $(CPP_FILES)
 	done
 
 install-data-hook:
-	test -z "$(noinst_htmldir)" || $(mkdir_p) "$(DESTDIR)$(noinst_htmldir)"
+	test -z "$(noinst_htmldir)" || $(mkinstalldirs) "$(DESTDIR)$(noinst_htmldir)"
 	( cd html ; \
 	  for f in *.html *.css *.png ; do \
 	    $(INSTALL_DATA) $$f "$(DESTDIR)$(noinst_htmldir)/$$f" ; \

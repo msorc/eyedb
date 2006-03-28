@@ -10,13 +10,13 @@ $(noinst_html_DATA): $(JAVA_FILES)
 	$(JAVADOC) $(JAVADOC_FLAGS) org.eyedb
 
 install-data-hook:
-	test -z "$(noinst_htmldir)" || $(mkdir_p) "$(DESTDIR)$(noinst_htmldir)"
+	test -z "$(noinst_htmldir)" || $(mkinstalldirs) "$(DESTDIR)$(noinst_htmldir)"
 	for f in * ; do \
 		test -f $$f && $(INSTALL_DATA) $$f "$(DESTDIR)$(noinst_htmldir)/$$f" ; \
 	done
 	for dir in resources org org/eyedb org/eyedb/dbm org/eyedb/syscls org/eyedb/utils; do \
 		test -z "$(noinst_htmldir)/$$dir" || \
-			$(mkdir_p) "$(DESTDIR)$(noinst_htmldir)/$$dir" ; \
+			$(mkinstalldirs) "$(DESTDIR)$(noinst_htmldir)/$$dir" ; \
 		( \
 			cd $$dir ; \
 			for f in * ; do \

@@ -75,11 +75,11 @@ clean-local:
 
 if COND_LATEX2HTML
 install-data-hook:
-	test -z "$(noinst_htmldir)" || $(mkdir_p) "$(DESTDIR)$(noinst_htmldir)"
+	test -z "$(noinst_htmldir)" || $(mkinstalldirs) "$(DESTDIR)$(noinst_htmldir)"
 	-rm "$(DESTDIR)$(noinst_htmldir)/index.html"
 	for d in CplusplusBinding GettingStarted JavaBinding ODL OQL Overview ; \
 	do \
-		test -z "$(noinst_htmldir)/$$d" || $(mkdir_p) "$(DESTDIR)$(noinst_htmldir)/$$d" ; \
+		test -z "$(noinst_htmldir)/$$d" || $(mkinstalldirs) "$(DESTDIR)$(noinst_htmldir)/$$d" ; \
 		(cd html/$$d ; \
 			for f in *.html *.css *.png ; do \
 				$(INSTALL_DATA) $$f "$(DESTDIR)$(noinst_htmldir)/$$d/$$f" ; \

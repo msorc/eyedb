@@ -23,6 +23,8 @@
 
 #include <eyedbconfig.h>
 
+#include <stdlib.h>
+
 #include <kern_p.h>
 #include <eyedblib/rpc_lib.h>
 
@@ -98,18 +100,9 @@ namespace eyedbsm {
     *datid = ((oid->getUnique() & ~PHYOID_BITMASK) >> PHYDATID_SHIFT);
   }
 
-  /*@@@@ what is the diff between LINUX and SOLARIS for this ??*/
-#if defined(LINUX) || defined(LINUX64) || defined(LINUX_IA64) || defined(LINUX_PPC64) || defined(ORIGIN) || defined(ALPHA) || defined(CYGWIN)
-#define RAND_COEF ((unsigned int)0x7fffffff)
-#else
-#define RAND_COEF ((unsigned int)0x7fff)
-#endif
-
-  static double ratio_o = (float)(0x3fffff - UNIQUE_BASE)/RAND_COEF;
-  static double ratio_n_log = (float)(0xfffff - UNIQUE_BASE)/RAND_COEF;
-  static double ratio_n_phy = (float)(0x1fff - UNIQUE_BASE)/RAND_COEF;
-
-  int rand() {return 1;}
+  static double ratio_o = (float)(0x3fffff - UNIQUE_BASE)/RAND_MAX;
+  static double ratio_n_log = (float)(0xfffff - UNIQUE_BASE)/RAND_MAX;
+  static double ratio_n_phy = (float)(0x1fff - UNIQUE_BASE)/RAND_MAX;
 
   static unsigned int
   uniqueGet_logical(DbHandle const *dbh)

@@ -184,6 +184,15 @@ AC_FUNC_FSEEKO
 AC_PATH_PROG(PATH_TO_MORE,more)
 AC_DEFINE_UNQUOTED([PATH_TO_MORE], "$PATH_TO_MORE", [Define to the absolute path of the more command])
 
+# check for /proc
+AC_MSG_CHECKING(for /proc)
+if test -d "/proc/1" ; then
+   AC_DEFINE([HAVE_SLASH_PROC],1,[Defined if pseudo-filesystem /proc exists])
+   AC_MSG_RESULT(yes)
+else
+   AC_MSG_RESULT(no)
+fi
+
 # check for libraries
 # this library is necessary on Solaris
 AC_CHECK_LIB( nsl, gethostbyname)

@@ -47,7 +47,7 @@ confdir=$(pkglibdir)/www/conf
 noinst_DATA=eyedb.conf
 
 install-data-local:
-	test -z "$(confdir)" || $(mkdir_p) "$(DESTDIR)$(confdir)"
+	test -z "$(confdir)" || $(mkinstalldirs) "$(DESTDIR)$(confdir)"
 	( \
 		test ! -f $(DESTDIR)$(confdir)/eyedb.conf && $(INSTALL_DATA) eyedb.conf $(DESTDIR)$(confdir)/eyedb.conf ; \
 		test ! -f $(DESTDIR)$(cgidir)/eyedbcgi.sh && $(INSTALL_DATA) $(srcdir)/eyedbcgi.sh $(DESTDIR)$(cgidir)/eyedbcgi.sh ; \
