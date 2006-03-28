@@ -21,6 +21,7 @@
    Author: Eric Viara <viara@sysra.com>
 */
 
+#include <eyedbconfig.h>
 
 #include <eyedb/eyedb.h>
 #include <math.h>
@@ -1364,8 +1365,12 @@ using namespace eyedb;
   Status
   __method_static_OUT_int32_isnan_math__IN_float(Database *_db, FEMethod_C *_m, const double arg1, eyedblib::int32 &retarg)
   {
-    // EV : 25/03/06: disconnected for compilation 
-    //retarg = std::isnan(arg1);
+#if defined(HAVE_ISNAN)
+    retarg = isnan(arg1);
+#elif defined(HAVE_STD_ISNAN)
+    retarg = std::isnan(arg1);
+#endif
+
     return Success;
   }
 
