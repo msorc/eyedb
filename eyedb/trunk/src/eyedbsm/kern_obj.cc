@@ -214,9 +214,17 @@ namespace eyedbsm {
       oidloc.datid = datid;
 
       se = mapAlloc(dbh, datid, rsize, &oidloc.ns);
-      if (se) return se;
+      if (se)
+	return se;
+
+      // should be disconnected
+#if 0
       if (oidloc.ns >= 0)
 	break;
+#else
+      if (oidloc.ns != INVALID_NS)
+	break;
+#endif
 
       if (dspid == DefaultDspid || !ESM_getNextDatafile(dbh, dspid, datid))
 	return statusMake(NO_DATAFILESPACE_LEFT,

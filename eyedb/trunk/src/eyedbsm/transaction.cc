@@ -51,6 +51,7 @@ static const char trTooLarge[] =
 #include <stdlib.h>
 #include <stdarg.h>
 #include <eyedblib/machtypes.h>
+#include <eyedblib/rpc_lib.h>
 #include <eyedbsm_p.h>
 #include <transaction.h>
 #include <hashtable.h>
@@ -1762,7 +1763,7 @@ do { \
     while (trs_own) {
       Transaction *trs = (Transaction *)XM_ADDR(xmh, trs_own->trs_off);
       if (trs->magic != TRS_MAGIC)
-	printf("%d: check_trans_owner: trs magic trsoff=%p failed\n", getpid(), XM_OFFSET(xmh, trs));
+	printf("%d: check_trans_owner: trs magic trsoff=%p failed\n", rpc_getpid(), XM_OFFSET(xmh, trs));
       trs_own = (TransOwner *)XM_ADDR(xmh, trs_own->next);
     }
   }
@@ -2170,7 +2171,7 @@ do { \
     MUTEX_LOCKER mtlock(trs->mut);
 #endif
     /*
-      std::cout << getpid() << ":" << pthread_self() <<
+      std::cout << rpc_getpid() << ":" << pthread_self() <<
       " transaction delete mut " << XM_OFFSET(xmh, &trs->mut) << std::endl;
     */
     time(&t);
@@ -2178,7 +2179,7 @@ do { \
     IDB_LOG(IDB_LOG_TRANSACTION, ("transaction delete xid=%d\n", xid));
 
     /*  printf("%d: transaction delete %d [%p] [magic=%d] [%s] %s",
-	getpid(), xid, trs, trs->magic, dbh->dbfile, ctime(&t)); */
+	rpc_getpid(), xid, trs, trs->magic, dbh->dbfile, ctime(&t)); */
 
 #ifdef TRS_SECURE
     ESM_ASSERT(trs->magic == TRS_MAGIC, 0, 0);
@@ -2497,7 +2498,7 @@ do { \
       trs = (Transaction *)XM_ADDR(xmh, po->trs_own.trs_off);
 
       if (trs->magic != TRS_MAGIC)
-	printf("%d: trs magic trsoff=%p failed\n", getpid(), XM_OFFSET(xmh, trs));
+	printf("%d: trs magic trsoff=%p failed\n", rpc_getpid(), XM_OFFSET(xmh, trs));
       if (trs->trobj_wait || po->trs_own.trs_off == trs_off)
 	trs_set[n++] = trs;
 
@@ -2506,7 +2507,7 @@ do { \
       while (trs_own) {
 	trs = (Transaction *)XM_ADDR(xmh, trs_own->trs_off);
 	if (trs->magic != TRS_MAGIC)
-	  printf("%d: trs magic trsoff=%p failed\n", getpid(), XM_OFFSET(xmh, trs));
+	  printf("%d: trs magic trsoff=%p failed\n", rpc_getpid(), XM_OFFSET(xmh, trs));
 	if (trs->trobj_wait || trs_own->trs_off == trs_off)
 	  trs_set[n++] = trs;
 	trs_own = (TransOwner *)XM_ADDR(xmh, trs_own->next);
@@ -2518,7 +2519,7 @@ do { \
       if (po->trs_own.trs_lock == LockX) {
 	trs = (Transaction *)XM_ADDR(xmh, po->trs_own.trs_off);
 	if (trs->magic != TRS_MAGIC)
-	  printf("%d: trs magic trsoff=%p failed\n", getpid(), XM_OFFSET(xmh, trs));
+	  printf("%d: trs magic trsoff=%p failed\n", rpc_getpid(), XM_OFFSET(xmh, trs));
 	  
 	if (po->trs_own.trs_off == trs_off || trs->trobj_wait)
 	  trs_set[n++] = trs;
@@ -2530,7 +2531,7 @@ do { \
 	if (trs_own->trs_lock == LockX) {
 	  trs = (Transaction *)XM_ADDR(xmh, trs_own->trs_off);
 	  if (trs->magic != TRS_MAGIC)
-	    printf("%d: trs magic trsoff=%p failed\n", getpid(), XM_OFFSET(xmh, trs));
+	    printf("%d: trs magic trsoff=%p failed\n", rpc_getpid(), XM_OFFSET(xmh, trs));
 	  if (trs_own->trs_off == trs_off || trs->trobj_wait)
 	    trs_set[n++] = trs;
 	}

@@ -7736,12 +7736,13 @@ void AttrIdxContext::addIdxOP(const Attribute *attr, IdxOP op,
   xop->data_oid[1] = data_oid[1];
 
 #ifdef NEW_NOTNULL_TRACE
-  printf("add_%s_op : %s, sz=%d, oid=%s",
+  printf("add_%s_op : %s::%s, sz=%d, oid=%s",
 	 (op == IdxInsert ? "insert" : "remove"),
+	 attr->getClassOwner()->getName(),
 	 attr->getName(),
 	 sz,
 	 data_oid[0].toString());
-
+  
   if (attr->isString())
     printf(", data='%s'", data);
   else {
@@ -7749,6 +7750,7 @@ void AttrIdxContext::addIdxOP(const Attribute *attr, IdxOP op,
     for (int i = 0; i < sz; i++)
       printf("%s%d", (i > 0 ? ", " : ""), data[i]);
     printf("}\n");
+  }
 
   printf("\n");
 #endif
@@ -7766,6 +7768,11 @@ AttrIdxContext::realizeIdxOP(Bool ok)
     IdxOperation *xop = &idx_ops[i];
     if (ok) {
       eyedbsm::Status s;
+      /*
+      printf("xop->op %d %s::%s\n", xop->op, 
+	     xop->attr->getClassOwner()->getName(),
+	     xop->idx_t->getAttrpath().c_str());
+      */
       if (xop->op == IdxInsert) {
 	s = xop->idx->insert(xop->data, xop->data_oid);
 	if (eyedbsm::hidx_gccnt > 20) {

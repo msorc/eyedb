@@ -1364,7 +1364,8 @@ using namespace eyedb;
   Status
   __method_static_OUT_int32_isnan_math__IN_float(Database *_db, FEMethod_C *_m, const double arg1, eyedblib::int32 &retarg)
   {
-    retarg = std::isnan(arg1);
+    // EV : 25/03/06: disconnected for compilation 
+    //retarg = std::isnan(arg1);
     return Success;
   }
 
