@@ -648,17 +648,11 @@ namespace eyedb {
     return sePort;
   }
 
-  extern pid_t getpid(void);
   void
   connection_handler(rpc_Server *server, rpc_ClientId clientid, rpc_Boolean isnew)
   {
     rpcDB_ClientInfo *ci = rpcDB_clientInfoGet(clientid);
 
-    /*
-      fprintf(stderr, "[thread %d#%d] idbd: connection_handler fd=%d, isnew=%d\n",
-      getpid(), pthread_self(), clientid, isnew);
-
-    */
     if (isnew)
       {
 	/*

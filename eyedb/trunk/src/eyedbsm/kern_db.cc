@@ -37,6 +37,7 @@
 #include <sys/types.h>
 
 #include "eyedblib/filelib.h"
+#include "eyedblib/rpc_lib.h"
 #include "kern_p.h"
 #include <eyedbsm/smd.h>
 #include "lib/compile_builtin.h"
@@ -1270,7 +1271,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
       }
 
     if (backend) {
-      *pxid = getpid();
+      *pxid = rpc_getpid();
 
       shmh->stat.total_db_access_cnt = h2x_u32(x2h_u32(shmh->stat.total_db_access_cnt)+1);
       shmh->stat.current_db_access_cnt = h2x_u32(x2h_u32(shmh->stat.current_db_access_cnt)+1);

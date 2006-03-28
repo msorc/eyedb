@@ -178,4 +178,6 @@ cmp_addr(const struct in_addr *a1, const struct in_addr *a2);
 extern int
 hostname2addr(const char *name, struct in_addr *addr);
 
+extern pid_t rpc_getpid();
+
 #endif

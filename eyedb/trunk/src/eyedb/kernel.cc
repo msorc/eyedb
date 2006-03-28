@@ -513,7 +513,7 @@ namespace eyedb {
 	    ("connected host='%s:%s', username='%s', progname='%s', pid=%d\n",
 	     host, port, username, progname, pid));
 
-    *sv_pid = getpid();
+    *sv_pid = rpc_getpid();
     *sv_uid = getuid();
 
     if (cli_version != eyedb::getVersionNumber())
@@ -549,9 +549,9 @@ namespace eyedb {
   {
     /*
       if (conn_ctx.clinfo)
-      fprintf(stderr, "release conn CONN_CTX.CLINFO is OK %d\n", getpid());
+      fprintf(stderr, "release conn CONN_CTX.CLINFO is OK %d\n", rpc_getpid());
       else
-      fprintf(stderr, "release conn CONN_CTX.CLINFO is NULL %d\n", getpid());
+      fprintf(stderr, "release conn CONN_CTX.CLINFO is NULL %d\n", rpc_getpid());
     */
 
     SessionLog::release();
@@ -6727,7 +6727,7 @@ do { \
     if (!_new)
       {
 	char tok[128];
-	sprintf(tok, "PID %d: Ran out of memory\n", getpid());
+	sprintf(tok, "PID %d: Ran out of memory\n", rpc_getpid());
 	write(2, tok, strlen(tok));
 
 	_new = True;

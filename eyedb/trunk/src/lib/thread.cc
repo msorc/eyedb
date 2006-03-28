@@ -24,6 +24,7 @@
 #include <eyedbconfig.h>
 
 #include <eyedblib/thread.h>
+#include <eyedblib/rpc_lib.h>
 
 #include <assert.h>
 #include <stdio.h>
@@ -112,7 +113,7 @@ namespace eyedblib {
 #if 1
     if (!locked) {
       fprintf(stderr, "eyedblib::Mutex::unlock(): Assertion `locked' failed\n");
-      fprintf(stderr, "dbgserv %d\n", getpid());
+      fprintf(stderr, "dbgserv %d\n", rpc_getpid());
       fflush(stderr);
       sleep(1000);
       abort();
@@ -357,7 +358,7 @@ namespace eyedblib {
       assert (!pthread_attr_setscope(&attr, PTHREAD_SCOPE_PROCESS));
 #endif
     assert (!pthread_create(&tid, &attr, run, this));
-    pid = getpid();
+    pid = rpc_getpid();
     idle = true;
   }
 
@@ -366,7 +367,7 @@ namespace eyedblib {
     user_data = 0;
     init = 0;
     init_arg = 0;
-    pid = getpid();
+    pid = rpc_getpid();
     name = strdup(_name);
     profiled = false;
   }

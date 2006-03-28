@@ -56,7 +56,7 @@ rpcDB_getDbhId()
   /* this kludge ensure that there is no concurency problem */
   /* BUT THE PROBLEM IS THAT the transaction XID are not the
      same in the server and in the client in case of a local opening! */
-  return 65536 + getpid() + dbhid++;
+  return 65536 + rpc_getpid() + dbhid++;
 #endif
 }
 

@@ -137,6 +137,15 @@ rpc_makeUserClientFunction(rpc_Client *client, rpc_RpcDescription *rd)
   return func;
 }
 
+pid_t rpc_pid;
+
+pid_t rpc_getpid()
+{
+  if (!rpc_pid)
+    return getpid();
+  return rpc_pid;
+}
+
 rpc_Status
 rpc_connOpen(rpc_Client *client, const char *hostname, const char *portname,
 	     rpc_ConnHandle **pconn, unsigned long magic,

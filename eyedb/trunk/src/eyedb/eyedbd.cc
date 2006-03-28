@@ -160,9 +160,7 @@ void rpc_unlink_socket();
 static void
 _quit_handler(void *xpid, int)
 {
-  //printf("quit_handler -> %d vs. %d\n", *(int *)xpid, getpid());
-
-  if (*(int *)xpid == getpid()) {
+  if (*(int *)xpid == rpc_getpid()) {
     sesslog->remove();
     rpc_unlink_socket();
   }

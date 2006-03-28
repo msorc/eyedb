@@ -24,6 +24,7 @@
 #include <eyedbconfig.h>
 
 #include <eyedblib/filelib.h>
+#include <eyedblib/rpc_lib.h>
 #include <kern_p.h>
 //#include <sys/stat.h>
 
@@ -231,11 +232,11 @@ checkFileAccessFailed(Error err, const char *what, const char *file,
   if (flags == F_OK)
     return statusMake(err,
 			 ACCESS_FILE_FMT "%s '%s' does not exist",
-			 getpid(), user, uid, what, file);
+			 rpc_getpid(), user, uid, what, file);
 
   return statusMake(err,
 		       ACCESS_FILE_FMT "no %s access on %s '%s'",
-		       getpid(), user, uid,
+		       rpc_getpid(), user, uid,
 		       getmsgaccess(flags), what, file);
 }
 

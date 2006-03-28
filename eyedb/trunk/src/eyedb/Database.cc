@@ -1644,6 +1644,14 @@ if ((mode) !=  NoDBAccessMode && \
 	return status;
 
       const Dataspace *dataspace = datafile->getDataspace();
+      if (!dataspace) {
+	return Exception::make(IDB_DATABASE_LOAD_OBJECT_ERROR,
+			       "loading object %s: "
+			       "cannot find dataspace for datafile %d",
+			       poid->getString(),
+			       datafile->getId());
+      }
+
       short dspid = dataspace->getId();
 
       Status (*make)(Database *, const Oid *, Object **,

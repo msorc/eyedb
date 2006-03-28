@@ -41,6 +41,7 @@
 #endif
 
 #include <eyedblib/log.h>
+#include <eyedblib/rpc_lib.h>
 
 #ifdef HAVE_CTIME_R_3
 #define M_ctime_r(T,S,L) ctime_r(T,S,L)
@@ -203,7 +204,7 @@ utlog(const char *fmt, ...)
 
 
   if (log_pid)
-    fprintf(logfd, "[thread %d#%d] ", getpid(), pthread_self());
+    fprintf(logfd, "[thread %d#%d] ", rpc_getpid(), pthread_self());
 
   if (log_progname)
     fprintf(logfd, "%s ", logProgName);

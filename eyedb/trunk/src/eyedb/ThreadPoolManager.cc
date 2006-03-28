@@ -61,11 +61,6 @@ ThreadPoolManager::init()
   if (thrprofile)
     thrpool->setProfile(true);
 
-  /*
-  printf("ThreadPoolManager::init(pid=%d, thread_count=%d, profiling=%s)\n",
-	 getpid(), thrcnt, thrprofile ? "on" : "off");
-  */
-
   eyedbsm::setThreadPool(thrpool);
 #endif
 }
@@ -89,11 +84,6 @@ ThreadPoolManager::getThrPool()
     
   if (thrprofile)
     thrpool->setProfile(true);
-
-  /*
-  printf("ThreadPoolManager::init(pid=%d, thread_count=%d, profiling=%s)\n",
-	 getpid(), thrcnt, thrprofile ? "on" : "off");
-  */
 
   eyedbsm::setThreadPool(thrpool);
   return thrpool;

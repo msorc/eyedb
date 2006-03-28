@@ -39,6 +39,8 @@ extern int RPC_MIN_SIZE;
 /* disconnected the 21/08/01 */
 /*#define RPC_TIMEOUT 7200*/
 
+extern pid_t rpc_pid;
+
 #ifdef HAVE_STROPTS
 #include <stropts.h>
 #endif
@@ -128,7 +130,7 @@ msg_make(const char *fmt, ...)
   va_start(ap, fmt);
 
 #if 0
-  sprintf(str, "\n[thread %d#%d] %s: ", getpid(), pthread_self(), progName);
+  sprintf(str, "\n[thread %d#%d] %s: ", rpc_getpid(), pthread_self(), progName);
   vsprintf(buf, fmt, ap);
   (void)strcat(str, buf);
 #else
@@ -623,7 +625,7 @@ static void *wait_thr(void *arg)
   pid_t pid = *(pid_t *)arg;
   free(arg);
 #ifdef TRACE2
-  printf("%d:%d waiting for pid %d\n", getpid(), pthread_self(), pid);
+  printf("%d:%d waiting for pid %d\n", rpc_getpid(), pthread_self(), pid);
 #endif
   int status;
   wait_thr_cond->signal();
@@ -637,7 +639,7 @@ static void *wait_thr(void *arg)
   } while(errno);
 
 #ifdef TRACE2
-  printf("%d:%d done pid %d\n", getpid(), pthread_self(), pid);
+  printf("%d:%d done pid %d\n", rpc_getpid(), pthread_self(), pid);
 #endif
   pthread_detach(pthread_self());
   pthread_exit(&status);
@@ -668,7 +670,7 @@ static void *serv_thr(void *arg)
 	utlog(msg_make("%d thread EXIT\n", pthread_self()));
 #endif
 #ifdef TRACE2
-	fprintf(stderr, "%d:%d thread EXIT\n", getpid(), pthread_self());
+	fprintf(stderr, "%d:%d thread EXIT\n", rpc_getpid(), pthread_self());
 	fflush(stderr);
 #endif
 	//	    rpc_garbClientInfo(server, which, fd);
@@ -772,12 +774,13 @@ rpc_makeNewConnection(rpc_Server *server, int new_fd[], int fd_cnt,
     }
     else if (server->mode == rpc_MultiProcs) {
       if ((ci->tid[0] = fork()) == 0) {
+	rpc_pid = getpid();
 	const char *w;
 	if ((w = getenv("EYEDBWAIT"))) {
 	  int sec = atoi(w);
 	  if (!sec)
 	    sec = 30;
-	  printf("Pid %d waiting for %d seconds\n", getpid(), sec);
+	  printf("Pid %d waiting for %d seconds\n", rpc_getpid(), sec);
 	  sleep(sec);
 	  printf("Continuing...\n");
 	}
@@ -1222,7 +1225,7 @@ rpc_garbClientInfo(rpc_Server *server, int which, int fd)
   rpc_ClientInfo *ci = clientInfo[fd];
 
 #ifdef TRACE2
-  printf("%d:%d garbClientInfo...\n", getpid(), pthread_self());
+  printf("%d:%d garbClientInfo...\n", rpc_getpid(), pthread_self());
 #endif
 #ifdef TRACE
   utlog(msg_make("rpc_garbClientInfo(which = %d, fd = %d, ci = %p)\n",
@@ -1262,8 +1265,8 @@ rpc_garbClientInfo(rpc_Server *server, int which, int fd)
     }
 
     for (++i; i < ci->fd_cnt; i++) {
-      printf("%d:%d killing thread %d:%d\n", getpid(),
-	     pthread_self(), getpid(), ci->tid[i]);
+      printf("%d:%d killing thread %d:%d\n", rpc_getpid(),
+	     pthread_self(), rpc_getpid(), ci->tid[i]);
       pthread_kill(ci->tid[i], SIGTERM);
     }
   }
@@ -1729,15 +1732,15 @@ eyedblib_abort()
 
   reentrant = 1;
 
-  sprintf(msg, "EyeDB aborting [pid = %d]\n", getpid());
+  sprintf(msg, "EyeDB aborting [pid = %d]\n", rpc_getpid());
   write(2, msg, strlen(msg));
 
-  utlog("EyeDB aborting [pid = %d]\n", getpid());
+  utlog("EyeDB aborting [pid = %d]\n", rpc_getpid());
   if (getenv("EYEDBDBG")) for (;;) sleep(1000);
 
   _QUIT_(0);
 
-  kill(SIGABRT, getpid());
+  kill(SIGABRT, rpc_getpid());
   exit(2);
 }
 

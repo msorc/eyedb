@@ -206,7 +206,7 @@ namespace eyedb {
 
     strncpy(connhead->datdir, datdir, DATDIRLEN);
     connhead->datdir[DATDIRLEN] = 0;
-    connhead->pid = getpid();
+    connhead->pid = rpc_getpid();
     connhead->uid = getuid();
 
     if (logdev) {
@@ -445,16 +445,15 @@ namespace eyedb {
     strncpy(conninfo->username, username, sizeof(conninfo->username)-1);
     strncpy(conninfo->progname, progname, sizeof(conninfo->progname)-1);
 
-    //printf("SessionLog adding %d\n", getpid());
     conninfo->prog_pid = pid;
-    conninfo->backend_pid = getpid();
+    conninfo->backend_pid = rpc_getpid();
 
 #ifdef TRACE
-    fprintf(stderr, "SessionLog %d tries to locked\n", getpid());
+    fprintf(stderr, "SessionLog %d tries to locked\n", rpc_getpid());
 #endif
     eyedbsm_mutexLock(xm_connlog->mp, 0);
 #ifdef TRACE
-    fprintf(stderr, "SessionLog %d is locked\n", getpid());
+    fprintf(stderr, "SessionLog %d is locked\n", rpc_getpid());
 #endif
     islocked = True;
 
@@ -472,7 +471,7 @@ namespace eyedb {
 
     eyedbsm_mutexUnlock(xm_connlog->mp, 0);
 #ifdef TRACE
-    fprintf(stderr, "SessionLog %d is UNlocked\n", getpid());
+    fprintf(stderr, "SessionLog %d is UNlocked\n", rpc_getpid());
 #endif
     islocked = False;
 
@@ -480,7 +479,7 @@ namespace eyedb {
 
 #ifdef TRACE
     fprintf(stderr, "log add (%s, %s, %s, %d, %d)\n",
-	    hostname, username, progname, pid, getpid());
+	    hostname, username, progname, pid, rpc_getpid());
 #endif
 
     return Success;
@@ -492,11 +491,11 @@ namespace eyedb {
     ClientInfo *conninfo = clientLog->getClientInfo();
 
 #ifdef TRACE
-    fprintf(stderr, "SessionLog %d tries to locked\n", getpid());
+    fprintf(stderr, "SessionLog %d tries to locked\n", rpc_getpid());
 #endif
     eyedbsm_mutexLock(xm_connlog->mp, 0);
 #ifdef TRACE
-    fprintf(stderr, "SessionLog %d is locked\n", getpid());
+    fprintf(stderr, "SessionLog %d is locked\n", rpc_getpid());
 #endif
     islocked = True;
 
@@ -519,7 +518,7 @@ namespace eyedb {
     connhead->nconns--;
     eyedbsm_mutexUnlock(xm_connlog->mp, 0);
 #ifdef TRACE
-    fprintf(stderr, "SessionLog %d is UNlocked\n", getpid());
+    fprintf(stderr, "SessionLog %d is UNlocked\n", rpc_getpid());
 #endif
     islocked = False;
 
@@ -572,11 +571,11 @@ namespace eyedb {
 
     if (!nolock) {
 #ifdef TRACE
-      fprintf(stderr, "SessionLog %d tries to locked\n", getpid());
+      fprintf(stderr, "SessionLog %d tries to locked\n", rpc_getpid());
 #endif
       eyedbsm_mutexLock(xm_connlog->mp, 0);
 #ifdef TRACE
-      fprintf(stderr, "SessionLog %d is locked\n", getpid());
+      fprintf(stderr, "SessionLog %d is locked\n", rpc_getpid());
 #endif
       islocked = True;
     }
@@ -593,7 +592,7 @@ namespace eyedb {
       if (!nolock) {
 	eyedbsm_mutexUnlock(xm_connlog->mp, 0);
 #ifdef TRACE
-	fprintf(stderr, "SessionLog %d is UNlocked\n", getpid());
+	fprintf(stderr, "SessionLog %d is UNlocked\n", rpc_getpid());
 #endif
 	islocked = False;
       }
@@ -641,7 +640,7 @@ namespace eyedb {
       if (!nolock) {
 	eyedbsm_mutexUnlock(xm_connlog->mp, 0);
 #ifdef TRACE
-	fprintf(stderr, "SessionLog %d is UNlocked\n", getpid());
+	fprintf(stderr, "SessionLog %d is UNlocked\n", rpc_getpid());
 #endif
 	islocked = False;
       }
@@ -697,7 +696,7 @@ namespace eyedb {
     if (!nolock) {
       eyedbsm_mutexUnlock(xm_connlog->mp, 0);
 #ifdef TRACE
-      fprintf(stderr, "SessionLog %d is UNlocked\n", getpid());
+      fprintf(stderr, "SessionLog %d is UNlocked\n", rpc_getpid());
 #endif
       islocked = False;
     }
