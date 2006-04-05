@@ -1370,7 +1370,6 @@ using namespace eyedb;
 #elif defined(HAVE_STD_ISNAN)
     retarg = std::isnan(arg1);
 #endif
-
     return Success;
   }
 

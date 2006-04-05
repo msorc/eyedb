@@ -207,7 +207,7 @@ namespace eyedb {
        @param fd
        @return
     */
-    Status print(FILE *fd = stderr) const;
+    Status print(FILE *fd = stderr, bool newline = true) const;
 
     /**
        Not yet documented
@@ -279,7 +279,7 @@ namespace eyedb {
     void (*getPrintMethod(void))(Status, FILE*);
   
     void statusMake(Status, int, SeverityStatus);
-    void print_realize(FILE*) const;
+    void print_realize(FILE*, bool newline) const;
 
     // ----------------------------------------------------------------------
     // Exception Restricted Access (conceptually private)
@@ -289,7 +289,7 @@ namespace eyedb {
     static void _release(void);
   };
 
-  std::ostream& operator<<(std::ostream&, Exception &);
+  std::ostream& operator<<(std::ostream&, const Exception &);
   std::ostream& operator<<(std::ostream&, Status);
 
   // ----------------------------------------------------------------------
