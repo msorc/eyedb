@@ -1619,6 +1619,11 @@ transaction_display_realize(int server_pid, Boolean all)
     }
     */
 
+#define SEC_PER_MIN 60
+#define MIN_PER_HOUR 60
+#define SEC_PER_HOUR (SEC_PER_MIN * MIN_PER_HOUR)
+#define USEC_PER_SECOND 1000000
+#define USEC_PER_MS        1000
   while (trs)
     {
       if (!server_pid || trs->xid == server_pid)
@@ -1630,6 +1635,15 @@ transaction_display_realize(int server_pid, Boolean all)
 	  printf(" Hash Table Entries %u\n", ((HashTable *)XM_ADDR(sm_xmh, trs->ht_off))->mask+1);
 	  printf(" Created on %s\n", eyedblib::setbuftime(trs->create_time));
 	  printf(" Last Access on %s\n", eyedblib::setbuftime(trs->access_time));
+	  unsigned long duration = trs->access_time - trs->create_time;
+	  unsigned int h = duration / (SEC_PER_HOUR * USEC_PER_SECOND);
+
+	  unsigned int m = (duration - h * SEC_PER_HOUR * USEC_PER_SECOND) / (long)(SEC_PER_MIN * USEC_PER_SECOND);
+	  unsigned int s = (duration - h * SEC_PER_HOUR * USEC_PER_SECOND - m * SEC_PER_MIN * USEC_PER_SECOND) / USEC_PER_SECOND;
+	  unsigned int ms = (duration - h * SEC_PER_HOUR * USEC_PER_SECOND - m * SEC_PER_MIN * USEC_PER_SECOND - s * USEC_PER_SECOND) / USEC_PER_MS;
+	  unsigned int us = (duration - h * SEC_PER_HOUR * USEC_PER_SECOND - m * SEC_PER_MIN * USEC_PER_SECOND - s * USEC_PER_SECOND - ms * USEC_PER_MS);
+	  
+	  printf(" Duration %02u:%02u:%02u %03u.%03ums\n", h, m, s, ms, us);
 	  printf(" State %s\n",
 		  (ESM_isTransactionActive(trs) ? "ACTIVE" : "INACTIVE"));
 	  one_transaction_display(sm_xmh, trshd, trs, all);

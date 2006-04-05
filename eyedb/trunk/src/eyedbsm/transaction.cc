@@ -2029,7 +2029,6 @@ do { \
       }
     }
     else if (state == TransABORTING) {
-      //printf("abort tro->op %d %s\n", tro->op, getOidString(&po->oid));
 #ifdef OCREADEL_SYNC
       if (tro->op == OCREATE)
 #else

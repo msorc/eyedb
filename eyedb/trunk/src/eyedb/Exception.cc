@@ -34,7 +34,6 @@ namespace eyedb {
 #define S_SIZE 2048
 
   Exception::Mode Exception::mode = Exception::StatusMode;
-  //  Exception::Mode Exception::mode = Exception::ExceptionMode;
   void (*Exception::handler)(Status, void *);
   void *Exception::handler_user_data;
   void (*Exception::print_method)(Status, FILE*);
@@ -358,18 +357,15 @@ statusDesc[ST].desc = MSG
     return parent;
   }
 
-  void Exception::print_realize(FILE *fd) const
+  void Exception::print_realize(FILE *fd, bool newline) const
   {
-    fprintf(fd, "%s\n", getDesc());
+    fprintf(fd, "%s%s", getDesc(), (newline ? "\n" : ""));
     fflush(fd);
-    /*
-      cerr << getDesc() << endl;
-    */
   }
 
-  Status Exception::print(FILE *fd) const
+  Status Exception::print(FILE *fd, bool newline) const
   {
-    print_realize(fd);
+    print_realize(fd, newline);
     return this;
   }
 
@@ -607,9 +603,9 @@ statusDesc[ST].desc = MSG
     return RPCSuccess;
   }
 
-  ostream& operator<<(ostream& os, Exception &e)
+  ostream& operator<<(ostream& os, const Exception &e)
   {
-    e.print(get_file());
+    e.print(get_file(), false);
     return convert_to_stream(os);
   }
 
@@ -617,8 +613,7 @@ statusDesc[ST].desc = MSG
   {
     if (!s)
       return os;
-    s->print(get_file());
+    s->print(get_file(), false);
     return convert_to_stream(os);
   }
-
 }
