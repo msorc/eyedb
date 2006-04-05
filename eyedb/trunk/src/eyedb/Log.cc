@@ -319,7 +319,7 @@ namespace eyedb {
   {
     std::string str;
 
-    str = "The logmask must be a hexadecimal number or a '+/-' combination of the following strings: "
+    str = "The logmask is an hexadecimal number or a '+/-' combination of the following strings: "
       "default, "
       "dev, "
       "local, "

@@ -1058,8 +1058,7 @@ namespace eyedb {
 				 const Oid& objoid,
 				 AttrIdxContext &idx_ctx,
 				 const RecMode *);
-    virtual Status postRealizePerform(Offset,
-				      const Oid& cloid,
+    virtual Status postRealizePerform(const Oid& cloid,
 				      const Oid& objoid,
 				      AttrIdxContext &idx_ctx,
 				      Bool &mustTouch,

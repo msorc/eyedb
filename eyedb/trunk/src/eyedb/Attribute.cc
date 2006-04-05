@@ -3045,12 +3045,12 @@ Attribute::sizesCompute(Database *db, const char fmt_error[],
 
 Status
 Attribute::updateIndexEntry(Database *db, Data pdata,
-			       const Oid *_oid,
-			       const Oid *cloid,
-			       int offset, const Oid *data_oid,
-			       int count,
-			       Size varsize, Bool novd,
-			       AttrIdxContext &idx_ctx)
+			    const Oid *_oid,
+			    const Oid *cloid,
+			    int offset, const Oid *data_oid,
+			    int count,
+			    Size varsize, Bool novd,
+			    AttrIdxContext &idx_ctx)
 {
   ATTR_COMPLETE();
   eyedbsm::Status status;
@@ -3069,7 +3069,7 @@ Attribute::updateIndexEntry(Database *db, Data pdata,
 
   Bool notnull, notnull_comp, unique, unique_comp;
   Status s = constraintPrologue(db, idx_ctx, notnull_comp, notnull,
-				   unique_comp, unique);
+				unique_comp, unique);
   if (s) return s;
 
   Index *idx_test;
@@ -3098,17 +3098,17 @@ Attribute::updateIndexEntry(Database *db, Data pdata,
       if (inisize) {
 	sinidata = (unsigned char *)malloc(inisize);
 	if ((status = eyedbsm::objectRead(se_dbh,
-				    idr_poff + offset,
-				    inisize,
-				    sinidata,
-				    eyedbsm::DefaultLock,
-				    0, 0,
-				    data_oid->getOid()))) {
+					  idr_poff + offset,
+					  inisize,
+					  sinidata,
+					  eyedbsm::DefaultLock,
+					  0, 0,
+					  data_oid->getOid()))) {
 	  free(sinidata);
 	  return Exception::make(IDB_INDEX_ERROR, fmt_error,
-				    eyedbsm::statusGet(status),
-				    idx_ctx.getAttrName().c_str(),
-				    class_owner->getName());
+				 eyedbsm::statusGet(status),
+				 idx_ctx.getAttrName().c_str(),
+				 class_owner->getName());
 	}
       }
 
@@ -3123,11 +3123,11 @@ Attribute::updateIndexEntry(Database *db, Data pdata,
       for (int n = 0; n < count; n++, data += idr_item_psize)
 	{
 	  if ((status = eyedbsm::objectRead(se_dbh,
-				      idr_poff + n * idr_item_psize + offset + inisize,
-				      idr_item_psize, s,
-				      eyedbsm::DefaultLock,
-				      0, 0,
-				      data_oid->getOid()))) {
+					    idr_poff + n * idr_item_psize + offset + inisize,
+					    idr_item_psize, s,
+					    eyedbsm::DefaultLock,
+					    0, 0,
+					    data_oid->getOid()))) {
 	    free(s);
 	    free(e);
 	    free(sinidata);
@@ -3987,6 +3987,9 @@ Status AttrDirect::realize(Database *db, Object *agr,
 	  setCollHints(o, objoid, card);
 	  status = setCollImpl(db, o, idx_ctx);
 	  if (status) return status;
+
+	  idx_ctx.pushOff(idr_poff +  (j * idr_item_psize));
+
 	  status = o->realizePerform(cloid, objoid, idx_ctx, rcm);
 
 	  if (status) return status;
@@ -4008,7 +4011,7 @@ Status AttrDirect::realize(Database *db, Object *agr,
 		agr->touch();
 
 	      Bool mustTouch;
-	      status = o->postRealizePerform(idr_poff, cloid, objoid,
+	      status = o->postRealizePerform(cloid, objoid,
 					     idx_ctx, mustTouch, rcm);
 	      if (status)
 		return status;
@@ -4016,6 +4019,8 @@ Status AttrDirect::realize(Database *db, Object *agr,
 	      if (mustTouch)
 		agr->touch();
 	    }
+
+	  idx_ctx.popOff();
 	}
     }
 
@@ -6329,6 +6334,7 @@ Status AttrVarDim::realize(Database *db, Object *agr,
 	  if (status != Success)
 	    return status;
 
+	  idx_ctx.pushOff(idr_poff +  (j * idr_item_psize));
 	  status = o->realizePerform(cloid, objoid, idx_ctx, rcm);
 	  
 	  if (status)
@@ -6345,7 +6351,7 @@ Status AttrVarDim::realize(Database *db, Object *agr,
 		     o->getIDR() + IDB_OBJ_HEAD_SIZE, idr_item_psize);
 
 	      Bool mustTouch;
-	      status = o->postRealizePerform(idr_poff, cloid, objoid,
+	      status = o->postRealizePerform(cloid, objoid,
 					     idx_ctx, mustTouch, rcm);
 	      if (status)
 		return status;
@@ -6353,6 +6359,8 @@ Status AttrVarDim::realize(Database *db, Object *agr,
 	      if (mustTouch)
 		agr->touch();
 	    }
+
+	  idx_ctx.popOff();
 	}
     }
 
@@ -7532,9 +7540,7 @@ AttrIdxContext::AttrIdxContext(const Data data, Size size)
   if (!size)
     return;
 
-#ifdef ATTRIDXCTX_NEW
   attrpath_computed = False;
-#endif
   Offset offset = 0;
   char *s;
   string_decode(data, &offset, &s);
@@ -7545,11 +7551,7 @@ AttrIdxContext::AttrIdxContext(const Data data, Size size)
   toFree = True;
   for (int i = 0; i < attr_cnt; i++) {
     string_decode(data, &offset, (char **)&s);
-#ifdef ATTRIDX_USE_STRING
     attrs[i] = s;
-#else
-    attrs[i] = strdup(s);
-#endif
   }
 }
 
@@ -7557,12 +7559,17 @@ AttrIdxContext::AttrIdxContext(AttrIdxContext *idx_ctx)
 {
   idx_ctx_root = idx_ctx;
   attr_cnt = idx_ctx->attr_cnt;
+  attr_off_cnt = idx_ctx->attr_off_cnt;
   class_owner = idx_ctx->class_owner;
   toFree = False;
-  memcpy(attrs, idx_ctx->attrs, sizeof(void *) * attr_cnt);
-#ifdef ATTRIDXCTX_NEW
+
+  for (int n = 0; n < attr_cnt; n++)
+    attrs[n] = idx_ctx->attrs[n];
+
+  for (int n = 0; n < attr_off_cnt; n++)
+    attr_off[n] = idx_ctx->attr_off[n];
+
   attrpath_computed = False;
-#endif
 
   idx_ops_alloc = idx_ops_cnt = 0;
   idx_ops = 0;
@@ -7571,24 +7578,12 @@ AttrIdxContext::AttrIdxContext(AttrIdxContext *idx_ctx)
 std::string
 AttrIdxContext::getString() const
 {
-#ifdef ATTRIDXCTX_NEW
   return getAttrName();
-#else
-  if (!class_owner)
-    return "null context";
-
-  std::string s = class_owner;
-  for (int i = 0; i < attr_cnt; i++)
-    s += std::string(".") + attrs[i];
-
-  return s;
-#endif
 }
 
 std::string
 AttrIdxContext::getAttrName(Bool ignore_class_owner) const
 {
-#ifdef ATTRIDXCTX_NEW
   if (attrpath_computed && attrpath_ignore_class_owner == ignore_class_owner)
     return attrpath;
 
@@ -7605,11 +7600,7 @@ AttrIdxContext::getAttrName(Bool ignore_class_owner) const
 
     for (int i = 0; i < attr_cnt; i++) {
       strcat(attrpath, ".");
-#ifdef ATTRIDX_USE_STRING
       strcat(attrpath, attrs[i].c_str());
-#else
-      strcat(attrpath, attrs[i]);
-#endif
     }
 
     return attrpath;
@@ -7618,34 +7609,10 @@ AttrIdxContext::getAttrName(Bool ignore_class_owner) const
   *attrpath = 0;
   for (int i = 0; i < attr_cnt; i++) {
     if (i) strcat(attrpath, ".");
-#ifdef ATTRIDX_USE_STRING
     strcat(attrpath, attrs[i].c_str());
-#else
-    strcat(attrpath, attrs[i]);
-#endif
   }
 
   return attrpath;
-#else
-  if (!ignore_class_owner) {
-    if (!class_owner)
-      return "";
-
-    std::string s = class_owner;
-
-    for (int i = 0; i < attr_cnt; i++)
-      s += std::string(".") + attrs[i];
-
-    return s;
-  }
-
-  std::string s;
-
-  for (int i = 0; i < attr_cnt; i++)
-    s += (i ? std::string(".") : std::string("")) + attrs[i];
-
-  return s;
-#endif
 }
 
 Data
@@ -7660,13 +7627,8 @@ AttrIdxContext::code(Size &size) const
   int32_code(&data, &offset, &alloc_size, &dummy);
   int16_code(&data, &offset, &alloc_size, &attr_cnt);
 
-#ifdef ATTRIDX_USE_STRING
   for (int i = 0; i < attr_cnt; i++)
     string_code(&data, &offset, &alloc_size, attrs[i].c_str());
-#else
-  for (int i = 0; i < attr_cnt; i++)
-    string_code(&data, &offset, &alloc_size, attrs[i]);
-#endif
 
   size = offset;
   return data;
@@ -7682,13 +7644,8 @@ AttrIdxContext::operator==(const AttrIdxContext &idx_ctx) const
     return 0;
 
   for (int i = 0; i < attr_cnt; i++)
-#ifdef ATTRIDX_USE_STRING
     if (strcmp(attrs[i].c_str(), idx_ctx.attrs[i].c_str()))
       return 0;
-#else
-  if (strcmp(attrs[i], idx_ctx.attrs[i]);
-      return 0;
-#endif
 
   return 1;
 }
@@ -7732,13 +7689,14 @@ void AttrIdxContext::addIdxOP(const Attribute *attr, IdxOP op,
   xop->data = (unsigned char *)malloc(sz+1);
   memcpy(xop->data, data, sz);
   xop->data[sz] = 0;
+
   xop->data_oid[0] = data_oid[0];
   xop->data_oid[1] = data_oid[1];
 
 #ifdef NEW_NOTNULL_TRACE
   printf("add_%s_op : %s::%s, sz=%d, oid=%s",
 	 (op == IdxInsert ? "insert" : "remove"),
-	 attr->getClassOwner()->getName(),
+	 attr->getClassOwner() ? attr->getClassOwner()->getName() : "<NULL>",
 	 attr->getName(),
 	 sz,
 	 data_oid[0].toString());
@@ -7769,8 +7727,8 @@ AttrIdxContext::realizeIdxOP(Bool ok)
     if (ok) {
       eyedbsm::Status s;
       /*
-      printf("xop->op %d %s::%s\n", xop->op, 
-	     xop->attr->getClassOwner()->getName(),
+      printf("xop->op %s %s::%s\n", xop->op == IdxInsert ? "insert" : "remove", 
+	     xop->attr->getClassOwner() ? xop->attr->getClassOwner()->getName() : "<NULL>",
 	     xop->idx_t->getAttrpath().c_str());
       */
       if (xop->op == IdxInsert) {
@@ -7807,21 +7765,38 @@ AttrIdxContext::realizeIdxOP(Bool ok)
 }
 
 void
+AttrIdxContext::pushOff(int off)
+{
+  attr_off[attr_off_cnt++] = off;
+}
+
+void
+AttrIdxContext::popOff()
+{
+  attr_off_cnt--;
+}
+
+int
+AttrIdxContext::getOff()
+{
+  int off = 0;
+  for (int n = 0; n < attr_off_cnt; n++)
+    off += attr_off[n];
+  return off;
+}
+
+void
 AttrIdxContext::push(const Attribute *attr)
 {
-  attrs[attr_cnt++] = (char *)attr->getName();
-#ifdef ATTRIDXCTX_NEW
+  attrs[attr_cnt++] = attr->getName();
   attrpath_computed = False;
-#endif
 }
 
 void
 AttrIdxContext::push(const char *attrname)
 {
-  attrs[attr_cnt++] = (char *)attrname;
-#ifdef ATTRIDXCTX_NEW
+  attrs[attr_cnt++] = attrname;
   attrpath_computed = False;
-#endif
 }
 
 void
@@ -7832,18 +7807,14 @@ AttrIdxContext::pop()
   if (!attr_cnt)
     class_owner = 0;
   */
-#ifdef ATTRIDXCTX_NEW
   attrpath_computed = False;
-#endif
 }
 
 void
 AttrIdxContext::set(const Class *_class_owner)
 {
   class_owner = (char *)_class_owner->getName();
-#ifdef ATTRIDXCTX_NEW
   attrpath_computed = False;
-#endif
 }
 
 void
@@ -7855,10 +7826,6 @@ AttrIdxContext::garbage(Bool all)
   }
 
   if (toFree) {
-#ifndef ATTRIDX_USE_STRING
-    for (int i = 0; i < attr_cnt; i++)
-      free(attrs[i]);
-#endif
     free(class_owner);
   }
 }

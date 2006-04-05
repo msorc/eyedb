@@ -236,11 +236,9 @@ namespace eyedb {
   static void
   clean(const char *tmpfile_1, const char *tmpfile_2)
   {
-    /*
     unlink(tmpfile_1);
     if (*tmpfile_2)
       unlink(tmpfile_2);
-    */
   }
 
   FILE *

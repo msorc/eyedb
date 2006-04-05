@@ -199,6 +199,7 @@ do { \
     static const std::string trans_def_mag_opt = "trans-def-mag";
     static const std::string arch_opt = "arch";
     static const std::string version_opt = "version";
+    static const std::string help_logmask_opt = "help-logmask";
     static const std::string help_eyedb_options_opt = "help-eyedb-options";
 
     Option opts[32];
@@ -307,6 +308,10 @@ do { \
 	     OptionDesc("Display the version"));
 
     opts[opt_cnt++] = 
+      Option(prefix + help_logmask_opt, OptionBoolType(), 0,
+	     OptionDesc("Display logmask usage"));
+
+    opts[opt_cnt++] = 
       Option(prefix + help_eyedb_options_opt, OptionBoolType(), 0,
 	     OptionDesc("Display this message"));
 
@@ -334,6 +339,11 @@ do { \
 
     if (map.find(help_eyedb_options_opt) != map.end()) {
       getopt.help(cerr, "  ");
+      exit(0);
+    }
+
+    if (map.find(help_logmask_opt) != map.end()) {
+      cerr << Log::getUsage() << endl;
       exit(0);
     }
 
@@ -523,62 +533,6 @@ do { \
     string listen;
     make_options(argc, argv, 0, &os, server ? &listen : 0);
   }
-
-#if 0
-  const char *
-  getStdOptionsUsage()
-  {
-    return "[-eyedbhost <host>] [-eyedbport <portname>] [-eyedbsmdport <smdport>] [-eyedbdbm <dbmfile>] [-eyedbuser <user>] [-eyedbuser?] [-eyedbpasswd <passwd>] [-eyedbpasswd?] [-eyedbauth?] [-eyedbconf <conffile>] [-eyedblog <logfile>] [-eyedblogmask <mask>] [-eyedblogpid on|off] [-eyedblogdate on|off] [-eyedblogtimer on|off] [-eyedblogprog on|off ] [-eyedb-error-policy status|exception|abort|stop|echo] [-eyedbarch] [-eyedbtransless] [-eyedbtransdefmgo <magorder>] [-eyedbversion]";
-  }
-
-  const char *
-  getSrvOptionsUsage()
-  {
-    return "[-sv_port <ports>] [-sv_host <hostname>] [-sv_access_file <accessfile>] [-sv_timeout <timeout>] [-sv_datdir <datdir>] [-sv_passwd_file <passwdfile>] [-sv_nod] [-eyedbdbm <dbmfile>] [-eyedbconf <conffile>] [-eyedblog <logfile>] [-eyedblogmask <mask>] [-eyedblogpid on|off] [-eyedblogdate on|off] [-eyedblogtimer on|off] [-eyedblogprog on|off ] [-eyedbarch] [-eyedbtransless] [-eyedbtransdefmgo <magorder>] [-eyedbversion] [-help]";
-  }
-
-
-  const char *
-  getStdOptionsHelp(const char *indent)
-  {
-    static char buf[2048];
-    sprintf(buf,
-	    "\neyedb standard options:\n"
-	    "%s-eyedbhost <host>             eyedb host server\n"
-	    "%s-eyedbport <port>             eyedb port name or number\n"
-	    "%s-eyedbsmdport <port>          smd port name [default is %s]\n"
-	    "%s-eyedbdbm <dbmfile>           EYEDBDBM database file\n"
-	    "%s-eyedbuser <user>             eyedb user name\n"
-	    "%s-eyedbpasswd <passwd>         eyedb password\n"
-	    "%s-eyedbuser?                   asks for eyedb user name on stdin\n"
-	    "%s-eyedbpasswd?                 asks for eyedb password on stdin\n"
-	    "%s-eyedbauth?                   asks for eyedb user/password on stdin\n"
-	    "%s-eyedbconf <conffile>         configuration file\n"
-	    "%s-eyedblog <logfile>           output log file\n"
-	    "%s-eyedblogmask <mask>          output log mask\n"
-	    "%s-eyedblogdate on|off          controls date display in output log\n"
-	    "%s-eyedblogtimer on|off         controls timer display in output log\n"
-	    "%s-eyedblogpid on|off           controls pid display in output log\n"
-	    "%s-eyedblogprog on|off          controls progname display in output log\n"
-	    "%s-eyedb-error-policy status    returns a status on any eyedb error\n"
-	    "%s-eyedb-error-policy exception throws an exception on any eyedb error\n"
-	    "%s-eyedb-error-policy abort     aborts the program on any eyedb error\n"
-	    "%s-eyedb-error-policy stop      stops the program on any eyedb error\n"
-	    "%s-eyedb-error-policy echo      displays each error on the standard error\n"
-	    "%s-eyedbtransless               default transaction mode is less\n"
-	    "%s-eyedbtransdefmgo <magorder>  sets the default transaction magnitude order\n"
-	    "%s-eyedbarch                    displays the client architecture\n"
-	    "%s-eyedbversion                 displays the eyedb version\n"
-	    "%s-eyedbhelp                    displays this message\n",
-	    indent, indent, indent, indent, smd_get_port(),
-	    indent, indent, indent, indent,
-	    indent, indent, indent, indent, indent, indent, indent, indent,
-	    indent, indent, indent, indent, indent, indent, indent, indent,
-	    indent, indent, indent, indent, indent, indent, indent, indent);
-
-    return buf;
-  }
-#endif
 
 #include <pthread.h>
 

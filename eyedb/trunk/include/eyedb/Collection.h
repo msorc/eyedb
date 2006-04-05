@@ -455,8 +455,7 @@ namespace eyedb {
 			 const RecMode *);
     Status loadDeferred(LockMode lockmode = DefaultLock,
 			const RecMode * = RecMode::NoRecurs);
-    Status postRealizePerform(Offset,
-			      const Oid& cloid,
+    Status postRealizePerform(const Oid& cloid,
 			      const Oid& objoid,
 			      AttrIdxContext &idx_ctx,
 			      Bool&,

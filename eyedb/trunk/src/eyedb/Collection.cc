@@ -2942,8 +2942,7 @@ do { \
   }
 
   Status
-  Collection::postRealizePerform(Offset idr_poff,
-				 const Oid& cloid,
+  Collection::postRealizePerform(const Oid& cloid,
 				 const Oid& objoid,
 				 AttrIdxContext &idx_ctx,
 				 Bool &mustTouch,
@@ -2960,7 +2959,7 @@ do { \
     memcpy(&xoid, getOidC().getOid());
 #endif
     RPCStatus rpc_status =
-      dataWrite(db->getDbHandle(), idr_poff,
+      dataWrite(db->getDbHandle(), idx_ctx.getOff() /*idr_poff*/,
 		    sizeof(eyedbsm::Oid),
 		    (Data)&xoid,
 		    objoid.getOid());

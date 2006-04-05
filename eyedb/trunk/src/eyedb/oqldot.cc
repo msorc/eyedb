@@ -375,8 +375,9 @@ make_idx_ctx(oqmlDotContext *dctx, AttrIdxContext &idx_ctx)
     if (dctx->desc[j-1].isref)
       break;
 
-  for (int i = j; i <= dctx->count; i++)
+  for (int i = j; i <= dctx->count; i++) {
     idx_ctx.push(dctx->desc[i].attrname);
+  }
 }
 
 oqmlStatus *

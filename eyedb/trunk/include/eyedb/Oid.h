@@ -122,7 +122,17 @@ namespace eyedb {
        @return
     */
     bool operator <(const Oid &oid) const {
+      if (getDbid() != oid.getDbid())
+	return getDbid() < oid.getDbid();
       return getNX() < oid.getNX();
+    }
+
+    /**
+       Not yet documented
+       @return
+    */
+    bool eyedb::Oid::operator !() const {
+      return !isValid() ? true : false;
     }
 
     /**
