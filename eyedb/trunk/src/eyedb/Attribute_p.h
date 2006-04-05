@@ -22,7 +22,7 @@
 */
 
 
-#define ATTRIDX_USE_STRING
+#include <assert.h>
 
 namespace eyedb {
 
@@ -314,10 +314,6 @@ namespace eyedb {
 			   Data in_idr, Size in_size) const;
   };
 
-#include <assert.h>
-
-#define ATTRIDXCTX_NEW
-
   class AttrIdxContext {
 
   public:
@@ -333,11 +329,6 @@ namespace eyedb {
     AttrIdxContext(const Class *_class_owner, const Attribute *attr) {
       init();
       set(_class_owner, attr);
-    }
-
-    AttrIdxContext(const Class *_class_owner, const char *attrname) {
-      init();
-      set(_class_owner, attrname);
     }
 
     AttrIdxContext(Class *_class_owner, Attribute **_attrs,
@@ -362,14 +353,6 @@ namespace eyedb {
 	push(attr);
     }
 
-    void set(const Class *_class_owner, const char *attrname) {
-      garbage(False);
-      set(_class_owner);
-      attr_cnt = 0;
-      if (attrname)
-	push(attrname);
-    }
-
     void push(Database *db, const Oid &cloid, const Attribute *attr) {
       if (!class_owner) {
 	set(db->getSchema()->getClass(cloid), attr);
@@ -386,8 +369,6 @@ namespace eyedb {
       }
       push(attr);
     }
-
-    //#define ATTRIDXCTX_INLINE
 
     void push(const Attribute *attr);
     void push(const char *attrname);
@@ -413,12 +394,12 @@ namespace eyedb {
 
     std::string getAttrName(Bool ignore_class_owner = False) const;
     const char *getClassOwner() const {return class_owner;}
-#ifdef ATTRIDX_USE_STRING
     const char *getAttrName(int n) const {return n >= attr_cnt ? 0 : attrs[n].c_str();}
-#else
-    const char *getAttrName(int n) const {return n >= attr_cnt ? 0 : attrs[n];}
-#endif
     unsigned int getAttrCount() const {return attr_cnt;}
+
+    void pushOff(int off);
+    int getOff();
+    void popOff();
 
     int operator==(const AttrIdxContext &) const;
     int operator!=(const AttrIdxContext &idx_ctx) const {
@@ -450,9 +431,8 @@ namespace eyedb {
 
     void init() {
       toFree = False;
-#ifdef ATTRIDXCTX_NEW
       attrpath_computed = False;
-#endif
+      attr_off_cnt = 0;
       attr_cnt = 0;
       class_owner = 0;
       idx_ops_cnt = 0;
@@ -463,15 +443,13 @@ namespace eyedb {
 
     void garbage(Bool);
     char *class_owner;
-#ifdef ATTRIDX_USE_STRING
     std::string attrs[64];
-#endif
+    int attr_off[64];
+    eyedblib::int16 attr_off_cnt;
     eyedblib::int16 attr_cnt;
-#ifdef ATTRIDXCTX_NEW
     mutable Bool attrpath_ignore_class_owner;
     mutable Bool attrpath_computed;
     mutable char attrpath[512];
-#endif
 
   private: // forbidden
     AttrIdxContext(const AttrIdxContext &);

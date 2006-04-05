@@ -36,6 +36,7 @@ namespace eyedblib {
   extern char *getFBuffer(const char *fmt, va_list ap);
   extern void display_time(const char *fmt, ...);
   extern int is_number(const char *s);
+  extern const char *setbuftime(eyedblib::int64 t);
 
   /**
      @}

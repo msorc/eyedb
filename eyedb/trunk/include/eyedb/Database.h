@@ -27,6 +27,7 @@
 
 #include <eyedb/ObjCache.h>
 #include <vector>
+#include <map>
 
 namespace eyedb {
 
@@ -1057,6 +1058,7 @@ namespace eyedb {
     int trs_cnt;
     LinkedList mark_deleted;
     LinkedList purge_action_list;
+    std::map<Oid, bool> mark_created;
     void purgeOnAbort();
     void purgeRelease();
     static ObjCache *makeRegister();
@@ -1115,6 +1117,9 @@ namespace eyedb {
     const Oid& getMprotOid() const {return m_protoid;}
     void updateSchema(const SchemaInfo &schinfo);
     LinkedList& getMarkDeleted() {return mark_deleted;}
+    void addMarkCreated(const Oid &);
+    bool isMarkCreated(const Oid &) const;
+    void markCreatedEmpty();
     void setIncoherency();
     Bool isOQLInit() const {return oqlInit;}
     void setOQLInit() {oqlInit = True;}

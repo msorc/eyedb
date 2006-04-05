@@ -2689,5 +2689,20 @@ if ((mode) !=  NoDBAccessMode && \
     return IDBBOOL(!(open_flag & _DBSRead));
   }
 
+  void Database::addMarkCreated(const Oid &oid)
+  {
+    mark_created[oid] = true;
+  }
+
+  bool Database::isMarkCreated(const Oid &oid) const
+  {
+    return mark_created.find(oid) != mark_created.end();
+  }
+
+  void Database::markCreatedEmpty()
+  {
+    return mark_created.erase(mark_created.begin(), mark_created.end());
+  }
+
 }
   

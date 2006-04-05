@@ -23,6 +23,7 @@
 
 
 #include "eyedb_p.h"
+#include <eyedblib/butils.h>
 #include "UserDataHT.h"
 #include <time.h>
 #include <sstream>
@@ -542,44 +543,14 @@ namespace eyedb {
     return oid;
   }
 
-#define USEC_PER_SECOND 1000000
-#define USEC_PER_MS        1000
-
-  static
-  const char *setbuftime(eyedblib::int64 t)
-  {
-#define NT 4
-    static char buftim[NT][64];
-    static int nt;
-    char *ds;
-
-    time_t sec = t / USEC_PER_SECOND;
-    eyedblib::int64 usec = t % USEC_PER_SECOND;
-    const char *s = ctime(&sec);
-
-    if (nt == NT)
-      nt = 0;
-
-    ds = buftim[nt++];
-    strcpy(ds, s);
-    ds[strlen(ds)-1] = 0;
-
-    char buf[64];
-    sprintf(buf, " %03d.%03dms", (int)(usec / USEC_PER_MS),
-	    (int)(usec % USEC_PER_MS));
-    strcat(ds, buf);
-
-    return ds;
-  }
-
   const char *Object::getStringCTime() const
   {
-    return setbuftime(c_time);
+    return eyedblib::setbuftime(c_time);
   }
 
   const char *Object::getStringMTime() const
   {
-    return setbuftime(m_time);
+    return eyedblib::setbuftime(m_time);
   }
 
   void

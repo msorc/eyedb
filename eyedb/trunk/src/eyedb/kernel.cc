@@ -1976,19 +1976,18 @@ namespace eyedb {
     Oid *oid;
     int error = 0;
 
-    while (c.getNext((void *&)oid))
-      {
-	if (commit && !error)
-	  {
-	    rpc_status =
-	      IDB_objectSizeModify(dbh, IDB_OBJ_HEAD_SIZE, oid->getOid());
-	    if (rpc_status)
-	      error++;
-	  }
-	delete oid;
+    while (c.getNext((void *&)oid)) {
+      if (commit && !error) {
+	rpc_status =
+	  IDB_objectSizeModify(dbh, IDB_OBJ_HEAD_SIZE, oid->getOid());
+	if (rpc_status)
+	  error++;
       }
+      delete oid;
+    }
 
     db->getMarkDeleted().empty();
+    db->markCreatedEmpty();
 
     if (error)
       return rpc_status;
@@ -2726,6 +2725,8 @@ namespace eyedb {
     if (rpc_status)
       return rpc_status;
 
+    db->addMarkCreated(Oid(*oid));
+
     unsigned char temp[IDB_OBJ_HEAD_SIZE];
 
     Offset offset = 0;
@@ -2751,6 +2752,8 @@ namespace eyedb {
     lock_data((Data *)&idr, xdata);
 
     status = eyedbsm::objectCreate(dbh->sedbh, idr, size, dspid, oid);
+    if (!status)
+      ((Database *)dbh->db)->addMarkCreated(Oid(*oid));
 
     unlock_data(idr, xdata);
     return rpcStatusMake_se(status);
@@ -6062,8 +6065,11 @@ namespace eyedb {
 
     if (isOidValid(oid))
       se_status = eyedbsm::objectWrite(dbh->sedbh, 0, hdr->size, idr, oid);
-    else
+    else {
       se_status = eyedbsm::objectCreate(dbh->sedbh, idr, hdr->size, dspid, oid);
+      if (!se_status)
+	((Database *)dbh->db)->addMarkCreated(Oid(*oid));
+    }
 
     restore_xinfo(idr, hdr, xinfo);
 
@@ -6334,6 +6340,11 @@ namespace eyedb {
     // added the 27/02/02
     if (really)
       return rpcStatusMake_se(eyedbsm::objectDelete(dbh->sedbh, oid));
+
+    if (db->isMarkCreated(Oid(oid))) {
+      se_status = eyedbsm::objectDelete(dbh->sedbh, oid);
+      return rpcStatusMake_se(se_status);
+    }
 
     db->getMarkDeleted().insertObject(new Oid(oid));
     return RPCSuccess;

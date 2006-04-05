@@ -43,6 +43,7 @@ namespace eyedbsm {
     OREAD,
     OWRITE,
     ODELETE,
+    OCREADEL,
     OCHSIZE,
     OERROR,
     OP_CNT, /* OP_CNT should be after PDELETE when all operations
@@ -104,6 +105,8 @@ namespace eyedbsm {
     TransState trs_state;
     ProcState proc_state;
 
+    eyedblib::int64 create_time;
+    eyedblib::int64 access_time;
     time_t timestamp;
     unsigned int xid;
     unsigned int obj_cnt;

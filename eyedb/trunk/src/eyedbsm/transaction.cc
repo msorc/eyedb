@@ -68,6 +68,7 @@ static const char trTooLarge[] =
 
 #include <eyedblib/iassert.h>
 #include <eyedblib/log.h>
+#include <eyedblib/butils.h>
 
 #define _ESM_C_
 #include <eyedblib/rpc_be.h>
@@ -96,15 +97,16 @@ namespace eyedbsm {
   ESM_transactionUnregister(Transaction *trs, Mutex *mp, unsigned int xid);
 
   static TransactionOP crossOps[OP_CNT][OP_CNT] = {
-    /*  OCREATE     OREAD       OWRITE      ODELETE     OCHSIZE     OERROR */
+    /*             OCREATE  OREAD    OWRITE   ODELETE  OCREADEL  OCHSIZE OERROR */
 
-    /* OCREATE  */ OCREATE, OCREATE, OCREATE, ODELETE, OCREATE, OERROR,
+    /* OCREATE  */ OCREATE, OCREATE, OCREATE, OCREADEL, OERROR, OCREATE, OERROR,
 
-    /* OREAD    */ OERROR,  OREAD,   OWRITE,  ODELETE, OCHSIZE, OERROR,
+    /* OREAD    */ OERROR,  OREAD,   OWRITE,  ODELETE, OERROR, OCHSIZE, OERROR,
 
-    /* OWRITE   */ OERROR,  OWRITE,  OWRITE,  ODELETE, OCHSIZE, OERROR,
+    /* OWRITE   */ OERROR,  OWRITE,  OWRITE,  ODELETE, OERROR, OCHSIZE, OERROR,
 
-    /* ODELETE  */ OERROR,  OERROR,  OERROR,  OERROR,  OERROR,  OERROR,
+    /* ODELETE  */ OERROR,  OERROR,  OERROR,  OERROR,  OERROR, OERROR,  OERROR,
+    /* OCREADEL */ OERROR,  OERROR,  OERROR,  OERROR,  OERROR, OERROR,  OERROR,
 
     // changed the 30/01/02
     // /* OCHSIZE  */ OERROR,  OCHSIZE, OCHSIZE, ODELETE, OCHSIZE, OERROR,
@@ -971,6 +973,15 @@ do { \
     return Success;
   }
 
+  static eyedblib::int64 current_time()
+  {
+    struct timeval tv;
+
+    gettimeofday(&tv, 0);
+
+    return (eyedblib::int64)tv.tv_sec * 1000000 + tv.tv_usec;
+  }
+
   Status
   ESM_objectLock(DbHandle const *dbh, const Oid *oid, TransactionOP op,
 		 Boolean *popsync, TRObject **ptro)
@@ -1049,6 +1060,8 @@ do { \
 
     xmh = dbh->vd->trs_mh;
     trs = (Transaction *)XM_ADDR(xmh, trctx->trs_off);
+
+    trs->access_time = current_time();
 
     ESM_ASSERT(trs->magic == TRS_MAGIC, 0, xid);
 
@@ -1254,6 +1267,15 @@ do { \
 	  *popsync = True;
 	return Success;
       }
+
+#define OCREADEL_SYNC
+#ifdef OCREADEL_SYNC
+      if (tro->op == OCREADEL) {
+	//printf("deleting object %s\n", getOidString(oid));
+	se = ESM_objectDelete(dbh, oid, OPShrinkingPhase);
+	return se;
+      }
+#endif
 
 #ifdef TRS_SECURE
       ESM_ASSERT(tro->magic == TROBJ_MAGIC, 0, 0);
@@ -1647,6 +1669,7 @@ do { \
     XMClose(xmh);
   }
 
+
   Status
   ESM_transactionCreate(DbHandle const *dbh,
 			const TransactionParams *params, XMOffset *off)
@@ -1687,6 +1710,8 @@ do { \
     trs->prot_update = False;
     trs->dl          = 0;
     trs->timestamp   = 0;
+    trs->create_time = current_time();
+    trs->access_time = current_time();
 #ifdef TRS_INTER_MUT
     mutexInit(dbh->vd, &trs->mut, &trs->mp, "TRANSACTION");
 #else
@@ -1939,6 +1964,7 @@ do { \
       return se;
 
     if (state == TransCOMMITING) {
+      //printf("commit tro->op %d %s\n", tro->op, getOidString(&po->oid));
       if (tro->op == OCREATE) {
 	/*
 	  if (recovmode == RecoveryPartial || recovmode == RecoveryFull)
@@ -1951,7 +1977,12 @@ do { \
 	  statusPrint(se, "ESM_ObjectValidate");
 	*/
       }
-      else if (tro->op == ODELETE) {
+#ifdef OCREADEL_SYNC
+      else if (tro->op == ODELETE)
+#else
+      else if (tro->op == ODELETE || tro->op == OCREADEL)
+#endif
+	{
 	if (tro->oidloc.ns) {
 	  po->oid.setUnique(po->oid.getUnique() - 1);
 	  se = ESM_objectDeleteByOidLoc(dbh, &po->oid, tro->oidloc.ns-1,
@@ -1959,6 +1990,7 @@ do { \
 	}
 	else
 	  se = ESM_objectDelete(dbh, &po->oid, OPShrinkingPhase);
+
 	/*
 	  if (se)
 	  statusPrint(se, "ESM_ObjectDelete");
@@ -1991,26 +2023,32 @@ do { \
       else if (tro->op == OCHSIZE) {
 	/* nothing */
 	/*
-	  printf("NOTHING FOR OCHSIZE %s tro->data %p\n",
-	  getOidString(&po->oid), tro->data);
+	printf("NOTHING FOR OCHSIZE %s tro->data %p\n",
+	       getOidString(&po->oid), tro->data);
 	*/
       }
     }
     else if (state == TransABORTING) {
-      if (tro->op == OCREATE) {
-	/*se =*/ ESM_objectDelete(dbh, &po->oid, OPShrinkingPhase);
+      //printf("abort tro->op %d %s\n", tro->op, getOidString(&po->oid));
+#ifdef OCREADEL_SYNC
+      if (tro->op == OCREATE)
+#else
+      if (tro->op == OCREATE || tro->op == OCREADEL)
+#endif
+	{
+	se = ESM_objectDelete(dbh, &po->oid, OPShrinkingPhase);
 	/*
-	  if (se)
+	if (se)
 	  statusPrint(se, "ESM_ObjectDelete");
 	*/
       }
 
       if (tro->op == ODELETE && tro->oidloc.ns) {
 	po->oid.setUnique(po->oid.getUnique() - 1);
-	se = ESM_objectRestore(dbh, &po->oid, tro->oidloc.ns-1,
+	/*se =*/ ESM_objectRestore(dbh, &po->oid, tro->oidloc.ns-1,
 			       tro->oidloc.datid);
 	/*
-	  if (se)
+	if (se)
 	  statusPrint(se, "ESM_ObjectRestore");
 	*/
       }
@@ -2819,7 +2857,7 @@ do { \
 	printf(" Server Pid %d\n", inactrs[i]->xid);
 	printf(" Object Count %d\n",  inactrs[i]->obj_cnt);
 	printf(" Deleted Object Count %d\n",  inactrs[i]->del_obj_cnt);
-	printf(" Last Access on %s", ctime(&inactrs[i]->timestamp));
+	printf(" Last Access on %s\n", eyedblib::setbuftime(inactrs[i]->access_time));
       }
       se = ESM_transactionDelete(dbh, XM_OFFSET(xmh, inactrs[i]), TransABORTING);
       if (se) return se;

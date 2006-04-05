@@ -38,6 +38,7 @@
 
 #include <eyedblib/machtypes.h>
 #include <eyedblib/filelib.h>
+#include <eyedblib/butils.h>
 #include <transaction.h>
 #include <eyedbsm_p.h>
 #include <hashtable.h>
@@ -1627,7 +1628,8 @@ transaction_display_realize(int server_pid, Boolean all)
 	  printf(" Object Count %d\n", trs->obj_cnt);
 	  printf(" Deleted Object Count %d\n", trs->del_obj_cnt);
 	  printf(" Hash Table Entries %u\n", ((HashTable *)XM_ADDR(sm_xmh, trs->ht_off))->mask+1);
-	  printf(" Last Access on %s", ctime(&trs->timestamp));
+	  printf(" Created on %s\n", eyedblib::setbuftime(trs->create_time));
+	  printf(" Last Access on %s\n", eyedblib::setbuftime(trs->access_time));
 	  printf(" State %s\n",
 		  (ESM_isTransactionActive(trs) ? "ACTIVE" : "INACTIVE"));
 	  one_transaction_display(sm_xmh, trshd, trs, all);
