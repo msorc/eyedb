@@ -82,7 +82,14 @@ sparc-sun-solaris2.9)
 	then
 		CFLAGS="-xtarget=ultra -xarch=v9"
 		CXXFLAGS="$CXXFLAGS -xtarget=ultra -xarch=v9"
+		LDFLAGS="-XCClinker -xtarget=ultra -XCClinker -xarch=v9"
 	fi
+	;;
+esac
+# special settings on Mac OS X
+case "$host" in
+powerpc-apple-darwin*)
+	LDFLAGS="-Wl,-m -Wl,-multiply_defined -Wl,suppress"
 	;;
 esac
 
@@ -253,9 +260,6 @@ sparc-sun-solaris2.9)
 	then
 		DEFINES="-DSOLARIS -DSPARCV9"
 	else
-		CFLAGS="-xtarget=ultra -xarch=v9"
-		CXXFLAGS="$CXXFLAGS -xtarget=ultra -xarch=v9"
-		LDFLAGS="-XCClinker -xtarget=ultra -XCClinker -xarch=v9"
 		DEFINES="-DSOLARIS -DSPARCV9"
 	fi
 	;;

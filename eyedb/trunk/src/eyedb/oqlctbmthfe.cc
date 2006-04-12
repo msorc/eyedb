@@ -23,15 +23,15 @@
 
 #include <eyedbconfig.h>
 
-#include <eyedb/eyedb.h>
 #include <math.h>
-#include <oql_p.h>
 #include <sstream>
+
+#include <eyedb/eyedb.h>
+#include <oql_p.h>
 #include <eyedb/oqlctb.h>
 #include "comp_time.h"
 
 using std::ostringstream;
-
 using namespace eyedb;
 
 #define CHKCONN(CONN, MSG) \
