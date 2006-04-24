@@ -142,6 +142,13 @@ AC_PROG_LIBTOOL
 AM_PROG_LEX
 AC_PROG_YACC
 
+# check for libraries
+# this library is necessary on Solaris
+AC_CHECK_LIB( nsl, gethostbyname)
+AC_CHECK_LIB( dl, dlopen)
+AC_CHECK_LIB( crypt, crypt)
+AC_SEARCH_LIBS( socket, socket)
+
 # check for pthread
 ACX_PTHREAD
 LIBS="$LIBS $PTHREAD_LIBS"
@@ -201,13 +208,6 @@ if test -d "/proc/1" ; then
 else
    AC_MSG_RESULT(no)
 fi
-
-# check for libraries
-# this library is necessary on Solaris
-AC_CHECK_LIB( nsl, gethostbyname)
-AC_CHECK_LIB( dl, dlopen)
-AC_CHECK_LIB( crypt, crypt)
-AC_SEARCH_LIBS( socket, socket)
 
 # determine the semaphore implementation for this platform
 AC_PTHREAD_PROCESS_SHARED
@@ -358,13 +358,13 @@ AM_CONDITIONAL(COND_LATEX2HTML, test x"$COND_LATEX2HTML" = xyes)
 case "$host" in
 i*86-*-linux*)
 	EYEDB_ARCH_CPPFLAGS="-D_REENTRANT -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
-	EYEDB_ARCH_CXXFLAGS=-fPIC
+	EYEDB_ARCH_CXXFLAGS="-fPIC $PTHREAD_CFLAGS"
 	EYEDB_ARCH_SOFLAGS=-shared
 	;;
 
 x86_64-*-linux*)
 	EYEDB_ARCH_CPPFLAGS="-D_REENTRANT -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
-	EYEDB_ARCH_CXXFLAGS=-fPIC
+	EYEDB_ARCH_CXXFLAGS="-fPIC $PTHREAD_CFLAGS"
 	EYEDB_ARCH_SOFLAGS=-shared
 	;;
 
@@ -372,11 +372,11 @@ sparc-sun-solaris2.9)
 	if test "$ac_cv_cxx_compiler_gnu" = "yes"
 	then
 		EYEDB_ARCH_CPPFLAGS="-D_REENTRANT -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
-		EYEDB_ARCH_CXXFLAGS=-fPIC
+		EYEDB_ARCH_CXXFLAGS="-fPIC $PTHREAD_CFLAGS"
 		EYEDB_ARCH_SOFLAGS=-shared
 	else
 		EYEDB_ARCH_CPPFLAGS="-mt -xtarget=ultra -xarch=v9"
-		EYEDB_ARCH_CXXFLAGS=-KPIC
+		EYEDB_ARCH_CXXFLAGS="-KPIC $PTHREAD_CFLAGS"
 		EYEDB_ARCH_SOFLAGS=-G
 	fi
 	;;
@@ -388,6 +388,7 @@ sparc-sun-solaris2.9)
 esac
 
 EYEDB_ARCH_LIBS=$LIBS
+AC_CHECK_LIB( pthread, pthread_join, EYEDB_ARCH_LIBS="-lpthread $EYEDB_ARCH_LIBS")
 
 AC_SUBST(EYEDB_ARCH_CPPFLAGS)
 AC_SUBST(EYEDB_ARCH_CXXFLAGS)
