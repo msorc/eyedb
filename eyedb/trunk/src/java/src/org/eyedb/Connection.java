@@ -73,6 +73,7 @@ public class Connection {
 
       if (isNumber(port)) {
 	  main_sock = new Socket(host, Integer.parseInt(port));
+	  main_sock.setTcpNoDelay(true);
 	  main_os = new StandardOutputStream(main_sock.getOutputStream());
 	  main_is = new StandardInputStream(main_sock.getInputStream());
 
