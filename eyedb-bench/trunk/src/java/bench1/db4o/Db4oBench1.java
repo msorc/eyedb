@@ -35,7 +35,7 @@ public class Db4oBench1 extends Benchmark {
 	    for (long i = 0; i < nObjectsPerTransaction; i++) {
 		Person p = new Person();
 		p.setName("toto" + i);
-		p.setAge((i+1)%42);
+		p.setAge((int)(i+1)%42);
 
 		client.set( p);
 	    }

@@ -50,7 +50,7 @@ public class EyedbBench1 extends Benchmark {
 		for (long i = 0; i < nObjectsPerTransaction; i++) {
 		    Person p = new Person(database);
 		    p.setName("toto"+i);
-		    p.setAge((i+1)%42);
+		    p.setAge((int)(i+1)%42);
 
 		    p.store(org.eyedb.RecMode.FullRecurs);
 		}
