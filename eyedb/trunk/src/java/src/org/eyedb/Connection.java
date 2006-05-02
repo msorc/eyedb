@@ -78,10 +78,12 @@ public class Connection {
 	  main_is = new StandardInputStream(main_sock.getInputStream());
 
 	  intr_sock = new Socket(host, Integer.parseInt(port));
+	  intr_sock.setTcpNoDelay(true);
 	  intr_os = new StandardOutputStream(intr_sock.getOutputStream());
 	  intr_is = new StandardInputStream(intr_sock.getInputStream());
 
 	  outband_sock = new Socket(host, Integer.parseInt(port));
+	  outband_sock.setTcpNoDelay(true);
 	  outband_os = new StandardOutputStream(outband_sock.getOutputStream());
 	  outband_is = new StandardInputStream(outband_sock.getInputStream());
 	}
