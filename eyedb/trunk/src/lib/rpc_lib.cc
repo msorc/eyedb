@@ -51,7 +51,8 @@
 #include <eyedblib/xdr.h>
 #include <lib/rpc_lib_p.h>
 
-int RPC_MIN_SIZE = 256;
+//int RPC_MIN_SIZE = 256;
+int RPC_MIN_SIZE = 1024;
 
 void
 print_addr(FILE *fd, struct in_addr *addr)
@@ -425,6 +426,8 @@ void rpc_socket_nodelay(int s)
 		 &size) < 0)
     perror("getsockopt nodelay");
   
+  //#define TCP_TRACE
+
 #ifdef TCP_TRACE
   fprintf(stderr, "NODELAY: %d [flag=%d, size=%d]\n", s, flag, size);
 #endif

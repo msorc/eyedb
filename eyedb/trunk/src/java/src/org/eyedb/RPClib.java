@@ -26,7 +26,7 @@ package org.eyedb;
 import java.io.*;
 import java.net.*;
 
-class RPClib {
+public class RPClib {
 
   static private final int rpc_SyncData  = 13;
   static private final int rpc_ASyncData = 18;
@@ -34,7 +34,7 @@ class RPClib {
   static final int rpc_Magic   = 0x43f2e341;
   static final int rpc_MMMagic = 0x43f2e341 + 0x11111111;
   static final int COMM_SZ = 2048;
-  static final int RPC_MIN_SIZE = 256;
+  static final int RPC_MIN_SIZE = 1024;
   static final long ANY = 0x10000;
 
   static private int serial = 1000;
@@ -273,7 +273,9 @@ protected static void start(int code) {
     }
   }
 
-  static boolean realize(Connection conn, Status status) {
+    public static int read_ms, write_ms, write_async_ms, read_cnt, read_async_cnt;
+
+    static boolean realize(Connection conn, Status status) {
 
     try {
       OutputStream os = conn.main_os;
@@ -283,10 +285,14 @@ protected static void start(int code) {
       coder_out.code(coder_data_cnt); // ndata
       coder_out.setOffset(offset);
       os.write(coder_out.getData(), 0, offset);
+      long ms = System.currentTimeMillis();
       int rsize = RPC_MIN_SIZE - offset;
       if (rsize > 0)
 	os.write(null_bytes, 0, rsize);
+      long ms2 = System.currentTimeMillis();
+      write_ms += ms2 - ms;
       writeASyncData(conn);
+      write_async_ms += System.currentTimeMillis() - ms;
     }
 
     catch(IOException e) {
@@ -298,7 +304,10 @@ protected static void start(int code) {
 
     InputStream is = conn.main_is;
     
+    long ms = System.currentTimeMillis();
     int n = read(is, coder_in.getData(), RPC_MIN_SIZE);
+    read_cnt++;
+    read_ms += System.currentTimeMillis() - ms;
     
     //System.out.println("has read: " + n);
     if (n != RPC_MIN_SIZE) {
@@ -337,6 +346,7 @@ protected static void start(int code) {
 	byte b[] = new byte[rsize];
 
 	n = read(is, b, rsize);
+	read_async_cnt++;
 
 	if (n != rsize)
 	  return false;
