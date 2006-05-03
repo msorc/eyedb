@@ -1,3 +1,9 @@
+2006-05-03  Eric Viara  <viara@sysra.com>
+
+	* Fixed problems for schema updates
+	* Fixed problems in OQL garbage collector
+	* Suppressed EYEDB_NUMVERSION in generated ODL
+
 2006-04-12  Francois Dechelle <francois@dechelle.net>
 
 	* Fixed multiple symbols link error, isnan() detection on Mac OS X
