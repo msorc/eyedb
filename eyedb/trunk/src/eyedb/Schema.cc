@@ -1424,8 +1424,9 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
 
     sprintf(file, "%s%s%s", files, ext, suffix);
     fprintf(fd ,"\n/*\n");
-    fprintf(fd, " * EyeDB Version %s Copyright (c) 1995-2006 SYSRA\n\n",
+    fprintf(fd, " * EyeDB Version %s Copyright (c) 1995-2006 SYSRA\n",
 	    eyedb::getVersion());
+    fprintf(fd, " *\n");
     fprintf(fd, " * File '%s'\n", file);
     fprintf(fd, " *\n");
     fprintf(fd, " * Package Name '%s'\n", package);
