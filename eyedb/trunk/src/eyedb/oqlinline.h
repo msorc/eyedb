@@ -662,7 +662,9 @@ inline oqmlAtom::~oqmlAtom()
 #ifdef DEST_TRACE
   printf("deleting atom %p\n", this);
 #endif
-  assert(!refcnt);
+  if (refcnt)
+    return;
+  //assert(!refcnt);
   refcnt = 32000;
   oqmlGarbManager::remove(link);
   free(string);
@@ -785,7 +787,10 @@ inline oqmlAtomList::~oqmlAtomList()
 #ifdef DEST_TRACE
   printf("deleting list %p\n", this);
 #endif
-  assert(!refcnt);
+  if (refcnt)
+    return;
+
+  //assert(!refcnt);
   oqmlAtom *a = first;
   while (a)
     {
