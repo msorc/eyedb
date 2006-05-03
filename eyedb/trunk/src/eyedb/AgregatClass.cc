@@ -707,6 +707,7 @@ Status AgregatClass::trace_realize(FILE *fd, int indent, unsigned int flags, con
   return Class::trace_realize(fd, indent, flags, rcm);
 }
 
+/*
 Bool
 AgregatClass::compare_perform(const Class *cl) const
 {
@@ -727,12 +728,39 @@ AgregatClass::compare_perform(const Class *cl) const
 
   return True;
 }
+*/
 
-  Status
-  agregatClassMake(Database *db, const Oid *oid, Object **o,
-		       const RecMode *rcm, const ObjectHeader *hdr,
-		       Data idr, LockMode lockmode, const Class*)
-  {
+Bool
+AgregatClass::compare_perform(const Class *cl,
+			      Bool compClassOwner,
+			      Bool compNum,
+			      Bool compName,
+			      Bool inDepth) const
+{
+  if (!cl->asAgregatClass())
+    return False;
+
+  const AgregatClass *ma = (AgregatClass *)cl;
+
+  if (asUnionClass() != ma->asUnionClass())
+    return False;
+
+  if (items_cnt != ma->items_cnt)
+    return False;
+
+  for (int i = 0; i < items_cnt; i++)
+    if (!items[i]->compare(db, ma->items[i], compClassOwner, compNum,
+			   compName, inDepth))
+      return False;
+
+  return True;
+}
+
+Status
+agregatClassMake(Database *db, const Oid *oid, Object **o,
+		 const RecMode *rcm, const ObjectHeader *hdr,
+		 Data idr, LockMode lockmode, const Class*)
+{
     RPCStatus rpc_status;
     Status status;
     Data temp;

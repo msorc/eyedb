@@ -132,6 +132,7 @@ odlAddComponent::odlAddComponent(ClassComponent *_comp) :
 {
 #ifdef TRACE
   printf("AddComponent(%p)\n", this);
+  printf("AddComponent(%p)\n", this);
   printf("%s '", cls_comp->getClass()->getCanonicalName());
   cls_comp->m_trace(stdout, 0, 0, NoRecurs);
   printf("\n");

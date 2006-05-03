@@ -230,7 +230,12 @@ namespace eyedb {
        @param cl
        @return
     */
-    Bool compare_perform(const Class *cl) const;
+    Bool compare_perform(const Class *cl,
+			 Bool compClassOwner,
+			 Bool compNum,
+			 Bool compName,
+			 Bool inDepth) const;
+    //Bool compare_perform(const Class *cl) const;
 
     /**
        Not yet documented

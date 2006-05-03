@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <assert.h>
+#include <errno.h>
 
 #include "base_p.h"
 #include "eyedb/internals/ObjectHeader.h"
@@ -85,7 +86,7 @@ namespace eyedb {
  \
   if (r) \
     { \
-      perror("server"); printf("r = %d\n", r); \
+      if (errno) perror("server"); \
       return rpcStatusMake(IDB_SERVER_FAILURE, SERVER_CRASH_MSG); \
     } \
 }

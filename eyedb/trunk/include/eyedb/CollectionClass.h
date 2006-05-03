@@ -120,7 +120,12 @@ namespace eyedb {
 			  FILE *, FILE *, FILE *, FILE *, FILE *, FILE *);
     Status generateCode_Java(Schema *, const char *prefix, 
 			     const GenCodeHints &, FILE *);
-    Bool compare_perform(const Class *) const;
+    //Bool compare_perform(const Class *) const;
+    Bool compare_perform(const Class *cl,
+			 Bool compClassOwner,
+			 Bool compNum,
+			 Bool compName,
+			 Bool inDepth) const;
 
     virtual const char *getPrefix() const {return NULL;}
     virtual const char *getCSuffix() const {return "NULL";}

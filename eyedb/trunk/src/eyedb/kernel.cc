@@ -3285,7 +3285,6 @@ namespace eyedb {
       AttributeComponent *cattr_comp;
       if (create) {
 	cattr_comp = attr_comp->xclone(db, subclasses[i]);
-	//      printf("Storing clone\n");
 	s = cattr_comp->store();
       }
       else {
@@ -3318,7 +3317,6 @@ namespace eyedb {
     if (!parent)
       return RPCSuccess;
 
-    //printf("attrCompPropagate(%s, %s)\n", cls->getName(), parent->getName());
     const LinkedList *complist;
     status = parent->getAttrCompList(complist);
     if (status) return rpcStatusMake(status);
@@ -5874,7 +5872,9 @@ namespace eyedb {
 	if (s)
 	  return rpcStatusMake(s);
 	if (!removed) {
-	  s = db->removeObject(attrs[n]->getAttrCompSetOid());
+	  s = db->removeObject(attr_comp_oid);
+	  printf("removing comp set %s %s\n",
+		 attr_comp_oid.getString(), cl->getName());
 	  if (s) return rpcStatusMake(s);
 	}
       }
@@ -5921,8 +5921,26 @@ namespace eyedb {
       }
     }
 
+    // disconnected 3/05/06 because it produced a bug in ODL updates when
+    // we add an attribute in some case, for instance :
+    // adding the attribute int contig_count produces a problem :
+    /*
+    class A {
+      int j; index<hash> on j;
+    };
+
+    class C extends A {
+      // int contig_count;  index<btree> on contig_count;
+      string s;
+      int h; constraint<notnull> on h;
+    };
+    */
+    // but this deconnexion leads to DB memory leaks, because some
+    // unuseful attr_comp_sets still in the DB : is it really a problem ?
+#if 0
     rpc_status = IDB_removeAttrCompSet(db, cl);
     if (rpc_status) return rpc_status;
+#endif
   
     eyedbsm::DbHandle *sedbh = dbh->sedbh;
     eyedbsm::Status se_status;
