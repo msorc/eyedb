@@ -211,7 +211,12 @@ namespace eyedb {
 
     // FE
     Status createIndexes(void);
-    Bool compare_perform(const Class *) const;
+    //Bool compare_perform(const Class *) const;
+    Bool compare_perform(const Class *cl,
+			 Bool compClassOwner,
+			 Bool compNum,
+			 Bool compName,
+			 Bool inDepth) const;
 
     // BE
     Status openIndexes_realize(Database *db);

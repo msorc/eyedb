@@ -1243,8 +1243,9 @@ namespace eyedb {
 
     Bool compare(Database *, const Attribute *,
 		 Bool compClassOwner,
-		 Bool compNum = True,
-		 Bool compName = True) const;
+		 Bool compNum,
+		 Bool compName,
+		 Bool inDepth) const;
 
     static Status openMultiIndexRealize(Database *db, Index *);
 

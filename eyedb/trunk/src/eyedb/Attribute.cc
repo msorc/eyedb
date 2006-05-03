@@ -952,9 +952,10 @@ Attribute::compare(Database *db, const Attribute *item) const
 
 Bool
 Attribute::compare(Database *db, const Attribute *item,
-		      Bool compClassOwner,
-		      Bool compNum,
-		      Bool compName) const
+		   Bool compClassOwner,
+		   Bool compNum,
+		   Bool compName,
+		   Bool inDepth) const
 {
   if (compNum && num != item->num)
     return False;
@@ -965,11 +966,26 @@ Attribute::compare(Database *db, const Attribute *item,
   if (!typmod.compare(&item->typmod))
     return False;
   
-  if (!cls->compare(item->cls))
-    return False;
+  if (!inDepth && isIndirect()) {
+    if (!cls->compare_l(item->cls))
+      return False;
+  }
+  else {
+    if (!cls->compare(item->cls, compClassOwner, compNum, compName, inDepth))
+      return False;
+  }
 
-  if (compClassOwner && !class_owner->compare(item->class_owner))
-    return False;
+  if (compClassOwner) {
+    if (!inDepth) {
+      if (!class_owner->compare_l(item->class_owner))
+	return False;
+    }
+    else {
+      if (!class_owner->compare(item->class_owner, compClassOwner, compNum,
+				compName, inDepth))
+	return False;
+    }
+  }
 
   return True;
 }
@@ -1044,13 +1060,14 @@ Status
 Attribute::clean_realize(Schema *m, const Class *&xcls)
 {
   if (xcls && !m->checkClass(xcls)) {
+    std::string str = xcls->getName();
     xcls = m->getClass(xcls->getName());
     if (!xcls)
       return Exception::make(IDB_ATTRIBUTE_ERROR, "clean() error for "
-				"attribute %s", name);
-    /*printf("must clean attribute %s %s %s %s\n", name, oid_cl.toString(),
-	   oid_cl_own.toString(), xcls->getOid().toString());
-    */
+			     "attribute %s::%s",
+			     (class_owner ? class_owner->getName() :
+			      "<unknown>"),
+			     name);
   }
 
   return Success;
@@ -7867,7 +7884,9 @@ Attribute::createComponentSet(Database *db)
     if (s) return s;
     assert(attr_comp_set);
     Class *xclass_owner = const_cast<Class *>(dyn_class_owner);
-    //printf("create #1 %s cls=%p\n", attr_comp_set_oid.toString(), xclass_owner);
+    /*
+    printf("create #1 %s cls=%p\n", attr_comp_set_oid.toString(), xclass_owner);
+    */
     assert(db->getSchema()->checkClass(xclass_owner));
     xclass_owner->touch();
     return xclass_owner->store();
@@ -7893,8 +7912,17 @@ Attribute::createComponentSet(Database *db)
 Status
 Attribute::loadComponentSet(Database *db, Bool create) const
 {
-  if (attr_comp_set)
+  /*
+  printf("loadComponentSet: %p %s %p %s\n", this, name, attr_comp_set,
+	 attr_comp_set_oid.getString());
+  */
+  if (attr_comp_set) {
+    if (attr_comp_set->isRemoved()) {
+      printf("REMOVED loadComponentSet: %p %s %p %s\n", this, name, attr_comp_set,
+	     attr_comp_set_oid.getString());
+    }
     return Success;
+  }
 
 #ifdef ATTRNAT_TRACE
   if (isNative()) {
@@ -7915,9 +7943,13 @@ Attribute::loadComponentSet(Database *db, Bool create) const
 	   attr_comp_set_oid.getString());
     */
     Status s = db->loadObject(attr_comp_set_oid,
-				 (Object *&)attr_comp_set);
+			      (Object *&)attr_comp_set);
     if (s) return s;
     attr_comp_set->keep();
+    if (attr_comp_set->isRemoved()) {
+      printf("REMOVED2 loadComponentSet: %p %s %p %s\n", this, name, attr_comp_set,
+	     attr_comp_set_oid.getString());
+    }
     return Success;
   }
 

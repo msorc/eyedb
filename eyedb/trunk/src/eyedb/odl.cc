@@ -165,7 +165,7 @@ namespace eyedb {
   }
 
   static void
-  odl_copy_multi_idx_oids(Class *ocls, Class *cls)
+  odl_copy_attr_comp_sets(Class *ocls, Class *cls)
   {
     int attr_cnt;
     Attribute **attrs = (Attribute **)cls->getAttributes(attr_cnt);
@@ -175,11 +175,11 @@ namespace eyedb {
 	const Attribute *oattr = ocls->getAttribute(attrs[i]->getName());
 	if (oattr) {
 	  /*
-	    printf("%s::%s attr_comp_set_oid %s -> %s\n",
-	    oattr->getAttrCompSetOid().toString(),
-	    attrs[i]->getAttrCompSetOid().toString(),
-	    attrs[i]->getDynClassOwner()->getName(),
-	    attrs[i]->getName());
+	  printf("%s::%s attr_comp_set_oid %s -> %s\n",
+		 oattr->getAttrCompSetOid().toString(),
+		 attrs[i]->getAttrCompSetOid().toString(),
+		 attrs[i]->getDynClassOwner()->getName(),
+		 attrs[i]->getName());
 	  */
 	  attrs[i]->setAttrCompSetOid(oattr->getAttrCompSetOid());
 	}
@@ -473,7 +473,7 @@ namespace eyedb {
 	odl_check_attributes(cl);
       
 	if (cl->getUserData())
-	  odl_copy_multi_idx_oids((Class *)cl->getUserData(), cl);
+	  odl_copy_attr_comp_sets((Class *)cl->getUserData(), cl);
       }
 
     if (odl_error) {
@@ -2267,7 +2267,7 @@ namespace eyedb {
   odl_add_attribute(Schema *m, const Class *cls,
 		    const Attribute *attr)
   {
-    //printf("XCOMP: add_attribute(%s)\n", attr->getName());
+    //printf("XCOMP: add_attribute(%s, %p)\n", attr->getName(), cls);
     odlUPDLIST(m)->insertObjectLast(new odlAddAttribute(cls, attr));
   }
 
@@ -2449,97 +2449,94 @@ namespace eyedb {
     COMPLETE(ocls);
 
     // check removed and converted attributes
-    for (i = 0; i < oattr_cnt; i++)
-      {
-	const Attribute *oattr = oattrs[i];
-	const Attribute *attr;
-	Bool migrate = False;
+    for (i = 0; i < oattr_cnt; i++) {
+      const Attribute *oattr = oattrs[i];
+      const Attribute *attr;
+      Bool migrate = False;
 
-	odlUpdateHint *upd_hints = (odlUpdateHint *)oattr->getUserData();
-	if (upd_hints && upd_hints->type == odlUpdateHint::MigrateTo)
-	  {
-	    migrate = True;
-	    odl_migrate_attribute(m, cls, oattr, upd_hints);
-	  }
+      odlUpdateHint *upd_hints = (odlUpdateHint *)oattr->getUserData();
+      if (upd_hints && upd_hints->type == odlUpdateHint::MigrateTo) {
+	migrate = True;
+	odl_migrate_attribute(m, cls, oattr, upd_hints);
+      }
 
-	if (!(attr = cls->getAttribute(oattr->getName())))
-	  {
-	    attr = odl_get_renamed_attr(attrs, attr_cnt, oattr);
-	    if (!attr)
-	      {
-		if (!migrate) {
-		  if (cls_hints && cls_hints->type == odlUpdateHint::Extend) {
-		    if (upd_hints && upd_hints->type == odlUpdateHint::Remove)
-		      odl_remove_attribute(m, cls, oattr);
-		  }
-		  else
-		    odl_remove_attribute(m, cls, oattr);
-		}
-	      }
-	    else if (upd_hints && upd_hints->type == odlUpdateHint::Convert)
-	      odl_convert_attribute(m, cls, oattr, attr, upd_hints);
-	    else if (!oattr->compare(m->getDatabase(), attr, False, False,
-				     False))
-	      odl_convert_attribute(m, cls, oattr, attr);
+      if (!(attr = cls->getAttribute(oattr->getName()))) {
+	attr = odl_get_renamed_attr(attrs, attr_cnt, oattr);
+	if (!attr) {
+	  if (!migrate) {
+	    if (cls_hints && cls_hints->type == odlUpdateHint::Extend) {
+	      if (upd_hints && upd_hints->type == odlUpdateHint::Remove)
+		odl_remove_attribute(m, cls, oattr);
+	    }
+	    else
+	      odl_remove_attribute(m, cls, oattr);
 	  }
+	}
 	else if (upd_hints && upd_hints->type == odlUpdateHint::Convert)
 	  odl_convert_attribute(m, cls, oattr, attr, upd_hints);
-	else if (!oattr->compare(m->getDatabase(), attr, False, False))
+	else if (!oattr->compare(m->getDatabase(), attr,
+				 False,  // compClassOwner
+				 False,  // compNum
+				 False,  // compName
+				 False)) // compInDepth
 	  odl_convert_attribute(m, cls, oattr, attr);
       }
+      else if (upd_hints && upd_hints->type == odlUpdateHint::Convert)
+	odl_convert_attribute(m, cls, oattr, attr, upd_hints);
+      else if (!oattr->compare(m->getDatabase(), attr,
+			       False,  // compClassOwner
+			       False,  // compNum
+			       False,  // compName
+			       False)) // inDepth
+	odl_convert_attribute(m, cls, oattr, attr);
+    }
 
     // check added attributes
-    for (i = 0; i < attr_cnt; i++)
-      {
-	const Attribute *attr = attrs[i];
-	const Attribute *oattr;
+    for (i = 0; i < attr_cnt; i++) {
+      const Attribute *attr = attrs[i];
+      const Attribute *oattr;
       
-	const char *name = attr->getName();
-	odlUpdateHint *upd_hints = (odlUpdateHint *)attr->getUserData();
-	if (upd_hints && upd_hints->type == odlUpdateHint::RenameFrom)
-	  {
-	    name = upd_hints->detail;
-	    if (oattr = ocls->getAttribute(name))
-	      odl_rename_attribute(m, cls, attr, upd_hints);
-	    else
-	      odl_add_error("class %s: no attribute named %s\n",
-			    cls->getName(), name);
-	  }
-
-	if (!(oattr = ocls->getAttribute(name)))
-	  {
-	    if (!upd_hints || upd_hints->type != odlUpdateHint::MigrateFrom)
-	      odl_add_attribute(m, cls, attr);
-	  }
+      const char *name = attr->getName();
+      odlUpdateHint *upd_hints = (odlUpdateHint *)attr->getUserData();
+      if (upd_hints && upd_hints->type == odlUpdateHint::RenameFrom) {
+	name = upd_hints->detail;
+	if (oattr = ocls->getAttribute(name))
+	  odl_rename_attribute(m, cls, attr, upd_hints);
+	else
+	  odl_add_error("class %s: no attribute named %s\n",
+			cls->getName(), name);
       }
+
+      if (!(oattr = ocls->getAttribute(name))) {
+	if (!upd_hints || upd_hints->type != odlUpdateHint::MigrateFrom)
+	  odl_add_attribute(m, cls, attr);
+      }
+    }
 
     if (odl_error) return;
 
 #ifndef NEW_REORDER
     // check attribute order
     int cnt = 0;
-    for (i = 0; i < attr_cnt; i++)
-      {
-	const Attribute *attr = attrs[i];
-	const Attribute *oattr;
+    for (i = 0; i < attr_cnt; i++) {
+      const Attribute *attr = attrs[i];
+      const Attribute *oattr;
 
-	if (oattr = ocls->getAttribute(attr->getName()))
-	  odl_reorder_attr(m, cls, attr, oattr->getNum() + cnt);
+      if (oattr = ocls->getAttribute(attr->getName()))
+	odl_reorder_attr(m, cls, attr, oattr->getNum() + cnt);
+      else {
+	odlUpdateHint *upd_hints = (odlUpdateHint *)attr->getUserData();
+	if (upd_hints && upd_hints->type == odlUpdateHint::RenameFrom) {
+	  oattr = ocls->getAttribute(upd_hints->detail);
+	  if (oattr)
+	    odl_reorder_attr(m, cls, attr, oattr->getNum() + cnt);
+	  else
+	    cnt++;
+	}
 	else
-	  {
-	    odlUpdateHint *upd_hints = (odlUpdateHint *)attr->getUserData();
-	    if (upd_hints && upd_hints->type == odlUpdateHint::RenameFrom)
-	      {
-		oattr = ocls->getAttribute(upd_hints->detail);
-		if (oattr)
-		  odl_reorder_attr(m, cls, attr, oattr->getNum() + cnt);
-		else
-		  cnt++;
-	      }
-	    else
-	      cnt++;
-	  }
+	  cnt++;
       }
+    }
 
     // ignore attribute reordering!
     qsort(attrs, attr_cnt, sizeof(Attribute *), cmp_attr);

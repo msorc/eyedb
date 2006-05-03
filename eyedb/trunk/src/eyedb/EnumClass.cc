@@ -173,7 +173,11 @@ const EnumItem **EnumClass::getEnumItems(int& cnt) const
 }
 
 Bool
-EnumClass::compare_perform(const Class *cl) const
+EnumClass::compare_perform(const Class *cl,
+			   Bool compClassOwner,
+			   Bool compNum,
+			   Bool compName,
+			   Bool inDepth) const
 {
   const EnumClass *me = (EnumClass *)cl;
   if (items_cnt != me->items_cnt)

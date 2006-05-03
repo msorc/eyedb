@@ -372,6 +372,13 @@ namespace eyedb {
     /**
        Not yet documented
        @param cl
+       @return
+    */
+    Bool compare_l(const Class *cl) const;
+
+    /**
+       Not yet documented
+       @param cl
        @param is
        @return
     */
@@ -696,7 +703,12 @@ namespace eyedb {
 
     MType m_type;
 
-    virtual Bool compare_perform(const Class *) const;
+    //virtual Bool compare_perform(const Class *) const;
+    virtual Bool compare_perform(const Class *cl,
+				 Bool compClassOwner,
+				 Bool compNum,
+				 Bool compName,
+				 Bool inDepth) const;
     virtual void garbage();
     Status setNameRealize(const char *);
     Status trace_comps(FILE *, int, unsigned int, const RecMode *) const;
@@ -793,6 +805,12 @@ namespace eyedb {
       return isBoolClass(cls->getName());
     }
   
+    Bool compare(const Class *cl,
+		 Bool compClassOwner,
+		 Bool compNum,
+		 Bool compName,
+		 Bool inDepth) const;
+
     // completion management
     Bool isAttrsComplete() const {return attrs_complete;}
     Bool isSetupComplete() const {return setup_complete;}

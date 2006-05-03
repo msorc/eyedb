@@ -230,7 +230,11 @@ CollectionClass& CollectionClass::operator=(const CollectionClass &cl)
 
 #define RECURS_BUG // added the 11/06/99
 
-Bool CollectionClass::compare_perform(const Class *cl) const
+Bool CollectionClass::compare_perform(const Class *cl,
+				      Bool compClassOwner,
+				      Bool compNum,
+				      Bool compName,
+				      Bool inDepth) const
 {
   if (!cl->asCollectionClass())
     return False;
@@ -257,7 +261,8 @@ Bool CollectionClass::compare_perform(const Class *cl) const
       return False;
     }
 
-  Bool r = coll_class->compare(cl_collclass);
+  Bool r = coll_class->compare(cl_collclass, compClassOwner,
+			       compNum, compName, inDepth);
 #ifdef RECURS_BUG
   ((CollectionClass *)this)->state &= ~Realizing;
 #endif

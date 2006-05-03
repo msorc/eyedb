@@ -3176,20 +3176,47 @@ namespace eyedb {
   }
 
   Bool
+  Class::compare_l(const Class *cl) const
+  {
+    if (strcmp(getAliasName(), cl->getAliasName()))
+      return False;
+
+    if (type != cl->getType())
+      return False;
+
+    return True;
+  }
+
+  Bool
   Class::compare(const Class *cl) const
+  {
+    /*
+    if (this == cl)
+      return True;
+
+    if (!compare_l(cl))
+      return False;
+
+    if (state & Realizing)
+      return True;
+
+    ((Class *)this)->state |= Realizing;
+    Bool r = compare_perform(cl);
+    ((Class *)this)->state &= ~Realizing;
+    return r;
+    */
+    return compare(cl, True, True, True, True);
+  }
+
+  Bool Class::compare(const Class *cl,
+		      Bool compClassOwner,
+		      Bool compNum,
+		      Bool compName,
+		      Bool inDepth) const
   {
     if (this == cl)
       return True;
 
-    /*
-    // BUG_ETC_UPDATE
-    // added test on aliasname the 5/3/00
-    if (strcmp(name, cl->getName()) &&
-    (!cl->getAliasName() || strcmp(name, cl->getAliasName())))
-    return False;
-    */
-
-    // changed 19/05/03
     if (strcmp(getAliasName(), cl->getAliasName()))
       return False;
 
@@ -3200,12 +3227,24 @@ namespace eyedb {
       return True;
 
     ((Class *)this)->state |= Realizing;
-    Bool r = compare_perform(cl);
+    Bool r = compare_perform(cl, compClassOwner, compNum, compName, inDepth);
     ((Class *)this)->state &= ~Realizing;
     return r;
   }
 
+
+  /*
   Bool Class::compare_perform(const Class *cl) const
+  {
+    return True;
+  }
+  */
+
+  Bool Class::compare_perform(const Class *cl,
+			      Bool compClassOwner,
+			      Bool compNum,
+			      Bool compName,
+			      Bool inDepth) const
   {
     return True;
   }
