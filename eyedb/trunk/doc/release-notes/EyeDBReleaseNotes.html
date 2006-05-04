@@ -10,7 +10,36 @@
 
     <p>
     <ul>
+      <li><a href="#2.7.7">Release notes for EyeDB 2.7.7</a></li>
       <li><a href="#2.7.6">Release notes for EyeDB 2.7.6</a></li>
+    </ul>
+    </p>
+
+    <h2>Release notes for EyeDB 2.7.7</h2><a name="2.7.7"></a>
+
+    <p>
+    <ul>
+      <li>Fixed problems for schema updates</li>
+      <li>Fixed problems in OQL garbage collector</li>
+      <li>Suppressed EYEDB_NUMVERSION in generated ODL</li>
+      <li>Fixed multiple symbols link error, isnan() detection on Mac OS X</li>
+      <li>Fixed a bug when database has reached its maximum size</li>
+      <li>Fixed a problem with getpid()</li>
+      <li>Fixed some remaining problems w.r.t Mac OS X. Now, runs the 'Getting Started' example.</li>
+      <li>Fixed stack allocation problems on Mac OS X</li>
+      <li>Added tests for timezone (Mac OS X porting)</li>
+      <li>Changed some enum values because of conflicts with ODL and OQL flex/bison tokens</li>
+      <li>Changed configure to use javac instead of jikes on Mac OS X</li>
+      <li>Changed UT_SEM to HAVE_SEMAPHORE_POLICY_SYSV_IPC, a config #define that is guessed by configure.in</li>
+      <li>Changed configure.in to find automatically the integer type that has the same size as a void *; fixed files using pointer_int, that is now pointer_int_t.</li>
+      <li>Changed configure.in to guess the semaphore policy, added a configure argument to force the semaphore policy, plus some sanity check</li>
+      <li>Changed src/eyedb/Architecture.cc to get the architecture from compile builtins.</li>
+      <li>Added m4 macro to check whether PTHREAD_PROCESS_SHARED is supported</li>
+      <li>Removed #ifdef LINUX|SOLARIS in src/eyedb/OString.cc and src/eyedb/utilsmthfe.cc. Added necessary tests in configure.in</li>
+      <li>Changed HAS_FATTACH to standard HAVE_FATTACH</li>
+      <li>Removed M_strsignal (assumed that all platforms have strsignal, if not we'll see)</li>
+      <li>Removed non-posix thread code in src/lib/rpcdb.cc (assume that all platforms have Posix threads)</li>
+      <li>Removed getrlimit code and #ifdef SOLARIS in src/lib/m_mem.cc</li>
     </ul>
     </p>
 
