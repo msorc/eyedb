@@ -52,6 +52,7 @@ m_mem_p.h \
 probe_p.h \
 rpc_beP.h \
 rpc_feP.h \
+rpc_lib_p.h \
 utlog.h
 
 EXTRA_DIST=compile_builtin.cc compile_builtin.h
