@@ -283,6 +283,7 @@ then
 	esac
 
 	AC_PROG_JAVAC
+	export CLASSPATH=.
 	AC_PROG_JAVA
 	AC_PATH_PROG(JAR, jar)
 
@@ -540,6 +541,7 @@ echo "  *** EyeDB Java binding ***"
 echo "  Compile Java binding: ${COND_JAVA:-no}"
 echo "  Java compiler: ${JAVAC:-none}"
 echo "  Java compiler flags: ${JAVACFLAGS:-none}"
+echo "  Java virtual machine: ${JAVA:-none}"
 echo "  Jar utility: ${JAR:-none}"
 echo 
 echo "  *** EyeDB Swig multi-languages binding ***" 
