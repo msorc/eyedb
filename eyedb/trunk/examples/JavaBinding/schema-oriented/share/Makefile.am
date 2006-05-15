@@ -1,6 +1,6 @@
 eyedbexamplesdir=$(datadir)/doc/$(PACKAGE)/examples/JavaBinding/schema-oriented/share
 dist_eyedbexamples_DATA= init.sh schema.odl
-#eyedbexamples_DATA=  Makefile.eyedb-examples
+eyedbexamples_DATA=  Makefile.eyedb-examples
 
 SUBDIRS=person
 

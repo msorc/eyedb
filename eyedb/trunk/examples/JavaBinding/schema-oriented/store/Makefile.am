@@ -1,6 +1,6 @@
 eyedbexamplesdir=$(datadir)/doc/$(PACKAGE)/examples/JavaBinding/schema-oriented/store
 dist_eyedbexamples_DATA= PersonTest.java
-#eyedbexamples_DATA=  Makefile.eyedb-examples
+eyedbexamples_DATA=  Makefile.eyedb-examples
 
 JAVAROOT=$(top_builddir)/examples/JavaBinding/schema-oriented/store
 CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_builddir)/src/java/eyedb.jar:$(top_builddir)/examples/JavaBinding/schema-oriented/share/person.jar:$(top_builddir)/examples/JavaBinding/schema-oriented/store

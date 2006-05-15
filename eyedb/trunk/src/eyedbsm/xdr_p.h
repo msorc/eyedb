@@ -49,8 +49,10 @@ namespace eyedbsm {
 			   Oid *prot_uid_oid, DbHeader *dbh);
 
 #define x2h_prologue(XMP, MP) \
-  unsigned char buf[MapHeader_SIZE]; \
-  MapHeader _tmp_(buf), *MP = &_tmp_; \
+  unsigned char buf[MapHeader_SIZE + 8]; \
+  POINTER_INT_TYPE buf_off_8 = reinterpret_cast<POINTER_INT_TYPE>(&buf) & 0x7; \
+  unsigned char *buf_align_8 = (buf_off_8) ? buf - buf_off_8 + 0x8 : buf; \
+  MapHeader _tmp_(buf_align_8), *MP = &_tmp_; \
   x2h_mapHeader(MP, XMP)
 
 #define h2x_epilogue(XMP, MP) \

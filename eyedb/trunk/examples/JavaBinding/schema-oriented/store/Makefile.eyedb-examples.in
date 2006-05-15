@@ -1,21 +1,10 @@
-
-#
-# Makefile, EyeDB Package
-#
-# Eric Viara Copyright (C) SYSRA 1995-1998
-#
-
-JAVAC = CLASSPATH=.:$(EYEDBCLASSPATH) javac -d .
+prefix=@prefix@
+include @datadir@/@PACKAGE@/Makefile.eyedb
 
 all: PersonTest.class
 
-%.class: %.java
-	$(JAVAC) $<
-
 PersonTest.class: PersonTest.java
-	$(JAVAC) $+
-
-clean_all: clean
+	CLASSPATH=$(EYEDB_CLASSPATH):.:../share @JAVAC@ $^
 
 clean:
 	rm -f *.class

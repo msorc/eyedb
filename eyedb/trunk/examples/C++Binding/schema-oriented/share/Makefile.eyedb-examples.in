@@ -1,23 +1,22 @@
-#
-# Makefile
-#
-# EyeDB Package
-#
-# Eric Viara Copyright (C) SYSRA 1995-1998
-#
-
 prefix=@prefix@
 include @datadir@/@PACKAGE@/Makefile.eyedb
 
-all: person.o personstubsfe.o personstubsbe.o
+CXXFLAGS += $(EYEDB_CXXFLAGS) $(EYEDB_CPPFLAGS)
+LDFLAGS += ${EYEDB_LDFLAGS}
+LDLIBS += ${EYEDB_LDLIBS}
 
-.PHONY: init
+all: person.o personstubsfe.o personstubsbe.o
 
 init:
 	sh init.sh
+.PHONY: init
 
-person.cc: schema.odl
-	$(EYEDBODL) --gencode=C++ --package=person $<
+person.o: person.cc
+personstubsfe.o: personstubsfe.cc
+personstubsbe.o: personstubsbe.cc
+
+person.cc personstubsfe.cc personstubbe.cc : schema.odl
+	$(EYEDB_ODL) --gencode=C++ --package=person $<
 
 clean::
 	rm -f *.o personinit* person.h person.cc person*-skel* person*stubs* \
