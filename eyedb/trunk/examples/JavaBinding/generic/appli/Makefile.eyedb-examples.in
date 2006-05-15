@@ -1,11 +1,3 @@
-#
-# Makefile, Eyedb Package
-#
-# examples/JavaBinding/generic makefile
-#
-# Eric Viara Copyright (c) SYSRA 2001
-#
-
 SUBDIRS = basic collections query store schema
 
 all:

@@ -1,11 +1,3 @@
-#
-# Makefile, Eyedb Package
-#
-# examples/JavaBinding makefile
-#
-# Eric Viara Copyright (C) SYSRA 1998
-#
-
 SUBDIRS = generic schema-oriented
 
 all:

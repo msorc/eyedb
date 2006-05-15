@@ -1,21 +1,17 @@
-#
-# Makefile
-#
-# C++Binding/generic/query package
-#
-
 prefix=@prefix@
 include @datadir@/@PACKAGE@/Makefile.eyedb
 
-EYEDBOPTS = -g
+CXXFLAGS += $(EYEDB_CXXFLAGS) $(EYEDB_CPPFLAGS)
+LDFLAGS += ${EYEDB_LDFLAGS}
+LDLIBS += ${EYEDB_LDLIBS}
 
 all: schema_dump object_dump
 
 schema_dump: schema_dump.o
-	$(CXX) -o $@ $+ $(LDXXFLAGS) $(LDXXLIBS)
+	$(CXX) $(LDFLAGS) -Wl,-R$(EYEDB_LIBDIR) -o $@ $^ $(LDLIBS)
 
 object_dump: object_dump.o
-	$(CXX) -o $@ $+ $(LDXXFLAGS) $(LDXXLIBS)
+	$(CXX) $(LDFLAGS) -Wl,-R$(EYEDB_LIBDIR) -o $@ $^ $(LDLIBS)
 
 clean:
 	rm -f *.o schema_dump object_dump

@@ -1,22 +1,11 @@
+prefix=@prefix@
+include @datadir@/@PACKAGE@/Makefile.eyedb
 
-#
-# Makefile, EyeDB Package
-#
-# Eric Viara Copyright (c) SYSRA 2001
-#
+all: Basic.class
 
-JAVAC = CLASSPATH=$(EYEDBCLASSPATH) javac
-
-all: classes/Basic.class
-
-classes/%.class: %.java
-	$(JAVAC) $<
-
-classes/Basic.class: Basic.java
-	$(JAVAC) *.java
+Basic.class: Basic.java
+	CLASSPATH=$(EYEDB_CLASSPATH):. @JAVAC@ $^
 
 clean:
-	rm -f classes/*.class
+	rm -f *.class
 
-init:
-	@if [ ! -d classes ]; then mkdir classes; fi

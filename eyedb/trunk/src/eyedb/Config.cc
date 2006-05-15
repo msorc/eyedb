@@ -609,7 +609,7 @@ namespace eyedb {
 
     VarMap::const_iterator begin = var_map->begin();
     VarMap::const_iterator end = var_map->end();
-    std::string msg = "Granted variables are: ";
+    std::string msg = "known variables are: ";
     for (int n = 0; begin != end; n++) {
       if (n)
 	msg += ", ";
@@ -617,7 +617,7 @@ namespace eyedb {
       ++begin;
     }
     
-    error("Invalid variable name '%s' in %s configuration.\n%s",
+    error("unknown variable '%s' found in %s configuration file.\n%s",
 	  name, getName().c_str(), msg.c_str());
   }
 

@@ -1,3 +1,9 @@
+2006-05-15  Francois Dechelle <francois@dechelle.net>
+
+	* Updated examples w.r.t. Makefile.eyedb with prefixed variables
+	* Changed eyedb-post-install.sh (no > /dev/null, using plain configuration)
+	* Fixed 8 bytes aligned stack allocation in src/eyedbsm/xdr_p.h for MapHeader
+
 2006-05-03  Eric Viara  <viara@sysra.com>
 
 	* Fixed problems for schema updates

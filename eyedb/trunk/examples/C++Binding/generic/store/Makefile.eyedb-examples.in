@@ -1,18 +1,14 @@
-#
-# Makefile
-#
-# C++Binding/generic/store package
-#
-
 prefix=@prefix@
 include @datadir@/@PACKAGE@/Makefile.eyedb
 
-EYEDBOPTS = -g
+CXXFLAGS += $(EYEDB_CXXFLAGS) $(EYEDB_CPPFLAGS)
+LDFLAGS += ${EYEDB_LDFLAGS}
+LDLIBS += ${EYEDB_LDLIBS}
 
 all: store
 
 store: store.o
-	$(CXX) -o $@ $+ $(LDXXFLAGS) $(LDXXLIBS)
+	$(CXX) $(LDFLAGS) -Wl,-R$(EYEDB_LIBDIR) -o $@ $^ $(LDLIBS)
 
 clean:
 	rm -f *.o store

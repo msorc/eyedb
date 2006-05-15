@@ -1,26 +1,20 @@
-#
-# Makefile
-#
-# C++Binding/scheme-oriented/methods package
-#
-
 prefix=@prefix@
 include @datadir@/@PACKAGE@/Makefile.eyedb
 
-EXTRA_CXXFLAGS= -I../share
-
-EYEDBOPTS = -g
+CXXFLAGS += $(EYEDB_CXXFLAGS) $(EYEDB_CPPFLAGS) -I../share
+LDFLAGS += ${EYEDB_LDFLAGS}
+LDLIBS += ${EYEDB_LDLIBS}
 
 all: personmthbe$(SO) personmthfe$(SO) methods
 
 methods: ../share/person.o methods.o
-	$(CXX) -o $@ $+ $(LDXXFLAGS) $(LDXXLIBS)
+	$(CXX) $(LDFLAGS) -Wl,-R$(EYEDB_LIBDIR) -o $@ $^ $(LDLIBS)
 
 personmthfe$(SO): personmthfe.o ../share/personstubsfe.o ../share/person.o $(EXTRALIBS)
-	$(CXX) $(CXXFLAGS) $(SO_FLAGS) -o $@ $+
+	$(CXX) $(CXXFLAGS) $(EYEDB_SOFLAGS) -o $@ $+
 
 personmthbe$(SO): personmthbe.o ../share/personstubsbe.o ../share/person.o $(EXTRALIBS)
-	$(CXX) $(CXXFLAGS) $(SO_FLAGS) -o $@ $+
+	$(CXX) $(CXXFLAGS) $(EYEDB_SOFLAGS) -o $@ $+
 
 init:
 	@for i in person.h person.cc person.o Makefile.person \

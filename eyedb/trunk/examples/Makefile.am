@@ -10,7 +10,7 @@ pkgdata_DATA=Makefile.eyedb
 
 eyedbexamplesdir=$(datadir)/doc/$(PACKAGE)/examples
 dist_eyedbexamples_DATA=README
-#eyedbexamples_DATA= Makefile.eyedb-examples 
+eyedbexamples_DATA= Makefile.eyedb-examples 
 
 EYEDB_ARCH_CPPFLAGS=@EYEDB_ARCH_CPPFLAGS@
 EYEDB_ARCH_CXXFLAGS=@EYEDB_ARCH_CXXFLAGS@
