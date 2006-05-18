@@ -7,7 +7,7 @@ import person.*;
  * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)
  */
 
-public class EyedbBench1 extends Benchmark {
+public class EyedbBench extends Benchmark {
 
     public void prepare()
     {
@@ -40,11 +40,11 @@ public class EyedbBench1 extends Benchmark {
 
     public void run()
     {
-	long nRuns = getProperties().getLongProperty( "runs");
+	long nObjects = getProperties().getLongProperty( "objects");
 	long nObjectsPerTransaction = getProperties().getLongProperty( "objects_per_transaction", 1000);
 
 	try {
-	    for (long count = nRuns; count > 0; count -= nObjectsPerTransaction) {
+	    for (long count = nObjects; count > 0; count -= nObjectsPerTransaction) {
 		database.transactionBegin();
 
 		for (long i = 0; i < nObjectsPerTransaction; i++) {

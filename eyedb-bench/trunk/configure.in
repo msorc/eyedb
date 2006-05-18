@@ -31,16 +31,36 @@ AC_ARG_WITH( eyedb-installdir,
 	     AS_HELP_STRING([--with-eyedb-installdir=DIRECTORY],[gives EyeDB installation directory]),
 	     ac_eyedb_installdir="$withval",
 	     ac_eyedb_installdir="none")
+# EyeDB binaries
+AC_ARG_WITH( eyedb-bindir, 
+	     AS_HELP_STRING([--with-eyedb-bindir=DIRECTORY],[gives EyeDB binaries directory]),
+	     ac_eyedb_bindir="$withval",
+	     ac_eyedb_bindir="none")
+# EyeDB jar file
+AC_ARG_WITH( eyedb-jar, 
+	     AS_HELP_STRING([--with-eyedb-jar=FILE],[gives EyeDB jar file location]),
+	     ac_eyedb_jar="$withval",
+	     ac_eyedb_jar="none")
 # Db4o
 AC_ARG_ENABLE(db4o,
 		AS_HELP_STRING([--enable-db4o],
 				[enable db4o code compilation [default=yes]]),,
 		enable_db4o="yes")
-# db4o files
+# db4o jar file
 AC_ARG_WITH( db4o-jar, 
 	     AS_HELP_STRING([--with-db4o-jar=FILE],[gives Db4o jar file location]),
 	     ac_db4o_jar="$withval",
 	     ac_db4o_jar="none")
+# hibernate
+AC_ARG_ENABLE(hibernate,
+		AS_HELP_STRING([--enable-hibernate],
+				[enable hibernate code compilation [default=yes]]),,
+		enable_hibernate="yes")
+# hibernate jar file
+AC_ARG_WITH( hibernate-jar, 
+	     AS_HELP_STRING([--with-hibernate-jar=FILE],[gives Hibernate jar file location]),
+	     ac_hibernate_jar="$withval",
+	     ac_hibernate_jar="none")
 
 # ========================================
 # JAVA compilation
@@ -75,22 +95,45 @@ AC_SUBST(JAVACFLAGS)
 # ========================================
 # Settings for packages
 # ========================================
+
+#
 # EyeDB
-EYEDB_BINDIR=${ac_eyedb_installdir}/bin
-EYEDB_LIBDIR=${ac_eyedb_installdir}/lib
-EYEDB_JAR=${EYEDB_LIBDIR}/eyedb/java/eyedb.jar
-AC_CHECK_FILE($EYEDB_JAR,HAVE_EYEDB_JAR="yes",HAVE_EYEDB_JAR="no")
+#
+if test x"$ac_eyedb_bindir" != xnone ; then
+   EYEDB_BINDIR=${ac_eyedb_bindir}
+elif test x"$ac_eyedb_installdir" != xnone ; then
+   EYEDB_BINDIR=${ac_eyedb_installdir}/bin
+fi
+
+AC_PATH_PROG(EYEDBRC,eyedbrc,none,${EYEDB_BINDIR:-$PATH})
+
+if test x$"EYEDBRC" != xnone ; then
+   EYEDB_BINDIR=`dirname $EYEDBRC`
+else
+   EYEDB_BINDIR=none
+fi   
 
 AC_SUBST(EYEDB_BINDIR)
-AC_SUBST(EYEDB_LIBDIR)
+
+if test x"$ac_eyedb_jar" != xnone ; then
+   EYEDB_JAR=${ac_eyedb_jar}
+else
+   EYEDB_JAR=${ac_eyedb_installdir}/lib/eyedb/java/eyedb.jar
+fi
+
+AC_CHECK_FILE($EYEDB_JAR,HAVE_EYEDB_JAR="yes",HAVE_EYEDB_JAR="no")
+
 AC_SUBST(EYEDB_JAR)
 
-if test "$enable_eyedb" = "yes" -a "$HAVE_EYEDB_JAR" = "yes" ; then
+if test "$enable_eyedb" = "yes" -a "$HAVE_EYEDB_JAR" = "yes" -a "$EYEDB_BINDIR" != "none" ; then
    COND_EYEDB="yes"
 fi
 AM_CONDITIONAL(COND_EYEDB, test x"$COND_EYEDB" = xyes)
 
+#
 # db4o
+#
+
 DB4O_JAR=${ac_db4o_jar}
 AC_CHECK_FILE($DB4O_JAR,HAVE_DB4O_JAR="yes",HAVE_DB4O_JAR="no")
 
@@ -100,6 +143,22 @@ if test "$enable_db4o" = "yes" -a "$HAVE_DB4O_JAR" = "yes" ; then
    COND_DB4O="yes"
 fi
 AM_CONDITIONAL(COND_DB4O, test x"$COND_DB4O" = xyes)
+
+
+#
+# hibernate
+#
+
+HIBERNATE_JAR=${ac_hibernate_jar}
+AC_CHECK_FILE($HIBERNATE_JAR,HAVE_HIBERNATE_JAR="yes",HAVE_HIBERNATE_JAR="no")
+
+AC_SUBST(HIBERNATE_JAR)
+
+if test "$enable_hibernate" = "yes" -a "$HAVE_HIBERNATE_JAR" = "yes" ; then
+   COND_HIBERNATE="yes"
+fi
+AM_CONDITIONAL(COND_HIBERNATE, test x"$COND_HIBERNATE" = xyes)
+
 
 # ========================================
 # Generate output files
@@ -114,6 +173,7 @@ src/java/org/eyedb/benchmark/Makefile
 src/java/bench1/Makefile
 src/java/bench1/eyedb/Makefile
 src/java/bench1/db4o/Makefile
+src/java/bench1/hibernate/Makefile
 src/java/bench2/Makefile
 src/java/bench2/eyedb/Makefile
 src/java/bench2/db4o/Makefile

@@ -1,0 +1,24 @@
+HIBERNATE_JAR=@HIBERNATE_JAR@
+
+packagedir=$(pkglibdir)/java/classes/bench1/eyedb/
+
+dist_package_JAVA =\
+HibernateBench.java \
+Person.java
+
+JAVAROOT=$(top_builddir)/src/java/bench1/hibernate
+CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_srcdir)/src/java:$(HIBERNATE_JAR)
+
+noinst_DATA=runit.sh
+
+EDIT = sed \
+	-e 's,@HIBERNATE_JAR\@,$(HIBERNATE_JAR),g' \
+	-e 's,@JAVA\@,$(JAVA),g' 
+
+%.sh: $(srcdir)/%.sh.in
+	rm -f $*.sh $*.sh.tmp
+	$(EDIT) $(srcdir)/$*.sh.in >$*.sh.tmp
+	mv $*.sh.tmp $*.sh
+
+runit.sh: Makefile
+

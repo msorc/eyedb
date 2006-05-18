@@ -1,6 +1,5 @@
 #!/bin/bash
 EYEDB_BINDIR=@EYEDB_BINDIR@
-EYEDB_LIBDIR=@EYEDB_LIBDIR@
 EYEDB_JAR=@EYEDB_JAR@
 JAVA=@JAVA@
 
@@ -31,7 +30,7 @@ create_db() {
 
 run_benchmark() {
     CLASSPATH=.:../../eyedb-benchmarks.jar:$EYEDB_JAR
-    CLASSPATH=$CLASSPATH $JAVA org.eyedb.benchmark.Run EyedbBench1 $PROPERTIES
+    CLASSPATH=$CLASSPATH $JAVA org.eyedb.benchmark.Run EyedbBench $PROPERTIES
 }
 
 stop_server() {
