@@ -1,4 +1,6 @@
 HIBERNATE_JAR=@HIBERNATE_JAR@
+HIBERNATE_LIBDIR=@HIBERNATE_LIBDIR@
+JDBC_DRIVER_JAR=@JDBC_DRIVER_JAR@
 
 packagedir=$(pkglibdir)/java/classes/bench1/eyedb/
 
@@ -13,6 +15,8 @@ noinst_DATA=runit.sh
 
 EDIT = sed \
 	-e 's,@HIBERNATE_JAR\@,$(HIBERNATE_JAR),g' \
+	-e 's,@HIBERNATE_LIBDIR\@,$(HIBERNATE_LIBDIR),g '\
+	-e 's,@JDBC_DRIVER_JAR\@,$(JDBC_DRIVER_JAR),g '\
 	-e 's,@JAVA\@,$(JAVA),g' 
 
 %.sh: $(srcdir)/%.sh.in

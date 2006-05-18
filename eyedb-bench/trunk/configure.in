@@ -61,6 +61,16 @@ AC_ARG_WITH( hibernate-jar,
 	     AS_HELP_STRING([--with-hibernate-jar=FILE],[gives Hibernate jar file location]),
 	     ac_hibernate_jar="$withval",
 	     ac_hibernate_jar="none")
+# hibernate library directory
+AC_ARG_WITH( hibernate-libdir, 
+	     AS_HELP_STRING([--with-hibernate-libdir=DIRECTORY],[gives Hibernate library directory]),
+	     ac_hibernate_libdir="$withval",
+	     ac_hibernate_libdir="none")
+# JDBC driver jar file
+AC_ARG_WITH( jdbc-driver-jar, 
+	     AS_HELP_STRING([--with-jdbc-driver-jar=FILE],[gives JDBC driver jar file location]),
+	     ac_jdbc_driver_jar="$withval",
+	     ac_jdbc_driver_jar="none")
 
 # ========================================
 # JAVA compilation
@@ -154,7 +164,16 @@ AC_CHECK_FILE($HIBERNATE_JAR,HAVE_HIBERNATE_JAR="yes",HAVE_HIBERNATE_JAR="no")
 
 AC_SUBST(HIBERNATE_JAR)
 
-if test "$enable_hibernate" = "yes" -a "$HAVE_HIBERNATE_JAR" = "yes" ; then
+HIBERNATE_LIBDIR=${ac_hibernate_libdir}
+
+AC_SUBST(EYEDB_BINDIR)
+
+JDBC_DRIVER_JAR=${ac_jdbc_driver_jar}
+AC_CHECK_FILE($JDBC_DRIVER_JAR,HAVE_JDBC_DRIVER_JAR="yes",HAVE_JDBC_DRIVER_JAR="no")
+
+AC_SUBST(JDBC_DRIVER_JAR)
+
+if test "$enable_hibernate" = "yes" -a "$HAVE_HIBERNATE_JAR" = "yes" -a "$HAVE_JDBC_DRIVER_JAR" = "yes" ; then
    COND_HIBERNATE="yes"
 fi
 AM_CONDITIONAL(COND_HIBERNATE, test x"$COND_HIBERNATE" = xyes)
