@@ -1,11 +1,15 @@
 #!/bin/bash
 HIBERNATE_JAR=@HIBERNATE_JAR@
+HIBERNATE_LIBDIR=@HIBERNATE_LIBDIR@
+JDBC_DRIVER_JAR=@JDBC_DRIVER_JAR@
+
 JAVA=@JAVA@
 
 set -e
 
 run_benchmark() {
-    CLASSPATH=.:../../eyedb-benchmarks.jar:$HIBERNATE_JAR
+    HIBERNATE_OTHER_JARS=$HIBERNATE_LIBDIR/dom4j-1.6.1.jar:$HIBERNATE_LIBDIR/commons-logging-1.0.4.jar:$HIBERNATE_LIBDIR/cglib-2.1.3.jar:$HIBERNATE_LIBDIR/commons-collections-2.1.1.jar:$HIBERNATE_LIBDIR/asm.jar:$HIBLIB/jta.jar
+    CLASSPATH=.:../../eyedb-benchmarks.jar:$HIBERNATE_JAR:$JDBC_DRIVER_JAR:$HIBERNATE_OTHER_JARS
     CLASSPATH=$CLASSPATH $JAVA org.eyedb.benchmark.Run HibernateBench hibernate.properties
 }
 
