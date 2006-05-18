@@ -1,5 +1,4 @@
 EYEDB_BINDIR=@EYEDB_BINDIR@
-EYEDB_LIBDIR=@EYEDB_LIBDIR@
 EYEDB_JAR=@EYEDB_JAR@
 
 EYEDBODLJAVA = $(EYEDB_BINDIR)/eyedbodl --gencode=java
@@ -10,7 +9,7 @@ packagedir=$(pkglibdir)/java/classes/bench1/eyedb/
 JAVA_ODL_FILES=$(addprefix person/, Database.java Person.java)
 
 dist_package_JAVA =\
-EyedbBench1.java \
+EyedbBench.java \
 $(JAVA_ODL_FILES)
 
 JAVAROOT=$(top_builddir)/src/java/bench1/eyedb
@@ -20,17 +19,18 @@ noinst_DATA=runit.sh
 
 EDIT = sed \
 	-e 's,@EYEDB_BINDIR\@,$(EYEDB_BINDIR),g' \
-	-e 's,@EYEDB_LIBDIR\@,$(EYEDB_LIBDIR),g' \
 	-e 's,@EYEDB_JAR\@,$(EYEDB_JAR),g' \
 	-e 's,@JAVA\@,$(JAVA),g' 
 
 $(JAVA_ODL_FILES): person.odl
 	$(EYEDBODLJAVA) $(EYEDBODLJAVAFLAGS) $<
 
-runit.sh: Makefile $(srcdir)/runit.sh.in
-	rm -f $@ $@.tmp
-	$(EDIT) $(srcdir)/$@.in >$@.tmp
-	mv $@.tmp $@
+%.sh: $(srcdir)/%.sh.in
+	rm -f $*.sh $*.sh.tmp
+	$(EDIT) $(srcdir)/$*.sh.in >$*.sh.tmp
+	mv $*.sh.tmp $*.sh
+
+runit.sh: Makefile
 
 clean-local:
 	-rm -f $(JAVA_ODL_FILES)

@@ -7,7 +7,7 @@ import java.io.*;
  * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)
  */
 
-public class Db4oBench1 extends Benchmark {
+public class Db4oBench extends Benchmark {
 
     public void prepare()
     {
@@ -27,10 +27,10 @@ public class Db4oBench1 extends Benchmark {
 
     public void run()
     {
-	long nRuns = getProperties().getLongProperty( "runs");
+	long nObjects = getProperties().getLongProperty( "objects");
 	long nObjectsPerTransaction = getProperties().getLongProperty( "objects_per_transaction", 1000);
 
-	for (long count = nRuns; count > 0; count -= nObjectsPerTransaction) {
+	for (long count = nObjects; count > 0; count -= nObjectsPerTransaction) {
 
 	    for (long i = 0; i < nObjectsPerTransaction; i++) {
 		Person p = new Person();

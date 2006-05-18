@@ -12,7 +12,7 @@ start_server() {
 
 run_benchmark() {
     CLASSPATH=.:../../eyedb-benchmarks.jar:$DB4O_JAR
-    CLASSPATH=$CLASSPATH $JAVA org.eyedb.benchmark.Run Db4oBench1 db4o.client.properties
+    CLASSPATH=$CLASSPATH $JAVA org.eyedb.benchmark.Run Db4oBench db4o.client.properties
 }
 
 stop_server() {

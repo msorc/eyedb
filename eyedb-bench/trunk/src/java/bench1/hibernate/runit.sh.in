@@ -1,0 +1,14 @@
+#!/bin/bash
+HIBERNATE_JAR=@HIBERNATE_JAR@
+JAVA=@JAVA@
+
+set -e
+
+run_benchmark() {
+    CLASSPATH=.:../../eyedb-benchmarks.jar:$HIBERNATE_JAR
+    CLASSPATH=$CLASSPATH $JAVA org.eyedb.benchmark.Run HibernateBench hibernate.properties
+}
+
+run_benchmark
+
+
