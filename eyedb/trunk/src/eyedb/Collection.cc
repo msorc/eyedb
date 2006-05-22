@@ -2958,11 +2958,23 @@ do { \
 #else
     memcpy(&xoid, getOidC().getOid());
 #endif
+
+    // 22/05/06 : disconnected because I do not know what is it for : inverse ?
+    // when disconnecting nothing happens
+    Oid dataoid = idx_ctx.getDataOid();
+    if (!dataoid.isValid())
+      dataoid = objoid;
+#if 0
+    printf("writing %s in %s at %d\n",
+	   getOidC().toString(),
+	   dataoid.toString(),
+	   idx_ctx.getOff());
+#endif
     RPCStatus rpc_status =
       dataWrite(db->getDbHandle(), idx_ctx.getOff() /*idr_poff*/,
-		    sizeof(eyedbsm::Oid),
-		    (Data)&xoid,
-		    objoid.getOid());
+		sizeof(eyedbsm::Oid),
+		(Data)&xoid,
+		dataoid.getOid());
 
     if (rpc_status)
       return StatusMake(IDB_COLLECTION_ERROR, rpc_status);
@@ -2972,23 +2984,21 @@ do { \
     printf("postRealizePerform(%p, idx_data = %p)\n", getUserData(), idx_data);
 #endif
 
-    if (getUserData() != IDB_MAGIC_COLL2)
-      {
-	// WARNING: disconnected (in)validateInverse() the 5/02/01!!!!!
-	// the problem is that I don't know why the (in)validateInverse()
-	// were for!
+    if (getUserData() != IDB_MAGIC_COLL2) {
+      // WARNING: disconnected (in)validateInverse() the 5/02/01!!!!!
+      // the problem is that I don't know why the (in)validateInverse()
+      // were for!
 
-	//invalidateInverse(); 
-	s = realizePerform(cloid, objoid, idx_ctx, rcm);
-	//validateInverse();
-      }
-    else
-      {
+      //invalidateInverse(); 
+      s = realizePerform(cloid, objoid, idx_ctx, rcm);
+      //validateInverse();
+    }
+    else {
 #ifdef COLLTRACE
-	printf("warning magic coll for collection %p\n", this);
+      printf("warning magic coll for collection %p\n", this);
 #endif
-	s = realizePerform(cloid, objoid, idx_ctx, rcm);
-      }
+      s = realizePerform(cloid, objoid, idx_ctx, rcm);
+    }
 
     return s;
   }

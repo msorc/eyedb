@@ -160,6 +160,16 @@ namespace eyedb {
   static void
   error(const char *fmt, const char *x1 = 0, const char *x2 = 0, const char *x3 = 0)
   {
+#if 1
+    if (Exception::getMode() == Exception::ExceptionMode) {
+      (void)Exception::make(IDB_ERROR, fmt, x1, x2, x3);
+      return;
+    }
+
+    fprintf(stderr, fmt, x1, x2, x3);
+    fprintf(stderr, "\n");
+    exit(1);
+#else
     if (initialized) {
       Exception::Mode mode = Exception::setMode(Exception::ExceptionMode);
       (void)Exception::make(IDB_ERROR, fmt, x1, x2, x3);
@@ -170,6 +180,7 @@ namespace eyedb {
     fprintf(stderr, fmt, x1, x2, x3);
     fprintf(stderr, "\n");
     exit(1);
+#endif
   }
 
   static void
@@ -794,6 +805,7 @@ namespace eyedb {
       client_map["tcp_port"] = true;
       client_map["host"] = true;
       client_map["user"] = true;
+      client_map["passwd"] = true;
       client_map["dbm"] = true;
 
       server_map["datadir"] = true;

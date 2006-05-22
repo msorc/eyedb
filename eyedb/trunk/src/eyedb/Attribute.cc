@@ -3973,74 +3973,82 @@ AttrDirect::load(Database *db,
 }
 
 Status AttrDirect::realize(Database *db, Object *agr,
-				 const Oid& cloid,
-				 const Oid& objoid,
-				 AttrIdxContext &idx_ctx,
-				 const RecMode *rcm) const
+			   const Oid& cloid,
+			   const Oid& objoid,
+			   AttrIdxContext &idx_ctx,
+			   const RecMode *rcm) const
 {
   if (is_basic_enum)
     return Success;
 
   /*
-  printf("AttrDirect::realize(%s);\n", name);
+    printf("AttrDirect::realize(%s);\n", name);
   */
 
   idx_ctx.push(db, cloid, this);
 
-  for (int j = 0; j < typmod.pdims; j++)
-    {
-      Object *o;
+  for (int j = 0; j < typmod.pdims; j++) {
+    Object *o;
 
-      // no XDR
-      memcpy(&o, agr->getIDR() + idr_voff + (j * idr_item_vsize),
-	     sizeof(Object *));
+    // no XDR
+    memcpy(&o, agr->getIDR() + idr_voff + (j * idr_item_vsize),
+	   sizeof(Object *));
 
-      if (o)
-	{
-	  Status status;
+    if (o) {
+      Status status;
 
-	  status = o->setDatabase(db);
-	  if (status) return status;
+      status = o->setDatabase(db);
+      if (status) return status;
 
-	  setCollHints(o, objoid, card);
-	  status = setCollImpl(db, o, idx_ctx);
-	  if (status) return status;
+      setCollHints(o, objoid, card);
+      status = setCollImpl(db, o, idx_ctx);
+      if (status) return status;
 
-	  idx_ctx.pushOff(idr_poff +  (j * idr_item_psize));
+      idx_ctx.pushOff(idr_poff +  (j * idr_item_psize));
+      /*
+      printf("%s: null_vd_oid: (null) %s %d\n", name,
+	     o->getClass()->getName(), IDB_OBJ_HEAD_SIZE);
 
-	  status = o->realizePerform(cloid, objoid, idx_ctx, rcm);
+      */
+      status = o->realizePerform(cloid, objoid, idx_ctx, rcm);
 
-	  if (status) return status;
+      if (status)
+	return status;
 
-	  // needs XDR ? no...
+      // needs XDR ? no...
 #ifdef E_XDR_TRACE
-	  printf("%s: AttrDirect::realize : cmp\n", name);
+      printf("%s: AttrDirect::realize : cmp\n", name);
 #endif
-	  if (memcmp(agr->getIDR() + idr_poff +  (j * idr_item_psize),
-		     o->getIDR() + IDB_OBJ_HEAD_SIZE, idr_item_psize))
-	    {
+      /*
+      printf("comparing: %s.%s[%d] %d agroid %s objoid %s [idr_size %d]\n",
+	     agr->getClass()->getName(), name, j, idr_poff,
+	     agr->getOid().toString(), objoid.toString(),
+	     agr->getIDRSize());
+      */
+      if (memcmp(agr->getIDR() + idr_poff +  (j * idr_item_psize),
+		 o->getIDR() + IDB_OBJ_HEAD_SIZE, idr_item_psize)) {
 #ifdef E_XDR_TRACE
-	      printf("%s: AttrDirect::realize : needs XDR ? no\n", name);
+	printf("%s: AttrDirect::realize : needs XDR ? no\n", name);
 #endif
-	      memcpy(agr->getIDR() + idr_poff +  (j * idr_item_psize),
-		     o->getIDR() + IDB_OBJ_HEAD_SIZE, idr_item_psize);
+	memcpy(agr->getIDR() + idr_poff +  (j * idr_item_psize),
+	       o->getIDR() + IDB_OBJ_HEAD_SIZE, idr_item_psize);
 
-	      if (!o->asCollection()) // changed the 9/11/99
-		agr->touch();
+	if (!o->asCollection()) // changed the 9/11/99
+	  agr->touch();
 
-	      Bool mustTouch;
-	      status = o->postRealizePerform(cloid, objoid,
-					     idx_ctx, mustTouch, rcm);
-	      if (status)
-		return status;
+	Bool mustTouch;
+	status = o->postRealizePerform(cloid, objoid,
+				       idx_ctx, mustTouch, rcm);
+	if (status)
+	  return status;
 
-	      if (mustTouch)
-		agr->touch();
-	    }
+	if (mustTouch)
+	  agr->touch();
+      }
 
-	  idx_ctx.popOff();
-	}
+      idx_ctx.popOff();
     }
+  }
 
   idx_ctx.pop();
   return Success;
@@ -6153,11 +6161,11 @@ Status AttrVarDim::copy(Object *agr, Bool share) const
 }
 
 Status AttrVD::update_realize(Database *db, Object *agr,
-				    const Oid& cloid,
-				    const Oid& objoid,
-				    int count, Size wpsize, Data pdata,
-				    Oid &oid,
-				    AttrIdxContext &idx_ctx) const
+			      const Oid& cloid,
+			      const Oid& objoid,
+			      int count, Size wpsize, Data pdata,
+			      Oid &oid,
+			      AttrIdxContext &idx_ctx) const
 {
   // added the 23/01/00
   // before this patch, notnull constraints on vardim with no index did
@@ -6324,12 +6332,11 @@ Status AttrVarDim::realize(Database *db, Object *agr,
 
   Status status;
   //printf("realize(%s)\n", name);
-  if (is_basic_enum)
-    {
-      status = update(db, cloid, objoid, agr, idx_ctx);
-      idx_ctx.pop();
-      return status;
-    }
+  if (is_basic_enum) {
+    status = update(db, cloid, objoid, agr, idx_ctx);
+    idx_ctx.pop();
+    return status;
+  }
 
   Size size;
   Data pdata, vdata;
@@ -6337,50 +6344,54 @@ Status AttrVarDim::realize(Database *db, Object *agr,
 
   getSize(agr, size);
   getData(agr, pdata, vdata);
+  Oid vd_oid;
+  getVarDimOid(agr, &vd_oid);
 
   dd = typmod.pdims * size;
 
-  for (int j = 0; j < dd; j++)
-    {
-      Object *o;
+  for (int j = 0; j < dd; j++) {
+    Object *o;
 
-      mcp(&o, vdata + (j * SIZEOFOBJECT),  sizeof(Object *));
+    mcp(&o, vdata + (j * SIZEOFOBJECT),  sizeof(Object *));
 
-      if (o)
-	{
-	  status = o->setDatabase(db);
-	  if (status != Success)
-	    return status;
+    if (o) {
+      status = o->setDatabase(db);
+      if (status != Success)
+	return status;
 
-	  idx_ctx.pushOff(idr_poff +  (j * idr_item_psize));
-	  status = o->realizePerform(cloid, objoid, idx_ctx, rcm);
+      //idx_ctx.pushOff(idr_poff +  (j * idr_item_psize));
+      idx_ctx.pushOff(j * idr_item_psize, vd_oid);
+      /*
+      printf("%s: vd_oid: %s %s %d\n", name, vd_oid.toString(),
+	     o->getClass()->getName(), IDB_OBJ_HEAD_SIZE);
+      */
+      status = o->realizePerform(cloid, objoid, idx_ctx, rcm);
 	  
-	  if (status)
-	    return status;
+      if (status)
+	return status;
 
-	  // needs XDR ? no
+      // needs XDR ? no
 #ifdef E_XDR_TRACE
-	  printf("%s: AttrVarDim::realize\n", name);
+      printf("%s: AttrVarDim::realize\n", name);
 #endif
-	  if (memcmp(pdata +  (j * idr_item_psize),
-		     o->getIDR() + IDB_OBJ_HEAD_SIZE, idr_item_psize))
-	    {
-	      memcpy(pdata +  (j * idr_item_psize),
-		     o->getIDR() + IDB_OBJ_HEAD_SIZE, idr_item_psize);
-
-	      Bool mustTouch;
-	      status = o->postRealizePerform(cloid, objoid,
-					     idx_ctx, mustTouch, rcm);
-	      if (status)
-		return status;
-
-	      if (mustTouch)
-		agr->touch();
-	    }
-
-	  idx_ctx.popOff();
-	}
+      if (memcmp(pdata +  (j * idr_item_psize),
+		 o->getIDR() + IDB_OBJ_HEAD_SIZE, idr_item_psize)) {
+	memcpy(pdata +  (j * idr_item_psize),
+	       o->getIDR() + IDB_OBJ_HEAD_SIZE, idr_item_psize);
+	
+	Bool mustTouch;
+	status = o->postRealizePerform(cloid, objoid,
+				       idx_ctx, mustTouch, rcm);
+	if (status)
+	  return status;
+	
+	if (mustTouch)
+	  agr->touch();
+      }
+      
+      idx_ctx.popOff();
     }
+  }
 
   status = update(db, cloid, objoid, agr, idx_ctx);
   idx_ctx.pop();
@@ -7785,7 +7796,16 @@ AttrIdxContext::realizeIdxOP(Bool ok)
 void
 AttrIdxContext::pushOff(int off)
 {
-  attr_off[attr_off_cnt++] = off;
+  pushOff(off, Oid::nullOid);
+}
+
+void
+AttrIdxContext::pushOff(int off, const Oid &data_oid)
+{
+  //printf("pushing [%d] %d %s\n", attr_off_cnt, off, data_oid.toString());
+  attr_off[attr_off_cnt].off = off;  
+  attr_off[attr_off_cnt].data_oid = data_oid;
+  attr_off_cnt++;
 }
 
 void
@@ -7798,9 +7818,25 @@ int
 AttrIdxContext::getOff()
 {
   int off = 0;
-  for (int n = 0; n < attr_off_cnt; n++)
-    off += attr_off[n];
+  for (int n = attr_off_cnt-1; n >= 0; n--) {
+    off += attr_off[n].off;
+    if (attr_off[n].data_oid.isValid()) {
+      off -= IDB_OBJ_HEAD_SIZE;
+      break;
+    }
+  }
   return off;
+}
+
+Oid
+AttrIdxContext::getDataOid()
+{
+  for (int n = attr_off_cnt-1; n >= 0; n--) {
+    if (attr_off[n].data_oid.isValid())
+      return attr_off[n].data_oid;
+  }
+
+  return Oid::nullOid;
 }
 
 void

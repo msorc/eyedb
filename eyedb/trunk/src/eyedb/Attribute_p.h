@@ -397,9 +397,12 @@ namespace eyedb {
     const char *getAttrName(int n) const {return n >= attr_cnt ? 0 : attrs[n].c_str();}
     unsigned int getAttrCount() const {return attr_cnt;}
 
+    void pushOff(int off, const Oid &data_oid);
     void pushOff(int off);
     int getOff();
     void popOff();
+
+    Oid getDataOid();
 
     int operator==(const AttrIdxContext &) const;
     int operator!=(const AttrIdxContext &idx_ctx) const {
@@ -444,7 +447,10 @@ namespace eyedb {
     void garbage(Bool);
     char *class_owner;
     std::string attrs[64];
-    int attr_off[64];
+    struct {
+      int off;
+      Oid data_oid;
+    } attr_off[64];
     eyedblib::int16 attr_off_cnt;
     eyedblib::int16 attr_cnt;
     mutable Bool attrpath_ignore_class_owner;

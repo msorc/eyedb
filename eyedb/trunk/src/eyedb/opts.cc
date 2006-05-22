@@ -401,8 +401,13 @@ do { \
     }
 
     if (map.find(passwd_opt) != map.end()) {
-      if (map[passwd_opt].value.length() == 0)
-	ask_for_passwd();
+      if (map[passwd_opt].value.length() == 0) {
+	const char *pwd = ClientConfig::getCValue("passwd");
+	if (pwd)
+	  Connection::setDefaultPasswd(pwd);
+	else
+	  ask_for_passwd();
+      }
       else
 	Connection::setDefaultPasswd(map[passwd_opt].value.c_str());
     }

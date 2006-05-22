@@ -190,6 +190,11 @@ rpc_connOpen(rpc_Client *client, const char *hostname, const char *portname,
   }
   else {
     /*domain = AF_UNIX;*/
+    if (hostname) {
+      if (!rpc_hostNameToAddr(hostname, &sock_in_name.sin_addr))
+	return rpc_ConnectionFailure;
+    }
+
     sock_un_name.sun_family = domain;
     strcpy(sock_un_name.sun_path, portname);
     sock_addr = (struct sockaddr *)&sock_un_name;
