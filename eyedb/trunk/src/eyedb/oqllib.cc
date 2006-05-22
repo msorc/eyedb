@@ -190,16 +190,19 @@ oqmlNode::init()
   operationName[oqmlFOREACH] = "for operator";
   operationName[oqmlFORDO] = "for operator";
   operationName[oqmlWHILE] = "while operator";
+  operationName[oqmlDOWHILE] = "do/while operator";
   operationName[oqmlBREAK] = "break operator";
 
   /* collection management */
   operationName[oqmlCOLLECTION] = "collection function";
   operationName[oqmlCONTENTS] = "contents operator";
-  operationName[oqmlADDTO] = " add/to operator";
+  operationName[oqmlADDTO] = "add/to operator";
+  operationName[oqmlAPPEND] = "append operator";
   operationName[oqmlSUPPRESSFROM] = "suppress operator";
   operationName[oqmlUNSETINAT] = "unset/in/at operator";
   operationName[oqmlSETINAT] = "set/in/at operator";
   operationName[oqmlELEMENT] = "element operator";
+  operationName[oqmlELEMENTAT] = "element operator";
   operationName[oqmlEMPTY] = "empty operator";
   operationName[oqmlIN] = "in operator";
   operationName[oqmlEXISTS] = "exists operator";
@@ -234,6 +237,10 @@ oqmlNode::init()
   /* time functions */
   operationName[oqmlTIMEFORMAT] = "timeformat function";
 
+  operationName[oqmlCOMPOUND_STATEMENT] = "";
+  operationName[oqmlCAST] = "";
+  operationName[oqmlCASTIDENT] = "";
+
   /* misc */
   operationName[oqmlDATABASE] = "database operator";
   operationName[oqmlCOMPOUND_STATEMENT] = "";
@@ -249,7 +256,8 @@ std::string
 oqmlNode::getOperationName() const
 {
   if (!_init) init();
-  return operationName[type];
+  const char *s = operationName[type];
+  return s ? s : "";
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

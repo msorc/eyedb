@@ -1066,6 +1066,7 @@ namespace eyedb {
       mustTouch = True;
       return Success;
     }
+
     void setXInfo(int _xinfo) {xinfo = _xinfo;}
   };
 
