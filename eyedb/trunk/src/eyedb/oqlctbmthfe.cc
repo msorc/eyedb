@@ -314,6 +314,7 @@ using namespace eyedb;
 
 #ifndef AUTO_GARB
     if (o != _o) {
+      printf("releasing %p [%p] %d\n", o, _o, o->getRefCount());
       o->release();
     }
 #endif
