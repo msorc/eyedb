@@ -191,7 +191,7 @@ namespace eyedb {
   getRpcClient(void);
 
   extern RPCStatus
-  connOpen(const char *, const char *, ConnHandle **, int);
+  connOpen(const char *, const char *, ConnHandle **, int, std::string &);
 
   extern RPCStatus
   connClose(ConnHandle *);

@@ -26,6 +26,7 @@
 #define _EYEDBLIB_RPC_FE_H
 
 #include <eyedblib/rpc.h>
+#include <string>
 
 typedef struct rpc_Client rpc_Client;
 
@@ -49,7 +50,7 @@ extern rpc_ClientFunction *
 rpc_makeUserClientFunction(rpc_Client *, rpc_RpcDescription *);
 
 extern rpc_Status
-rpc_connOpen(rpc_Client *, const char *, const char *, rpc_ConnHandle **, unsigned long, int, int);
+rpc_connOpen(rpc_Client *, const char *, const char *, rpc_ConnHandle **, unsigned long, int, int, std::string &);
 
 extern rpc_Status
 rpc_connClose(rpc_ConnHandle *);
