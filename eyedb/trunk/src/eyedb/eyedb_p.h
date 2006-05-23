@@ -39,10 +39,6 @@
 #include <eyedb/code.h>
 #include <eyedb/SchemaInfo.h>
 #include <eyedblib/log.h>
-namespace eyedb {
-  typedef eyedblib::int16 titus;
-}
-
 #include <eyedb/Log.h>
 #include <string>
 #include <eyedblib/probe.h>
@@ -218,8 +214,6 @@ if ((O)->getDamaged()) \
     std::cerr << name << "::" << MTHNAME << " size: " << INCSIZE << " vs. " << SZ << std::endl; \
     assert(0); \
   }
-
-const char *convertVersionNumber(int version);
 
 eyedbsm::DbHandle *get_eyedbsm_DbHandle(DbHandle *);
 

@@ -1,6 +1,6 @@
 /* 
    EyeDB Object Database Management System
-   Copyright (C) 1994-1999,2004,2005 SYSRA
+   Copyright (C) 1994-1999,2004-2006 SYSRA
    
    EyeDB is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -21,37 +21,11 @@
    Author: Eric Viara <viara@sysra.com>
 */
 
-package org.eyedb;
+#ifndef _EYEDB_VERSION_P_H
+#define _EYEDB_VERSION_P_H
 
-class Version {
-    static String getVersion()
-    {
-	return "@EYEDB_VERSION@";
-    }
-
-    static int getVersionNumber()
-    {
-	return @EYEDB_NUMVERSION@;
-    }
-
-    static int getMajorVersion()
-    {
-	return @EYEDB_MAJOR_VERSION@;
-    }
-
-    static int getMinorVersion()
-    {
-	return @EYEDB_MINOR_VERSION@;
-    }
-
-    static int getPatchLevel()
-    {
-	return @EYEDB_PATCH_LEVEL@;
-    }
-
-    static String getVersionStatus()
-    {
-	return "@EYEDB_VERSION_STATUS@";
-    }
+namespace eyedb {
+  const char *convertVersionNumber(int version);
 }
 
+#endif

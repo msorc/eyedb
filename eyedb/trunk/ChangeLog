@@ -1,3 +1,7 @@
+2006-05-23 Francois Dechelle <francois@dechelle.net>
+
+	* Added version definitions (major,minor,patch)
+
 2006-05-15  Francois Dechelle <francois@dechelle.net>
 
 	* Updated examples w.r.t. Makefile.eyedb with prefixed variables

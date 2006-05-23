@@ -7,11 +7,15 @@ AC_INIT(include/eyedb/eyedb.h)
 PACKAGE_NAME=eyedb
 
 . $srcdir/VERSION
-EYEDB_VERSION=${EYEDB_MAJOR_VERSION}.${EYEDB_MINOR_VERSION}.${EYEDB_PATCH_VERSION}${EYEDB_VERSION_STATUS}
+EYEDB_VERSION=${EYEDB_MAJOR_VERSION}.${EYEDB_MINOR_VERSION}.${EYEDB_PATCH_LEVEL}${EYEDB_VERSION_STATUS}
 PACKAGE_VERSION=$EYEDB_VERSION
-AC_SUBST(EYEDB_VERSION)
+EYEDB_NUMVERSION=`echo | awk '{printf("%d%02d%03d", '${EYEDB_MAJOR_VERSION}','${EYEDB_MINOR_VERSION}','${EYEDB_PATCH_LEVEL}')}' `
 
-EYEDB_NUMVERSION=`echo | awk '{printf("%d%02d%03d", '${EYEDB_MAJOR_VERSION}','${EYEDB_MINOR_VERSION}','${EYEDB_PATCH_VERSION}')}' `
+AC_SUBST(EYEDB_VERSION)
+AC_SUBST(EYEDB_MAJOR_VERSION)
+AC_SUBST(EYEDB_MINOR_VERSION)
+AC_SUBST(EYEDB_PATCH_LEVEL)
+AC_SUBST(EYEDB_VERSION_STATUS)
 AC_SUBST(EYEDB_NUMVERSION)
 
 AM_INIT_AUTOMAKE(${PACKAGE_NAME}, ${PACKAGE_VERSION})
@@ -155,8 +159,8 @@ LIBS="$LIBS $PTHREAD_LIBS"
 CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
 CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
 
-echo CFLAGS=$CFLAGS
-echo CXXFLAGS=$CXXFLAGS
+# echo CFLAGS=$CFLAGS
+# echo CXXFLAGS=$CXXFLAGS
 
 # check for headers
 AC_CHECK_HEADERS( time.h sys/time.h unistd.h sys/types.h regex.h libgen.h sys/stat.h pwd.h stropts.h crypt.h)
@@ -471,6 +475,7 @@ examples/Makefile.eyedb-examples
 examples/oql/Makefile
 include/Makefile
 include/eyedb/Makefile
+include/eyedb/version.h
 include/eyedb/internals/Makefile
 include/eyedblib/Makefile
 include/eyedblib/endian.h
@@ -484,7 +489,6 @@ src/Makefile
 src/bindings/Makefile
 src/bindings/python/Makefile
 src/eyedb/Makefile
-src/eyedb/eyedbversion.h
 src/eyedbsm/Makefile
 src/java/Makefile
 src/java/src/Makefile
