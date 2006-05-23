@@ -150,7 +150,7 @@ pid_t rpc_getpid()
 rpc_Status
 rpc_connOpen(rpc_Client *client, const char *hostname, const char *portname,
 	     rpc_ConnHandle **pconn, unsigned long magic,
-	     int conn_cnt, int comm_size)
+	     int conn_cnt, int comm_size, std::string &errmsg)
 {
   int domain, sock_fd, length;
   struct sockaddr_in sock_in_name;
@@ -160,12 +160,14 @@ rpc_connOpen(rpc_Client *client, const char *hostname, const char *portname,
   int i;
   int xid = 0;
 
+  errmsg = "";
+
   const char *t_portname;
   int type;
 
   t_portname = rpc_getPortAttr(portname, &domain, &type);
   if (!t_portname) {
-    fprintf(stderr, "invalid port '%s'", portname);
+    errmsg = std::string("invalid port: " ) + hostname;
     return rpc_ConnectionFailure;
   }
 
@@ -184,16 +186,26 @@ rpc_connOpen(rpc_Client *client, const char *hostname, const char *portname,
     else
       gethostname(hname, sizeof(hname)-1);
 
-    if (!rpc_hostNameToAddr(hname, &sock_in_name.sin_addr))
+    if (!rpc_hostNameToAddr(hname, &sock_in_name.sin_addr)) {
+      errmsg = std::string("unknown host: " ) + hostname;
       return rpc_ConnectionFailure;
+    }
     sock_addr = (struct sockaddr *)&sock_in_name;
     length = sizeof(sock_in_name);
   }
   else {
     /*domain = AF_UNIX;*/
     if (hostname) {
-      if (!rpc_hostNameToAddr(hostname, &sock_in_name.sin_addr))
+      if (!rpc_hostNameToAddr(hostname, &sock_in_name.sin_addr)) {
+	errmsg = std::string("unknown host: " ) + hostname;
 	return rpc_ConnectionFailure;
+      }
+
+      if (strcmp(hostname, "localhost")) {
+	errmsg = std::string("localhost expected (got ") +
+	  hostname + ") for named pipe " + portname;
+	return rpc_ConnectionFailure;
+      }	
     }
 
     sock_un_name.sun_family = domain;
@@ -211,13 +223,19 @@ rpc_connOpen(rpc_Client *client, const char *hostname, const char *portname,
 #ifdef HAVE_FATTACH
     if (domain == AF_UNIX) {
       sock_fd = open(portname, O_RDWR);
-      if (sock_fd  < 0)
+      if (sock_fd  < 0) {
+	errmsg = std::string("server unreachable: ") +
+	  "host " + hostname + ", port " + portname;
 	goto failure;
+      }
     }
     else {
 #endif
-      if ((sock_fd = socket(domain, type, 0))  < 0)
+      if ((sock_fd = socket(domain, type, 0))  < 0) {
+	errmsg = std::string("server unreachable: ") +
+	  "host " + hostname + ", port " + portname;
 	goto failure;
+      }
 #if 0
       if (domain == AF_INET)
 	rpc_socket_nodelay(sock_fd);
@@ -227,8 +245,11 @@ rpc_connOpen(rpc_Client *client, const char *hostname, const char *portname,
       utlog("opening sock_fd=%d\n", sock_fd);
 #endif
 
-      if (connect(sock_fd, sock_addr, length) < 0)
+      if (connect(sock_fd, sock_addr, length) < 0) {
+	errmsg = std::string("server unreachable: ") +
+	  "host " + hostname + ", port " + portname;
 	goto failure;
+      }
 
 #ifdef HAVE_FATTACH
     }
@@ -250,15 +271,26 @@ rpc_connOpen(rpc_Client *client, const char *hostname, const char *portname,
     }
 	  
     h2x_rpc_multiconninfo(&xinfo, &info);
-    if (rpc_socketWrite(sock_fd, &xinfo, sizeof(xinfo)) != sizeof(xinfo))
+    if (rpc_socketWrite(sock_fd, &xinfo, sizeof(xinfo)) != sizeof(xinfo)) {
+      errmsg = std::string("cannot write on socket: ") +
+	"host " + hostname + ", port " + portname;
       goto failure;
+    }
 
-    if (rpc_socketRead(sock_fd, &info, sizeof(info)) != sizeof(info))
+    if (rpc_socketRead(sock_fd, &info, sizeof(info)) != sizeof(info)) {
+      errmsg = std::string("client connection not granted by server: ") +
+	"host " + hostname + ", port " + portname;
       goto failure;
+    }
+
     x2h_rpc_multiconninfo(&info);
 
-    if (info.magic != MM(magic) || info.cmd != rpc_ReplyNewConnection)
+    if (info.magic != MM(magic) || info.cmd != rpc_ReplyNewConnection) {
+      errmsg = std::string("protocol error: ") +
+	"host " + hostname + ", port " + portname;
       goto failure;
+    }
+
 
     if (!i)
       xid = info.xid;

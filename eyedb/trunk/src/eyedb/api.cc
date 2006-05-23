@@ -106,18 +106,19 @@ const int CONN_COUNT = 3; // 20/03/06: can be more for multi-threading
 
 RPCStatus
 connOpen(const char *hostname, const char *portname,
-	 ConnHandle **pch, int flags)
+	 ConnHandle **pch, int flags, std::string &errmsg)
 {
   *pch = rpc_new(ConnHandle);
 
   if (!rpc_connOpen(getRpcClient(), hostname, portname,
-		    &((*pch)->ch), RPC_PROTOCOL_MAGIC, CONN_COUNT, 0))
+		    &((*pch)->ch), RPC_PROTOCOL_MAGIC, CONN_COUNT, 0,
+		    errmsg))
     return RPCSuccess;
   else {
     free(*pch);
     *pch = 0;
     return rpcStatusMake(IDB_CONNECTION_FAILURE,
-			     "portname '%s'", portname);
+			 "portname '%s'", portname);
   }
 }
 

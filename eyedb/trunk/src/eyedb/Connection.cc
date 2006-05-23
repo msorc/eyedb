@@ -121,7 +121,8 @@ namespace eyedb {
     if (!_port)
       return Exception::make(IDB_CONNECTION_FAILURE, "default eyedb port is not set for connection");
 
-    if ((connOpen(_host, _port, &connh, 0)) == RPCSuccess)
+    std::string errmsg;
+    if ((connOpen(_host, _port, &connh, 0, errmsg)) == RPCSuccess)
       {
 	if (_host)
 	  host = strdup(_host);
@@ -175,8 +176,9 @@ namespace eyedb {
       }
 
     return Exception::make(IDB_CONNECTION_FAILURE,
-			   "connection refused to '%s', eyedb port '%s'",
-			   (_host ? _host : "localhost"), _port);
+			   errmsg.c_str());
+    //"connection refused to '%s', eyedb port '%s'",
+    //(_host ? _host : "localhost"), _port);
   }
 
   Status Connection::close(void)
