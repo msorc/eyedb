@@ -1389,7 +1389,7 @@ Attribute::setValue(Object *agr,
 	((Data)(pvdata + (from * incsize)), (Data)data, nb,
 	 modify, check_class);
       
-      if (!status && modify)
+      if (!status && (modify || isNull(inidata, nb, from)))
 	agr->touch();
 
       if (!status)
