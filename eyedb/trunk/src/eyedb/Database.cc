@@ -35,6 +35,7 @@
 #include "ExecutableCache.h"
 #include "oqlctb.h"
 #include <eyedb/GenHashTable.h>
+#include "version_p.h"
 
 #define FULL_CACHE_OBJECTS
 #define CACHE_OBJECTS

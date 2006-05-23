@@ -63,6 +63,7 @@ using namespace std;
 #include <fcntl.h>
 #include <pwd.h>
 #include "Attribute_p.h"
+#include "version_p.h"
 
 #include <eyedblib/rpc_lib.h>
 

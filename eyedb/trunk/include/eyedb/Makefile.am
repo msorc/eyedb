@@ -75,6 +75,8 @@ TransactionParams.h \
 UnionClass.h \
 Union.h \
 utils.h \
-Value.h \
+Value.h 
+
+nodist_pkginclude_HEADERS= \
 version.h 
 

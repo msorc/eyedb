@@ -149,7 +149,7 @@ public class Connection {
 	(this,
 	 InetAddress.getLocalHost().getHostName(),
 	 Root.user, Root.progname, 0,
-	 Version.getNumVersion(),
+	 Version.getVersionNumber(),
 	 challenge);
 
       if (!status.isSuccess())

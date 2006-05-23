@@ -121,7 +121,8 @@ oql.tab.cc					\
 DBM.cc						\
 syscls.cc					\
 oqlctb.cc					\
-utils.cc
+utils.cc					\
+version.cc
 
 BUILT_SOURCES=lex.oql.c lex.odl.c
 
@@ -301,7 +302,6 @@ db_p.h \
 ExecutableCache.h \
 Executable.h \
 eyedb_p.h \
-eyedbversion.h \
 GenContext.h \
 GetOpt.h \
 GregorianCalendarConverter.h \
@@ -330,7 +330,8 @@ serv_lib.h \
 SessionLog.h \
 ThreadPoolManager.h \
 UserDataHT.h \
-ValueCache.h
+ValueCache.h \
+version_p.h
 
 EYEDBADMIN_LINKS= \
 	eyedbdbmcreate \

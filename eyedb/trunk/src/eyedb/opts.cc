@@ -29,7 +29,6 @@
 #include "eyedb/GenHashTable.h"
 #include <eyedblib/m_malloc.h>
 #include <eyedbsm/smd.h>
-#include "eyedbversion.h"
 #include "oqlctb.h"
 #include <eyedb/ThreadPoolManager.h>
 #include "comp_time.h"
@@ -49,10 +48,7 @@ static const char *eyedb_probe_name = getenv("EYEDBPROBE");
 
 extern void (*rpc_release_all)(void);
 
-// EYEDB_VERSION defined in eyedbversion.h
 namespace eyedb {
-
-  static const char eyedb_version[] = EYEDB_VERSION;
 
   static void
   stop_on_error(Status status, void *)
@@ -98,7 +94,7 @@ namespace eyedb {
   printVersion()
   {
     printf("EyeDB Copyright (C) 1994-1999,2004-2006 SYSRA\n");
-    printf(" Version      V%s\n", eyedb_version);
+    printf(" Version      V%s\n", getVersion());
     printf(" Compiled     %s\n", getCompilationTime());
     printf(" Architecture %s\n", Architecture::getArchitecture()->getArch());
     exit(0);
@@ -777,43 +773,5 @@ do { \
   {
     DBM_Database::_release();
     IDB_releaseConn();
-  }
-
-  const char *
-  getVersion()
-  {
-    return eyedb_version;
-  }
-
-  static const char version_fmt[] = "%d.%d.%d";
-
-  const char *
-  convertVersionNumber(int version)
-  {
-#define MAJORCOEF 100000
-#define MINORCOEF   1000
-    static char s_version[32];
-    int major     = version/MAJORCOEF;
-    int minor     = (version - major*MAJORCOEF)/MINORCOEF;
-    int bug_fixed = (version - major*MAJORCOEF - minor*MINORCOEF);
-    sprintf(s_version, version_fmt, major, minor, bug_fixed);
-    return s_version;
-  }
-
-  unsigned int
-  getVersionNumber()
-  {
-    static unsigned int version;
-
-    if (!version)
-      {
-	int major, minor, bug_fixed;
-	char tok[16];
-	sscanf(eyedb_version, version_fmt, &major, &minor, &bug_fixed);
-	sprintf(tok, "%d%02d%03d", major, minor, bug_fixed);
-	version = atoi(tok);
-      }
-
-    return version;
   }
 }
