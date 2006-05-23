@@ -1637,14 +1637,15 @@ void Attribute::manageCycle(Object *mo, Data _idr, int n,
 	      "<unknown class>"), name, mo, o, o->getClass()->getName());
 	}
 
-	printf("%s: mustclean %p in object %p at #%d\n", name, o, mo, i);
+	//printf("%s: mustclean %p in object %p at #%d\n", name, o, mo, i);
 	mset(_idr, 0, sizeof(Object *));
-	mo->setDamaged(this);
+	if (!isIndirect())
+	  mo->setDamaged(this);
       }
 
       if (r.isCycle()) {
 	//#ifdef MANAGE_CYCLE_TRACE
-	printf("found #3 premature cycle in %s\n", name);
+	//printf("found #3 premature cycle in %s\n", name);
 	//#endif
 	return;
       }
