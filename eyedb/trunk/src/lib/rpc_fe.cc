@@ -91,6 +91,7 @@ rpc_feInit()
   signal(SIGSEGV, signal_handler);
   signal(SIGBUS, signal_handler);
   signal(SIGABRT, signal_handler);
+  signal(SIGPIPE, signal_handler);
 }
 
 rpc_Client *rpc_clientCreate(void)

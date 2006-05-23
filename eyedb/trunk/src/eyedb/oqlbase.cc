@@ -1204,17 +1204,19 @@ namespace eyedb {
 
     if (!cls || cls->asInt64Class()) {
       psize = sizeof(eyedblib::int64);
-      eyedblib::int64 v = (eyedblib::int64)i;
+      //eyedblib::int64 v = (eyedblib::int64)i;
+      eyedblib::int64 v = i;
       memcpy(data, &v, psize);
     }
     else if (cls->asInt32Class() || cls->asEnumClass()) {
       psize = sizeof(eyedblib::int32);
       eyedblib::int32 v = (eyedblib::int32)i;
+      //eyedblib::int32 v = (eyedblib::int32)(i >> 32);
       memcpy(data, &v, psize);
     }
     else if (cls->asInt16Class()) {
       psize = sizeof(eyedblib::int16);
-      eyedblib::int16 v = (eyedblib::int16)i;
+      eyedblib::int16 v = (eyedblib::int16)(i >> 48);
       memcpy(data, &v, psize);
     }
     else

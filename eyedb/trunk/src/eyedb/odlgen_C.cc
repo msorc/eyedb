@@ -1422,7 +1422,9 @@ do { \
     else
 #endif
 #if defined(SET_COUNT_DIRECT) || defined(NO_DIRECT_SET)
-      if (isVarDim() && !isIndirect() && !is_string) /*&& not_basic*/
+      // 23/05/06: suppressed !isIndirect()
+      //      if (isVarDim() && !isIndirect() && !is_string) /*&& not_basic*/
+      if (isVarDim() && !is_string) /*&& not_basic*/
 	{
 	  fprintf(fd, "eyedb::Status %s::%s(", className(own),
 		  ATTRNAME(name, tSetCount, hints));
@@ -2079,7 +2081,10 @@ do { \
     else
 #endif
 #if defined(SET_COUNT_DIRECT) || defined(NO_DIRECT_SET)
-      if (isVarDim() && !isIndirect() && !is_string) /*&& not_basic*/
+      // 23/05/06: suppressed !isIndirect()
+      //      if (isVarDim() && !isIndirect() && !is_string) /*&& not_basic*/
+      //if (isVarDim() && !isIndirect() && !is_string) /*&& not_basic*/
+      if (isVarDim() && !is_string) /*&& not_basic*/
 	{
 	  fprintf(fdh, "%seyedb::Status %s(",
 		  ctxH->get(), ATTRNAME(name, tSetCount, hints));
