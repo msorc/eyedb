@@ -18,7 +18,7 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
+  Author: Eric Viara <viara@sysra.com>
 */
 
 
@@ -27,32 +27,32 @@
 
 namespace eyedb {
 
-class InvOidContext {
+  class InvOidContext {
 
- public: // conceptually private: package level
+  public: // conceptually private: package level
 
-  Oid objoid;
-  Offset attr_offset;
-  int attr_num;
-  Oid valoid;
+    Oid objoid;
+    Offset attr_offset;
+    int attr_num;
+    Oid valoid;
 
-  InvOidContext(const Oid &_objoid,
-		   const Attribute *attr,
-		   const Oid &_valoid);
+    InvOidContext(const Oid &_objoid,
+		  const Attribute *attr,
+		  const Oid &_valoid);
 
-  InvOidContext(const Oid &_objoid,
-		   int _attr_num, Offset _attr_offset,
-		   const Oid &_valoid);
+    InvOidContext(const Oid &_objoid,
+		  int _attr_num, Offset _attr_offset,
+		  const Oid &_valoid);
 
-  static Bool getContext();
-  static void insert(const Oid &objoid, const Attribute *attr,
-		     const Oid &valoid);
-  static void releaseContext(Bool newctx, Data *, void *);
+    static Bool getContext();
+    static void insert(const Oid &objoid, const Attribute *attr,
+		       const Oid &valoid);
+    static void releaseContext(Bool newctx, Data *, void *);
 
-  static void code(Data *data, LinkedList &inv_list, Bool toDel,
-		   Size &size);
-  static void decode(Data data, LinkedList &);
-};
+    static void code(Data *data, LinkedList &inv_list, Bool toDel,
+		     Size &size);
+    static void decode(Data data, LinkedList &);
+  };
 
 }
 

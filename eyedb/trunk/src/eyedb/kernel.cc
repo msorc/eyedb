@@ -7310,7 +7310,11 @@ do { \
 	    printf("object_epilogue: updating object %s\n",
 		   ctx->objoid.toString());
 #endif
-	    mcp(o->getIDR()+ctx->attr_offset, &ctx->valoid, sizeof(Oid));
+	    // 22/05/06
+	    //mcp(o->getIDR()+ctx->attr_offset, &ctx->valoid, sizeof(Oid));
+	    eyedbsm::Oid toid;
+	    eyedbsm::h2x_oid(&toid, ctx->valoid.getOid());
+	    mcp(o->getIDR()+ctx->attr_offset, &toid, sizeof(Oid));
 	  }
 
 	delete ctx;
