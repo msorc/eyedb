@@ -27,6 +27,7 @@
 #include <string.h>
 #include <assert.h>
 #include <wctype.h>
+#include <values.h>
 #include <eyedb/oqlctb.h>
 #include <set>
 
@@ -1210,13 +1211,25 @@ namespace eyedb {
     }
     else if (cls->asInt32Class() || cls->asEnumClass()) {
       psize = sizeof(eyedblib::int32);
-      eyedblib::int32 v = (eyedblib::int32)i;
-      //eyedblib::int32 v = (eyedblib::int32)(i >> 32);
+      eyedblib::int32 v;
+      if (i >= MAXINT)
+	v = MAXINT;
+      else if (i <= MININT)
+	v = MININT;
+      else
+	v = (eyedblib::int32)i;
       memcpy(data, &v, psize);
     }
     else if (cls->asInt16Class()) {
       psize = sizeof(eyedblib::int16);
-      eyedblib::int16 v = (eyedblib::int16)(i >> 48);
+      eyedblib::int16 v;
+      if (i >= MAXSHORT)
+	v = MAXSHORT;
+      else if (i <= MINSHORT)
+	v = MINSHORT;
+      else
+	v = (eyedblib::int16)i;
+
       memcpy(data, &v, psize);
     }
     else
