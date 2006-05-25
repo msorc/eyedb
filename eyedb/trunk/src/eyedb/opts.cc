@@ -174,7 +174,7 @@ do { \
 
     static const std::string user_opt = "user";
     static const std::string passwd_opt = "passwd";
-    static const std::string auth_opt = "auth";
+    //static const std::string auth_opt = "auth";
     static const std::string listen_opt = "listen";
     static const std::string host_opt = "host";
     static const std::string port_opt = "port";
@@ -390,32 +390,34 @@ do { \
       Database::setDefaultDBMDB(map[dbm_opt].value.c_str());
 
     if (map.find(user_opt) != map.end()) {
-      if (map[user_opt].value.length() == 0)
-	ask_for_user();
+      if (map[user_opt].value.length() != 0)
+	Connection::setDefaultUser(map[user_opt].value.c_str());
       else
-	  Connection::setDefaultUser(map[user_opt].value.c_str());
+	ask_for_user();
     }
+
+    const char *pwd = ClientConfig::getCValue("passwd");
+    if (pwd)
+      Connection::setDefaultPasswd(pwd);
 
     if (map.find(passwd_opt) != map.end()) {
-      if (map[passwd_opt].value.length() == 0) {
-	const char *pwd = ClientConfig::getCValue("passwd");
-	if (pwd)
-	  Connection::setDefaultPasswd(pwd);
-	else
-	  ask_for_passwd();
-      }
-      else
+      if (map[passwd_opt].value.length() != 0)
 	Connection::setDefaultPasswd(map[passwd_opt].value.c_str());
+      else {
+	ask_for_passwd();
+      }
     }
 
+#if 0
     if (map.find(auth_opt) != map.end()) {
-      if (map[auth_opt].value.length() == 0) {
+      if (map[auth_opt].value.length() != 0)
+	Connection::setDefaultPasswd(map[user_opt].value.c_str());
+      else {
 	ask_for_user();
 	ask_for_passwd();
       }
-      else
-	Connection::setDefaultPasswd(map[user_opt].value.c_str());
     }
+#endif
 
     if (map.find(version_opt) != map.end()) {
       printVersion();
