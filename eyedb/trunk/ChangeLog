@@ -1,3 +1,10 @@
+2006-05-25  viara  <viara@sysra.com>
+
+	* Fixed litteral collection bug within direct attributes
+	* Fixed unitialized enum attribute assignement
+	* Fixed int32 and int64 comparison in OQL
+	* Fixed append bug (server crash) in OQL
+
 2006-05-23 Francois Dechelle <francois@dechelle.net>
 
 	* Added version definitions (major,minor,patch)
