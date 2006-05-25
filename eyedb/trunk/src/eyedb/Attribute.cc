@@ -1751,7 +1751,7 @@ Status Attribute::remove(Database *db, Object *agr,
 }
 
 void Attribute::getPersistentIDR(Offset& p_off, Size& item_p_sz,
-				    Size& p_sz, Size& item_ini_sz) const
+				 Size& p_sz, Size& item_ini_sz) const
 {
   p_off = idr_poff;
   item_p_sz = idr_item_psize;
@@ -7819,13 +7819,16 @@ int
 AttrIdxContext::getOff()
 {
   int off = 0;
+
   for (int n = attr_off_cnt-1; n >= 0; n--) {
     off += attr_off[n].off;
     if (attr_off[n].data_oid.isValid()) {
-      off -= IDB_OBJ_HEAD_SIZE;
       break;
     }
   }
+
+  off -= (attr_off_cnt - 1) * IDB_OBJ_HEAD_SIZE;
+  //printf("getOff n=%d off=%d\n", attr_off_cnt, off);
   return off;
 }
 

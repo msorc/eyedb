@@ -1589,6 +1589,8 @@ namespace eyedb {
     return Success;
   }
 
+  static bool debug_trace = getenv("EYEDB_DEBUG_TRACE") ? true : false;
+
   Status Class::trace_realize(FILE *fd, int indent, unsigned int flags, const RecMode *rcm) const
   {
     IDB_CHECK_INTR();
@@ -1637,6 +1639,10 @@ namespace eyedb {
       }
 
     fprintf(fd, " { ");
+    if (debug_trace) {
+      fprintf(fd, "// psize %d, vsize %d, inisize %d, objsize %d ",
+	      idr_psize, idr_vsize, idr_inisize, idr_objsz);
+    }
 
     /*
       if (flags & NativeTrace)
@@ -1730,7 +1736,22 @@ namespace eyedb {
 	  fprintf(fd, " [attr_comp_set_oid = %s]", attr->getAttrCompSetOid().toString());
 #endif
 
-	fprintf(fd, ";\n");
+	fprintf(fd, ";");
+	if (debug_trace) {
+	  Offset poff, voff;
+	  Size item_psize, psize, inisize, item_vsize, vsize;
+
+	  attr->getPersistentIDR(poff, item_psize, psize, inisize);
+	  attr->getVolatileIDR(voff, item_vsize, vsize);
+	  fprintf(fd,
+		  " // poff %d, item_psize %d, psize %d, inisize %d, "
+		  "voff %d, item_vsize %d, vsize %d",
+		  poff, item_psize, psize, inisize, voff, item_vsize,
+		  vsize);
+		  
+	}
+
+	fprintf(fd, "\n");
       }
 
     status = trace_comps(fd, indent, flags, rcm);

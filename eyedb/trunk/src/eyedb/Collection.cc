@@ -2964,12 +2964,14 @@ do { \
     Oid dataoid = idx_ctx.getDataOid();
     if (!dataoid.isValid())
       dataoid = objoid;
+
 #if 0
     printf("writing %s in %s at %d\n",
 	   getOidC().toString(),
 	   dataoid.toString(),
 	   idx_ctx.getOff());
 #endif
+
     RPCStatus rpc_status =
       dataWrite(db->getDbHandle(), idx_ctx.getOff() /*idr_poff*/,
 		sizeof(eyedbsm::Oid),
