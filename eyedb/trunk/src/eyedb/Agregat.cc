@@ -292,7 +292,7 @@ Status Agregat::realize(const RecMode *rcm)
 	    {
 	      status = StatusMake
 		(objectCreate(db->getDbHandle(), getDataspaceID(),
-				  idr->getIDR(), oid.getOid()));
+			      idr->getIDR(), oid.getOid()));
 	      if (!status)
 		modify = False;
 	    }
@@ -300,7 +300,7 @@ Status Agregat::realize(const RecMode *rcm)
 	    {
 	      status = StatusMake
 		(objectWrite(db->getDbHandle(),
-				 idr->getIDR(), oid.getOid()));
+			     idr->getIDR(), oid.getOid()));
 	      if (!status)
 		modify = False;
 	    }

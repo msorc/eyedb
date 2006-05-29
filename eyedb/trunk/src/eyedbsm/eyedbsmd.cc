@@ -769,6 +769,11 @@ main(int argc, char *argv[])
   smd_refcnt = 1;
   (void)notice(0);
 
+#ifndef TRACE
+  close(0);
+  close(1);
+  close(2);
+#endif
   net_main_loop(sock_fd);
 
   clean_exit();

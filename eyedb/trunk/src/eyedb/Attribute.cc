@@ -1536,9 +1536,9 @@ Attribute::setValue(Object *agr,
 }
 
 Status Attribute::getValue(Database *db,
-				 Data pvdata, // pdata or vdata
-				 Data *data, Size incsize,
-				 int nb, int from, Data inidata, Bool *isnull) const
+			   Data pvdata, // pdata or vdata
+			   Data *data, Size incsize,
+			   int nb, int from, Data inidata, Bool *isnull) const
 {
   if (isnull)
     *isnull = False;
@@ -4034,9 +4034,10 @@ Status AttrDirect::realize(Database *db, Object *agr,
 	memcpy(agr->getIDR() + idr_poff +  (j * idr_item_psize),
 	       o->getIDR() + IDB_OBJ_HEAD_SIZE, idr_item_psize);
 
-	if (!o->asCollection()) // changed the 9/11/99
-	  agr->touch();
-
+	// 27/05/06: suppressed test
+	//if (!o->asCollection()) // changed the 9/11/99
+	agr->touch();
+	  
 	Bool mustTouch;
 	status = o->postRealizePerform(cloid, objoid,
 				       idx_ctx, mustTouch, rcm);
@@ -6350,6 +6351,13 @@ Status AttrVarDim::realize(Database *db, Object *agr,
 
   dd = typmod.pdims * size;
 
+  //#define TRACE_OFF
+
+#ifdef TRACE_OFF
+  Offset OFFSET;
+  eyedbsm::Oid xoid, hoid;
+#endif
+
   for (int j = 0; j < dd; j++) {
     Object *o;
 
@@ -6360,8 +6368,20 @@ Status AttrVarDim::realize(Database *db, Object *agr,
       if (status != Success)
 	return status;
 
-      //idx_ctx.pushOff(idr_poff +  (j * idr_item_psize));
+      //idx_ctx.pushOff(idr_poff +  (j * idr_item_psize), vd_oid);
+#ifdef TRACE_OFF
+      getVarDimOid(agr, &vd_oid);
+      printf("#1 %s vd_oid %s\n", name, vd_oid.toString());
+#endif
+
       idx_ctx.pushOff(j * idr_item_psize, vd_oid);
+
+#ifdef TRACE_OFF
+      memcpy(&xoid, pdata +  + (j * idr_item_psize), sizeof(xoid));
+      eyedbsm::x2h_oid(&hoid, &xoid);
+      printf("#1 %s pdata %s at %d\n", name, Oid(hoid).toString(),  + (j * idr_item_psize));
+#endif
+
       /*
       printf("%s: vd_oid: %s %s %d\n", name, vd_oid.toString(),
 	     o->getClass()->getName(), IDB_OBJ_HEAD_SIZE);
@@ -6370,6 +6390,15 @@ Status AttrVarDim::realize(Database *db, Object *agr,
 	  
       if (status)
 	return status;
+
+#ifdef TRACE_OFF
+      getVarDimOid(agr, &vd_oid);
+      printf("#2 %s vd_oid %s\n", name, vd_oid.toString());
+
+      memcpy(&xoid, pdata +  + (j * idr_item_psize), sizeof(xoid));
+      eyedbsm::x2h_oid(&hoid, &xoid);
+      printf("#2 %s pdata %s at %d\n", name, Oid(hoid).toString(),  + (j * idr_item_psize));
+#endif
 
       // needs XDR ? no
 #ifdef E_XDR_TRACE
@@ -6380,6 +6409,9 @@ Status AttrVarDim::realize(Database *db, Object *agr,
 	memcpy(pdata +  (j * idr_item_psize),
 	       o->getIDR() + IDB_OBJ_HEAD_SIZE, idr_item_psize);
 	
+	// added 27/05/06
+	agr->touch();
+
 	Bool mustTouch;
 	status = o->postRealizePerform(cloid, objoid,
 				       idx_ctx, mustTouch, rcm);
@@ -6390,11 +6422,33 @@ Status AttrVarDim::realize(Database *db, Object *agr,
 	  agr->touch();
       }
       
+#ifdef TRACE_OFF
+      OFFSET = idx_ctx.getOff();
+#endif
+
       idx_ctx.popOff();
     }
   }
 
   status = update(db, cloid, objoid, agr, idx_ctx);
+
+#ifdef TRACE_OFF
+  getVarDimOid(agr, &vd_oid);
+  printf("#3 %s vd_oid %s\n", name, vd_oid.toString());
+  if (pdata) {
+    memcpy(&xoid, pdata, sizeof(xoid));
+    eyedbsm::x2h_oid(&hoid, &xoid);
+    printf("#3 %s pdata %s at %d\n", name, Oid(hoid).toString(), 0);
+  }
+  dataRead(db->getDbHandle(), OFFSET,
+	   sizeof(eyedbsm::Oid),
+	   (Data)&xoid, 0,
+	   vd_oid.getOid());
+  eyedbsm::x2h_oid(&hoid, &xoid);
+  printf("#3 %s DB pdata %s\n", name, Oid(hoid).toString());
+  printf("\n");
+#endif
+
   idx_ctx.pop();
   return status;
 }
@@ -7803,16 +7857,24 @@ AttrIdxContext::pushOff(int off)
 void
 AttrIdxContext::pushOff(int off, const Oid &data_oid)
 {
-  //printf("pushing [%d] %d %s\n", attr_off_cnt, off, data_oid.toString());
+  // 27/05/06: no more useful
+#ifdef TRACE_OFF
+  printf("pushing [%d] %d %s\n", attr_off_cnt, off, data_oid.toString());
+#endif
   attr_off[attr_off_cnt].off = off;  
   attr_off[attr_off_cnt].data_oid = data_oid;
   attr_off_cnt++;
 }
 
+#undef TRACE_OFF
+
 void
 AttrIdxContext::popOff()
 {
   attr_off_cnt--;
+#ifdef TRACE_OFF
+  printf("popOff [%d]\n", attr_off_cnt);
+#endif
 }
 
 int
@@ -7820,6 +7882,9 @@ AttrIdxContext::getOff()
 {
   int off = 0;
 
+#ifdef TRACE_OFF
+  printf("getOff(%d)\n", attr_off_cnt);
+#endif
   for (int n = attr_off_cnt-1; n >= 0; n--) {
     off += attr_off[n].off;
     if (attr_off[n].data_oid.isValid()) {

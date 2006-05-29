@@ -568,6 +568,13 @@ namespace eyedb {
     return s;
   }
 
+  void Collection::setMasterObject(Object *_master_object)
+  {
+    Object::setMasterObject(_master_object);
+    if (!getDatabase() && is_literal)
+      setDatabase(_master_object->getDatabase());
+  }
+
   //
   // Collection check methods
   //
@@ -2824,7 +2831,7 @@ do { \
     if (master_object)
       printf("MASTER_OBJECT %s %s [%s]\n",
 	     master_object->getOid().toString(),
-	     master_object->getClass()->getName(), (const char *)idx_ctx.getString());
+	     master_object->getClass()->getName(), idx_ctx.getString().c_str());
 #endif
     if (!idx_data)
       idx_data = idx_ctx.code(idx_data_size);
@@ -2832,7 +2839,9 @@ do { \
     void *ud = setUserData(IDB_MAGIC_COLL);
     Status s = realize(rcm);
     (void)setUserData(ud);
-    if (s) return s;
+    if (s)
+      return s;
+
 #ifdef COLLTRACE
     printf("Collection::realizePerform(-> %s, %p)\n", literal_oid.toString(),
 	   idx_data);
@@ -2841,6 +2850,15 @@ do { \
     Offset offset = IDB_OBJ_HEAD_SIZE;
     Size alloc_size = idr->getSize();
     Data data = idr->getIDR();
+
+#if 0
+    eyedbsm::Oid hoid;
+    oid_decode(data, &offset, &hoid);
+    printf("before coding %s on %p\n", Oid(hoid).toString(), data);
+    offset = IDB_OBJ_HEAD_SIZE;
+    printf("coding %s on %p\n", literal_oid.toString(), data);
+#endif
+
     oid_code(&data, &offset, &alloc_size, literal_oid.getOid());
 
     return Success;
@@ -2952,6 +2970,10 @@ do { \
     if (!getOidC().isValid())
       return Success;
 
+    //printf("postRealizePerform(%p)\n", this);
+
+    // 27/06/05: disconnected
+#if 0
 #ifdef E_XDR
     eyedbsm::Oid xoid;
     eyedbsm::h2x_oid(&xoid, getOidC().getOid());
@@ -2962,24 +2984,53 @@ do { \
     // 22/05/06 : disconnected because I do not know what is it for : inverse ?
     // when disconnecting nothing happens
     Oid dataoid = idx_ctx.getDataOid();
-    if (!dataoid.isValid())
+    if (!dataoid.isValid()) {
+      printf("not valid oid\n");
       dataoid = objoid;
+    }
 
-#if 0
-    printf("writing %s in %s at %d\n",
-	   getOidC().toString(),
-	   dataoid.toString(),
-	   idx_ctx.getOff());
+#if 1
+    if (getenv("EYEDB_XX"))
+      printf("not writing %s in %s [%s] at %d\n",
+	     getOidC().toString(),
+	     dataoid.toString(),
+	     objoid.toString(),
+	     idx_ctx.getOff());
+    else if (getenv("EYEDB_ZZ"))
+      printf("setting to NULL in %s [%s] at %d\n",
+	     dataoid.toString(),
+	     objoid.toString(),
+	     idx_ctx.getOff());
+    else
+      printf("writing %s in %s [%s] at %d\n",
+	     getOidC().toString(),
+	     dataoid.toString(),
+	     objoid.toString(),
+	     idx_ctx.getOff());
 #endif
+    
+    if (getenv("EYEDB_YY")) {
+      RPCStatus rpc_status =
+	dataWrite(db->getDbHandle(), idx_ctx.getOff() /*idr_poff*/,
+		  sizeof(eyedbsm::Oid),
+		  (Data)Oid::nullOid.getOid(),
+		  dataoid.getOid());
 
-    RPCStatus rpc_status =
-      dataWrite(db->getDbHandle(), idx_ctx.getOff() /*idr_poff*/,
-		sizeof(eyedbsm::Oid),
-		(Data)&xoid,
-		dataoid.getOid());
+      if (rpc_status)
+	return StatusMake(IDB_COLLECTION_ERROR, rpc_status);
+    }
+  
+    else if (!getenv("EYEDB_XX")) {
+      RPCStatus rpc_status =
+	dataWrite(db->getDbHandle(), idx_ctx.getOff() /*idr_poff*/,
+		  sizeof(eyedbsm::Oid),
+		  (Data)&xoid,
+		  dataoid.getOid());
 
-    if (rpc_status)
-      return StatusMake(IDB_COLLECTION_ERROR, rpc_status);
+      if (rpc_status)
+	return StatusMake(IDB_COLLECTION_ERROR, rpc_status);
+    }
+#endif
   
     Status s;
 #ifdef COLLTRACE
