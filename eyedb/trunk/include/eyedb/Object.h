@@ -1045,7 +1045,10 @@ namespace eyedb {
 			    unsigned int flags = 0);
     const Object *getMasterObject() const {return master_object;}
     Object *getMasterObject() {return master_object;}
-    void setMasterObject(Object *_master_object) {master_object = _master_object;}
+    virtual void setMasterObject(Object *_master_object) {
+      master_object = _master_object;
+    }
+
     virtual Status realizePerform(const Oid& cloid,
 				  const Oid& objoid,
 				  AttrIdxContext &idx_ctx,

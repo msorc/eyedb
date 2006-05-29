@@ -436,6 +436,7 @@ namespace eyedb {
     }
 
     Bool isPartiallyStored() const;
+    virtual void setMasterObject(Object *_master_object);
 
     void makeValue(Value &);
 

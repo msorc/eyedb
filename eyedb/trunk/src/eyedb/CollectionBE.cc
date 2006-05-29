@@ -367,6 +367,7 @@ namespace eyedb {
 
     // 31/08/05 : for class removal
     Oid inv_cls_oid;
+    //printf("inv_oid %s\n", inv_oid.getString());
     if (s = _db->getObjectClass(inv_oid, inv_cls_oid))
       return s;
 
