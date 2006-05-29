@@ -1,3 +1,9 @@
+2006-05-29  Eric Viara  <viara@sysra.com>
+
+	* Fixed litteral collection one more bug within direct attributes
+	* Fixed unitialized Database handle in litteral collections
+	* Fixed commit() in OQL which hangs at exit
+
 2006-05-26 Francois Dechelle <francois@dechelle.net>
 
 	* Release 2.7.8
