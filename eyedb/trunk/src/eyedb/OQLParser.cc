@@ -881,7 +881,7 @@ quit_command(OQLParser *parser, int, char *[])
 
       if (c == 'y' || c == 'Y') {
 	Status s = db->transactionCommit();
-	if (s) {
+	if (s && s->getStatus() != IDB_NO_CURRENT_TRANSACTION) {
 	  s->print();
 	}
 	else

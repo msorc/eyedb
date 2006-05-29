@@ -356,8 +356,10 @@ LinkedList *Database::dbopen_list;
 	  {
 	    RPCStatus rpc_status;
 	    if ((rpc_status = (commit ? eyedb::transactionCommit(dbh, 0 ) :
-			       eyedb::transactionAbort(dbh, 0))) != RPCSuccess)
+			       eyedb::transactionAbort(dbh, 0))) != RPCSuccess) {
 	      delete curtrs;
+	      curtrs = 0;
+	    }
 	  }
 
 	if (isBackEnd())
