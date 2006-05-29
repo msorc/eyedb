@@ -1,0 +1,141 @@
+2006-05-29  Eric Viara  <viara@sysra.com>
+
+	* Fixed litteral collection one more bug within direct attributes
+	* Fixed unitialized Database handle in litteral collections
+	* Fixed commit() in OQL which hangs at exit
+
+2006-05-26 Francois Dechelle <francois@dechelle.net>
+
+	* Release 2.7.8
+	
+2006-05-25  viara  <viara@sysra.com>
+
+	* Fixed litteral collection bug within direct attributes
+	* Fixed unitialized enum attribute assignement
+	* Fixed int32 and int64 comparison in OQL
+	* Fixed append bug (server crash) in OQL
+
+2006-05-23 Francois Dechelle <francois@dechelle.net>
+
+	* Added version definitions (major,minor,patch)
+
+2006-05-15  Francois Dechelle <francois@dechelle.net>
+
+	* Updated examples w.r.t. Makefile.eyedb with prefixed variables
+	* Changed eyedb-post-install.sh (no > /dev/null, using plain configuration)
+	* Fixed 8 bytes aligned stack allocation in src/eyedbsm/xdr_p.h for MapHeader
+
+2006-05-04 Francois Dechelle <francois@dechelle.net>
+
+	* Release 2.7.7
+	
+2006-05-03  Eric Viara  <viara@sysra.com>
+
+	* Fixed problems for schema updates
+	* Fixed problems in OQL garbage collector
+	* Suppressed EYEDB_NUMVERSION in generated ODL
+
+2006-04-12  Francois Dechelle <francois@dechelle.net>
+
+	* Fixed multiple symbols link error, isnan() detection on Mac OS X
+
+2006-03-28  Eric Viara  <viara@sysra.com>
+
+	* Fixed a bug when database has reached its maximum size
+	* Fixed a problem with getpid()
+
+2006-03-28  Francois Dechelle <francois@dechelle.net>
+
+	* Fixed some remaining problems w.r.t Mac OS X. Now, runs the 'Getting Started' example.
+
+2006-03-26  Francois Dechelle <francois@dechelle.net>
+
+	* Fixed stack allocation problems on Mac OS X
+
+2006-03-21  Francois Dechelle <francois@dechelle.net>
+
+	* Added tests for timezone (Mac OS X porting)
+	* Changed some enum values because of conflicts with ODL and OQL flex/bison tokens
+
+2006-03-17 Francois Dechelle <francois@dechelle.net>
+
+	* Changed configure to use javac instead of jikes on Mac OS X
+	* Changed UT_SEM to HAVE_SEMAPHORE_POLICY_SYSV_IPC, a config #define that is guessed by configure.in
+
+2006-03-16 Francois Dechelle <francois@dechelle.net>
+
+	* Changed configure.in to find automatically the integer type that has the same size as a void *; fixed files using pointer_int, that is now pointer_int_t.
+	* Changed configure.in to guess the semaphore policy, added a configure argument to force the semaphore policy, plus some sanity check
+	* Changed src/eyedb/Architecture.cc to get the architecture from compile builtins.
+
+2006-03-10 Francois Dechelle <francois@dechelle.net>
+
+	* Added m4 macro to check whether PTHREAD_PROCESS_SHARED is supported
+
+2006-03-09 Francois Dechelle <francois@dechelle.net>
+
+	* Removed #ifdef LINUX|SOLARIS in src/eyedb/OString.cc and src/eyedb/utilsmthfe.cc. Added necessary tests in configure.in
+	* Changed HAS_FATTACH to standard HAVE_FATTACH
+	* Removed M_strsignal (assumed that all platforms have strsignal, if not we'll see)
+	* Removed non-posix thread code in src/lib/rpcdb.cc (assume that all platforms have Posix threads)
+	* Removed getrlimit code and #ifdef SOLARIS in src/lib/m_mem.cc
+	
+2006-03-07 Francois Dechelle <francois@dechelle.net>
+
+	* Release 2.7.6
+
+2006-03-07  Eric Viara  <viara@sysra.com>
+
+	* Added const Oid::operator<(const Oid &) const method
+	* Support --attr-cache=yes eyedbodl option
+	* Sync stdio, iostream and write in eyedboql
+
+2006-02-27 Francois Dechelle <francois@dechelle.net>
+
+	* Changed Java m4 autoconf macros not to exit with error if javac
+	not found
+	* Added configure summary at end of configure.in
+
+2006-02-21  Eric Viara  <viara@sysra.com>
+
+	* Improved OQL GC
+	* Added std::map var_map in class Config
+	* Added ClientConfig and ServerConfig classes
+	* Updated ODL C++ generator : suppressed #define Class_c, clone method, const behind GETOID methods
+
+2006-02-19 Francois  <francois@dechelle.net>
+
+	* Changed configure.in to reintroduce --enable-java flag
+
+2006-02-16  Eric Viara  <viara@sysra.com>
+
+	* Improved configuration parsing and error reporting
+	* Added --server-conf option
+	* Fixed concurrency problems in SessionLog
+	* Suppressed pending eyedbd
+
+2006-02-16 Francois  <francois@dechelle.net>
+
+	* Changed src/eyedb/Config.cc and include/eyedb/Config.h: read $HOME/.eyedb/eyedb[d].conf file if this file exists, @include to include a file without error if file not found.
+
+2006-02-16 Francois  <francois@dechelle.net>
+
+	* Fixed examples/Makefile.am w.r.t. Makefile.eyedb, to get rid of Makefile variables that are not prefixed with EYEDB_
+
+2006-02-16  Francois  <francois@dechelle.net>
+
+	* Moved all configuration files in install/etc to "sample" configuration files, installed in pkgdatadir. Removed Makefile.am test to not overwrite the configuration files.
+
+2006-02-13  Francois  <francois@dechelle.net>
+
+	* Fixed src/www/Makefile.am and src/www/html/Makefile.am to not overwrite existing files (Apache config file, cgi scripts, html files)
+	
+2006-02-13  Francois  <francois@dechelle.net>
+
+	* Added install/etc/eyedb.conf.in and install/etc/eyedbd.conf.in, configuration file templates, plus substitution in Makefile.am instead of configure.in
+
+2006-01-29  Francois  <francois@dechelle.net>
+
+	* Release 2.7.5
+
+
