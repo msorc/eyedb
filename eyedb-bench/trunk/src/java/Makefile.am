@@ -1,4 +1,4 @@
-SUBDIRS=org bench1
+SUBDIRS=org bench1 quicktour
 
 JARFILE=eyedb-benchmarks.jar
 noinst_DATA= $(JARFILE)

@@ -189,6 +189,8 @@ src/java/Makefile
 src/java/org/Makefile
 src/java/org/eyedb/Makefile
 src/java/org/eyedb/benchmark/Makefile
+src/java/common/Makefile
+src/java/common/db4o/Makefile
 src/java/bench1/Makefile
 src/java/bench1/eyedb/Makefile
 src/java/bench1/db4o/Makefile
@@ -196,4 +198,7 @@ src/java/bench1/hibernate/Makefile
 src/java/bench2/Makefile
 src/java/bench2/eyedb/Makefile
 src/java/bench2/db4o/Makefile
+src/java/quicktour/Makefile
+src/java/quicktour/db4o/Makefile
+src/java/quicktour/eyedb/Makefile
 )
