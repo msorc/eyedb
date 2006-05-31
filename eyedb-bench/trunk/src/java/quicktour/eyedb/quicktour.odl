@@ -1,0 +1,20 @@
+class Person {
+  attribute string firstName;
+  attribute string lastName;
+};
+
+class Student extends Person {
+  attribute short beginYear;
+  relationship set<Course *> courses inverse students;
+};
+
+class Course {
+  attribute string title;
+  attribute string description;
+  relationship set<Student *> students inverse courses;
+  relationship Teacher *teacher inverse courses;
+};
+
+class Teacher extends Person {
+  relationship set<Course *> courses inverse teacher;
+};
