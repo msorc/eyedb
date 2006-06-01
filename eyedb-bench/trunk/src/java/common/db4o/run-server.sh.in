@@ -5,7 +5,7 @@ JAVA=@JAVA@
 set -e
 
 start_server() {
-    CLASSPATH=.:$DB4O_JAR
+    CLASSPATH=.:$DB4O_JAR:../../eyedb-benchmarks.jar
     CLASSPATH=$CLASSPATH $JAVA Db4oServer db4o.server.properties &
     echo $! > server.pid
 }
