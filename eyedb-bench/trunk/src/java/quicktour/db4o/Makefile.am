@@ -5,11 +5,10 @@ packagedir=$(pkglibdir)/java/classes/quicktour/db4o
 dist_package_JAVA =\
 Benchmark.java \
 CreateBenchmark.java \
-Person.java 
-
-#Student.java \
-#Teacher.java \
-#Course.java 
+Person.java \
+Student.java \
+Course.java \
+Teacher.java
 
 JAVAROOT=$(top_builddir)/src/java/quicktour/db4o
 CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_srcdir)/src/java:$(DB4O_JAR)

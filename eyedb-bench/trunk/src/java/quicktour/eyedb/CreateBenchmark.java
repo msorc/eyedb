@@ -27,7 +27,7 @@ public class CreateBenchmark extends Benchmark {
 	return firstNames[ random.nextInt( firstNames.length)];
     }
 
-    private static Teacher[] fillTeachers( quicktour.Database database, int nTeachers) throws org.eyedb.Exception
+    private Teacher[] fillTeachers( int nTeachers) throws org.eyedb.Exception
     {
 	Teacher[] teachers = new Teacher[nTeachers];
 
@@ -41,7 +41,7 @@ public class CreateBenchmark extends Benchmark {
 	return teachers;
     }
 
-    private static Course[] fillCourses( quicktour.Database database, int nCourses, Teacher[] teachers) throws org.eyedb.Exception
+    private Course[] fillCourses( int nCourses, Teacher[] teachers) throws org.eyedb.Exception
     {
 	Course courses[] = new Course[ nCourses];
 
@@ -64,8 +64,8 @@ public class CreateBenchmark extends Benchmark {
 	int nObjectsPerTransaction = getProperties().getIntProperty( "objects_per_transaction", 1000);
 
 	try {
-	    Teacher[] teachers = fillTeachers( database, nTeachers);
-	    Course[] courses = fillCourses( database, nCourses, teachers);
+	    Teacher[] teachers = fillTeachers( nTeachers);
+	    Course[] courses = fillCourses( nCourses, teachers);
 
 	    for (long count = 0; count < nStudents; count += nObjectsPerTransaction) {
 		database.transactionBegin();

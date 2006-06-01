@@ -30,6 +30,6 @@ public abstract class Benchmark extends org.eyedb.benchmark.Benchmark {
 	client.close();
     }
 
-    private ObjectContainer client;
+    protected ObjectContainer client;
 }
 
