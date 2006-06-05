@@ -50,6 +50,10 @@ public class PersonTest {
 	    db.open(conn, org.eyedb.Database.DBRW, null, null);
 	    display("After Opening");
 
+	    db.transactionBegin();
+	    test0(db);
+	    db.transactionCommit();
+
 	    display_("Starting");
 	    db.transactionBegin();
 	    test(db);
@@ -128,6 +132,17 @@ public class PersonTest {
     static void test_simple(org.eyedb.Database db) throws org.eyedb.Exception {
 	Employee p = makeEmployee(db, 0, "");
 	p.store();
+    }
+
+    static void test0(org.eyedb.Database db) throws org.eyedb.Exception {
+	long ms = System.currentTimeMillis();
+	Person ps[] = new Person[10000];
+	for (int i = 0; i < ps.length; i++) {
+	    ps[i] = makePerson(db, i, "#R");
+	    ps[i].store();
+	}
+	long ms1 = System.currentTimeMillis();
+	System.out.println("test0: ms " + (ms1 - ms));
     }
 
     static void test(org.eyedb.Database db) throws org.eyedb.Exception {
