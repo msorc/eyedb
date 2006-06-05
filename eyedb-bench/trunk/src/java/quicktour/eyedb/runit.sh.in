@@ -1,6 +1,6 @@
 #!/bin/bash
 BENCHMARK=$1
-PROPERTIES=$2
+PROPERTIES=eyedb.properties
 
 EYEDB_BINDIR=@EYEDB_BINDIR@
 EYEDB_JAR=@EYEDB_JAR@
@@ -32,7 +32,7 @@ create_db() {
 
 run_benchmark() {
     CLASSPATH=.:../../eyedb-benchmarks.jar:$EYEDB_JAR
-    CLASSPATH=$CLASSPATH $JAVA org.eyedb.benchmark.Run $BENCHMARK $PROPERTIES
+    CLASSPATH=$CLASSPATH time $JAVA org.eyedb.benchmark.Run $BENCHMARK $PROPERTIES
 }
 
 stop_server() {

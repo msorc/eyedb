@@ -10,10 +10,10 @@ else
 DB4O_DIR=
 endif
 
-#if COND_HIBERNATE
-#HIBERNATE_DIR=hibernate
-#else
-#HIBERNATE_DIR=
-#endif
+if COND_HIBERNATE
+HIBERNATE_DIR=hibernate
+else
+HIBERNATE_DIR=
+endif
 
 SUBDIRS=$(EYEDB_DIR) $(DB4O_DIR) $(HIBERNATE_DIR)

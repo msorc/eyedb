@@ -1,6 +1,6 @@
 #!/bin/bash
 BENCHMARK=$1
-PROPERTIES=$2
+PROPERTIES=db4o.client.properties
 
 DB4O_JAR=@DB4O_JAR@
 JAVA=@JAVA@
@@ -9,7 +9,7 @@ set -e
 
 run_benchmark() {
     CLASSPATH=.:../../eyedb-benchmarks.jar:$DB4O_JAR
-    CLASSPATH=$CLASSPATH $JAVA org.eyedb.benchmark.Run $BENCHMARK $PROPERTIES
+    CLASSPATH=$CLASSPATH time $JAVA org.eyedb.benchmark.Run $BENCHMARK $PROPERTIES
 }
 
 run_benchmark

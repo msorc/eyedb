@@ -1,7 +1,6 @@
-import com.db4o.*;
-import com.db4o.messaging.*;
 import org.eyedb.benchmark.*;
-import java.io.*;
+import org.hibernate.*;
+import org.hibernate.cfg.*;
 import java.util.Random;
 
 /**
@@ -68,6 +67,10 @@ public class CreateBenchmark extends Benchmark {
 	for (long count = 0; count < nStudents; count += nObjectsPerTransaction) {
 	    Student student = null;
 
+	    Session session = sessionFactory.getCurrentSession();
+
+	    session.beginTransaction();
+
 	    for ( int n = 0; n < nObjectsPerTransaction; n++)
 		{
 		    student = new Student( CreateBenchmark.findFirstName(), "Student_"+n);
@@ -80,10 +83,10 @@ public class CreateBenchmark extends Benchmark {
 			    courseIndex = (courseIndex + 719518367) % courses.length; // 719518367 is prime
 			}
 
-		    client.set( student);
+		    session.save(student);
 		}
 
-	    client.commit();
+	    session.getTransaction().commit();
 	}
     }
 }

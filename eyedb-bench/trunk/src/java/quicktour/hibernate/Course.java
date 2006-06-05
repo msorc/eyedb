@@ -1,6 +1,11 @@
 import java.util.*;
 
 public class Course {
+    public Course()
+    {
+	this( "", "");
+    }
+
     public Course( String title, String description)
     {
 	this.title = title;
@@ -34,6 +39,11 @@ public class Course {
 	return students;
     }
 
+    void setStudents( Set students)
+    {
+	this.students = students;
+    }
+
     public void addStudent( Student student)
     {
 	students.add( student);
@@ -58,6 +68,16 @@ public class Course {
 	this.teacher = teacher;
 	teacher.getCourses().add( this);
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    private void setId(Long id) {
+        this.id = id;
+    }
+
+    private Long id;
 
     private String title;
     private String description;

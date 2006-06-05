@@ -1,0 +1,74 @@
+
+EyeDB/db4o/hibernate benchmarks
+
+François Déchelle (francois@dechelle.net)
+
+
+configure flags
+===============
+
+EyeDB flags:
+  --with-eyedb-installdir=DIRECTORY
+                          gives EyeDB installation directory
+  --with-eyedb-bindir=DIRECTORY
+                          gives EyeDB binaries directory
+  --with-eyedb-jar=FILE   gives EyeDB jar file location
+
+If you use --with-eyedb-installdir, you don't need the other flags (the 
+binaries directory and the jar file location are guessed from the installation
+directory).
+
+db4o flags:
+  --with-db4o-jar=FILE    gives Db4o jar file location
+
+hibernate flags:
+  --with-hibernate-jar=FILE
+                          gives Hibernate jar file location
+  --with-hibernate-libdir=DIRECTORY
+                          gives Hibernate library directory
+  --with-jdbc-driver-jar=FILE
+                          gives JDBC driver jar file location
+
+other variables:
+JAVA   Java virtual machine
+JAVAC  Java compiler
+JAR    Java archiver
+
+
+EyeDB
+=====
+
+To run the EyeDB part:
+cd src/java/quicktour/eyedb
+./runit.sh CreateBenchmark  # to run the objects creation benchmark
+
+you can edit src/java/quicktour/eyedb/eyedb.properties to set the 
+benchmark parameters.
+
+
+db4o
+====
+
+To run the db4o part:
+- first launch the server:
+cd src/java/common/db4o
+./start-server.sh
+- then launch the benchmark client:
+cd src/java/quicktour/db4o
+./runit.sh CreateBenchmark  # to run the objects creation benchmark
+- to stop the server:
+cd src/java/common/db4o
+./stop-server.sh
+
+you can edit src/java/quicktour/eyedb/db4o.client.properties to set the 
+benchmark parameters.
+
+
+hibernate
+=========
+
+To run the hibernate part:
+cd src/java/quicktour/hibernate
+./runit.sh CreateBenchmark  # to run the objects creation benchmark
+
+To run the hibernate part, you must first check that your JDBC driver works.
