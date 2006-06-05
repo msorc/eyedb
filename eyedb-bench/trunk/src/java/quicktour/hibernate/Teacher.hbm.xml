@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+  <joined-subclass name="Teacher" table="TEACHER" extends="Person">
+
+    <key column="PERSON_ID"/>
+
+    <set name="courses" inverse="true">
+      <key column="PERSON_ID"/>
+      <one-to-many class="Course"/>
+    </set>
+
+  </joined-subclass>
+
+</hibernate-mapping>

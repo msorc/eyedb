@@ -166,7 +166,7 @@ AC_SUBST(HIBERNATE_JAR)
 
 HIBERNATE_LIBDIR=${ac_hibernate_libdir}
 
-AC_SUBST(EYEDB_BINDIR)
+AC_SUBST(HIBERNATE_LIBDIR)
 
 JDBC_DRIVER_JAR=${ac_jdbc_driver_jar}
 AC_CHECK_FILE($JDBC_DRIVER_JAR,HAVE_JDBC_DRIVER_JAR="yes",HAVE_JDBC_DRIVER_JAR="no")
@@ -201,4 +201,5 @@ src/java/bench2/db4o/Makefile
 src/java/quicktour/Makefile
 src/java/quicktour/db4o/Makefile
 src/java/quicktour/eyedb/Makefile
+src/java/quicktour/hibernate/Makefile
 )

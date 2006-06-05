@@ -8,7 +8,7 @@ Db4oServer.java
 JAVAROOT=$(top_builddir)/src/java/common/db4o
 CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_srcdir)/src/java:$(DB4O_JAR)
 
-noinst_DATA=run-server.sh
+noinst_DATA=start-server.sh stop-server.sh
 
 EDIT = sed \
         -e 's,@DB4O_JAR\@,$(DB4O_JAR),g' \
@@ -19,4 +19,5 @@ EDIT = sed \
 	$(EDIT) $(srcdir)/$*.sh.in >$*.sh.tmp
 	mv $*.sh.tmp $*.sh
 
-run-server.sh: Makefile
+start-server.sh: Makefile
+stop-server.sh: Makefile

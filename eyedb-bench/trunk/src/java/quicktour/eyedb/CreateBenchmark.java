@@ -89,8 +89,6 @@ public class CreateBenchmark extends Benchmark {
 			student.store(org.eyedb.RecMode.FullRecurs);
 		    }
 
-		System.out.println( "Inserted " + count + " Students: " + student);
-
 		database.transactionCommit();
 	    }
 	}
