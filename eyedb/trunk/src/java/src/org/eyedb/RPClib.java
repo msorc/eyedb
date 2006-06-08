@@ -46,6 +46,8 @@ public class RPClib {
   static private Connection xconn;
   static private byte null_bytes[];
 
+    public static boolean TRACE = false;
+
   static {
     null_bytes = new byte[RPC_MIN_SIZE];
   }
@@ -283,12 +285,15 @@ protected static void start(int code) {
 
     static boolean realize(Connection conn, Status status) {
 
+	if (TRACE)
+	    (new java.lang.Exception()).printStackTrace();
+
 	rpc_write_cnt = 0;
 	rpc_read_cnt = 0;
     try {
       OutputStream os = conn.main_os;
       int offset = coder_out.getOffset();
-      System.out.println("writing size " + offset);
+      //System.out.println("writing size " + offset);
       coder_out.setOffset(12);
       coder_out.code(offset < RPC_MIN_SIZE ? RPC_MIN_SIZE : offset); // size
       coder_out.code(coder_data_cnt); // ndata
@@ -343,6 +348,7 @@ protected static void start(int code) {
     if (stat != 0)
       status.set(1, "rpc failure: stat=" + stat);
 
+    /*
 
       System.out.println("magic  = " + magic);
       System.out.println("serial = " + serial);
@@ -350,6 +356,8 @@ protected static void start(int code) {
       System.out.println("size   = " + size);
       System.out.println("ndata  = " + ndata);
       System.out.println("stat   = " + stat);
+    */
+
 
     int rsize = size - RPC_MIN_SIZE;
     if (rsize > 0)
@@ -367,8 +375,10 @@ protected static void start(int code) {
       }
 
     xconn = conn;
+    /*
     System.out.println("write " + rpc_write_cnt + " read " +
 		       rpc_read_cnt);
+    */
     return (stat == 0 ? true : false);
   }
 }

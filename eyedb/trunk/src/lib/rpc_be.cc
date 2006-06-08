@@ -1684,7 +1684,6 @@ int rpc_serverArgsMake(rpc_Server *server, int which, int fd,
     }
   }
 
-  printf("write %d read %d\n", write_cnt, read_cnt);
   return 1;
 }
 

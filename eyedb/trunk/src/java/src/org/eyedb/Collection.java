@@ -523,8 +523,12 @@ public class Collection extends Instance {
 	Oid a_oid;
 	if (a.getType() == Value.OID)
 	    a_oid = a.oid;
-	else if (a.getType() == Value.OBJECT && a.o != null)
-	    a_oid = a.o.getOid();
+	else if (a.getType() == Value.OBJECT && a.o != null) {
+	    Class obj_class = a.o.getClass(true);
+	    if (!coll_cls.isSubClass(obj_class))
+		throw new CollectionInvalidValueTypeException();
+	    return;
+	}
 	else
 	    return;
 
