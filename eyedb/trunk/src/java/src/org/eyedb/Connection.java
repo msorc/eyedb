@@ -74,9 +74,6 @@ public class Connection {
       if (isNumber(port)) {
 	  main_sock = new Socket(host, Integer.parseInt(port));
 	  main_sock.setTcpNoDelay(true);
-	  System.out.println("traffic: " + main_sock.getTrafficClass());
-	  //main_sock.setTrafficClass(0x12);
-	  //System.out.println("traffic2: " + main_sock.getTrafficClass());
 	  main_os = new StandardOutputStream(main_sock.getOutputStream());
 	  main_is = new StandardInputStream(main_sock.getInputStream());
 
