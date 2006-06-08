@@ -1,3 +1,11 @@
+//#define USE_INVERSE
+
+#ifdef USE_INVERSE
+#define RELSHIP(TYPE, ATTR, INV) relationship TYPE ATTR inverse INV
+#else
+#define RELSHIP(TYPE, ATTR, INV) attribute TYPE ATTR
+#endif
+
 class Person {
   attribute string firstName;
   attribute string lastName;
@@ -5,16 +13,16 @@ class Person {
 
 class Student extends Person {
   attribute short beginYear;
-  relationship set<Course *> courses inverse students;
+  RELSHIP(set<Course *>, courses, students);
 };
 
 class Course {
   attribute string title;
   attribute string description;
-  relationship set<Student *> students inverse courses;
-  relationship Teacher *teacher inverse courses;
+  RELSHIP(set<Student *>, students, courses);
+  RELSHIP(Teacher *, teacher, courses);
 };
 
 class Teacher extends Person {
-  relationship set<Course *> courses inverse teacher;
+  RELSHIP(set<Course *>, courses, teacher);
 };
