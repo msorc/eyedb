@@ -34,7 +34,7 @@ public class RPClib {
   static final int rpc_Magic   = 0x43f2e341;
   static final int rpc_MMMagic = 0x43f2e341 + 0x11111111;
   static final int COMM_SZ = 2048;
-  static final int RPC_MIN_SIZE = 1024;
+  static final int RPC_MIN_SIZE = 128;
   static final long ANY = 0x10000;
 
   static private int serial = 1000;
@@ -76,6 +76,7 @@ protected static void start(int code) {
   //
 
   static int read(InputStream is, byte b[], int len) {
+      rpc_read_cnt++;
     try {
       int n = 0;
 
@@ -261,10 +262,13 @@ protected static void start(int code) {
 
     try {
       OutputStream os = conn.main_os;
+      rpc_write_cnt++;
       os.write(coder.getData(), 0, coder.getOffset());
 
-      for (int i = 0; i < coder_data_cnt; i++)
-	os.write(coder_data[i].data, 0, coder_data[i].len);
+      for (int i = 0; i < coder_data_cnt; i++) {
+	  rpc_write_cnt++;
+	  os.write(coder_data[i].data, 0, coder_data[i].len);
+      }
     }
 
     catch(IOException e) {
@@ -274,21 +278,29 @@ protected static void start(int code) {
   }
 
     public static int read_ms, write_ms, write_async_ms, read_cnt, read_async_cnt;
+    public static int rpc_write_cnt, rpc_read_cnt;
+    
 
     static boolean realize(Connection conn, Status status) {
 
+	rpc_write_cnt = 0;
+	rpc_read_cnt = 0;
     try {
       OutputStream os = conn.main_os;
       int offset = coder_out.getOffset();
+      System.out.println("writing size " + offset);
       coder_out.setOffset(12);
       coder_out.code(offset < RPC_MIN_SIZE ? RPC_MIN_SIZE : offset); // size
       coder_out.code(coder_data_cnt); // ndata
       coder_out.setOffset(offset);
+      rpc_write_cnt++;
       os.write(coder_out.getData(), 0, offset);
       long ms = System.currentTimeMillis();
       int rsize = RPC_MIN_SIZE - offset;
-      if (rsize > 0)
-	os.write(null_bytes, 0, rsize);
+      if (rsize > 0) {
+	  rpc_write_cnt++;
+	  os.write(null_bytes, 0, rsize);
+      }
       long ms2 = System.currentTimeMillis();
       write_ms += ms2 - ms;
       writeASyncData(conn);
@@ -331,14 +343,13 @@ protected static void start(int code) {
     if (stat != 0)
       status.set(1, "rpc failure: stat=" + stat);
 
-    /*
+
       System.out.println("magic  = " + magic);
       System.out.println("serial = " + serial);
       System.out.println("code   = " + code);
       System.out.println("size   = " + size);
       System.out.println("ndata  = " + ndata);
       System.out.println("stat   = " + stat);
-    */
 
     int rsize = size - RPC_MIN_SIZE;
     if (rsize > 0)
@@ -356,6 +367,8 @@ protected static void start(int code) {
       }
 
     xconn = conn;
+    System.out.println("write " + rpc_write_cnt + " read " +
+		       rpc_read_cnt);
     return (stat == 0 ? true : false);
   }
 }

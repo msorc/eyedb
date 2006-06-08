@@ -51,8 +51,8 @@
 #include <eyedblib/xdr.h>
 #include <lib/rpc_lib_p.h>
 
-//int RPC_MIN_SIZE = 256;
-int RPC_MIN_SIZE = 1024;
+int RPC_MIN_SIZE = 128;
+//int RPC_MIN_SIZE = 1024;
 
 void
 print_addr(FILE *fd, struct in_addr *addr)

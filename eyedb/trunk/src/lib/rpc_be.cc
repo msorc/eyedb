@@ -1313,6 +1313,8 @@ int rpc_serverArgsMake(rpc_Server *server, int which, int fd,
 
   rstatus.err = 0;
 
+  int read_cnt = 0;
+  int write_cnt = 0;
   commb = comm_buff;
   commsz = comm_size;
   /*#ifdef RPC_MIN_SIZE*/
@@ -1328,6 +1330,7 @@ int rpc_serverArgsMake(rpc_Server *server, int which, int fd,
   if (fromto == rpc_From) {
     /* lecture de l'header */
 #ifdef USE_RPC_MIN_SIZE
+    read_cnt++;
 #ifdef RPC_TIMEOUT
     if (rpc_socketReadTimeout(fd, buff, RPC_MIN_SIZE, rpc_timeout) !=
 	RPC_MIN_SIZE)
@@ -1343,6 +1346,7 @@ int rpc_serverArgsMake(rpc_Server *server, int which, int fd,
 #else
 
 #ifdef RPC_TIMEOUT
+    read_cnt++;
     if (rpc_socketReadTimeout(fd, buff, sizeof(rhd), rpc_timeout) !=
 	sizeof(rhd))
       return 0;
@@ -1372,7 +1376,8 @@ int rpc_serverArgsMake(rpc_Server *server, int which, int fd,
     }
 
 #ifdef USE_RPC_MIN_SIZE
-    if (rhd.size-RPC_MIN_SIZE > 0)
+    if (rhd.size-RPC_MIN_SIZE > 0) {
+      read_cnt++;
       if (rpc_socketRead(fd, buff+RPC_MIN_SIZE-sizeof(rhd),
 			 rhd.size-RPC_MIN_SIZE) != rhd.size-RPC_MIN_SIZE) {
 	IDB_LOG_FX(("Server Error #3: read failed for %d bytes\n",
@@ -1380,6 +1385,7 @@ int rpc_serverArgsMake(rpc_Server *server, int which, int fd,
 	/*rpc_quit(1, 0);*/
 	return 0;
       }
+    }
 #else
     if (rhd.size-sizeof(rhd))
       if (rpc_socketRead(fd, buff, rhd.size-sizeof(rhd)) !=
@@ -1601,6 +1607,7 @@ int rpc_serverArgsMake(rpc_Server *server, int which, int fd,
       {
 	int d[RPC_NDATA], i;
 
+	read_cnt++;
 	if (rpc_socketRead(fd, d, rhd.ndata*sizeof(int)) != rhd.ndata*sizeof(int))
 	  return 0;
       }
@@ -1615,13 +1622,21 @@ int rpc_serverArgsMake(rpc_Server *server, int which, int fd,
 
     rhd.size = (int)(buff-commb) + buff_size;
 
+    /*
 #ifdef USE_RPC_MIN_SIZE
     if (rhd.size < RPC_MIN_SIZE)
       rhd.size = RPC_MIN_SIZE;
 #endif
+    */
     h2x_rpc_hd(&xrhd, &rhd);
     memcpy(commb, &xrhd, sizeof(xrhd));
       
+#ifdef USE_RPC_MIN_SIZE
+    if (rhd.size < RPC_MIN_SIZE)
+      rhd.size = RPC_MIN_SIZE;
+#endif
+
+    write_cnt++;
     if (rpc_socketWrite(fd, commb, rhd.size) <= 0)
       return 0;
       
@@ -1629,12 +1644,14 @@ int rpc_serverArgsMake(rpc_Server *server, int which, int fd,
       int d[RPC_NDATA], i;
       for (i = 0; i < ndata; i++)
 	d[i] = h2x_32(p_data[i]->size);
+      write_cnt++;
       if (rpc_socketWrite(fd, d, ndata*sizeof(int)) <= 0)
 	return 0;
 
       for (i = 0; i < ndata; i++) {
 	if (p_data[i]->size) {
 	  int error = 0;
+	  write_cnt++;
 	  if (rpc_socketWrite(fd, p_data[i]->data, p_data[i]->size) <= 0)
 	    error = 1;
 	  if (p_data[i]->status == rpc_TempDataUsed) {
@@ -1654,16 +1671,20 @@ int rpc_serverArgsMake(rpc_Server *server, int which, int fd,
     if (rstatus.err) {
       int len = strlen(rstatus.err_msg);
       int tmp = h2x_32(rstatus.err);
+      write_cnt++;
       if (rpc_socketWrite(fd, &tmp, sizeof(tmp)) != sizeof(tmp))
 	return 0;
       tmp = h2x_32(len);
+      write_cnt++;
       if (rpc_socketWrite(fd, &tmp, sizeof(tmp)) != sizeof(tmp))
 	return 0;
+      write_cnt++;
       if (rpc_socketWrite(fd, rstatus.err_msg, len+1) != len+1)
 	return 0;
     }
   }
 
+  printf("write %d read %d\n", write_cnt, read_cnt);
   return 1;
 }
 

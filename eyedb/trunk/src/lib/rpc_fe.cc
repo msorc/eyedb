@@ -443,7 +443,7 @@ rpc_clientArgsMake(rpc_ConnHandle *conn, int which, rpc_RpcDescription **prd,
 	}
 
 #ifdef USE_RPC_MIN_SIZE
-      if (rhd.size-RPC_MIN_SIZE > 0)
+      if (rhd.size-RPC_MIN_SIZE > 0) {
 	if (rpc_socketRead(fd, buff+RPC_MIN_SIZE-sizeof(rhd),
 			   rhd.size-RPC_MIN_SIZE) != rhd.size-RPC_MIN_SIZE)
 	  {
@@ -451,6 +451,7 @@ rpc_clientArgsMake(rpc_ConnHandle *conn, int which, rpc_RpcDescription **prd,
 			rhd.size-sizeof(rhd)));
 	    return 0;
 	  }
+      }
 #else
       if (rhd.size-sizeof(rhd))
 	if (rpc_socketRead(fd, buff, rhd.size-sizeof(rhd)) !=
@@ -621,13 +622,20 @@ rpc_clientArgsMake(rpc_ConnHandle *conn, int which, rpc_RpcDescription **prd,
 	  return 0;
 	}
 
+      /*
 #ifdef USE_RPC_MIN_SIZE
       if (rhd.size < RPC_MIN_SIZE)
 	rhd.size = RPC_MIN_SIZE;
 #endif
+      */
 
       h2x_rpc_hd(&xrhd, &rhd);
       memcpy(commb, &xrhd, sizeof(xrhd));
+
+#ifdef USE_RPC_MIN_SIZE
+      if (rhd.size < RPC_MIN_SIZE)
+	rhd.size = RPC_MIN_SIZE;
+#endif
 
       if (rpc_socketWrite(fd, commb, rhd.size) != rhd.size)
 	{
@@ -648,7 +656,7 @@ rpc_clientArgsMake(rpc_ConnHandle *conn, int which, rpc_RpcDescription **prd,
 			 "bytes\n", ndata*sizeof(int)));
 	      return 0;
 	    }
-	  for (i = 0; i < ndata; i++)
+	  for (i = 0; i < ndata; i++) {
 	    if (rpc_socketWrite(fd, p_data[i]->data, p_data[i]->size) !=
 		p_data[i]->size)
 	      {
@@ -657,6 +665,7 @@ rpc_clientArgsMake(rpc_ConnHandle *conn, int which, rpc_RpcDescription **prd,
 			   p_data[i]->size));
 		return 0;
 	      }
+	  }
 	}
     }
 
