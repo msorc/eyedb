@@ -1257,8 +1257,10 @@ namespace eyedb {
     if (inv_item->cls->asCollSetClass())
       coll = new CollSet(db, collname.c_str(), coll_class);
 
-    else if (inv_item->cls->asCollBagClass())
+    else if (inv_item->cls->asCollBagClass()) {
+      printf("inverse: creating bag collection\n");
       coll = new CollBag(db, collname.c_str(), coll_class);
+    }
 
     else if (inv_item->cls->asCollArrayClass())
       coll = new CollArray(db, collname.c_str(), coll_class);
@@ -1266,11 +1268,10 @@ namespace eyedb {
     else if (inv_item->cls->asCollListClass())
       coll = new CollList(db, collname.c_str(), coll_class);
 
-    else
-      {
-	coll = 0;
-	abort();
-      }
+    else {
+      coll = 0;
+      abort();
+    }
 
     if (is_N_N)
       CollectionPeer::setInvOid(coll, obj_oid, inv_item->getNum());

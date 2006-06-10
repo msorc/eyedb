@@ -371,7 +371,8 @@ namespace eyedb {
 
     locked = False;
 
-    if (!_idximpl) _idximpl = getDefaultIndexImpl();
+    if (!_idximpl)
+      _idximpl = getDefaultIndexImpl();
     idximpl = _idximpl->clone();
     cache = 0;
 
