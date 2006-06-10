@@ -3982,6 +3982,12 @@ namespace eyedb {
     eyedbsm::Idx *idx1, *idx2;
     eyedbsm::Oid idx1_oid, idx2_oid;
 
+    /*
+    printf("IDB_collectionCreate dspid = %d\n", dspid);
+    printf("creating collection %s\n", idximpl->getHintsString().c_str());
+    printf("idximpl->getType() %d %d\n", idximpl->getType(), IndexImpl::BTree);
+    */
+
     if (idximpl->getType() == IndexImpl::BTree) {
       eyedbsm::BIdx::KeyType ktypes;
 
