@@ -1,0 +1,39 @@
+
+Collections bugs :
+email 7/7/06 18:11:39 : stage->store(fullrecurs) -> assert(master_object) in
+SuperContig collection because it thinks it is litteral (different behaviours
+in local and remote modes)
+
+adding an element to an "array<set<Supercontig *> >" using eyedboql crashes
+the server (see Stuart's email 06/07/06 17:49) 
+
+stage->clone_link_counts_at(n) raises an exception when it should return null
+(see Eric's email 05/07/06 23:41).
+-> must check Oid of array before getByInd
+
+one should add a argument eyedb::Bool *found in retrieveAt()
+if (found) -> does not throw exception, *found = True or False
+if (!found) -> throws exception when not found
+=> must changed odl -gencode C++
+
+one should add a method : Status hasAt(ItemId, eyedb::Bool &found) (or
+other name)
+
+implementation :
+- default implementation is bad
+- cannot set inner collection implementation :
+array<set<X *> *>
+perharps using C++ API ?
+
+mekano-255 does not work because intermediate stores are needed : it seems
+that store(FullRecurs) on stage does not follow array : perharps because
+clone_link_counts is a literal collection ?
+mekano-256 works well
+
+Litteral collections :
+- an element of an "array<set<Supercontig *> >" cannot be retrieved using
+ "retrieveAt(int n, Object &*)"(see Eric's email 06/07/06 19:12)
+
+- make litteral collections of sets array<set<X *> > works properly
+
+
