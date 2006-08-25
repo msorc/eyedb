@@ -18,7 +18,7 @@ TOPIC_JAVA_FILES =
 # ODL file (only one file allowed)
 # Example:
 # TOPIC_ODL_FILE = person.odl
-TOPIC_ODL_FILE =
+TOPIC_ODL_FILE = 
 
 # Script files
 # Example:
@@ -29,7 +29,7 @@ TOPIC_SCRIPT_FILES =
 # End of editable part
 # ######################################################################
 
-TOPIC=@TOPIC@
+TOPIC = @TOPIC@
 
 # ######################################################################
 #
