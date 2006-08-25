@@ -32,7 +32,7 @@ a shell script:
 
 The SCRIPTNAME.sh.in file can contain variables like:
 EYEDB_BINDIR=@EYEDB_BINDIR@
-$EYEDBBINDIR/eyedbdbcreate foo
+$EYEDB_BINDIR/eyedbdbcreate foo
 
 The @@ variables will be automatically substituted when running make
 

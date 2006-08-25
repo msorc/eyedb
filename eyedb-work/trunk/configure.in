@@ -60,5 +60,4 @@ AC_OUTPUT(
 Makefile
 src/Makefile
 src/alpha/Makefile
-src/beta/Makefile
 )

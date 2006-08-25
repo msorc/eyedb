@@ -1,3 +1,2 @@
 SUBDIRS=\
-alpha \
-beta
+alpha
