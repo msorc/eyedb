@@ -2,30 +2,29 @@
 # Editable part
 
 # Binaries
-TOPIC_BINARY_FILES=test1
+TOPIC_BINARY_FILES = 
 
 # For each binary listed in $(TOPIC_BINARY_FILES) add the following line:
 # <<BINARY_FILE>>_SOURCES=<<list of all C++ source files>>
 # Example:
-# TOPIC_BINARY_FILES=test1
-# test1_SOURCES= test1.cc
-test1_SOURCES= test1.cc
+# TOPIC_BINARY_FILES = test1
+# test1_SOURCES = test1.cc
 
 # Java files (excluding the .java files generated from odl)
 # Example:
-# TOPIC_JAVA_FILES=Test1.java
-TOPIC_JAVA_FILES=Test1.java
+# TOPIC_JAVA_FILES = Test1.java
+TOPIC_JAVA_FILES = 
 
 # ODL file (only one file allowed)
 # Example:
-# TOPIC_ODL_FILE=person.odl
-TOPIC_ODL_FILE=person.odl
+# TOPIC_ODL_FILE = person.odl
+TOPIC_ODL_FILE =
 
 # Script files
 # Example:
-# TOPIC_SCRIPT_FILES= init.sh
+# TOPIC_SCRIPT_FILES = init.sh
 # (this implies that you have a init.sh.in source script)
-TOPIC_SCRIPT_FILES=
+TOPIC_SCRIPT_FILES = 
 
 # End of editable part
 # ######################################################################

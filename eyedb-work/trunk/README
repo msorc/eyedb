@@ -1,0 +1,60 @@
+
+1) Adding a new topic
+
+bash scripts/newtopic TOPIC
+
+This will create the following files and directories:
+src/TOPIC
+src/TOPIC/ChangeLog
+src/TOPIC/Makefile.am
+
+The src/TOPIC/Makefile.am is copied from scripts/newtopic/template/Makefile.am
+
+The 'newtopic' script updates the following files:
+ChangeLog
+configure.in
+src/Makefile.am
+
+
+2) Updating the topic directory
+
+Edit src/TOPIC/Makefile.am to add:
+- the list of binaries to build
+- for each list of binaries, the list of C++ sources
+- the list of Java files
+- the ODL file (currently only one file allowed)
+- the scripts
+
+The generated Makefile.am contains rules to create shell scripts. To create
+a shell script:
+- create a SCRIPTNAME.sh.in file
+- add SCRIPTNAME to TOPIC_SCRIPT_FILES
+
+The SCRIPTNAME.sh.in file can contain variables like:
+EYEDB_BINDIR=@EYEDB_BINDIR@
+$EYEDBBINDIR/eyedbdbcreate foo
+
+The @@ variables will be automatically substituted when running make
+
+
+3) Generating the Makefiles
+
+In top directory, run:
+./autogen.sh
+./configure
+
+As configure must know the path to eyedb.pc (the EyeDB pkg-config file), 
+you must pass PKG_CONFIG_PATH to configure, for instance with:
+PKG_CONFIG_PATH=$HOME/projects/eyedb_install/lib/pkgconfig ./configure 
+
+configure supports also standard definitions, for instance:
+PKG_CONFIG_PATH=$HOME/projects/eyedb_install/lib/pkgconfig ./configure CXX=gcc-4.1 JAVAC=/usr/local/java/jdk1.5.0_05/bin/javac JAVA=/usr/local/java/jdk1.5.0_05/bin/java
+
+
+4) Compile
+
+Compile with:
+make
+
+at toplevel directory or in topic subdirectory
+

@@ -4,6 +4,10 @@ usage() {
     echo "Usage: `basename $0` TOPIC"
 }
 
+full_date() {
+    date "+%Y-%m-%d %H:%M"
+}
+
 backup_file_aux() {
     if [ $2 -ge 2 ] ; then return 0; fi
     if [ -f $1.backup ] ; then backup_file_aux $1.backup `expr $2 + 1` ; fi
@@ -15,7 +19,7 @@ backup_file() {
 }
 
 user_full_name() {
-    awk < /etc/passwd --assign id=`id --real -u` -F : '$3 == id {gsub(",","",$5); print $5;}'
+    awk < /etc/passwd -F : 'BEGIN { id = '`id --real -u`' } $3 == id {gsub(",","",$5); print $5;}'
 }
 
 make_topic_directory() {
@@ -33,7 +37,7 @@ generate_topic_changelog() {
     FILE=$TOPIC_DIR/ChangeLog
     backup_file $FILE
     ( \
-	echo `date "+%Y-%m-%d"` `user_full_name`
+	echo `full_date` `user_full_name`
 	echo
 	echo -e '\t* Added topic '$TOPIC
 	echo ) > $FILE
@@ -43,11 +47,11 @@ generate_topic_changelog() {
 update_makefile_am() {
     FILE=$TOPDIR/src/Makefile.am
     backup_file $FILE
-    awk --assign topic=$TOPIC '
-BEGIN { a[topic] = topic; }
-/SUBDIRS=/ { print; }
+    awk '
+BEGIN { topic = "'$TOPIC'"; a[topic] = topic; }
+/SUBDIRS=/ { }
 !/SUBDIRS=/ && NF > 0 { gsub("\\","",$1); a[$1] = $1; }
-END { n = asort(a); for (i = 1; i < n; i++) print( a[i]" \\"); print( a[n]); }
+END { print "SUBDIRS=\\"; n = asort(a); for (i = 1; i < n; i++) print( a[i]" \\"); print( a[n]); }
 ' $FILE > $FILE.out
     mv $FILE.out $FILE
     echo "Updated $FILE"
@@ -56,8 +60,8 @@ END { n = asort(a); for (i = 1; i < n; i++) print( a[i]" \\"); print( a[n]); }
 update_configure_in() {
     FILE=$TOPDIR/configure.in
     backup_file $FILE
-    awk --assign topic=$TOPIC '
-BEGIN { in_ac_output = 0; s = "src/"topic"/Makefile"; a[s] = s; }
+    awk '
+BEGIN {topic = "'$TOPIC'";  in_ac_output = 0; s = "src/"topic"/Makefile"; a[s] = s; }
 in_ac_output == 0 && ! ($1 ~ /AC_OUTPUT/) { print; }
 in_ac_output == 0 && $1 ~ /AC_OUTPUT/ { print; in_ac_output = 1; }
 in_ac_output == 1 && ! ($1 ~ /)/) && ! ($1 ~ /AC_OUTPUT/) && NF > 0 { a[$1] = $1; }
@@ -75,7 +79,7 @@ update_changelog() {
     FILE=$TOPDIR/ChangeLog
     touch $FILE
     backup_file $FILE 
-    DATE=`date "+%Y-%m-%d"`
+    DATE=`full_date`
     ed $FILE > /dev/null 2>&1 <<EOF
 1i
 $DATE `user_full_name`

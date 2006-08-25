@@ -59,5 +59,6 @@ fi
 AC_OUTPUT(
 Makefile
 src/Makefile
-src/zob/Makefile
+src/alpha/Makefile
+src/beta/Makefile
 )
