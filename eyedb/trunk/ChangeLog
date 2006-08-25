@@ -1,3 +1,7 @@
+2006-08-25  Francois Dechelle  <francois@localhost.localdomain>
+
+	* Added pkg-config support
+
 2006-05-29 Francois Dechelle <francois@dechelle.net>
 
 	* Release 2.7.9
