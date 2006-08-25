@@ -482,6 +482,7 @@ include/eyedblib/endian.h
 include/eyedbsm/Makefile
 install/Makefile
 install/etc/Makefile
+pkg-config/Makefile
 scripts/Makefile
 scripts/eyedb-postinstall.sh
 scripts/eyedbjrun
