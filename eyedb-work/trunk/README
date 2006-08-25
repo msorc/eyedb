@@ -34,7 +34,11 @@ The SCRIPTNAME.sh.in file can contain variables like:
 EYEDB_BINDIR=@EYEDB_BINDIR@
 $EYEDB_BINDIR/eyedbdbcreate foo
 
-The @@ variables will be automatically substituted when running make
+The following @@ variables will be automatically substituted when running make:
+@EYEDB_BINDIR@
+@EYEDB_LIBDIR@
+@EYEDB_JAR@
+@JAVA@
 
 
 3) Generating the Makefiles
