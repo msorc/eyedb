@@ -4376,7 +4376,6 @@ namespace eyedb {
 
     if (status)
       return rpcStatusMake(status);
-
     
     int i;
     for (i = 0; i < oid_cnt; i++) {
@@ -4396,6 +4395,10 @@ namespace eyedb {
 
       int32_decode(idr, &offset, &ind);
       char_decode(idr, &offset, &state);
+      Oid i_oid;
+      if (collbe->getIsRef())
+	eyedbsm::x2h_oid(i_oid.getOid(), temp);
+
       if (is_idx2) {
 	unsigned char *temp1 = (unsigned char *)malloc(collbe->getItemSize());
 	if (state == CollectionPeer::removed) {
@@ -4406,11 +4409,9 @@ namespace eyedb {
 	    if (se_status)
 	      return rpcStatusMake_se(se_status);
 	  
-	    Oid _tmp;
-	    memcpy(&_tmp, temp, sizeof(Oid));
 	    return rpcStatusMake(IDB_COLLECTION_ERROR,
 				 "item %s not found at %d in %s",
-				 _tmp.toString(), ind,
+				 i_oid.toString(), ind,
 				 eyedbsm::getOidString(oid));
 	  }
 
@@ -4420,23 +4421,19 @@ namespace eyedb {
 	    free(temp1);
 	    if (se_status)
 	      return rpcStatusMake_se(se_status);
-	    Oid _tmp;
-	    memcpy(&_tmp, temp, sizeof(Oid));
 	    return rpcStatusMake(IDB_COLLECTION_ERROR,
 				 "item %s not found at %d in %s",
-				 _tmp.toString(), ind,
+				 i_oid.toString(), ind,
 				 eyedbsm::getOidString(oid));
 	  }
 	
 	  if (idx) {
 	    se_status = idx->remove(temp, inv_oid.getOid(), &found);
 	    if ((eyedblib::log_mask & IDB_LOG_IDX_SUPPRESS) == IDB_LOG_IDX_SUPPRESS) {
-	      Oid _tmp;
-	      mcp(&_tmp, temp, sizeof(Oid));
 	      IDB_LOG(IDB_LOG_IDX_SUPPRESS,
 		      ("Removing Collection index entry '%s'"
 		       " %s <-> %s\n", inv_item->getName(),
-		       _tmp.toString(), inv_oid.toString()));
+		       i_oid.toString(), inv_oid.toString()));
 	    }
 	    if (se_status || !found)
 	      return rpcStatusMake_se(se_status);
@@ -4446,6 +4443,9 @@ namespace eyedb {
 	
 	  if (ind < items_bottom)
 	    items_bottom = ind;
+	  // added the 15/08/06 but not correct
+	  if (ind+1  == items_top)
+	    items_top--;
 	}
 	else if (state == CollectionPeer::added) {
 	  se_status = idx1->insert(temp, &ind);
@@ -4488,13 +4488,11 @@ namespace eyedb {
 	    se_status = idx->insert(temp, inv_oid.getOid());
 	    if ((eyedblib::log_mask & IDB_LOG_IDX_CREATE) ==
 		IDB_LOG_IDX_CREATE) {
-	      Oid _tmp;
-	      mcp(&_tmp, temp, sizeof(Oid));
 	      IDB_LOG(IDB_LOG_IDX_CREATE,
 		      ("Inserting Collection index entry '%s'"
 		       " %s <-> %s\n",
 		       inv_item->getName(),
-		       _tmp.toString(), inv_oid.toString()));
+		       i_oid.toString(), inv_oid.toString()));
 	    }
 
 	    if (se_status)
@@ -4517,11 +4515,9 @@ namespace eyedb {
 	    UPDATE_COUNT();
 	    if (se_status)
 	      return rpcStatusMake_se(se_status);
-	    Oid _tmp;
-	    memcpy(&_tmp, temp, sizeof(Oid));
 	    return rpcStatusMake(IDB_COLLECTION_ERROR,
 				 "item %s not found in %s",
-				 _tmp.toString(),
+				 i_oid.toString(),
 				 eyedbsm::getOidString(oid));
 	  }
 
@@ -4529,13 +4525,11 @@ namespace eyedb {
 	    se_status = idx->remove(temp, inv_oid.getOid(), &found);
 	    if ((eyedblib::log_mask & IDB_LOG_IDX_SUPPRESS) ==
 		IDB_LOG_IDX_SUPPRESS) {
-	      Oid _tmp;
-	      mcp(&_tmp, temp, sizeof(Oid));
 	      IDB_LOG(IDB_LOG_IDX_SUPPRESS,
 		      ("Removing Collection index entry '%s'"
 		       " %s <-> %s\n",
 		       inv_item->getName(),
-		       _tmp.toString(), inv_oid.toString()));
+		       i_oid.toString(), inv_oid.toString()));
 	    }
 	    if (se_status || !found)
 	      return rpcStatusMake_se(se_status);
@@ -4553,13 +4547,11 @@ namespace eyedb {
 	  if (idx) {
 	    se_status = idx->insert(temp, inv_oid.getOid());
 	    if ((eyedblib::log_mask & IDB_LOG_IDX_CREATE) == IDB_LOG_IDX_CREATE) {
-	      Oid _tmp;
-	      mcp(&_tmp, temp, sizeof(Oid));
 	      IDB_LOG(IDB_LOG_IDX_CREATE,
 		      ("Inserting Collection index entry '%s'"
 		       " %s <-> %s\n",
 		       inv_item->getName(),
-		       _tmp.toString(), inv_oid.toString()));
+		       i_oid.toString(), inv_oid.toString()));
 	    }
 
 	    if (se_status)
@@ -4743,13 +4735,19 @@ namespace eyedb {
     CollectionBE *collbe;
     Status status;
 
-    if (!(collbe = IDB_getCollBE("collectionGetByInd", db, dbh, colloid, &status)))
+    rpc_ServerData *data = (rpc_ServerData *)xdata;
+
+    if (data) {
+      data->status = rpc_BuffUsed;
+      data->size = 0;
+    }
+
+    if (!(collbe = IDB_getCollBE("collectionGetByInd", db, dbh, colloid,
+				 &status)))
       return rpcStatusMake(status);
 
     int item_size = collbe->getItemSize();
   
-    rpc_ServerData *data = (rpc_ServerData *)xdata;
-
     if (data) {
       if (item_size <= data->buff_size)
 	data->status = rpc_BuffUsed;

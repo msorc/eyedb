@@ -221,4 +221,7 @@ const char strict_unix_user[] = "**||STRICT||UNIX||USER||**";
 
 }
 
+// 8/07/06 and 15/08/06
+#define DONT_SET_LITERAL_IN_NEWOBJ
+
 #endif

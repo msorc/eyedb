@@ -1166,10 +1166,13 @@ odlConvertAttribute::prePerform(Database *db, Schema *m)
 		 oitem->getClass()->getOid().toString());
 #endif
 
+#ifdef VERBOSE_2
 	  odlUpdateItem::initDisplay();
-	  fprintf(odl_fd, "Converting attribute %s::%s ", cls->getName(),
+	  fprintf(odl_fd, "Converting attribute %s::%s", cls->getName(),
 		  item->getName());
-	  fprintf(odl_fd, "using CLASS_TO_CLASS conversion method\n");
+	  fprintf(odl_fd, " using CLASS_TO_CLASS conversion method\n");
+#endif
+
 	  // changed the 12/06/01
 	  //clsconv->setRoidO(ncls->getOid());
 	  clsconv->setSizeO(item_psize_o);

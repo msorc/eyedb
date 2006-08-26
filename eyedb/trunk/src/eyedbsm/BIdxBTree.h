@@ -79,8 +79,8 @@ namespace eyedbsm {
     Node *node;
 	
     InCore(BIdx *);				// constructor: create InCore
-    InCore(InCore const &);				// copy constructor
-    InCore&	InCore::operator=(InCore const &);	// assignment: cleanup and copy
+    InCore(InCore const &);			// copy constructor
+    InCore& operator=(InCore const &);		// assignment: cleanup and copy
     ~InCore();					// destructor: cleanup
 
     Status create();

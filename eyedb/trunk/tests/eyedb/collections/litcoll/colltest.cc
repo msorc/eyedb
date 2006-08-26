@@ -176,15 +176,12 @@ bug_coll_cnt_at(Database &db)
 static void
 display_coll_elements(const char *when, Database &db, A *a)
 {
-  OidArray oid_arr;
-  ValueArray val_arr;
+  printf("\n------------- %s bottom %d and top %d array.cnt = %d\n",
+	 when, a->getArrB4Coll()->getBottom(),
+	 a->getArrB4Coll()->getTop(),
+	 a->getArrB4Coll()->getCount());
 
-  a->getArrB4Coll()->getElements(oid_arr);
-
-  printf("%s bottom %d and top %d\n", when, a->getArrB4Coll()->getBottom(),
-	 a->getArrB4Coll()->getTop());
-
-  assert(oid_arr.getCount() == 3);
+  //assert(a->getArrB4Coll()->getCount() == 3);
 
   printf("objat[0] = %p\n", a->retrieveArrB4At(0));
   printf("objat[1] = %p\n", a->retrieveArrB4At(1));
@@ -192,6 +189,7 @@ display_coll_elements(const char *when, Database &db, A *a)
   printf("objat[3] = %p\n", a->retrieveArrB4At(3));
   printf("objat[4] = %p\n", a->retrieveArrB4At(4));
   printf("objat[5] = %p\n", a->retrieveArrB4At(5));
+  printf("objat[6] = %p\n", a->retrieveArrB4At(6));
 
   printf("oidat[0] = %s\n", a->retrieveArrB4OidAt(0).toString());
   printf("oidat[1] = %s\n", a->retrieveArrB4OidAt(1).toString());
@@ -199,34 +197,98 @@ display_coll_elements(const char *when, Database &db, A *a)
   printf("oidat[3] = %s\n", a->retrieveArrB4OidAt(3).toString());
   printf("oidat[4] = %s\n", a->retrieveArrB4OidAt(4).toString());
   printf("oidat[5] = %s\n", a->retrieveArrB4OidAt(5).toString());
+  printf("oidat[6] = %s\n", a->retrieveArrB4OidAt(6).toString());
+
+  // val_arr
+  ValueArray val_arr;
+
+  /*
+  a->getBagB5Coll()->getElements(val_arr);
+  printf("BagB5 val_arr.getCount() == %d\n", val_arr.getCount());
+  for (int i = 0; i < val_arr.getCount(); i++) 
+    printf("BagB5 valarr[%d] = %s\n", i, val_arr[i].getString());
 
   a->getArrB4Coll()->getElements(val_arr, True);
+  */
 
-  printf("val_arr.getCount() == %d\n", val_arr.getCount());
-    //assert(val_arr.getCount() == 6);
-  for (int i = 0; i < 10; i++)
-    {
-      Oid oid;
-      Object *o;
-      a->getArrB4Coll()->retrieveAt(i, oid);
-      printf("item_oid[%d] = %s\n", i, oid.toString());
-      a->getArrB4Coll()->retrieveAt(i, o);
-      printf("item_obj[%d] = %p\n", i, o);
-    }
-  
+  printf("ArrB4 True val_arr.getCount() == %d\n", val_arr.getCount());
+
+  for (int i = 0; i < val_arr.getCount(); i++) 
+    printf("ArrB4 True valarr[%d] = %s\n", i, val_arr[i].getString());
+
+  a->getArrB4Coll()->getElements(val_arr, False);
+
+  printf("ArrB4 False val_arr.getCount() == %d\n", val_arr.getCount());
+
+  for (int i = 0; i < val_arr.getCount(); i++) 
+    printf("ArrB4 False valarr[%d] = %s\n", i, val_arr[i].getString());
+
+  // oid_arr
+
+  OidArray oid_arr;
+  /*
+  a->getBagB5Coll()->getElements(oid_arr);
+  printf("BagB5 oid_arr.getCount() == %d\n", oid_arr.getCount());
+  for (int i = 0; i < oid_arr.getCount(); i++) 
+    printf("BagB5 oidarr[%d] = %s\n", i, oid_arr[i].getString());
+  */
+
+  a->getArrB4Coll()->getElements(oid_arr);
+
+  printf("ArrB4 oid_arr.getCount() == %d\n", oid_arr.getCount());
+
+  for (int i = 0; i < oid_arr.getCount(); i++) 
+    printf("ArrB4 oidarr[%d] = %s\n", i, oid_arr[i].getString());
+
+
+  for (int i = 0; i < 10; i++) {
+    Oid oid;
+    Object *o;
+    a->getArrB4Coll()->retrieveAt(i, oid);
+    printf("item_oid[%d] = %s\n", i, oid.toString());
+    a->getArrB4Coll()->retrieveAt(i, o);
+    printf("item_obj[%d] = %p\n", i, o);
+  }
+
+  printf("Checking %s [%d]\n", a->getArrB4Coll()->getOid().toString(),
+	 a->getArrB4Coll()->getCount());
 }
 
 static void
 bug_coll_array(Database &db)
 {
   A *a = new A(&db);
-  a->setInArrB4CollAt(0, new B(&db));
-  a->setInArrB4CollAt(3, new B(&db));
+  B *b = new B(&db);
+  a->setInArrB4CollAt(0, b);
+  a->setInArrB4CollAt(3, b);
   a->setInArrB4CollAt(4, new B(&db));
+
+  a->addToBagB5Coll(b);
+  a->addToBagB5Coll(b);
+  a->addToBagB5Coll(new B(&db));
+  a->addToBagB5Coll(b);
+  a->addToBagB5Coll(new B(&db));
+  a->addToBagB5Coll(new B(&db));
+  a->addToBagB5Coll(new B(&db));
+  a->addToBagB5Coll(new B(&db));
 
   display_coll_elements("first", db, a);
   a->store(RecMode::FullRecurs);
-  display_coll_elements("middle", db, a);
+  display_coll_elements("middle 1", db, a);
+  a->setInArrB4CollAt(5, b);
+  a->setInArrB4CollAt(2, new B(&db));
+  a->setInArrB4CollAt(1, b);
+  a->unsetInArrB4CollAt(3);
+  display_coll_elements("middle 2", db, a);
+  a->getArrB4Coll()->empty();
+  //a->getBagB5Coll()->empty();
+  display_coll_elements("after empty", db, a);
+  //printf("before store 1\n");
+  //a->getBagB5Coll()->store();
+  printf("before store 2\n");
+  a->getArrB4Coll()->store();
+  printf("after store\n");
+  display_coll_elements("after empty/store", db, a);
 
   db.transactionCommit();
 
@@ -235,6 +297,103 @@ bug_coll_array(Database &db)
   db.loadObject(a->getOid(), o);
   a = A_c(o);
   display_coll_elements("last", db, a);
+}
+
+static void
+bug_coll_array2(Database &db)
+{
+  Supercontig *sctg;
+  eyedb::CollSet *set;
+
+  Stage *s = new Stage(&db);
+  s->setId(1);
+
+  set = new eyedb::CollSet(&db, "", db.getSchema()->getClass("Supercontig"), eyedb::True);
+
+  for (int n = 0; n < 10; n++) {
+    sctg = new Supercontig(&db);
+    sctg->setId(n+1);
+    set->insert(sctg);
+    sctg->release();
+  }
+
+  s->setInLinkCounts1CollAt(0, set);
+  set->release();
+
+  set = new eyedb::CollSet(&db, "", db.getSchema()->getClass("Supercontig"), eyedb::True);
+
+  for (int n = 0; n < 10; n++) {
+    sctg = new Supercontig(&db);
+    sctg->setId(n+11);
+    set->insert(sctg);
+    sctg->release();
+  }
+
+  s->setInLinkCounts1CollAt(3, set);
+  set->release();
+  s->store(RecMode::FullRecurs);
+  printf("oid: %s\n", s->getOid().toString());
+}
+
+//#define FULL_RECURS
+
+static void
+bug_coll_array3(Database &db)
+{
+  Supercontig *sctg;
+  eyedb::CollSet *set;
+
+  Stage *s = new Stage(&db);
+  s->setId(1);
+
+  set = new eyedb::CollSet(&db, "", db.getSchema()->getClass("Supercontig"), eyedb::True);
+
+  for (int n = 0; n < 10; n++) {
+    sctg = new Supercontig(&db);
+    sctg->setId(n+1);
+    set->insert(sctg);
+#ifndef FULL_RECURS
+    sctg->store();
+#endif
+    sctg->release();
+  }
+
+#ifndef FULL_RECURS
+  set->store();
+#endif
+
+  s->setInLinkCounts1CollAt(0, set);
+  set->release();
+
+  set = new eyedb::CollSet(&db, "", db.getSchema()->getClass("Supercontig"), eyedb::True);
+
+  for (int n = 0; n < 10; n++) {
+    sctg = new Supercontig(&db);
+    sctg->setId(n+11);
+    set->insert(sctg);
+#ifndef FULL_RECURS
+    sctg->store();
+#endif
+    sctg->release();
+  }
+
+#ifndef FULL_RECURS
+  set->store();
+#endif
+
+  s->setInLinkCounts1CollAt(3, set);
+  set->release();
+#ifdef FULL_RECURS
+  s->store(RecMode::FullRecurs);
+#else
+  s->store();
+#endif
+#ifdef FULL_RECURS
+  printf("FullRecurs mode\n");
+#else
+  printf("NoRecurs mode\n");
+#endif
+  printf("oid: %s\n", s->getOid().toString());
 }
 
 int
@@ -262,7 +421,7 @@ main(int argc, char *argv[])
 
     conn.open();
 
-    Database db(dbname);
+    schemaDatabase db(dbname);
     db.open(&conn, (getenv("EYEDBLOCAL") ?
 		    Database::DBRWLocal :
 		    Database::DBRW));
@@ -274,13 +433,15 @@ main(int argc, char *argv[])
     bug_coll_empty(db);
     bug_coll_cnt_at(db);
     */
-    bug_coll_array(db);
+    //bug_coll_array(db);
+    //    bug_coll_array2(db);
+    bug_coll_array3(db);
 
     db.transactionCommit();
   }
 
   catch(Exception &e) {
-    cerr << argv[0] << ": " << e;
+    cerr << argv[0] << ": " << e << endl;
     return 1;
   }
 

@@ -172,7 +172,8 @@ namespace eyedb {
       }
 
     create_cache();
-    cache->insert(item_oid, v_items_cnt, added);
+    //    cache->insert(item_oid, v_items_cnt, added);
+    cache->insert(item_oid, ValueCache::DefaultItemID, added);
     v_items_cnt++;
 
     return Success;
@@ -261,7 +262,8 @@ namespace eyedb {
       }
 
     create_cache();
-    cache->insert(item_o, v_items_cnt, added);
+    //    cache->insert(item_o, v_items_cnt, added);
+    cache->insert(item_o, ValueCache::DefaultItemID, added);
     v_items_cnt++;
 
     return Success;
@@ -330,9 +332,11 @@ namespace eyedb {
 
     create_cache();
 #ifdef USE_VALUE_CACHE
-    cache->insert(Value(item_data, item_size), v_items_cnt, added);
+    //    cache->insert(Value(item_data, item_size), v_items_cnt, added);
+    cache->insert(Value(item_data, item_size), ValueCache::DefaultItemID, added);
 #else
-    cache->insert(item_data, v_items_cnt, added);
+    //    cache->insert(item_data, v_items_cnt, added);
+    cache->insert(item_data, ValueCache::DefaultItemID, added);
 #endif
     v_items_cnt++;
 

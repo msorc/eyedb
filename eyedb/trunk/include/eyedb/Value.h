@@ -792,6 +792,14 @@ namespace eyedb {
 
     /**
        Not yet documented
+       @param value1
+       @param value2
+       @return
+    */
+    Bool suppressPairValues(const Value &value1, const Value &value2);
+
+    /**
+       Not yet documented
        @param value
        @return
     */

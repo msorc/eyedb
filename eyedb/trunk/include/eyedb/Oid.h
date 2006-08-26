@@ -131,7 +131,7 @@ namespace eyedb {
        Not yet documented
        @return
     */
-    bool eyedb::Oid::operator !() const {
+    bool operator !() const {
       return !isValid() ? true : false;
     }
 

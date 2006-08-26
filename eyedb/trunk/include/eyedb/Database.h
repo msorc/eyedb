@@ -1040,7 +1040,7 @@ namespace eyedb {
 			       Database *(*)(const void *, const char *),
 			       const char *, const char *,
 			       Database **);
-    const char *Database::getTName() const;
+    const char *getTName() const;
 
     TransactionParams def_params;
 

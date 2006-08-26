@@ -212,6 +212,31 @@ startServer(int argc, char *argv[], const char *smdport)
   return status;
 }
 
+static void unlink_port(const char *port)
+{
+  if (*port == '/' || strchr(port, ':') == 0) {
+    unlink(port);
+  }
+}
+
+static void unlink_ports(const char *smdport, const char *_listen)
+{
+  char *listen = strdup(_listen);
+  char *p = listen;
+
+  for (;;) {
+    char *q = strchr(p, ',');
+    if (q)
+      *q = 0;
+    unlink_port(p);
+    if (!q)
+      break;
+    p = q + 1;
+  }
+
+  unlink(smdport);
+}
+
 static void make_host_port(const char *_listen, const char *&host,
 			   const char *&port)
 {
@@ -300,6 +325,10 @@ main(int argc, char *argv[])
       listen = s;
 
     smdport = smd_get_port();
+
+    if (cmd == Start && force) {
+      unlink_ports(smdport, listen);
+    }
 
     bindir = eyedblib::CompileBuiltin::getBindir();
 

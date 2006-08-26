@@ -84,7 +84,7 @@ namespace eyedb {
        @param dims
        @return
     */
-    static TypeModifier TypeModifier::make(Bool isRef, int ndims, int *dims);
+    static TypeModifier make(Bool isRef, int ndims, int *dims);
 
     /**
        Not yet documented

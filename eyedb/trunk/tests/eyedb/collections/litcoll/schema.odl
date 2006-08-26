@@ -90,3 +90,17 @@ class B2 {
 class B3 {
   B2 b2;
 };
+
+// mekano (Stuart) test
+class Supercontig {
+  int id; index on id;
+};
+
+class Stage {
+  int id; index on id;
+
+  //  array<Supercontig *> link_test;
+  //  array<set<Supercontig *> *> link_counts1;
+  // array<set<Supercontig *> > link_counts2;
+  bag<set<Supercontig *> > link_counts2;
+};

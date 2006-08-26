@@ -53,6 +53,8 @@ namespace eyedb {
   class ValueCache {
 
   public:
+    static Collection::ItemId DefaultItemID;
+
     ValueCache(Object *);
 
     Status insert(const Value &, Collection::ItemId, int state);
@@ -76,6 +78,7 @@ namespace eyedb {
 
     ValueMap &getValueMap() {return val_map;}
     IdMap &getIdMap() {return id_map;}
+    void trace();
 
     // bwc
     Status suppressOid(ValueItem *item) {return suppress(item);}
@@ -96,5 +99,6 @@ namespace eyedb {
     //std::map<Collection::ItemId, ValueItem *> id_map;
     ValueMap val_map;
     IdMap id_map;
+    Collection::ItemId current_id;
   };
 }

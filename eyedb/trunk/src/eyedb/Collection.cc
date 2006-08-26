@@ -22,9 +22,8 @@
 */
 
 
-// 25/09/05: attempt to use ValueCache instead of CollCache
-
-//#define USE_VALUE_CACHE
+// 15/08/06 : avoid use of exists method
+#define NEW_GET_ELEMENTS
 
 #include "eyedb_p.h"
 #include "CollCache.h"
@@ -32,6 +31,8 @@
 #include <assert.h>
 #include "AttrNative.h"
 #include "Attribute_p.h"
+
+//#define INIT_IDR
 
 using namespace std;
 
@@ -44,7 +45,7 @@ namespace eyedb {
 
 #define CACHE_LIST(C)       ((C) ? (C)->getList() : (LinkedList *)0)
 #ifdef USE_VALUE_CACHE
-#define CACHE_LIST_COUNT(C) ((C) ? (C)->getValueMap().size() : 0)
+#define CACHE_LIST_COUNT(C) ((C) ? (C)->getIdMap().size() : 0)
 #else
 #define CACHE_LIST_COUNT(C) ((C) ? (C)->getList()->getCount() : 0)
 #endif
@@ -106,6 +107,7 @@ namespace eyedb {
     read_cache.val_arr = 0;
 
     read_cache_state_oid = read_cache_state_value = read_cache_state_object = coherent;
+    read_cache_state_index = False;
     locked = False;
     if (!_idximpl)
       _idximpl = getDefaultIndexImpl();
@@ -124,12 +126,17 @@ namespace eyedb {
     idx_data = 0;
     idx_data_size = 0;
     implModified = False;
+#ifdef INIT_IDR
+    inv_oid_offset = 0;
+    init_idr();
+#endif
   }
 
   void
   Collection::unvalidReadCache()
   {
     read_cache_state_oid = read_cache_state_object = read_cache_state_value = modified;
+    read_cache_state_index = False;
   }
 
 #define DEFMAGORDER 4
@@ -393,6 +400,11 @@ namespace eyedb {
     idx_data = (idx_data_size ? (Data)malloc(idx_data_size) : 0);
     memcpy(idx_data, _idx_data, idx_data_size);
     implModified = False;
+#ifdef INIT_IDR
+    inv_oid_offset = 0;
+    init_idr();
+#endif
+
 #ifdef COLLTRACE
     printf("Collection[%p] -> %s\n", this,
 	   (const char *)AttrIdxContext(idx_data, idx_data_size).getString());
@@ -571,9 +583,16 @@ namespace eyedb {
 
   void Collection::setMasterObject(Object *_master_object)
   {
+#ifdef DONT_SET_LITERAL_IN_NEWOBJ
+    setLiteral(True);
+    Object::setMasterObject(_master_object);
+    if (!getDatabase())
+      setDatabase(_master_object->getDatabase());
+#else
     Object::setMasterObject(_master_object);
     if (!getDatabase() && is_literal)
       setDatabase(_master_object->getDatabase());
+#endif
   }
 
   //
@@ -881,7 +900,8 @@ namespace eyedb {
       return StatusMake(IDB_COLLECTION_SUPPRESS_ERROR, rpc_status);
 
     create_cache();
-    cache->insert(item_oid, v_items_cnt, removed);
+    //cache->insert(item_oid, v_items_cnt, removed);
+    cache->insert(item_oid, ValueCache::DefaultItemID, removed);
     v_items_cnt--;
     return Success;
   }
@@ -989,7 +1009,8 @@ namespace eyedb {
       return StatusMake(IDB_COLLECTION_SUPPRESS_ERROR, rpc_status);
 
     create_cache();
-    cache->insert(item_o, v_items_cnt, removed);
+    //cache->insert(item_o, v_items_cnt, removed);
+    cache->insert(item_o, ValueCache::DefaultItemID, removed);
     v_items_cnt--;
     return Success;
   }
@@ -1033,49 +1054,58 @@ namespace eyedb {
       {
 	p_items_cnt = 0;
 	v_items_cnt = 0;
+	top = bottom = 0;
 	return Success;
       }
 
     Status s;
-    Iterator q(this);
+    Iterator q(this, True);
 
     if ((s = q.getStatus()))
       return s;
 
     IteratorAtom qatom;
-    int n = 0;
-    for (;;)
-      {
-	Bool found;
-	s = q.scanNext(&found, &qatom);
-	if (s)
-	  {
-	    //cache->empty();
-	    return s;
-	  }
-
-	if (!found)
-	  break;
-      
-	create_cache();
-	if (isref)
-	  cache->insert(&qatom.oid, n++, removed);
-	else
-	  {
-	    Data _idr = 0;
-	    Offset offset = 0;
-	    Size alloc_size = 0;
-	    qatom.code(&_idr, &offset, &alloc_size);
-#ifdef USE_VALUE_CACHE
-	    cache->insert(Value(idr->getIDR(), item_size), n++, removed);
-#else
-	    cache->insert(idr->getIDR(), n++, removed);
-#endif
-	  }
+    int ind = 0;
+    for (int n = 0; ; n++) {
+      Bool found;
+      s = q.scanNext(&found, &qatom);
+      if (s) {
+	//cache->empty();
+	return s;
       }
+
+      if (!found)
+	break;
+      
+      if (asCollArray()) {
+	if (!(n & 1)) {
+	  assert(qatom.type == IteratorAtom_INT32);
+	  ind = qatom.i32;
+	  continue;
+	}
+      }
+      else
+	ind = ValueCache::DefaultItemID;
+
+      create_cache();
+      if (isref)
+	cache->insert(&qatom.oid, ind, removed);
+      else {
+	Data _idr = 0;
+	Offset offset = 0;
+	Size alloc_size = 0;
+	qatom.code(&_idr, &offset, &alloc_size);
+#ifdef USE_VALUE_CACHE
+	cache->insert(Value(idr->getIDR(), item_size), ind, removed);
+#else
+	cache->insert(idr->getIDR(), ind, removed);
+#endif
+      }
+    }
 
     p_items_cnt = 0;
     v_items_cnt = 0;
+    top = bottom = 0;
     return Success;
   }
 
@@ -1455,6 +1485,64 @@ namespace eyedb {
     return Success;
   }
 
+  Status Collection::init_idr() {
+#ifdef INIT_IDR
+    assert(!getIDR());
+    Size alloc_size = 0;
+    Offset offset = IDB_OBJ_HEAD_SIZE;
+
+    idr->setIDR((Size)0);
+    Data data = 0;
+
+    /* locked */
+    char c = locked;
+    char_code (&data, &offset, &alloc_size, &c);
+
+    /* item_size */
+    eyedblib::int16 kk = (eyedblib::int16)item_size;
+    int16_code (&data, &offset, &alloc_size, &kk);
+
+    Status s = codeIndexImpl(data, offset, alloc_size);
+    if (s)
+      return s;
+
+    /* null oid */
+    oid_code (&data, &offset, &alloc_size, getInvalidOid());
+    /* null oid */
+    oid_code (&data, &offset, &alloc_size, getInvalidOid());
+
+    eyedblib::int32 zero = 0;
+    /* item count */
+
+    int32_code (&data, &offset, &alloc_size, &zero);
+    /* bottom */
+    int32_code (&data, &offset, &alloc_size, &zero);
+    /* top */
+    int32_code (&data, &offset, &alloc_size, &zero);
+  
+    cardCode(data, offset, alloc_size);
+
+    inv_oid_offset = offset;
+    oid_code(&data, &offset, &alloc_size, inv_oid.getOid());
+    int16_code(&data, &offset, &alloc_size, &inv_item);
+
+    char c = is_literal;
+    /* is_literal */
+    char_code (&data, &offset, &alloc_size, &c);
+    eyedblib::int16 sz = idx_data_size;
+    int16_code (&data, &offset, &alloc_size, &sz);
+    buffer_code(&data, &offset, &alloc_size, idx_data, idx_data_size);
+
+    /* collection name */
+    string_code(&data, &offset, &alloc_size, name);
+
+    int idr_sz = offset;
+    idr->setIDR(idr_sz, data);
+    headerCode(type, idr_sz);
+#endif
+    return Success;
+  }
+
   Status Collection::create_realize(const RecMode *rcm)
   {
     if (status != Success)
@@ -1475,6 +1563,7 @@ namespace eyedb {
       if (s) return s;
     }
 
+#if 0
     Size wr_size = 0;
     unsigned char *temp = 0;
     Offset cache_offset = 0;
@@ -1482,7 +1571,12 @@ namespace eyedb {
       s = cache_compile(cache_offset, wr_size, &temp, rcm);
       if (s) return s;
     }
+#endif
 
+#ifdef INIT_IDR
+    assert(getIDR());
+    //init_idr();
+#else
     Size alloc_size = 0;
     Offset offset = IDB_OBJ_HEAD_SIZE;
 
@@ -1515,35 +1609,51 @@ namespace eyedb {
     int32_code (&data, &offset, &alloc_size, &zero);
   
     cardCode(data, offset, alloc_size);
+#endif
 
-    if (is_literal)
-      {
-	Object *o = get_master_object(master_object);
-	if (!inv_oid.isValid())
-	  inv_oid = o->getOid();
+    if (is_literal) {
+      Object *o = get_master_object(master_object);
+      if (!inv_oid.isValid())
+	inv_oid = o->getOid();
 
-	if (!o->getOid().isValid())
-	  return Exception::make(IDB_ERROR,
-				 "inner object of class '%s' containing "
-				 "collection of type '%s' has no valid oid",
-				 o->getClass()->getName(), getClass()->getName());
+      if (!o->getOid().isValid())
+	return Exception::make(IDB_ERROR,
+			       "inner object of class '%s' containing "
+			       "collection of type '%s' has no valid oid",
+			       o->getClass()->getName(), getClass()->getName());
 
-	assert(inv_oid == o->getOid());
-      }
+      assert(inv_oid == o->getOid());
+    }
+
+#ifdef INIT_IDR
+    Offset offset = inv_oid_offset;
+    assert(offset);
+    Size alloc_size = idr->getSize();
+    Data data = idr->getIDR();
 
     oid_code(&data, &offset, &alloc_size, inv_oid.getOid());
+
     int16_code(&data, &offset, &alloc_size, &inv_item);
 
-    if (db->getVersionNumber() >= 20414)
-      {
-	char c = is_literal;
-	/* is_literal */
-	char_code (&data, &offset, &alloc_size, &c);
-	eyedblib::int16 sz = idx_data_size;
-	int16_code (&data, &offset, &alloc_size, &sz);
-	buffer_code(&data, &offset, &alloc_size,
-		    idx_data, idx_data_size);
-      }
+    c = is_literal;
+    /* is_literal */
+    char_code (&data, &offset, &alloc_size, &c);
+    eyedblib::int16 sz = idx_data_size;
+    printf("IDX_DATA_SIZE = %d\n", idx_data_size);
+    int16_code (&data, &offset, &alloc_size, &sz);
+    buffer_code(&data, &offset, &alloc_size, idx_data, idx_data_size);
+#else
+    //printf("inv_oid_offset %d idx_data_size %d name %d ", offset, idx_data_size,  strlen(name));
+    oid_code(&data, &offset, &alloc_size, inv_oid.getOid());
+
+    int16_code(&data, &offset, &alloc_size, &inv_item);
+
+    c = is_literal;
+    /* is_literal */
+    char_code (&data, &offset, &alloc_size, &c);
+    eyedblib::int16 sz = idx_data_size;
+    int16_code (&data, &offset, &alloc_size, &sz);
+    buffer_code(&data, &offset, &alloc_size, idx_data, idx_data_size);
 
     /* collection name */
     string_code(&data, &offset, &alloc_size, name);
@@ -1551,7 +1661,11 @@ namespace eyedb {
     int idr_sz = offset;
     idr->setIDR(idr_sz, data);
     headerCode(type, idr_sz);
+    //printf("IDR size %d\n", idr_sz);
+    // -------------- end of IDR creation
+#endif
 
+    // -------------- begin of object creation
     RPCStatus rpc_status;
     //printf("collection create %s %s %d\n", getClass()->getName(), getClass()->getOid().toString(), getDataspaceID());
     rpc_status = objectCreate(db->getDbHandle(), getDataspaceID(), data, getOidC().getOid());
@@ -1569,9 +1683,21 @@ namespace eyedb {
       return Success;
     }
 
+    // -------------- end of object creation
+
     ObjectHeader hdr;
     memset(&hdr, 0, sizeof(hdr));
   
+#if 1
+    Size wr_size = 0;
+    unsigned char *temp = 0;
+    Offset cache_offset = 0;
+    if (!is_literal) {
+      s = cache_compile(cache_offset, wr_size, &temp, rcm);
+      if (s) return s;
+    }
+#endif
+
     if (wr_size) {
       short x = IDB_COLL_IMPL_UNCHANGED;
       int16_code(&temp, &cache_offset, &wr_size, &x);
@@ -1955,8 +2081,8 @@ namespace eyedb {
 
 #ifdef USE_VALUE_CACHE
     if (cache) {
-      ValueCache::ValueMapIterator begin = cache->getValueMap().begin();
-      ValueCache::ValueMapIterator end = cache->getValueMap().end();
+      ValueCache::IdMapIterator begin = cache->getIdMap().begin();
+      ValueCache::IdMapIterator end = cache->getIdMap().end();
 
       while (begin != end) {
 	item = (*begin).second;
@@ -1966,13 +2092,22 @@ namespace eyedb {
 
 	  int s = item->getState();
 
+#ifdef NEW_GET_ELEMENTS
+	  if (s == removed) {
+	    if (item_oid.isValid())
+	      oid_list->suppressOid(item_oid);
+	  }
+	  else if (s == added) {
+	    oid_list->insertOidLast(item_oid);
+	  }
+#else
 	  if (s == removed && item_oid.isValid())
 	    oid_list->suppressOid(item_oid);
 	  else if (s == added) {
 	    if (!item_oid.isValid() || !oid_list->exists(item_oid))
 	      oid_list->insertOidLast(item_oid);
 	  }
-	
+#endif
 	}
 	++begin;
       }
@@ -2070,8 +2205,8 @@ namespace eyedb {
 
 #ifdef USE_VALUE_CACHE
     if (cache) {
-      ValueCache::ValueMapIterator begin = cache->getValueMap().begin();
-      ValueCache::ValueMapIterator end = cache->getValueMap().end();
+      ValueCache::IdMapIterator begin = cache->getIdMap().begin();
+      ValueCache::IdMapIterator end = cache->getIdMap().end();
 
       while (begin != end) {
 	item = (*begin).second;
@@ -2081,7 +2216,8 @@ namespace eyedb {
 	  Oid item_oid = *v.oid;
 	  if (item_oid.isValid() && db) {
 	    Status s = db->loadObject(item_oid, item_o);
-	    if (s) return s; // what about garbage??
+	    if (s)
+	      return s; // what about garbage??
 	  }
 	}
 	else if (v.type == Value::tObject)
@@ -2092,13 +2228,20 @@ namespace eyedb {
 				 "found in Collection::getObjElementsRealize()");
 
 	int s = item->getState();
+
+#ifdef NEW_GET_ELEMENTS
 	if (s == removed)
 	  obj_list->suppressObject(item_o);
 	else if (s == added) {
-	  if (!obj_list->exists(item_o)) {
-	    obj_list->insertObjectLast(item_o);
-	    item_o->incrRefCount();
-	  }
+	  obj_list->insertObjectLast(item_o);
+	  item_o->incrRefCount();
+#else
+	if (s == removed)
+	  obj_list->suppressObject(item_o);
+	else if (s == added) {
+	  obj_list->insertObjectLast(item_o);
+	  item_o->incrRefCount();
+#endif
 	}
 	++begin;
       }
@@ -2202,7 +2345,9 @@ do { \
   {
     IDB_COLL_LOAD_DEFERRED();
 
-    if (read_cache.val_arr && read_cache_state_value == coherent)
+    if (read_cache.val_arr &&
+	read_cache_state_value == coherent &&
+	read_cache_state_index == index)
       return Success;
  
     delete read_cache.val_arr;
@@ -2224,7 +2369,8 @@ do { \
       if (s) return s;
     }
 
-    if (read_cache_state_value == coherent) {
+    if (read_cache_state_value == coherent &&
+	read_cache_state_index == index) {
       assert(CACHE_LIST_COUNT(cache) == 0);
       /*
       int idx = (index ? 1 : 0);
@@ -2235,17 +2381,54 @@ do { \
       return Success;
     }
 
-    // EV: 12/05/01: je n'ai pas l'impression que ce code
-    // fonctionne dans le cas ou index est true!
-    if (read_cache_state_value != coherent) {
+    if (read_cache_state_value != coherent ||
+	read_cache_state_index != index) {
       CollItem *item;
       ValueList *value_list = read_cache.val_arr->toList();
       
+      // IMPORTANT NOTICE 15/08/06
+      // Two bugs
+      // - does not work when index is true
+      // - the test 'if (!value_list->exists(item_value)' is not correct
+      //   in case of the collection contains duplicate elements (not sets,
+      //   but bags and arrays).
+      //   The exists method should deal with pointers and not values.
+      //   The problem is the same for getOidElements and getObjElements
+      //   Question : why do we need value_list in case of cache is not
+      //   coherent ?
+      // patchs for these bugs : #define NEW_GET_ELEMENTS
+
 #ifdef USE_VALUE_CACHE
       if (cache) {
-	ValueCache::ValueMapIterator begin = cache->getValueMap().begin();
-	ValueCache::ValueMapIterator end = cache->getValueMap().end();
+	ValueCache::IdMapIterator begin = cache->getIdMap().begin();
+	ValueCache::IdMapIterator end = cache->getIdMap().end();
 
+#ifdef NEW_GET_ELEMENTS
+	while (begin != end) {
+	  item = (*begin).second;
+	  const Value &item_value = item->getValue();
+	  
+	  int s = item->getState();
+	  if (s == removed) {
+	    /*
+	    if (index)
+	      value_list->suppressValue(Value((int)(*begin).first));
+	    value_list->suppressValue(item_value);
+	    */
+	    if (index)
+	      value_list->suppressPairValues(Value((int)(*begin).first),
+					     item_value);
+	    else
+	      value_list->suppressValue(item_value);
+	  }
+	  else if (s == added) {
+	    if (item_value.type == Value::tObject)
+	      item_value.o->incrRefCount();
+	    if (index)
+	      value_list->insertValueLast(Value((int)(*begin).first));
+	    value_list->insertValueLast(item_value);
+	  }
+#else
 	while (begin != end) {
 	  item = (*begin).second;
 	  const Value &item_value = item->getValue();
@@ -2260,6 +2443,7 @@ do { \
 	      value_list->insertValueLast(item_value);
 	    }
 	  }
+#endif
 	  ++begin;
 	}
       }
@@ -2284,6 +2468,7 @@ do { \
       delete value_list;
       
       read_cache_state_value = coherent;
+      read_cache_state_index = index;
     }
     
     if (index && (asCollArray() || asCollList()))
@@ -2454,11 +2639,11 @@ do { \
 
 #ifdef USE_VALUE_CACHE
     if (cache) {
-      ValueCache::ValueMapIterator begin = cache->getValueMap().begin();
-      ValueCache::ValueMapIterator end = cache->getValueMap().end();
+      ValueCache::IdMapIterator begin = cache->getIdMap().begin();
+      ValueCache::IdMapIterator end = cache->getIdMap().end();
 
-      begin = cache->getValueMap().begin();
-      end = cache->getValueMap().end();
+      begin = cache->getIdMap().begin();
+      end = cache->getIdMap().end();
 
       while (begin != end) {
 	item = (*begin).second;

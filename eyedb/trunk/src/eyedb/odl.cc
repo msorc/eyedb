@@ -2478,7 +2478,7 @@ namespace eyedb {
 				 False,  // compClassOwner
 				 False,  // compNum
 				 False,  // compName
-				 False)) // compInDepth
+				 True))  // inDepth
 	  odl_convert_attribute(m, cls, oattr, attr);
       }
       else if (upd_hints && upd_hints->type == odlUpdateHint::Convert)
@@ -2487,7 +2487,7 @@ namespace eyedb {
 			       False,  // compClassOwner
 			       False,  // compNum
 			       False,  // compName
-			       False)) // inDepth
+			       True))  // inDepth
 	odl_convert_attribute(m, cls, oattr, attr);
     }
 
@@ -3012,25 +3012,23 @@ namespace eyedb {
       return 0;
 
     odl_migrate_attributes(m, cls);
-    if (!ocls)
-      {
+    if (!ocls) {
 #ifndef NEW_REORDER
-	odl_add_class(m, cls);
+      odl_add_class(m, cls);
 #endif
-	return 0;
-      }
-
+      return 0;
+    }
+    
     // added 31/05/01
     if (agrspec == odl_Declare)
       return 0;
 
-    if (agrspec != odl_NativeClass)
-      {
-	odl_class_compare(m, ocls, cls, upd_hints);
-	if (odl_error)
-	  return 0;
-	odl_class_parent_compare(m, ocls, cls);
-      }
+    if (agrspec != odl_NativeClass) {
+      odl_class_compare(m, ocls, cls, upd_hints);
+      if (odl_error)
+	return 0;
+      odl_class_parent_compare(m, ocls, cls);
+    }
 
     const LinkedList *complist = cls->getCompList();
     const LinkedList *ocomplist = ocls->getCompList();
