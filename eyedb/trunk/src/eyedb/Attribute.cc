@@ -966,6 +966,10 @@ Attribute::compare(Database *db, const Attribute *item,
   if (!typmod.compare(&item->typmod))
     return False;
   
+  if (!cls) {
+    printf("OID: %s %p\n", oid_cl.toString(), db->getSchema()->getClass(oid_cl));
+  }
+
   if (!inDepth && isIndirect()) {
     if (!cls->compare_l(item->cls))
       return False;
@@ -1064,10 +1068,11 @@ Attribute::clean_realize(Schema *m, const Class *&xcls)
     xcls = m->getClass(xcls->getName());
     if (!xcls)
       return Exception::make(IDB_ATTRIBUTE_ERROR, "clean() error for "
-			     "attribute %s::%s",
+			     "attribute %s::%s (%s)",
 			     (class_owner ? class_owner->getName() :
 			      "<unknown>"),
-			     name);
+			     name,
+			     str.c_str());
   }
 
   return Success;

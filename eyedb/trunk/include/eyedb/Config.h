@@ -46,7 +46,7 @@ namespace eyedb {
        @param name
     */
 
-    Config::Config(const std::string &name);
+    Config(const std::string &name);
 
     /**
        Not yet documented.
@@ -54,7 +54,7 @@ namespace eyedb {
        @param var_map
     */
 
-    Config::Config(const std::string &name, const VarMap &var_map);
+    Config(const std::string &name, const VarMap &var_map);
 
     /**
        Not yet documented.

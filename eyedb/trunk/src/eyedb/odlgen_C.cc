@@ -1567,6 +1567,8 @@ do { \
 	generateSetMethod_C(own, ctx, True, hints);
 	generateGetMethod_C(own, ctx, True, hints, "");
       }
+    else if (cls->asCollectionClass())
+      generateCollGetMethod_C(own, ctx, True, hints, "");
 
     generateSetMethod_C(own, ctx, hints);
 

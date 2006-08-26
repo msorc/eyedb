@@ -1258,7 +1258,7 @@ namespace eyedb {
       coll = new CollSet(db, collname.c_str(), coll_class);
 
     else if (inv_item->cls->asCollBagClass()) {
-      printf("inverse: creating bag collection\n");
+      //printf("inverse: creating bag collection\n");
       coll = new CollBag(db, collname.c_str(), coll_class);
     }
 
@@ -1358,7 +1358,7 @@ namespace eyedb {
     eyedbsm::h2x_oid(&toid, new_obj_oid.getOid());
 
     if (obj_oid == inv_ctx.oid) {
-      printf("writing in idr %p\m", inv_ctx.idr);
+      //printf("writing in idr %p\n", inv_ctx.idr);
       //IDB_LOG(IDB_LOG_RELSHIP_DETAILS, ("writing oid on idr %p %p\n",
       //inv_ctx.idr, item->idr_poff));
       mcp(inv_ctx.idr+item->idr_poff, &toid, sizeof(Oid));

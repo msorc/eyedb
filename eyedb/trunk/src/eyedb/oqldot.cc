@@ -132,11 +132,18 @@ oqml_getclass(oqmlNode *node, Database *db, oqmlContext *ctx,
 	  return oqmlSuccess;
 	}
 
-      if (!OQML_ATOM_OIDVAL(a).isValid() && ctx->isWhereContext())
-	{
-	  *cls = 0;
-	  return oqmlSuccess;
-	}
+      if (!OQML_ATOM_OIDVAL(a).isValid() && ctx->isWhereContext()) {
+	*cls = 0;
+	return oqmlSuccess;
+      }
+
+      /*
+      // 9/07/06
+      if (!OQML_ATOM_OIDVAL(a).isValid()) {
+	*cls = 0;
+	return oqmlSuccess;
+      }
+      */
 
       Status is = db->getObjectClass(OQML_ATOM_OIDVAL(a), *cls);
       if (is)
@@ -160,11 +167,18 @@ oqml_getclass(oqmlNode *node, Database *db, oqmlContext *ctx,
     }
  
   // added 28/02/00
-  if ((OQML_IS_NULL(a) || a->as_nil()) && ctx->isWhereContext())
-    {
-      *cls = 0;
-      return oqmlSuccess;
-    }
+  if ((OQML_IS_NULL(a) || a->as_nil()) && ctx->isWhereContext()) {
+    *cls = 0;
+    return oqmlSuccess;
+  }
+
+  /*
+  // 9/07/06
+  if (OQML_IS_NULL(a) || a->as_nil()) {
+    *cls = 0;
+    return oqmlSuccess;
+  }
+  */
 
   if (a)
     {
@@ -1449,6 +1463,12 @@ oqmlDotContext::eval(Database *db, oqmlContext *ctx, oqmlAtom *atom,
   if ((OQML_IS_NULL(atom) || atom->as_nil()) && ctx->isWhereContext())
     return oqmlSuccess;
   // ...
+
+  /*
+  // added 9/07/06
+  if (OQML_IS_NULL(atom) || atom->as_nil())
+    return oqmlSuccess;
+  */
 
   return oqmlStatus::expected(dot, "oid or struct", atom->type.getString());
 }

@@ -147,7 +147,7 @@ namespace eyedb {
     Bool value_read;
     SchemaInfo *schema_info;
     Status getResult();
-    void OQL::init(Connection *, Database *, const char *);
+    void init(Connection *, Database *, const char *);
     void log_result() const;
 
   public: /* restricted */

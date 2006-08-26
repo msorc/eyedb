@@ -79,7 +79,7 @@ public:
 			  oql_select_log_ctl_var);
   }
 
-  static oqmlStatus *SelectLog::init(oqmlNode *node, oqmlContext *ctx) {
+  static oqmlStatus *init(oqmlNode *node, oqmlContext *ctx) {
     if (ctx->getHiddenSelectContextCount())
       return oqmlSuccess;;
 
@@ -113,7 +113,7 @@ public:
     return oqmlSuccess;
   }
 
-  static void SelectLog::append(const std::string &str) {
+  static void append(const std::string &str) {
     oql_select_log->as_string()->set((std::string(OQML_ATOM_STRVAL(oql_select_log)) + str).c_str());
   }
 };

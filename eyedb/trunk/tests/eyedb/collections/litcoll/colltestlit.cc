@@ -245,10 +245,10 @@ realize(Database &db)
   test_N_1(db);
   printf("end> ");
   getchar();
+  */
   test_1_Na(db);
   test_1_Nb(db);
   test_1_Nc(db);
-  */
 }
 
 int

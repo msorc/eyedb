@@ -396,9 +396,11 @@ namespace eyedb {
   private:
     Collection::State read_cache_state_oid, read_cache_state_object,
       read_cache_state_value;
+    Bool read_cache_state_index;
     Bool inverse_valid;
     virtual Status cache_compile(Offset &, Size&, unsigned char **, const RecMode *);
     void _init(const IndexImpl *);
+    Status init_idr();
     virtual const char *getClassName() const = 0;
     friend class CollectionPeer;
 
@@ -411,6 +413,7 @@ namespace eyedb {
     Status update();
     void literalMake(Collection *o);
     std::string getStringType() const;
+    Offset inv_oid_offset;
 
     // ----------------------------------------------------------------------
     // Collection Restricted Access (conceptually private)

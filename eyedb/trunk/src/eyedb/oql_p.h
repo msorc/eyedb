@@ -869,9 +869,9 @@ namespace eyedb {
     static void add(char *);
     static unsigned int getCount() {return count;}
 
-    static void oqmlGarbManager::garbage(gbLink *l, bool full = false);
-    static gbContext *oqmlGarbManager::peek();
-    static void oqmlGarbManager::garbage(gbContext *ctx);
+    static void garbage(gbLink *l, bool full = false);
+    static gbContext *peek();
+    static void garbage(gbContext *ctx);
   };
 
   class oqml_Location {

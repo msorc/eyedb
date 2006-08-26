@@ -11,7 +11,7 @@ stage->clone_link_counts_at(n) raises an exception when it should return null
 (see Eric's email 05/07/06 23:41).
 -> must check Oid of array before getByInd
 
-one should add a argument eyedb::Bool *found in retrieveAt()
+one should add an optional argument eyedb::Bool *found in retrieveAt()
 if (found) -> does not throw exception, *found = True or False
 if (!found) -> throws exception when not found
 => must changed odl -gencode C++
@@ -35,5 +35,4 @@ Litteral collections :
  "retrieveAt(int n, Object &*)"(see Eric's email 06/07/06 19:12)
 
 - make litteral collections of sets array<set<X *> > works properly
-
 

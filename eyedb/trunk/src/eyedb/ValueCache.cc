@@ -25,8 +25,11 @@
 #include "eyedb_p.h"
 #include "ValueCache.h"
 #include <assert.h>
+#include <iostream>
 
 namespace eyedb {
+
+  Collection::ItemId ValueCache::DefaultItemID = ~0;
 
   ValueItem::ValueItem(Object *o, const Value &v,
 		       Collection::ItemId id, int state) :
@@ -52,6 +55,7 @@ namespace eyedb {
 
   void ValueItem::setState(int _state)
   {
+    printf("setting state %d of %s\n", _state, v.getString());
     if (state == _state)
       return;
 
@@ -69,11 +73,15 @@ namespace eyedb {
 
   ValueCache::ValueCache(Object *o) : o(o) 
   {
+    current_id = 0;
   }
 
   Status
   ValueCache::insert(const Value &v, Collection::ItemId id, int state) 
   {
+    if (id == DefaultItemID)
+      id = current_id++;
+
     ValueItem *item = new ValueItem(o, v, id, state);
     item->incRef();
 
@@ -168,6 +176,7 @@ namespace eyedb {
   Status
   ValueCache::setState(int state)
   {
+    /*
     std::map<Value, ValueItem *>::iterator val_begin = val_map.begin();
     std::map<Value, ValueItem *>::iterator val_end = val_map.end();
 
@@ -175,7 +184,51 @@ namespace eyedb {
       (*val_begin).second->setState(state);
       ++val_begin;
     }
+    */
+
+    std::map<Collection::ItemId, ValueItem *>::iterator id_begin = id_map.begin();
+    std::map<Collection::ItemId, ValueItem *>::iterator id_end = id_map.end();
+
+    while (id_begin != id_end) {
+      if (state == Collection::removed &&
+	  (*id_begin).second->getState() == Collection::added) {
+	id_map.erase(id_begin);
+      }
+      else
+	(*id_begin).second->setState(state);
+      ++id_begin;
+    }
+
     return Success;
+  }
+
+  void
+  ValueCache::trace()
+  {
+    std::cout << "ValueMap (" << val_map.size() << "):\n";
+    /*
+    std::map<Value, ValueItem *>::iterator val_begin = val_map.begin();
+    std::map<Value, ValueItem *>::iterator val_end = val_map.end();
+
+    while (val_begin != val_end) {
+      std::cout << (*val_begin).second->getValue()
+		<< " (" << (*val_begin).second->getState()
+		<< ")\n";
+      ++val_begin;
+    }
+    */
+
+    std::map<Collection::ItemId, ValueItem *>::iterator id_begin = id_map.begin();
+    std::map<Collection::ItemId, ValueItem *>::iterator id_end = id_map.end();
+
+    std::cout << "IdMap (" << id_map.size() << "):\n";
+    while (id_begin != id_end) {
+      std::cout << "[" << (*id_begin).first << "] "
+		<< (*id_begin).second->getValue()
+		<< " {state=" << (*id_begin).second->getState()
+		<< "}\n";
+      ++id_begin;
+    }
   }
 
   ValueItem *ValueCache::get(Data data, Size item_size)

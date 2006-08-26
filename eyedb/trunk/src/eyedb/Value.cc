@@ -1200,11 +1200,31 @@ ValueList::suppressValue(const Value &value)
   LinkedListCursor c(list);
   Value *xvalue;
   while (c.getNext((void *&)xvalue))
-    if (*xvalue == value)
-      {
-	list->deleteObject(xvalue);
-	return True;
-      }
+    if (*xvalue == value) {
+      list->deleteObject(xvalue);
+      return True;
+    }
+
+  return False;
+}
+
+Bool
+ValueList::suppressPairValues(const Value &value1, const Value &value2)
+{
+  LinkedListCursor c(list);
+  int cnt = list->getCount();
+
+  for (int n = 0; n < cnt; n += 2) {
+    Value *xvalue1, *xvalue2;
+    assert(c.getNext((void *&)xvalue1));
+    assert(c.getNext((void *&)xvalue2));
+
+    if (value1 == *xvalue1 && value2 == *xvalue2) {
+      list->deleteObject(xvalue1);
+      list->deleteObject(xvalue2);
+      return True;
+    }
+  }
 
   return False;
 }

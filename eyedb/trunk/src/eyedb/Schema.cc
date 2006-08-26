@@ -460,9 +460,16 @@ namespace eyedb {
     //  hash = (SchemaHashTable *)0;
   }
 
+  //#define BUG_TRACE
+
   Status Schema::addClass_nocheck(Class *mc, Bool atall)
   {
-    assert(!mc->isRemoved());
+    if (mc->isRemoved()) {
+#ifdef BUG_TRACE
+      printf("%d adding class %s %s %p\n", getpid(), mc->getName(), mc->getOid().toString(), mc);
+#endif
+      assert(!mc->isRemoved());
+    }
     /*
       printf("adding class %s %s %p\n", mc->getName(), mc->getOid().toString(),
       mc);
@@ -1213,24 +1220,29 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
     printf("class %s is deferred %s %p\n", cl->getName(), cl->getOid().getString(),
 	   cl);
 #endif
+#ifdef BUG_TRACE
+    printf("isRemoved %d %p %s\n", cl->isRemoved(), cl, cl->getName());
+#endif
     cl->setPartiallyLoaded(False);
 
     Class *clx;
     Status s = db->loadObject(cl->getOid(), (Object *&)clx);
     if (s) return s;
 
+#ifdef BUG_TRACE
+    printf("isRemoved2 %d %p %s\n", clx->isRemoved(), clx, clx->getName());
+#endif
 #ifdef OPTOPEN_TRACE
     printf("clx %s -> %d [clx => %p == %p?\n",
 	   clx->getName(), clx->getAttributesCount(), clx, cl);
 #endif
-    if (cl != clx)
-      {
-	s = cl->loadComplete(clx);
-	if (s) return s;
-	s = cl->attrsComplete();
-	if (s) return s;
-	clx->release();
-      }
+    if (cl != clx) {
+      s = cl->loadComplete(clx);
+      if (s) return s;
+      s = cl->attrsComplete();
+      if (s) return s;
+      clx->release();
+    }
 
 #ifdef OPTOPEN_TRACE
     printf("Returning %p %s cnt=%d\n",

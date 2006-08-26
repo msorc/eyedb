@@ -26,17 +26,74 @@
 
 namespace eyedb {
 
-int CollectionPeer::coherent = Collection::coherent,
-CollectionPeer::added = Collection::added,
-CollectionPeer::removed = Collection::removed;
+  int CollectionPeer::coherent = Collection::coherent,
+    CollectionPeer::added = Collection::added,
+    CollectionPeer::removed = Collection::removed;
 
-CollSet *CollectionPeer::collSet(const char *name,
+  CollSet *CollectionPeer::collSet(const char *name,
+				   const IndexImpl *idximpl)
+  {
+    return new CollSet(name, 0, True, idximpl);
+  }
+
+  CollSet *CollectionPeer::collSet(const char *name, Class *cls,
+				   const Oid& idx1_oid,
+				   const Oid& idx2_oid, int icnt,
+				   int bottom, int top,
+				   const IndexImpl *idximpl,
+				   Object *card,
+				   Bool is_literal,
+				   Data idx_data, Size idx_data_size)
+  {
+    return new CollSet(name, cls, idx1_oid, idx2_oid, icnt,
+		       bottom, top, idximpl, card, is_literal, idx_data, idx_data_size);
+  }
+
+  CollBag *CollectionPeer::collBag(const char *name,
+				   const IndexImpl *idximpl)
+  {
+    return new CollBag(name, 0, True, idximpl);
+  }
+
+  CollBag *CollectionPeer::collBag(const char *name, Class *cls,
+				   const Oid& idx1_oid,
+				   const Oid& idx2_oid, int icnt,
+				   int bottom, int top,
+				   const IndexImpl *idximpl,
+				   Object *card,
+				   Bool is_literal,
+				   Data idx_data, Size idx_data_size)
+  {
+    return new CollBag(name, cls, idx1_oid, idx2_oid, icnt,
+		       bottom, top, idximpl, card, is_literal, idx_data, idx_data_size);
+  }
+
+  CollList *CollectionPeer::collList(const char *name,
+				     const IndexImpl *idximpl)
+  {
+    return new CollList(name, 0, True, idximpl);
+  }
+
+  CollList *CollectionPeer::collList(const char *name, Class *cls,
+				     const Oid& idx1_oid,
+				     const Oid& idx2_oid, int icnt,
+				     int bottom, int top,
+				     const IndexImpl *idximpl,
+				     Object *card,
+				     Bool is_literal,
+				     Data idx_data, Size idx_data_size)
+  {
+    return new CollList(name, cls, idx1_oid, idx2_oid, icnt,
+			bottom, top, idximpl, card, is_literal, idx_data, idx_data_size);
+  }
+
+  CollArray *CollectionPeer::collArray(const char *name,
 				       const IndexImpl *idximpl)
-{
-  return new CollSet(name, 0, True, idximpl);
-}
+  {
+    return new CollArray(name, 0, True, idximpl);
+  }
 
-CollSet *CollectionPeer::collSet(const char *name, Class *cls,
+  CollArray *CollectionPeer::collArray(const char *name, Class *cls,
 				       const Oid& idx1_oid,
 				       const Oid& idx2_oid, int icnt,
 				       int bottom, int top,
@@ -44,83 +101,26 @@ CollSet *CollectionPeer::collSet(const char *name, Class *cls,
 				       Object *card,
 				       Bool is_literal,
 				       Data idx_data, Size idx_data_size)
-{
-  return new CollSet(name, cls, idx1_oid, idx2_oid, icnt,
-			bottom, top, idximpl, card, is_literal, idx_data, idx_data_size);
-}
-
-CollBag *CollectionPeer::collBag(const char *name,
-				       const IndexImpl *idximpl)
-{
-  return new CollBag(name, 0, True, idximpl);
-}
-
-CollBag *CollectionPeer::collBag(const char *name, Class *cls,
-				       const Oid& idx1_oid,
-				       const Oid& idx2_oid, int icnt,
-				       int bottom, int top,
-				       const IndexImpl *idximpl,
-				       Object *card,
-				       Bool is_literal,
-				       Data idx_data, Size idx_data_size)
-{
-  return new CollBag(name, cls, idx1_oid, idx2_oid, icnt,
-			bottom, top, idximpl, card, is_literal, idx_data, idx_data_size);
-}
-
-CollList *CollectionPeer::collList(const char *name,
-					 const IndexImpl *idximpl)
-{
-  return new CollList(name, 0, True, idximpl);
-}
-
-CollList *CollectionPeer::collList(const char *name, Class *cls,
-					 const Oid& idx1_oid,
-					 const Oid& idx2_oid, int icnt,
-					 int bottom, int top,
-					 const IndexImpl *idximpl,
-					 Object *card,
-					 Bool is_literal,
-					 Data idx_data, Size idx_data_size)
-{
-  return new CollList(name, cls, idx1_oid, idx2_oid, icnt,
+  {
+    return new CollArray(name, cls, idx1_oid, idx2_oid, icnt,
 			 bottom, top, idximpl, card, is_literal, idx_data, idx_data_size);
-}
+  }
 
-CollArray *CollectionPeer::collArray(const char *name,
-					   const IndexImpl *idximpl)
-{
-  return new CollArray(name, 0, True, idximpl);
-}
+  void CollectionPeer::setLock(Collection *coll, Bool locked)
+  {
+    coll->locked = locked;
+  }
 
-CollArray *CollectionPeer::collArray(const char *name, Class *cls,
-					   const Oid& idx1_oid,
-					   const Oid& idx2_oid, int icnt,
-					   int bottom, int top,
-					   const IndexImpl *idximpl,
-					   Object *card,
-					   Bool is_literal,
-					   Data idx_data, Size idx_data_size)
-{
-  return new CollArray(name, cls, idx1_oid, idx2_oid, icnt,
-			  bottom, top, idximpl, card, is_literal, idx_data, idx_data_size);
-}
+  void CollectionPeer::setInvOid(Collection *coll, const Oid& inv_oid,
+				 int inv_item)
+  {
+    coll->inv_oid = inv_oid;
+    coll->inv_item = inv_item;
+  }
 
-void CollectionPeer::setLock(Collection *coll, Bool locked)
-{
-  coll->locked = locked;
-}
-
-void CollectionPeer::setInvOid(Collection *coll, const Oid& inv_oid,
-				  int inv_item)
-{
-  coll->inv_oid = inv_oid;
-  coll->inv_item = inv_item;
-}
-
-Bool CollectionPeer::isLocked(Collection *coll)
-{
-  Database *db = coll->getDatabase();
-  return IDBBOOL(coll->locked && (!db || !(db->getOpenFlag() & _DBAdmin)));
-}
+  Bool CollectionPeer::isLocked(Collection *coll)
+  {
+    Database *db = coll->getDatabase();
+    return IDBBOOL(coll->locked && (!db || !(db->getOpenFlag() & _DBAdmin)));
+  }
 }

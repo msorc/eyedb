@@ -27,6 +27,10 @@
 #include <assert.h>
 #include "AttrNative.h"
 
+// 15/08/06 : does not raise an exception when itemid in retrieveAt is
+// out of range
+#define NO_EXC_WHEN_OUT_OF_RANGE
+
 /* CollArray */
 
 namespace eyedb {
@@ -204,7 +208,8 @@ namespace eyedb {
 
     cache->insert(item_oid, id, added);
 
-    if (id >= top) top = id+1;
+    if (id >= top)
+      top = id+1;
 
     return Success;
   }
@@ -217,6 +222,8 @@ namespace eyedb {
     if (!isref) {
       Status s = check(item_o, IDB_COLLECTION_INSERT_ERROR);
       if (s) return s;
+      if (!item_o->getIDR())
+	return Exception::make(IDB_COLLECTION_INSERT_ERROR, "%s object IDR is not allocated", item_o->getClass()->getName());
       return insertAt_p(id, item_o->getIDR() + IDB_OBJ_HEAD_SIZE);
     }
 
@@ -242,7 +249,8 @@ namespace eyedb {
 
     cache->insert(item_o, id, added);
 
-    if (id >= top) top = id+1;
+    if (id >= top)
+      top = id+1;
 
     return Success;
   }
@@ -281,7 +289,8 @@ namespace eyedb {
     cache->insert(item_data, id, added);
 #endif
 
-    if (id >= top) top = id+1;
+    if (id >= top)
+      top = id+1;
 
     return Success;
   }
@@ -312,49 +321,50 @@ namespace eyedb {
     CollItem *item;
     IDB_COLL_LOAD_DEFERRED();
     touch();
-    if (cache && (item = cache->get(id)))
-	{
-	  int s = item->getState();
-	  if (s == removed)
-	    return Exception::make(IDB_COLLECTION_SUPPRESS_ERROR, "item index %d is already suppressed", id);
-	  else if (s == coherent)
-	    item->setState(removed);
-	  else if (s == added)
-	    {
-	      if (isref)
-		{
-		  cache->suppressOid(item);
-		  cache->suppressObject(item);
-		}
-	      else
-		cache->suppressData(item);
-	    }
-
-	  v_items_cnt--;
-	  return Success;
+    if (cache && (item = cache->get(id))) {
+      int s = item->getState();
+      if (s == removed)
+	return Exception::make(IDB_COLLECTION_SUPPRESS_ERROR, "item index %d is already suppressed", id);
+      else if (s == coherent)
+	item->setState(removed);
+      else if (s == added) {
+	if (isref) {
+	  cache->suppressOid(item);
+	  cache->suppressObject(item);
 	}
-      
-    int f;
-      
-    RPCStatus rpc_status;
-
-    unsigned char *item_data = (unsigned char *)malloc(item_size);
-    rpc_status = collectionGetByInd(db->getDbHandle(), getOidC().getOid(),
-					id, &f, item_data, item_size);
-
-    if (!f)
-      {
-	free(item_data);
-	return Exception::make(IDB_COLLECTION_SUPPRESS_ERROR, "no item found at index %d in collection '%s' [%s]", id, name, oid.getString());
+	else
+	  cache->suppressData(item);
       }
+
+      v_items_cnt--;
+      if (top == id+1)
+	top--;
+      return Success;
+    }
+      
+    int f = 0;
+      
+    unsigned char *item_data = (unsigned char *)malloc(item_size);
+
+    if (getOidC().isValid()) {
+      RPCStatus rpc_status;
+      rpc_status = collectionGetByInd(db->getDbHandle(), getOidC().getOid(),
+				      id, &f, item_data, item_size);
+      if (rpc_status)
+	return StatusMake(rpc_status);
+    }
+
+    if (!f) {
+      free(item_data);
+      return Exception::make(IDB_COLLECTION_SUPPRESS_ERROR, "no item found at index %d in collection '%s' [%s]", id, name, oid.getString());
+    }
 
     create_cache();
-    if (isref)
-      {
-	Oid toid;
-	memcpy(&toid, item_data, sizeof(Oid));
-	cache->insert(toid, id, removed);
-      }
+    if (isref) {
+      Oid toid;
+      memcpy(&toid, item_data, sizeof(Oid));
+      cache->insert(toid, id, removed);
+    }
 #ifdef USE_VALUE_CACHE
     else
       cache->insert(Value(item_data, item_size), id, removed);
@@ -365,7 +375,8 @@ namespace eyedb {
 
     v_items_cnt--;
 
-    return StatusMake(IDB_COLLECTION_SUPPRESS_ERROR, rpc_status);
+    //return StatusMake(IDB_COLLECTION_SUPPRESS_ERROR, rpc_status);
+    return Success;
   }
 
   Status CollArray::retrieveAt(Collection::ItemId id, Oid &item_oid) const
@@ -373,10 +384,17 @@ namespace eyedb {
     if (status)
       return Exception::make(status);
 
+#ifdef NO_EXC_WHEN_OUT_OF_RANGE
+    if (id < getBottom() || id >= getTop()) {
+      item_oid.invalidate();
+      return Success;
+    }
+#else
     if (id < getBottom() || id >= getTop())
       return Exception::make(IDB_COLLECTION_ERROR,
 			     "index out of range #%d for collection array",
 			     id, oid.toString());
+#endif
     CollItem *item;
 
     if (cache && (item = cache->get(id)))
@@ -399,11 +417,10 @@ namespace eyedb {
 	  return Success;
 	}
       
-    if (!getOidC().isValid())
-      {
-	item_oid.invalidate();
-	return Success;
-      }
+    if (!getOidC().isValid()) {
+      item_oid.invalidate();
+      return Success;
+    }
 
     int found;
     RPCStatus rpc_status;
@@ -420,7 +437,8 @@ namespace eyedb {
     else
       item_oid.invalidate();
 
-    return StatusMake(IDB_COLLECTION_IS_IN_ERROR, rpc_status);
+    //return StatusMake(IDB_COLLECTION_IS_IN_ERROR, rpc_status);
+    return Success;
   }
 
   Status CollArray::retrieveAt(Collection::ItemId id, Object* &o, const RecMode *rcm) const
@@ -428,10 +446,17 @@ namespace eyedb {
     if (status)
       return Exception::make(status);
 
+#ifdef NO_EXC_WHEN_OUT_OF_RANGE
+    if (id < getBottom() || id >= getTop()) {
+      o = 0;
+      return Success;
+    }
+#else
     if (id < getBottom() || id >= getTop())
       return Exception::make(IDB_COLLECTION_ERROR,
 			     "index out of range #%d for collection array",
 			     id, oid.toString());
+#endif
 
     CollItem *item;
     Oid item_oid;
@@ -476,15 +501,17 @@ namespace eyedb {
 	  return Success;
 	}
       
-    int found;
-    RPCStatus rpc_status;
+    int found = 0;
 
-    rpc_status = collectionGetByInd(db->getDbHandle(), getOidC().getOid(),
-					id, &found, (Data)item_oid.getOid(),
-					sizeof(eyedbsm::Oid));
+    if (getOidC().isValid()) {
+      RPCStatus rpc_status;
+      rpc_status = collectionGetByInd(db->getDbHandle(), getOidC().getOid(),
+				      id, &found, (Data)item_oid.getOid(),
+				      sizeof(eyedbsm::Oid));
 
-    if (rpc_status)
-      return StatusMake(rpc_status);
+      if (rpc_status)
+	return StatusMake(rpc_status);
+    }
 
     if (found)
       decode((Data)item_oid.getOid());
@@ -505,10 +532,17 @@ namespace eyedb {
     if (status)
       return Exception::make(status);
 
+#ifdef NO_EXC_WHEN_OUT_OF_RANGE
+    if (id < getBottom() || id >= getTop()) {
+      memset(data, 0, size);
+      return Success;
+    }
+#else
     if (id < getBottom() || id >= getTop())
       return Exception::make(IDB_COLLECTION_ERROR,
 			     "index out of range #%d for collection array",
 			     id, oid.toString());
+#endif
 
     if (size == defaultSize)
       size = item_size;
