@@ -1,7 +1,7 @@
 #!/bin/bash
 
 usage() {
-    echo "Usage: `basename $0` TOPIC"
+    echo "Usage: `basename $0` {<topic>}"
 }
 
 full_date() {
@@ -23,14 +23,17 @@ user_full_name() {
 }
 
 make_topic_directory() {
-    [ ! -d $TOPIC_DIR ] && ( mkdir $TOPIC_DIR ; echo "Created directory $TOPIC_DIR")
+    if [ -d $TOPIC_DIR ] ; then return 0; fi
+    mkdir -p $TOPIC_DIR #; echo "Created directory $TOPIC_DIR"
+    mkdir $TOPIC_DIR/doc 
+    return 1
 }
 
 generate_topic_makefile_am() {
     FILE=$TOPIC_DIR/Makefile.am
     backup_file $FILE
-    sed -e "s/@TOPIC@/$TOPIC/g" < $TOPDIR/scripts/template/Makefile.am > $FILE
-    echo "Generated $FILE"
+    sed -e "s'@TOPIC@'$TOPIC'g" < $TOPDIR/scripts/template/Makefile.am > $FILE
+#    echo "Generated $FILE"
 }
 
 generate_topic_changelog() {
@@ -41,11 +44,11 @@ generate_topic_changelog() {
 	echo
 	echo -e '\t* Added topic '$TOPIC
 	echo ) > $FILE
-    echo "Generated $FILE"
+#    echo "Generated $FILE"
 }
 
 update_makefile_am() {
-    FILE=$TOPDIR/src/Makefile.am
+    FILE=$TOPDIR/$TOPICROOT/Makefile.am
     backup_file $FILE
     awk '
 BEGIN { topic = "'$TOPIC'"; a[topic] = topic; }
@@ -54,14 +57,14 @@ BEGIN { topic = "'$TOPIC'"; a[topic] = topic; }
 END { print "SUBDIRS=\\"; n = asort(a); for (i = 1; i < n; i++) print( a[i]" \\"); print( a[n]); }
 ' $FILE > $FILE.out
     mv $FILE.out $FILE
-    echo "Updated $FILE"
+#    echo "Updated $FILE"
 }
 
 update_configure_in() {
     FILE=$TOPDIR/configure.in
     backup_file $FILE
     awk '
-BEGIN {topic = "'$TOPIC'";  in_ac_output = 0; s = "src/"topic"/Makefile"; a[s] = s; }
+BEGIN {topic = "'$TOPIC'";  in_ac_output = 0; s = "'$TOPICROOT'/" topic "/Makefile"; a[s] = s; }
 in_ac_output == 0 && ! ($1 ~ /AC_OUTPUT/) { print; }
 in_ac_output == 0 && $1 ~ /AC_OUTPUT/ { print; in_ac_output = 1; }
 in_ac_output == 1 && ! ($1 ~ /)/) && ! ($1 ~ /AC_OUTPUT/) && NF > 0 { a[$1] = $1; }
@@ -72,7 +75,7 @@ in_ac_output == 1 && $1 ~ /)/ {
 }
 ' $FILE > $FILE.out
     mv $FILE.out $FILE
-    echo "Updated $FILE"
+#    echo "Updated $FILE"
 }
 
 update_changelog() {
@@ -90,20 +93,31 @@ $DATE `user_full_name`
 w
 q
 EOF
-    echo "Updated $FILE"
+#    echo "Updated $FILE"
 }
 
 if [ $# -eq 0 ] ; then usage $*; exit 2; fi
 
 TOPDIR=`dirname $0`/..
 TOPDIR=`(cd $TOPDIR; pwd)`
+TOPICROOT=src
 
-TOPIC=$1
-TOPIC_DIR=$TOPDIR/src/$1
+for topic in $*
+do
+  TOPIC=$topic
+  TOPIC_DIR=$TOPDIR/$TOPICROOT/$topic
 
-make_topic_directory 
-generate_topic_makefile_am 
-generate_topic_changelog 
-update_makefile_am 
-update_configure_in 
-update_changelog 
+  if make_topic_directory 
+  then
+    echo "Topic $topic already exists"
+    continue
+  fi
+
+  echo "Generating topic $topic"
+
+  generate_topic_makefile_am 
+  generate_topic_changelog 
+  update_makefile_am 
+  update_configure_in 
+  update_changelog 
+done
