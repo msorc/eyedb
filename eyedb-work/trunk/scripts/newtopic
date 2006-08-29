@@ -4,10 +4,6 @@ usage() {
     echo "Usage: `basename $0` {<topic>}"
 }
 
-full_date() {
-    date "+%Y-%m-%d %H:%M"
-}
-
 backup_file_aux() {
     if [ $2 -ge 2 ] ; then return 0; fi
     if [ -f $1.backup ] ; then backup_file_aux $1.backup `expr $2 + 1` ; fi
@@ -16,6 +12,10 @@ backup_file_aux() {
 
 backup_file() {
     backup_file_aux $1 0
+}
+
+full_date() {
+    date "+%Y-%m-%d %H:%M"
 }
 
 user_full_name() {
@@ -31,25 +31,20 @@ make_topic_directory() {
 
 generate_topic_makefile_am() {
     FILE=$TOPIC_DIR/Makefile.am
-    backup_file $FILE
     sed -e "s'@TOPIC@'$TOPIC'g" < $TOPDIR/scripts/template/Makefile.am > $FILE
-#    echo "Generated $FILE"
 }
 
 generate_topic_changelog() {
     FILE=$TOPIC_DIR/ChangeLog
-    backup_file $FILE
     ( \
 	echo `full_date` `user_full_name`
 	echo
 	echo -e '\t* Added topic '$TOPIC
 	echo ) > $FILE
-#    echo "Generated $FILE"
 }
 
 update_makefile_am() {
     FILE=$TOPDIR/$TOPICROOT/Makefile.am
-    backup_file $FILE
     awk '
 BEGIN { topic = "'$TOPIC'"; a[topic] = topic; }
 /SUBDIRS=/ { }
@@ -57,12 +52,10 @@ BEGIN { topic = "'$TOPIC'"; a[topic] = topic; }
 END { print "SUBDIRS=\\"; n = asort(a); for (i = 1; i < n; i++) print( a[i]" \\"); print( a[n]); }
 ' $FILE > $FILE.out
     mv $FILE.out $FILE
-#    echo "Updated $FILE"
 }
 
 update_configure_in() {
     FILE=$TOPDIR/configure.in
-    backup_file $FILE
     awk '
 BEGIN {topic = "'$TOPIC'";  in_ac_output = 0; s = "'$TOPICROOT'/" topic "/Makefile"; a[s] = s; }
 in_ac_output == 0 && ! ($1 ~ /AC_OUTPUT/) { print; }
@@ -75,13 +68,11 @@ in_ac_output == 1 && $1 ~ /)/ {
 }
 ' $FILE > $FILE.out
     mv $FILE.out $FILE
-#    echo "Updated $FILE"
 }
 
 update_changelog() {
     FILE=$TOPDIR/ChangeLog
     touch $FILE
-    backup_file $FILE 
     DATE=`full_date`
     ed $FILE > /dev/null 2>&1 <<EOF
 1i
@@ -93,14 +84,23 @@ $DATE `user_full_name`
 w
 q
 EOF
-#    echo "Updated $FILE"
+}
+
+generate_topic() {
+  echo "Generating topic $topic"
+
+  generate_topic_makefile_am 
+  generate_topic_changelog 
+  update_makefile_am 
+  update_configure_in 
+  update_changelog 
 }
 
 if [ $# -eq 0 ] ; then usage $*; exit 2; fi
 
 TOPDIR=`dirname $0`/..
 TOPDIR=`(cd $TOPDIR; pwd)`
-TOPICROOT=src
+TOPICROOT=topics
 
 for topic in $*
 do
@@ -113,11 +113,5 @@ do
     continue
   fi
 
-  echo "Generating topic $topic"
-
-  generate_topic_makefile_am 
-  generate_topic_changelog 
-  update_makefile_am 
-  update_configure_in 
-  update_changelog 
+  generate_topic
 done
