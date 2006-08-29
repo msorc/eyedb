@@ -1,6 +1,6 @@
 #!/bin/bash
 set -x
-[ ! -d config/ ] || mkdir config/
+[ ! -d config/ ] && echo mkdir config/
 aclocal
 # On Mac OS X, libtoolize is named glibtoolize
 libtoolize --force --automake --copy || glibtoolize --force --automake --copy
