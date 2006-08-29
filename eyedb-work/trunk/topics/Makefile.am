@@ -1,2 +1,1 @@
-SUBDIRS=\
-alpha
+SUBDIRS=

@@ -2,12 +2,13 @@
 # Editable part
 
 # Binaries
+# Example:
+# TOPIC_BINARY_FILES = test1
 TOPIC_BINARY_FILES = 
 
 # For each binary listed in $(TOPIC_BINARY_FILES) add the following line:
 # <<BINARY_FILE>>_SOURCES=<<list of all C++ source files>>
 # Example:
-# TOPIC_BINARY_FILES = test1
 # test1_SOURCES = test1.cc
 
 # Java files (excluding the .java files generated from odl)
@@ -37,7 +38,8 @@ TOPIC = @TOPIC@
 #
 TOPIC_ODL_NO_SUFFIX=$(subst .odl,,$(TOPIC_ODL_FILE))
 BUILT_SOURCES= $(if $(TOPIC_ODL_FILE),$(TOPIC_ODL_NO_SUFFIX).cc $(TOPIC_ODL_NO_SUFFIX).h $(TOPIC_ODL_NO_SUFFIX)/Database.java,)
-CLEANFILES=$(BUILT_SOURCES)
+OTHER_BUILD_FILES=$(if $(TOPIC_ODL_FILE),$(TOPIC_ODL_NO_SUFFIX)mthbe-skel.cc $(TOPIC_ODL_NO_SUFFIX)mthfe-skel.cc $(TOPIC_ODL_NO_SUFFIX)stubsbe.cc $(TOPIC_ODL_NO_SUFFIX)stubsfe.cc template_$(TOPIC_ODL_NO_SUFFIX).cc Makefile.$(TOPIC_ODL_NO_SUFFIX) $(TOPIC_ODL_NO_SUFFIX)/*.java)
+CLEANFILES=$(BUILT_SOURCES) $(OTHER_BUILD_FILES)
 
 #
 # Programs
