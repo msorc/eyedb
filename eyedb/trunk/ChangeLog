@@ -1,3 +1,9 @@
+2006-09-07  viara  <viara@sysra.com>
+
+	* Added eyedb::ObjectObserver
+	* Suppressed a few memory leaks
+	* Corrected a bug in class update
+
 2006-08-25  Francois Dechelle  <francois@localhost.localdomain>
 
 	* Added pkg-config support
