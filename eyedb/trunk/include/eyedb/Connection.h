@@ -53,6 +53,16 @@ namespace eyedb {
 
     /**
        Not yet documented
+       @param open
+       @param host
+       @param port
+       @return
+    */
+    Connection(bool opening, const char *host = DefaultHost,
+	       const char *port = DefaultIDBPort);
+
+    /**
+       Not yet documented
        @param host
        @param port
        @return

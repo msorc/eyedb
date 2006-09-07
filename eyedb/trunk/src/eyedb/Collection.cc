@@ -34,6 +34,8 @@
 
 //#define INIT_IDR
 
+static bool eyedb_support_stack = getenv("EYEDB_SUPPORT_STACK") ? true : false;
+
 using namespace std;
 
 namespace eyedb {
@@ -649,9 +651,11 @@ namespace eyedb {
     if (!item_o)
       return Exception::make(err, "");
 
-    if (item_o->isOnStack())
-      return Exception::make(IDB_COLLECTION_ERROR,
-			     "cannot insert a stack allocated object in collection '%s'", oid.toString());
+    if (item_o->isOnStack()) {
+      if (!eyedb_support_stack)
+	return Exception::make(IDB_COLLECTION_ERROR,
+			       "cannot insert a stack allocated object in collection '%s'", oid.toString());
+    }
 
 
     if (!isref &&

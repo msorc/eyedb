@@ -151,6 +151,7 @@ LinkedList *Database::dbopen_list;
     _passwd = (char *)0;
     consapp_cnt = 0;
 
+    setClass(Object_Class);
     sysclsDatabase::setConsApp(this);
     oqlctbDatabase::setConsApp(this);
     utilsDatabase::setConsApp(this);
@@ -187,7 +188,40 @@ LinkedList *Database::dbopen_list;
     dbid = _dbid;
   }
 
-  Database::Database(const Database &_db)
+  Database::Database(Connection *conn,
+		     const char *dbname,
+		     Database::OpenFlag flag,
+		     const char *user,
+		     const char *passwd)
+  {
+    init_open(conn, dbname, 0, flag, user, passwd);
+  }
+
+  Database::Database(Connection *conn,
+		     const char *dbname,
+		     const char *_dbmdb_str,
+		     Database::OpenFlag flag,
+		     const char *user,
+		     const char *passwd)
+  {
+    init_open(conn, dbname, _dbmdb_str, flag, user, passwd);
+  }
+
+  void Database::init_open(Connection *conn,
+			   const char *dbname,
+			   const char *_dbmdb_str,
+			   Database::OpenFlag flag,
+			   const char *user,
+			   const char *passwd)
+  {
+    init(_dbmdb_str);
+    name = strdup(dbname);
+    Status status = open(conn, flag, user, passwd);
+    if (status)
+      throw *status;
+  }
+
+  Database::Database(const Database &_db) : Struct(_db)
   {
     int r = _db.open_refcnt + 1;
     init(_db.dbmdb_str);

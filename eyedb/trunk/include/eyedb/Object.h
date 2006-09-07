@@ -1209,6 +1209,24 @@ namespace eyedb {
     LinkedList list;
   };
 
+  class ObjectObserver : public gbxObserver {
+
+  public:
+    typedef std::vector<Object *> ObjectVector;
+    typedef ObjectVector::iterator ObjectVectorIterator;
+    typedef ObjectVector::const_iterator ObjectVectorConstIterator;
+
+    ObjectObserver(const std::string &tag = "");
+
+    virtual void getObjects(ObjectVector &) const;
+    virtual bool isObjectRegistered(Object *) const;
+
+    virtual void addObj(gbxObject *o);
+    virtual void rmvObj(gbxObject *o);
+
+    ~ObjectObserver();
+  };
+
   /**
      @}
   */

@@ -755,6 +755,7 @@ namespace eyedb {
     void genODL(FILE *fd, Schema *m, Attribute *attr) const;
     Status makeAttrCompList();
     void compAddGenerate(GenContext *ctx, FILE *fd);
+    void pre_release();
 
     // ----------------------------------------------------------------------
     // Class Restricted Access (conceptually private)

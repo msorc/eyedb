@@ -306,8 +306,9 @@ rpc_connOpen(rpc_Client *client, const char *hostname, const char *portname,
   conn->comm_size = comm_size;
   conn->comm_buff = (char **)malloc(conn_cnt * sizeof(char *));
 
-  for (i = 0; i < conn_cnt; i++)
+  for (i = 0; i < conn_cnt; i++) {
     conn->comm_buff[i] = (char *)calloc(comm_size, 1);
+  }
 
   *pconn = conn;
 

@@ -652,13 +652,14 @@ do { \
 
   void init()
   {
-    static int init;
+    static bool initialized = false;
 
-    if (init)
+    if (initialized)
       return;
 
+    initialized = true;
+
     rpc_release_all = release_all;
-    init = 1;
 
     checkLinkedWithMt();
 
@@ -710,23 +711,27 @@ do { \
 
     Config::_release();
     Architecture::_release();
+
+    DBM_Database::__release();
+    Database::_release();
     Class::_release();
     Basic::_release();
     AgregatClass::_release();
     RecMode::_release();
     Connection::_release();
     Exception::_release();
-    Database::_release();
-    DBM_Database::__release();
     CollectionClass::_release();
     ClassConversion::_release();
     ThreadPoolManager::_release();
+
     oqml_release();
     rpcFeRelease();
+
     eyedbsm::release();
     oqlctb::release();
     utils::release();
     syscls::release();
+
     stream_release();
 
     /*
@@ -748,7 +753,14 @@ do { \
 #endif
   }
 
-  void init(int &argc, char *argv[], string *listen, bool purgeargv) {
+  void init(int &argc, char *argv[], string *listen, bool purgeargv)
+  {
+    static bool initialized = false;
+
+    if (initialized)
+      return;
+
+    initialized = true;
 
     init();
 

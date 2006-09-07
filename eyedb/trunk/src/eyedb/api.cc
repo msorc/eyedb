@@ -1057,7 +1057,7 @@ objectHeaderRead(DbHandle *dbh, const eyedbsm::Oid *oid, ObjectHeader *hdr)
 }
 
 RPCStatus
-objectSizeModify(DbHandle *dbh, int size, const eyedbsm::Oid *oid)
+objectSizeModify(DbHandle *dbh, unsigned int size, const eyedbsm::Oid *oid)
 {
   CHECK_DBH(dbh, "objectSizeModify");
 
@@ -1354,7 +1354,7 @@ dataSizeGet(DbHandle *dbh, const eyedbsm::Oid *oid, unsigned int *size)
 }
 
 RPCStatus
-dataSizeModify(DbHandle *dbh, int size, const eyedbsm::Oid *oid)
+dataSizeModify(DbHandle *dbh, unsigned int size, const eyedbsm::Oid *oid)
 {
   CHECK_DBH(dbh, "dataSizeModify");
 

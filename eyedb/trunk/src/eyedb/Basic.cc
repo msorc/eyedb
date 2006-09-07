@@ -558,6 +558,7 @@ void Basic::_release(void)
   Int32_Class->release();
   Int64_Class->release();
   Float_Class->release();
+  Bool_Class->release();
 }
 
 Status

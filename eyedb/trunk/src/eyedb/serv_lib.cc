@@ -394,7 +394,7 @@ namespace eyedb {
 				 DATA_SIZE_GET_realize);
 
     DATA_SIZE_MODIFY_RPC =
-      rpc_makeUserServerFunction(server, makeOBJECT_SIZE_MODIFY(),
+      rpc_makeUserServerFunction(server, makeDATA_SIZE_MODIFY(),
 				 DATA_SIZE_MODIFY_realize);
 
     VDDATA_CREATE_RPC =

@@ -98,7 +98,7 @@ CPPLINE   #\ ?{INTEGER}\n
 	    char *q = strchr(p, ' ');
 	    if (q)
 	      *q = 0;
-	    delete _file;
+            free(_file);
 	    _file = strdup(p);
 	  }
 }

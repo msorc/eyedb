@@ -44,11 +44,26 @@ namespace eyedb {
 
   Connection::Connection()
   {
-    host     = 0;
+    host = 0;
     port = 0;
-    connh    = 0;
+    connh = 0;
     oql_info = 0;
     user_data = 0;
+  }
+
+  Connection::Connection(bool opening, const char *_host, const char *_port)
+  {
+    host = 0;
+    port = 0;
+    connh = 0;
+    oql_info = 0;
+    user_data = 0;
+
+    if (opening) {
+      Status status = open(_host, _port);
+      if (status)
+	throw *status;
+    }
   }
 
   const char *Connection::getHost(void) const

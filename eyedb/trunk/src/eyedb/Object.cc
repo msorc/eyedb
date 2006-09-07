@@ -22,6 +22,7 @@
 */
 
 
+#define private public
 #include "eyedb_p.h"
 #include <eyedblib/butils.h>
 #include "UserDataHT.h"
@@ -29,6 +30,9 @@
 #include <sstream>
 
 using std::ostringstream;
+
+// 31/08/06
+#define NO_GARB_REALIZE
 
 using namespace std;
 
@@ -54,6 +58,12 @@ namespace eyedb {
 #endif
 
   Bool Object::release_cycle_detection = False;
+
+  // force static initialisation order
+  static std::string &getObjectTag() {
+    static std::string ObjectTag = "eyedb::Object";
+    return ObjectTag;
+  }
 
   void *idr_dbg;
 
@@ -172,7 +182,7 @@ namespace eyedb {
     //  userInitialize();
   }
 
-  Object::Object(Database *_db, const Dataspace *_dataspace) : gbxObject()
+  Object::Object(Database *_db, const Dataspace *_dataspace) : gbxObject(getObjectTag())
   {
     init(True); // conceptually this 3 calls are: Object::initialize(_db);
     dataspace = _dataspace;
@@ -260,7 +270,9 @@ namespace eyedb {
 
     unlock_refcnt();
 
+#ifndef NO_GARB_REALIZE
     garbageRealize();
+#endif
 
     *(gbxObject *)this = gbxObject::operator=((const gbxObject &)o);
 
@@ -1158,4 +1170,55 @@ namespace eyedb {
 	o->release();
     }
   }
+
+  ObjectObserver::ObjectObserver(const std::string &tag) :
+    gbxObserver(tag)
+  {
+  }
+
+  void ObjectObserver::addObj(gbxObject *o)
+  {
+    if (o->getPTag() == getObjectTag()) {
+      gbxObserver::addObj(o);
+    }
+  }
+
+  void ObjectObserver::rmvObj(gbxObject *_o)
+  {
+    /*
+    Object *o = dynamic_cast<Object *>(_o);
+    if (o) {
+    */
+    if (_o->getPTag() == getObjectTag()) {
+      gbxObserver::rmvObj(_o);
+    }
+  }
+
+  ObjectObserver::~ObjectObserver() {
+  }
+
+  void ObjectObserver::getObjects(std::vector<Object *> &ov) const
+  {
+    std::map<gbxObject *, bool>::const_iterator begin = obj_map->begin();
+    std::map<gbxObject *, bool>::const_iterator end = obj_map->end();
+
+    ov.erase(ov.begin(), ov.end());
+    while (begin != end) {
+      gbxObject *o = (*begin).first;
+      if (o->getPTag() != getObjectTag()) {
+	//if (!o) {
+	std::cerr << "eyedb::Observer error: " << (void *)(*begin).first <<
+	  " is not an eyedb::Object\n";
+      }
+      else
+	ov.push_back((eyedb::Object *)o);
+      ++begin;
+    }
+  }
+
+  bool ObjectObserver::isObjectRegistered(Object *o) const
+  {
+    return gbxObserver::isObjectRegistered(o);
+  }
+
 }

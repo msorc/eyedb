@@ -27,6 +27,8 @@
 
 #include <stdlib.h>
 #include <map>
+#include <vector>
+#include <string>
 
 namespace eyedb {
 
@@ -55,7 +57,8 @@ namespace eyedb {
     // ----------------------------------------------------------------------
   public:
     gbxObject();
-    gbxObject(const gbxTag &);
+    gbxObject(const std::string &ptag);
+    gbxObject(const gbxTag &tag);
     gbxObject(const gbxObject &);
     gbxObject(const gbxObject *);
 
@@ -75,10 +78,13 @@ namespace eyedb {
 
     gbxBool isOnStack() const {return gbx_isonstack;}
 
+    void reserve();
+
     void release();
 
     void setTag(const gbxTag &);
     const gbxTag *getTag() const {return gbx_tag;}
+    const std::string &getPTag() const {return gbx_ptag;}
 
     virtual void userGarbage() {}
 
@@ -107,9 +113,10 @@ namespace eyedb {
     gbxBool gbx_locked;
     gbxBool gbx_isonstack;
     gbxTag *gbx_tag;
+    std::string gbx_ptag;
     gbxBool gbx_chgRefCnt;
 
-    void garbageRealize(gbxBool reentrant = gbxFalse);
+    void garbageRealize(gbxBool reentrant = gbxFalse, gbxBool remove = gbxTrue);
     virtual void garbage() {}
 #ifdef GBX_NEW_CYCLE
     virtual void decrRefCountPropag() {}
@@ -120,7 +127,7 @@ namespace eyedb {
     // gbxObject Private Part
     // ----------------------------------------------------------------------
   private:
-    void init();
+    void init(const std::string &ptag);
     unsigned int gbx_magic;
     gbxBool gbx_activeDestruction;
     static int obj_cnt;
@@ -283,10 +290,81 @@ namespace eyedb {
     void init();
   };
 
+  class gbxObserver {
+
+    // ----------------------------------------------------------------------
+    // gbxObserver Interface
+    // ----------------------------------------------------------------------
+  public:
+    typedef std::vector<gbxObject *> ObjectVector;
+    typedef ObjectVector::iterator ObjectVectorIterator;
+    typedef ObjectVector::const_iterator ObjectVectorConstIterator;
+
+    gbxObserver(const std::string &tag = "");
+
+    const std::string &getTag() const {return tag;}
+
+    virtual size_t getObjectCount() const;
+
+    virtual void getObjects(ObjectVector &) const;
+
+    virtual bool isObjectRegistered(gbxObject *) const;
+
+    class ObjectTrigger {
+
+    public:
+      virtual void operator()(gbxObject *o) = 0;
+      virtual ~ObjectTrigger();
+    };
+
+    class AddObjectTrigger : public ObjectTrigger {
+
+    public:
+      virtual ~AddObjectTrigger();
+    };
+
+    class RemoveObjectTrigger : public ObjectTrigger {
+
+    public:
+      virtual ~RemoveObjectTrigger();
+    };
+
+    virtual void setAddObjectTrigger(AddObjectTrigger *trigger);
+    virtual void setRemoveObjectTrigger(RemoveObjectTrigger *trigger);
+
+    static gbxObserver *getCurrentObserver() {return current_observer;}
+
+    virtual ~gbxObserver();
+
+    // ----------------------------------------------------------------------
+    // conceptually private
+    // ----------------------------------------------------------------------
+    static void addObject(gbxObject *o);
+    static void rmvObject(gbxObject *o);
+
+    virtual void addObj(gbxObject *o);
+    virtual void rmvObj(gbxObject *o);
+
+    // ----------------------------------------------------------------------
+    // gbxObserver Protected Part
+    // ----------------------------------------------------------------------
+  protected:
+    std::map<gbxObject *, bool> *obj_map;
+
+    // ----------------------------------------------------------------------
+    // gbxObserver Private Part
+    // ----------------------------------------------------------------------
+  private:
+    std::string tag;
+    gbxObserver *prev;
+    AddObjectTrigger *addobj_trigger;
+    RemoveObjectTrigger *rmvobj_trigger;
+    static gbxObserver *current_observer;
+  };
+
   /**
      @}
   */
-
 }
 
 #endif

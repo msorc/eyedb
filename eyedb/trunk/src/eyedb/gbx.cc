@@ -84,18 +84,23 @@ namespace eyedb {
 
   gbxObject::gbxObject()
   {
-    init();
-    //gbx_tag = new gbxTag();
+    init("");
   }
 
   gbxObject::gbxObject(const gbxTag &_tag)
   {
-    init();
-    //  gbx_tag = new gbxTag(_tag);
+    init("");
+    gbx_tag = new gbxTag(_tag);
   }
 
-  void gbxObject::init()
+  gbxObject::gbxObject(const std::string &ptag)
   {
+    init(ptag);
+  }
+
+  void gbxObject::init(const std::string &ptag)
+  {
+    gbx_ptag = ptag;
     gbx_magic     = ValidObject;
     gbx_refcnt    = 1;
     gbx_locked    = gbxFalse;
@@ -113,6 +118,7 @@ namespace eyedb {
       gbxAutoGarb::addObject(this);
 
     obj_cnt++;
+    gbxObserver::addObject(this);
 
 #if 0
     void * array[100];
@@ -129,8 +135,7 @@ namespace eyedb {
 
     if (obj_map) {
       if (obj_map->find(this) != obj_map->end())
-	std::cerr << "gbxObject::init: " << this << " already in map" <<
-	  std::endl;
+	std::cerr << "gbxObject::init: " << this << " already in map" << std::endl;
 
       (*obj_map)[this] = true;
     }
@@ -152,21 +157,20 @@ namespace eyedb {
 
   gbxObject::gbxObject(const gbxObject &o)
   {
-    init();
+    init(o.gbx_ptag);
 
-    gbx_locked    = o.gbx_locked;
-    gbx_tag       = o.gbx_tag ? new gbxTag(*o.gbx_tag) : 0;
+    gbx_locked = o.gbx_locked;
+    gbx_tag = o.gbx_tag ? new gbxTag(*o.gbx_tag) : 0;
   }
 
   gbxObject::gbxObject(const gbxObject *o)
   {
-    init();
+    init(o ? o->gbx_ptag : std::string(""));
 
-    if (o)
-      {
-	gbx_locked    = o->gbx_locked;
-	gbx_tag       = o->gbx_tag ? new gbxTag(*o->gbx_tag) : 0;
-      }
+    if (o) {
+      gbx_locked  = o->gbx_locked;
+      gbx_tag = o->gbx_tag ? new gbxTag(*o->gbx_tag) : 0;
+    }
   }
 
   gbxObject &gbxObject::operator=(const gbxObject &o)
@@ -174,12 +178,12 @@ namespace eyedb {
     if (&o == this)
       return *this;
 
-    garbageRealize();
+    garbageRealize(gbxFalse, gbxFalse);
 
-    gbx_magic     = ValidObject;
-    gbx_refcnt    = 1;
-    gbx_locked    = o.gbx_locked;
-    gbx_tag       = o.gbx_tag ? new gbxTag(*o.gbx_tag) : 0;
+    gbx_magic = ValidObject;
+    gbx_refcnt = 1;
+    gbx_locked = o.gbx_locked;
+    gbx_tag = o.gbx_tag ? new gbxTag(*o.gbx_tag) : 0;
 
     gbx_activeDestruction = gbxFalse;
 
@@ -213,18 +217,27 @@ namespace eyedb {
     gbxAutoGarb::keepObject(this, gbxFalse);
   }
 
-  static int nodelete = getenv("NODELETE") ? 1 : 0;
+  static int nodelete = getenv("EYEDB_NODELETE") ? 1 : 0;
 
   void gbxObject::release_realize(gbxBool reentrant)
   {
     if (gbx_activeDestruction)
       return;
-    garbageRealize(reentrant);
+    garbageRealize(reentrant, gbxTrue);
     gbx_activeDestruction = gbxFalse;
+
+    /*
+    if (!gbx_refcnt && !gbx_locked) {
+      obj_cnt--;
+      assert(gbx_magic == DeletedObject);
+      gbxObserver::rmvObject(this);
+    }
+    */
 
     if (!nodelete)
       if (!gbx_isonstack && !gbx_refcnt && !gbx_locked)
 	delete ((void *)this);
+
   }
 
   void gbxObject::release()
@@ -242,8 +255,16 @@ namespace eyedb {
   }
 
   void
-  gbxObject::garbageRealize(gbxBool reentrant)
+  gbxObject::garbageRealize(gbxBool reentrant, gbxBool remove)
   {
+#if 0
+    if (gbx_isonstack) {
+      std::cerr << "---> onstack " << (void *)this << ": " <<
+	gbx_refcnt << " " << gbx_locked << " " << reentrant << " " << remove
+	       << std::endl;
+    }
+#endif
+
     if (gbx_activeDestruction)
       return;
 
@@ -262,9 +283,7 @@ namespace eyedb {
 
     if ((reentrant && gbx_refcnt < 0) || (!reentrant && gbx_refcnt < 1)) {
 #if 1
-      /*
 	fprintf(stderr, "gbxObject::delete warning, tries to delete a null ref count object `%p', refcnt = %d\n", this, gbx_refcnt);
-      */
       gbx_refcnt = 1;
 #else
       fprintf(stderr, "gbxObject::delete error, tries to delete a null ref count object `%p', refcnt = %d\n", this, gbx_refcnt);
@@ -317,6 +336,13 @@ namespace eyedb {
       }
     }
 
+#if 0
+    if (gbx_isonstack) {
+      std::cerr << "onstack " << (void *)this << ": " <<
+	gbx_refcnt << " " << gbx_locked << std::endl;
+    }
+#endif
+
     if (!gbx_refcnt && !gbx_locked) {
       if (!gbx_isonstack)
 	gbxAutoGarb::markObjectDeleted(this);
@@ -346,11 +372,17 @@ namespace eyedb {
 	}
       }
 
+      if (remove) {
+	obj_cnt--;
+	gbxObserver::rmvObject(this);
+      }
+
+
       userGarbage();
       garbage();
       delete gbx_tag;
+      gbx_tag = 0;
       gbx_magic = DeletedObject;
-      obj_cnt--;
 
       heap_size -= gbx_size; 
    }
@@ -394,6 +426,12 @@ namespace eyedb {
   }
 
   void
+  gbxObject::reserve()
+  {
+    incrRefCount();
+  }
+
+  void
   gbxObject::decrRefCount()
   {
     IDB_LOG(IDB_LOG_OBJ_GBX, ("gbxObject::decrRefCount(o=%p, refcnt=%d -> %d)\n", this, gbx_refcnt, gbx_refcnt-1));
@@ -415,7 +453,7 @@ namespace eyedb {
 
   gbxObject::~gbxObject()
   {
-    garbageRealize();
+    garbageRealize(gbxFalse, gbxTrue);
     gbx_activeDestruction = gbxFalse;
   }
 
@@ -931,6 +969,94 @@ namespace eyedb {
     if (current)
       current->restore(type);
   }
-}
 
-  
+  gbxObserver *gbxObserver::current_observer = 0;
+
+  gbxObserver::gbxObserver(const std::string &tag) : tag(tag)
+  {
+    prev = current_observer;
+    current_observer = this;
+    addobj_trigger = 0;
+    rmvobj_trigger = 0;
+    obj_map = new std::map<gbxObject *, bool>();
+  }
+
+  gbxObserver::~gbxObserver()
+  {
+    delete obj_map;
+    current_observer = prev;
+  }
+
+  void gbxObserver::addObject(gbxObject *o)
+  {
+    if (getCurrentObserver())
+      getCurrentObserver()->addObj(o);
+  }
+
+  void gbxObserver::rmvObject(gbxObject *o)
+  {
+    if (getCurrentObserver())
+      getCurrentObserver()->rmvObj(o);
+  }
+
+  void gbxObserver::addObj(gbxObject *o)
+  {
+    assert(!isObjectRegistered(o));
+    (*obj_map)[o] = true;
+    if (addobj_trigger)
+      (*addobj_trigger)(o);
+  }
+
+  void gbxObserver::rmvObj(gbxObject *o)
+  {
+    assert(isObjectRegistered(o));
+    if (isObjectRegistered(o))
+      obj_map->erase(obj_map->find(o));
+    if (rmvobj_trigger)
+      (*rmvobj_trigger)(o);
+  }
+
+  bool gbxObserver::isObjectRegistered(gbxObject *o) const
+  {
+    return obj_map->find(o) != obj_map->end();
+  }
+
+  void gbxObserver::getObjects(std::vector<gbxObject *> &v) const
+  {
+    v.erase(v.begin(), v.end());
+    std::map<gbxObject *, bool>::const_iterator begin = obj_map->begin();
+    std::map<gbxObject *, bool>::const_iterator end = obj_map->end();
+
+    while (begin != end) {
+      v.push_back((*begin).first);
+      ++begin;
+    }
+  }
+
+  size_t gbxObserver::getObjectCount() const
+  {
+    return obj_map->size();
+  }
+
+  void gbxObserver::setAddObjectTrigger(gbxObserver::AddObjectTrigger *_addobj_trigger)
+  {
+    addobj_trigger = _addobj_trigger;
+  }
+
+  void gbxObserver::setRemoveObjectTrigger(gbxObserver::RemoveObjectTrigger *_rmvobj_trigger)
+  {
+    rmvobj_trigger = _rmvobj_trigger;
+  }
+
+  gbxObserver::ObjectTrigger::~ObjectTrigger()
+  {
+  }
+
+  gbxObserver::AddObjectTrigger::~AddObjectTrigger()
+  {
+  }
+
+  gbxObserver::RemoveObjectTrigger::~RemoveObjectTrigger()
+  {
+  }
+}
