@@ -49,7 +49,7 @@ namespace eyedb {
     if (&o == this)
       return *this;
 
-    garbageRealize();
+    //garbageRealize();
 
     *(Instance *)this = Instance::operator=((const Instance &)o);
 

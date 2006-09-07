@@ -883,6 +883,12 @@ namespace eyedb {
     items = NULL;
   }
 
+  void Class::pre_release(void)
+  {
+    for (int i = 0; i < items_cnt; i++)
+      items[i]->pre_release();
+  }
+
   Status
   Class::check_items(Attribute **agr, int base_n)
   {
@@ -1244,7 +1250,9 @@ namespace eyedb {
 
   void Class::_release(void)
   {
-    //  AttrNative::_release();
+#if 1
+    AttrNative::_release();
+#endif
 
     Object_Class->release();
     Class_Class->release();

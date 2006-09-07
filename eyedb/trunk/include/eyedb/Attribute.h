@@ -1258,6 +1258,8 @@ namespace eyedb {
     Status clean(Database *db);
     virtual void reportAttrCompSetOid(Offset *offset, Data idr) const;
 
+    void pre_release();
+
   private:
     Status clean_realize(Schema *, const Class *&);
     Status createComponentSet(Database *);

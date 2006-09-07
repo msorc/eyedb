@@ -3037,7 +3037,7 @@ namespace eyedb {
     LinkedListCursor c(complist);
 
     //printf("NEW COMLIST = %d %s\n", complist->getCount(), cls->getName());
-    ClassComponent *clcomp, *fclcomp;
+    ClassComponent *clcomp = 0, *fclcomp;
 
     m->getDatabase()->transactionBegin();
 

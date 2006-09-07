@@ -623,7 +623,7 @@ void AttrNative::_release()
   free(collitems);
   free(m_clitems);
 
-  collsetobjs->setAttributes(NULL, 0);
+  //collsetobjs->setAttributes(NULL, 0);
   collsetobjs->release();
 }
 

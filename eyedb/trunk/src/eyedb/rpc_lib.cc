@@ -873,7 +873,7 @@ namespace eyedb {
 
     rd->args[n].type = rpc_Int32Type; /* rdbhid */
     rd->args[n++].send_rcv = rpc_Send;
-    rd->args[n].type = rpc_Int32Type;
+    rd->args[n].type = rpc_Int32Type; /* size */
     rd->args[n++].send_rcv = rpc_Send;
     rd->args[n].type = OidType;
     rd->args[n++].send_rcv = rpc_Send;

@@ -71,18 +71,48 @@ namespace eyedb {
 
     /**
        Not yet documented
-       @param s
+       @param dbname
        @param dbmdb_str
     */
-    Database(const char *s, const char *dbmdb_str = 0);
+    Database(const char *dbname, const char *dbmdb_str = 0);
 
     /**
        Not yet documented
-       @param s
+       @param conn
+       @param dbname
+       @param flag
+       @param user
+       @param passwd
+    */
+    Database(Connection *conn,
+	     const char *dbname,
+	     Database::OpenFlag flag = Database::DBRead,
+	     const char *user = 0,
+	     const char *passwd = 0);
+
+    /**
+       Not yet documented
+       @param conn
+       @param dbname
+       @param dbmdb_str
+       @param flag
+       @param user
+       @param passwd
+    */
+    Database(Connection *conn,
+	     const char *dbname,
+	     const char *dbmdb_str,
+	     Database::OpenFlag flag = Database::DBRead,
+	     const char *user = 0,
+	     const char *passwd = 0);
+
+    /**
+       Not yet documented
+       @param dbname
        @param dbid
        @param dbmdb_str
     */
-    Database(const char *s, int dbid, const char *dbmdb_str = 0);
+    Database(const char *dbname, int dbid, const char *dbmdb_str = 0);
 
     /**
        Not yet documented
@@ -105,31 +135,32 @@ namespace eyedb {
 
     /**
        Not yet documented
-       @param ch
+       @param ccnn
        @param user
        @param passwd
        @param pdbdesc
        @return
     */
-    Status create(Connection *ch, const char *user = 0, const char *passwd = 0,
+    Status create(Connection *conn, const char *user = 0,
+		  const char *passwd = 0,
 		  DbCreateDescription *pdbdesc = 0);
 
     /**
        Not yet documented
-       @param ch
+       @param conn
        @param pdbdesc
        @return
     */
-    Status create(Connection *ch, DbCreateDescription *pdbdesc);
+    Status create(Connection *conn, DbCreateDescription *pdbdesc);
 
     /**
        Not yet documented
-       @param ch
+       @param conn
        @param user
        @param passwd
        @return
     */
-    Status remove(Connection *ch, const char *user = 0, const char *passwd = 0);
+    Status remove(Connection *conn, const char *user = 0, const char *passwd = 0);
 
     /**
        Not yet documented
@@ -141,37 +172,37 @@ namespace eyedb {
 
     /**
        Not yet documented
-       @param ch
+       @param conn
        @param mode
        @param user
        @param passwd
        @return
     */
-    Status setDefaultDBAccess(Connection *ch, int mode,
+    Status setDefaultDBAccess(Connection *conn, int mode,
 			      const char *user = 0, const char *passwd = 0);
 
     /**
        Not yet documented
-       @param ch
+       @param conn
        @param username
        @param mode
        @param user
        @param passwd
        @return
     */
-    Status setUserDBAccess(Connection *ch, const char *username,
+    Status setUserDBAccess(Connection *conn, const char *username,
 			   int mode,
 			   const char *user = 0, const char *passwd = 0);
 
     /**
        Not yet documented
-       @param ch
+       @param conn
        @param user
        @param passwd
        @param pdbdesc
        @return
     */
-    Status getInfo(Connection *ch,
+    Status getInfo(Connection *conn,
 		   const char *user, const char *passwd, DbInfoDescription *pdbdesc) const;
 
     /**
@@ -185,29 +216,29 @@ namespace eyedb {
 
     /**
        Not yet documented
-       @param ch
+       @param conn
        @param flag
        @param user
        @param passwd
        @return
     */
-    virtual Status open(Connection *ch,
+    virtual Status open(Connection *conn,
 			Database::OpenFlag flag = Database::DBRead,
 			const char *user = 0,
 			const char *passwd = 0);
 
     /**
        Not yet documented
-       @param ch
+       @param conn
        @param flag
-       @param oh
+       @param hints
        @param user
        @param passwd
        @return
     */
-    virtual Status open(Connection *ch,
+    virtual Status open(Connection *conn,
 			Database::OpenFlag flag,
-			const OpenHints *oh,
+			const OpenHints *hints,
 			const char *user = 0,
 			const char *passwd = 0);
 
@@ -1051,6 +1082,13 @@ namespace eyedb {
     // Database Private Part
     // ----------------------------------------------------------------------
   private:
+    void init_open(Connection *conn,
+		   const char *dbname,
+		   const char *dbmdb_str,
+		   Database::OpenFlag flag,
+		   const char *user,
+		   const char *passwd);
+
     Status create();
     Status update();
     Status realize(const RecMode * = RecMode::NoRecurs);

@@ -341,7 +341,7 @@ namespace eyedb {
   dataSizeGet(DbHandle *, const eyedbsm::Oid *, unsigned int *);
 
   extern RPCStatus
-  dataSizeModify(DbHandle *, int, const eyedbsm::Oid *);
+  dataSizeModify(DbHandle *, unsigned int, const eyedbsm::Oid *);
 
   extern RPCStatus
   schemaComplete(DbHandle *, const char *);

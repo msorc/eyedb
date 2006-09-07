@@ -59,11 +59,13 @@ static void stop_imm2() { }
 #define VARS_SZ   24
 #define VARS_TSZ  (VARS_INISZ+VARS_SZ)
 
+static bool eyedb_support_stack = getenv("EYEDB_SUPPORT_STACK") ? true : false;
+
 //#define E_XDR_TRACE
 
-  namespace eyedbsm {
-    extern int hidx_gccnt;
-  }
+namespace eyedbsm {
+  extern int hidx_gccnt;
+}
 
 
 namespace eyedb {
@@ -966,9 +968,7 @@ Attribute::compare(Database *db, const Attribute *item,
   if (!typmod.compare(&item->typmod))
     return False;
   
-  if (!cls) {
-    printf("OID: %s %p\n", oid_cl.toString(), db->getSchema()->getClass(oid_cl));
-  }
+  ATTR_COMPLETE();
 
   if (!inDepth && isIndirect()) {
     if (!cls->compare_l(item->cls))
@@ -1415,11 +1415,13 @@ Attribute::setValue(Object *agr,
       if (old_o == o)
 	continue;
 
-      if (o && o->isOnStack())
-	return Exception::make(IDB_ERROR,
-				  "setting attribute '%s::%s': "
-				  "cannot set a stack allocated object",
-				  class_owner->getName(), name);
+      if (o && o->isOnStack()) {
+	if (!eyedb_support_stack)
+	  return Exception::make(IDB_ERROR,
+				 "setting attribute '%s::%s': "
+				 "cannot set a stack allocated object",
+				 class_owner->getName(), name);
+      }
 
       setCollHints(old_o, Oid::nullOid, NULL);
       
@@ -7534,6 +7536,14 @@ AttrIndirectVarDim::load(Database *db,
   return Success;
 }
 
+void Attribute::pre_release()
+{
+  if (attr_comp_set)
+    attr_comp_set->release();
+
+  attr_comp_set = 0;
+}
+
 Attribute::~Attribute()
 {
   free((void *)name);
@@ -8175,6 +8185,9 @@ AttributeComponentSet::Cache::Comp::Comp()
 
 AttributeComponentSet::Cache::Comp::~Comp()
 {
+  abort();
+  if (comp)
+    comp->release();
   free(attrpath);
 }
 
@@ -8193,6 +8206,12 @@ AttributeComponentSet::Cache::add(AttributeComponent *comp)
 
 AttributeComponentSet::Cache::~Cache()
 {
+  for (int n = 0; n < comp_count; n++) {
+    free(comps[n].attrpath);
+    if (comps[n].comp)
+      comps[n].comp->release();
+  }
+
   free(comps);
 }
 

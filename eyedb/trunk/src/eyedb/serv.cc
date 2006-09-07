@@ -904,6 +904,7 @@ namespace eyedb {
   void
   DATA_SIZE_MODIFY_realize(rpc_ClientId clientid, void *xua)
   {
+    printf("coucou les lapins\n");
     ServerArg *ua = (ServerArg *)xua;
     RPCStatus status;
     rpcDB_DbHandleClientInfo *dcinfo = rpcDB_clientDbhGet(clientid, ua[0].a_int);
