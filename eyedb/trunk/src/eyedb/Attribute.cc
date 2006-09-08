@@ -2889,24 +2889,20 @@ Attribute::createIndexEntry(Database *db, Data pdata,
       unsigned char *e = (unsigned char *)malloc(size_of_e);
       Data data = pdata;
       Bool indirect = isIndirect();
-      for (int n = 0; n < count; n++, data += idr_item_psize)
-	{
-	  IS_NULL(isnull, data, inidata);
-	  e[0] = (isnull ? idxNull : idxNotNull);
-	  memcpy(e+sizeof(char), &n, sizeof(eyedblib::int32));
-#ifdef E_XDR
-	  if (indirect) {
-	    eyedbsm::Oid toid;
-	    eyedbsm::x2h_oid(&toid, data);
-	    mcp(e+sizeof(char)+sizeof(eyedblib::int32), &toid, sizeof(eyedbsm::Oid));
-	  }
-	  else
-	    cls->decode(e+sizeof(char)+sizeof(eyedblib::int32), data, idr_item_psize);
-#else
-	  memcpy(e+sizeof(char)+sizeof(eyedblib::int32), data, idr_item_psize);
-#endif
+      for (int n = 0; n < count; n++, data += idr_item_psize) {
+	IS_NULL(isnull, data, inidata);
+	e[0] = (isnull ? idxNull : idxNotNull);
 
-	  CHECK_UNIQUE(isnull, e, 0);
+	h2x_32_cpy(e+sizeof(char), &n); // must code n because the index does not perform the swap
+	if (indirect) {
+	  eyedbsm::Oid toid;
+	  eyedbsm::x2h_oid(&toid, data); // 8/09/06: data contains XDR oid : must be decoded to put in index because index perform the swap
+	  mcp(e+sizeof(char)+sizeof(eyedblib::int32), &toid, sizeof(eyedbsm::Oid));
+	}
+	else
+	  cls->decode(e+sizeof(char)+sizeof(eyedblib::int32), data, idr_item_psize);
+
+	CHECK_UNIQUE(isnull, e, 0);
 
 	  IDB_LOG(IDB_LOG_IDX_INSERT,
 		  (log_item_entry_fmt,
@@ -3171,8 +3167,7 @@ Attribute::updateIndexEntry(Database *db, Data pdata,
 	    {
 	      if (unique) {
 		e[0] = (isnull_data ? idxNull : idxNotNull);
-		memcpy(e+sizeof(char), &n, sizeof(eyedblib::int32));
-#ifdef E_XDR
+		h2x_32_cpy(e+sizeof(char), &n);
 		if (indirect) {
 		  eyedbsm::Oid toid;
 		  eyedbsm::x2h_oid(&toid, data);
@@ -3180,15 +3175,12 @@ Attribute::updateIndexEntry(Database *db, Data pdata,
 		}
 		else
 		  cls->decode(e+sizeof(char)+sizeof(eyedblib::int32), data, idr_item_psize);
-#else
-		memcpy(e+sizeof(char)+sizeof(eyedblib::int32), data, idr_item_psize);
-#endif
+
 		CHECK_UNIQUE(isnull_data, e, s);
 	      }
 
 	      e[0] = (isnull_s ? idxNull : idxNotNull);
-	      memcpy(e+sizeof(char), &n, sizeof(eyedblib::int32));
-#ifdef E_XDR
+	      h2x_32_cpy(e+sizeof(char), &n);
 	      if (indirect) {
 		eyedbsm::Oid toid;
 		eyedbsm::x2h_oid(&toid, sx);
@@ -3196,10 +3188,7 @@ Attribute::updateIndexEntry(Database *db, Data pdata,
 	      }
 	      else
 		cls->decode(e+sizeof(char)+sizeof(eyedblib::int32), sx, idr_item_psize);
-#else
-	      memcpy(e+sizeof(char)+sizeof(eyedblib::int32), sx, idr_item_psize);
-#endif
-	      
+
 	      eyedbsm::Boolean found;
 	      
 	      IDB_LOG(IDB_LOG_IDX_SUPPRESS,
@@ -3211,8 +3200,7 @@ Attribute::updateIndexEntry(Database *db, Data pdata,
 			       idx_test, idx_item, e, size_of_e, soid);
 	      
 	      e[0] = (isnull_data ? idxNull : idxNotNull);
-	      memcpy(e+sizeof(char), &n, sizeof(eyedblib::int32));
-#ifdef E_XDR
+	      h2x_32_cpy(e+sizeof(char), &n);
 	      if (indirect) {
 		eyedbsm::Oid toid;
 		eyedbsm::x2h_oid(&toid, data);
@@ -3220,10 +3208,7 @@ Attribute::updateIndexEntry(Database *db, Data pdata,
 	      }
 	      else
 		cls->decode(e+sizeof(char)+sizeof(eyedblib::int32), data, idr_item_psize);
-#else
-	      memcpy(e+sizeof(char)+sizeof(eyedblib::int32), data, idr_item_psize);
-#endif
-	      
+
 	      IDB_LOG(IDB_LOG_IDX_INSERT,
 		      (log_item_entry_fmt,
 		       ATTRPATH(idx_test), soid[0].toString(),
@@ -3529,8 +3514,7 @@ Status Attribute::removeIndexEntry(Database *db, Data pdata,
 
 	  IS_NULL(isnull_s, s, sinidata);
 	  e[0] = (isnull_s ? idxNull : idxNotNull);
-	  memcpy(e+sizeof(char), &n, sizeof(eyedblib::int32));
-#ifdef E_XDR
+	  h2x_32_cpy(e+sizeof(char), &n);
 	  if (indirect) {
 	    eyedbsm::Oid toid;
 	    eyedbsm::x2h_oid(&toid, sx);
@@ -3538,9 +3522,6 @@ Status Attribute::removeIndexEntry(Database *db, Data pdata,
 	  }
 	  else
 	    cls->decode(e+sizeof(char)+sizeof(eyedblib::int32), sx, idr_item_psize);
-#else
-	  memcpy(e+sizeof(char)+sizeof(eyedblib::int32), sx, idr_item_psize);
-#endif
 
 	  IDB_LOG(IDB_LOG_IDX_SUPPRESS,
 		  (log_item_entry_fmt,
@@ -4403,11 +4384,7 @@ AttrDirect::getTValue(Database *db, const Oid &objoid,
     return Success;
   }
 
-  Data xdata;
-  if (cls->asEnumClass())
-    xdata = (unsigned char *)malloc(nb * idr_item_psize);
-  else
-    xdata = (Data)data;
+  Data xdata = (unsigned char *)malloc(nb * idr_item_psize);
 
   rpc_status = dataRead(db->getDbHandle(),
 			    poffset + idr_inisize + idr_poff +
@@ -4416,14 +4393,19 @@ AttrDirect::getTValue(Database *db, const Oid &objoid,
 			    0, objoid.getOid());
 
   if (rpc_status) {
+    free(xdata);
     CHECK_OID(objoid);
     return StatusMake(rpc_status);
   }
 
   if (cls->asEnumClass()) {
     cls->asEnumClass()->getRawData((Data)data, xdata, nb);
-    free(xdata);
   }
+  else {
+    cls->decode(data, xdata, idr_item_psize, nb);
+  }
+
+  free(xdata);
 
   Data inidata = (unsigned char *)malloc(idr_inisize);
 

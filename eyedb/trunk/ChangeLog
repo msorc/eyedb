@@ -1,3 +1,7 @@
+2006-09-08  viara  <viara@sysra.com>
+
+	* Corrected a bug in indexed arrays on little endian platforms
+
 2006-09-07  viara  <viara@sysra.com>
 
 	* Added eyedb::ObjectObserver
