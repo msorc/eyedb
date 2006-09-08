@@ -844,7 +844,7 @@ namespace eyedb {
       memset(&entry->data, 0, key_len);
       entry->ind = ind;
     */
-    memcpy(entry, &ind, sizeof(eyedblib::int32));
+    x2h_32_cpy(entry, &ind);
     memset(entry+sizeof(eyedblib::int32), 0, key_len);
     int len;
     Data val;
@@ -1191,7 +1191,7 @@ namespace eyedb {
     if (key_len < strlen(shstr->s))
       return oqml_False;
 
-    memcpy(entry, &ind, sizeof(eyedblib::int32));
+    x2h_32_cpy(entry, &ind);
     memset(entry+sizeof(eyedblib::int32), 0, key_len);
     strcpy((char *)entry+sizeof(eyedblib::int32), shstr->s);
     return oqml_True;

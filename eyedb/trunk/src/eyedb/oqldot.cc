@@ -1263,7 +1263,8 @@ oqmlDotContext::eval_terminal(Database *db, oqmlContext *ctx,
   else
     nb = 1;
 
-  s = d->evalInd(dot, db, ctx, s_ind, e_ind, oqml_True, oqml_False);
+  //s = d->evalInd(dot, db, ctx, s_ind, e_ind, oqml_True, oqml_False);
+  s = d->evalInd(dot, db, ctx, s_ind, e_ind, oqml_False, oqml_False);
   if (s) return s;
 
   Data data = d->e_data;
