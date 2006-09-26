@@ -404,7 +404,7 @@ oqmlDotDesc::getIdx(Database *db, oqmlContext *ctx, oqmlDot *dot)
   if (!rootcls)
     return oqmlSuccess;
 
-  int subclass_cnt;
+  unsigned int subclass_cnt;
   Class **subclasses;
   Status status;
   int maxind;
@@ -1636,7 +1636,7 @@ oqmlDot::getAttrRealize(const Class *cls, const char *name,
   if (*attr)
     return oqmlSuccess;
 
-  int subclass_cnt, i, j;
+  unsigned int subclass_cnt, i, j;
   Class **subclasses;
   Status s;
   s = cls->getSubClasses(subclasses, subclass_cnt);

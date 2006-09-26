@@ -34,15 +34,25 @@ namespace eyedb {
 				       TransactionLockMode lockmode,
 				       RecoveryMode recovmode,
 				       unsigned int magorder,
-				       unsigned int ratiolart,
+				       unsigned int ratioalrt,
 				       unsigned int wait_timeout)
   {
     this->trsmode = trsmode;
     this->lockmode = lockmode;
     this->recovmode = recovmode;
     this->magorder = magorder;
-    this->ratioalrt = ratiolart;
+    this->ratioalrt = ratioalrt;
     this->wait_timeout = wait_timeout;
+  }
+
+  bool TransactionParams::operator==(const TransactionParams &params) const
+  {
+    return params.trsmode == trsmode &&
+      params.lockmode == lockmode &&
+      params.recovmode == recovmode &&
+      params.magorder == magorder &&
+      params.ratioalrt == ratioalrt &&
+      params.wait_timeout == wait_timeout;
   }
 
   TransactionParams::TransactionParams()

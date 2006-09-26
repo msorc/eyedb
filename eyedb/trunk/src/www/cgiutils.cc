@@ -661,7 +661,7 @@ idbWIsEmpty(Object *o, const char * &item_name)
 
   if (cls->asAgregatClass())
     {
-      int items_cnt;
+      unsigned int items_cnt;
       const Attribute **items =
 	((const AgregatClass *)cls)->getAttributes(items_cnt);
 

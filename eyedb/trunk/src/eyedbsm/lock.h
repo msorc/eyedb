@@ -27,24 +27,28 @@
 #include <mutex.h>
 
 namespace eyedbsm {
-extern Status
-  lockS(DbDescription *, DbLock *, unsigned int, unsigned int),
-  lockX(DbDescription *, DbLock *, unsigned int, unsigned int),
-  unlockS(DbDescription *, DbLock *, unsigned int),
-  unlockX(DbDescription *, DbLock *, unsigned int),
-  checkLock(DbDescription *, DbLock *);
+  extern void lockInit(DbDescription *, DbLock *, const char *name);
+  extern void lockLightInit(DbDescription *, DbLock *);
 
-extern Status
-  pobjLock(DbHandle const *dbh, XMHandle *,
-	      const TransactionContext *,
-	      Transaction *, XMOffset, 
-	      LockMode lockMode, PObject *,
-	      Mutex *, unsigned int, unsigned int),
-  pobjUnlock(DbDescription *vd, XMHandle *, PObject *,
-		LockMode lockMode, Mutex *, unsigned int);
+  extern Status lockS(DbDescription *, DbLock *, unsigned int, unsigned int);
 
-extern int
-findXid(DbDescription *vd, DbLock *, unsigned int, int *,
-	   Boolean);
+  extern Status lockX(DbDescription *, DbLock *, unsigned int, unsigned int);
 
+  extern Status unlockS(DbDescription *, DbLock *, unsigned int);
+
+  extern Status unlockX(DbDescription *, DbLock *, unsigned int);
+
+  extern Status checkLock(DbDescription *, DbLock *);
+
+  extern Status pobjLock(DbHandle const *dbh, XMHandle *,
+			 const TransactionContext *,
+			 Transaction *, XMOffset, 
+			 LockMode lockMode, PObject *,
+			 Mutex *, unsigned int, unsigned int);
+
+  extern Status pobjUnlock(DbDescription *vd, XMHandle *, PObject *,
+			   LockMode lockMode, Mutex *, unsigned int);
+
+  extern bool findDbLockXID(DbDescription *vd, DbLock *, unsigned int, bool *,
+			    Boolean);
 }

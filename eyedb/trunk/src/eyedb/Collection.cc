@@ -661,7 +661,7 @@ namespace eyedb {
     if (!isref &&
 	!coll_class->asBasicClass() &&
 	!coll_class->asEnumClass()) {
-      int attr_cnt;
+      unsigned int attr_cnt;
       const Attribute **attrs = coll_class->getAttributes(attr_cnt);
       for (int n = 0; n < attr_cnt; n++) {
 	const Attribute *attr = attrs[n];

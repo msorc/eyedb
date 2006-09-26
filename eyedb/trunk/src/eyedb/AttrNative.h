@@ -119,7 +119,7 @@ namespace eyedb {
 				  const GenCodeHints &)
     {return Success;}
 
-    static void copy(int, Attribute ** &, int &, Class *);
+    static void copy(int, Attribute ** &, unsigned int &, Class *);
     static void init();
     static void _release();
   };

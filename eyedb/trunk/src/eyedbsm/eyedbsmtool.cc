@@ -53,7 +53,7 @@ using namespace eyedbsm;
 
 static const TransactionParams params_X = {
   TransactionOn,
-  DatabaseX,
+  DatabaseW,
   RecoveryFull,
   0,
   0,
@@ -1385,21 +1385,25 @@ mutex_display_realize(int argc, char *argv[])
 
   sm_SHMH_INIT(argv[0], True);
 
-  int i, lockX;
+  int lockX;
 
-  printf("  Main DataBase Mutex ");
-  if (sm_shmh->lock.mp.xid || sm_shmh->lock.S || sm_shmh->lock.X)
-    {
+  DbLock *dblocks[] = {&sm_shmh->dblock_W, &sm_shmh->dblock_RW,
+		       &sm_shmh->dblock_Wtrans};
+  for (unsigned int i = 0; i < sizeof(dblocks)/sizeof(dblocks[0]); i++) {
+    DbLock *dblock = dblocks[i];
+    printf("  Mutex %s ", dblock->mp.mtname);
+    if (dblock->mp.xid || dblock->S || dblock->X) {
       printf("Locked ");
-      if (sm_shmh->lock.mp.xid)
-	printf("by Server Pid %d ", sm_shmh->lock.mp.xid);
-      printf("[S=%d, X=%d]\n", sm_shmh->lock.S, sm_shmh->lock.X);
+      if (dblock->mp.xid)
+	printf("by Server Pid %d ", dblock->mp.xid);
+      printf("[S=%d, X=%d]\n", dblock->S, dblock->X);
     }
-  else
-    printf("not Locked\n");
+    else
+      printf("not Locked\n");
+  }
 
   MutexP *mt = sm_shmh->mtx.mp;
-  for (i = 0; i < MTX_CNT; i++, mt++)
+  for (unsigned i = 0; i < MTX_CNT; i++, mt++)
     {
 #ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
       printf("  Mutex %-4s ", mt->mtname);
@@ -1415,7 +1419,7 @@ mutex_display_realize(int argc, char *argv[])
       else
 	printf("LOCKED] ");
 #endif
-      printf("[SE mutex ");
+      printf("[eyedbsm mutex ");
       if (mt->locked)
 	printf("LOCKED");
       else

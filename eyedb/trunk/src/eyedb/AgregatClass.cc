@@ -347,7 +347,7 @@ namespace eyedb {
     int32_code  (&data, &offset, &alloc_size, (eyedblib::int32 *)&idr_psize);
     int32_code  (&data, &offset, &alloc_size, (eyedblib::int32 *)&idr_vsize);
     int32_code  (&data, &offset, &alloc_size, (eyedblib::int32 *)&idr_objsz);
-    int32_code  (&data, &offset, &alloc_size, &items_cnt);
+    int32_code  (&data, &offset, &alloc_size, (eyedblib::int32 *)&items_cnt);
   
     ioff = offset;
     post_create_offset = ioff;
@@ -638,7 +638,7 @@ namespace eyedb {
     int32_code  (&data, &offset, &alloc_size, (eyedblib::int32 *)&idr_psize);
     int32_code  (&data, &offset, &alloc_size, (eyedblib::int32 *)&idr_vsize);
     int32_code  (&data, &offset, &alloc_size, (eyedblib::int32 *)&idr_objsz);
-    int32_code  (&data, &offset, &alloc_size, &items_cnt);
+    int32_code  (&data, &offset, &alloc_size, (eyedblib::int32 *)&items_cnt);
   
     ioff = offset;
 
@@ -854,7 +854,7 @@ namespace eyedb {
 	int32_decode(temp, &offset, (eyedblib::int32 *)&ma->idr_objsz);
 	int32_decode(temp, &offset, &cnt);
 
-	int native_cnt;
+	unsigned int native_cnt;
 	const Attribute **items_nat = ma->getAttributes(native_cnt);
 
 	ma->items = (Attribute **)malloc(sizeof(Attribute *) * cnt);

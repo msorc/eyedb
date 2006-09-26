@@ -91,7 +91,7 @@ Iterator::Iterator(Class *cls, Bool subclass)
 #define SUBCLASS_OPTIM
 #ifdef SUBCLASS_OPTIM
 	  Class **subclasses;
-	  int subclass_count;
+	  unsigned int subclass_count;
 
 	  if (status = cls->getSubClasses(subclasses, subclass_count))
 	    return;

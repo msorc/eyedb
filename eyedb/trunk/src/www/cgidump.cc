@@ -106,7 +106,8 @@ struct idbWDumpCollContext {
   }
 
   void sync_extents() {
-    Class **classes; int cnt;
+    Class **classes;
+    unsigned int cnt;
     cls->getSubClasses(classes, cnt);
     for (int i = 0; i < cnt; i++)
       {
@@ -178,7 +179,8 @@ struct idbWDumpCollContext {
 
   unsigned int get_prev_coll(int elemcnt, Oid &prevoid) {
 
-    Class **classes; int cnt;
+    Class **classes;
+    unsigned int cnt;
     cls->getSubClasses(classes, cnt);
 
     for (int n = cnt-1; n >= 0; n--)
@@ -205,7 +207,8 @@ struct idbWDumpCollContext {
   }
 
   Bool get_next_coll_realize(const Class *xcls, Collection *&_coll) {
-    Class **classes; int cnt;
+    Class **classes;
+    unsigned int cnt;
     xcls->getSubClasses(classes, cnt);
 
     Oid coll_oid = _coll->getOidC();
@@ -420,7 +423,7 @@ idbWDumpAgregatClass(idbWDest *dest, Class *cls,
   idbW_CHECK_FLUSH(idbW_NL());
   idbW_dest->push();
 
-  int items_cnt;
+  unsigned int items_cnt;
   const Attribute **items;
 
   items = cls->getAttributes(items_cnt);
@@ -1156,7 +1159,7 @@ Status
 idbWGetTagClass(const Class *cls, Object *o, const char *&tag,
 		 idbWTextMode textmod, int &len)
 {
-  int items_cnt, n;
+  unsigned int items_cnt, n;
   const Attribute **items = cls->getAttributes(items_cnt);
   idbWObjectContext *obj_ctx;
 
@@ -1623,7 +1626,7 @@ autoLoad(const Attribute *item, Object *o, Object **po, int n)
 int
 idbW_get_instance_number(const Class *cls, Bool reload)
 {
-  int class_cnt;
+  unsigned int class_cnt;
   Class **classes;
   Status s = cls->getSubClasses(classes, class_cnt);
 

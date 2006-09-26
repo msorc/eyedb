@@ -189,7 +189,7 @@ idbWMakeOptionItemRealizeOne(const Class *rootcls, const Class *cls,
 			     const char *prefix, int depth, int maxdepth,
 			     Bool polymorph)
 {
-  int items_cnt;
+  unsigned int items_cnt;
   const Attribute **items;
 
   const idbWItemList *item_list = idbW_get_item_list(cls);
@@ -303,7 +303,7 @@ idbWMakeOptionItemRealize(const Class *cls,
   if (polymorph)
     {
       Class **subclasses;
-      int subclass_cnt;
+      unsigned int subclass_cnt;
 
       cls->getSubClasses(subclasses, subclass_cnt);
 
@@ -511,7 +511,7 @@ Collection *
 get_first_extent(const Class *cls)
 {
   Class **subclasses;
-  int subclass_cnt = 0;
+  unsigned int subclass_cnt = 0;
   Status s = cls->getSubClasses(subclasses, subclass_cnt);
   if (s) s->print();
 

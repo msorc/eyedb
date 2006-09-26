@@ -279,7 +279,7 @@ clear_help(FILE *fd, OQLCommand *cmd)
 static void
 begin_args_usage(FILE *fd, OQLCommand *cmd)
 {
-  fprintf(fd, "[TRSON|TRSOFF [R_S_W_S|R_S_W_SX|R_S_W_X|R_SX_W_SX|R_SX_W_X|R_X_W_X|R_N_W_S|R_N_W_SX|R_N_W_X|R_N_W_N|DB_X [RV_OFF|RV_FULL|RV_PARTIAL [<magorder> [<ratioalrt> [<wait_timeout>]]]]]]\n");
+  fprintf(fd, "[R_S_W_S|R_S_W_SX|R_S_W_X|R_SX_W_SX|R_SX_W_X|R_X_W_X|R_N_W_S|R_N_W_SX|R_N_W_X|R_N_W_N|DB_W|DB_RW|DB_Wtrans] [RV_OFF|RV_FULL|RV_PARTIAL] [MG=<magorder>] [RT=<ratioalrt>] [TM=<wait_timeout>] [TRSOFF]\n");
 }
 
 static void
@@ -288,8 +288,6 @@ begin_args_help(FILE *fd, OQLCommand *cmd)
   fprintf(fd, command_help);
   fprintf(fd, "%sbegin a new transaction\n", help_indent);
   fprintf(fd, options_help);
-  fprintf(fd, "%sTRSON       use transaction processing\n", help_indent);
-  fprintf(fd, "%sTRSOFF      no transaction processing\n", help_indent);
   fprintf(fd, "%sR_S_W_S     read shared/write shared\n", help_indent);
   fprintf(fd, "%sR_S_W_SX    read shared/write shared exclusive\n", help_indent);
   fprintf(fd, "%sR_S_W_X     read shared/write exclusive\n", help_indent);
@@ -300,15 +298,18 @@ begin_args_help(FILE *fd, OQLCommand *cmd)
   fprintf(fd, "%sR_N_W_SX    read no lock/write shared exclusive\n", help_indent);
   fprintf(fd, "%sR_N_W_X     read no lock/write exclusive\n", help_indent);
   fprintf(fd, "%sR_N_W_N     read no lock/write no lock\n", help_indent);
-  fprintf(fd, "%sDB_X        database exclusive\n", help_indent);
+  fprintf(fd, "%sDB_W        database exclusive for writing\n", help_indent);
+  fprintf(fd, "%sDB_RW       database exclusive for reading and writing\n", help_indent);
+  fprintf(fd, "%sDB_Wtrans   database exclusive for writing transactions\n", help_indent);
   fprintf(fd, "\n");
   fprintf(fd, "%sRV_OFF      recovery off\n", help_indent);
   fprintf(fd, "%sRV_FULL     full recovery (not yet implemented)\n", help_indent);
   fprintf(fd, "%sRV_PARTIAL  partial recovery\n", help_indent);
   fprintf(fd, "\n");
-  fprintf(fd, "%s<magorder>  magnitude order of object count\n", help_indent);
-  fprintf(fd, "%s<ratioalrt> ratio alert\n", help_indent);
-  fprintf(fd, "%s<timeout>   wait timeout in seconds\n", help_indent);
+  fprintf(fd, "%sMG=<magorder>  magnitude order of object count\n", help_indent);
+  fprintf(fd, "%sRT=<ratioalrt> ratio alert\n", help_indent);
+  fprintf(fd, "%sTM=<timeout>   wait timeout in seconds\n", help_indent);
+  fprintf(fd, "%sTRSOFF      no transaction processing\n", help_indent);
 }
 
 static void
@@ -597,7 +598,7 @@ static void
 open_usage(FILE *fd, OQLCommand *cmd, bool indent)
 {
   command_s_print(fd, cmd, indent);
-  fprintf(fd, "[<database> [rw|ro|sr] [local] [trsless]]\n");
+  fprintf(fd, "[<database> [rw|ro|sr] [local]\n");
 }
 
 static void
@@ -611,6 +612,7 @@ open_help(FILE *fd, OQLCommand *cmd)
   fprintf(fd, "%srw         opens in read/write mode\n", help_indent);
   fprintf(fd, "%sro         opens in read only mode\n", help_indent);
   fprintf(fd, "%ssr         opens in strict read mode\n", help_indent);
+  fprintf(fd, "%slocal      opens in local mode\n", help_indent);
 }
 
 static void
@@ -782,6 +784,7 @@ setmute_help(FILE *fd, OQLCommand *cmd)
   fprintf(fd, "%sfalse  sets mute to false\n", help_indent);
 }
 
+/*
 static void
 setechofound_usage(FILE *fd, OQLCommand *cmd, bool indent)
 {
@@ -801,6 +804,7 @@ setechofound_help(FILE *fd, OQLCommand *cmd)
   fprintf(fd, "%strue   displays the number of found objects\n", help_indent);
   fprintf(fd, "%strue   does not display the number of found objects\n", help_indent);
 }
+*/
 
 static void
 echo_usage(FILE *fd, OQLCommand *cmd, bool indent)
@@ -988,6 +992,7 @@ setmute_command(OQLParser *parser, int argc, char *argv[])
   return 1;
 }
 
+/*
 static int
 setechofound_command(OQLParser *parser, int argc, char *argv[])
 {
@@ -1008,6 +1013,7 @@ setechofound_command(OQLParser *parser, int argc, char *argv[])
   
   return 1;
 }
+*/
 
 static int
 help_command(OQLParser *parser, int argc, char *argv[])
@@ -1209,18 +1215,23 @@ schema_command(OQLParser *parser, int argc, char *argv[])
 static int
 setecho_command(OQLParser *parser, int argc, char *argv[])
 {
-  if (argc == 2)
-    {
-      char *p = argv[1];
-      if (!strcmp(p, "true"))
-	parser->setEchoMode(True);
-      else if (!strcmp(p, "false"))
-	parser->setEchoMode(False);
-      else
-	return 0;
-      return 1;
-    }
-  return 1;
+  if (argc == 1) {
+    printf("%s\n", (parser->getEchoMode() ? "true" : "false"));
+    return 1;
+  }
+  else if (argc == 2) {
+    char *p = argv[1];
+    if (!strcmp(p, "true"))
+      parser->setEchoMode(True);
+    else if (!strcmp(p, "false"))
+      parser->setEchoMode(False);
+    else
+      return 0;
+
+    return 1;
+  }
+
+  return 0;
 }
 
 static int
@@ -1266,15 +1277,17 @@ time_command(OQLParser *parser, int argc, char *argv[])
 static int
 setescapechar_command(OQLParser *parser, int argc, char *argv[])
 {
-  if (argc == 2)
-    {
-      char *p = argv[1];
-      if (strlen(p) == 1)
-	{
-	  parser->setEscapeChar(p[0]);
-	  return 1;
-	}
+  if (argc == 1) {
+    printf("%c\n", parser->getEscapeChar());
+    return 1;
+  }
+  else if (argc == 2) {
+    char *p = argv[1];
+    if (strlen(p) == 1) {
+      parser->setEscapeChar(p[0]);
+      return 1;
     }
+  }
   return 0;
 }
 
@@ -2042,60 +2055,63 @@ settrmode_realize(char *argv[], int argc, TransactionParams &params)
 
   params = TransactionParams::getGlobalDefaultTransactionParams();
 
-  if (argc == 0) return 1;
+  if (argc == 0)
+    return 1;
 
-  if (!strcmp(argv[0], "TRSOFF"))
+  if (!strcmp(argv[0], "TRSOFF")) {
+    if (argc != 1)
+      return 0;
     params.trsmode = TransactionOff;
-  else if (!strcmp(argv[0], "TRSON"))
-    params.trsmode = TransactionOn;
-  else
-    return 0;
+    return 1;
+  }
 
-  if (argc == 1) return 1;
+  params.trsmode = TransactionOn;
 
-  if (!strcmp(argv[1], "R_S_W_S"))
-    params.lockmode = ReadSWriteS;
-  else if (!strcmp(argv[1], "R_S_W_SX"))
-    params.lockmode = ReadSWriteSX;
-  else if (!strcmp(argv[1], "R_S_W_X"))
-    params.lockmode = ReadSWriteX;
-  else if (!strcmp(argv[1], "R_SX_W_SX"))
-    params.lockmode = ReadSXWriteSX;
-  else if (!strcmp(argv[1], "R_SX_W_X"))
-    params.lockmode = ReadSXWriteX;
-  else if (!strcmp(argv[1], "R_X_W_X"))
-    params.lockmode = ReadXWriteX;
-  else if (!strcmp(argv[1], "R_N_W_S"))
-    params.lockmode = ReadNWriteS;
-  else if (!strcmp(argv[1], "R_N_W_SX"))
-    params.lockmode = ReadNWriteSX;
-  else if (!strcmp(argv[1], "R_N_W_X"))
-    params.lockmode = ReadNWriteX;
-  else if (!strcmp(argv[1], "R_N_W_N"))
-    params.lockmode = ReadNWriteN;
-  else if (!strcmp(argv[1], "DB_X"))
-    params.lockmode = DatabaseX;
+  for (int n = 0; n < argc; n++) {
+    if (!strcmp(argv[n], "R_S_W_S"))
+      params.lockmode = ReadSWriteS;
+    else if (!strcmp(argv[n], "R_S_W_SX"))
+      params.lockmode = ReadSWriteSX;
+    else if (!strcmp(argv[n], "R_S_W_X"))
+      params.lockmode = ReadSWriteX;
+    else if (!strcmp(argv[n], "R_SX_W_SX"))
+      params.lockmode = ReadSXWriteSX;
+    else if (!strcmp(argv[n], "R_SX_W_X"))
+      params.lockmode = ReadSXWriteX;
+    else if (!strcmp(argv[n], "R_X_W_X"))
+      params.lockmode = ReadXWriteX;
+    else if (!strcmp(argv[n], "R_N_W_S"))
+      params.lockmode = ReadNWriteS;
+    else if (!strcmp(argv[n], "R_N_W_SX"))
+      params.lockmode = ReadNWriteSX;
+    else if (!strcmp(argv[n], "R_N_W_X"))
+      params.lockmode = ReadNWriteX;
+    else if (!strcmp(argv[n], "R_N_W_N"))
+      params.lockmode = ReadNWriteN;
+    else if (!strcmp(argv[n], "DB_W"))
+      params.lockmode = DatabaseW;
+    else if (!strcmp(argv[n], "DB_RW"))
+      params.lockmode = DatabaseRW;
+    else if (!strcmp(argv[n], "DB_Wtrans"))
+      params.lockmode = DatabaseWtrans;
 
-  if (argc == 2) return 1;
+    else if (!strcmp(argv[n], "RV_OFF"))
+      params.recovmode = RecoveryOff;
+    else if (!strcmp(argv[n], "RV_FULL"))
+      params.recovmode = RecoveryFull;
+    else if (!strcmp(argv[n], "RV_PARTIAL"))
+      params.recovmode = RecoveryPartial;
 
-  if (!strcmp(argv[2], "RV_OFF"))
-    params.recovmode = RecoveryOff;
-  else if (!strcmp(argv[2], "RV_FULL"))
-    params.recovmode = RecoveryFull;
-  else if (!strcmp(argv[2], "RV_PARTIAL"))
-    params.recovmode = RecoveryPartial;
-  else
-    return 0;
+    else if (!strncmp(argv[n], "MG=", 3))
+      params.magorder = atoi(&argv[n][3]);
+    else if (!strncmp(argv[n], "RT=", 3))
+      params.ratioalrt = atoi(&argv[n][3]);
+    else if (!strncmp(argv[n], "TM=", 3))
+      params.wait_timeout = atoi(&argv[n][3]);
 
-  if (argc == 3) return 1;
-
-  params.magorder = atoi(argv[3]);
-  if (argc == 4) return 1;
-
-  params.ratioalrt = atoi(argv[4]);
-  if (argc == 5) return 1;
-
-  params.wait_timeout = atoi(argv[5]);
+    else
+      return 0;
+  }
 
   return 1;
 }
@@ -2103,69 +2119,68 @@ settrmode_realize(char *argv[], int argc, TransactionParams &params)
 static int
 settrmode_command(OQLParser *parser, int argc, char *argv[])
 {
-  if (argc == 1)
-    {
-      if (auto_trmode)
-	{
-	  printf("auto ");
+  if (argc == 1) {
+    if (auto_trmode) {
+      printf("auto ");
 
-	  if (params.trsmode == TransactionOn)
-	    printf("TRSON");
-	  else if (params.trsmode == TransactionOff)
-	    printf("TRSOFF");
+      if (params.trsmode == TransactionOff) {
+	printf("TRSOFF");
+	return 1;
+      }
 
-	  printf(" ");
+      if (params.lockmode == ReadSWriteS)
+	printf("R_S_W_S");
+      else if (params.lockmode == ReadSWriteSX)
+	printf("R_S_W_SX");
+      else if (params.lockmode == ReadSWriteX)
+	printf("R_S_W_X");
+      else if (params.lockmode == ReadSXWriteSX)
+	printf("R_SX_W_SX");
+      else if (params.lockmode == ReadSXWriteX)
+	printf("R_SX_W_X");
+      else if (params.lockmode == ReadXWriteX)
+	printf("R_X_W_X");
+      else if (params.lockmode == ReadNWriteS)
+	printf("R_N_W_S");
+      else if (params.lockmode == ReadNWriteSX)
+	printf("R_N_W_SX");
+      else if (params.lockmode == ReadNWriteX)
+	printf("R_N_W_X");
+      else if (params.lockmode == ReadNWriteN)
+	printf("R_N_W_N");
+      else if (params.lockmode == DatabaseW)
+	printf("DB_W");
+      else if (params.lockmode == DatabaseRW)
+	printf("DB_RW");
+      else if (params.lockmode == DatabaseWtrans)
+	printf("DB_Wtrans");
 
-	  if (params.lockmode == ReadSWriteS)
-	    printf("R_S_W_S");
-	  else if (params.lockmode == ReadSWriteSX)
-	    printf("R_S_W_SX");
-	  else if (params.lockmode == ReadSWriteX)
-	    printf("R_S_W_X");
-	  else if (params.lockmode == ReadSXWriteSX)
-	    printf("R_SX_W_SX");
-	  else if (params.lockmode == ReadSXWriteX)
-	    printf("R_SX_W_X");
-	  else if (params.lockmode == ReadXWriteX)
-	    printf("R_X_W_X");
-	  else if (params.lockmode == ReadNWriteS)
-	    printf("R_N_W_S");
-	  else if (params.lockmode == ReadNWriteSX)
-	    printf("R_N_W_SX");
-	  else if (params.lockmode == ReadNWriteX)
-	    printf("R_N_W_X");
-	  else if (params.lockmode == ReadNWriteN)
-	    printf("R_N_W_N");
-	  else if (params.lockmode == DatabaseX)
-	    printf("DB_X");
+      if (params.recovmode == RecoveryOff)
+	printf(" RV_OFF");
+      else if (params.recovmode == RecoveryFull)
+	printf(" RV_FULL");
+      else if (params.recovmode == RecoveryPartial)
+	printf(" RV_PARTIAL");
 
-	  if (params.recovmode == RecoveryOff)
-	    printf(" RV_OFF");
-	  else if (params.recovmode == RecoveryFull)
-	    printf(" RV_FULL");
-	  else if (params.recovmode == RecoveryPartial)
-	    printf(" RV_PARTIAL");
+      printf(" ");
 
-	  printf(" ");
-
-	  printf("magorder=%u ratioalrt=%u wait_timeout=%u\n",
-		 params.magorder, params.ratioalrt,
-		 params.wait_timeout);
-	}
-      else
-	printf("noauto\n");
-
-      return 1;
+      printf("MG=%u RT=%u TM=%u\n",
+	     params.magorder, params.ratioalrt,
+	     params.wait_timeout);
     }
+    else
+      printf("noauto\n");
 
-  if (!strcmp(argv[1], "noauto"))
-    {
-      if (argc != 2)
-	return 0;
+    return 1;
+  }
+  
+  if (!strcmp(argv[1], "noauto")) {
+    if (argc != 2)
+      return 0;
 
-      auto_trmode = False;
-      return 1;
-    }
+    auto_trmode = False;
+    return 1;
+  }
 
   if (strcmp(argv[1], "auto"))
     return 0;
@@ -2604,7 +2619,7 @@ public:
 TempFileManager TempFileManager::instance;
 
 static void
-rvalue_manage(const Value &v)
+rvalue_manage(OQLParser *parser, const Value &v)
 {
   bool done = false;
 
@@ -2640,9 +2655,11 @@ rvalue_manage(const Value &v)
   }
 
   if (!done && v.type != Value::tNil) { // added the 12/01/00
-    printf("= ");
-    v.print(stdout);
-    printf("\n");
+    if (!parser->getMuteMode()) {
+      printf("= ");
+      v.print(stdout);
+      printf("\n");
+    }
   }
 }
 
@@ -2682,6 +2699,11 @@ Status OQLParser::oql_send()
   std::string oql_send_buffer = oql_buffer;
   percent_manage(oql_send_buffer);
 
+  /*
+  if (getEchoMode())
+    printf("%s", oql_send_buffer.c_str());
+  */
+
   OQL q(db, oql_send_buffer.c_str());
 
   if (oql_interrupt) {
@@ -2707,7 +2729,7 @@ Status OQLParser::oql_send()
   operation = idbOqlScanning;
 
   if (!status) {
-    rvalue_manage(query_value);
+    rvalue_manage(this, query_value);
   }
   else {
     if (curfile)
@@ -2905,8 +2927,9 @@ int OQLParser::parse(const char *str, Bool echo)
       }
 
       if (!(*com->exec)(this, argc, argv)) {
-	fprintf(stderr, "usage: %c", getEscapeChar());
-	(*com->usage)(stderr, com, true);
+	//	fprintf(stderr, "usage: %c", getEscapeChar());
+	fprintf(stderr, "usage: ", getEscapeChar());
+	(*com->usage)(stderr, com, false);
       }
     }
     else {

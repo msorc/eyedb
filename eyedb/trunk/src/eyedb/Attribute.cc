@@ -2773,7 +2773,7 @@ Attribute::getAttrComponents(Database *db, const Class *xcls,
     
   if (!isIndirect() && !is_basic_enum && !cls->asCollectionClass()) {
     ATTR_COMPLETE();
-    int attr_cnt;
+    unsigned int attr_cnt;
     const Attribute **attrs = cls->getAttributes(attr_cnt);
     for (int i = 0; i < attr_cnt; i++) {
       Status s = const_cast<Attribute *>(attrs[i])->getAttrComponents

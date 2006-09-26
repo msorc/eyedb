@@ -1661,8 +1661,10 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     *pdbh = (DbHandle *)calloc(sizeof(DbHandle), 1);
     (*pdbh)->vd = vd;
 
+    assert(!pdblock); // 17/09/06
+
     if (pdblock)
-      *pdblock = &((DbShmHeader *)shm_addr)->lock;
+      *pdblock = &((DbShmHeader *)shm_addr)->dblock_W;
 
     if (pversion)
       *pversion = x2h_u32(((DbShmHeader *)shm_addr)->version);

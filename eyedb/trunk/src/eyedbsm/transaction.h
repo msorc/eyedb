@@ -70,7 +70,9 @@ namespace eyedbsm {
     R_N_W_SX,    /* read no lock; write shared/exclusive */
     R_N_W_X,     /* read no lock; write exclusive */
     R_N_W_N,     /* read no lock; write no lock */
-    DB_X,        /* database exclusive */
+    DB_W,        /* database exclusive for writing */
+    DB_RW,       /* database exclusive for reading and writing */
+    DB_Wtrans,   /* database exclusive for writing trans */
     LockModeIndex_CNT
   };
 

@@ -167,7 +167,7 @@ namespace eyedb {
   static void
   odl_copy_attr_comp_sets(Class *ocls, Class *cls)
   {
-    int attr_cnt;
+    unsigned int attr_cnt;
     Attribute **attrs = (Attribute **)cls->getAttributes(attr_cnt);
 
     for (int i = 0; i < attr_cnt; i++)
@@ -220,7 +220,7 @@ namespace eyedb {
 	    continue;
 
 	  Class **subclasses;
-	  int subclass_cnt;
+	  unsigned int subclass_cnt;
 	  cls->getSubClasses(subclasses, subclass_cnt);
 	  bool subclass_notin = false;
 	  for (int n = 0; n < subclass_cnt; n++) {
@@ -386,7 +386,7 @@ namespace eyedb {
   static void
   odl_check_attributes(const Class *cls)
   {
-    int attr_cnt;
+    unsigned int attr_cnt;
     Attribute **attrs = (Attribute **)cls->getAttributes(attr_cnt);
   
     for (int i = 0; i < attr_cnt; i++)
@@ -782,7 +782,7 @@ namespace eyedb {
 	    printf("should report attributes from ocls %d to cls %d\n",
 	    ocls->getAttributesCount(), cls->getAttributesCount());
 	  */
-	  int attr_cnt;
+	  unsigned int attr_cnt;
 	  const Attribute **attrs = ocls->getAttributes(attr_cnt);
 	  Status status = cls->setAttributes((Attribute **)attrs, attr_cnt);
 	  if (status)
@@ -1319,7 +1319,7 @@ namespace eyedb {
       //if (is_pred_bypass) return 0;
 
       if (!attr->isIndirect() && attr->getClass()->asAgregatClass()) {
-	int attr_cnt;
+	unsigned int attr_cnt;
 	const Attribute **attrs = attr->getClass()->getAttributes(attr_cnt);
 	/*
 	  printf("XCOMP: is_%s_attribute recursion in %s\n", predname,
@@ -2222,7 +2222,7 @@ namespace eyedb {
   static void
   odl_migrate_attributes(Schema *m, const Class *cls)
   {
-    int attr_cnt;
+    unsigned int attr_cnt;
     const Attribute **attrs  = cls->getAttributes(attr_cnt);
 
     for (int i = 0; i < attr_cnt; i++)
@@ -2378,7 +2378,7 @@ namespace eyedb {
   odl_class_premanage(Schema *m, const Class *ocls, const Class *cls)
   {
     static const int invalid_num = -1;
-    int attr_cnt;
+    unsigned int attr_cnt;
     Attribute **attrs = (Attribute **)cls->getAttributes(attr_cnt);
     int i;
 
@@ -2440,7 +2440,7 @@ namespace eyedb {
   odl_class_compare(Schema *m, const Class *ocls, const Class *cls,
 		    odlUpdateHint *cls_hints)
   {
-    int oattr_cnt, attr_cnt;
+    unsigned int oattr_cnt, attr_cnt;
     Attribute **oattrs = (Attribute **)ocls->getAttributes(oattr_cnt);
     Attribute **attrs = (Attribute **)cls->getAttributes(attr_cnt);
     int i;
@@ -2772,7 +2772,7 @@ namespace eyedb {
     if (!ocls)
       return 0;
 
-    int oattr_cnt;
+    unsigned int oattr_cnt;
     const Attribute **oattrs  = ocls->getAttributes(oattr_cnt);
 
     for (int i = 0; i < oattr_cnt; i++) {
@@ -2798,7 +2798,7 @@ namespace eyedb {
     if (!ocls)
       return 0;
 
-    int oattr_cnt, attr_cnt;
+    unsigned int oattr_cnt, attr_cnt;
     const Attribute **attrs  = cls->getAttributes(attr_cnt);
     const Attribute **oattrs  = ocls->getAttributes(oattr_cnt);
 
@@ -3189,7 +3189,7 @@ namespace eyedb {
 
     //printf("\npropagate components %s\n", cls->getAliasName());
     Class **subclasses;
-    int subclass_cnt;
+    unsigned int subclass_cnt;
     Status s = cls->getSubClasses(subclasses, subclass_cnt);
     if (s) {
       odl_add_error(s);

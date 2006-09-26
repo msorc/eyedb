@@ -127,7 +127,7 @@ namespace eyedb {
        Not yet documented
        @return
     */
-    int getNum() const {return num;};
+    unsigned int getNum() const {return num;};
 
     /**
        Not yet documented
@@ -234,7 +234,7 @@ namespace eyedb {
        @param incrRefCount
        @return
     */
-    Status add(int w, ClassComponent * comp, Bool incrRefCount = True);
+    Status add(unsigned int w, ClassComponent * comp, Bool incrRefCount = True);
 
     /**
        Not yet documented
@@ -242,7 +242,7 @@ namespace eyedb {
        @param comp
        @return
     */
-    Status add(int w, AttributeComponent *comp);
+    Status add(unsigned int w, AttributeComponent *comp);
 
     /**
        Not yet documented
@@ -250,7 +250,7 @@ namespace eyedb {
        @param comp
        @return
     */
-    Status suppress(int w, ClassComponent *comp);
+    Status suppress(unsigned int w, ClassComponent *comp);
 
     /**
        Not yet documented
@@ -258,7 +258,7 @@ namespace eyedb {
        @param comp
        @return
     */
-    Status suppress(int w, AttributeComponent *comp);
+    Status suppress(unsigned int w, AttributeComponent *comp);
 
     /**
        Not yet documented
@@ -399,7 +399,7 @@ namespace eyedb {
        @param sort_down_to_top
        @return
     */
-    Status getSubClasses(Class **&subclasses, int &subclass_count,
+    Status getSubClasses(Class **&subclasses, unsigned int &subclass_count,
 			 Bool sort_down_to_top = True) const;
 
     /**
@@ -426,14 +426,14 @@ namespace eyedb {
        Not yet documented
        @return
     */
-    int getAttributesCount(void) const;
+    unsigned int getAttributesCount(void) const;
 
     /**
        Not yet documented
        @param n
        @return
     */
-    const Attribute *getAttribute(int n) const;
+    const Attribute *getAttribute(unsigned int n) const;
 
     /**
        Not yet documented
@@ -448,14 +448,14 @@ namespace eyedb {
        @param base_n
        @return
     */
-    virtual Status setAttributes(Attribute **agr, int base_n);
+    virtual Status setAttributes(Attribute **agr, unsigned int base_n);
 
     /**
        Not yet documented
        @param cnt
        @return
     */
-    inline const Attribute **getAttributes(int& cnt) const {
+    inline const Attribute **getAttributes(unsigned int& cnt) const {
       cnt = items_cnt;
       return (const Attribute **)items;
     }
@@ -481,14 +481,14 @@ namespace eyedb {
        @param mth_cnt
        @return
     */
-    Method **getMethods(int& mth_cnt);
+    Method **getMethods(unsigned int& mth_cnt);
 
     /**
        Not yet documented
        @param mth_cnt
        @return
     */
-    const Method **getMethods(int& mth_cnt) const;
+    const Method **getMethods(unsigned int& mth_cnt) const;
 
     /**
        Not yet documented
@@ -529,28 +529,28 @@ namespace eyedb {
        @param cnt
        @return
     */
-    Trigger **getTriggers(int& cnt);
+    Trigger **getTriggers(unsigned int& cnt);
 
     /**
        Not yet documented
        @param cnt
        @return
     */
-    const Trigger **getTriggers(int& cnt) const;
+    const Trigger **getTriggers(unsigned int& cnt) const;
 
     /**
        Not yet documented
        @param cnt
        @return
     */
-    ClassVariable **getVariables(int& cnt);
+    ClassVariable **getVariables(unsigned int& cnt);
 
     /**
        Not yet documented
        @param cnt
        @return
     */
-    const ClassVariable **getVariables(int& cnt) const;
+    const ClassVariable **getVariables(unsigned int& cnt) const;
 
     /**
        Not yet documented
@@ -714,7 +714,7 @@ namespace eyedb {
     Status trace_comps(FILE *, int, unsigned int, const RecMode *) const;
     Status trace_common(FILE *, int, unsigned int, const RecMode *) const;
     Bool items_set;
-    int		  items_cnt;
+    unsigned int items_cnt;
     Attribute ** items;
     void free_items();
     virtual Status trace_realize(FILE*, int, unsigned int, const RecMode *) const;
@@ -733,9 +733,9 @@ namespace eyedb {
     Bool sort_down_to_top;
     Bool subclass_set;
     Class **subclasses;
-    int subclass_count;
+    unsigned int subclass_count;
     Schema *sch;
-    int num;
+    unsigned int num;
     Oid extent_oid, comp_oid;
     Bool partially_loaded;
     Bool setup_complete;
@@ -750,7 +750,7 @@ namespace eyedb {
     Status scanComponents();
     Status triggerManage(Trigger *);
     Status sort(Bool sort_down_to_top) const;
-    void setNum(int _num) {num = _num;};
+    void setNum(unsigned int _num) {num = _num;};
 
     void genODL(FILE *fd, Schema *m, Attribute *attr) const;
     Status makeAttrCompList();
