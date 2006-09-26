@@ -729,8 +729,8 @@ namespace eyedb {
     int nb_clients = get_nb_clients();
     if (nb_clients && !force) {
       return Exception::make
-	(IDB_ERROR, "%d Client%s %s still connected.\n"
-	 "Use `stop -f' option to force the servers stopping.",
+	(IDB_ERROR, "%d client%s %s connected.\n"
+	 "Use the `stop -f' option to force the servers to stop.",
 	 nb_clients,
 	 (nb_clients > 1 ? "s" : ""),
 	 (nb_clients > 1 ? "are" : "is"));

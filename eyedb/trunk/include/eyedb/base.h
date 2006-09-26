@@ -107,7 +107,9 @@ namespace eyedb {
     ReadNWriteSX = eyedbsm::ReadNWriteSX, /* read no lock; write shared/exclusive */
     ReadNWriteX = eyedbsm::ReadNWriteX, /* read no lock; write exclusive */
     ReadNWriteN = eyedbsm::ReadNWriteN, /* read no lock; write no lock */
-    DatabaseX = eyedbsm::DatabaseX /* database exclusive */
+    DatabaseW = eyedbsm::DatabaseW, /* database exclusive for writing */
+    DatabaseRW = eyedbsm::DatabaseRW, /* database exclusive for reading and writing */
+    DatabaseWtrans = eyedbsm::DatabaseWtrans /* database exclusive for writing transaction */
   };
 
   enum RecoveryMode {

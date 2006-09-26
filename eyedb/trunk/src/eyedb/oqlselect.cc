@@ -827,7 +827,7 @@ oqmlSelect::processMissingIdentsRequalification(Database *db, oqmlContext *ctx)
 
       //      idents[i]->ident = strdup(ident_gen());
       idents[i]->ident = strdup(ident);
-      int attr_cnt;
+      unsigned int attr_cnt;
       const Attribute **attrs = idents[i]->cls->getAttributes(attr_cnt);
       oqmlStatus *s;
       if (where)
@@ -894,7 +894,7 @@ oqmlSelect::processMissingProjRequalification(Database *db, oqmlContext *ctx)
 				idents[j]->ql->toString().c_str());
 	}
 
-      int attr_cnt;
+      unsigned int attr_cnt;
       const Attribute **attrs = idents[j]->cls->getAttributes(attr_cnt);
       for (int k = 0; k < attr_cnt; k++)
 	if (is_terminal(attrs[k]))

@@ -56,7 +56,7 @@ usage()
   fprintf(stderr, "   -admin          : opens database in admin mode\n");
   fprintf(stderr, "   -commit         : commits the current transaction on close\n");
   fprintf(stderr, "   -local|-l       : opens database in local mode\n");
-  fprintf(stderr, "   -trsless        : opens database in transaction less mode\n");
+  //  fprintf(stderr, "   -trsless        : opens database in transaction less mode\n");
   fprintf(stderr, "   -c <command>    : executes command\n");
   fprintf(stderr, "   -print|-p       : displays all the objects loaded\n");
   fprintf(stderr, "   -full|-f        : the full recursive mode is used to display objects\n");

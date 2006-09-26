@@ -252,7 +252,9 @@ namespace eyedbsm {
     ReadNWriteSX,    /* read no lock; write shared/exclusive */
     ReadNWriteX,     /* read no lock; write exclusive */
     ReadNWriteN,     /* read no lock; write no lock */
-    DatabaseX        /* database exclusive */
+    DatabaseW,       /* database exclusive for writing */
+    DatabaseRW,      /* database exclusive for reading and writing */
+    DatabaseWtrans   /* database exclusive for writing transaction */
   };
 
   enum RecoveryMode {

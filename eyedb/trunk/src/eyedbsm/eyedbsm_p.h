@@ -110,7 +110,9 @@ namespace eyedbsm {
 #else
     int dummy;
 #endif
-    DbLock lock;
+    DbLock dblock_W;      // database exclusive lock for writing
+    DbLock dblock_RW;     // database exclusive lock for reading and writing
+    DbLock dblock_Wtrans; // database exclusive lock for writing transaction
     TransHeader trs_hdr;
     DbMutexes mtx;
   };
@@ -118,17 +120,6 @@ namespace eyedbsm {
   // end of shm file structures ---------------------------------------------
 
   // runtime structures -----------------------------------------------------
-
-  // do not seem to be used
-  /*
-  struct MapInfo {
-    NS nslots;
-    unsigned int sizeslot;
-    eyedbsm::MapStat mstat;
-    NS lastbusy;
-    NS firstfree;
-  };
-  */
 
   struct MmapDesc {
     Boolean ismapped, locked;
@@ -287,11 +278,11 @@ if (!(X)) \
 #define DBH2TRCTX(DBH) (&(DBH)->vd->trctx[(DBH)->vd->tr_cnt-1])
 
 #define NEED_LOCK(TRCTX) \
-((TRCTX)->params.lockmode != DatabaseX)
+((TRCTX)->params.lockmode != DatabaseW)
 
 #define NEED_OBJLOCK(TRCTX) \
 ((TRCTX)->params.lockmode != ReadNWriteN && \
- (TRCTX)->params.lockmode != DatabaseX)
+ (TRCTX)->params.lockmode != DatabaseW)
 
   static char* msg_1 = __FILE__;
 #define TTT(S) (write( 1, S, strlen(S)))

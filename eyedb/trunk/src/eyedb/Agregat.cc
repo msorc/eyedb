@@ -38,7 +38,7 @@ namespace eyedb {
 
 Status Agregat::checkAgreg(const Attribute *agreg) const
 {
-  int num;
+  unsigned int num;
   const Attribute **items = ((AgregatClass *)getClass())->getAttributes(num);
 
   if (!agreg)
@@ -154,7 +154,7 @@ Status Agregat::trace_realize(FILE *fd, int indent, unsigned int flags,
     }
   else
     {
-      int items_cnt;
+      unsigned int items_cnt;
       int isnat = ((flags & NativeTrace) == NativeTrace);
       const Attribute **items = getClass()->getAttributes(items_cnt);
       for (int n = 0; n < items_cnt; n++)
@@ -340,7 +340,7 @@ Status Agregat::realizePerform(const Oid& cloid,
   CHK_OBJ(this);
 
   Status status;
-  int items_cnt;
+  unsigned int items_cnt;
   const Attribute **items;
 
   items = getClass()->getAttributes(items_cnt);
@@ -372,7 +372,7 @@ Agregat::manageCycle(gbxCycleContext &r)
 
   gbx_chgRefCnt = gbxTrue;
 
-  int items_cnt;
+  unsigned int items_cnt;
   const Attribute **items;
   items = getClass()->getAttributes(items_cnt);
 
@@ -397,7 +397,7 @@ Status Agregat::removePerform(const Oid& cloid,
     }
 
   Status status;
-  int items_cnt;
+  unsigned int items_cnt;
   const Attribute **items;
   
   items = ((AgregatClass *)getClass())->getAttributes(items_cnt);
@@ -461,7 +461,7 @@ Agregat::loadPerform(const Oid& cloid,
 		     AttrIdxContext &idx_ctx,
 		     const RecMode *rcm)
 {
-  int items_cnt;
+  unsigned int items_cnt;
   const Attribute **items = getClass()->getAttributes(items_cnt);
   
   for (int i = 0; i < items_cnt; i++)
@@ -571,7 +571,7 @@ void Agregat::garbage()
 	}
       else
 	{
-	  int items_cnt;
+	  unsigned int items_cnt;
 	  const Attribute **items =
 	    ((AgregatClass *)getClass())->getAttributes(items_cnt);
 
@@ -599,7 +599,7 @@ Agregat::copy(const Agregat *o, Bool share)
     }
   else
     {
-      int items_cnt;
+      unsigned int items_cnt;
       const Attribute **items =
 	((AgregatClass *)getClass())->getAttributes(items_cnt);
       

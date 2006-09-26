@@ -87,7 +87,7 @@ idbWSchemaStatsRealize(idbWProcess *p, int fd)
 
   Class *objclass = idbW_ctx->db->getSchema()->getClass("object");
   Class **objclasses;
-  int objclass_cnt;
+  unsigned int objclass_cnt;
   Status s = objclass->getSubClasses(objclasses, objclass_cnt);
   if (s) s->print();
 
@@ -105,7 +105,8 @@ idbWSchemaStatsRealize(idbWProcess *p, int fd)
       idbWRowClass(cls, True);
       idbWRowClass(cls->getParent(), True);
 
-      Class **classes; int cnt;
+      Class **classes;
+      unsigned int cnt;
       cls->getSubClasses(classes, cnt);
       idbW_dest->flush("<td>");
       int nn = 0;

@@ -135,6 +135,7 @@ class OQLParser {
   void setEchoFound(int mode) {echofound = mode;}
   int getMuteMode() const {return mutemode;} 
   int getEchoFound() const {return echofound;} 
+  int getEchoMode() const {return echo_mode;} 
   OQLCommand *find_command(const char *) const;
   void add_command(OQLCommand *);
   void remove_command(OQLCommand *);

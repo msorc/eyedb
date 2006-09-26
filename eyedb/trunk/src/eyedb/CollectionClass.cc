@@ -96,7 +96,7 @@ CollectionClass::check(Class *_coll_class, Bool _isref, int _dim)
 	   !_coll_class->asBasicClass() &&
 	   !_coll_class->asEnumClass()) {
     // check for : no vardim
-    int attr_cnt;
+    unsigned int attr_cnt;
     const Attribute **attrs = _coll_class->getAttributes(attr_cnt);
     for (int n = 0; n < attr_cnt; n++)
       if (attrs[n]->isVarDim()) {

@@ -663,7 +663,7 @@ init_display_attributes_init(Database *db, idbWDest *dest)
       config->cls = cls;
       config->expand_cnt = 0;
 
-      int attr_cnt;
+      unsigned int attr_cnt;
       const Attribute **attrs = cls->getAttributes(attr_cnt);
 
       config->expands = new idbWDisplayConfig::Config::Expand[2*attr_cnt];
@@ -693,7 +693,7 @@ init_display_attributes_expand_config(Database *db, idbWDest *dest)
       config->cls = cls;
       config->expand_cnt = 0;
 
-      int attr_cnt;
+      unsigned int attr_cnt;
       const Attribute **attrs = cls->getAttributes(attr_cnt);
 
       print_nl(dest, attrs, attr_cnt);
@@ -794,7 +794,7 @@ make_attr_extra(struct idbWDisplayConfig::Config *config,
   config->attrs = new idbWDisplayConfig::Config::Attr[config->attr_alloc_cnt];
   config->attr_cnt = 0;
 
-  int attr_cnt;
+  unsigned int attr_cnt;
   const Attribute **attrs = cls->getAttributes(attr_cnt);
   for (int i = 0; i < attr_cnt; i++)
     {
@@ -1532,7 +1532,7 @@ make_default_attr_list(const Class *cls, int &attr_cnt)
 #define DEPTH 12
   static int depth;
   static WAttr *idbW_attrs[DEPTH];
-  static int idbW_attr_cnt[DEPTH];
+  static unsigned int idbW_attr_cnt[DEPTH];
 
   if (depth == DEPTH)
     depth = 0;

@@ -34,9 +34,6 @@
 #define TT(X)
 #endif
 
-/* 24/08/01 */
-#define LAZY_LOCK_X
-
 /*#define NEW_TR_CNT*/
 
 static const char trTooLarge[] = 
@@ -83,6 +80,9 @@ static const char trTooLarge[] =
 #else
 #define MUTEX_LOCKER eyedblib::MutexLocker
 #endif
+
+/* 24/08/01 */
+#define LAZY_LOCK_X
 
 namespace eyedbsm {
 
@@ -217,6 +217,15 @@ namespace eyedbsm {
     return 0;
   }
 
+  static bool must_lock_db(DbHandle const *dbh)
+  {
+#ifdef LAZY_LOCK_X
+    return dbh->vd->flags == VOLRW;
+#else
+    return true;
+#endif
+  }
+
   static int
   magorderHtCount(int magorder)
   {
@@ -289,8 +298,13 @@ namespace eyedbsm {
     else if (lockmode == ReadNWriteN)
       trctx->lockmodeIndex = R_N_W_N;
 
-    else if (lockmode == DatabaseX)
-      trctx->lockmodeIndex = DB_X;
+    else if (lockmode == DatabaseW)
+      trctx->lockmodeIndex = DB_W;
+    else if (lockmode == DatabaseRW)
+      trctx->lockmodeIndex = DB_RW;
+    else if (lockmode == DatabaseWtrans)
+      trctx->lockmodeIndex = DB_Wtrans;
+
     else
       return statusMake(INVALID_TRANSACTION_MODE,
 			"transaction lock mode %d", lockmode);
@@ -339,11 +353,20 @@ namespace eyedbsm {
 			"only lockmode, timeout and ratioalrt can be changed"
 			"dynamically");
 
-    if (params->lockmode == DatabaseX && oparams &&
+    if (params->lockmode == DatabaseW && oparams &&
 	oparams->lockmode != params->lockmode)
       return statusMake(INVALID_TRANSACTION_MODE,
-			"cannot change dynamically to database exclusive "
-			"mode");
+			"cannot change dynamically to database W lockmode");
+
+    if (params->lockmode == DatabaseRW && oparams &&
+	oparams->lockmode != params->lockmode)
+      return statusMake(INVALID_TRANSACTION_MODE,
+			"cannot change dynamically to database RW lockmode");
+
+    if (params->lockmode == DatabaseWtrans && oparams &&
+	oparams->lockmode != params->lockmode)
+      return statusMake(INVALID_TRANSACTION_MODE,
+			"cannot change dynamically to database Wtrans lockmode");
 
     trctx->params = *params;
 
@@ -355,7 +378,9 @@ namespace eyedbsm {
       trctx->params.magorder = params->magorder;
 
     if (params->trsmode == TransactionOff &&
-	(params->lockmode == ReadNWriteN || params->lockmode == DatabaseX))
+	(params->lockmode == ReadNWriteN ||
+	 params->lockmode == DatabaseW ||
+	 params->lockmode == DatabaseRW))
       trctx->skip = True;
     else
       trctx->skip = False;
@@ -405,12 +430,8 @@ namespace eyedbsm {
     if (!TR_CNT(dbh))
       return False;
 
-    /*
-      return (dbh->vd->trctx[TR_CNT(dbh)-1].params.lockmode == DatabaseX &&
-      dbh->vd->flags == ESM_VOLRW) ? True : False;
-    */
-
-    return dbh->vd->trctx[TR_CNT(dbh)-1].params.lockmode == DatabaseX ?
+    return dbh->vd->trctx[TR_CNT(dbh)-1].params.lockmode == DatabaseW ||
+      dbh->vd->trctx[TR_CNT(dbh)-1].params.lockmode == DatabaseRW ?
       True : False;
   }
 
@@ -420,10 +441,8 @@ namespace eyedbsm {
   {
     TransactionContext *trctx;
     unsigned int xid = dbh->vd->xid;
-    DbLock *dblock = &dbh->vd->shm_addr->lock;
+    DbLock *dblock_W = &dbh->vd->shm_addr->dblock_W;
     Status se;
-
-    /*printf("OPEN MODE %x\n", dbh->vd->flags);*/
 
     if (TR_CNT(dbh) >= MAXTRS)
       return statusMake(TOO_MANY_TRANSACTIONS, "maximum transaction excedeed [max=%d]", MAXTRS);
@@ -451,25 +470,20 @@ namespace eyedbsm {
 
     IDB_LOG(IDB_LOG_TRANSACTION, ("lockmode index=%p\n", trctx->lockmodeIndex));
 
-    if (params->lockmode == DatabaseX) {
-      se = lockX(dbh->vd, dblock, xid, trctx->params.wait_timeout);
+    if (params->lockmode == DatabaseW) {
+      se = lockX(dbh->vd, dblock_W, xid, trctx->params.wait_timeout);
       if (se) {
 	TR_CNT(dbh)--;
 	return se;
       }
     }
-#ifdef LAZY_LOCK_X
-    else if (dbh->vd->flags == VOLRW)
-#else
-      else
-#endif
-	{
-	  se = lockS(dbh->vd, dblock, xid, trctx->params.wait_timeout);
-	  if (se) {
-	    TR_CNT(dbh)--;
-	    return se;
-	  }
-	}
+    else if (must_lock_db(dbh)) {
+      se = lockS(dbh->vd, dblock_W, xid, trctx->params.wait_timeout);
+      if (se) {
+	TR_CNT(dbh)--;
+	return se;
+      }
+    }
 
     if (trctx->skip)
       trctx->trs_off = 0;
@@ -653,7 +667,7 @@ do { \
   ESM_transactionRealize(DbHandle const *dbh, TransState state)
   {
     TransactionContext *trctx;
-    DbLock *dblock = &dbh->vd->shm_addr->lock;
+    DbLock *dblock_W = &dbh->vd->shm_addr->dblock_W;
     unsigned int xid = dbh->vd->xid;
 
     if (!TR_CNT(dbh))
@@ -664,25 +678,31 @@ do { \
 
     trctx = &dbh->vd->trctx[--TR_CNT(dbh)];
 
-    /*  printf("transactionRealize(%d)\n", TR_CNT(dbh)); */
+    Status se = Success;
 
-    if (findXid(dbh->vd, dblock, xid, 0, False)) {
-      if (trctx->params.lockmode == DatabaseX)
-	unlockX(dbh->vd, dblock, xid);
-#ifdef LAZY_LOCK_X
-      else if (dbh->vd->flags == VOLRW)
-	unlockS(dbh->vd, dblock, xid);
-#else
-      else
-	unlockS(dbh->vd, dblock, xid);
+    // 15/09/06:
+    // why the unlock is before the ESM_transactionDelete !?
+    // I think, it should be after...
+    // => #define NEW_DBLOCK
+
+#define NEW_DBLOCK
+
+#ifdef NEW_DBLOCK
+    if (!trctx->skip)
+      se = ESM_transactionDelete(dbh, trctx->trs_off, state);
 #endif
+
+    if (findDbLockXID(dbh->vd, dblock_W, xid, 0, False)) {
+      if (trctx->params.lockmode == DatabaseW)
+	unlockX(dbh->vd, dblock_W, xid);
+      else if (must_lock_db(dbh))
+	unlockS(dbh->vd, dblock_W, xid);
     }
 
-    if (!trctx->skip) {
-      Status se = ESM_transactionDelete(dbh, trctx->trs_off, state);
-      if (se)
-	return se;
-    }
+#ifndef NEW_DBLOCK
+    if (!trctx->skip)
+      se = ESM_transactionDelete(dbh, trctx->trs_off, state);
+#endif
 
     trctx->trs_off = 0;
 
@@ -691,7 +711,7 @@ do { \
     else
       ESM_transactionProtectionsAdvise(dbh);
 
-    return Success;
+    return se;
   }
 
   Status
@@ -1705,7 +1725,6 @@ do { \
     trs->obj_cnt     = 0;
     trs->del_obj_cnt = 0;
     trs->xid = dbh->vd->xid;
-    /*  printf("xid = %d [%p]\n", trs->xid, trs);*/
     trs->wrimmediate = (params->trsmode == TransactionOff ? True : False);
     trs->prot_update = False;
     trs->dl          = 0;
@@ -1881,7 +1900,6 @@ do { \
     ESM_ASSERT(po->magic == POBJ_MAGIC, 0, 0);
 #endif
     TT(printf("TRObjectUnlock(nx = %d)\n", tro->oid.nx));
-    /*printf("TRObjectUnlock(nx = %d)\n", tro->oid.nx);*/
 
     trctx = &dbh->vd->trctx[TR_CNT(dbh)-1];
 
@@ -2446,19 +2464,9 @@ do { \
   void
   DbMutexesInit(DbDescription *vd, DbShmHeader *shmh)
   {
-    DbLock *dblock = &shmh->lock;
-
-    mutexInit(vd, DBLOCK_MTX(vd), &dblock->mp, "DATABASE");
-    condInit(vd, DBLOCK_COND(vd), &dblock->cond_wait);
-
-    dblock->X = 0;
-    dblock->S = 0;
-
-    dblock->wt_cnt = 0;
-
-    dblock->xidX = 0;
-
-    memset(dblock->xidS, 0, MAXCLIENTS_PERDB * sizeof(unsigned int));
+    lockInit(vd, &shmh->dblock_W, "database W");
+    lockInit(vd, &shmh->dblock_RW, "database RW");
+    lockInit(vd, &shmh->dblock_Wtrans, "database Wtrans");
 
     mutexInit(vd, VD2MTX(vd, MAP), &shmh->mtx.mp[MAP], "map");
     mutexInit(vd, VD2MTX(vd, TRS), &shmh->mtx.mp[TRS], "trs");
@@ -2470,10 +2478,9 @@ do { \
   void
   DbMutexesLightInit(DbDescription *vd, DbShmHeader *shmh)
   {
-    DbLock *dblock = &shmh->lock;
-
-    mutexLightInit(vd, DBLOCK_MTX(vd), &dblock->mp);
-    condLightInit(vd, DBLOCK_COND(vd), &dblock->cond_wait);
+    lockLightInit(vd, &shmh->dblock_W);
+    lockLightInit(vd, &shmh->dblock_RW);
+    lockLightInit(vd, &shmh->dblock_Wtrans);
 
     mutexLightInit(vd, &vd->mp[MAP], &shmh->mtx.mp[MAP]);
     mutexLightInit(vd, &vd->mp[TRS], &shmh->mtx.mp[TRS]);
@@ -2486,27 +2493,28 @@ do { \
   DbMutexesRelease(DbDescription *vd, DbShmHeader *shmh, unsigned int xid)
   {
     Mutex *mp;
-    int i, lockX;
+    bool lockX;
 
     IDB_LOG(IDB_LOG_TRANSACTION, ("eyedbsm: DbMutexesRelease\n"));
 
-    while (findXid(vd, &shmh->lock, xid, &lockX, True))
-      {
+    DbLock *dblocks[] = {&shmh->dblock_W, &shmh->dblock_RW, &shmh->dblock_Wtrans};
+
+    for (unsigned int i = 0; i < sizeof(dblocks)/sizeof(dblocks[0]); i++) {
+      while (findDbLockXID(vd, dblocks[i], xid, &lockX, True)) {
 	IDB_LOG(IDB_LOG_TRANSACTION, ("eyedbsm: main db mutex is kept by CURRENT xid = %d lockX = %d\n", xid, lockX));
 
-	/* MIND: if XID has several lockS on dblock, one
-	   must do S -= n */
-
+	// MIND: if XID has several lockS on dblock, one must do S -= n
+      
 	if (lockX)
-	  unlockX(vd, &shmh->lock, xid);
+	  unlockX(vd, dblocks[i], xid);
 	else 
-	  unlockS(vd, &shmh->lock, xid);
+	  unlockS(vd, dblocks[i], xid);
       }
-
-    TT(printf("MUTEXES RELEASE #2\n"));
+    }
+    
     mp = vd->mp;
 
-    for (i = 0; i < MTX_CNT; i++, mp++)
+    for (int i = 0; i < MTX_CNT; i++, mp++)
       mutexCheckNotLock(mp, xid);
 
     fflush(stderr);

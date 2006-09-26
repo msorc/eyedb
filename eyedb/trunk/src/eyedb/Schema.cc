@@ -1767,7 +1767,7 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
     for (j = i-1; j >= 0; j--)
       if (tmp[j]->getUserData() != InsertedSort)
 	{
-	  int attr_cnt;
+	  unsigned int attr_cnt;
 	  const Attribute **attr = tmp[j]->getAttributes(attr_cnt);
 	  for (int k = 0; k < attr_cnt; k++)
 	    if (!attr[k]->isIndirect() &&

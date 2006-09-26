@@ -18,7 +18,7 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
+  Author: Eric Viara <viara@sysra.com>
 */
 
 
@@ -42,10 +42,10 @@
 
 namespace eyedb {
 
-LinkedList *Database::dbopen_list;
+  LinkedList *Database::dbopen_list;
 
-//TransactionMode Database::global_def_trmod = idbReadWriteSharedTRMode;
-// changed the 19/10/99
+  //TransactionMode Database::global_def_trmod = idbReadWriteSharedTRMode;
+  // changed the 19/10/99
 
   Bool Database::def_commit_on_close = False;
 
@@ -90,11 +90,11 @@ LinkedList *Database::dbopen_list;
 #endif
 
   /*
-  void Database::setDefaultVolumeDirectory(const char *voldir)
-  {
+    void Database::setDefaultVolumeDirectory(const char *voldir)
+    {
     if (voldir)
-      default_voldir = strdup(voldir);
-  }
+    default_voldir = strdup(voldir);
+    }
   */
 
   void Database::init(const char *_dbmdb_str)
@@ -280,11 +280,11 @@ LinkedList *Database::dbopen_list;
   {
     return ServerConfig::getSValue("default_dbm");
     /*
-    const std::vector<std::string> & granted_dbm = getGrantedDBMDB();
-    if (granted_dbm.size())
+      const std::vector<std::string> & granted_dbm = getGrantedDBMDB();
+      if (granted_dbm.size())
       return granted_dbm[0].c_str();
 
-    return "";
+      return "";
     */
   }
 
@@ -375,49 +375,45 @@ LinkedList *Database::dbopen_list;
   Status Database::close(void)
   {
     RPCStatus status;
-    if (dbh)
-      {
-	open_refcnt--;
-	if (open_refcnt > 0)
-	  {
-	    ObjectPeer::decrRefCount(this);
-	    return Success;
-	  }
-
-	Bool commit = (commit_on_close_set ? commit_on_close :
-		       def_commit_on_close);
-	if (curtrs)
-	  {
-	    RPCStatus rpc_status;
-	    if ((rpc_status = (commit ? eyedb::transactionCommit(dbh, 0 ) :
-			       eyedb::transactionAbort(dbh, 0))) != RPCSuccess) {
-	      delete curtrs;
-	      curtrs = 0;
-	    }
-	  }
-
-	if (isBackEnd())
-	  status = IDB_dbClose((DbHandle *)dbh->u.dbh);
-	else
-	  status = dbClose(dbh);
-
-	if (status == RPCSuccess)
-	  {
-	    free(dbh);
-	    dbh = 0;
-	    /*
-	      sch->release();
-	      sch = 0;
-	    */
-	    dbid = 0;
-
-	    dbopen_list->deleteObject(this);
-
-	    return Success;
-	  }
-	else
-	  return StatusMake(status);
+    if (dbh) {
+      open_refcnt--;
+      if (open_refcnt > 0) {
+	ObjectPeer::decrRefCount(this);
+	return Success;
       }
+
+      Bool commit = (commit_on_close_set ? commit_on_close :
+		     def_commit_on_close);
+      if (curtrs) {
+	RPCStatus rpc_status;
+	if ((rpc_status = (commit ? eyedb::transactionCommit(dbh, 0 ) :
+			   eyedb::transactionAbort(dbh, 0))) != RPCSuccess) {
+	  delete curtrs;
+	  curtrs = 0;
+	}
+      }
+
+      if (isBackEnd())
+	status = IDB_dbClose((DbHandle *)dbh->u.dbh);
+      else
+	status = dbClose(dbh);
+
+      if (status == RPCSuccess) {
+	free(dbh);
+	dbh = 0;
+	/*
+	  sch->release();
+	  sch = 0;
+	*/
+	dbid = 0;
+
+	dbopen_list->deleteObject(this);
+
+	return Success;
+      }
+      else
+	return StatusMake(status);
+    }
 
     return Exception::make(IDB_DATABASE_CLOSE_ERROR, "database '%s' is not opened", getTName());
   }
@@ -429,16 +425,14 @@ LinkedList *Database::dbopen_list;
 
     Status status = sch->init(this, True);
 
-    if (status)
-      {
-	close();
-	return status;
-      }
-    else
-      {
-	sch->setDatabase(this);
-	return close();
-      }
+    if (status) {
+      close();
+      return status;
+    }
+    else {
+      sch->setDatabase(this);
+      return close();
+    }
   }
 
   const char *
@@ -471,35 +465,32 @@ LinkedList *Database::dbopen_list;
   Status Database::create_prologue(DbCreateDescription &dbdesc,
 				   DbCreateDescription **pdbdesc)
   {
-    if (!*pdbdesc)
-      {
-	eyedb_clear(dbdesc);
+    if (!*pdbdesc) {
+      eyedb_clear(dbdesc);
 
-	eyedbsm::DbCreateDescription *d = &dbdesc.sedbdesc;
-	if (!strcmp(name, DBM_Database::getDbName()))
-	  {
-	    strcpy(dbdesc.dbfile, dbmdb_str);
-	    char *q = strdup(dbmdb_str), *p;
+      eyedbsm::DbCreateDescription *d = &dbdesc.sedbdesc;
+      if (!strcmp(name, DBM_Database::getDbName())) {
+	strcpy(dbdesc.dbfile, dbmdb_str);
+	char *q = strdup(dbmdb_str), *p;
 
-	    if ((p = strrchr(q, '.')) && !strchr(p, '/'))
-	      *p = 0;
+	if ((p = strrchr(q, '.')) && !strchr(p, '/'))
+	  *p = 0;
 
-	    sprintf(d->dat[0].file, "%s.dat", q);
-	    delete q;
-	  }
-	else
-	  {
-	    sprintf(dbdesc.dbfile, "%s.dbs", name);
-	    sprintf(d->dat[0].file, "%s.dat", name);
-	  }
-
-	d->dat[0].mtype    = eyedbsm::BitmapType;
-	d->dat[0].sizeslot = 32;
-	d->dbid     = 0;
-	d->ndat     = 1;
-	d->dat[0].maxsize = 2000000;
-	*pdbdesc = &dbdesc;
+	sprintf(d->dat[0].file, "%s.dat", q);
+	delete q;
       }
+      else {
+	sprintf(dbdesc.dbfile, "%s.dbs", name);
+	sprintf(d->dat[0].file, "%s.dat", name);
+      }
+
+      d->dat[0].mtype    = eyedbsm::BitmapType;
+      d->dat[0].sizeslot = 32;
+      d->dbid     = 0;
+      d->ndat     = 1;
+      d->dat[0].maxsize = 2000000;
+      *pdbdesc = &dbdesc;
+    }
     else if (!strcmp(name, DBM_Database::getDbName()) &&
 	     strcmp((*pdbdesc)->dbfile, dbmdb_str))
       return Exception::make(IDB_DATABASE_CREATE_ERROR,
@@ -531,14 +522,13 @@ LinkedList *Database::dbopen_list;
     create_prologue(dbdesc, &pdbdesc);
 
     rpc_status = dbCreate(ConnectionPeer::getConnH(ch), dbmdb_str,
-			      user, passwd, name,
-			      pdbdesc);
+			  user, passwd, name,
+			  pdbdesc);
 
-    if (rpc_status == RPCSuccess)
-      {
-	conn = ch;
-	return init_db(ch);
-      }
+    if (rpc_status == RPCSuccess) {
+      conn = ch;
+      return init_db(ch);
+    }
     else
       return StatusMake(rpc_status);
   }
@@ -610,8 +600,8 @@ if ((mode) !=  NoDBAccessMode && \
     conn = ch;
     RPCStatus rpc_status;
     rpc_status = userDBAccessSet(ConnectionPeer::getConnH(conn),
-				     dbmdb_str, user, passwd,
-				     name, username, mode);
+				 dbmdb_str, user, passwd,
+				 name, username, mode);
     return StatusMake(rpc_status);
   }
 
@@ -630,8 +620,8 @@ if ((mode) !=  NoDBAccessMode && \
     conn = ch;
     RPCStatus rpc_status;
     rpc_status = defaultDBAccessSet(ConnectionPeer::getConnH(conn),
-					dbmdb_str, user, passwd,
-					name, mode);
+				    dbmdb_str, user, passwd,
+				    name, mode);
     return StatusMake(rpc_status);
   }
 
@@ -651,8 +641,8 @@ if ((mode) !=  NoDBAccessMode && \
     check_auth_st(user, passwd, "get info database", name);
 
     return StatusMake(dbInfo(ConnectionPeer::getConnH(ch), dbmdb_str,
-				 user, passwd,
-				 name, 0, pdbdesc));
+			     user, passwd,
+			     name, 0, pdbdesc));
   }
 
   /* static */
@@ -702,15 +692,14 @@ if ((mode) !=  NoDBAccessMode && \
 
     pdb = 0;
     while (c.getNext((void *&)db))
-      if (!strcmp(db->getDBMDB(), dbref->getDBMDB()) && db->getDbid() == dbid)
-	{
-	  if (pdb)
-	    return Exception::make
-	      (IDB_ERROR,
-	       "several opened databases with dbid #%d are opened: "
-	       "cannot choose", dbid);
-	  pdb = db;
-	}
+      if (!strcmp(db->getDBMDB(), dbref->getDBMDB()) && db->getDbid() == dbid) {
+	if (pdb)
+	  return Exception::make
+	    (IDB_ERROR,
+	     "several opened databases with dbid #%d are opened: "
+	     "cannot choose", dbid);
+	pdb = db;
+      }
 
     if (pdb) {
       pdb->open_refcnt++; // preventing closing
@@ -762,20 +751,18 @@ if ((mode) !=  NoDBAccessMode && \
     while (c.getNext((void *&)db)) {
       // 26/08/02: changed : ``db->getConnection() == conn'' to :
       if (db->getConnection()->getConnHandle() == conn->getConnHandle() &&
-	  (*cmp)(db, user_data) && flag == (db->open_flag & ~_DBOpenLocal))
-	{
-	  // check authentication
-	  if ((!user && !passwd && !db->_user && !db->_passwd) ||
-	      (user && passwd && db->_user && db->_passwd &&
-	       !strcmp(db->_user, user) &&
-	       !strcmp(db->_passwd, passwd)))
-	    {
-	      db->open_refcnt++; // preventing closing
-	      ObjectPeer::incrRefCount(db);    // preventing deleting
-	      *pdb = db;
-	      return Success;
-	    }
+	  (*cmp)(db, user_data) && flag == (db->open_flag & ~_DBOpenLocal)) {
+	// check authentication
+	if ((!user && !passwd && !db->_user && !db->_passwd) ||
+	    (user && passwd && db->_user && db->_passwd &&
+	     !strcmp(db->_user, user) &&
+	     !strcmp(db->_passwd, passwd))) {
+	  db->open_refcnt++; // preventing closing
+	  ObjectPeer::incrRefCount(db);    // preventing deleting
+	  *pdb = db;
+	  return Success;
 	}
+      }
     }
 
     db = make_db(user_data, dbmdb_str);
@@ -845,44 +832,42 @@ if ((mode) !=  NoDBAccessMode && \
     char *pname = (char *)(name ? name : "");
 
     //eyedblib::display_time("%s %s", name, "::open #3");
-    if (isBackEnd())
-      {
-	int pid;
-	DbHandle *ldbh;
+    if (isBackEnd()) {
+      int pid;
+      DbHandle *ldbh;
 
-	rpc_status = IDB_dbOpen(ConnectionPeer::getConnH(ch), (const char *&)dbmdb_str,
-				user, passwd,
-				pname, dbid, flag, (oh ? oh->maph : 0),
-				(oh ? oh->mapwide : 0),
-				&pid, &uid, (void *)this, &rname, &rdbid, 
-				&version, &ldbh);
-	if (rpc_status != RPCSuccess)
-	  return StatusMake(rpc_status);
+      rpc_status = IDB_dbOpen(ConnectionPeer::getConnH(ch), (const char *&)dbmdb_str,
+			      user, passwd,
+			      pname, dbid, flag, (oh ? oh->maph : 0),
+			      (oh ? oh->mapwide : 0),
+			      &pid, &uid, (void *)this, &rname, &rdbid, 
+			      &version, &ldbh);
+      if (rpc_status != RPCSuccess)
+	return StatusMake(rpc_status);
 
-	//eyedblib::display_time("%s %s", name, "::open #4");
-	dbh = (DbHandle *)malloc(sizeof(DbHandle));
+      //eyedblib::display_time("%s %s", name, "::open #4");
+      dbh = (DbHandle *)malloc(sizeof(DbHandle));
 
-	IDB_getLocalInfo(ldbh, &dbh->ldbctx, &dbh->sch_oid);
+      IDB_getLocalInfo(ldbh, &dbh->ldbctx, &dbh->sch_oid);
 
-	dbh->ch = ConnectionPeer::getConnH(ch);
-	dbh->ldbctx.local = rpc_True; // ?? oups
-	dbh->u.dbh = ldbh;
-	dbh->flags = flag & ~_DBOpenLocal;
-	dbh->tr_cnt = 0;
+      dbh->ch = ConnectionPeer::getConnH(ch);
+      dbh->ldbctx.local = rpc_True; // ?? oups
+      dbh->u.dbh = ldbh;
+      dbh->flags = flag & ~_DBOpenLocal;
+      dbh->tr_cnt = 0;
+      dbh->db = (void *)this;
+      //eyedblib::display_time("%s %s", name, "::open #5");
+    }
+    else {
+      rpc_status = dbOpen(ConnectionPeer::getConnH(ch), dbmdb_str,
+			  user, passwd,
+			  pname, dbid, flag, (oh ? oh->maph : 0),
+			  (oh ? oh->mapwide : 0), &uid,
+			  (void *)this, &rname, &rdbid, &version, &dbh);
+      //eyedblib::display_time("%s %s", name, "::open #6");
+      if (!rpc_status)
 	dbh->db = (void *)this;
-	//eyedblib::display_time("%s %s", name, "::open #5");
-      }
-    else
-      {
-	rpc_status = dbOpen(ConnectionPeer::getConnH(ch), dbmdb_str,
-				user, passwd,
-				pname, dbid, flag, (oh ? oh->maph : 0),
-				(oh ? oh->mapwide : 0), &uid,
-				(void *)this, &rname, &rdbid, &version, &dbh);
-	//eyedblib::display_time("%s %s", name, "::open #6");
-	if (!rpc_status)
-	  dbh->db = (void *)this;
-      }
+    }
 
     if (rpc_status != RPCSuccess)
       return StatusMake(rpc_status);
@@ -890,12 +875,11 @@ if ((mode) !=  NoDBAccessMode && \
     if (rdbid)
       dbid = rdbid;
 
-    if (rname)
-      {
-	if (rname != name)
-	  free(name);
-	name = strdup(rname);
-      }
+    if (rname) {
+      if (rname != name)
+	free(name);
+      name = strdup(rname);
+    }
 
     open_flag = flag;
 
@@ -917,13 +901,12 @@ if ((mode) !=  NoDBAccessMode && \
     //    status = sch->complete(True, False);
     status = sch->complete(False, False); // changed on 14/10/00
 #endif
-    else
-      {
-	/*
-	  fprintf(stderr, "error here!\n");
-	  status->print();
-	*/
-      }
+    else {
+      /*
+	fprintf(stderr, "error here!\n");
+	status->print();
+      */
+    }
 
     //eyedblib::display_time("%s %s", name, "::open #8");
     transactionCommit();
@@ -931,20 +914,18 @@ if ((mode) !=  NoDBAccessMode && \
     //eyedblib::display_time("%s %s", name, "::open #9");
     open_state = False;
 
-    if (status == Success)
-      {
-	dbopen_list->insertObject(this);
-	open_refcnt = 1;
-      }
+    if (status == Success) {
+      dbopen_list->insertObject(this);
+      open_refcnt = 1;
+    }
 
-    if (!status)
-      {
-	transactionBegin();
-	const Class *m_protclass = sch->getClass("protection");
-	if (m_protclass)
-	  m_protoid = m_protclass->getOid();
-	transactionCommit();
-      }
+    if (!status) {
+      transactionBegin();
+      const Class *m_protclass = sch->getClass("protection");
+      if (m_protclass)
+	m_protoid = m_protclass->getOid();
+      transactionCommit();
+    }
   
     //eyedblib::display_time("%s %s", name, "::open #10");
     return status;
@@ -996,11 +977,10 @@ if ((mode) !=  NoDBAccessMode && \
 
     open_state = False;
 
-    if (status == Success)
-      {
-	dbopen_list->insertObject(this);
-	open_refcnt = 1;
-      }
+    if (status == Success) {
+      dbopen_list->insertObject(this);
+      open_refcnt = 1;
+    }
 
     transactionCommit();
     return status;
@@ -1015,14 +995,13 @@ if ((mode) !=  NoDBAccessMode && \
     RPCStatus rpc_status;
 
     rpc_status = dbRename(ConnectionPeer::getConnH(_conn), dbmdb_str,
-			      user, passwd,
-			      name, newdbname);
-    if (rpc_status == RPCSuccess)
-      {
-	free(name);
-	name = strdup(newdbname);
-	return Success;
-      }
+			  user, passwd,
+			  name, newdbname);
+    if (rpc_status == RPCSuccess) {
+      free(name);
+      name = strdup(newdbname);
+      return Success;
+    }
 
     return StatusMake(rpc_status);
   }
@@ -1037,8 +1016,8 @@ if ((mode) !=  NoDBAccessMode && \
     RPCStatus rpc_status;
 
     rpc_status = dbMove(ConnectionPeer::getConnH(_conn), dbmdb_str,
-			    user, passwd,
-			    name, dbdesc);
+			user, passwd,
+			name, dbdesc);
 
     return StatusMake(rpc_status);
   }
@@ -1056,8 +1035,8 @@ if ((mode) !=  NoDBAccessMode && \
     RPCStatus rpc_status;
 
     rpc_status = dbCopy(ConnectionPeer::getConnH(_conn), dbmdb_str,
-			    user, passwd,
-			    name, newdbname, newdbid, dbdesc);
+			user, passwd,
+			name, newdbname, newdbid, dbdesc);
 
     return StatusMake(rpc_status);
   }
@@ -1150,13 +1129,15 @@ if ((mode) !=  NoDBAccessMode && \
 
   Status Database::transactionBegin(const TransactionParams &params)
   {
-    if (!trs_cnt)
-      {
-	Status status = 
-	  transactionBegin_realize(&params);
+    if (!trs_cnt) {
+      Status status = transactionBegin_realize(&params);
 
-	if (status) return status;
-      }
+      if (status)
+	return status;
+    }
+    else
+      return Exception::make(IDB_ERROR,
+			     "nested transactions are not yet implemented");
 
     ++trs_cnt;
     return Success;
@@ -1165,13 +1146,15 @@ if ((mode) !=  NoDBAccessMode && \
   Status
   Database::transactionBegin()
   {
-    if (!trs_cnt)
-      {
-	Status status = 
-	  transactionBegin_realize(0);
+    if (!trs_cnt) {
+      Status status = transactionBegin_realize(0);
 
-	if (status) return status;
-      }
+      if (status)
+	return status;
+    }
+    else
+      return Exception::make(IDB_ERROR,
+			     "nested transactions are not yet implemented");
 
     ++trs_cnt;
     return Success;
@@ -1181,7 +1164,7 @@ if ((mode) !=  NoDBAccessMode && \
   Database::transactionBeginExclusive()
   {
     TransactionParams params = TransactionParams::getGlobalDefaultTransactionParams();
-    params.lockmode = DatabaseX;
+    params.lockmode = DatabaseW;
     params.wait_timeout = 1;
 
     Status s = transactionBegin(params);
@@ -1212,12 +1195,11 @@ if ((mode) !=  NoDBAccessMode && \
 
     s = trs->begin();
 
-    if (s == Success)
-      {
-	if (!curtrs)
-	  roottrs = trs;
-	curtrs = trs;
-      }
+    if (s == Success) {
+      if (!curtrs)
+	roottrs = trs;
+      curtrs = trs;
+    }
     else
       curtrs = 0;
 
@@ -1236,21 +1218,19 @@ if ((mode) !=  NoDBAccessMode && \
     if (!curtrs || !trs_cnt)
       return Exception::make(IDB_NO_CURRENT_TRANSACTION, "transactionCommit");
 
-    if (trs_cnt > 1)
-      {
-	--trs_cnt;
-	return Success;
-      }
+    if (trs_cnt > 1) {
+      --trs_cnt;
+      return Success;
+    }
 
     IDB_LOG(IDB_LOG_TRANSACTION, ("database transaction commit\n"));
 
     Status s;
 
-    if (store_on_commit && obj_register)
-      {
-	s = storeRegisteredObjects();
-	if (s) return s;
-      }
+    if (store_on_commit && obj_register) {
+      s = storeRegisteredObjects();
+      if (s) return s;
+    }
 
     //  printf("db->transactionCommit_realize()\n\n");
 
@@ -1289,11 +1269,10 @@ if ((mode) !=  NoDBAccessMode && \
     if (!curtrs || !trs_cnt)
       return Exception::make(IDB_NO_CURRENT_TRANSACTION, "transactionAbort");
 
-    if (trs_cnt > 1)
-      {
-	--trs_cnt;
-	return Success;
-      }
+    if (trs_cnt > 1) {
+      --trs_cnt;
+      return Success;
+    }
 
     IDB_LOG(IDB_LOG_TRANSACTION, ("database transaction abort\n"));
 
@@ -1339,180 +1318,15 @@ if ((mode) !=  NoDBAccessMode && \
 
     obj_array.set(objs, count);
 
-    for (int i = 0; i < count; i++)
-      {
-	const Oid *poid = &oid_array[i];
-	Status status = loadObject(*poid, objs[i], lockmode, rcm);
-	if (status)
-	  return status;
-      }
+    for (int i = 0; i < count; i++) {
+      const Oid *poid = &oid_array[i];
+      Status status = loadObject(*poid, objs[i], lockmode, rcm);
+      if (status)
+	return status;
+    }
 
     return Success;
   }
-
-#if 0
-  Status Database::queryObject(Object *&o, const char *fmt, ...)
-  {
-    va_list ap;
-
-    va_start(ap, fmt);
-
-    Status status = queryObject(o, NoRecurs, fmt, ap);
-
-    va_end(ap);
-    return status;
-  }
-
-  Status Database::queryObject(Object *&o, const RecMode *rcm,
-			       const char *fmt, ...)
-  {
-    va_list ap;
-
-    va_start(ap, fmt);
-
-    Iterator q(this, fmt, ap);
-
-    o = NULL;
-
-    if (q.getStatus())
-      {
-	va_end(ap);
-	return q.getStatus();
-      }
-
-    Bool found;
-    Status status = q.scanNext(found, o, rcm);
-
-    va_end(ap);
-    return status;
-  }
-
-  Status Database::queryObjects(ObjectArray &obj_array, const char *fmt, ...)
-  {
-    va_list ap;
-
-    va_start(ap, fmt);
-
-    Status status = queryObjects(obj_array, NoRecurs, fmt, ap);
-
-    va_end(ap);
-    return status;
-  }
-
-  Status Database::queryOid(Oid &_oid, const char *fmt, ...)
-  {
-    va_list ap;
-
-    va_start(ap, fmt);
-
-    Iterator q(this, fmt, ap);
-
-    _oid.invalidate();
-
-    if (q.getStatus())
-      {
-	va_end(ap);
-	return q.getStatus();
-      }
-
-    Bool found;
-    Status status = q.scanNext(found, _oid);
-
-    va_end(ap);
-    return status;
-  }
-
-  Status Database::queryOids(OidArray &oid_array, const char *fmt, ...)
-  {
-    va_list ap;
-
-    va_start(ap, fmt);
-
-    Iterator q(this, fmt, ap);
-
-    oid_array.set(NULL, 0);
-
-    if (q.getStatus())
-      {
-	va_end(ap);
-	return q.getStatus();
-      }
-
-    Status status = q.scan(oid_array);
-
-    va_end(ap);
-    return status;
-  }
-
-  Status Database::queryValue(Value &value, const char *fmt, ...)
-  {
-    va_list ap;
-
-    va_start(ap, fmt);
-
-    Iterator q(this, fmt, ap);
-
-    value.set();
-
-    if (q.getStatus())
-      {
-	va_end(ap);
-	return q.getStatus();
-      }
-
-    Bool found;
-    Status status = q.scanNext(found, value);
-
-    va_end(ap);
-    return status;
-  }
-
-  Status Database::queryValues(ValueArray &val_array, const char *fmt, ...)
-  {
-    va_list ap;
-
-    va_start(ap, fmt);
-
-    Iterator q(this, fmt, ap);
-
-    val_array.set(NULL, 0);
-
-    if (q.getStatus())
-      {
-	va_end(ap);
-	return q.getStatus();
-      }
-
-    Status status = q.scan(val_array);
-
-    va_end(ap);
-    return status;
-  }
-
-  Status Database::queryObjects(ObjectArray &obj_array,
-				const RecMode *rcm,
-				const char *fmt, ...)
-  {
-    va_list ap;
-
-    va_start(ap, fmt);
-
-    Iterator q(this, fmt, ap);
-
-    obj_array.set(NULL, 0);
-
-    if (q.getStatus())
-      {
-	va_end(ap);
-	return q.getStatus();
-      }
-
-    Status status = q.scan(obj_array, rcm);
-
-    va_end(ap);
-    return status;
-  }
-#endif
 
   Status
   Database::loadObject(const Oid &xoid, Object *&o,
@@ -1624,12 +1438,11 @@ if ((mode) !=  NoDBAccessMode && \
 #ifdef CACHE_OBJECTS
     if (reload)
       uncacheObject(*poid);
-    else if (curtrs && (*o = (Object *)curtrs->getObject(*poid)))
-      {
-	ObjectPeer::incrRefCount(*o);
-	//printf("object %s in transaction cache\n", poid->getString());
-	return Success;
-      }
+    else if (curtrs && (*o = (Object *)curtrs->getObject(*poid))) {
+      ObjectPeer::incrRefCount(*o);
+      //printf("object %s in transaction cache\n", poid->getString());
+      return Success;
+    }
 #endif
 
     if (recmode->getType() != RecMode_NoRecurs &&
@@ -1650,11 +1463,11 @@ if ((mode) !=  NoDBAccessMode && \
     short datid;
     if (isLocal())
       rpc_status = objectRead(dbh, 0, &o_idr, &datid, poid->getOid(), &hdr,
-				  lockmode, (void **)&cl);
+			      lockmode, (void **)&cl);
     else {
       if ((rpc_status = objectRead(dbh, 0, &o_idr, &datid, poid->getOid(),
-				       0,
-				       lockmode, 0)) ==
+				   0,
+				   lockmode, 0)) ==
 	  RPCSuccess) {
 	Offset offset = 0;
 	object_header_decode(o_idr, &offset, &hdr);
@@ -1863,19 +1676,17 @@ if ((mode) !=  NoDBAccessMode && \
 #ifdef CACHE_OBJECTS
     // 18/05/99 WE DO NOT USE CACHE anymore
     //  if (useCache && curtrs && (*o = (Object *)curtrs->getObject(*poid)))
-    if (0)
-      {
-	ObjectPeer::incrRefCount(*o);
-	if (!memcmp(_idr, (*o)->getIDR(), hdr->size))
-	  return Success;
-	else
-	  {
-	    fprintf(stderr, "invalid cache for object '%s'\n", 
-		    poid->getString());
-	    utlog("invalid cache for object '%s'\n", 
-		  poid->getString());
-	  }
+    if (0) {
+      ObjectPeer::incrRefCount(*o);
+      if (!memcmp(_idr, (*o)->getIDR(), hdr->size))
+	return Success;
+      else {
+	fprintf(stderr, "invalid cache for object '%s'\n", 
+		poid->getString());
+	utlog("invalid cache for object '%s'\n", 
+	      poid->getString());
       }
+    }
 #endif
 
     Status status = Success;
@@ -1883,19 +1694,17 @@ if ((mode) !=  NoDBAccessMode && \
 
     Class *cl = sch->getClass(ClassOidDecode(_idr));
     Size _obj_sz = hdr->size;
-    if (cl)
-      {
-	Size _psize, _vsize;
-	_obj_sz = cl->getIDRObjectSize(&_psize, &_vsize);
-	if (_vsize)
-	  {
-	    Data cp_idr = (unsigned char *)malloc(_obj_sz);
-	    memcpy(cp_idr, _idr, hdr->size);
-	    memset(cp_idr + _psize, 0, _vsize);
-	    _idr = cp_idr;
-	    copy = True;
-	  }
+    if (cl) {
+      Size _psize, _vsize;
+      _obj_sz = cl->getIDRObjectSize(&_psize, &_vsize);
+      if (_vsize) {
+	Data cp_idr = (unsigned char *)malloc(_obj_sz);
+	memcpy(cp_idr, _idr, hdr->size);
+	memset(cp_idr + _psize, 0, _vsize);
+	_idr = cp_idr;
+	copy = True;
       }
+    }
 
     Status (*make)(Database *, const Oid *, Object **,
 		   const RecMode *,
@@ -1975,12 +1784,11 @@ if ((mode) !=  NoDBAccessMode && \
   void Database::cacheObject(Object *o)
   {
 #ifdef CACHE_OBJECTS
-    if (curtrs)
-      {
-	Oid _oid = o->getOid();
-	if (_oid.isValid())
-	  curtrs->cacheObject(_oid, o);
-      }
+    if (curtrs) {
+      Oid _oid = o->getOid();
+      if (_oid.isValid())
+	curtrs->cacheObject(_oid, o);
+    }
 #endif
   }
 
@@ -2027,11 +1835,10 @@ if ((mode) !=  NoDBAccessMode && \
       return;
 
     store_on_commit = on;
-    if (store_on_commit && !auto_register_on)
-      {
-	auto_register_on = True;
-	clearRegister();
-      }
+    if (store_on_commit && !auto_register_on) {
+      auto_register_on = True;
+      clearRegister();
+    }
   }
 
   void
@@ -2047,12 +1854,11 @@ if ((mode) !=  NoDBAccessMode && \
   void
   Database::addToRegister(const Object *o, Bool force)
   {
-    if (auto_register_on || force)
-      {
-	if (!obj_register)
-	  obj_register = makeRegister();
-	obj_register->insertObject(obj2oid(o), (void *)o);
-      }
+    if (auto_register_on || force) {
+      if (!obj_register)
+	obj_register = makeRegister();
+      obj_register->insertObject(obj2oid(o), (void *)o);
+    }
   }
 
   void
@@ -2077,12 +1883,11 @@ if ((mode) !=  NoDBAccessMode && \
 
     ObjectListCursor c(list);
     Object *o;
-    while (c.getNext(o))
-      {
-	//printf("storing registered objects %p\n", o);
-	Status s = o->store(RecMode::FullRecurs);
-	if (s) {delete list; return s;}
-      }
+    while (c.getNext(o)) {
+      //printf("storing registered objects %p\n", o);
+      Status s = o->store(RecMode::FullRecurs);
+      if (s) {delete list; return s;}
+    }
 
     delete list;
     return Success;
@@ -2181,21 +1986,20 @@ if ((mode) !=  NoDBAccessMode && \
       return Exception::make(IDB_ERROR, "oid '%s': invalid null database",
 			     _oid.toString());
 
-    if (obj_dbid != dbid)
-      {
-	Database *xdb;
-	Status status = getOpenedDB(obj_dbid, this, xdb);
-	if (status) return status;
+    if (obj_dbid != dbid) {
+      Database *xdb;
+      Status status = getOpenedDB(obj_dbid, this, xdb);
+      if (status) return status;
 
-	if (!xdb)
-	  return Exception::make(IDB_DATABASE_GET_OBJECT_CLASS_ERROR,
-				 "cannot get class of object %s: "
-				 "database ID #%d must be manually "
-				 "opened by the client",
-				 _oid.getString(), obj_dbid);
+      if (!xdb)
+	return Exception::make(IDB_DATABASE_GET_OBJECT_CLASS_ERROR,
+			       "cannot get class of object %s: "
+			       "database ID #%d must be manually "
+			       "opened by the client",
+			       _oid.getString(), obj_dbid);
       
-	return xdb->getObjectClass(_oid, _class);
-      }
+      return xdb->getObjectClass(_oid, _class);
+    }
 
     eyedbsm::Oid moid;
     int _state;
@@ -2213,25 +2017,23 @@ if ((mode) !=  NoDBAccessMode && \
 
     // added this kludge (?) the 6/10/99
     Class *clx;
-    if (!cloid.isValid() && (clx = sch->getClass(_oid)))
-      {
-	if (!strcmp(clx->getName(), "class") || !strcmp(clx->getName(), "set") ||
-	    !strcmp(clx->getName(), "set<object*>") ||
-	    !strcmp(clx->getName(), "object")) // last test added 2/5/00
-	  _class = sch->getClass("class");
-      }
+    if (!cloid.isValid() && (clx = sch->getClass(_oid))) {
+      if (!strcmp(clx->getName(), "class") || !strcmp(clx->getName(), "set") ||
+	  !strcmp(clx->getName(), "set<object*>") ||
+	  !strcmp(clx->getName(), "object")) // last test added 2/5/00
+	_class = sch->getClass("class");
+    }
     else
       _class = sch->getClass(cloid);
 
 #if 0
-    if (!_class)
-      {
-	ClassConversion::Context *conv_ctx = 0;
-	Status s = ClassConversion::getClass(this, cloid,
-					     (const Class *&)_class,
-					     conv_ctx);
-	if (s) return s;
-      }
+    if (!_class) {
+      ClassConversion::Context *conv_ctx = 0;
+      Status s = ClassConversion::getClass(this, cloid,
+					   (const Class *&)_class,
+					   conv_ctx);
+      if (s) return s;
+    }
 #endif
 
     if (!_class)
@@ -2251,7 +2053,7 @@ if ((mode) !=  NoDBAccessMode && \
     RPCStatus rpc_status;
 
     rpc_status = objectProtectionSet(getDbHandle(), obj_oid.getOid(),
-					 prot_oid.getOid());
+				     prot_oid.getOid());
 
     return StatusMake(rpc_status);
   }
@@ -2269,7 +2071,7 @@ if ((mode) !=  NoDBAccessMode && \
     eyedbsm::Oid _prot_oid;
 
     rpc_status = objectProtectionGet(getDbHandle(), obj_oid.getOid(),
-					 &_prot_oid);
+				     &_prot_oid);
 
     if (!rpc_status) {
       prot_oid.setOid(_prot_oid);
@@ -2294,18 +2096,16 @@ if ((mode) !=  NoDBAccessMode && \
 
   void Database::updateSchema(const SchemaInfo &schinfo)
   {
-    if (schinfo.class_cnt)
-      {
-	for (int i = 0; i < schinfo.class_cnt; i++)
-	  {
-	    Object *o;
-	    Class *cl = sch->getClass(schinfo.class_oid[i]);
-	    if (cl) {uncacheObject(cl); sch->suppressClass(cl);}
-	    loadObject(&schinfo.class_oid[i], &o);
-	  }
-
-	sch->complete(True, True);
+    if (schinfo.class_cnt) {
+      for (int i = 0; i < schinfo.class_cnt; i++) {
+	Object *o;
+	Class *cl = sch->getClass(schinfo.class_oid[i]);
+	if (cl) {uncacheObject(cl); sch->suppressClass(cl);}
+	loadObject(&schinfo.class_oid[i], &o);
       }
+
+      sch->complete(True, True);
+    }
   }
 
   const char *
@@ -2681,7 +2481,7 @@ if ((mode) !=  NoDBAccessMode && \
       return Success;
 
     RPCStatus rpc_status = getObjectsLocations(dbh, oids, cnt,
-						   (Data *)&locarr);
+					       (Data *)&locarr);
     delete [] oids;
     return StatusMake(rpc_status);
   }
@@ -2715,7 +2515,7 @@ if ((mode) !=  NoDBAccessMode && \
   {
     char **datids = Dataspace::makeDatid(datafiles, datafile_cnt);
     RPCStatus rpc_status = eyedb::createDataspace(dbh, dspname,
-					       datids, datafile_cnt);
+						  datids, datafile_cnt);
     Dataspace::freeDatid(datids, datafile_cnt);
     return StatusMake(rpc_status);
   }
@@ -2742,4 +2542,3 @@ if ((mode) !=  NoDBAccessMode && \
   }
 
 }
-  

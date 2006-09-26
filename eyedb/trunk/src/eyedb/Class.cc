@@ -916,7 +916,7 @@ namespace eyedb {
     return Success;
   }
 
-  Status Class::setAttributes(Attribute **agr, int base_n)
+  Status Class::setAttributes(Attribute **agr, unsigned int base_n)
   {
     if (items_set)
       return Exception::make(IDB_ATTRIBUTE_ERROR, "class '%s' has already its attributes set", name);
@@ -984,7 +984,7 @@ namespace eyedb {
     return Success;
   }
 
-  const Attribute *Class::getAttribute(int n) const
+  const Attribute *Class::getAttribute(unsigned int n) const
   {
     if (n >= 0 && n < items_cnt)
       return items[n];
@@ -992,7 +992,7 @@ namespace eyedb {
       return 0;
   }
 
-  int Class::getAttributesCount(void) const
+  unsigned int Class::getAttributesCount(void) const
   {
     return items_cnt;
   }
@@ -1363,7 +1363,7 @@ namespace eyedb {
     //  trace_comps(fd, indent, flags, rcm);
     if ((flags & NativeTrace) == NativeTrace)
       {
-	int _items_cnt;
+	unsigned int _items_cnt;
 	const Attribute **_items = getClass()->getAttributes(_items_cnt);
 
 	for (int n = 0; n < _items_cnt; n++)
@@ -2286,8 +2286,9 @@ namespace eyedb {
   }
 
   static ClassComponent **
-  make_array(const LinkedList *list, int &cnt, ClassComponent **prev = 0,
-	     int prev_cnt = 0)
+  make_array(const LinkedList *list, unsigned int &cnt,
+	     ClassComponent **prev = 0,
+	     unsigned int prev_cnt = 0)
   {
     cnt = (list ? list->getCount() : 0) + prev_cnt;
 
@@ -2315,13 +2316,13 @@ namespace eyedb {
   }
 
   Method **
-  Class::getMethods(int& cnt)
+  Class::getMethods(unsigned int& cnt)
   {
     return (Method **)make_array(getCompList(Method_C), cnt);
   }
 
   const Method **
-  Class::getMethods(int& cnt) const
+  Class::getMethods(unsigned int& cnt) const
   {
     return (const Method **)make_array(getCompList(Method_C), cnt);
   }
@@ -2393,7 +2394,7 @@ namespace eyedb {
   }
 
   Trigger **
-  Class::getTriggers(int& cnt)
+  Class::getTriggers(unsigned int& cnt)
   {
     ClassComponent **arr;
     arr = make_array(getCompList(TrigCreateBefore_C), cnt);
@@ -2408,20 +2409,20 @@ namespace eyedb {
   }
 
   const Trigger **
-  Class::getTriggers(int& cnt) const
+  Class::getTriggers(unsigned int& cnt) const
   {
     return (const Trigger **)((Class *)this)->getTriggers(cnt);
   }
 
 
   ClassVariable **
-  Class::getVariables(int& cnt)
+  Class::getVariables(unsigned int& cnt)
   {
     return (ClassVariable **)make_array(getCompList(Variable_C), cnt);
   }
 
   const ClassVariable **
-  Class::getVariables(int& cnt) const
+  Class::getVariables(unsigned int& cnt) const
   {
     return (const ClassVariable **)make_array(getCompList(Variable_C), cnt);
   }
@@ -2458,7 +2459,7 @@ namespace eyedb {
     return const_cast<Class *>(this)->getVariable(_name, (const ClassVariable *&)rvar);
   }
 
-  Status Class::add(int w, AttributeComponent *comp)
+  Status Class::add(unsigned int w, AttributeComponent *comp)
   {
     Status s = makeAttrCompList();
     if (s) return s;
@@ -2474,7 +2475,7 @@ namespace eyedb {
     return Success;
   }
 
-  Status Class::add(int w, ClassComponent *comp, Bool incrRefCount)
+  Status Class::add(unsigned int w, ClassComponent *comp, Bool incrRefCount)
   {
     Status status;
 
@@ -2511,7 +2512,7 @@ namespace eyedb {
     return Success;
   }
 
-  Status Class::suppress(int w, ClassComponent *comp)
+  Status Class::suppress(unsigned int w, ClassComponent *comp)
   {
     if (clist[w])
       clist[w]->deleteObject(comp);
@@ -2526,7 +2527,7 @@ namespace eyedb {
     return Success;
   }
 
-  Status Class::suppress(int w, AttributeComponent *comp)
+  Status Class::suppress(unsigned int w, AttributeComponent *comp)
   {
     if (attr_clist[w])
       attr_clist[w]->deleteObject(comp);
@@ -3324,7 +3325,7 @@ namespace eyedb {
   }
 
   Status
-  Class::getSubClasses(Class **&_subclasses, int &_subclass_count,
+  Class::getSubClasses(Class **&_subclasses, unsigned int &_subclass_count,
 		       Bool _sort_down_to_top) const
   {
     Schema *msch = 0;

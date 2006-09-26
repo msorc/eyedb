@@ -78,6 +78,13 @@ namespace eyedb {
     */
     static unsigned int getGlobalDefaultMagOrder();
 
+    /**
+       Not yet documented
+       @param params
+       @return
+    */
+    bool operator==(const TransactionParams &params) const;
+
   public:
     TransactionMode trsmode;
     TransactionLockMode lockmode;

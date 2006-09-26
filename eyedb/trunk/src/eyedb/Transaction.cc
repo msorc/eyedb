@@ -144,7 +144,9 @@ Status Transaction::checkParams(const TransactionParams &params,
       params.lockmode != ReadNWriteSX &&
       params.lockmode != ReadNWriteX &&
       params.lockmode != ReadNWriteN &&
-      params.lockmode != DatabaseX)
+      params.lockmode != DatabaseW &&
+      params.lockmode != DatabaseRW &&
+      params.lockmode != DatabaseWtrans)
     return Exception::make(IDB_INVALID_TRANSACTION_PARAMS,
 			      "invalid lock mode %d", params.lockmode);
 

@@ -976,7 +976,7 @@ oqmlStatus *oqmlMethodCall::resolveMethod(Database *db, oqmlContext *ctx,
   printf("resolving method '%s' [isStatic %d] [class %s]\n",
 	 rmthname, isStatic, cls->getName());
 #endif
-  int mth_cnt;
+  unsigned int mth_cnt;
   const Method **mths = cls->getMethods(mth_cnt);
   const Method **cand_mths = (const Method **)
     malloc(mth_cnt * sizeof(Method *));

@@ -2841,7 +2841,7 @@ namespace eyedb {
 			   "class '%s' is not a agregat_class in %s()",
 			   cls->getName(), fname);
 
-    int count;
+    unsigned int count;
     const Attribute **items = ((AgregatClass *)cls)->getAttributes(count);
     if (num < 0 || num >= count)
       return rpcStatusMake(IDB_FATAL_ERROR, "invalid item number `%d' in for class '%s' in %s()",
@@ -3277,7 +3277,7 @@ namespace eyedb {
 
     //printf("\nPropagating...\n");
     Class **subclasses;
-    int subclass_cnt;
+    unsigned int subclass_cnt;
     Status s = cls->getSubClasses(subclasses, subclass_cnt);
     if (s) return rpcStatusMake(s);
 
@@ -5709,7 +5709,7 @@ namespace eyedb {
   trace_oids(Class *cls)
   {
     printf("TRACE %s cls=%p\n", cls->getName(), cls);
-    int attr_cnt;
+    unsigned int attr_cnt;
     const Attribute **attrs = cls->getAttributes(attr_cnt);
     for (int i = 0; i < attr_cnt; i++)
       printf("%s -> %s\n", attrs[i]->getName(), attrs[i]->getAttrCompSetOid().toString());
@@ -5718,7 +5718,7 @@ namespace eyedb {
   static void
   IDB_reportAttrCompSetOids(Class *cls, Data idr)
   {
-    int attr_cnt;
+    unsigned int attr_cnt;
     const Attribute **attrs = cls->getAttributes(attr_cnt);
     Offset offset = IDB_CLASS_ATTR_START;
     for (int i = 0; i < attr_cnt; i++)
@@ -5859,7 +5859,7 @@ namespace eyedb {
   static RPCStatus
   IDB_removeAttrCompSet(Database *db, Class *cl)
   {
-    int attr_cnt;
+    unsigned int attr_cnt;
     const Attribute **attrs = cl->getAttributes(attr_cnt);
     for (int n = 0; n < attr_cnt; n++) {
       if (!cl->compare(attrs[n]->getClassOwner()))

@@ -317,7 +317,7 @@ odlRemoveClass::prePerform(Database *db, Schema *_m)
     if (must_remove(xcls, cls_oid, false))
       err += string("\n  must remove class ") + xcls->getName();
     else {
-      int attr_cnt;
+      unsigned int attr_cnt;
       const Attribute **attrs = xcls->getAttributes(attr_cnt);
       for (int n = 0; n < attr_cnt; n++) {
 	if (must_remove(attrs[n]->getClass(), cls_oid, true))
@@ -561,7 +561,7 @@ odlUpdateAttribute::invalidateInverseOid(Database *db,
       AgregatClass *cls_c = xcls->asAgregatClass();
       if (!cls_c || cls_c->isSystem())
 	continue;
-      int attr_cnt;
+      unsigned int attr_cnt;
       const Attribute **attrs = cls_c->getAttributes(attr_cnt);
       for (int i = 0; i < attr_cnt; i++)
 	{
@@ -648,7 +648,7 @@ refer_to(const Class *xcls, const Class *cls)
 
   const_cast<Class *>(xcls)->state |= 1;
 
-  int attr_cnt;
+  unsigned int attr_cnt;
   const Attribute **attrs = xcls->getAttributes(attr_cnt);
   for (int i = 0; i < attr_cnt; i++)
     if (refer_to(attrs[i], cls)) {
@@ -737,7 +737,7 @@ odlPostUpdate::perform(Database *db)
     }
   }
 
-  int attr_cnt;
+  unsigned int attr_cnt;
   Attribute **attrs = (Attribute **)cls->getAttributes(attr_cnt);
 
   return Success;
