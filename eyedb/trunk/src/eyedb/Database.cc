@@ -40,6 +40,8 @@
 #define FULL_CACHE_OBJECTS
 #define CACHE_OBJECTS
 
+//#define STRICT_NOT_NESTED_TRANSACTIONS
+
 namespace eyedb {
 
   LinkedList *Database::dbopen_list;
@@ -1135,9 +1137,11 @@ if ((mode) !=  NoDBAccessMode && \
       if (status)
 	return status;
     }
+#ifdef STRICT_NOT_NESTED_TRANSACTIONS
     else
       return Exception::make(IDB_ERROR,
 			     "nested transactions are not yet implemented");
+#endif
 
     ++trs_cnt;
     return Success;
@@ -1152,9 +1156,11 @@ if ((mode) !=  NoDBAccessMode && \
       if (status)
 	return status;
     }
+#ifdef STRICT_NOT_NESTED_TRANSACTIONS
     else
       return Exception::make(IDB_ERROR,
 			     "nested transactions are not yet implemented");
+#endif
 
     ++trs_cnt;
     return Success;
