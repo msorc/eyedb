@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+  "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+
+<!ENTITY eyedbadmin "<command>eyedbadmin</command>">
+
+]>
+
+<refentry id="eyedbadmin">
+  <refentryinfo>
+    <date>04 October 2005</date>
+  </refentryinfo>
+
+  <refmeta>
+    <refentrytitle>eyedbadmin</refentrytitle>
+    <manvolnum>1</manvolnum>
+    <refmiscinfo>eyedb database</refmiscinfo>
+  </refmeta>
+
+  <refnamediv>
+    <refname>&eyedbadmin;</refname>
+    <refpurpose>administer eyedb database</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      &eyedbadmin;
+      <arg choice="req"><replaceable>command</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+      <varlistentry>
+	<term>-eyedbroot</term>
+	<listitem>
+	  <para>gives the root directory of the Eyedb installation</para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+
+  </refsect1>
+
+  <refsect1>
+    <title>Examples</title>
+  </refsect1>
+
+  <refsect1>
+    <title>Files</title>
+  </refsect1>
+
+  <refsect1>
+    <title>Environment</title>
+  </refsect1>
+
+  <refsect1>
+    <title>See also</title>
+
+    <simplelist>
+      <member><command>eyedbdbcreate</command></member>
+    </simplelist>
+
+  </refsect1>
+
+  <refsect1>
+    <title>Bugs</title>
+  </refsect1>
+
+  <refsect1>
+    <title>Authors</title>
+  </refsect1>
+
+</refentry>
