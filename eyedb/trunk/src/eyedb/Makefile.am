@@ -22,7 +22,6 @@ code.cc						\
 CollectionBE.cc					\
 CollArray.cc					\
 CollBag.cc					\
-CollCache.cc					\
 CollectionClass.cc				\
 Collection.cc					\
 CollectionIterator.cc				\

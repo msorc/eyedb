@@ -23,9 +23,11 @@
 
 
 #include "eyedb_p.h"
-#include "CollCache.h"
+#include "ValueCache.h"
 #include <assert.h>
 #include "AttrNative.h"
+
+#define TEMP_COLL_ARRAY_READ_CACHE
 
 // 15/08/06 : does not raise an exception when itemid in retrieveAt is
 // out of range
@@ -40,6 +42,9 @@ namespace eyedb {
     allow_dup = True;
     ordered = True;
     type = _CollArray_Type;
+
+    read_arr_cache = new ValueCache(this);
+
     if (!status)
       setClass(CollArrayClass::make(coll_class, isref, dim, status));
   }
@@ -97,6 +102,8 @@ namespace eyedb {
     allow_dup = True;
     ordered = True;
     type = _CollArray_Type;
+
+    read_arr_cache = new ValueCache(this);
   }
 
   CollArray& CollArray::operator=(const CollArray& o)
@@ -105,6 +112,10 @@ namespace eyedb {
     allow_dup = True;
     ordered = True;
     type = _CollArray_Type;
+
+    delete read_arr_cache;
+    read_arr_cache = new ValueCache(this);
+
     return *this;
   }
 
@@ -197,7 +208,7 @@ namespace eyedb {
 
     IDB_COLL_LOAD_DEFERRED();
     touch();
-    CollItem *item;
+    ValueItem *item;
 
     create_cache();
 
@@ -238,7 +249,7 @@ namespace eyedb {
 
     IDB_COLL_LOAD_DEFERRED();
     touch();
-    CollItem *item;
+    ValueItem *item;
 
     create_cache();
 
@@ -274,7 +285,7 @@ namespace eyedb {
     Data item_data = make_data(val, size);
 #endif
  
-    CollItem *item;
+    ValueItem *item;
 
     create_cache();
 
@@ -283,11 +294,7 @@ namespace eyedb {
     else
       v_items_cnt++;
 
-#ifdef USE_VALUE_CACHE
     cache->insert(Value(item_data, item_size), id, added);
-#else
-    cache->insert(item_data, id, added);
-#endif
 
     if (id >= top)
       top = id+1;
@@ -318,7 +325,7 @@ namespace eyedb {
     if (status)
       return Exception::make(status);
 
-    CollItem *item;
+    ValueItem *item;
     IDB_COLL_LOAD_DEFERRED();
     touch();
     if (cache && (item = cache->get(id))) {
@@ -365,13 +372,8 @@ namespace eyedb {
       memcpy(&toid, item_data, sizeof(Oid));
       cache->insert(toid, id, removed);
     }
-#ifdef USE_VALUE_CACHE
     else
       cache->insert(Value(item_data, item_size), id, removed);
-#else
-    else
-      cache->insert(item_data, id, removed);
-#endif
 
     v_items_cnt--;
 
@@ -395,27 +397,25 @@ namespace eyedb {
 			     "index out of range #%d for collection array",
 			     id, oid.toString());
 #endif
-    CollItem *item;
+    ValueItem *item;
 
-    if (cache && (item = cache->get(id)))
-	{
-	  if (item->getState() == added) {
-#ifdef USE_VALUE_CACHE
-	    if (item->getValue().type == Value::tOid)
-	      item_oid = *item->getValue().oid;
-	    else
-	      item_oid = Oid::nullOid;
-#else
-	    item_oid = item->getOid();
-#endif
-	  }
-	  else
-	    item_oid = Oid::nullOid;
+    // should take read_arr_cache into account and merge cache and read_arr_cache
+    if (cache && (item = cache->get(id))) {
+      if (item->getState() == added) {
+	if (item->getValue().type == Value::tOid)
+	  item_oid = *item->getValue().oid;
+	else if (item->getValue().type == Value::tObject)
+	  item_oid = item->getValue().o->getOid();
+	else
+	  item_oid = Oid::nullOid;
+      }
+      else
+	item_oid = Oid::nullOid;
 #ifdef NEW_COLL_XDR2
-	  decode((Data)item_oid.getOid());
+      decode((Data)item_oid.getOid());
 #endif
-	  return Success;
-	}
+      return Success;
+    }
       
     if (!getOidC().isValid()) {
       item_oid.invalidate();
@@ -458,48 +458,45 @@ namespace eyedb {
 			     id, oid.toString());
 #endif
 
-    CollItem *item;
+    ValueItem *item;
     Oid item_oid;
 
-    if (cache && (item = cache->get(id)))
-	{
-	  if (item->getState() == added)
-	    {
-#ifdef USE_VALUE_CACHE
-	      if (item->getValue().type == Value::tObject)
-		o = item->getValue().o;
-	      else
-		o = 0;
+#ifdef TEMP_COLL_ARRAY_READ_CACHE
+    item = read_arr_cache->get(id);
+    if (!item && cache)
+      item = cache->get(id);
+    if (item) {
 #else
-	      o = (Object *)item->getObject();
+    if (cache && (item = cache->get(id))) {
 #endif
-	      if (o)
-		return Success;
+      if (item->getState() == added) {
+	if (item->getValue().type == Value::tObject)
+	  o = item->getValue().o;
+	else
+	  o = 0;
 
-#ifdef USE_VALUE_CACHE
-	      if (item->getValue().type == Value::tOid)
-		item_oid = *item->getValue().oid;
-	      else
-		item_oid = Oid::nullOid;
-#else
-	      item_oid = item->getOid();
-#endif
-
-#ifdef NEW_COLL_XDR2
-	      decode((Data)item_oid.getOid());
-#endif
-	      if (item_oid.isValid())
-		{
-		  if (db)
-		    return db->loadObject(item_oid, o, rcm);
-		  return Exception::make(IDB_COLLECTION_ERROR,
-					 "database is not set in collection");
-		}
-	    }
-
-	  item_oid.invalidate();
+	if (o)
 	  return Success;
+	
+	if (item->getValue().type == Value::tOid)
+	  item_oid = *item->getValue().oid;
+	else
+	  item_oid = Oid::nullOid;
+	
+#ifdef NEW_COLL_XDR2
+	decode((Data)item_oid.getOid());
+#endif
+	if (item_oid.isValid())	{
+	  if (db)
+	    return db->loadObject(item_oid, o, rcm);
+	  return Exception::make(IDB_COLLECTION_ERROR,
+				 "database is not set in collection");
 	}
+      }
+      
+      item_oid.invalidate();
+      return Success;
+    }
       
     int found = 0;
 
@@ -520,8 +517,16 @@ namespace eyedb {
       return Success;
     }
 
-    if (db)
-      return db->loadObject(item_oid, o, rcm);
+    if (db) {
+      Status s = db->loadObject(item_oid, o, rcm);
+#ifdef TEMP_COLL_ARRAY_READ_CACHE
+      if (!s && o) {
+	read_arr_cache->insert(o, id, added);
+	o->decrRefCount();
+      }
+#endif
+      return s;
+    }
 
     return Exception::make(IDB_COLLECTION_ERROR,
 			   "database is not set in collection");
@@ -550,14 +555,11 @@ namespace eyedb {
     if (size < 0 || size > item_size)
       return Exception::make(IDB_COLLECTION_ERROR, "data too long for collection search");
 
-    CollItem *item;
+    ValueItem *item;
 
     if (cache && (item = cache->get(id)) && item->getState() != removed) {
-#ifdef USE_VALUE_CACHE
       memcpy(data, item->getValue().getData(), size);
-#else
-      memcpy(data, item->getData(), size);
-#endif
+
 #ifdef NEW_COLL_XDR2
       decode(data);
 #endif
@@ -827,6 +829,12 @@ namespace eyedb {
     }
 
     return Success;
+  }
+
+  void CollArray::garbage() 
+  {
+    delete read_arr_cache;
+    Collection::garbage();
   }
 }
 

@@ -166,10 +166,14 @@ namespace eyedb {
 		    const char *indent = "");
     Status simulate(const IndexImpl &, IndexStats *&, IndexStats *&);
 
+    virtual void garbage();
+
     // ----------------------------------------------------------------------
     // CollArray Private Part
     // ----------------------------------------------------------------------
   private:
+    ValueCache *read_arr_cache;
+
     void init();
     const char *getClassName() const;
     CollArray(const char *, Class *,

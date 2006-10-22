@@ -100,7 +100,8 @@ rpc_Client *rpc_clientCreate(void)
 
   client->last_type = rpc_NBaseType;
 
-#if 1
+  // EV : disconnected 22/10/06
+#if 0
   rpc_feInit();
 #endif
 

@@ -561,24 +561,21 @@ void Agregat::decrRefCountPropag()
 
 void Agregat::garbage()
 {
-  if (getClass())
-    {
-      if (((AgregatClass *)getClass())->asUnionClass())
-	{
-	  Attribute *item = (Attribute *)((Union *)this)->getCurrentItem();
-	  if (item)
-	    item->garbage(this, idr->getRefCount());
-	}
-      else
-	{
-	  unsigned int items_cnt;
-	  const Attribute **items =
-	    ((AgregatClass *)getClass())->getAttributes(items_cnt);
-
-	  for (int i = 0; i < items_cnt; i++)
-	    items[i]->garbage(this, idr->getRefCount());
-	}
+  if (getClass() && getClass()->isValidObject())  {
+    if (((AgregatClass *)getClass())->asUnionClass()) {
+      Attribute *item = (Attribute *)((Union *)this)->getCurrentItem();
+      if (item)
+	item->garbage(this, idr->getRefCount());
     }
+    else {
+      unsigned int items_cnt;
+      const Attribute **items =
+	((AgregatClass *)getClass())->getAttributes(items_cnt);
+
+      for (int i = 0; i < items_cnt; i++)
+	items[i]->garbage(this, idr->getRefCount());
+    }
+  }
 
   Instance::garbage();
 }
@@ -591,21 +588,19 @@ Agregat::~Agregat()
 void
 Agregat::copy(const Agregat *o, Bool share)
 {
-  if (((AgregatClass *)getClass())->asUnionClass())
-    {
-      Attribute *item = (Attribute *)((Union *)this)->getCurrentItem();
-      if (item)
-	item->copy(this, share);
-    }
-  else
-    {
-      unsigned int items_cnt;
-      const Attribute **items =
-	((AgregatClass *)getClass())->getAttributes(items_cnt);
+  if (((AgregatClass *)getClass())->asUnionClass()) {
+    Attribute *item = (Attribute *)((Union *)this)->getCurrentItem();
+    if (item)
+      item->copy(this, share);
+  }
+  else {
+    unsigned int items_cnt;
+    const Attribute **items =
+      ((AgregatClass *)getClass())->getAttributes(items_cnt);
       
-      for (int i = 0; i < items_cnt; i++)
-	items[i]->copy(this, share);
-    }
+    for (int i = 0; i < items_cnt; i++)
+      items[i]->copy(this, share);
+  }
 }
 
 Agregat::Agregat(const Agregat *o, Bool share) : Instance(o, share) {
