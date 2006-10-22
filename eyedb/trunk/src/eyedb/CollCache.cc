@@ -25,7 +25,7 @@
 #include "eyedb_p.h"
 
 #ifndef USE_VALUE_CACHE
-#include "CollCache.h"
+#include "ValueCache.h"
 #include <assert.h>
 
 //

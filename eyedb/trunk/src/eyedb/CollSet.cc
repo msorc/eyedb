@@ -23,7 +23,7 @@
 
 
 #include "eyedb_p.h"
-#include "CollCache.h"
+#include "ValueCache.h"
 #include <assert.h>
 #include "AttrNative.h"
 
@@ -126,7 +126,7 @@ namespace eyedb {
     Status s = check(item_oid, IDB_COLLECTION_INSERT_ERROR);
     if (s) return s;
 
-    CollItem *item;
+    ValueItem *item;
 
     IDB_COLL_LOAD_DEFERRED();
     touch();
@@ -208,7 +208,7 @@ namespace eyedb {
 
     IDB_COLL_LOAD_DEFERRED();
     touch();
-    CollItem *item;
+    ValueItem *item;
 
     if (cache && (item = cache->get(item_o)))
 	{
@@ -282,7 +282,7 @@ namespace eyedb {
 
     IDB_COLL_LOAD_DEFERRED();
     touch();
-    CollItem *item;
+    ValueItem *item;
 
 #ifdef NEW_COLL_XDR2
     Data item_data = make_data(val, size, True);
@@ -293,11 +293,7 @@ namespace eyedb {
     if (!item_data)
       return Exception::make(IDB_COLLECTION_ERROR, "data too long for collection insertion");
 
-#ifdef USE_VALUE_CACHE
     if (cache && (item = cache->get(item_data, item_size))) {
-#else
-    if (cache && (item = cache->get(item_data))) {
-#endif
       int s = item->getState();
       if (s != removed) {
 	if (noDup)
@@ -331,13 +327,8 @@ namespace eyedb {
       }
 
     create_cache();
-#ifdef USE_VALUE_CACHE
     //    cache->insert(Value(item_data, item_size), v_items_cnt, added);
     cache->insert(Value(item_data, item_size), ValueCache::DefaultItemID, added);
-#else
-    //    cache->insert(item_data, v_items_cnt, added);
-    cache->insert(item_data, ValueCache::DefaultItemID, added);
-#endif
     v_items_cnt++;
 
     return Success;

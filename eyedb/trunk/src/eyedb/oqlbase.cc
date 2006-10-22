@@ -30,6 +30,7 @@
 #include <values.h>
 #include <eyedb/oqlctb.h>
 #include <set>
+#include <vector>
 
 //#define SUPPORT_OQLRESULT
 //#define SUPPORT_POSTACTIONS
@@ -3738,10 +3739,6 @@ namespace eyedb {
     ctx.setSymbol("oql$default_and_rule", &x->type, x, oqml_True, oqml_True);
   }
 
-  void oqml_release()
-  {
-  }
-
   static Database *curdb;
 
   void oqml_reinit(Database *db)
@@ -3752,7 +3749,8 @@ namespace eyedb {
 
   void oqml_initialize(Database *db)
   {
-    if (!db) return;
+    if (!db)
+      return;
 
     if (!db->isOQLInit()) {
       Bool isInTrans = True;
@@ -3791,6 +3789,10 @@ namespace eyedb {
 
       curdb = db;
     }
+  }
+
+  void oqml_release()
+  {
   }
 
   oqmlBool

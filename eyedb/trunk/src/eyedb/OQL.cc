@@ -104,7 +104,8 @@ OQL::initDatabase(Database *db)
 {
   Status status;
   status = db->transactionBegin();
-  if (status) return status;
+  if (status)
+    return status;
   OQL oql(db, "import \"stdlib\";");
   status = oql.execute();
   db->transactionCommit();

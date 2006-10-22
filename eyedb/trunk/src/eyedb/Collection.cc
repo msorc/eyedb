@@ -26,7 +26,7 @@
 #define NEW_GET_ELEMENTS
 
 #include "eyedb_p.h"
-#include "CollCache.h"
+#include "ValueCache.h"
 #include "CollectionBE.h"
 #include <assert.h>
 #include "AttrNative.h"
@@ -46,11 +46,7 @@ namespace eyedb {
   static Bool collupd_noopt = getenv("EYEDB_COLLUPD_NOOPT") ? True : False;
 
 #define CACHE_LIST(C)       ((C) ? (C)->getList() : (LinkedList *)0)
-#ifdef USE_VALUE_CACHE
 #define CACHE_LIST_COUNT(C) ((C) ? (C)->getIdMap().size() : 0)
-#else
-#define CACHE_LIST_COUNT(C) ((C) ? (C)->getList()->getCount() : 0)
-#endif
 
   // WARNING: the optimisation for create makes a problem in the
   // inverses! => 
@@ -153,13 +149,8 @@ namespace eyedb {
   void
   Collection::create_cache()
   {
-#ifdef USE_VALUE_CACHE
     if (!cache)
       cache = new ValueCache(this);
-#else
-    if (!cache)
-      cache = new CollCache(this, getMagorder(idximpl), item_size);
-#endif
   }
 
   void
@@ -861,7 +852,7 @@ namespace eyedb {
     */
     IDB_COLL_LOAD_DEFERRED();
     touch();
-    CollItem *item;
+    ValueItem *item;
 
     if (cache && (item = cache->get(item_oid)))
       {
@@ -947,7 +938,7 @@ namespace eyedb {
 
     IDB_COLL_LOAD_DEFERRED();
     touch();
-    CollItem *item;
+    ValueItem *item;
 
     if (cache && (item = cache->get(item_o)))
       {
@@ -1041,15 +1032,7 @@ namespace eyedb {
     emptyReadCache();
 
     if (cache) {
-#ifdef USE_VALUE_CACHE
       cache->setState(removed);
-#else
-      LinkedListCursor c(cache->getList());
-      CollItem *item;
-
-      while (c.getNext((void *&)item))
-	item->setState(removed);
-#endif
     }
 
     IDB_COLL_LOAD_DEFERRED();
@@ -1099,11 +1082,7 @@ namespace eyedb {
 	Offset offset = 0;
 	Size alloc_size = 0;
 	qatom.code(&_idr, &offset, &alloc_size);
-#ifdef USE_VALUE_CACHE
 	cache->insert(Value(idr->getIDR(), item_size), ind, removed);
-#else
-	cache->insert(idr->getIDR(), ind, removed);
-#endif
       }
     }
 
@@ -1127,7 +1106,7 @@ namespace eyedb {
       collectionGetByOid() -> true ou false
     */
     //  printf("Collection::isIn(%s)\n", item_oid.getString());
-    CollItem *item;
+    ValueItem *item;
 
     found = False;
 
@@ -1173,7 +1152,7 @@ namespace eyedb {
       return isIn_p(item_o->getIDR() + IDB_OBJ_HEAD_SIZE, found, defaultSize,
 		    where);
 
-    CollItem *item;
+    ValueItem *item;
 
     if (cache && (item = cache->get(item_o)) && item->getState() != removed)
       {
@@ -1218,18 +1197,14 @@ namespace eyedb {
     if (status != Success)
       return status;
 
-    CollItem *item;
+    ValueItem *item;
 
     Data item_data = make_data(data, size, True);
 
     if (!item_data)
       return Exception::make(IDB_COLLECTION_ERROR, "data too long for collection search");
 
-#ifdef USE_VALUE_CACHE
     if (cache && (item = cache->get(item_data, item_size))) {
-#else
-    if (cache && (item = cache->get(item_data))) {
-#endif
       if (item->getState() != removed)
 	found = True;
       return Success;
@@ -2080,10 +2055,9 @@ namespace eyedb {
 	return Success;
       }
 
-    CollItem *item;
+    ValueItem *item;
     OidList *oid_list = read_cache.oid_arr->toList();
 
-#ifdef USE_VALUE_CACHE
     if (cache) {
       ValueCache::IdMapIterator begin = cache->getIdMap().begin();
       ValueCache::IdMapIterator end = cache->getIdMap().end();
@@ -2116,23 +2090,7 @@ namespace eyedb {
 	++begin;
       }
     }
-#else
-    LinkedListCursor c(CACHE_LIST(cache));
 
-    while (c.getNext((void *&)item)) {
-      Oid item_oid = item->getOid();
-
-      int s = item->getState();
-
-      if (s == removed && item_oid.isValid())
-	oid_list->suppressOid(item_oid);
-      else if (s == added) {
-	if (!item_oid.isValid() || !oid_list->exists(item_oid))
-	  oid_list->insertOidLast(item_oid);
-      }
-    }
-#endif
-    
     delete read_cache.oid_arr;
     read_cache.oid_arr = oid_list->toArray();
     delete oid_list;
@@ -2184,30 +2142,27 @@ namespace eyedb {
 
     delete read_cache.obj_arr;
     read_cache.obj_arr = new ObjectArray();
-    if (getOidC().isValid())
-      {
-	Iterator q(this);
-	if (q.getStatus())
-	  return q.getStatus();
+    if (getOidC().isValid()) {
+      Iterator q(this);
+      if (q.getStatus())
+	return q.getStatus();
 	  
-	Status s = q.scan(*read_cache.obj_arr);
-	if (s || read_cache_state_object == coherent)
-	  return s;
-      }
+      Status s = q.scan(*read_cache.obj_arr);
+      if (s || read_cache_state_object == coherent)
+	return s;
+    }
     else if (read_cache_state_object == coherent)
       return Success;
 
-    if (read_cache_state_object == coherent)
-      {
-	assert(CACHE_LIST_COUNT(cache) == 0);
-	return Success;
-      }
+    if (read_cache_state_object == coherent) {
+      assert(CACHE_LIST_COUNT(cache) == 0);
+      return Success;
+    }
 
-    CollItem *item;
+    ValueItem *item;
 
     ObjectList *obj_list = read_cache.obj_arr->toList();
 
-#ifdef USE_VALUE_CACHE
     if (cache) {
       ValueCache::IdMapIterator begin = cache->getIdMap().begin();
       ValueCache::IdMapIterator end = cache->getIdMap().end();
@@ -2250,35 +2205,7 @@ namespace eyedb {
 	++begin;
       }
     }
-#else
-    LinkedListCursor c(CACHE_LIST(cache));
-    while (c.getNext((void *&)item)) {
-      Object *item_o = (Object *)item->getObject();
 
-      if (!item_o) {
-	Oid item_oid = item->getOid();
-	if (item_oid.isValid() && db)
-	  {
-	    Status s = db->loadObject(item_oid, item_o);
-	    if (s) return s; // what about garbage??
-	  }
-      }
-
-      if (!item_o)
-	return Exception::make(IDB_INTERNAL_ERROR, "invalid null object "
-			       "found in Collection::getObjElementsRealize()");
-
-      int s = item->getState();
-      if (s == removed)
-	obj_list->suppressObject(item_o);
-      else if (s == added) {
-	if (!obj_list->exists(item_o)) {
-	  obj_list->insertObjectLast(item_o);
-	  item_o->incrRefCount();
-	}
-      }
-    }
-#endif
     delete read_cache.obj_arr;
     read_cache.obj_arr = obj_list->toArray();
     delete obj_list;
@@ -2387,7 +2314,7 @@ do { \
 
     if (read_cache_state_value != coherent ||
 	read_cache_state_index != index) {
-      CollItem *item;
+      ValueItem *item;
       ValueList *value_list = read_cache.val_arr->toList();
       
       // IMPORTANT NOTICE 15/08/06
@@ -2402,7 +2329,6 @@ do { \
       //   coherent ?
       // patchs for these bugs : #define NEW_GET_ELEMENTS
 
-#ifdef USE_VALUE_CACHE
       if (cache) {
 	ValueCache::IdMapIterator begin = cache->getIdMap().begin();
 	ValueCache::IdMapIterator end = cache->getIdMap().end();
@@ -2451,21 +2377,6 @@ do { \
 	  ++begin;
 	}
       }
-#else
-      LinkedListCursor c(CACHE_LIST(cache));
-      
-      while (c.getNext((void *&)item)) {
-	Value item_value = item->getValue();
-	  
-	int s = item->getState();
-	if (s == removed)
-	  value_list->suppressValue(item_value);
-	else if (s == added) {
-	  if (!value_list->exists(item_value))
-	    value_list->insertValueLast(item_value);
-	}
-      }
-#endif
       
       delete read_cache.val_arr;
       read_cache.val_arr = value_list->toArray();
@@ -2615,10 +2526,6 @@ do { \
     if (_status = checkCardinality())
       return _status;
 
-    //Offset offset;
-#ifndef USE_VALUE_CACHE
-    LinkedList *list = CACHE_LIST(cache);
-#endif
     unsigned int count = CACHE_LIST_COUNT(cache);
 
     alloc_size = IDB_OBJ_HEAD_SIZE + 2 * sizeof(eyedblib::int32) +
@@ -2639,9 +2546,8 @@ do { \
     eyedblib::int32 kh = count;
     int32_code (&temp, &offset, &alloc_size, &kh);
 
-    CollItem *item;
+    ValueItem *item;
 
-#ifdef USE_VALUE_CACHE
     if (cache) {
       ValueCache::IdMapIterator begin = cache->getIdMap().begin();
       ValueCache::IdMapIterator end = cache->getIdMap().end();
@@ -2652,22 +2558,12 @@ do { \
       while (begin != end) {
 	item = (*begin).second;
 	const Value &v = item->getValue();
-#else
-	/*
-	LinkedListCursor c(list);
 
-	while (c.getNext((void * &)item)) {
-	*/
-#endif
 	if (isref)  {
 	  Oid _oid;
-#ifdef USE_VALUE_CACHE
 	  Object *_o = 0;
 	  if (v.type == Value::tObject)
 	    _o = v.o;
-#else
-	  Object *_o = (Object *)item->getObject();
-#endif
 	  if (_o) {
 	    if (item->getState() == added &&
 		rcm->getType() == RecMode_FullRecurs)  {
@@ -2679,13 +2575,8 @@ do { \
 	    }
 	    _oid = _o->getOid();
 	  }
-#ifdef USE_VALUE_CACHE
 	  else
 	    _oid = *v.oid;
-#else
-	  else
-	    _oid = item->getOid();
-#endif
 
 	  if (!_oid.isValid() && item->getState() == removed) {
 	    skip_cnt++;
@@ -2724,13 +2615,9 @@ do { \
 	}
 #endif
 	else {
-#ifdef USE_VALUE_CACHE
 	  buffer_code   (&temp, &offset, &alloc_size, v.getData(),
 			 item_size);
-#else
-	  buffer_code   (&temp, &offset, &alloc_size, item->getData(),
-			 item_size);
-#endif
+
 	}
 
 
@@ -2738,9 +2625,7 @@ do { \
 	int32_code (&temp, &offset, &alloc_size, (int*)&id);
 	char kc = (char)item->getState();
 	char_code (&temp, &offset, &alloc_size, &kc);
-#ifdef USE_VALUE_CACHE
 	++begin;
-#endif
       }
     }
     
@@ -2977,13 +2862,9 @@ do { \
     delete cache;
     // ...
     cache = o->cache;
-#ifdef USE_VALUE_CACHE
     if (cache)
       cache->setObject(this);
-#else
-    if (cache)
-      cache->setColl(this);
-#endif
+
     o->cache = 0;
     p_items_cnt = o->p_items_cnt;
     v_items_cnt = o->v_items_cnt;

@@ -709,6 +709,8 @@ do { \
 
     release = 1;
 
+    oqml_release();
+
     Config::_release();
     Architecture::_release();
 
@@ -724,7 +726,6 @@ do { \
     ClassConversion::_release();
     ThreadPoolManager::_release();
 
-    oqml_release();
     rpcFeRelease();
 
     eyedbsm::release();

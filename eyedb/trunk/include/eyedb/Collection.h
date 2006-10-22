@@ -27,11 +27,6 @@
 
 #define USE_VALUE_CACHE
 
-#ifdef USE_VALUE_CACHE
-#define CollCache ValueCache
-#define CollItem ValueItem
-#endif
-
 namespace eyedb {
 
   /**
@@ -39,7 +34,7 @@ namespace eyedb {
      @{
   */
 
-  class CollCache;
+  class ValueCache;
   class CollectionPeer;
   class CardinalityDescription;
   class IndexImpl;
@@ -349,7 +344,7 @@ namespace eyedb {
     eyedbsm::Idx *idx1, *idx2; // back end only
     int p_items_cnt;
     int v_items_cnt;
-    CollCache *cache;
+    ValueCache *cache;
     Bool is_complete;
     void create_cache();
 

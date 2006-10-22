@@ -317,17 +317,15 @@ oqmlIdent::initEnumValues(Database *db, oqmlContext *ctx)
   Class *cl;
   
   while (c.getNext((void *&)cl))
-    if (cl->asEnumClass())
-      {
-	int item_cnt;
-	const EnumItem **items = cl->asEnumClass()->getEnumItems(item_cnt);
-	for (int i = 0; i < item_cnt; i++)
-	  {
-	    oqmlAtom *atom = new oqmlAtom_int(items[i]->getValue());
-	    ctx->setSymbol(items[i]->getName(), &atom->type, atom, oqml_True,
-			   oqml_True);
-	  }
+    if (cl->asEnumClass()) {
+      int item_cnt;
+      const EnumItem **items = cl->asEnumClass()->getEnumItems(item_cnt);
+      for (int i = 0; i < item_cnt; i++) {
+	oqmlAtom *atom = new oqmlAtom_int(items[i]->getValue());
+	ctx->setSymbol(items[i]->getName(), &atom->type, atom, oqml_True,
+		       oqml_True);
       }
+    }
 }
 
 // -----------------------------------------------------------------------

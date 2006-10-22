@@ -37,12 +37,16 @@
 #include <eyedb/GenHashTable.h>
 #include "version_p.h"
 
+#include <map>
+
 #define FULL_CACHE_OBJECTS
 #define CACHE_OBJECTS
 
 //#define STRICT_NOT_NESTED_TRANSACTIONS
 
 namespace eyedb {
+
+  //static std::map<Database *, bool> db_list;
 
   LinkedList *Database::dbopen_list;
 
@@ -102,6 +106,8 @@ namespace eyedb {
   void Database::init(const char *_dbmdb_str)
   {
     //  printf("Database::Database(this=%p)\n", this);
+    //db_list[this] = true;
+
     if (_dbmdb_str)
       dbmdb_str = strdup(_dbmdb_str);
     else {
@@ -312,7 +318,8 @@ namespace eyedb {
 
   void Database::garbage()
   {
-    //printf("Database::garbage(this=%p, %p)\n", this, dbh);
+    //db_list.erase(db_list.find(this));
+    //printf("Database::garbage(this=%p, %p, oql_info = %p)\n", this, dbh, oql_info);
     if (dbh)
       close();
 
@@ -655,7 +662,19 @@ if ((mode) !=  NoDBAccessMode && \
 
   void Database::_release(void)
   {
-    // unopens all!
+    /*
+    std::map<Database *, bool>::iterator begin = db_list.begin();
+    std::map<Database *, bool>::iterator end = db_list.end();
+    
+    printf("oqml_release: %d\n", db_list.size());
+    while (begin != end) {
+      printf("release: %p %d\n", (*begin).first, (*begin).first->isValidObject());
+      (*begin).first->release();
+      ++begin;
+    }
+
+    db_list.clear();
+    */
   }
 
   static Bool
