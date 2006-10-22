@@ -1,0 +1,561 @@
+# 
+# configure.in for eyedb
+# 
+
+AC_INIT(include/eyedb/eyedb.h)
+
+PACKAGE_NAME=eyedb
+
+. $srcdir/VERSION
+EYEDB_VERSION=${EYEDB_MAJOR_VERSION}.${EYEDB_MINOR_VERSION}.${EYEDB_PATCH_LEVEL}${EYEDB_VERSION_STATUS}
+PACKAGE_VERSION=$EYEDB_VERSION
+EYEDB_NUMVERSION=`echo | awk '{printf("%d%02d%03d", '${EYEDB_MAJOR_VERSION}','${EYEDB_MINOR_VERSION}','${EYEDB_PATCH_LEVEL}')}' `
+
+AC_SUBST(EYEDB_VERSION)
+AC_SUBST(EYEDB_MAJOR_VERSION)
+AC_SUBST(EYEDB_MINOR_VERSION)
+AC_SUBST(EYEDB_PATCH_LEVEL)
+AC_SUBST(EYEDB_VERSION_STATUS)
+AC_SUBST(EYEDB_NUMVERSION)
+
+AM_INIT_AUTOMAKE(${PACKAGE_NAME}, ${PACKAGE_VERSION})
+
+#
+# Checks for command line flags
+#
+
+# if CXXFLAGS are not already set, set them to an empty value
+if test x"$CXXFLAGS" = "x"
+then
+	CXXFLAGS=''
+fi
+
+# Collect enable arguments
+#
+# debug
+AC_ARG_ENABLE(debug,
+		AS_HELP_STRING([--enable-debug],
+				[compile with debug [default=no]]),,
+		enable_debug="no")
+# optimize
+AC_ARG_ENABLE(optimize,
+		AS_HELP_STRING([--enable-optimize=flag],
+				[compile with given optimization flag [default=no]]),,
+		enable_optimize="")
+# Java
+AC_ARG_ENABLE(java,
+		AS_HELP_STRING([--enable-java],
+				[enable Java code compilation [default=yes]]),,
+		enable_java="yes")
+# Swig
+AC_ARG_ENABLE(swig,
+		AS_HELP_STRING([--enable-swig],
+				[enable SWIG bindings generation [default=no]]),,
+		enable_swig="no")
+
+
+
+# config header file
+AM_CONFIG_HEADER(eyedbconfig.h)
+
+# by default we install in /usr
+AC_PREFIX_DEFAULT(/usr)
+
+# check for compilers
+AC_PROG_CXX
+
+AC_LANG(C++)
+
+# debug and optimize flags
+if test "$enable_debug" = "yes"
+then
+  CXXFLAGS="$CXXFLAGS -g"
+fi
+if test "x$enable_optimize" != "x"
+then
+  CXXFLAGS="$CXXFLAGS $enable_optimize"
+fi
+
+# check for architecture
+AC_CANONICAL_HOST
+
+# special settings on Solaris 64 bits
+case "$host" in
+sparc-sun-solaris2.9)
+	if test "$ac_cv_cxx_compiler_gnu" != "yes"
+	then
+		CFLAGS="-xtarget=ultra -xarch=v9"
+		CXXFLAGS="$CXXFLAGS -xtarget=ultra -xarch=v9"
+		LDFLAGS="-XCClinker -xtarget=ultra -XCClinker -xarch=v9"
+	fi
+	;;
+esac
+# special settings on Mac OS X
+case "$host" in
+powerpc-apple-darwin*)
+	LDFLAGS="-Wl,-m -Wl,-multiply_defined -Wl,suppress"
+	;;
+esac
+
+# check for endianism
+AC_C_BIGENDIAN
+if test $ac_cv_c_bigendian = yes; then
+EYEDB_CONFIG_BYTE_ORDER=EYEDBLIB_BIG_ENDIAN
+else
+EYEDB_CONFIG_BYTE_ORDER=EYEDBLIB_LITTLE_ENDIAN
+fi
+AC_SUBST(EYEDB_CONFIG_BYTE_ORDER)
+
+# check for unsigned long long type
+AC_CHECK_TYPES( unsigned long long)
+if test x"$ac_cv_type_unsigned_long_long" != xyes ; then
+   AC_MSG_ERROR( "this platform does not support type unsigned long long")
+fi
+
+# check for type sizes
+AC_CHECK_SIZEOF(void *)
+AC_CHECK_SIZEOF(unsigned int)
+AC_CHECK_SIZEOF(unsigned long)
+AC_CHECK_SIZEOF(unsigned long long)
+if test "$ac_cv_sizeof_unsigned_long_long" -lt 8 ; then
+   AC_MSG_ERROR( "this platform has an unsigned long long type with sizeof(unsigned long long) < 8")
+fi
+
+AC_MSG_CHECKING(for integer type of same size as void *)
+case $ac_cv_sizeof_void_p in
+$ac_cv_sizeof_unsigned_int)
+		ac_pointer_int_type='unsigned int'
+	;;
+$ac_cv_sizeof_unsigned_long)
+		ac_pointer_int_type='unsigned long'
+	;;
+$ac_cv_sizeof_unsigned_long_long)
+		ac_pointer_int_type='unsigned long long'
+	;;
+*)
+		AC_MSG_ERROR('cannot find an integer type of same size as void *')
+	;;
+esac
+AC_MSG_RESULT($ac_pointer_int_type)
+AC_DEFINE_UNQUOTED([POINTER_INT_TYPE], $ac_pointer_int_type, [Define to the integer type of same size as void *])
+
+# check for libtool
+AC_PROG_LIBTOOL
+
+# Check for lex/flex and yacc/bison
+AM_PROG_LEX
+AC_PROG_YACC
+
+# check for libraries
+# this library is necessary on Solaris
+AC_CHECK_LIB( nsl, gethostbyname)
+AC_CHECK_LIB( dl, dlopen)
+AC_CHECK_LIB( crypt, crypt)
+AC_SEARCH_LIBS( socket, socket)
+
+# check for pthread
+ACX_PTHREAD
+LIBS="$LIBS $PTHREAD_LIBS"
+CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
+CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+
+# echo CFLAGS=$CFLAGS
+# echo CXXFLAGS=$CXXFLAGS
+
+# check for headers
+AC_CHECK_HEADERS( time.h sys/time.h unistd.h sys/types.h regex.h libgen.h sys/stat.h pwd.h stropts.h crypt.h)
+AC_HEADER_TIME
+
+# check for flock structure
+AC_CHECK_TYPES(flock_t,,,[#include <fcntl.h>])
+
+# check for union semun
+AC_CHECK_MEMBERS(union semun.val,,,[#include <sys/sem.h>])
+
+# check for struct in_addr
+AC_CHECK_MEMBERS(struct in_addr.s_addr,,,[#include <netinet/in.h>])
+AC_CHECK_MEMBERS(struct in_addr._S_un,,,[#include <netinet/in.h>])
+
+# check for functions
+AC_CHECK_FUNCS(strsignal)
+AC_CHECK_FUNCS(fattach)
+# check if function ctime_r exists and has 2 or 3 arguments
+AC_FUNC_CTIME_R_3_ARGS
+# check for regular expressions functions
+AC_CHECK_FUNC(regcomp,AC_DEFINE([HAVE_REGCOMP],1,[Defined if function regcomp exists]),,[#include <regex.h>])
+AC_CHECK_FUNC(regexec,AC_DEFINE([HAVE_REGEXEC],1,[Defined if function regexec exists]),,[#include <regex.h>])
+AC_CHECK_FUNC(regcmp,AC_DEFINE([HAVE_REGCMP],1,[Defined if function regcmp exists]),,[#include <libgen.h>])
+AC_CHECK_FUNC(regex,AC_DEFINE([HAVE_REGEX],1,[Defined if function regex exists]),,[#include <libgen.h>])
+# check for isnan
+AC_ISNAN
+
+# check for tzset and long timezone
+AC_CHECK_FUNC(tzset,AC_DEFINE([HAVE_TZSET],1,[Defined if function tzset exists]),,[#include <time.h>])
+AC_VAR_LONG_TIMEZONE
+
+# check for X11
+AC_PATH_XTRA
+
+# check for large file
+AC_SYS_LARGEFILE
+AC_FUNC_FSEEKO
+
+# check for 'more' executable
+AC_PATH_PROG(PATH_TO_MORE,more)
+AC_DEFINE_UNQUOTED([PATH_TO_MORE], "$PATH_TO_MORE", [Define to the absolute path of the more command])
+
+# check for /proc
+AC_MSG_CHECKING(for /proc)
+if test -d "/proc/1" ; then
+   AC_DEFINE([HAVE_SLASH_PROC],1,[Defined if pseudo-filesystem /proc exists])
+   AC_MSG_RESULT(yes)
+else
+   AC_MSG_RESULT(no)
+fi
+
+# determine the semaphore implementation for this platform
+AC_PTHREAD_PROCESS_SHARED
+AC_ARG_WITH( semaphore-policy, 
+	     AS_HELP_STRING([--with-semaphore-policy=(posix|sysv_ipc)],[force semaphore implementation (if none given, is found by configure.in)]),
+	     ac_semaphore_policy="$withval",
+	     ac_semaphore_policy="guess")
+
+AC_MSG_CHECKING(for semaphore policy)
+case "$ac_semaphore_policy" in
+posix)
+	if test "$ac_pthread_process_shared" = "no"; then
+	   AC_MSG_ERROR( this platform does not support PTHREAD_PROCESS_SHARED and cannot use Posix semaphore policy)
+	fi
+	AC_MSG_RESULT(Posix)
+	AC_DEFINE(HAVE_SEMAPHORE_POLICY_POSIX, 1, [Define if semaphore policy is Posix (must support PTHREAD_PROCESS_SHARED)])
+	;;
+sysv_ipc)
+	AC_MSG_RESULT(Sys V IPC)
+	AC_DEFINE(HAVE_SEMAPHORE_POLICY_SYSV_IPC, 1, [Define if semaphore policy is Sys V IPC])
+	;;
+guess)
+	if test "$ac_pthread_process_shared" = "yes"; then
+	   AC_MSG_RESULT(Posix)
+	   ac_semaphore_policy="posix"
+	   AC_DEFINE(HAVE_SEMAPHORE_POLICY_POSIX, 1, [Define if semaphore policy is Posix (must support PTHREAD_PROCESS_SHARED)])
+	else
+	   ac_semaphore_policy="sysv_ipc"
+	   AC_MSG_RESULT(Sys V IPC)
+	   AC_DEFINE(HAVE_SEMAPHORE_POLICY_SYSV_IPC, 1, [Define if semaphore policy is Sys V IPC])
+	fi
+	;;
+*)
+	AC_MSG_ERROR( "--with-semaphore-policy must be one of posix or sysv_ipc")
+	;;
+esac
+
+# must disappear
+case "$host" in
+i*86-*-linux*)
+	DEFINES="-DLINUX -DX86"
+	;;
+
+x86_64-*-linux*)
+	DEFINES="-DLINUX"
+	;;
+
+sparc-sun-solaris2.9)
+	if test "$ac_cv_cxx_compiler_gnu" = "yes"
+	then
+		DEFINES="-DSOLARIS -DSPARCV9"
+	else
+		DEFINES="-DSOLARIS -DSPARCV9"
+	fi
+	;;
+esac
+
+# -D are taken verbatim for now. Later, may use autodetection and/or command line flags
+DEFINES="$DEFINES -DOPTOPEN -DMOZILLA -DNEW_COLL_XDR -DNEW_COLL_XDR2 -DSUPPORT_NON_BASIC_LITERAL_COLL -DSTUART_AUTH"
+CXXFLAGS="$CXXFLAGS $DEFINES"
+
+# ========================================
+# JAVA compilation
+# ========================================
+if test "$enable_java" = "yes"
+then
+	# On Mac OS X, if JAVAC is not set, we force it to be javac, because
+	# AC_PROG_JAVAC tests first jikes, which is currently broken on Mac OS X
+	case "$host" in
+	powerpc-apple-darwin*)
+		if test x"$JAVAC" = x ; then export JAVAC=javac ; fi
+		;;
+	esac
+
+	AC_PROG_JAVAC
+	export CLASSPATH=.
+	AC_PROG_JAVA
+	AC_PATH_PROG(JAR, jar)
+
+	if test "$enable_debug" = "yes"
+	then
+		JAVACFLAGS="$JAVACFLAGS -g"
+	fi
+fi
+
+if test "$enable_java" = "yes" -a x"$JAVAC" != x -a x"$JAR" != x  ; then
+COND_JAVA="yes"
+fi
+AM_CONDITIONAL(COND_JAVA, test x"$COND_JAVA" = xyes)
+AC_SUBST(JAVACFLAGS)
+
+# ========================================
+# SWIG
+# ========================================
+if test "$enable_swig" = "yes"
+then
+	AC_PROG_SWIG
+	SWIG_ENABLE_CXX
+	SWIG_PYTHON
+fi
+
+if test "$enable_swig" = "yes" ; then
+COND_SWIG="yes"
+fi
+AM_CONDITIONAL(COND_SWIG, test x"$COND_SWIG" = xyes)
+
+# ========================================
+# Documentation building
+# ========================================
+# check for needed programs
+AC_PATH_PROG(DOXYGEN, doxygen)
+if test x"$DOXYGEN" != x ; then
+COND_DOXYGEN="yes"
+fi
+AM_CONDITIONAL(COND_DOXYGEN, test x"$COND_DOXYGEN" = xyes)
+
+AC_PATH_PROG(JAVADOC, javadoc)
+if test x"$JAVADOC" != x ; then
+COND_JAVADOC="yes"
+fi
+AM_CONDITIONAL(COND_JAVADOC, test x"$COND_JAVADOC" = xyes)
+
+AC_PATH_PROG(XSLTPROC, xsltproc)
+if test x"$XSLTPROC" != x ; then
+COND_XSLTPROC="yes"
+fi
+AM_CONDITIONAL(COND_XSLTPROC, test x"$COND_XSLTPROC" = xyes)
+
+AC_PATH_PROG(LATEX, latex)
+AC_PATH_PROG(DVIPS, dvips)
+AC_PATH_PROG(PS2PDF, ps2pdf)
+if test x"$LATEX" != x -a x"$DVIPS" != x -a x"$PS2PDF" != x ; then
+COND_LATEX="yes"
+fi
+AM_CONDITIONAL(COND_LATEX, test x"$COND_LATEX" = xyes)
+
+AC_PATH_PROG(LATEX2HTML, latex2html)
+if test x"$LATEX2HTML" != x ; then
+COND_LATEX2HTML="yes"
+fi
+AM_CONDITIONAL(COND_LATEX2HTML, test x"$COND_LATEX2HTML" = xyes)
+
+
+# ========================================
+# Examples building
+#  is not architecture independant because of CXXFLAGS setting by hand
+#  must be replaced in order to have a configure.in that does not do 'case $host'
+# ========================================
+case "$host" in
+i*86-*-linux*)
+	EYEDB_ARCH_CPPFLAGS="-D_REENTRANT -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
+	EYEDB_ARCH_CXXFLAGS="-fPIC $PTHREAD_CFLAGS"
+	EYEDB_ARCH_SOFLAGS=-shared
+	;;
+
+x86_64-*-linux*)
+	EYEDB_ARCH_CPPFLAGS="-D_REENTRANT -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
+	EYEDB_ARCH_CXXFLAGS="-fPIC $PTHREAD_CFLAGS"
+	EYEDB_ARCH_SOFLAGS=-shared
+	;;
+
+sparc-sun-solaris2.9)
+	if test "$ac_cv_cxx_compiler_gnu" = "yes"
+	then
+		EYEDB_ARCH_CPPFLAGS="-D_REENTRANT -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
+		EYEDB_ARCH_CXXFLAGS="-fPIC $PTHREAD_CFLAGS"
+		EYEDB_ARCH_SOFLAGS=-shared
+	else
+		EYEDB_ARCH_CPPFLAGS="-mt -xtarget=ultra -xarch=v9"
+		EYEDB_ARCH_CXXFLAGS="-KPIC $PTHREAD_CFLAGS"
+		EYEDB_ARCH_SOFLAGS=-G
+	fi
+	;;
+
+*)
+	# should output some error?
+	;;
+
+esac
+
+EYEDB_ARCH_LIBS=$LIBS
+AC_CHECK_LIB( pthread, pthread_join, EYEDB_ARCH_LIBS="-lpthread $EYEDB_ARCH_LIBS")
+
+AC_SUBST(EYEDB_ARCH_CPPFLAGS)
+AC_SUBST(EYEDB_ARCH_CXXFLAGS)
+AC_SUBST(EYEDB_ARCH_SOFLAGS)
+AC_SUBST(EYEDB_ARCH_LIBS)
+
+# ========================================
+# End of Examples building
+# ========================================
+
+
+
+AC_OUTPUT(
+Makefile 
+doc/Makefile
+doc/images/Makefile
+doc/doxygen/Makefile
+doc/doxygen/eyedb-doxygen.cfg
+doc/javadoc/Makefile
+doc/manpages/Makefile
+doc/manual/Makefile
+doc/manual/figures/Makefile
+doc/manual/version.tex
+doc/manual/latex2html-init
+doc/release-notes/Makefile
+examples/C++Binding/Makefile
+examples/C++Binding/Makefile.eyedb-examples
+examples/C++Binding/generic/Makefile
+examples/C++Binding/generic/Makefile.eyedb-examples
+examples/C++Binding/generic/basic/Makefile
+examples/C++Binding/generic/basic/Makefile.eyedb-examples
+examples/C++Binding/generic/query/Makefile
+examples/C++Binding/generic/query/Makefile.eyedb-examples
+examples/C++Binding/generic/schema/Makefile
+examples/C++Binding/generic/schema/Makefile.eyedb-examples
+examples/C++Binding/generic/store/Makefile
+examples/C++Binding/generic/store/Makefile.eyedb-examples
+examples/C++Binding/schema-oriented/Makefile
+examples/C++Binding/schema-oriented/Makefile.eyedb-examples
+examples/C++Binding/schema-oriented/admin/Makefile
+examples/C++Binding/schema-oriented/admin/Makefile.eyedb-examples
+examples/C++Binding/schema-oriented/methods/Makefile
+examples/C++Binding/schema-oriented/methods/Makefile.eyedb-examples
+examples/C++Binding/schema-oriented/query/Makefile
+examples/C++Binding/schema-oriented/query/Makefile.eyedb-examples
+examples/C++Binding/schema-oriented/share/Makefile
+examples/C++Binding/schema-oriented/share/Makefile.eyedb-examples
+examples/C++Binding/schema-oriented/store/Makefile
+examples/C++Binding/schema-oriented/store/Makefile.eyedb-examples
+examples/GettingStarted/Makefile
+examples/GettingStarted/Makefile.eyedb-examples
+examples/JavaBinding/Makefile
+examples/JavaBinding/Makefile.eyedb-examples
+examples/JavaBinding/generic/Makefile
+examples/JavaBinding/generic/Makefile.eyedb-examples
+examples/JavaBinding/generic/applet/Makefile
+examples/JavaBinding/generic/applet/Makefile.eyedb-examples
+examples/JavaBinding/generic/appli/Makefile
+examples/JavaBinding/generic/appli/Makefile.eyedb-examples
+examples/JavaBinding/generic/appli/basic/Makefile
+examples/JavaBinding/generic/appli/basic/Makefile.eyedb-examples
+examples/JavaBinding/generic/appli/collections/Makefile
+examples/JavaBinding/generic/appli/collections/Makefile.eyedb-examples
+examples/JavaBinding/generic/appli/query/Makefile
+examples/JavaBinding/generic/appli/query/Makefile.eyedb-examples
+examples/JavaBinding/generic/appli/schema/Makefile
+examples/JavaBinding/generic/appli/schema/Makefile.eyedb-examples
+examples/JavaBinding/generic/appli/store/Makefile
+examples/JavaBinding/generic/appli/store/Makefile.eyedb-examples
+examples/JavaBinding/schema-oriented/Makefile
+examples/JavaBinding/schema-oriented/Makefile.eyedb-examples
+examples/JavaBinding/schema-oriented/share/Makefile
+examples/JavaBinding/schema-oriented/share/Makefile.eyedb-examples
+examples/JavaBinding/schema-oriented/share/person/Makefile
+examples/JavaBinding/schema-oriented/store/Makefile
+examples/JavaBinding/schema-oriented/store/Makefile.eyedb-examples
+examples/Makefile
+examples/Makefile.eyedb-examples
+examples/oql/Makefile
+include/Makefile
+include/eyedb/Makefile
+include/eyedb/version.h
+include/eyedb/internals/Makefile
+include/eyedblib/Makefile
+include/eyedblib/endian.h
+include/eyedbsm/Makefile
+install/Makefile
+install/etc/Makefile
+pkg-config/Makefile
+scripts/Makefile
+scripts/eyedb-postinstall.sh
+scripts/eyedbjrun
+src/Makefile
+src/bindings/Makefile
+src/bindings/python/Makefile
+src/eyedb/Makefile
+src/eyedbsm/Makefile
+src/java/Makefile
+src/java/src/Makefile
+src/java/src/org/Makefile
+src/java/src/org/eyedb/Makefile
+src/java/src/org/eyedb/Version.java
+src/java/src/org/eyedb/dbm/Makefile
+src/java/src/org/eyedb/syscls/Makefile
+src/java/src/org/eyedb/utils/Makefile
+src/lib/Makefile
+src/oql/Makefile
+src/www/Makefile
+src/www/eyedb.conf
+src/www/html/Makefile
+src/www/icons/Makefile
+tests/Makefile
+tests/eyedb/Makefile
+tests/eyedb/collections/Makefile
+tests/eyedb/collections/basic/Makefile
+tests/eyedb/collections/litcoll/Makefile
+tests/eyedb/dataspace/Makefile
+tests/eyedb/dataspace/dspsch/Makefile
+tests/eyedb/export/Makefile
+tests/eyedbsm/Makefile
+tests/eyedbsm/basic/Makefile
+)
+
+# make symbolic links for ODL files
+for f in src/java/src/org/eyedb/dbm/DBM.odl src/java/src/org/eyedb/utils/utils.odl src/java/src/org/eyedb/syscls/syscls.odl 
+do
+	if test ! -f $srcdir/$f
+	then 
+		test -L $srcdir/$f && rm $srcdir/$f
+		(cd $srcdir/`dirname $f`; ln -s $srcdir/src/eyedb/`basename $f`)
+	fi
+done
+
+echo
+echo
+echo "  EyeDB ${PACKAGE_VERSION} configured for '${host}'."
+echo
+echo "  EyeDB will be compiled with the following options:"
+echo 
+echo "  *** EyeDB Core ***" 
+echo "  Prefix where EyeDB will be installed: ${prefix:-none}"
+echo "  C++ compiler: ${CXX:-none}"
+echo "  C++ compiler flags: ${CXXFLAGS:-none}"
+echo "  Compile with debug: ${enable_debug:-no}"
+echo "  Compile with optimization: ${enable_optimize:-no}"
+echo "  Semaphore policy: ${ac_semaphore_policy}"
+echo "  Libraries: ${LIBS}"
+echo 
+echo "  *** EyeDB Java binding ***" 
+echo "  Compile Java binding: ${COND_JAVA:-no}"
+echo "  Java compiler: ${JAVAC:-none}"
+echo "  Java compiler flags: ${JAVACFLAGS:-none}"
+echo "  Java virtual machine: ${JAVA:-none}"
+echo "  Jar utility: ${JAR:-none}"
+echo 
+echo "  *** EyeDB Swig multi-languages binding ***" 
+echo "  Compile Swig bindings: ${COND_SWIG:-no}"
+echo 
+echo "  *** EyeDB documentation ***" 
+echo "  Generate doxygen C++ api documentation: ${COND_DOXYGEN:-no}"
+echo "  Generate javadoc Java api documentation: ${COND_JAVADOC:-no}"
+echo "  Generate docbook man pages: ${COND_XSLTPROC:-no}"
+echo "  Generate LaTEX manual: ${COND_LATEX:-no}"
+echo "  Generate html LaTEX manual: ${COND_LATEX2HTML:-no}"
+echo ""
