@@ -4164,7 +4164,7 @@ namespace eyedb {
 
   Value *oqmlAtom_obj::toValue() const
   {
-    return new Value(o, idx);
+    return new Value(const_cast<const Object *>(o), idx);
   }
 
   Value *oqmlAtom_int::toValue() const

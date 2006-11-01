@@ -111,9 +111,10 @@ namespace eyedb {
   odl_add_error(Status s)
   {
     ostringstream ostr;
-    ostr << s; // << ends;
+    ostr << s;
     odl_str_error += ostr.str();
-    //delete[] ostr.str();
+    if (odl_str_error[odl_str_error.size()-1] != '\n')
+      odl_str_error += "\n";
     odl_error++;
   }
 

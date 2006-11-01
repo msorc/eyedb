@@ -70,6 +70,8 @@ namespace eyedb {
     int getRefCount() const  {return gbx_refcnt;}
     gbxBool isLocked() const {return gbx_locked;}
 
+    bool mustRelease() const {return gbx_must_release;}
+
     virtual void incrRefCount();
     virtual void decrRefCount();
 
@@ -115,6 +117,7 @@ namespace eyedb {
     gbxTag *gbx_tag;
     std::string gbx_ptag;
     gbxBool gbx_chgRefCnt;
+    bool gbx_must_release;
 
     void garbageRealize(gbxBool reentrant = gbxFalse, gbxBool remove = gbxTrue);
     virtual void garbage() {}
@@ -143,6 +146,7 @@ namespace eyedb {
   public:
     virtual void manageCycle(gbxCycleContext &);
     void release_r();
+    void setMustRelease(bool must_release) {gbx_must_release = must_release;}
     gbxBool isChgRefCnt() const {return gbx_chgRefCnt;}
     gbxBool setChgRefCnt(gbxBool chgRefCnt) {
       gbxBool old_chgRefCnt = gbx_chgRefCnt;

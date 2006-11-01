@@ -32,6 +32,8 @@
 #include "AttrNative.h"
 #include "Attribute_p.h"
 
+#define TRY_GETELEMS_GC
+
 //#define INIT_IDR
 
 static bool eyedb_support_stack = getenv("EYEDB_SUPPORT_STACK") ? true : false;
@@ -997,7 +999,7 @@ namespace eyedb {
 	  {
 	    if (checkFirst)
 	      return Success;
-	    return Exception::make(IDB_COLLECTION_SUPPRESS_ERROR, "item '%s' not found in collection", oid.toString());
+	    return Exception::make(IDB_COLLECTION_SUPPRESS_ERROR, "item '%s' not found in collection", item_oid.toString());
 	  }
       }
     else
@@ -1845,13 +1847,14 @@ namespace eyedb {
     int value_off = (isidx ? 1 : 0);
     int ind;
 
-    for (int i = 0; i < array.value_cnt; i += inc)
+    unsigned int cnt = array.getCount();
+    for (int i = 0; i < cnt; i += inc)
       {
 	IDB_CHECK_INTR();
-	Value value = array.values[i+value_off];
+	Value value = array[i+value_off]; //Value value = array.values[i+value_off];
 
 	if (isidx)
-	  ind = array.values[i].l;
+	  ind = array[i].l; // ind = array.values[i].l;
 
 	if (value.type == Value::tOid)
 	  {
@@ -2105,6 +2108,14 @@ namespace eyedb {
     if (status)
       return Exception::make(status);
 
+#ifdef TRY_GETELEMS_GC
+    if (obj_array.isAutoGarbage()) {
+      return Exception::make(IDB_ERROR,
+			     "Collection::getElements(ObjectArray &): "
+			     "ObjectArray argument cannot be in auto-garbaged mode");
+    }
+#endif
+
     if (!isref && !coll_class->asBasicClass() &&
 	!coll_class->asEnumClass()) {
       ValueArray val_arr;
@@ -2115,13 +2126,15 @@ namespace eyedb {
       for (int n = 0; n < count; n++) {
 	if (val_arr[n].getType() != Value::tObject)
 	  return Exception::make(IDB_ERROR, "unexpected value type");
-	obj_array[n] = val_arr[n].o;
+	obj_array.setObjectAt(n, val_arr[n].o); //obj_array[n] = val_arr[n].o;
       }
       return Success;
     }
 
     Status s = const_cast<Collection *>(this)->getObjElementsRealize(rcm);
     if (s) return s;
+
+    printf("obj_array auto_garb: %d\n", obj_array.isAutoGarbage());
 
     obj_array = *read_cache.obj_arr;
     return Success;
@@ -2140,8 +2153,21 @@ namespace eyedb {
     if (read_cache.obj_arr && read_cache_state_object == coherent)
       return Success;
 
+#ifdef TRY_GETELEMS_GC
+    assert(!read_cache.obj_arr || read_cache.obj_arr->isAutoGarbage());
+    assert(!read_cache.val_arr || read_cache.val_arr->isAutoObjGarbage());
+#endif
     delete read_cache.obj_arr;
+
+    // 31/10/06: changed because of a memory leaks bug
+    // but not really shure that could not have side effect
+    //    read_cache.obj_arr = new ObjectArray();
+#ifdef TRY_GETELEMS_GC
+    read_cache.obj_arr = new ObjectArray(true);
+#else
     read_cache.obj_arr = new ObjectArray();
+#endif
+
     if (getOidC().isValid()) {
       Iterator q(this);
       if (q.getStatus())
@@ -2162,6 +2188,21 @@ namespace eyedb {
     ValueItem *item;
 
     ObjectList *obj_list = read_cache.obj_arr->toList();
+
+#if 0
+#ifdef TRY_GETELEMS_GC
+    // 31/10/06: see above
+    {
+      Object *oo;
+      ObjectListCursor c(obj_list);
+
+      while (c.getNext(oo)) {
+	oo->incrRefCount();
+	printf("incrRefCount #1 %p %d\n", oo, oo->getRefCount());
+      }
+    }
+#endif
+#endif
 
     if (cache) {
       ValueCache::IdMapIterator begin = cache->getIdMap().begin();
@@ -2202,12 +2243,49 @@ namespace eyedb {
 	  item_o->incrRefCount();
 #endif
 	}
+
 	++begin;
       }
     }
 
+#ifdef TRY_GETELEMS_GC
+    assert(!read_cache.obj_arr || read_cache.obj_arr->isAutoGarbage());
+    assert(!read_cache.val_arr || read_cache.val_arr->isAutoObjGarbage());
+#endif
     delete read_cache.obj_arr;
+
+    /*
+#ifdef TRY_GETELEMS_GC
+    {
+      Object *oo;
+      ObjectListCursor c(obj_list);
+
+      while (c.getNext(oo)) {
+	printf("refCount #3 %p %d\n", oo, oo->getRefCount());
+      }
+    }
+#endif
+    */
+
     read_cache.obj_arr = obj_list->toArray();
+#ifdef TRY_GETELEMS_GC
+    // 31/10/06: see above
+    read_cache.obj_arr->setAutoGarbage(true);
+#endif
+
+    /*
+#ifdef TRY_GETELEMS_GC
+    {
+      Object *oo;
+      ObjectListCursor c(obj_list);
+
+      while (c.getNext(oo)) {
+	printf("refCount #4 %p %d\n", oo, oo->getRefCount());
+      }
+    }
+#endif
+    */
+
     delete obj_list;
 
     read_cache_state_object = coherent;
@@ -2223,7 +2301,15 @@ namespace eyedb {
       read_cache.obj_arr->garbage();
     */
 
+    // 31/10/06: the previous disconnection leads to a memory leaks (sometimes)
+    // so...
+
+#ifdef TRY_GETELEMS_GC
+    assert(!read_cache.obj_arr || read_cache.obj_arr->isAutoGarbage());
+    assert(!read_cache.val_arr || read_cache.val_arr->isAutoObjGarbage());
+#endif
     delete read_cache.obj_arr;
+
     delete read_cache.oid_arr;
     delete read_cache.val_arr;
     read_cache.obj_arr = 0;
@@ -2254,7 +2340,7 @@ do { \
   static void
   sortValues(ValueArray &value_array)
   {
-    qsort(value_array.values, value_array.value_cnt/2, 2*sizeof(Value),
+    qsort(value_array.getValues(), value_array.getCount()/2, 2*sizeof(Value),
 	  value_index_cmp);
   }
 
@@ -2263,6 +2349,14 @@ do { \
   {
     if (status)
       return Exception::make(status);
+
+#ifdef TRY_GETELEMS_GC
+    if (value_array.isAutoObjGarbage()) {
+      return Exception::make(IDB_ERROR,
+			     "Collection::getElements(ValueArray &): "
+			     "ValueArray argument cannot be in auto-object-garbaged mode");
+    }
+#endif
 
     Status s =  const_cast<Collection *>(this)->getValElementsRealize(index);
     if (s) return s;
@@ -2282,7 +2376,12 @@ do { \
       return Success;
  
     delete read_cache.val_arr;
+#ifdef TRY_GETELEMS_GC
+    read_cache.val_arr = new ValueArray(true);
+#else
     read_cache.val_arr = new ValueArray();
+#endif
+
     if (getOidC().isValid()) {
       Iterator q(this, index);
       if (q.getStatus())
@@ -2380,6 +2479,9 @@ do { \
       
       delete read_cache.val_arr;
       read_cache.val_arr = value_list->toArray();
+#ifdef TRY_GETELEMS_GC
+      read_cache.val_arr->setAutoObjGarbage(true);
+#endif
       delete value_list;
       
       read_cache_state_value = coherent;
@@ -2405,8 +2507,9 @@ do { \
     // - must decode here
     // - before, in IteratorAtom::decode ??
 
-    for (int i = idx; i < read_cache.val_arr->value_cnt; i += idx+1) {
-      makeValue(read_cache.val_arr->values[i]);
+    unsigned int value_cnt = read_cache.val_arr->getCount();
+    for (int i = idx; i < value_cnt; i += idx+1) {
+      makeValue(const_cast<Value&>((*read_cache.val_arr)[i])); // makeValue(read_cache.val_arr->values[i]);
       /*
       if (read_cache.val_arr->values[i].type == Value::tObject)
 	read_cache.val_arr->values[i].o->incrRefCount();

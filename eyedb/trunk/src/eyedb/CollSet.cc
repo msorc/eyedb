@@ -210,25 +210,23 @@ namespace eyedb {
     touch();
     ValueItem *item;
 
-    if (cache && (item = cache->get(item_o)))
-	{
-	  if (item->getState() != removed)
-	    {
-	      if (noDup)
-		return Success;
-
-	      return Exception::make(IDB_COLLECTION_DUPLICATE_INSERT_ERROR, "item 0x%x is already in the collection cache", item_o);
-	    }
-
-#if 0
-	  cache->suppressObject(item);
-	  cache->insert(item_o, item->getInd(), added);
-#else
-	  item->setState(added);
-#endif
-	  v_items_cnt++;
+    if (cache && (item = cache->get(item_o))){
+      if (item->getState() != removed) {
+	if (noDup)
 	  return Success;
-	}
+
+	return Exception::make(IDB_COLLECTION_DUPLICATE_INSERT_ERROR, "item 0x%x is already in the collection cache", item_o);
+      }
+      
+#if 0
+      cache->suppressObject(item);
+      cache->insert(item_o, item->getInd(), added);
+#else
+      item->setState(added);
+#endif
+      v_items_cnt++;
+      return Success;
+    }
 
     Oid item_oid = item_o->getOid();
     Bool valid = item_oid.isValid();

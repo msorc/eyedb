@@ -79,7 +79,7 @@ sort_array(ObjectArray *obj_arr_pt)
   Object **objs = new Object*[obj_arr_pt->getCount()];
   int cnt = obj_arr_pt->getCount();
   for (int i = 0; i < cnt; i++)
-    objs[i] = (*obj_arr_pt)[i];
+    objs[i] = const_cast<Object *>((*obj_arr_pt)[i]);
   qsort(objs, cnt, sizeof(Object *), cmp);
   obj_arr_pt->set(objs, cnt);
 }
@@ -131,7 +131,7 @@ ClassConversion::getClass_(Database *_db, const Oid &ocloid,
     for (int i = 0; i < cnt; i++) {
       ClassConversion *cls_cnv = (ClassConversion *)tmp_obj_arr[i];
       if (cls_cnv->getOidO() == ocloid)
-	objs[n++] = tmp_obj_arr[i];
+	objs[n++] = const_cast<Object *>(tmp_obj_arr[i]);
     }
 
     obj_arr_pt->set(objs, n);

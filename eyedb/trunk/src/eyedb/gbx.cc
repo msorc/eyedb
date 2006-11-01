@@ -103,6 +103,7 @@ namespace eyedb {
     gbx_ptag = ptag;
     gbx_magic     = ValidObject;
     gbx_refcnt    = 1;
+    gbx_must_release = true;
     gbx_locked    = gbxFalse;
     gbx_isonstack = object_isonstack;
 
@@ -161,6 +162,7 @@ namespace eyedb {
 
     gbx_locked = o.gbx_locked;
     gbx_tag = o.gbx_tag ? new gbxTag(*o.gbx_tag) : 0;
+    gbx_must_release = o.gbx_must_release; // ??
   }
 
   gbxObject::gbxObject(const gbxObject *o)
@@ -170,6 +172,7 @@ namespace eyedb {
     if (o) {
       gbx_locked  = o->gbx_locked;
       gbx_tag = o->gbx_tag ? new gbxTag(*o->gbx_tag) : 0;
+      gbx_must_release = o->gbx_must_release; // ??
     }
   }
 
@@ -184,6 +187,7 @@ namespace eyedb {
     gbx_refcnt = 1;
     gbx_locked = o.gbx_locked;
     gbx_tag = o.gbx_tag ? new gbxTag(*o.gbx_tag) : 0;
+    gbx_must_release = o.gbx_must_release; // ??
 
     gbx_activeDestruction = gbxFalse;
 

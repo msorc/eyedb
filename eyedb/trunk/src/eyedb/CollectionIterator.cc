@@ -61,7 +61,7 @@ namespace eyedb {
 
     if (!q) {
       for (int n = cur; cur < val_arr.getCount(); cur++) {
-	Value &v = val_arr[cur];
+	const Value &v = val_arr[cur];
 	if (v.type == Value::tObject) {
 	  if (v.o)
 	    oid = v.o->getOid();
@@ -94,7 +94,7 @@ namespace eyedb {
 
     if (!q) {
       for (int n = cur; cur < val_arr.getCount(); cur++) {
-	Value &v = val_arr[cur];
+	const Value &v = val_arr[cur];
 	if (v.type == Value::tObject) {
 	  o = v.o;
 	  cur++;
@@ -105,6 +105,7 @@ namespace eyedb {
 	  status = const_cast<Database *>(coll->getDatabase())->loadObject(*v.oid, o, rcm);
 	  if (status)
 	    throw *status;
+	  cur++;
 	  return True;
 	}
       }
@@ -147,7 +148,7 @@ namespace eyedb {
   {
     if (!q) {
       for (int n = cur; cur < val_arr.getCount(); cur++) {
-	Value &v = val_arr[cur];
+	const Value &v = val_arr[cur];
 	if (v.type == Value::tObject && v.o)
 	  v.o->release();
       }

@@ -43,6 +43,7 @@ namespace eyedbsm {
 }
 namespace eyedb {
 
+#define TRY_GETELEMS_GC
 
 //
 // this method initializes a few OQL built-in functions in the
@@ -382,35 +383,44 @@ Status Iterator::scan(ValueArray &valarray, unsigned int max,
   Value *values = 0;
   int count, n;
 
-  for (count = 0, n = 0; count < max; n++)
-    {
-      Bool found = False;
-      Value avalue;
-      Status s = scanNext(found, avalue);
+  for (count = 0, n = 0; count < max; n++) {
+    Bool found = False;
+    Value avalue;
+    /*
+#ifdef TRY_GETELEMS_GC
+    avalue.setAutoObjGarbage(valarray.isAutoObjGarbage());
+#endif
+    */
 
-      if (s)
-	return s;
+    Status s = scanNext(found, avalue);
 
-      if (!found)
-	break;
+    if (s)
+      return s;
 
-      if (n < start)
-	continue;
+    if (!found)
+      break;
 
-      if (count >= alloc)
-	{
-	  int nalloc = alloc + INCR;
-	  Value *v = new Value[nalloc];
-	  for (int i = 0; i < alloc; i++)
-	    v[i] = values[i];
+    if (n < start)
+      continue;
 
-	  delete [] values;
-	  values = v;
-	  alloc = nalloc;
-	}
+    if (count >= alloc) {
+      int nalloc = alloc + INCR;
+      Value *v = new Value[nalloc];
+      for (int i = 0; i < alloc; i++)
+	v[i] = values[i];
 
-      values[count++] = avalue;
+      delete [] values;
+      values = v;
+      alloc = nalloc;
     }
+
+#ifdef TRY_GETELEMS_GC
+    std::cout << avalue << std::endl;
+    values[count].setAutoObjGarbage(valarray.isAutoObjGarbage());
+#endif
+
+    values[count++] = avalue;
+  }
 
   valarray.set(values, count, False);
   return Success;

@@ -1104,28 +1104,30 @@ namespace eyedb {
     // ObjectArray Interface
     // ----------------------------------------------------------------------
   public:
-    ObjectArray(Object ** = 0, int count = 0);
-    ObjectArray(Bool auto_garb, Object ** = 0, int count = 0);
-    ObjectArray(const Collection *, Bool auto_garb = False);
+    ObjectArray(Object ** = 0, unsigned int count = 0);
+    ObjectArray(bool auto_garb, Object ** = 0, unsigned int count = 0);
+    ObjectArray(const Collection *, bool auto_garb = False);
     ObjectArray(const ObjectArray &);
     ObjectArray(const ObjectList &);
 
     ObjectArray& operator=(const ObjectArray &);
 
-    void set(Object **, int count);
+    void set(Object **, unsigned int count);
+    Status setObjectAt(unsigned int ind, Object *o);
 
-    int getCount() const {return count;}
-
+    unsigned int getCount() const {return count;}
+    /*
     Object *& operator[](int x) {
       return objs[x];
     }
+    */
 
-    const Object * operator[](int x) const {
-      return objs[x];
+    const Object *operator[](unsigned int ind) const {
+      return objs[ind];
     }
 
-    void setAutoGarbage(Bool _auto_garb) {auto_garb = _auto_garb;}
-    Bool getAutoGarbage() const {return auto_garb;}
+    void setAutoGarbage(bool _auto_garb) {auto_garb = _auto_garb;}
+    bool isAutoGarbage() const {return auto_garb;}
 
     ObjectList *toList() const;
 
@@ -1137,9 +1139,9 @@ namespace eyedb {
     // ObjectArray Private Part
     // ----------------------------------------------------------------------
   private:
-    int count;
+    unsigned int count;
     Object **objs;
-    Bool auto_garb;
+    bool auto_garb;
   };
 
   class ObjectListCursor;
