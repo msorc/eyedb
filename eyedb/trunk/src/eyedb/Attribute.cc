@@ -3904,6 +3904,7 @@ AttrDirect::newObjRealize(Object *o) const
     memcpy(&oo, vdata + (j * idr_item_vsize), sizeof(Object *));
     if (!oo) {
       oo = (Object *)cls->newObj(pdata + (j * idr_item_psize));
+      oo->setMustRelease(false); // SMART_PTR
       memcpy(vdata + (j * idr_item_vsize), &oo, sizeof(Object *));
     }
     // added the 5/11/99
@@ -4583,6 +4584,7 @@ AttrIndirect::load(Database *db,
 	    if (status != Success)
 	      return status;
 
+	    o->setMustRelease(false); // SMART_PTR
 	    status = setValue(agr, (Data)&o, 1, j, False);
 
 	    if (status != Success)
@@ -5691,6 +5693,7 @@ AttrVarDim::setSize_realize(Object *agr, Data _idr, Size nsize,
       if (!oo)
 	{
 	  oo = (Object *)cls->newObj(npdata + (j * idr_item_psize));
+	  oo->setMustRelease(false); // SMART_PTR
 	  // no XDR
 	  memcpy(nvdata + (j * idr_item_vsize), &oo, sizeof(Object *));
 	}
@@ -7508,6 +7511,8 @@ AttrIndirectVarDim::load(Database *db,
 	    if (status != Success)
 	      return status;
 
+	    o->setMustRelease(false); // SMART_PTR
+
 	    status = setValue(agr, (Data)&o, 1, j, False);
 
 	    if (status != Success)
@@ -8423,7 +8428,7 @@ Attribute::getAttrComp(Database *db, const char *clsname,
   if (obj_arr.getCount() > 1)
     return Exception::make(IDB_ATTRIBUTE_ERROR, "multiple index with attrpath '%s'", attrpath);
 
-  o = obj_arr[0];
+  o = const_cast<Object *>(obj_arr[0]);
   return Success;
 }
 

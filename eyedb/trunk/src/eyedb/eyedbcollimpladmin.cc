@@ -360,7 +360,7 @@ get_collections(const char *str, LinkedList &list)
 
   for (int n = 0; n < obj_arr.getCount(); n++)
     if (obj_arr[n]->asCollection())
-      list.insertObject(obj_arr[n]);
+      list.insertObject(const_cast<Object *>(obj_arr[n]));
   return 0;
 }
 

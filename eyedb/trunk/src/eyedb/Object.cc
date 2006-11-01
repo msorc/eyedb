@@ -634,7 +634,9 @@ namespace eyedb {
   // ObjectArray
   //
 
-  ObjectArray::ObjectArray(Object **_objs, int _count)
+#define TRY_GETELEMS_GC
+
+  ObjectArray::ObjectArray(Object **_objs, unsigned int _count)
   {
     objs = 0;
     count = 0;
@@ -642,7 +644,7 @@ namespace eyedb {
     set(_objs, _count);
   }
 
-  ObjectArray::ObjectArray(Bool _auto_garb, Object **_objs, int _count)
+  ObjectArray::ObjectArray(bool _auto_garb, Object **_objs, unsigned int _count)
   {
     objs = 0;
     count = 0;
@@ -650,7 +652,7 @@ namespace eyedb {
     set(_objs, _count);
   }
 
-  ObjectArray::ObjectArray(const Collection *coll, Bool _auto_garb)
+  ObjectArray::ObjectArray(const Collection *coll, bool _auto_garb)
   {
     objs = 0;
     count = 0;
@@ -658,8 +660,17 @@ namespace eyedb {
     coll->getElements(*this);
   }
 
-  void ObjectArray::set(Object **_objs, int _count)
+  void ObjectArray::set(Object **_objs, unsigned int _count)
   {
+    // 01/11/06
+#ifdef TRY_GETELEMS_GC
+    if (auto_garb && _count && !_objs)
+      throw *Exception::make(IDB_ERROR,
+			     "cannot set an auto-garbaged object array with "
+			     "for %d objets with no object pointer",
+			     _count);
+
+#endif
     if (auto_garb)
       garbage();
 
@@ -670,18 +681,58 @@ namespace eyedb {
     if (_objs)
       memcpy(objs, _objs, sz);
     count = _count;
+
+#ifdef TRY_GETELEMS_GC
+    if (auto_garb) {
+      for (int n = 0; n < count; n++) {
+	if (objs[n]) {
+	  objs[n]->incrRefCount();
+	}
+      }
+    }
+#endif
   }
 
   ObjectArray::ObjectArray(const ObjectArray &objarr)
   {
     count = 0;
     objs = 0;
+    auto_garb = False;
     *this = objarr;
+  }
+
+  Status ObjectArray::setObjectAt(unsigned int ind, Object *o)
+  {
+    if (ind >= count)
+      return Exception::make(IDB_ERROR, "invalid range %d (maximun is %d)",
+			     ind, count);
+    if (objs[ind] == o)
+      return Success;
+
+#ifdef TRY_GETELEMS_GC
+    if (auto_garb) {
+
+      if (objs[ind])
+	objs[ind]->release();
+
+      objs[ind] = o;
+
+      if (objs[ind])
+	objs[ind]->incrRefCount();
+
+      return Success;
+    }
+#endif
+
+    objs[ind] = o;
+    return Success;
   }
 
   ObjectArray::ObjectArray(const ObjectList &list)
   {
     count = 0;
+    auto_garb = False;
+
     int cnt = list.getCount();
     if (!cnt)
       {
@@ -694,25 +745,34 @@ namespace eyedb {
     ObjectListCursor c(list);
     Object *o;
 
-    for (; c.getNext(o); count++)
+    for (; c.getNext(o); count++) {
       objs[count] = o;
+      /*
+#ifdef TRY_GETELEMS_GC
+      // 31/10/06
+      if (auto_garb)
+	o->incrRefCount();
+#endif
+      */
+    }
   }
 
   ObjectArray& ObjectArray::operator=(const ObjectArray &objarr)
   {
     set(objarr.objs, objarr.count);
+#ifndef TRY_GETELEMS_GC
     auto_garb = objarr.auto_garb;
+#endif
     return *this;
   }
 
   void ObjectArray::garbage()
   {
     for (int i = 0; i < count; i++)
-      if (objs[i])
-	{
-	  objs[i]->release();
-	  objs[i] = 0;
-	}
+      if (objs[i]) {
+	objs[i]->release();
+	objs[i] = 0;
+      }
   }
 
   ObjectList *

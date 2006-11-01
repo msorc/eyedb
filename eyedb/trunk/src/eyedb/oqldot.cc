@@ -841,7 +841,7 @@ oqmlDotContext::eval_middle(Database *db, oqmlContext *ctx, Object *o,
 	return new oqmlStatus(dot, is);
 
       for (int i = 0; i < obj_arr.getCount(); i++)  {
-	s = eval_perform(db, ctx, obj_arr[i], value, n+1, alist);
+	s = eval_perform(db, ctx, const_cast<Object *>(obj_arr[i]), value, n+1, alist);
 	if (s) return s;
       }
 

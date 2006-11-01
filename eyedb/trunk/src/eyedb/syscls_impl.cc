@@ -544,21 +544,20 @@ namespace eyedb {
       {
 	OQL q(db, "select trigger.name = \"%s\"", getCSym());
 
-	ObjectArray obj_arr;
+	ObjectArray obj_arr(true);
 	Status s = q.execute(obj_arr);
 	if (s) return s;
       
-	if (obj_arr.getCount())
-	  {
-	    obj_arr[0]->release();
-	    return Exception::make(IDB_UNIQUE_CONSTRAINT_ERROR,
-				   "trigger<%s> %s::%s() already exists "
-				   "in database '%s'",
-				   Trigger::getStrTriggerType(getType()),
-				   getClassOwner()->getName(),
-				   getName().c_str(),
-				   db->getName());
-	  }
+	if (obj_arr.getCount()) {
+	  //obj_arr[0]->release();
+	  return Exception::make(IDB_UNIQUE_CONSTRAINT_ERROR,
+				 "trigger<%s> %s::%s() already exists "
+				 "in database '%s'",
+				 Trigger::getStrTriggerType(getType()),
+				 getClassOwner()->getName(),
+				 getName().c_str(),
+				 db->getName());
+	}
       }
 
     return ClassComponent::realize(rcm);

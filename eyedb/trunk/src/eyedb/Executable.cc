@@ -423,24 +423,22 @@ namespace eyedb {
     if (!db)
       return Exception::make(IDB_ERROR, "no database associated with object");
 
-    if (!oid.isValid())
-      {
-	OQL q(db, "select method.ex.intname = \"%s\"", getEx()->getIntname().c_str());
+    if (!oid.isValid()) {
+      OQL q(db, "select method.ex.intname = \"%s\"", getEx()->getIntname().c_str());
 
-	ObjectArray obj_arr;
-	Status s = q.execute(obj_arr);
+      ObjectArray obj_arr(true);
+      Status s = q.execute(obj_arr);
 
-	if (obj_arr.getCount())
-	  {
-	    obj_arr[0]->release();
-	    return Exception::make(IDB_UNIQUE_CONSTRAINT_ERROR,
-				   "method '%s::%s' already exists in"
-				   " database '%s'",
-				   getClassOwner()->getName(),
-				   getEx()->getIntname().c_str(),
-				   db->getName());
-	  }
+      if (obj_arr.getCount()) {
+	//obj_arr[0]->release();
+	return Exception::make(IDB_UNIQUE_CONSTRAINT_ERROR,
+			       "method '%s::%s' already exists in"
+			       " database '%s'",
+			       getClassOwner()->getName(),
+			       getEx()->getIntname().c_str(),
+			       db->getName());
       }
+    }
 
     return ClassComponent::realize(rcm);
   }

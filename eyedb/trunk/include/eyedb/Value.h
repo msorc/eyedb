@@ -141,6 +141,7 @@ namespace eyedb {
     */
     Value() {
       bufstr = NULL;
+      auto_obj_garb = false;
       set();
     }
 
@@ -151,6 +152,7 @@ namespace eyedb {
     */
     Value(Bool b1, Bool b2) {
       bufstr = NULL;
+      auto_obj_garb = false;
       set(b1, b2);
     }
 
@@ -160,6 +162,7 @@ namespace eyedb {
     */
     Value(Bool _b) {
       bufstr = NULL;
+      auto_obj_garb = false;
       set(_b);
     }
 
@@ -169,6 +172,7 @@ namespace eyedb {
     */
     Value(unsigned char _by) {
       bufstr = NULL;
+      auto_obj_garb = false;
       set(_by);
     }
 
@@ -178,6 +182,7 @@ namespace eyedb {
     */
     Value(char _c) {
       bufstr = NULL;
+      auto_obj_garb = false;
       set(_c);
     }
 
@@ -187,6 +192,7 @@ namespace eyedb {
     */
     Value(short _s) {
       bufstr = NULL;
+      auto_obj_garb = false;
       set(_s);
     }
 
@@ -196,6 +202,7 @@ namespace eyedb {
     */
     Value(double _d) {
       bufstr = NULL;
+      auto_obj_garb = false;
       set(_d);
     }
 
@@ -205,6 +212,7 @@ namespace eyedb {
     */
     Value(eyedblib::int32 _i) {
       bufstr = NULL;
+      auto_obj_garb = false;
       set(_i);
     }
 
@@ -214,6 +222,7 @@ namespace eyedb {
     */
     Value(eyedblib::int64 _l) {
       bufstr = NULL;
+      auto_obj_garb = false;
       set(_l);
     }
 
@@ -223,6 +232,7 @@ namespace eyedb {
     */
     Value(const char *_str) {
       bufstr = NULL;
+      auto_obj_garb = false;
       set(_str);
     }
 
@@ -233,6 +243,7 @@ namespace eyedb {
     */
     Value(const char *_str, Bool isident) {
       bufstr = NULL;
+      auto_obj_garb = false;
       set(_str, isident);
     }
 
@@ -242,6 +253,7 @@ namespace eyedb {
     */
     Value(Data _data, Size _size) {
       bufstr = NULL;
+      auto_obj_garb = false;
       set(_data, _size);
     }
 
@@ -251,6 +263,7 @@ namespace eyedb {
     */
     Value(const Oid &_oid) {
       bufstr = NULL;
+      auto_obj_garb = false;
       set(_oid);
     }
 
@@ -260,6 +273,8 @@ namespace eyedb {
     */
     Value(const Object *_o) {
       bufstr = NULL;
+      auto_obj_garb = false;
+      o = 0;
       set(_o);
     }
 
@@ -270,6 +285,8 @@ namespace eyedb {
     */
     Value(const Object *_o, unsigned int _idx) {
       bufstr = NULL;
+      auto_obj_garb = false;
+      o = 0;
       set(_o, _idx);
     }
 
@@ -277,8 +294,10 @@ namespace eyedb {
        Not yet documented
        @param _o
     */
-    Value(Object *_o) {
+    Value(Object *_o, bool _auto_obj_garb = false) {
       bufstr = NULL;
+      auto_obj_garb = _auto_obj_garb;
+      o = 0;
       set(_o);
     }
 
@@ -289,6 +308,7 @@ namespace eyedb {
     */
     Value(LinkedList *_list, Value::Type _type) {
       bufstr = NULL;
+      auto_obj_garb = false;
       set(_list, _type);
     }
 
@@ -298,6 +318,7 @@ namespace eyedb {
     */
     Value(Value::Struct *_stru) {
       bufstr = NULL;
+      auto_obj_garb = false;
       set(_stru);
     }
 
@@ -456,11 +477,7 @@ namespace eyedb {
        Not yet documented
        @param *_o
     */
-    void set(Object *_o) {
-      type = tObject;
-      o = _o;
-      unvalid();
-    }
+    void set(Object *_o);
 
     /**
        Not yet documented
@@ -625,6 +642,19 @@ namespace eyedb {
     */
     void code(Data &idr, Offset &offset, Size &alloc_size) const;
 
+    /**
+       Not yet documented
+       @param auto_obj_garb
+    */
+
+    void setAutoObjGarbage(bool _auto_obj_garb) {auto_obj_garb = _auto_obj_garb;}
+
+    /**
+       Not yet documented
+    */
+
+    bool isAutoObjGarbage() const {return auto_obj_garb;}
+
     ~Value();
 
   private:
@@ -633,6 +663,7 @@ namespace eyedb {
 			    Bool isObj, const RecMode *rcm);
     void garbage();
     char *bufstr;
+    bool auto_obj_garb;
     void unvalid() {
       free(bufstr);
       bufstr = NULL;
@@ -651,15 +682,13 @@ namespace eyedb {
     // ----------------------------------------------------------------------
 
   public:
-    Value *values;
-    int value_cnt;
-
     /**
        Not yet documented
     */
-    ValueArray() {
+    ValueArray(bool _auto_obj_garb = false) {
       values = NULL;
       value_cnt = 0;
+      auto_obj_garb = _auto_obj_garb;
     }
 
     /**
@@ -668,9 +697,25 @@ namespace eyedb {
        @param _value_cnt
        @param copy
     */
-    ValueArray(Value *_values, int _value_cnt, Bool copy = True) {
+    ValueArray(Value *_values, unsigned int _value_cnt, Bool copy = True) {
       values = NULL;
       value_cnt = 0;
+      auto_obj_garb = false;
+      set(_values, _value_cnt, copy);
+    }
+
+    /**
+       Not yet documented
+       @param _auto_obj_garb
+       @param _values
+       @param _value_cnt
+       @param copy
+    */
+    ValueArray(bool _auto_obj_garb, Value *_values, unsigned int _value_cnt,
+	       Bool copy = True) {
+      values = NULL;
+      value_cnt = 0;
+      auto_obj_garb = _auto_obj_garb;
       set(_values, _value_cnt, copy);
     }
 
@@ -703,7 +748,7 @@ namespace eyedb {
        Not yet documented
        @return
     */
-    int getCount() const {return value_cnt;}
+    unsigned int getCount() const {return value_cnt;}
 
     /**
        Not yet documented
@@ -711,24 +756,28 @@ namespace eyedb {
        @param _value_cnt
        @param copy
     */
-    void set(Value *_values, int _value_cnt, Bool copy = True);
+    void set(Value *_values, unsigned int _value_cnt, Bool copy = True);
 
     /**
        Not yet documented
-       @param x
+       @param ind
+       @param value
        @return
     */
-    Value & operator[](int x) {
-      return values[x];
-    }
+    Status setValueAt(unsigned int ind, const Value &value);
 
     /**
        Not yet documented
-       @param x
+    */
+    Value *getValues() {return values;}
+
+    /**
+       Not yet documented
+       @param ind
        @return
     */
-    const Value & operator[](int x) const {
-      return values[x];
+    const Value & operator[](unsigned int ind) const {
+      return values[ind];
     }
 
     /**
@@ -737,7 +786,25 @@ namespace eyedb {
     */
     ValueList *toList() const;
 
+    /**
+       Not yet documented
+       @param auto_obj_garb
+    */
+
+    void setAutoObjGarbage(bool auto_obj_garb);
+
+    /**
+       Not yet documented
+    */
+
+    bool isAutoObjGarbage() const {return auto_obj_garb;}
+
     ~ValueArray();
+
+  private:
+    Value *values;
+    unsigned int value_cnt;
+    bool auto_obj_garb;
   };
 
   class ValueListCursor;

@@ -474,7 +474,7 @@ setprotRealize()
 
   for (int i = 0; i < obj_array.getCount(); i++)
     {
-      Status s = obj_array[i]->setProtection(prot_oid);
+      Status s = const_cast<Object *>(obj_array[i])->setProtection(prot_oid);
       if (s)
 	s->print();
       printf("\t%s\n", obj_array[i]->getOid().getString());
