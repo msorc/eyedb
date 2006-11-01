@@ -24,6 +24,8 @@
 
 #include "eyedb_p.h"
 
+#define TRY_GETELEMS_GC
+
 namespace eyedb {
 
   CollectionIterator::CollectionIterator(const Collection *_coll, Bool indexed)
@@ -42,6 +44,9 @@ namespace eyedb {
     if (coll->isPartiallyStored()) {
       q = 0;
       cur = 0;
+      // 1/11/06
+      // val_arr may contains objects: these objets must *not* be released
+      // by the client
       status = coll->getElements(val_arr);
       return;
     }
@@ -105,6 +110,10 @@ namespace eyedb {
 	  status = const_cast<Database *>(coll->getDatabase())->loadObject(*v.oid, o, rcm);
 	  if (status)
 	    throw *status;
+#ifdef TRY_GETELEMS_GC
+	  if (o)
+	    objv.push_back(o);
+#endif
 	  cur++;
 	  return True;
 	}
@@ -119,6 +128,10 @@ namespace eyedb {
     if (status) 
       throw *status;
 
+#ifdef TRY_GETELEMS_GC
+    if (o)
+      objv.push_back(o);
+#endif
     return found;
   }
 
@@ -140,12 +153,26 @@ namespace eyedb {
     if (status)
       throw *status;
 
+#ifdef TRY_GETELEMS_GC
+    if (v.type == Value::tObject && v.o)
+      objv.push_back(v.o);
+#endif
+
     const_cast<Collection *>(coll)->makeValue(v);
     return found;
   }
 
   CollectionIterator::~CollectionIterator()
   {
+#ifdef TRY_GETELEMS_GC
+    std::vector<Object *>::iterator begin = objv.begin();
+    std::vector<Object *>::iterator end = objv.end();
+    while (begin != end) {
+      printf("releasing %p\n", *begin);
+      (*begin)->release();
+      ++begin;
+    }
+#else
     if (!q) {
       for (int n = cur; cur < val_arr.getCount(); cur++) {
 	const Value &v = val_arr[cur];
@@ -153,7 +180,7 @@ namespace eyedb {
 	  v.o->release();
       }
     }
-
+#endif
     delete q;
   }
 }

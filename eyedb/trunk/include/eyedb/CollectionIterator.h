@@ -44,6 +44,7 @@ namespace eyedb {
     ~CollectionIterator();
 
   private:
+    std::vector<Object *> objv;
     void init(const Collection *, Bool indexed);
     const Collection *coll;
     Iterator *q;
