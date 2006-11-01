@@ -415,7 +415,6 @@ Status Iterator::scan(ValueArray &valarray, unsigned int max,
     }
 
 #ifdef TRY_GETELEMS_GC
-    std::cout << avalue << std::endl;
     values[count].setAutoObjGarbage(valarray.isAutoObjGarbage());
 #endif
 
