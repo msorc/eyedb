@@ -161,7 +161,7 @@ class AttrDirect extends Attribute {
 	  {
 	    xo.setDatabase(db);
 
-	    MISSING : setCollImp(db, xo, idx_ctx)
+	    // MISSING : setCollImp(db, xo, idx_ctx)
 
 	    xo.realizePerform(clsoid, objoid, idx_ctx, rcm);
 
