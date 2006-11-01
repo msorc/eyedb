@@ -1883,7 +1883,7 @@ idbWGetTagObjects(Collection *coll, idbWTextMode textmod,
 
   for (int j = 0; j < count; j++)
     {
-      Object *o = obj_array[j];
+      Object *o = const_cast<Object *>(obj_array[j]);
       if (!o)
 	{
 	  tags[j+offset] = 0;
@@ -1903,7 +1903,7 @@ idbWGetTagObjects(Collection *coll, idbWTextMode textmod,
       if (idbW_ctx->exp_ctx.isExpanded(idbW_ctx->dump_ctx))
 	{
 	  objs[j+offset] = o;
-	  obj_array[j] = 0;
+	  obj_array.setObjectAt(j, 0); // obj_array[j] = 0;
 	}
       else
 	{
