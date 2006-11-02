@@ -655,6 +655,13 @@ namespace eyedb {
 
     bool isAutoObjGarbage() const {return auto_obj_garb;}
 
+    /**
+       Not yet documented
+       @param must_release
+    */
+
+    void setMustRelease(bool must_release);
+
     ~Value();
 
   private:
@@ -798,6 +805,13 @@ namespace eyedb {
     */
 
     bool isAutoObjGarbage() const {return auto_obj_garb;}
+
+    /**
+       Not yet documented
+       @param must_release
+    */
+
+    void setMustRelease(bool must_release);
 
     ~ValueArray();
 

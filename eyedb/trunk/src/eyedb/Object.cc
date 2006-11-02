@@ -666,7 +666,7 @@ namespace eyedb {
 #ifdef TRY_GETELEMS_GC
     if (auto_garb && _count && !_objs)
       throw *Exception::make(IDB_ERROR,
-			     "cannot set an auto-garbaged object array with "
+			     "cannot set an auto-garbaged object array "
 			     "for %d objets with no object pointer",
 			     _count);
 
@@ -691,6 +691,13 @@ namespace eyedb {
       }
     }
 #endif
+  }
+
+  void ObjectArray::setMustRelease(bool must_release)
+  {
+    for (int i = 0; i < count; i++)
+      if (objs[i])
+	objs[i]->setMustRelease(must_release);
   }
 
   ObjectArray::ObjectArray(const ObjectArray &objarr)
