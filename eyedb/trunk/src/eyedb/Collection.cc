@@ -2102,6 +2102,17 @@ namespace eyedb {
     return Success;
   }
 
+  Status Collection::getElements(ObjectPtrVector &obj_vect,
+				 const RecMode *rcm) const
+  {
+    ObjectArray obj_array; // true or false;
+    Status s = getElements(obj_array, rcm);
+    if (s)
+      return s;
+    obj_array.makeObjectPtrVector(obj_vect);
+    return Success;
+  }
+
   Status Collection::getElements(ObjectArray &obj_array,
 				 const RecMode *rcm) const
   {

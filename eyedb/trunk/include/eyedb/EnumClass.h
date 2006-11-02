@@ -304,6 +304,20 @@ namespace eyedb {
     virtual Status loadComplete(const Class *);
   };
 
+  class EnumClassPtr : public ClassPtr {
+
+  public:
+    EnumClassPtr(EnumClass *o = 0) : ClassPtr(o) { }
+
+    EnumClass *getEnumClass() {return dynamic_cast<EnumClass *>(o);}
+    const EnumClass *getEnumClass() const {return dynamic_cast<EnumClass *>(o);}
+
+    EnumClass *operator->() {return dynamic_cast<EnumClass *>(o);}
+    const EnumClass *operator->() const {return dynamic_cast<EnumClass *>(o);}
+  };
+
+  typedef std::vector<EnumClassPtr> EnumClassPtrVector;
+
   /**
      @}
   */

@@ -113,6 +113,20 @@ namespace eyedb {
     CollBagClass(const Oid&, const char *);
   };
 
+  class CollBagClassPtr : public CollectionClassPtr {
+
+  public:
+    CollBagClassPtr(CollBagClass *o = 0) : CollectionClassPtr(o) { }
+
+    CollBagClass *getCollBagClass() {return dynamic_cast<CollBagClass *>(o);}
+    const CollBagClass *getCollBagClass() const {return dynamic_cast<CollBagClass *>(o);}
+
+    CollBagClass *operator->() {return dynamic_cast<CollBagClass *>(o);}
+    const CollBagClass *operator->() const {return dynamic_cast<CollBagClass *>(o);}
+  };
+
+  typedef std::vector<CollBagClassPtr> CollBagClassPtrVector;
+
   /**
      @}
   */

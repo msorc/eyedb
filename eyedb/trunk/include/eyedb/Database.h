@@ -373,7 +373,30 @@ namespace eyedb {
        @param recmode
        @return
     */
+    Status loadObject(const Oid &oid, ObjectPtr &o,
+		      const RecMode *recmode = RecMode::NoRecurs);
+
+    // object loading
+    /**
+       Not yet documented
+       @param oid
+       @param o
+       @param recmode
+       @return
+    */
     Status loadObject(const Oid &oid, Object *&o,
+		      const RecMode *recmode = RecMode::NoRecurs);
+
+    /**
+       Not yet documented
+       @param xoid
+       @param o
+       @param lockmode
+       @param recmode
+       @return
+    */
+    Status loadObject(const Oid &xoid, ObjectPtr &o,
+		      LockMode lockmode,
 		      const RecMode *recmode = RecMode::NoRecurs);
 
     /**
@@ -395,9 +418,32 @@ namespace eyedb {
        @param recmode
        @return
     */
+    Status reloadObject(const Oid &oid, ObjectPtr &o,
+			const RecMode *recmode = RecMode::NoRecurs);
+
+
+    /**
+       Not yet documented
+       @param oid
+       @param o
+       @param recmode
+       @return
+    */
     Status reloadObject(const Oid &oid, Object *&o,
 			const RecMode *recmode = RecMode::NoRecurs);
 
+
+    /**
+       Not yet documented
+       @param oid
+       @param o
+       @param lockmode
+       @param recmode
+       @return
+    */
+    Status reloadObject(const Oid &oid, ObjectPtr &o,
+			LockMode lockmode,
+			const RecMode *recmode = RecMode::NoRecurs);
 
     /**
        Not yet documented
@@ -414,11 +460,33 @@ namespace eyedb {
     /**
        Not yet documented
        @param oid_array
+       @param obj_vect
+       @param recmode
+       @return
+    */
+    Status loadObjects(const OidArray &oid_array, ObjectPtrVector &obj_vect,
+		       const RecMode *recmode = RecMode::NoRecurs);
+
+    /**
+       Not yet documented
+       @param oid_array
        @param obj_array
        @param recmode
        @return
     */
     Status loadObjects(const OidArray &oid_array, ObjectArray &obj_array,
+		       const RecMode *recmode = RecMode::NoRecurs);
+
+    /**
+       Not yet documented
+       @param oid_array
+       @param obj_vect
+       @param lockmode
+       @param recmode
+       @return
+    */
+    Status loadObjects(const OidArray &oid_array, ObjectPtrVector &obj_vect,
+		       LockMode lockmode,
 		       const RecMode *recmode = RecMode::NoRecurs);
 
     /**
@@ -986,27 +1054,13 @@ namespace eyedb {
     Status removeObject(const Oid *,
 			const RecMode * = RecMode::NoRecurs);
 
-    // deprecated
-    /*
-      Status queryObject(Object *&, const char *fmt, ...);
-      Status queryObject(Object *&, const RecMode *,
-      const char *fmt, ...);
-      Status queryObjects(ObjectArray &, const char *fmt, ...);
-      Status queryObjects(ObjectArray &, const RecMode *,
-      const char *fmt, ...);
-      Status queryOid(Oid &, const char *fmt, ...);
-      Status queryOids(OidArray &, const char *fmt, ...);
-      Status queryValue(Value &, const char *fmt, ...);
-      Status queryValues(ValueArray &, const char *fmt, ...);
-
-    */
-
     Status updateSchema(const char *odlfile, const char *package,
 			const char *schname = 0, const char *db_prefix = 0,
 			FILE *fd = stdout, const char *cpp_cmd = 0,
 			const char *cpp_flags = 0);
 
-    // not implemented
+    // not implemented (yet ?)
+    /*
     Status execOQL(Object *&, const char *fmt, ...);
     Status execOQL(Object *&, const RecMode *,
 		   const char *fmt, ...);
@@ -1017,6 +1071,7 @@ namespace eyedb {
     Status execOQL(OidArray &, const char *fmt, ...);
     Status execOQL(Value &, const char *fmt, ...);
     Status execOQL(ValueArray &, const char *fmt, ...);
+    */
 
     // ----------------------------------------------------------------------
     // Database Protected Part

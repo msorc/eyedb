@@ -92,6 +92,20 @@ namespace eyedb {
     }
   };
 
+  class StructPtr : public AgregatPtr {
+
+  public:
+    StructPtr(Struct *o = 0) : AgregatPtr(o) { }
+
+    Struct *getStruct() {return dynamic_cast<Struct *>(o);}
+    const Struct *getStruct() const {return dynamic_cast<Struct *>(o);}
+
+    Struct *operator->() {return dynamic_cast<Struct *>(o);}
+    const Struct *operator->() const {return dynamic_cast<Struct *>(o);}
+  };
+
+  typedef std::vector<StructPtr> StructPtrVector;
+
   /**
      @}
   */

@@ -125,6 +125,20 @@ namespace eyedb {
     Status update();
   };
 
+  class CharPtr : public BasicPtr {
+
+  public:
+    CharPtr(Char *o = 0) : BasicPtr(o) { }
+
+    Char *getChar() {return dynamic_cast<Char *>(o);}
+    const Char *getChar() const {return dynamic_cast<Char *>(o);}
+
+    Char *operator->() {return dynamic_cast<Char *>(o);}
+    const Char *operator->() const {return dynamic_cast<Char *>(o);}
+  };
+
+  typedef std::vector<CharPtr> CharPtrVector;
+
   extern CharClass    *Char_Class;
   extern const char char_class_name[];
 

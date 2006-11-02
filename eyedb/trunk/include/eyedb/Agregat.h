@@ -212,6 +212,20 @@ namespace eyedb {
 			 const RecMode *);
   };
 
+  class AgregatPtr : public InstancePtr {
+
+  public:
+    AgregatPtr(Agregat *o = 0) : InstancePtr(o) { }
+
+    Agregat *getAgregat() {return dynamic_cast<Agregat *>(o);}
+    const Agregat *getAgregat() const {return dynamic_cast<Agregat *>(o);}
+
+    Agregat *operator->() {return dynamic_cast<Agregat *>(o);}
+    const Agregat *operator->() const {return dynamic_cast<Agregat *>(o);}
+  };
+
+  typedef std::vector<AgregatPtr> AgregatPtrVector;
+
   /**
      @}
   */

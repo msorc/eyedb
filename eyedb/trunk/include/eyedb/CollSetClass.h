@@ -113,6 +113,20 @@ namespace eyedb {
     CollSetClass(const Oid&, const char *);
   };
   
+  class CollSetClassPtr : public CollectionClassPtr {
+
+  public:
+    CollSetClassPtr(CollSetClass *o = 0) : CollectionClassPtr(o) { }
+
+    CollSetClass *getCollSetClass() {return dynamic_cast<CollSetClass *>(o);}
+    const CollSetClass *getCollSetClass() const {return dynamic_cast<CollSetClass *>(o);}
+
+    CollSetClass *operator->() {return dynamic_cast<CollSetClass *>(o);}
+    const CollSetClass *operator->() const {return dynamic_cast<CollSetClass *>(o);}
+  };
+
+  typedef std::vector<CollSetClassPtr> CollSetClassPtrVector;
+
   /**
      @}
   */

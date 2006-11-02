@@ -124,6 +124,20 @@ namespace eyedb {
 		    unsigned int nb = 1) const;
   };
 
+  class CharClassPtr : public BasicClassPtr {
+
+  public:
+    CharClassPtr(CharClass *o = 0) : BasicClassPtr(o) { }
+
+    CharClass *getCharClass() {return dynamic_cast<CharClass *>(o);}
+    const CharClass *getCharClass() const {return dynamic_cast<CharClass *>(o);}
+
+    CharClass *operator->() {return dynamic_cast<CharClass *>(o);}
+    const CharClass *operator->() const {return dynamic_cast<CharClass *>(o);}
+  };
+
+  typedef std::vector<CharClassPtr> CharClassPtrVector;
+
   /**
      @}
   */

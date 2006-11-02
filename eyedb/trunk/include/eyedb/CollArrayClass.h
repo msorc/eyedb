@@ -122,6 +122,20 @@ namespace eyedb {
     CollArrayClass(const Oid&, const char *);
   };
 
+  class CollArrayClassPtr : public CollectionClassPtr {
+
+  public:
+    CollArrayClassPtr(CollArrayClass *o = 0) : CollectionClassPtr(o) { }
+
+    CollArrayClass *getCollArrayClass() {return dynamic_cast<CollArrayClass *>(o);}
+    const CollArrayClass *getCollArrayClass() const {return dynamic_cast<CollArrayClass *>(o);}
+
+    CollArrayClass *operator->() {return dynamic_cast<CollArrayClass *>(o);}
+    const CollArrayClass *operator->() const {return dynamic_cast<CollArrayClass *>(o);}
+  };
+
+  typedef std::vector<CollArrayClassPtr> CollArrayClassPtrVector;
+
   /**
      @}
   */

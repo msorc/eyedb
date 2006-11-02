@@ -508,14 +508,25 @@ namespace eyedb {
     }
 
     // flatten methods
+
     /**
        Not yet documented
        @param db
-       @param objarr
+       @param obj_vect
        @param recmode
        @return
     */
-    Status toArray(Database *db, ObjectArray &objarr,
+    Status toArray(Database *db, ObjectPtrVector &obj_vect,
+		   const RecMode *recmode = RecMode::NoRecurs);
+
+    /**
+       Not yet documented
+       @param db
+       @param obj_array
+       @param recmode
+       @return
+    */
+    Status toArray(Database *db, ObjectArray &obj_array,
 		   const RecMode *recmode = RecMode::NoRecurs);
 
     /**

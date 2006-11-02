@@ -37,8 +37,8 @@ namespace eyedb {
     OQLIterator(OQL &);
 
     Bool next(Oid &);
-    Bool next(Object *&,
-	      const RecMode * = RecMode::NoRecurs);
+    Bool next(ObjectPtr &, const RecMode * = RecMode::NoRecurs);
+    Bool next(Object *&, const RecMode * = RecMode::NoRecurs);
     Bool next(Value &);
 
     ~OQLIterator();

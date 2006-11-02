@@ -125,6 +125,20 @@ namespace eyedb {
     Status update();
   };
 
+  class Int16Ptr : public BasicPtr {
+
+  public:
+    Int16Ptr(Int16 *o = 0) : BasicPtr(o) { }
+
+    Int16 *getInt16() {return dynamic_cast<Int16 *>(o);}
+    const Int16 *getInt16() const {return dynamic_cast<Int16 *>(o);}
+
+    Int16 *operator->() {return dynamic_cast<Int16 *>(o);}
+    const Int16 *operator->() const {return dynamic_cast<Int16 *>(o);}
+  };
+
+  typedef std::vector<Int16Ptr> Int16PtrVector;
+
   extern Int16Class   *Int16_Class;
   extern const char int16_class_name[];
 

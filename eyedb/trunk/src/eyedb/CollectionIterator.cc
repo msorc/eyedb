@@ -92,6 +92,14 @@ namespace eyedb {
     return found;
   }
 
+  Bool CollectionIterator::next(ObjectPtr &o_ptr, const RecMode *rcm)
+  {
+    Object *o = 0;
+    Bool b = next(o, rcm);
+    o_ptr = o;
+    return b;
+  }
+
   Bool CollectionIterator::next(Object *&o, const RecMode *rcm)
   {
     if (status)

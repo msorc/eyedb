@@ -163,6 +163,20 @@ namespace eyedb {
     void copy_realize(const BasicClass &);
   };
 
+  class BasicClassPtr : public ClassPtr {
+
+  public:
+    BasicClassPtr(BasicClass *o = 0) : ClassPtr(o) { }
+
+    BasicClass *getBasicClass() {return dynamic_cast<BasicClass *>(o);}
+    const BasicClass *getBasicClass() const {return dynamic_cast<BasicClass *>(o);}
+
+    BasicClass *operator->() {return dynamic_cast<BasicClass *>(o);}
+    const BasicClass *operator->() const {return dynamic_cast<BasicClass *>(o);}
+  };
+
+  typedef std::vector<BasicClassPtr> BasicClassPtrVector;
+
   /**
      @}
   */

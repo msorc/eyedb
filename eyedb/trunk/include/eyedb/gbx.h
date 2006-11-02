@@ -366,6 +366,44 @@ namespace eyedb {
     static gbxObserver *current_observer;
   };
 
+  class gbxObjectPtr {
+
+  protected:
+    gbxObject *o;
+
+  public:
+    gbxObjectPtr(gbxObject *o = 0) {
+      this->o = o;
+      if (o && !o->mustRelease())
+	o->reserve();
+    }
+
+    gbxObjectPtr(const gbxObjectPtr &o_ptr) {
+      o = 0;
+      *this = o_ptr;
+    }
+
+    gbxObjectPtr& operator=(const gbxObjectPtr &o_ptr) {
+      if (o)
+	o->release();
+      o = o_ptr.o;
+      if (o)
+	o->reserve();
+      return *this;
+    }
+
+    gbxObject *getGBXObject() {return o;}
+    const gbxObject *getGBXObject() const {return o;}
+
+    gbxObject *operator->() {return o;}
+    const gbxObject *operator->() const {return o;}
+
+    virtual ~gbxObjectPtr() {
+      if (o)
+	o->release();
+      o = 0; // secure
+    }
+  };
   /**
      @}
   */

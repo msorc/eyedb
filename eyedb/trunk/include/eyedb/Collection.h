@@ -125,6 +125,15 @@ namespace eyedb {
 
     /**
        Not yet documented
+       @param obj_vect
+       @param recmode
+       @return
+    */
+    Status getElements(ObjectPtrVector &obj_vect,
+		       const RecMode *recmode = RecMode::NoRecurs) const;
+
+    /**
+       Not yet documented
        @param obj_array
        @param recmode
        @return
@@ -475,6 +484,20 @@ namespace eyedb {
 		  Collection::ItemId *where = 0) const;
 
   };
+
+  class CollectionPtr : public InstancePtr {
+
+  public:
+    CollectionPtr(Collection *o = 0) : InstancePtr(o) { }
+
+    Collection *getCollection() {return dynamic_cast<Collection *>(o);}
+    const Collection *getCollection() const {return dynamic_cast<Collection *>(o);}
+
+    Collection *operator->() {return dynamic_cast<Collection *>(o);}
+    const Collection *operator->() const {return dynamic_cast<Collection *>(o);}
+  };
+
+  typedef std::vector<CollectionPtr> CollectionPtrVector;
 
   /**
      @}

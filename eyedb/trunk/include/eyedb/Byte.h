@@ -124,6 +124,20 @@ namespace eyedb {
     Status update();
   };
 
+  class BytePtr : public BasicPtr {
+
+  public:
+    BytePtr(Byte *o = 0) : BasicPtr(o) { }
+
+    Byte *getByte() {return dynamic_cast<Byte *>(o);}
+    const Byte *getByte() const {return dynamic_cast<Byte *>(o);}
+
+    Byte *operator->() {return dynamic_cast<Byte *>(o);}
+    const Byte *operator->() const {return dynamic_cast<Byte *>(o);}
+  };
+
+  typedef std::vector<BytePtr> BytePtrVector;
+
   extern ByteClass    *Byte_Class;
   extern const char byte_class_name[];
 

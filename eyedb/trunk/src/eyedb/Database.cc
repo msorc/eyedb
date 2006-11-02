@@ -1326,6 +1326,33 @@ if ((mode) !=  NoDBAccessMode && \
 
   Status
   Database::loadObjects(const OidArray &oid_array,
+			ObjectPtrVector &obj_vect,
+			const RecMode *rcm)
+  {
+    ObjectArray obj_array; // true of false ?
+    Status s = loadObjects(oid_array, obj_array, rcm);
+    if (s)
+      return s;
+    obj_array.makeObjectPtrVector(obj_vect);
+    return Success;
+  }
+
+  Status
+  Database::loadObjects(const OidArray &oid_array,
+			ObjectPtrVector &obj_vect,
+			LockMode lockmode,
+			const RecMode *rcm)
+  {
+    ObjectArray obj_array; // true of false ?
+    Status s = loadObjects(oid_array, obj_array, lockmode, rcm);
+    if (s)
+      return s;
+    obj_array.makeObjectPtrVector(obj_vect);
+    return Success;
+  }
+
+  Status
+  Database::loadObjects(const OidArray &oid_array,
 			ObjectArray &obj_array,
 			const RecMode *rcm)
   {
@@ -1351,6 +1378,48 @@ if ((mode) !=  NoDBAccessMode && \
     }
 
     return Success;
+  }
+
+  Status
+  Database::loadObject(const Oid &xoid, ObjectPtr &o_ptr,
+		       const RecMode *recmode)
+  {
+    Object *o = 0;
+    Status s = loadObject(xoid, o, recmode);
+    o_ptr = o;
+    return s;
+  }
+
+  Status
+  Database::loadObject(const Oid &xoid, ObjectPtr &o_ptr,
+		       LockMode lockmode,
+		       const RecMode *recmode)
+  {
+    Object *o = 0;
+    Status s = loadObject(xoid, o, lockmode, recmode);
+    o_ptr = o;
+    return s;
+  }
+
+  Status
+  Database::reloadObject(const Oid &xoid, ObjectPtr &o_ptr,
+			 const RecMode *recmode)
+  {
+    Object *o = 0;
+    Status s = reloadObject(xoid, o, recmode);
+    o_ptr = o;
+    return s;
+  }
+
+  Status
+  Database::reloadObject(const Oid &xoid, ObjectPtr &o_ptr,
+			 LockMode lockmode,
+			 const RecMode *recmode)
+  {
+    Object *o = 0;
+    Status s = reloadObject(xoid, o, lockmode, recmode);
+    o_ptr = o;
+    return s;
   }
 
   Status

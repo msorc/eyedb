@@ -41,6 +41,7 @@ namespace eyedb {
 
   struct Attribute;
   class Object;
+  class ObjectPtr;
 
   /**
      Not yet documented.

@@ -261,6 +261,20 @@ namespace eyedb {
     AgregatClass(const Oid&, const char *);
   };
 
+  class AgregatClassPtr : public ClassPtr {
+
+  public:
+    AgregatClassPtr(AgregatClass *o = 0) : ClassPtr(o) { }
+
+    AgregatClass *getAgregatClass() {return dynamic_cast<AgregatClass *>(o);}
+    const AgregatClass *getAgregatClass() const {return dynamic_cast<AgregatClass *>(o);}
+
+    AgregatClass *operator->() {return dynamic_cast<AgregatClass *>(o);}
+    const AgregatClass *operator->() const {return dynamic_cast<AgregatClass *>(o);}
+  };
+
+  typedef std::vector<AgregatClassPtr> AgregatClassPtrVector;
+
   /**
      @}
   */

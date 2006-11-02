@@ -846,6 +846,20 @@ namespace eyedb {
 		    unsigned int nb = 1) const;
   };
 
+  class ClassPtr : public ObjectPtr {
+
+  public:
+    ClassPtr(Class *o = 0) : ObjectPtr(o) { }
+
+    Class *getClass() {return dynamic_cast<Class *>(o);}
+    const Class *getClass() const {return dynamic_cast<Class *>(o);}
+
+    Class *operator->() {return dynamic_cast<Class *>(o);}
+    const Class *operator->() const {return dynamic_cast<Class *>(o);}
+  };
+
+  typedef std::vector<ClassPtr> ClassPtrVector;
+
   extern Class
   *Object_Class,
 

@@ -132,6 +132,20 @@ namespace eyedb {
 		    unsigned int nb = 1) const;
   };
 
+  class Int16ClassPtr : public BasicClassPtr {
+
+  public:
+    Int16ClassPtr(Int16Class *o = 0) : BasicClassPtr(o) { }
+
+    Int16Class *getInt16Class() {return dynamic_cast<Int16Class *>(o);}
+    const Int16Class *getInt16Class() const {return dynamic_cast<Int16Class *>(o);}
+
+    Int16Class *operator->() {return dynamic_cast<Int16Class *>(o);}
+    const Int16Class *operator->() const {return dynamic_cast<Int16Class *>(o);}
+  };
+
+  typedef std::vector<Int16ClassPtr> Int16ClassPtrVector;
+
   /**
      @}
   */

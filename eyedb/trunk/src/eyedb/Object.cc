@@ -788,6 +788,12 @@ namespace eyedb {
     return new ObjectList(*this);
   }
 
+  void ObjectArray::makeObjectPtrVector(ObjectPtrVector &obj_vect)
+  {
+    for (int n = 0; n < count; n++)
+      obj_vect.push_back(objs[n]);
+  }
+
   ObjectArray::~ObjectArray()
   {
     if (auto_garb)

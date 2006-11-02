@@ -110,6 +110,20 @@ namespace eyedb {
     virtual Status loadComplete(const Class *);
   };
 
+  class StructClassPtr : public AgregatClassPtr {
+
+  public:
+    StructClassPtr(StructClass *o = 0) : AgregatClassPtr(o) { }
+
+    StructClass *getStructClass() {return dynamic_cast<StructClass *>(o);}
+    const StructClass *getStructClass() const {return dynamic_cast<StructClass *>(o);}
+
+    StructClass *operator->() {return dynamic_cast<StructClass *>(o);}
+    const StructClass *operator->() const {return dynamic_cast<StructClass *>(o);}
+  };
+
+  typedef std::vector<StructClassPtr> StructClassPtrVector;
+
   /**
      @}
   */
