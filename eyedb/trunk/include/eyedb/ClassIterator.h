@@ -34,6 +34,7 @@ namespace eyedb {
 
   public:
     ClassIterator(const Class *, Bool subclass = False);
+    ClassIterator(const ClassPtr &, Bool subclass = False);
 
     Bool next(Oid &);
     Bool next(ObjectPtr &, const RecMode * = RecMode::NoRecurs);
@@ -44,6 +45,7 @@ namespace eyedb {
 
   private:
     Iterator *q; // for now
+    void init(const Class *, Bool subclass);
   };
 }
 

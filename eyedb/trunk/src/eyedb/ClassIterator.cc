@@ -29,6 +29,16 @@ namespace eyedb {
 
   ClassIterator::ClassIterator(const Class *cls, Bool subclass)
   {
+    init(cls, subclass);
+  }
+
+  ClassIterator::ClassIterator(const ClassPtr &cls_ptr, Bool subclass)
+  {
+    init(cls_ptr.getClass(), subclass);
+  }
+
+  void ClassIterator::init(const Class *cls, Bool subclass)
+  {
     q = new Iterator(const_cast<Class*>(cls), subclass);
     status = q->getStatus();
     if (status) {

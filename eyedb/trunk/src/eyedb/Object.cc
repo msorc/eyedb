@@ -805,6 +805,11 @@ namespace eyedb {
   extern ostream& 
   tmpfile2stream(const char *file, ostream& os, FILE *fd);
 
+  ostream& operator<<(ostream& os, const ObjectPtr &o_ptr)
+  {
+    return os << o_ptr.getObject();
+  }
+
   ostream& operator<<(ostream& os, const Object &o)
   {
     return os << &o;
