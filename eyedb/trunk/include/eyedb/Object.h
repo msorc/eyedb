@@ -1116,11 +1116,11 @@ namespace eyedb {
     Status setObjectAt(unsigned int ind, Object *o);
 
     unsigned int getCount() const {return count;}
-    /*
-    Object *& operator[](int x) {
-      return objs[x];
+
+    // voluntary not left value !
+    Object *operator[](unsigned int ind) {
+      return objs[ind];
     }
-    */
 
     const Object *operator[](unsigned int ind) const {
       return objs[ind];
@@ -1128,6 +1128,8 @@ namespace eyedb {
 
     void setAutoGarbage(bool _auto_garb) {auto_garb = _auto_garb;}
     bool isAutoGarbage() const {return auto_garb;}
+
+    void setMustRelease(bool must_release);
 
     ObjectList *toList() const;
 

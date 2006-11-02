@@ -251,71 +251,69 @@ namespace eyedb {
   Value::toOidObjectArray(Database *db, LinkedList &ll, Bool isobj,
 			  const RecMode *rcm)
   {
-    if (type == tOid)
-      {
-	if (isobj)
-	  {
-	    if (db)
-	      {
-		Object *x;
-		Status status = db->loadObject(*oid, x, rcm);
-		if (status) return status;
-		ll.insertObjectLast(x);
-	      }
-	  }
-	else
-	  ll.insertObjectLast(new Oid(*oid));
+    if (type == tOid) {
+      if (isobj) {
+	if (db) {
+	  Object *x;
+	  Status status = db->loadObject(*oid, x, rcm);
+	  if (status)
+	    return status;
+	  ll.insertObjectLast(x);
+	}
       }
+      else
+	ll.insertObjectLast(new Oid(*oid));
+    }
     else if (type == tObject)
       {
-	if (isobj)
+	if (isobj) {
+#ifdef TRY_GETELEMS_GC
+	  if (o)
+	    o->incrRefCount();
+#endif
 	  ll.insertObjectLast(o);
-	else if (o)
-	  {
-	    Oid *xoid = new Oid(o->getOid());
-	    ll.insertObjectLast(new Oid(*xoid));
-	  }
+	}
+	else if (o) {
+	  Oid *xoid = new Oid(o->getOid());
+	  ll.insertObjectLast(new Oid(*xoid));
+	}
       }
 
-    else if (type == tList || type == tBag || type == tSet || type == tArray)
-      {
-	LinkedListCursor cc(list);
-	Value *v;
-	Status status;
-	while (cc.getNext((void *&)v))
-	  if (status = v->toOidObjectArray(db, ll, isobj, rcm))
-	    return status;
-      }
-    else if (type == tStruct)
-      {
-	Status status;
-	for (int ii = 0; ii < stru->attr_cnt; ii++)
-	  if (status = stru->attrs[ii]->value->toOidObjectArray(db, ll, isobj, rcm))
-	    return status;
-      }
-
+    else if (type == tList || type == tBag || type == tSet || type == tArray) {
+      LinkedListCursor cc(list);
+      Value *v;
+      Status status;
+      while (cc.getNext((void *&)v))
+	if (status = v->toOidObjectArray(db, ll, isobj, rcm))
+	  return status;
+    }
+    else if (type == tStruct) {
+      Status status;
+      for (int ii = 0; ii < stru->attr_cnt; ii++)
+	if (status = stru->attrs[ii]->value->toOidObjectArray(db, ll, isobj, rcm))
+	  return status;
+    }
+    
     return Success;
   }
 
   Status
   Value::toValueArray(LinkedList &ll)
   {
-    if (type == tList || type == tBag || type == tSet || type == tArray)
-      {
-	LinkedListCursor cc(list);
-	Value *v;
-	Status status;
-	while (cc.getNext((void *&)v))
-	  if (status = v->toValueArray(ll))
-	    return status;
-      }
-    else if (type == tStruct)
-      {
-	Status status;
-	for (int ii = 0; ii < stru->attr_cnt; ii++)
-	  if (status = stru->attrs[ii]->value->toValueArray(ll))
-	    return status;
-      }
+    if (type == tList || type == tBag || type == tSet || type == tArray) {
+      LinkedListCursor cc(list);
+      Value *v;
+      Status status;
+      while (cc.getNext((void *&)v))
+	if (status = v->toValueArray(ll))
+	  return status;
+    }
+    else if (type == tStruct) {
+      Status status;
+      for (int ii = 0; ii < stru->attr_cnt; ii++)
+	if (status = stru->attrs[ii]->value->toValueArray(ll))
+	  return status;
+    }
     else
       ll.insertObjectLast(new Value(*this));
 
@@ -323,14 +321,33 @@ namespace eyedb {
   }
 
   Status
-  Value::toArray(Database *db, ObjectArray &objarr,
-		 const RecMode *rcm)
+  Value::toArray(Database *db, ObjectArray &objarr, const RecMode *rcm)
   {
     LinkedList ll;
     Status status = toOidObjectArray(db, ll, True, rcm);
     if (status)
       return status;
 
+#ifdef TRY_GETELEMS_GC
+    Object **o_arr = new Object*[ll.getCount()];
+    LinkedListCursor cc(ll);
+    Object *o;
+    for (int ii = 0; cc.getNext((void *&)o); ii++)
+      o_arr[ii] = o;
+
+    objarr.set(o_arr, ll.getCount());
+    delete [] o_arr;
+
+    if (objarr.isAutoGarbage()) {
+      // should release objects because auto garb objectarray has
+      // increase refcnt
+      LinkedListCursor cc2(ll);
+      for (int ii = 0; cc2.getNext((void *&)o); ii++) {
+	if (o)
+	  o->release();
+      }
+    }
+#else
     objarr.set(0, ll.getCount());
 
     LinkedListCursor cc(ll);
@@ -338,6 +355,7 @@ namespace eyedb {
     for (int ii = 0; cc.getNext((void *&)x); ii++)
       objarr.setObjectAt(ii, x);//objarr[ii] = x;
 
+#endif
     return Success;
   }
 
@@ -352,11 +370,10 @@ namespace eyedb {
 
     LinkedListCursor cc(ll);
     Oid *x;
-    for (int ii = 0; cc.getNext((void *&)x); ii++)
-      {
-	oidarr[ii] = *x;
-	delete x;
-      }
+    for (int ii = 0; cc.getNext((void *&)x); ii++) {
+      oidarr[ii] = *x;
+      delete x;
+    }
 
     return Success;
   }
@@ -366,7 +383,8 @@ namespace eyedb {
   {
     LinkedList ll;
     Status status = toValueArray(ll);
-    if (status) return status;
+    if (status)
+      return status;
 
     valarr.set(0, ll.getCount());
 
@@ -1006,6 +1024,12 @@ namespace eyedb {
       }
   }
 
+  void Value::setMustRelease(bool must_release)
+  {
+    if (type == tObject && o)
+      o->setMustRelease(must_release);
+  }
+
   Value::~Value()
   {
     garbage();
@@ -1075,6 +1099,12 @@ namespace eyedb {
     }
     
     values = _values;
+  }
+
+  void ValueArray::setMustRelease(bool must_release)
+  {
+    for (int i = 0; i < value_cnt; i++)
+      values[i].setMustRelease(must_release);
   }
 
   void ValueArray::setAutoObjGarbage(bool _auto_obj_garb)

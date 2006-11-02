@@ -102,6 +102,8 @@ namespace eyedb {
 	const Value &v = val_arr[cur];
 	if (v.type == Value::tObject) {
 	  o = v.o;
+	  if (o)
+	    o->setMustRelease(false);
 	  cur++;
 	  return True;
 	}
@@ -111,8 +113,10 @@ namespace eyedb {
 	  if (status)
 	    throw *status;
 #ifdef TRY_GETELEMS_GC
-	  if (o)
+	  if (o) {
 	    objv.push_back(o);
+	    o->setMustRelease(false);
+	  }
 #endif
 	  cur++;
 	  return True;
@@ -129,8 +133,10 @@ namespace eyedb {
       throw *status;
 
 #ifdef TRY_GETELEMS_GC
-    if (o)
+    if (o) {
       objv.push_back(o);
+      o->setMustRelease(false);
+    }
 #endif
     return found;
   }
@@ -168,7 +174,6 @@ namespace eyedb {
     std::vector<Object *>::iterator begin = objv.begin();
     std::vector<Object *>::iterator end = objv.end();
     while (begin != end) {
-      printf("releasing %p\n", *begin);
       (*begin)->release();
       ++begin;
     }

@@ -2269,8 +2269,8 @@ namespace eyedb {
 
     read_cache.obj_arr = obj_list->toArray();
 #ifdef TRY_GETELEMS_GC
-    // 31/10/06: see above
     read_cache.obj_arr->setAutoGarbage(true);
+    read_cache.obj_arr->setMustRelease(false);
 #endif
 
     /*
@@ -2481,6 +2481,7 @@ do { \
       read_cache.val_arr = value_list->toArray();
 #ifdef TRY_GETELEMS_GC
       read_cache.val_arr->setAutoObjGarbage(true);
+      read_cache.val_arr->setMustRelease(false);
 #endif
       delete value_list;
       
