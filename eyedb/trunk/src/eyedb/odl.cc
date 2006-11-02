@@ -59,6 +59,8 @@ namespace eyedb {
   Bool odl_dynamic_attr = False;
   Bool odl_class_enums = False;
   Bool odl_sch_rm = False;
+  Bool odl_smartptr = False;
+
   LinkedList odl_cls_rm;
   static Bool odl_not_check_missing = IDBBOOL(getenv("EYEDBNOCHECKMISSING"));
   FILE *odl_fd = stdout;

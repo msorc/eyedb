@@ -61,6 +61,7 @@ namespace eyedb {
       tData,
       tOid,
       tObject,
+      tObjectPtr,
       tPobj,
       tList,
       tSet,
@@ -131,6 +132,7 @@ namespace eyedb {
       } data;
       Oid *oid;
       Object *o;
+      ObjectPtr *o_ptr;
       unsigned int idx;
       LinkedList *list;
       Value::Struct *stru;
@@ -303,6 +305,16 @@ namespace eyedb {
 
     /**
        Not yet documented
+       @param _o_ptr
+    */
+    Value(const ObjectPtr &_o_ptr) {
+      bufstr = NULL;
+      auto_obj_garb = false;
+      set(_o_ptr);
+    }
+
+    /**
+       Not yet documented
        @param _list
        @param _type
     */
@@ -470,6 +482,16 @@ namespace eyedb {
     void set(const Object *_o, unsigned int _idx) {
       type = tPobj;
       idx = _idx;
+      unvalid();
+    }
+
+    /**
+       Not yet documented
+       @param &o_ptr
+    */
+    void set(const ObjectPtr &_o_ptr) {
+      type = tObjectPtr;
+      o_ptr = new ObjectPtr(_o_ptr);
       unvalid();
     }
 

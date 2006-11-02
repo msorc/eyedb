@@ -42,6 +42,8 @@ using namespace std;
 
 namespace eyedb {
 
+  extern Bool odl_smartptr;
+
   // 22/08/01: defined if one wants the same API when using dynamic-attr
   // option or not:
 #define UNIFIED_API
@@ -2253,47 +2255,71 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
 
     GenContext ctxH(fdh, package, odl_rootclass);
 
-    if (true_prefix)
-      {
-	fprintf(fdh, "class %s {\n", true_prefix);
-	ctxH.push();
-      }
+    if (true_prefix){
+      fprintf(fdh, "class %s {\n", true_prefix);
+      ctxH.push();
+    }
 
-    while (_class->getNextObject(curs, (void *&)cl))
-      if (check_class(cl, False))
-	{
-	  const char *suffix;
-	  string s;
-	  if (cl->asEnumClass())
-	    suffix = "eyedb::Enum";
-	  else if (cl->asAgregatClass())
-	    suffix = cl->asStructClass() ? "eyedb::Struct" : "eyedb::Union";
-	  else if (cl->asCollectionClass()) {
-	    s = string("eyedb::") + cl->asCollectionClass()->getCSuffix();
-	    suffix = s.c_str();
-	  }
-	  else
-	    suffix = "";
-
-#define NEW_ENUM
-#ifdef NEW_ENUM
-	  if (!cl->asEnumClass())
-	    fprintf(fdh, "%sclass %s;\n", ctxH.get(), cl->getCName());
-#else
-	  if (cl->asEnumClass())
-	    fprintf(fdh, "%stypedef int %s;\n", ctxH.get(), cl->getCName());
-	  else
-	    fprintf(fdh, "%sclass %s;\n", ctxH.get(), cl->getCName());
-#endif
-
-	  fprintf(fdc, "%s" DEF_PREFIX "%sClass *%s_Class;\n",
-		  ((!_export || cl->asCollectionClass()) ? "static " : ""),
-		  suffix, cl->asBasicClass() ? cl->getName() : cl->getCName());
-
-	  cl->setCanonicalName(cap(cl->getName(), prefix));
+    while (_class->getNextObject(curs, (void *&)cl)) {
+      if (check_class(cl, False)) {
+	const char *suffix;
+	string s;
+	if (cl->asEnumClass())
+	  suffix = "eyedb::Enum";
+	else if (cl->asAgregatClass())
+	  suffix = cl->asStructClass() ? "eyedb::Struct" : "eyedb::Union";
+	else if (cl->asCollectionClass()) {
+	  s = string("eyedb::") + cl->asCollectionClass()->getCSuffix();
+	  suffix = s.c_str();
 	}
+	else
+	  suffix = "";
+
+	if (!cl->asEnumClass() && !cl->asCollectionClass()) // added !cl->asCollectionClass the 2/11/06
+	  fprintf(fdh, "%sclass %s;\n", ctxH.get(), cl->getCName());
+
+	fprintf(fdc, "%s" DEF_PREFIX "%sClass *%s_Class;\n",
+		((!_export || cl->asCollectionClass()) ? "static " : ""),
+		suffix, cl->asBasicClass() ? cl->getName() : cl->getCName());
+
+	cl->setCanonicalName(cap(cl->getName(), prefix));
+      }
+    }
 
     fprintf(fdc, "\n");
+    fprintf(fdh, "\n");
+    _class->endScan(curs);
+
+    curs = _class->startScan();
+    while (_class->getNextObject(curs, (void *&)cl)) {
+      if (check_class(cl, False)) {
+	if (!cl->asEnumClass() && !cl->asCollectionClass()) {
+	  if (!odl_smartptr)
+	    fprintf(fdh, "%stypedef %s * %sPtr;\n", ctxH.get(), cl->getCName(), cl->getName());
+	  else {
+	    fprintf(fdh, "%sclass %sPtr : public %sPtr {\n",
+		    ctxH.get(), cl->getCName(), cl->getParent()->getCName());
+
+	    fprintf(fdh, "\npublic:\n");
+	    fprintf(fdh, "%s  %sPtr(%s *o = 0);\n\n",
+		    ctxH.get(), cl->getCName(), cl->getCName(),
+		    cl->getParent()->getCName());
+	  
+	    fprintf(fdh, "%s  %s *get%s();\n",
+		    ctxH.get(), cl->getCName(), cl->getCName(), cl->getCName());
+	    fprintf(fdh, "%s  const %s *get%s() const;\n\n",
+		    ctxH.get(), cl->getCName(), cl->getCName(), cl->getCName());
+    
+	    fprintf(fdh, "%s  %s *operator->();\n",
+		    ctxH.get(), cl->getCName(), cl->getCName());
+	    fprintf(fdh, "%s  const %s *operator->() const;\n",
+		    ctxH.get(), cl->getCName(), cl->getCName());
+	    fprintf(fdh, "%s};\n\n", ctxH.get());
+	  }
+	}
+      }
+    }
+
     _class->endScan(curs);
 
     fprintf(fdh, "\n%sclass %s {\n\n", ctxH.get(), package);
@@ -2830,6 +2856,33 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
     }
 
     // end of add
+
+    fprintf(fdh, "\n");
+    if (odl_smartptr) {
+      curs = _class->startScan();
+      while (_class->getNextObject(curs, (void *&)cl)) {
+	if (check_class(cl, False)) {
+	  if (!cl->asEnumClass() && !cl->asCollectionClass()) {
+	    fprintf(fdh, "%sinline %sPtr::%sPtr(%s *o) : %sPtr(o) { }\n\n",
+		    ctxH.get(), cl->getCName(), cl->getCName(), cl->getCName(),
+		    cl->getParent()->getCName());
+	  
+	    fprintf(fdh, "%sinline %s *%sPtr::get%s() {return dynamic_cast<%s *>(o);}\n",
+		    ctxH.get(), cl->getCName(), cl->getCName(), cl->getCName(), cl->getCName());
+	    fprintf(fdh, "%sinline const %s *%sPtr::get%s() const "
+		    "{return dynamic_cast<%s *>(o);}\n\n",
+		    ctxH.get(), cl->getCName(), cl->getCName(), cl->getCName(), cl->getCName());
+    
+	    fprintf(fdh, "%sinline %s *%sPtr::operator->() {return dynamic_cast<%s *>(o);}\n",
+		    ctxH.get(), cl->getCName(), cl->getCName(), cl->getCName());
+	    fprintf(fdh, "%sinline const %s *%sPtr::operator->() const {return dynamic_cast<%s *>(o);}\n\n",
+		    ctxH.get(), cl->getCName(), cl->getCName(), cl->getCName());
+	  }
+	}
+      }
+
+      _class->endScan(curs);
+    }
 
     if (c_namespace)
       fprintf(fdh, "\n}\n", c_namespace);

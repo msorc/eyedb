@@ -455,6 +455,12 @@ namespace eyedb {
     */
     Bool isRemoved() const {return removed;}
 
+    /**
+       Not yet documented
+       @return
+    */
+    const void *getPtr() const {return (const void *)this;};
+
     virtual ~Object();
 
     // ----------------------------------------------------------------------
@@ -1108,6 +1114,8 @@ namespace eyedb {
   };
 
   typedef std::vector<ObjectPtr> ObjectPtrVector;
+
+  std::ostream& operator<<(std::ostream&, const ObjectPtr &);
 
   /**
      Not yet documented.

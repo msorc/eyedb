@@ -241,7 +241,6 @@ namespace eyedb {
     if (!nodelete)
       if (!gbx_isonstack && !gbx_refcnt && !gbx_locked)
 	delete ((void *)this);
-
   }
 
   void gbxObject::release()

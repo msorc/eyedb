@@ -122,6 +122,9 @@ namespace eyedb {
       case tObject:
 	return val.o == o;
 
+      case tObjectPtr:
+	return val.o_ptr->getObject() == o_ptr->getObject();
+
       case tList:
       case tBag:
       case tSet:
@@ -141,6 +144,27 @@ namespace eyedb {
       }
 
     return 0;
+  }
+
+  int cmp_objects(const Object *o, const Object *val_o)
+  {
+    if (o->getOid().isValid() && val_o->getOid().isValid())
+      return o->getOid().getNX() < val_o->getOid().getNX();
+
+    Size o_size;
+    Data o_idr = o->getIDR(o_size);
+
+    Size val_o_size;
+    Data val_o_idr = val_o->getIDR(val_o_size);
+
+    Size size = (o_size < val_o_size ? o_size : val_o_size);
+
+    int r = memcmp(o_idr, val_o_idr, size);
+    if (r < 0)
+      return 1;
+    if (r > 0)
+      return 0;
+    return o < val_o;
   }
 
   int Value::operator<(const Value &val) const
@@ -189,6 +213,13 @@ namespace eyedb {
     case tOid:
       return oid->getNX() < val.oid->getNX();
 
+#if 1
+    case tObject:
+      return cmp_objects(o, val.o);
+
+    case tObjectPtr:
+      return cmp_objects(o_ptr->getObject(), val.o_ptr->getObject());
+#else
     case tObject: {
       if (o->getOid().isValid() && val.o->getOid().isValid())
 	return o->getOid().getNX() < val.o->getOid().getNX();
@@ -201,7 +232,6 @@ namespace eyedb {
 
       Size size = (o_size < val_o_size ? o_size : val_o_size);
 
-      //return memcmp(o_idr, val_o_idr, size) < 0 ? 1 : 0;
       int r = memcmp(o_idr, val_o_idr, size);
       if (r < 0)
 	return 1;
@@ -209,6 +239,7 @@ namespace eyedb {
 	return 0;
       return o < val.o;
     }
+#endif
 
     default:
       return !(*this == val);
@@ -264,21 +295,32 @@ namespace eyedb {
       else
 	ll.insertObjectLast(new Oid(*oid));
     }
-    else if (type == tObject)
-      {
-	if (isobj) {
+    else if (type == tObject) {
+      if (isobj) {
 #ifdef TRY_GETELEMS_GC
-	  if (o)
-	    o->incrRefCount();
+	if (o)
+	  o->incrRefCount();
 #endif
-	  ll.insertObjectLast(o);
-	}
-	else if (o) {
-	  Oid *xoid = new Oid(o->getOid());
-	  ll.insertObjectLast(new Oid(*xoid));
-	}
+	ll.insertObjectLast(o);
       }
+      else if (o) {
+	Oid *xoid = new Oid(o->getOid());
+	ll.insertObjectLast(new Oid(*xoid));
+      }
+    }
 
+    else if (type == tObjectPtr) {
+      if (isobj) {
+	if (o_ptr->getObject())
+	  o_ptr->getObject()->incrRefCount();
+	ll.insertObjectLast(o_ptr->getObject());
+      }
+      else if (o_ptr->getObject()) {
+	Oid *xoid = new Oid(o_ptr->getObject()->getOid());
+	ll.insertObjectLast(new Oid(*xoid));
+      }
+    }
+    
     else if (type == tList || type == tBag || type == tSet || type == tArray) {
       LinkedListCursor cc(list);
       Value *v;
@@ -444,6 +486,9 @@ namespace eyedb {
       }
     }
 #endif
+    else if (type == tObjectPtr) {
+      o_ptr = new ObjectPtr(*val.o_ptr);
+    }
     else
       memcpy(this, &val, sizeof(*this));
 
@@ -598,7 +643,15 @@ namespace eyedb {
       case tObject:
 	{
 	  ostringstream ostr;
-	  ostr << o; // << ends;
+	  ostr << o;
+	  ((Value *)this)->bufstr = strdup(ostr.str().c_str());
+	}
+	break;
+
+      case tObjectPtr:
+	{
+	  ostringstream ostr;
+	  ostr << o_ptr->getObject();
 	  ((Value *)this)->bufstr = strdup(ostr.str().c_str());
 	}
 	break;
@@ -701,6 +754,10 @@ namespace eyedb {
 	o->trace(fd);
 	break;
 
+      case tObjectPtr:
+	o_ptr->getObject()->trace(fd);
+	break;
+
       case tList:
 	print_list(fd, list, "list");
 	break;
@@ -799,6 +856,8 @@ namespace eyedb {
       }
     }
 #endif
+    else if (type == tObjectPtr)
+      delete o_ptr;
 
     free(bufstr);
   }
@@ -855,6 +914,9 @@ namespace eyedb {
 
       case tObject:
 	return "object";
+
+      case tObjectPtr:
+	return "object_ptr";
 
       case tList:
 	return "list";
@@ -997,6 +1059,9 @@ namespace eyedb {
 	break;
 
       case tObject:
+	break;
+
+      case tObjectPtr:
 	break;
 
       case tList:
@@ -1214,6 +1279,9 @@ namespace eyedb {
 	break;
 
       case tObject:
+	break;
+
+      case tObjectPtr:
 	break;
 
       case tList:

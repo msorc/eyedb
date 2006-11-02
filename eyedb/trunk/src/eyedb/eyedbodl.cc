@@ -29,6 +29,10 @@
 using namespace eyedb;
 using namespace std;
 
+namespace eyedb {
+  extern Bool odl_smartptr;
+}
+
 #include "GetOpt.h"
 
 extern void
@@ -56,7 +60,7 @@ usage(const char *msg = 0, const char *etc = 0)
 
   fprintf(stderr, "%s[--output-dir=<dirname>] [--output-file-prefix=<prefix>]%s",
 	  sp, nl);
-  fprintf(stderr, "%s[--schema-name=<schname>] [--namespace=<namespace>]%s", sp, nl);
+  fprintf(stderr, "%s[--schema-name=<schname>] [--namespace=<namespace>] [--use-smart-pointers=yes|no]%s", sp, nl);
   fprintf(stderr, "%s[--class-prefix=<prefix>] [--db-class-prefix=<dbprefix>]%s", sp, nl);
   fprintf(stderr, "%s[--attr-style=implicit|explicit]%s", sp, nl);
   fprintf(stderr, "%s[--dynamic-attr]%s", sp, nl);
@@ -148,6 +152,7 @@ help()
   fprintf(stderr, "--attr-cache=no               Does not use a second level cache for attribute value (the default)\n");
   fprintf(stderr, "\nFor the --gencode=C++ option only\n");
   fprintf(stderr, "--namespace=<namespace>       Define classes with the namespace <namespace>\n");
+  fprintf(stderr, "--use-smart-pointers=yes|no   The generated C++ code will use (=yes) smart pointers or not (=no)\n");
   fprintf(stderr, "--c-suffix=<suffix>           Use <suffix> as the C file suffix\n");
   fprintf(stderr, "--h-suffix=<suffix>           Use <suffix> as the H file suffix\n");
   fprintf(stderr, "--gen-class-stubs             Generates a file class_stubs.h for each class\n");
@@ -344,6 +349,15 @@ getOpts(int argc, char *argv[], Bool &dirname_set)
     }
     else if (GetOpt::parseLongOpt(s, "namespace", &value)) {
       c_namespace = strdup(value.c_str());
+    }
+    else if (GetOpt::parseLongOpt(s, "use-smart-pointers", &value)) {
+      const char *s = value.c_str();
+      if (!strcasecmp(s, "yes"))
+	odl_smartptr = True;
+      else if (!strcasecmp(s, "no"))
+	odl_smartptr = False;
+      else
+	return usage("must set yes or no behind --use-smart-pointers");
     }
     else if (GetOpt::parseLongOpt(s, "db-class-prefix", &value)) {
       db_prefix = strdup(value.c_str());
@@ -619,10 +633,11 @@ getOpts(int argc, char *argv[], Bool &dirname_set)
 
       i += 2;
     }
+    _OBSOLETE_CODE_
     else if (!strcmp(s, "--class-prefix"))
       GETOPT(prefix, -class-prefix);
     else if (!strcmp(s, "--namespace"))
-      GETOPT(c_namespace, -namespace);
+      GETOPT(c_namespace, --namespace);
     else if (!strcmp(s, "--db-class-prefix"))
       GETOPT(db_prefix, -db-class-prefix);
     else if (!strcmp(s, "--rmv-undef-attrcomp")) {

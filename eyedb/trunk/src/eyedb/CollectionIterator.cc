@@ -38,6 +38,12 @@ namespace eyedb {
     init(&_coll, indexed);
   }
 
+  CollectionIterator::CollectionIterator(const CollectionPtr &coll_ptr, Bool indexed)
+  {
+    init(coll_ptr.getCollection(), indexed);
+  }
+
+
   void CollectionIterator::init(const Collection *_coll, Bool indexed)
   {
     coll = _coll;

@@ -45,7 +45,29 @@
 
 #define ODL_STD_STRING
 
+/*
+#define TRY_PTR
+
+#ifdef TRY_PTR
+#define _PTR_ "Ptr "
+#define _PTR_ "Ptr "
+#else
+#define _PTR_ "*"
+#endif
+*/
+
+#define _PTR_ getPtr()
+
 namespace eyedb {
+
+  extern Bool odl_smartptr;
+
+  static const char *getPtr()
+  {
+    if (odl_smartptr)
+      return "Ptr ";
+    return "*";
+  }
 
   static void
   gbx_suspend(GenContext *ctx)
@@ -458,8 +480,8 @@ do { \
 	else if (isoid)
 	  fprintf(fd, "%sconst eyedb::Oid &_oid%s)\n{\n", comma, etc);
 	else
-	  fprintf(fd, "%s%s %s_%s%s%s)\n{\n", comma, oclassname,
-		  (_isref || !cl->asBasicClass() ? "*" : ""), name,
+	  fprintf(fd, "%s%s%s_%s%s%s)\n{\n", comma, oclassname,
+		  (_isref || !cl->asBasicClass() ? _PTR_ : " "), name,
 		  etc1, etc);
       }
     else if (!strcmp(cl->getName(), char_class_name) && _dim > 1)
@@ -604,7 +626,7 @@ do { \
     FILE *fd = ctx->getFile();
     int ndims = typmod.ndims, i;
     int not_basic = NOT_BASIC();
-    const char *ref = (not_basic ? "*" : "");
+    const char *ref = (not_basic ? _PTR_ : " ");
     const char *comma = (ndims ? ", " : "");
     const char *classname = isIndirect() ?
       className(cls, True) : className(cls, False);
@@ -621,10 +643,10 @@ do { \
     if (isoid)
       fprintf(fd, "%sconst eyedb::Oid &_oid)\n{\n", comma);
     else if (cls->asEnumClass())
-      fprintf(fd, "%s%s %s_%s, eyedb::Bool _check_value)\n{\n",
+      fprintf(fd, "%s%s%s_%s, eyedb::Bool _check_value)\n{\n",
 	      comma, classname, ref, name);
     else
-      fprintf(fd, "%s%s %s_%s)\n{\n", comma, classname, ref, name);
+      fprintf(fd, "%s%s%s_%s)\n{\n", comma, classname, ref, name);
 
     GenCodeHints::OpType optype = (isoid ? GenCodeHints::tSetOid:
 				   GenCodeHints::tSet);
@@ -772,7 +794,7 @@ do { \
     eyedblib::int16 _dim;
     Class *cl = const_cast<Class *>(cls->asCollectionClass()->getCollClass(&_isref, &_dim));
     int not_basic = _isref || (!cl->asBasicClass() && !cl->asEnumClass());
-    const char *ref = (not_basic ? "*" : "");
+    const char *ref = (not_basic ? _PTR_ : " ");
     const char *starg    = STATUS_ARG(hints, False);
     const char *stargcom = STATUS_ARG(hints, True);
     const char *classname = isIndirect() ?
@@ -801,7 +823,8 @@ do { \
 	*/
 	fprintf(fd, "%seyedb::Status s;\n", ctx->get());
       
-	fprintf(fd, "%sconst eyedb::Collection *coll = %s(", ctx->get(),
+	fprintf(fd, "%sconst eyedb::Collection%s coll = %s(", ctx->get(),
+		_PTR_,
 		ATTRNAME(name, tGetColl, hints));
 
 	for (i = 0; i < ndims; i++)
@@ -835,7 +858,7 @@ do { \
 	      ATTRNAME_1(name, (ordered ? GenCodeHints::tRetrieveItemAt : GenCodeHints::tGetItemAt), hints));
     }
     else if (_dim == 1)
-      fprintf(fd, "%s%s %s%s::%s(unsigned int ind, ",
+      fprintf(fd, "%s%s%s%s::%s(unsigned int ind, ",
 	      _const, oclassname, ref, own->getName(),
 	      ATTRNAME_1(name, (ordered ? GenCodeHints::tRetrieveItemAt : GenCodeHints::tGetItemAt), hints));
     else {
@@ -853,7 +876,8 @@ do { \
     */
     fprintf(fd, "%seyedb::Status s;\n", ctx->get());
 
-    fprintf(fd, "%sconst eyedb::Collection *coll = %s(", ctx->get(),
+    fprintf(fd, "%sconst eyedb::Collection%s coll = %s(", ctx->get(),
+	    _PTR_,
 	    ATTRNAME(name, tGetColl, hints));
 
     for (i = 0; i < ndims; i++)
@@ -906,7 +930,8 @@ do { \
     FILE *fd = ctx->getFile();
     int ndims = typmod.ndims, i;
     int not_basic = NOT_BASIC();
-    const char *ref = (not_basic ? "*" : "");
+    const char *ref = (not_basic ? _PTR_ : " ");
+    const char *pure_ref = (not_basic ? "*" : " ");
     const char *starg    = STATUS_ARG(hints, False);
     const char *stargcom = STATUS_ARG(hints, True);
     const char *classname = isIndirect() ?
@@ -916,7 +941,7 @@ do { \
       fprintf(fd, "eyedb::Oid %s::%s(", className(own),
 	      ATTRNAME(name, tGetOid, hints));
     else
-      fprintf(fd, "%s%s %s%s::%s(", _const, classname, ref,
+      fprintf(fd, "%s%s%s%s::%s(", _const, classname, ref,
 	      className(own), ATTRNAME_1(name, ATTRGET(cls), hints));
 
     dimArgsGen(fd, ndims, True);
@@ -953,7 +978,7 @@ do { \
 		  ref,
 		  (!strcmp(cls->getName(), "oid") ? "" : " = 0"));
 	else
-	  fprintf(fd, "%s%s %s__tmp%s;\n", ctx->get(),
+	  fprintf(fd, "%s%s%s__tmp%s;\n", ctx->get(),
 		  classname, ref,
 		  (!strcmp(cls->getName(), "oid") ? "" : " = 0"));
       }
@@ -1068,8 +1093,8 @@ do { \
 		  }
 	      }
 
-	    fprintf(fd, "   %sreturn (%s %s)__o;\n", ctx->get(),
-		    classname, ref);
+	    fprintf(fd, "   %sreturn (%s%s)__o;\n", ctx->get(),
+		    classname, pure_ref);
 	    fprintf(fd, "%s  }\n\n", ctx->get());
 
 	    fprintf(fd, "%seyedb::Bool wasnull = (!__o ? eyedb::True : eyedb::False);\n", ctx->get());
@@ -1165,8 +1190,8 @@ do { \
       genAttrCacheGetEpilogue(ctx, optype);
 
     if (const_obj)
-      fprintf(fd, "%sreturn (%s %s)__o;\n", ctx->get(),
-	      classname, ref);
+      fprintf(fd, "%sreturn (%s%s)__o;\n", ctx->get(),
+	      classname, pure_ref);
     else if (cls->asEnumClass())
       fprintf(fd, "%sreturn (%s)__tmp;\n", ctx->get(), className(cls, True));
     else
@@ -1228,7 +1253,7 @@ do { \
     int ndims = typmod.ndims, i;
     int maxdims = typmod.maxdims;
     int not_basic = NOT_BASIC();
-    const char *ref = (not_basic ? "*" : "");
+    const char *ref = (not_basic ? _PTR_ : " ");
     int is_string = IS_STRING();
     int is_raw = IS_RAW();
     const char *starg    = STATUS_ARG(hints, False);
@@ -1617,7 +1642,7 @@ do { \
 
 #ifndef ATC_NOVD
     if (isVarDim())
-      fprintf(fd, "*");
+      fprintf(fd, _PTR_);
 #endif
 
     fprintf(fd, atc_set(name));
@@ -1653,9 +1678,9 @@ do { \
 	return;
       }
     else
-      fprintf(fd, "%s%s %s%s%s",
+      fprintf(fd, "%s%s%s%s%s",
 	      ctx->get(), className(cls, (isIndirect() ? True : False)),
-	      (isVarDim() ? "*" : ""), (NOT_BASIC() ? "*" : ""), atc_name(name));
+	      (isVarDim() ? _PTR_ : " "), (NOT_BASIC() ? _PTR_ : " "), atc_name(name));
 
     for (i = 0; i < typmod.ndims; i++)
       if (typmod.dims[i] > 0)
@@ -1887,7 +1912,7 @@ do { \
 	  if (typmod.dims[i] > 0) fprintf(fd, "[a%d]", i);
 	fprintf(fd, " = (%s *%s)malloc((a%d+1)*sizeof(%s *));\n",
 		className(cls, (isIndirect() ? True : False)),
-		(NOT_BASIC() ? "*" : ""),
+		(NOT_BASIC() ? _PTR_ : " "),
 		typmod.ndims-1, className(cls, True));
       }
 
@@ -2040,8 +2065,9 @@ do { \
     FILE *fdh = ctxH->getFile();
     int ndims = typmod.ndims, i;
     int not_basic = NOT_BASIC();
-    const char *ref1 = (not_basic ? "*" : "");
-    const char *ref2 = (not_basic ? " *" : " ");
+    const char *ref1 = (not_basic ? _PTR_ : " ");
+    //    const char *ref2 = (not_basic ? " *" : " ");
+    const char *ref2 = (not_basic ? _PTR_ : " ");
     const char *comma = (ndims ? ", " : "");
     int is_string = IS_STRING();
     int is_raw = IS_RAW();
@@ -2125,11 +2151,11 @@ do { \
 	      ATTRNAME(name, tGetCount, hints));
       dimArgsGen(fdh, ndims);
       fprintf(fdh, "%seyedb::Bool *isnull = 0, eyedb::Status *rs = 0) const "
-	      "{const eyedb::Collection *_coll = %s(", comma, ATTRNAME(name, tGetColl, hints));
+	      "{const eyedb::Collection%s _coll = %s(", comma, _PTR_,ATTRNAME(name, tGetColl, hints));
       for (i = 0; i < ndims; i++)
 	fprintf(fdh, "a%d, ", i);
       fprintf(fdh, "isnull, rs); ");
-      fprintf(fdh, "return (_coll ? _coll->getCount() : 0);}\n");
+      fprintf(fdh, "return (!!_coll ? _coll->getCount() : 0);}\n");
     }
 
     if (not_basic) {
@@ -2173,7 +2199,7 @@ do { \
 		ATTRNAME_1(name, (ordered ? GenCodeHints::tSetItemInColl : GenCodeHints::tAddItemToColl), hints), where);
 	dimArgsGen(fdh, ndims);
 	fprintf(fdh, "%s%s%s%s, const eyedb::IndexImpl * = 0);\n", comma,
-		oclassname, (_isref || !cl->asBasicClass() ? "*" : ""),
+		oclassname, (_isref || !cl->asBasicClass() ? _PTR_ : " "),
 		(!*where ? ", eyedb::Bool noDup = eyedb::False" : ""));
 
 	if (ordered) {
@@ -2189,7 +2215,7 @@ do { \
 		    ATTRNAME(name, tRmvItemFromColl, hints), where);
 	    dimArgsGen(fdh, ndims);
 	    fprintf(fdh, "%s%s%s%s);\n", comma, oclassname,
-		    (_isref || !cl->asBasicClass() ? "*" : ""),
+		    (_isref || !cl->asBasicClass() ? _PTR_ : " "),
 		    (!*where ? ", eyedb::Bool checkFirst = eyedb::False" : ""));
 	  }
       }
@@ -2234,17 +2260,17 @@ do { \
 	  fprintf(fdh, "%seyedb::Bool *isnull = 0, eyedb::Status *rs = 0) const;\n", comma);
 	}
 	else if (_dim == 1) {
-	  fprintf(fdh, "%sconst %s %s%s(unsigned int ind, ",
+	  fprintf(fdh, "%sconst %s%s%s(unsigned int ind, ",
 		  ctxH->get(),
-		  oclassname, (_isref || !cl->asBasicClass() ? "*" : ""), 
+		  oclassname, (_isref || !cl->asBasicClass() ? _PTR_ : " "), 
 		  ATTRNAME_1(name, (ordered ? GenCodeHints::tRetrieveItemAt : GenCodeHints::tGetItemAt), hints));
 	  dimArgsGen(fdh, ndims);
 	  fprintf(fdh, "%seyedb::Bool *isnull = 0, eyedb::Status *rs = 0) const;\n", comma);
 	  
 	  if (!cl->asBasicClass()) {
-	    fprintf(fdh, "%s%s %s%s(unsigned int ind, ",
+	    fprintf(fdh, "%s%s%s%s(unsigned int ind, ",
 		    ctxH->get(),
-		    oclassname, (_isref || !cl->asBasicClass() ? "*" : ""),
+		    oclassname, (_isref || !cl->asBasicClass() ? _PTR_ : " "),
 		    ATTRNAME_1(name, (ordered ? GenCodeHints::tRetrieveItemAt : GenCodeHints::tGetItemAt), hints));
 	    dimArgsGen(fdh, ndims);
 	    fprintf(fdh, "%seyedb::Bool *isnull = 0, eyedb::Status *rs = 0);\n", comma);
