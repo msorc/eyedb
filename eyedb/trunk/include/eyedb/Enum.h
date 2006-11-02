@@ -159,6 +159,20 @@ namespace eyedb {
     virtual void garbage();
   };
 
+  class EnumPtr : public InstancePtr {
+
+  public:
+    EnumPtr(Enum *o = 0) : InstancePtr(o) { }
+
+    Enum *getEnum() {return dynamic_cast<Enum *>(o);}
+    const Enum *getEnum() const {return dynamic_cast<Enum *>(o);}
+
+    Enum *operator->() {return dynamic_cast<Enum *>(o);}
+    const Enum *operator->() const {return dynamic_cast<Enum *>(o);}
+  };
+
+  typedef std::vector<EnumPtr> EnumPtrVector;
+
   /**
      @}
   */

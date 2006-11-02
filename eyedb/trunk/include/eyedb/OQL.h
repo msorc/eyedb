@@ -69,6 +69,16 @@ namespace eyedb {
     Status execute(Value &value);
 
     // get flattened results
+
+    /**
+       Not yet documented
+       @param obj_vect
+       @param recmode
+       @return
+    */
+    Status execute(ObjectPtrVector &obj_vect,
+		   const RecMode *recmode = RecMode::NoRecurs);
+
     /**
        Not yet documented
        @param obj_array
@@ -100,6 +110,16 @@ namespace eyedb {
     Status getResult(Value &value);
 
     // get flattened results
+
+    /**
+       Not yet documented
+       @param obj_vect
+       @param recmode
+       @return
+    */
+    Status getResult(ObjectPtrVector &obj_vect,
+		     const RecMode *recmode = RecMode::NoRecurs);
+
     /**
        Not yet documented
        @param obj_array

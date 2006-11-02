@@ -132,6 +132,20 @@ namespace eyedb {
 		    unsigned int nb = 1) const;
   };
 
+  class OidClassPtr : public BasicClassPtr {
+
+  public:
+    OidClassPtr(OidClass *o = 0) : BasicClassPtr(o) { }
+
+    OidClass *getOidClass() {return dynamic_cast<OidClass *>(o);}
+    const OidClass *getOidClass() const {return dynamic_cast<OidClass *>(o);}
+
+    OidClass *operator->() {return dynamic_cast<OidClass *>(o);}
+    const OidClass *operator->() const {return dynamic_cast<OidClass *>(o);}
+  };
+
+  typedef std::vector<OidClassPtr> OidClassPtrVector;
+
   /**
      @}
   */

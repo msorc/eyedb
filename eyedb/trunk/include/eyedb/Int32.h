@@ -125,6 +125,20 @@ namespace eyedb {
     Status update();
   };
 
+  class Int32Ptr : public BasicPtr {
+
+  public:
+    Int32Ptr(Int32 *o = 0) : BasicPtr(o) { }
+
+    Int32 *getInt32() {return dynamic_cast<Int32 *>(o);}
+    const Int32 *getInt32() const {return dynamic_cast<Int32 *>(o);}
+
+    Int32 *operator->() {return dynamic_cast<Int32 *>(o);}
+    const Int32 *operator->() const {return dynamic_cast<Int32 *>(o);}
+  };
+
+  typedef std::vector<Int32Ptr> Int32PtrVector;
+
   extern Int32Class   *Int32_Class;
   extern const char int32_class_name[];
 

@@ -125,6 +125,20 @@ namespace eyedb {
     Status update();
   };
 
+  class FloatPtr : public BasicPtr {
+
+  public:
+    FloatPtr(Float *o = 0) : BasicPtr(o) { }
+
+    Float *getFloat() {return dynamic_cast<Float *>(o);}
+    const Float *getFloat() const {return dynamic_cast<Float *>(o);}
+
+    Float *operator->() {return dynamic_cast<Float *>(o);}
+    const Float *operator->() const {return dynamic_cast<Float *>(o);}
+  };
+
+  typedef std::vector<FloatPtr> FloatPtrVector;
+
   extern FloatClass   *Float_Class;
   extern const char float_class_name[];
 

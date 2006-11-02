@@ -1148,6 +1148,20 @@ namespace eyedb {
     Argument **args;
   };
 
+  class ArgumentPtr : public gbxObjectPtr {
+
+  public:
+    ArgumentPtr(Argument *o = 0) : gbxObjectPtr(o) { }
+
+    Argument *getArgument() {return dynamic_cast<Argument *>(o);}
+    const Argument *getArgument() const {return dynamic_cast<Argument *>(o);}
+
+    Argument *operator->() {return dynamic_cast<Argument *>(o);}
+    const Argument *operator->() const {return dynamic_cast<Argument *>(o);}
+  };
+
+  typedef std::vector<ArgumentPtr> ArgumentPtrVector;
+
   /**
      @}
   */

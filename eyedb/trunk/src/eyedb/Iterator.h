@@ -53,6 +53,8 @@ namespace eyedb {
     int getCount() const {return _count;}
 
     Status scanNext(Bool &found, Oid &);
+    Status scanNext(Bool &found, ObjectPtr &,
+		    const RecMode * = RecMode::NoRecurs);
     Status scanNext(Bool &found, Object *&,
 		    const RecMode * = RecMode::NoRecurs);
     Status scanNext(Bool &found, Value &);
@@ -63,6 +65,9 @@ namespace eyedb {
 		    const RecMode * = RecMode::NoRecurs);
     Status scanNext(Bool *found, Value *);
 
+    Status scan(ObjectPtrVector &, const RecMode * = RecMode::NoRecurs);
+    Status scan(ObjectPtrVector &, unsigned int max,
+		unsigned int start = 0, const RecMode * = RecMode::NoRecurs);
     Status scan(ObjectArray &, const RecMode * = RecMode::NoRecurs);
     Status scan(ObjectArray &, unsigned int max,
 		unsigned int start = 0, const RecMode * = RecMode::NoRecurs);

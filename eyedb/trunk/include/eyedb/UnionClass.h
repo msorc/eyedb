@@ -105,6 +105,20 @@ namespace eyedb {
     virtual Status loadComplete(const Class *);
   };
 
+  class UnionClassPtr : public AgregatClassPtr {
+
+  public:
+    UnionClassPtr(UnionClass *o = 0) : AgregatClassPtr(o) { }
+
+    UnionClass *getUnionClass() {return dynamic_cast<UnionClass *>(o);}
+    const UnionClass *getUnionClass() const {return dynamic_cast<UnionClass *>(o);}
+
+    UnionClass *operator->() {return dynamic_cast<UnionClass *>(o);}
+    const UnionClass *operator->() const {return dynamic_cast<UnionClass *>(o);}
+  };
+
+  typedef std::vector<UnionClassPtr> UnionClassPtrVector;
+
   /**
      @}
   */

@@ -126,6 +126,20 @@ namespace eyedb {
     const Attribute *item;
   };
 
+  class UnionPtr : public AgregatPtr {
+
+  public:
+    UnionPtr(Union *o = 0) : AgregatPtr(o) { }
+
+    Union *getUnion() {return dynamic_cast<Union *>(o);}
+    const Union *getUnion() const {return dynamic_cast<Union *>(o);}
+
+    Union *operator->() {return dynamic_cast<Union *>(o);}
+    const Union *operator->() const {return dynamic_cast<Union *>(o);}
+  };
+
+  typedef std::vector<UnionPtr> UnionPtrVector;
+
   /**
      @}
   */

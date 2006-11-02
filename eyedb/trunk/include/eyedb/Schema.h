@@ -447,6 +447,20 @@ namespace eyedb {
     Status clean(Database *db);
   };
 
+  class SchemaPtr : public InstancePtr {
+
+  public:
+    SchemaPtr(Schema *o = 0) : InstancePtr(o) { }
+
+    Schema *getSchema() {return dynamic_cast<Schema *>(o);}
+    const Schema *getSchema() const {return dynamic_cast<Schema *>(o);}
+
+    Schema *operator->() {return dynamic_cast<Schema *>(o);}
+    const Schema *operator->() const {return dynamic_cast<Schema *>(o);}
+  };
+
+  typedef std::vector<SchemaPtr> SchemaPtrVector;
+
   /**
      @}
   */

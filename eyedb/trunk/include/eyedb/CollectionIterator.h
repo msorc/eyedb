@@ -37,8 +37,8 @@ namespace eyedb {
     CollectionIterator(const Collection &, Bool indexed = False);
 
     Bool next(Oid &);
-    Bool next(Object *&,
-	      const RecMode * = RecMode::NoRecurs);
+    Bool next(ObjectPtr &, const RecMode * = RecMode::NoRecurs);
+    Bool next(Object *&, const RecMode * = RecMode::NoRecurs);
     Bool next(Value &);
 
     ~CollectionIterator();

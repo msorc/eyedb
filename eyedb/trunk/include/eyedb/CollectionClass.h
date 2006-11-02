@@ -197,6 +197,20 @@ namespace eyedb {
     virtual Status loadComplete(const Class *);
   };
 
+  class CollectionClassPtr : public ClassPtr {
+
+  public:
+    CollectionClassPtr(CollectionClass *o = 0) : ClassPtr(o) { }
+
+    CollectionClass *getCollectionClass() {return dynamic_cast<CollectionClass *>(o);}
+    const CollectionClass *getCollectionClass() const {return dynamic_cast<CollectionClass *>(o);}
+
+    CollectionClass *operator->() {return dynamic_cast<CollectionClass *>(o);}
+    const CollectionClass *operator->() const {return dynamic_cast<CollectionClass *>(o);}
+  };
+
+  typedef std::vector<CollectionClassPtr> CollectionClassPtrVector;
+
   /**
      @}
   */

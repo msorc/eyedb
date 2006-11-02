@@ -133,6 +133,20 @@ namespace eyedb {
 		    unsigned int nb = 1) const;
   };
 
+  class Int32ClassPtr : public BasicClassPtr {
+
+  public:
+    Int32ClassPtr(Int32Class *o = 0) : BasicClassPtr(o) { }
+
+    Int32Class *getInt32Class() {return dynamic_cast<Int32Class *>(o);}
+    const Int32Class *getInt32Class() const {return dynamic_cast<Int32Class *>(o);}
+
+    Int32Class *operator->() {return dynamic_cast<Int32Class *>(o);}
+    const Int32Class *operator->() const {return dynamic_cast<Int32Class *>(o);}
+  };
+
+  typedef std::vector<Int32ClassPtr> Int32ClassPtrVector;
+
   /**
      @}
   */

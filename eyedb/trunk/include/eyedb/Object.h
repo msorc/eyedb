@@ -1095,6 +1095,20 @@ namespace eyedb {
 
   class ObjectList;
 
+  class ObjectPtr : public gbxObjectPtr {
+
+  public:
+    ObjectPtr(Object *o = 0) : gbxObjectPtr(o) { }
+
+    Object *getObject() {return dynamic_cast<Object *>(o);}
+    const Object *getObject() const {return dynamic_cast<const Object *>(o);}
+
+    Object *operator->() {return dynamic_cast<Object *>(o);}
+    const Object *operator->() const {return dynamic_cast<const Object *>(o);}
+  };
+
+  typedef std::vector<ObjectPtr> ObjectPtrVector;
+
   /**
      Not yet documented.
   */
@@ -1132,6 +1146,7 @@ namespace eyedb {
     void setMustRelease(bool must_release);
 
     ObjectList *toList() const;
+    void makeObjectPtrVector(ObjectPtrVector &);
 
     void garbage();
 

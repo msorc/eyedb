@@ -89,6 +89,20 @@ namespace eyedb {
     virtual Status update();
   };
 
+  class BasicPtr : public InstancePtr {
+
+  public:
+    BasicPtr(Basic *o = 0) : InstancePtr(o) { }
+
+    Basic *getBasic() {return dynamic_cast<Basic *>(o);}
+    const Basic *getBasic() const {return dynamic_cast<Basic *>(o);}
+
+    Basic *operator->() {return dynamic_cast<Basic *>(o);}
+    const Basic *operator->() const {return dynamic_cast<Basic *>(o);}
+  };
+
+  typedef std::vector<BasicPtr> BasicPtrVector;
+
   /**
      @}
   */

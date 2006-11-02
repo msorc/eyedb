@@ -131,6 +131,20 @@ namespace eyedb {
 		    unsigned int nb = 1) const;
   };
 
+  class ByteClassPtr : public BasicClassPtr {
+
+  public:
+    ByteClassPtr(ByteClass *o = 0) : BasicClassPtr(o) { }
+
+    ByteClass *getByteClass() {return dynamic_cast<ByteClass *>(o);}
+    const ByteClass *getByteClass() const {return dynamic_cast<ByteClass *>(o);}
+
+    ByteClass *operator->() {return dynamic_cast<ByteClass *>(o);}
+    const ByteClass *operator->() const {return dynamic_cast<ByteClass *>(o);}
+  };
+
+  typedef std::vector<ByteClassPtr> ByteClassPtrVector;
+
   /**
      @}
   */

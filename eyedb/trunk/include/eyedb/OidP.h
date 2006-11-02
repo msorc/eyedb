@@ -127,6 +127,20 @@ namespace eyedb {
     Status update();
   };
 
+  class OidPPtr : public BasicPtr {
+
+  public:
+    OidPPtr(OidP *o = 0) : BasicPtr(o) { }
+
+    OidP *getOidP() {return dynamic_cast<OidP *>(o);}
+    const OidP *getOidP() const {return dynamic_cast<OidP *>(o);}
+
+    OidP *operator->() {return dynamic_cast<OidP *>(o);}
+    const OidP *operator->() const {return dynamic_cast<OidP *>(o);}
+  };
+
+  typedef std::vector<OidPPtr> OidPPtrVector;
+
   extern OidClass     *OidP_Class;
   extern const char oid_class_name[];
 

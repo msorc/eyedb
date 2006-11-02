@@ -133,6 +133,20 @@ namespace eyedb {
 		    unsigned int nb = 1) const;
   };
 
+  class Int64ClassPtr : public BasicClassPtr {
+
+  public:
+    Int64ClassPtr(Int64Class *o = 0) : BasicClassPtr(o) { }
+
+    Int64Class *getInt64Class() {return dynamic_cast<Int64Class *>(o);}
+    const Int64Class *getInt64Class() const {return dynamic_cast<Int64Class *>(o);}
+
+    Int64Class *operator->() {return dynamic_cast<Int64Class *>(o);}
+    const Int64Class *operator->() const {return dynamic_cast<Int64Class *>(o);}
+  };
+
+  typedef std::vector<Int64ClassPtr> Int64ClassPtrVector;
+
   /**
      @}
   */

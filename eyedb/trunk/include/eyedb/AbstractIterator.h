@@ -65,6 +65,16 @@ namespace eyedb {
        @param recmode	the recursion mode
        @return true if the iterator has more elements
     */
+    virtual Bool next(ObjectPtr &obj,
+		      const RecMode *recmode = RecMode::NoRecurs) = 0;
+
+    /**
+       Go to the next element in the iteration, specifying the recursion mode.
+
+       @param obj	a reference to a pointer to an Object that is used to return the next object
+       @param recmode	the recursion mode
+       @return true if the iterator has more elements
+    */
     virtual Bool next(Object *&obj,
 		      const RecMode *recmode = RecMode::NoRecurs) = 0;
 

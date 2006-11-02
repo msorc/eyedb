@@ -321,6 +321,17 @@ namespace eyedb {
   }
 
   Status
+  Value::toArray(Database *db, ObjectPtrVector &obj_vect, const RecMode *rcm)
+  {
+    ObjectArray obj_array; // true or false ?
+    Status s = toArray(db, obj_array, rcm);
+    if (s)
+      return s;
+    obj_array.makeObjectPtrVector(obj_vect);
+    return Success;
+  }
+
+  Status
   Value::toArray(Database *db, ObjectArray &objarr, const RecMode *rcm)
   {
     LinkedList ll;

@@ -89,6 +89,20 @@ namespace eyedb {
     void initialize(Database *);
   };
 
+  class InstancePtr : public ObjectPtr {
+
+  public:
+    InstancePtr(Instance *o = 0) : ObjectPtr(o) { }
+
+    Instance *getInstance() {return dynamic_cast<Instance *>(o);}
+    const Instance *getInstance() const {return dynamic_cast<Instance *>(o);}
+
+    Instance *operator->() {return dynamic_cast<Instance *>(o);}
+    const Instance *operator->() const {return dynamic_cast<Instance *>(o);}
+  };
+
+  typedef std::vector<InstancePtr> InstancePtrVector;
+
   /**
      @}
   */

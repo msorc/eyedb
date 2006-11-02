@@ -61,6 +61,14 @@ namespace eyedb {
       }
   }
 
+  Bool OQLIterator::next(ObjectPtr &o_ptr, const RecMode *rcm)
+  {
+    Object *o = 0;
+    Bool b = next(o, rcm);
+    o_ptr = o;
+    return b;
+  }
+
   Bool OQLIterator::next(Object *&o, const RecMode *rcm)
   {
     Oid oid;

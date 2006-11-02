@@ -124,6 +124,20 @@ namespace eyedb {
     Status insert_p(Data data, Bool noDup = False, Size size = defaultSize);
   };
 
+  class CollSetPtr : public CollectionPtr {
+
+  public:
+    CollSetPtr(CollSet *o = 0) : CollectionPtr(o) { }
+
+    CollSet *getCollSet() {return dynamic_cast<CollSet *>(o);}
+    const CollSet *getCollSet() const {return dynamic_cast<CollSet *>(o);}
+
+    CollSet *operator->() {return dynamic_cast<CollSet *>(o);}
+    const CollSet *operator->() const {return dynamic_cast<CollSet *>(o);}
+  };
+
+  typedef std::vector<CollSetPtr> CollSetPtrVector;
+
   /**
      @}
   */

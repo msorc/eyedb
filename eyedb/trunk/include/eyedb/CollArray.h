@@ -142,6 +142,16 @@ namespace eyedb {
        @param recmode
        @return
     */
+    Status retrieveAt(Collection::ItemId id, ObjectPtr &o,
+		      const RecMode *recmode = RecMode::NoRecurs) const;
+
+    /**
+       Not yet documented
+       @param id
+       @param o
+       @param recmode
+       @return
+    */
     Status retrieveAt(Collection::ItemId id, Object *&o,
 		      const RecMode *recmode = RecMode::NoRecurs) const;
 
@@ -206,6 +216,20 @@ namespace eyedb {
     Status retrieveAt_p(Collection::ItemId id, Data data, Size size = defaultSize) const;
 
   };
+
+  class CollArrayPtr : public CollectionPtr {
+
+  public:
+    CollArrayPtr(CollArray *o = 0) : CollectionPtr(o) { }
+
+    CollArray *getCollArray() {return dynamic_cast<CollArray *>(o);}
+    const CollArray *getCollArray() const {return dynamic_cast<CollArray *>(o);}
+
+    CollArray *operator->() {return dynamic_cast<CollArray *>(o);}
+    const CollArray *operator->() const {return dynamic_cast<CollArray *>(o);}
+  };
+
+  typedef std::vector<CollArrayPtr> CollArrayPtrVector;
 
   /**
      @}
