@@ -2294,9 +2294,7 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
     while (_class->getNextObject(curs, (void *&)cl)) {
       if (check_class(cl, False)) {
 	if (!cl->asEnumClass() && !cl->asCollectionClass()) {
-	  if (!odl_smartptr)
-	    fprintf(fdh, "%stypedef %s * %sPtr;\n", ctxH.get(), cl->getCName(), cl->getName());
-	  else {
+	  if (odl_smartptr) {
 	    fprintf(fdh, "%sclass %sPtr : public %sPtr {\n",
 		    ctxH.get(), cl->getCName(), cl->getParent()->getCName());
 
@@ -2316,6 +2314,10 @@ cls->setAttributes((Attribute **)class_info[Basic_Type].items, \
 		    ctxH.get(), cl->getCName(), cl->getCName());
 	    fprintf(fdh, "%s};\n\n", ctxH.get());
 	  }
+	  /*
+	  else
+	    fprintf(fdh, "%stypedef %s * %sPtr;\n", ctxH.get(), cl->getCName(), cl->getName());
+	  */
 	}
       }
     }

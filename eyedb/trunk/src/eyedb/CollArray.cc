@@ -311,6 +311,9 @@ namespace eyedb {
     if (v.type == Value::tObject)
       return insertAt_p(id, v.o);
 
+    if (v.type == Value::tObjectPtr)
+      return insertAt_p(id, v.o_ptr->getObject());
+
     if (v.type == Value::tOid)
       return insertAt_p(id, Oid(*v.oid));
 
@@ -406,6 +409,8 @@ namespace eyedb {
 	  item_oid = *item->getValue().oid;
 	else if (item->getValue().type == Value::tObject)
 	  item_oid = item->getValue().o->getOid();
+	else if (item->getValue().type == Value::tObjectPtr)
+	  item_oid = item->getValue().o_ptr->getObject()->getOid();
 	else
 	  item_oid = Oid::nullOid;
       }
@@ -472,6 +477,8 @@ namespace eyedb {
       if (item->getState() == added) {
 	if (item->getValue().type == Value::tObject)
 	  o = item->getValue().o;
+	else if (item->getValue().type == Value::tObjectPtr)
+	  o = item->getValue().o_ptr->getObject();
 	else
 	  o = 0;
 

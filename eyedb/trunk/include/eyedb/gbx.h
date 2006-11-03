@@ -398,7 +398,7 @@ namespace eyedb {
     gbxObject *operator->() {return o;}
     const gbxObject *operator->() const {return o;}
 
-    bool operator !() const {return o == 0;}
+    bool operator!() const {return o == 0;}
 
     virtual ~gbxObjectPtr() {
       if (o)

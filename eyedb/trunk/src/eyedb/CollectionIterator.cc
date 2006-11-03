@@ -82,6 +82,15 @@ namespace eyedb {
 	  return True;
 	}
 
+	if (v.type == Value::tObjectPtr) {
+	  if (v.o_ptr->getObject())
+	    oid = v.o_ptr->getObject()->getOid();
+	  else
+	    oid.invalidate();
+	  cur++;
+	  return True;
+	}
+
 	if (v.type == Value::tOid) {
 	  oid = *v.oid;
 	  return True;
@@ -118,6 +127,12 @@ namespace eyedb {
 	  o = v.o;
 	  if (o)
 	    o->setMustRelease(false);
+	  cur++;
+	  return True;
+	}
+
+	if (v.type == Value::tObjectPtr) {
+	  o = v.o_ptr->getObject();
 	  cur++;
 	  return True;
 	}

@@ -716,6 +716,9 @@ namespace eyedb {
     if (v.type == Value::tObject)
       return check(v.o, err);
 
+    if (v.type == Value::tObjectPtr)
+      return check(v.o_ptr->getObject(), err);
+
     if (v.type == Value::tOid)
       return check(Oid(*v.oid), err);
 
@@ -793,6 +796,9 @@ namespace eyedb {
     if (v.type == Value::tObject)
       return insert_p(v.o, noDup);
 
+    if (v.type == Value::tObjectPtr)
+      return insert_p(v.o_ptr->getObject(), noDup);
+
     if (v.type == Value::tOid)
       return insert_p(Oid(*v.oid), noDup);
 
@@ -811,6 +817,9 @@ namespace eyedb {
 
     if (v.type == Value::tObject)
       return suppress_p(v.o, checkFirst);
+
+    if (v.type == Value::tObjectPtr)
+      return suppress_p(v.o_ptr->getObject(), checkFirst);
 
     if (v.type == Value::tOid)
       return suppress_p(Oid(*v.oid), checkFirst);
@@ -1237,6 +1246,9 @@ namespace eyedb {
 
     if (v.type == Value::tObject)
       return isIn_p(v.o, found, where);
+
+    if (v.type == Value::tObjectPtr)
+      return isIn_p(v.o_ptr->getObject(), found, where);
 
     if (v.type == Value::tOid)
       return isIn_p(Oid(*v.oid), found, where);
@@ -2135,9 +2147,12 @@ namespace eyedb {
       int count = val_arr.getCount();
       obj_array.set(0, count);
       for (int n = 0; n < count; n++) {
-	if (val_arr[n].getType() != Value::tObject)
+	if (val_arr[n].getType() == Value::tObject)
+	  obj_array.setObjectAt(n, val_arr[n].o); //obj_array[n] = val_arr[n].o;
+	else if (val_arr[n].getType() == Value::tObjectPtr)
+	  obj_array.setObjectAt(n, val_arr[n].o_ptr->getObject());
+	else
 	  return Exception::make(IDB_ERROR, "unexpected value type");
-	obj_array.setObjectAt(n, val_arr[n].o); //obj_array[n] = val_arr[n].o;
       }
       return Success;
     }
@@ -2233,6 +2248,8 @@ namespace eyedb {
 	}
 	else if (v.type == Value::tObject)
 	  item_o = v.o;
+	else if (v.type == Value::tObjectPtr)
+	  item_o = v.o_ptr->getObject();
 
 	if (!item_o)
 	  return Exception::make(IDB_INTERNAL_ERROR, "invalid null object "
@@ -2677,8 +2694,12 @@ do { \
 	if (isref)  {
 	  Oid _oid;
 	  Object *_o = 0;
+
 	  if (v.type == Value::tObject)
 	    _o = v.o;
+	  else if (v.type == Value::tObjectPtr)
+	    _o = v.o_ptr->getObject();
+
 	  if (_o) {
 	    if (item->getState() == added &&
 		rcm->getType() == RecMode_FullRecurs)  {
