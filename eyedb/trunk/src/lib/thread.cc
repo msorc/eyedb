@@ -241,7 +241,7 @@ namespace eyedblib {
       else
 	printf("Condition::timedwait(@%d, %p) <- wakeup\n", pthread_self(), this);
 #endif
-      if (r == ETIMEDOUT || r == ETIME) {
+      if (r == ETIMEDOUT) {
 	ret = false;
 	break;
       }

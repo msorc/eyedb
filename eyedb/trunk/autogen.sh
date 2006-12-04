@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 set -x
 aclocal -I m4/java -I m4/swig -I m4/python -I m4/extras
 # On Mac OS X, libtoolize is named glibtoolize

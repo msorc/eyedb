@@ -207,8 +207,10 @@ XMMutexInit(XMHandle *xmh)
 #ifdef XM_CONCURRENT
   pthread_mutexattr_t mattr;
   pthread_mutexattr_init(&mattr);
+#ifdef HAVE_PTHREAD_MUTEXATTR_SETPSHARED
 #ifdef _POSIX_THREAD_PROCESS_SHARED
   pthread_mutexattr_setpshared(&mattr, PTHREAD_PROCESS_SHARED);
+#endif
 #endif
 
 #ifdef XM_ESM_MUTEX

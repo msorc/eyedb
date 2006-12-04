@@ -26,12 +26,15 @@
 #include <assert.h>
 #include <string.h>
 #include <errno.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 #include <sys/select.h>
 #include <time.h>
-// @@@ ???
-#ifdef AIX
-#define _NO_BITFIELDS
-#endif
+// // @@@ ???
+// #ifdef AIX
+// #define _NO_BITFIELDS
+// #endif
+#include <netinet/in.h>
 #include <netinet/tcp.h>
 
 #if TIME_WITH_SYS_TIME
