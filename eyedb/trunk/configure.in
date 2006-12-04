@@ -78,6 +78,9 @@ fi
 
 # check for architecture
 AC_CANONICAL_HOST
+AC_SUBST(host)
+AC_SUBST(host_cpu)
+AC_SUBST(host_os)
 
 # special settings on Solaris 64 bits
 case "$host" in
