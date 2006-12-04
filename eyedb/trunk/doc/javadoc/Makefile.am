@@ -17,10 +17,12 @@ install-data-hook:
 	for dir in resources org org/eyedb org/eyedb/dbm org/eyedb/syscls org/eyedb/utils; do \
 		test -z "$(noinst_htmldir)/$$dir" || \
 			$(mkinstalldirs) "$(DESTDIR)$(noinst_htmldir)/$$dir" ; \
-		( \
-			cd $$dir ; \
-			for f in * ; do \
-				test -f $$f && $(INSTALL_DATA) $$f "$(DESTDIR)$(noinst_htmldir)/$$dir/$$f" ; \
-	  		done ; \
-		) ; \
+		if test -d $$dir ; then \
+			( \
+				cd $$dir ; \
+				for f in * ; do \
+					test -f $$f && $(INSTALL_DATA) $$f "$(DESTDIR)$(noinst_htmldir)/$$dir/$$f" ; \
+		  		done ; \
+			) ; \
+		fi \
 	done
