@@ -161,6 +161,7 @@ ACX_PTHREAD
 LIBS="$LIBS $PTHREAD_LIBS"
 CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
 CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+AC_CHECK_FUNC(pthread_mutexattr_setpshared,AC_DEFINE([HAVE_PTHREAD_MUTEXATTR_SETPSHARED],1,[Defined if function pthread_mutexattr_setpshared exists]),,[#include <pthread.h>])
 
 # echo CFLAGS=$CFLAGS
 # echo CXXFLAGS=$CXXFLAGS

@@ -26,7 +26,6 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <fcntl.h>
-#include <alloca.h>
 #include <string.h>
 #include <signal.h>
 #include <unistd.h>

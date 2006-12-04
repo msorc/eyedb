@@ -202,7 +202,9 @@ m_init(void)
 
   pthread_mutexattr_init(&mattr);
 
+#ifdef HAVE_PTHREAD_MUTEXATTR_SETPSHARED
   pthread_mutexattr_setpshared(&mattr, PTHREAD_PROCESS_PRIVATE);
+#endif
 
   pthread_mutex_init(&m_mp, &mattr);
 

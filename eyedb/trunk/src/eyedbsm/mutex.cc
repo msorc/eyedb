@@ -675,7 +675,7 @@ do { \
 #endif
 #endif
 
-      if (r == ETIMEDOUT || r == ETIME) {
+      if (r == ETIMEDOUT ) {
 	IDB_LOG(IDB_LOG_MTX, ("condWait timedwait [cond = 0x%x]\n", cond));
 	time_t t = time(0);
 	//printf("elapsed %d @%d\n", t - tm.tv_sec, pthread_self());
