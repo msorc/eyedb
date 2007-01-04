@@ -43,25 +43,13 @@ namespace eyedb {
     gbxBool cycle;
 
   public:
-    gbxCycleContext(gbxObject *_ref) {
-      ref = _ref;
-      cycle = gbxFalse;
-    }
+    gbxCycleContext(gbxObject *ref) : ref(ref), cycle(gbxFalse) { }
 
-    gbxBool mustClean(gbxObject *_ref) {
-      if (ref == _ref && ref->getRefCount() == 1)
-	return gbxTrue;
-      return gbxFalse;
-    }
+    gbxBool mustClean(gbxObject *ref);
 
-    void manageCycle(gbxObject *_ref) {
-      if (ref == _ref)
-	cycle = gbxTrue;
-    }
+    void manageCycle(gbxObject *ref);
 
-    gbxBool isCycle() const {
-      return cycle;
-    }
+    gbxBool isCycle() const {return cycle;}
   };
 
   /**
