@@ -166,6 +166,17 @@ using namespace eyedb;
     return Success;
   }
 
+  //
+  // object *object::getObject() [oqlctbfe.cc]
+  //
+
+  Status
+  __method__OUT_object_REF__getObject_object(eyedb::Database *_db, eyedb::FEMethod_C *_m, eyedb::Object *_o, eyedb::Object * &retarg)
+   {
+      retarg = _o;
+    return Success;
+  }
+
   static OqlCtbDatafile *
   makeDatafile(Database *db, const Datafile *dat)
   {

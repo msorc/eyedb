@@ -46,6 +46,11 @@ namespace eyedb {
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   static oqmlStatus *
+  append_perform(oqmlNode *node, Collection *coll, const Oid *oid,
+		 Data data, int size, oqmlAtom *a,
+		 oqmlAtomList *atom_coll, oqmlAtomList *alist);
+
+  static oqmlStatus *
   oqml_check_coll_type(Collection *coll, oqmlATOMTYPE &t)
   {
     Bool isref;
@@ -732,11 +737,26 @@ namespace eyedb {
       return new oqmlStatus(node, "invalid nil atom: %s",
 			    qleft->toString().c_str());
 
-    if (qright)
-      {
-	s = qright->eval(db, ctx, &al_right);
-	if (s) return s;
+    if (qright) {
+      s = qright->eval(db, ctx, &al_right);
+      if (s) return s;
+    }
+
+#if 0
+    if (perform == append_perform) {
+      printf("aleft %p aright %p\n", al_left, al_right);
+      printf("aleft first %p aright %p\n", al_left->first, al_right->first);
+      printf("copying %p %d\n", al_right->first, aleft->as_coll());
+      al_right = al_right->copy();
+      printf("after copying %p\n", al_right->first);
+      /*
+      if (aleft->as_coll()) {
+	aleft->as_coll()->list->append(al_right, oqml_False);
+	return oqmlSuccess;
       }
+      */
+    }
+#endif
 
     oqmlAtom *aright = (qright ? al_right->first : 0);
 
@@ -1177,7 +1197,9 @@ namespace eyedb {
     }
 
     oqmlAtom *x = a->copy();
-    atom_coll->append(x);
+    if (atom_coll->append(x, true, x->as_coll() ? true : false))
+      return new oqmlStatus(node, "collection cycle detected");
+
     alist->append(x);
     return oqmlSuccess;
   }

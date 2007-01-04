@@ -316,7 +316,8 @@ namespace eyedb {
 	    ("gbxObject::garbageRealize(o=%p, refcnt=%d, locked=%d)\n",
 	     this, gbx_refcnt, gbx_locked));
 
-    if (!reentrant && gbx_refcnt == 1) {// added the 18/10/99: '&& gbx_refcnt==1'
+    //if (!reentrant && gbx_refcnt == 1) {// added the 18/10/99: '&& gbx_refcnt==1'
+    if (!reentrant) {// EV_CYCLE: suppress the 23/11/06: '&& gbx_refcnt==1' for testing
 #ifdef MANAGE_CYCLE_TRACE
       struct timeval tp0, tp1;
       gettimeofday(&tp0, NULL);
@@ -426,6 +427,8 @@ namespace eyedb {
 
     if (!gbx_chgRefCnt)
       gbx_refcnt++;
+    else
+      printf("should increment refcnt %p\n", this);
   }
 
   void
@@ -446,6 +449,8 @@ namespace eyedb {
 
     if (!gbx_chgRefCnt)
       gbx_refcnt--;
+    else
+      printf("should decrement refcnt %p\n", this);
     assert(gbx_refcnt >= 0);
   }
 
@@ -458,6 +463,30 @@ namespace eyedb {
   {
     garbageRealize(gbxFalse, gbxTrue);
     gbx_activeDestruction = gbxFalse;
+  }
+
+  //
+  // gbxCycleContext
+  //
+
+  gbxBool gbxCycleContext::mustClean(gbxObject *_ref)
+  {
+    if (this->ref == _ref)
+      printf("mustClean: ref %p refcnt=%d\n", ref, ref->getRefCount());
+
+    //    if (this->ref == _ref && this->ref->getRefCount() == 1)
+    // EV_CYCLE
+    if (this->ref == _ref)
+      return gbxTrue;
+    return gbxFalse;
+  }
+
+  void gbxCycleContext::manageCycle(gbxObject *_ref)
+  {
+    if (this->ref == _ref) {
+      printf("manage cycle %p\n", ref);
+      cycle = gbxTrue;
+    }
   }
 
   //

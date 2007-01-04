@@ -54,8 +54,9 @@ inline gbLink *oqmlGarbManager::add_realize(gbLink *link)
 
   count++;
 #ifdef GB_TRACE
-  printf("creating %s link %p [%d]\n",
+  printf("creating %s link=%p ptr=%p [%d]\n",
 	 link->at ? "atom" : "list",
+	 link,
 	 link->at ? (void *)link->at : (void *)link->atlist,
 	 GB_COUNT);
   if (BR_CND && GB_COUNT == BR_CND)
@@ -117,6 +118,12 @@ inline void oqmlGarbManager::remove(gbLink *link)
 #endif
     delete link;
   }
+#ifdef GB_TRACE
+  else
+    printf("NOT removing %s link %p\n",
+	   link->at ? "atom" : "list",
+	   link->at ? (void *)link->at : (void *)link->atlist);
+#endif
 }
 
 inline oqmlAtom::oqmlAtom()
@@ -326,14 +333,15 @@ inline oqmlAtom *oqmlAtom_select::copy()
 
 inline oqmlAtom_coll::oqmlAtom_coll(oqmlAtomList *_list) : oqmlAtom()
 {
+#ifdef DEST_TRACE
+  printf("new coll %p\n", this);
+#endif
   list = _list;
 }
 
 inline oqmlAtom_list::oqmlAtom_list(oqmlAtomList *_list) : oqmlAtom_coll(_list)
 {
-  extern void stop_in_1();
   type.type = oqmlATOM_LIST;
-  stop_in_1();
   type.cls = 0;
 }
 
@@ -349,8 +357,6 @@ inline oqmlAtom_set::oqmlAtom_set(oqmlAtomList *_list,
 
 inline oqmlAtom_bag::oqmlAtom_bag(oqmlAtomList *_list) : oqmlAtom_coll(_list)
 {
-  extern void stop_in_2();
-  stop_in_2();
   type.type = oqmlATOM_BAG;
   type.cls = 0;
 }
@@ -660,11 +666,11 @@ inline oqmlBool oqmlAtom::compare(unsigned char *, int, Bool, oqmlTYPE) const
 inline oqmlAtom::~oqmlAtom()
 {
 #ifdef DEST_TRACE
-  printf("deleting atom %p\n", this);
+  printf("deleting atom %p refcnt=%d\n", this, refcnt);
 #endif
+  assert(!refcnt);
   if (refcnt)
     return;
-  //assert(!refcnt);
   refcnt = 32000;
   oqmlGarbManager::remove(link);
   free(string);
@@ -785,24 +791,26 @@ inline oqmlAtomList::oqmlAtomList(oqmlAtom *a)
 inline oqmlAtomList::~oqmlAtomList()
 {
 #ifdef DEST_TRACE
-  printf("deleting list %p\n", this);
+  printf("deleting list %p refcnt=%d\n", this, refcnt);
 #endif
+  assert(!refcnt);
   if (refcnt)
     return;
 
-  //assert(!refcnt);
   oqmlAtom *a = first;
-  while (a)
-    {
-      oqmlAtom *next = a->next;
-      //printf("a->refcnt %d %s\n", a->refcnt, a->getString());
-      if (!a->refcnt)
-	delete a;
-      a = next;
-    }
+  while (a) {
+    oqmlAtom *next = a->next;
+    //printf("a->refcnt %d %s\n", a->refcnt, a->getString());
+    if (!a->refcnt)
+      delete a;
+    a = next;
+  }
 
   cnt = 0;
   oqmlGarbManager::remove(link);
+#ifdef DEST_TRACE
+  printf("end of deleting list %p\n", this);
+#endif
   refcnt = 64000;
   free(string);
 }
@@ -862,14 +870,43 @@ inline char *oqmlAtomList::getString() const
   return b;
 }
 
-inline void oqmlAtomList::append(oqmlAtom *a, bool incref)
+inline bool detect_cycle(oqmlAtom *a1, oqmlAtom *a2)
+{
+  while (a1) {
+    while (a2) {
+      bool r = false;
+
+      if (a1 == a2)
+	r = true;
+      else if (a1->as_coll() && a2->as_coll())
+	r = detect_cycle(a1->as_coll()->list->first, a2->as_coll()->list->first);
+      else if (a1->as_coll())
+	r = detect_cycle(a1->as_coll()->list->first, a2);
+
+      else if (a2->as_coll())
+	r = detect_cycle(a1, a2->as_coll()->list->first);
+
+      if (r)
+	return true;
+      a2 = a2->next;
+    }
+    a1 = a1->next;
+  }
+
+  return false;
+}
+
+inline bool oqmlAtomList::append(oqmlAtom *a, bool incref, bool _detect_cycle)
 {
   a->next = 0;
-  if (last)
-    {
-      last->next = a;
-      last = a;
-    }
+
+  if (_detect_cycle && detect_cycle(first, a))
+    return true;
+
+  if (last) {
+    last->next = a;
+    last = a;
+  }
   else
     first = last = a;
 
@@ -881,12 +918,17 @@ inline void oqmlAtomList::append(oqmlAtom *a, bool incref)
   }
 
   cnt++;
+
+  return false;
 }
 
-inline void oqmlAtomList::append(oqmlAtomList *al, oqmlBool dodel)
+inline bool oqmlAtomList::append(oqmlAtomList *al, oqmlBool dodel, bool _detect_cycle)
 {
   if (!al)
-    return;
+    return false;
+
+  if (_detect_cycle && detect_cycle(first, al->first))
+    return true;
 
   if (refcnt)
     oqmlLock(al, oqml_True);
@@ -896,7 +938,7 @@ inline void oqmlAtomList::append(oqmlAtomList *al, oqmlBool dodel)
   oqmlAtom *a = al->first;
 
   if (!a)
-    return;
+    return false;
 
   if (last)
     last->next = a;
@@ -906,10 +948,11 @@ inline void oqmlAtomList::append(oqmlAtomList *al, oqmlBool dodel)
   last = al->last;
 
   cnt += al->cnt;
-  if (dodel)
-    {
-      al->first = 0;
-      al->cnt = 0;
-      delete al;
-    }
+  if (dodel && !al->refcnt) {
+    al->first = 0;
+    al->cnt = 0;
+    delete al;
+  }
+
+  return false;
 }

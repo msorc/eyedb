@@ -107,15 +107,15 @@ oqmlStatus *oqmlAdd::eval(Database *db, oqmlContext *ctx, oqmlAtomList **alist, 
     al->append(OQML_ATOM_COLLVAL(aleft), oqml_False);
 #ifdef NEW_ADD_COLL
     if (!aright->as_nil())
-      al->append(aright);
+      al->append(aright->copy());
 #else
     if (OQML_IS_COLL(aright)) {
       if (atleft != atright)
 	return oqmlStatus::expected(this, &aleft->type, &aright->type);
-      al->append(OQML_ATOM_COLLVAL(aright), oqml_False);
+      al->append(OQML_ATOM_COLLVAL(aright)->copy(), oqml_False);
     }
     else if (!aright->as_nil())
-      al->append(aright);
+      al->append(aright->copy());
 #endif
 
     if (OQML_IS_LIST(aleft))
@@ -198,8 +198,8 @@ oqmlStatus *oqmlAdd::eval(Database *db, oqmlContext *ctx, oqmlAtomList **alist, 
     return new oqmlStatus(this, "unexpected type %s", aleft->type.getString());
 
 #ifdef SYNC_GARB
-  delete al_left;
-  delete al_right;
+  OQL_DELETE(al_left);
+  OQL_DELETE(al_right);
 #endif
   return oqmlSuccess;
 }
@@ -294,8 +294,8 @@ oqmlStatus *oqmlSub::eval(Database *db, oqmlContext *ctx, oqmlAtomList **alist, 
     return oqmlStatus::expected(this, "integer, character or double", aleft->type.getString());
 
 #ifdef SYNC_GARB
-  delete al_left;
-  delete al_right;
+  OQL_DELETE(al_left);
+  OQL_DELETE(al_right);
 #endif
   return oqmlSuccess;
 }
@@ -1145,7 +1145,7 @@ oqmlStatus *oqmlComma::eval(Database *db, oqmlContext *ctx, oqmlAtomList **alist
     return s;
 
 #ifdef SYNC_GARB
-  delete al_left;
+  OQL_DELETE(al_left);
 #endif
   s = qright->eval(db, ctx, &al_right);
   if (s)
@@ -1155,7 +1155,7 @@ oqmlStatus *oqmlComma::eval(Database *db, oqmlContext *ctx, oqmlAtomList **alist
   /*
 #ifdef SYNC_GARB
   al_right->first = 0;
-  delete al_right;
+  OQL_DELETE(al_right);
 #endif
   */
 
@@ -1279,8 +1279,10 @@ oqmlStatus *oqmlAssign::eval(Database *db, oqmlContext *ctx,
       if (al_right->cnt == 1) {
 	a = al_right->first;
 #ifdef SYNC_GARB
-	al_right->first = 0;
-	delete al_right;
+	if (al_right && !al_right->refcnt) {
+	  al_right->first = 0;
+	  OQL_DELETE(al_right);
+	}
 #endif
       }
       else if (al_right->cnt)
@@ -1329,8 +1331,10 @@ oqmlStatus *oqmlAssign::eval(Database *db, oqmlContext *ctx,
       if (al_right->cnt == 1) {
 	a = al_right->first;
 #ifdef SYNC_GARB
-	al_right->first = 0;
-	delete al_right;
+	if (al_right && !al_right->refcnt) {
+	  al_right->first = 0;
+	  OQL_DELETE(al_right);
+	}
 #endif
       }
 
@@ -1445,7 +1449,7 @@ oqmlStatus *oqmlCompoundStatement::eval(Database *db, oqmlContext *ctx, oqmlAtom
   oqmlAtomList *dlist = 0;
   oqmlStatus *s = node->eval(db, ctx, &dlist);
 #ifdef SYNC_GARB
-  delete dlist;
+  OQL_DELETE(dlist);
 #endif
   return s;
 }
@@ -2146,8 +2150,8 @@ oqmlStatus *oqml_x::eval(Database *db, oqmlContext *ctx, oqmlAtomList **alist, o
   else \
     return oqmlStatus::expected(this, "integer or character", aleft->type.getString()); \
 \
-  delete al_left; \
-  delete al_right; \
+  OQL_DELETE(al_left); \
+  OQL_DELETE(al_right); \
 \
   return oqmlSuccess; \
 } \
@@ -2237,8 +2241,8 @@ oqmlStatus *oqml_x::eval(Database *db, oqmlContext *ctx, oqmlAtomList **alist, o
   else \
     return oqmlStatus::expected(this, "integer, character or double", aleft->type.getString()); \
 \
-  delete al_left; \
-  delete al_right; \
+  OQL_DELETE(al_left); \
+  OQL_DELETE(al_right); \
 \
   return oqmlSuccess; \
 } \

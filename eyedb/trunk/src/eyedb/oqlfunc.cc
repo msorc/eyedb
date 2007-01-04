@@ -735,7 +735,7 @@ namespace eyedb {
 
     if (oqml_is_return(s)) {
 #ifdef SYNC_GARB
-      delete *alist;
+      OQL_DELETE(*alist);
 #endif
       (*alist) = new oqmlAtomList(s->returnAtom);
       delete s;
@@ -808,8 +808,10 @@ namespace eyedb {
 
 	    ctx->pushSymbol(pl->ident, (a ? &a->type : 0), a);
 #ifdef SYNC_GARB
-	    al->first = 0;
-	    delete al;
+	    if (al && !al->refcnt) {
+	      al->first = 0;
+	      OQL_DELETE(al);
+	    }
 #endif
 	  }
 

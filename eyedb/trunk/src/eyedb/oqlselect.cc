@@ -1409,8 +1409,10 @@ oqmlSelect::evalCartProdRealize(Database *db, oqmlContext *ctx,
 				  (const char *)ylist->first->getString()));
 		    rlist->append(ylist->first);
 #ifdef SYNC_GARB
-		    ylist->first = 0;
-		    delete ylist;
+		    if (ylist && !ylist->refcnt) {
+		      ylist->first = 0;
+		      delete ylist;
+		    }
 #endif
 		  }
 		}
@@ -1423,7 +1425,7 @@ oqmlSelect::evalCartProdRealize(Database *db, oqmlContext *ctx,
 	  // added the 4/07/01
 	  ctx->setSelectContextCount(select_ctx_cnt);
 #ifdef SYNC_GARB
-	  delete xlist;
+	  OQL_DELETE(xlist);
 #endif
 	}
 	else {
@@ -1437,8 +1439,10 @@ oqmlSelect::evalCartProdRealize(Database *db, oqmlContext *ctx,
 			  (const char *)ylist->first->getString()));
 	    rlist->append(ylist->first);
 #ifdef SYNC_GARB
-	    ylist->first = 0;
-	    delete ylist;
+	    if (ylist && !ylist->refcnt) {
+	      ylist->first = 0;
+	      delete ylist;
+	    }
 #endif
 	  }
 	  // added the 4/07/01

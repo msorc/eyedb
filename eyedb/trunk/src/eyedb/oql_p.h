@@ -795,12 +795,12 @@ namespace eyedb {
     oqmlStatus *setAtom(oqmlAtom *, int idx, oqmlNode *);
     int getFlattenCount() const;
 
-    void append(oqmlAtom *, bool incref = true);
+    bool append(oqmlAtom *, bool incref = true, bool detect_cycle = false);
     oqmlBool isIn(oqmlAtom *);
     oqmlStatus *suppress(oqmlAtom *);
     void empty();
 
-    void append(oqmlAtomList *, oqmlBool = oqml_True);
+    bool append(oqmlAtomList *, oqmlBool = oqml_True, bool detect_cycle = false);
     void suppressDoubles();
     oqmlStatus *compare(oqmlNode *node, oqmlContext *ctx, oqmlAtomList *, const char *, oqmlTYPE, oqmlBool &) const;
     oqmlBool isEqualTo(oqmlAtomList &);
@@ -3287,6 +3287,8 @@ do { \
 } while (0)
 
 #define SYNC_GARB
+
+#define OQL_DELETE(X) do {if ((X) && !(X)->refcnt) delete (X);} while(0)
 
   extern oqmlBool
   oqml_is_symbol(oqmlContext *ctx, const char *sym);

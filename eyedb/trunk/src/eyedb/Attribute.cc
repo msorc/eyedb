@@ -1479,6 +1479,12 @@ Attribute::setValue(Object *agr,
 #ifdef E_XDR_TRACE
 	printf("%s: Attribute::setValue : cmp\n", name);
 #endif
+	if (!o->getIDR()) {
+	  return Exception::make
+	    ("setting attribute value '%s': object of class '%s' "
+	     "invalid null IDR", name, o->getClass()->getName());
+	}
+
 	if (memcmp(pvdata + ((from+n) * incsize),
 		   o->getIDR() + IDB_OBJ_HEAD_SIZE, incsize)) {
 #ifdef E_XDR_TRACE
@@ -1646,6 +1652,10 @@ void Attribute::manageCycle(Object *mo, Data _idr, int n,
 
 	//printf("%s: mustclean %p in object %p at #%d\n", name, o, mo, i);
 	mset(_idr, 0, sizeof(Object *));
+	/*
+	printf("%s::%s %s setting damaged %p\n", getClassOwner()->getName(),
+	       name, (isIndirect() ? "indirect" : "direct"), mo);
+	*/
 	if (!isIndirect())
 	  mo->setDamaged(this);
       }
