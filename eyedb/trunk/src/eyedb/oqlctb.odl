@@ -88,6 +88,7 @@ enum tostring_flags [OqlCtbToStringFlags] {
 native object {
 
   instance_method<client, called_from=OQL> oid getOid();
+  instance_method<client, called_from=OQL> object *getObject();
 
   instance_method<client, called_from=OQL> string toString();
   instance_method<client, called_from=OQL> string toString(in int flags);

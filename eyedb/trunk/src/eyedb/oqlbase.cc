@@ -2103,8 +2103,8 @@ namespace eyedb {
 
       s = comp->compare(db, ctx, al_left, al_right, alist);
 #ifdef SYNC_GARB
-      delete al_left;
-      delete al_right;
+      OQL_DELETE(al_left);
+      OQL_DELETE(al_right);
 #endif
       return s;
     }
@@ -2249,16 +2249,20 @@ namespace eyedb {
     if (s) return s;
     cst_atom = al->first;
 #ifdef SYNC_GARB
-    al->first = 0;
-    delete al;
+    if (al && !al->refcnt) {
+      al->first = 0;
+      OQL_DELETE(al);
+    }
 #endif
     s = complete(db, ctx, cst_atom);
     if (s) return s;
     s = qleft_x->eval(db, ctx, &al_left, this, cst_atom);
     if (s) return s;
 #ifdef SYNC_GARB
-    al_left = 0;
-    delete al_left;
+    if (al_left && !al_left->refcnt) {
+      al_left->first = 0;
+      OQL_DELETE(al_left);
+    }
 #endif
 
     if (iter) {
@@ -2775,7 +2779,7 @@ namespace eyedb {
     oqmlLock(list, oqml_False);
 
 #ifdef SYNC_GARB
-    delete list;
+    OQL_DELETE(list);
 #endif
     //    printf("~oqmlSymbolEntry(%s)\n", ident);
     oqmlLock(at, oqml_False);
@@ -3365,7 +3369,10 @@ namespace eyedb {
     oqmlAtom *a = first;
 
     while (a) {
-      list->append(a->copy());
+      if (a->as_coll())
+	list->append(a->as_coll()->list->copy());
+      else
+	list->append(a->copy());
       a = a->next;
     }
 
@@ -4352,8 +4359,10 @@ namespace eyedb {
       oqmlStatus *s = oqml_get_location_db(db, ctx, location, al->first, xdb[xdb_cnt]);
       if (!s) xdb_cnt++;
 #ifdef SYNC_GARB
-      al->first = 0;
-      delete al;
+      if (al && !al->refcnt) {
+	al->first = 0;
+	OQL_DELETE(al);
+      }
 #endif
       return s;
     }
@@ -4367,8 +4376,10 @@ namespace eyedb {
 	a = a->next;
       }
 #ifdef SYNC_GARB
-      al->first = 0;
-      delete al;
+      if (al && !al->refcnt) {
+	al->first = 0;
+	OQL_DELETE(al);
+      }
 #endif
       return oqmlSuccess;
     }

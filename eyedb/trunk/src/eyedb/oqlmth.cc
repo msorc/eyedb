@@ -467,8 +467,10 @@ oqmlMethodCall::evalList(Database *db, oqmlContext *ctx)
 			      (cls ? cls->getName() : ""), mthname, i+1);
       tmp_atoms[i] = al->first;
 #ifdef SYNC_GARB
-      al->first = 0;
-      delete al;
+      if (al && !al->refcnt) {
+	al->first = 0;
+	OQL_DELETE(al);
+      }
 #endif
     }
 

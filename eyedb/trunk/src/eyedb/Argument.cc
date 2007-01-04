@@ -1395,9 +1395,9 @@ namespace eyedb {
 	if (clname && *clname)
 	  {
 	    static char tok[512];
-	    const char *clsname = getClname().c_str();
-	    sprintf(tok, "%s", m->getClass(clsname)->getCName(True));
-	    if (odl_class_enums && !Class::isBoolClass(clsname))
+	    std::string clsname = getClname();
+	    sprintf(tok, "%s", m->getClass(clsname.c_str())->getCName(True));
+	    if (odl_class_enums && !Class::isBoolClass(clsname.c_str()))
 	      strcat(tok, "::Type");
 	    return tok;
 	  }
@@ -1540,9 +1540,9 @@ namespace eyedb {
       }
 
     if (PURGE(_type) == INT32_TYPE && *getClname().c_str()) {
-      const char *clsname = getClname().c_str();
-      fprintf(fd, "(%s%s%s)",  m->getClass(clsname)->getCName(True),
-	      (odl_class_enums && !Class::isBoolClass(clsname) ? "::Type" : ""),
+      std::string clsname = getClname();
+      fprintf(fd, "(%s%s%s)",  m->getClass(clsname.c_str())->getCName(True),
+	      (odl_class_enums && !Class::isBoolClass(clsname.c_str()) ? "::Type" : ""),
 	      (_type & ARRAY_TYPE) ? " *" : "");
     }
 

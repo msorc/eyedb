@@ -2160,8 +2160,6 @@ namespace eyedb {
     Status s = const_cast<Collection *>(this)->getObjElementsRealize(rcm);
     if (s) return s;
 
-    printf("obj_array auto_garb: %d\n", obj_array.isAutoGarbage());
-
     obj_array = *read_cache.obj_arr;
     return Success;
   }

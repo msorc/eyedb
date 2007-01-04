@@ -95,7 +95,7 @@ namespace eyedb {
       toeval = qthen;
 
 #ifdef SYNC_GARB
-    delete al;
+    OQL_DELETE(al);
 #endif
 
     *alist = 0;
@@ -115,7 +115,7 @@ namespace eyedb {
 
     if (!is_cond_expr && toeval) {
 #ifdef SYNC_GARB
-      delete *alist;
+      OQL_DELETE(*alist);
 #endif
       *alist = new oqmlAtomList();
     }
@@ -229,7 +229,7 @@ namespace eyedb {
 	  tal = 0;
 	  s = action->eval(db, ctx, &tal);
 #ifdef SYNC_GARB
-	  delete tal;
+	  OQL_DELETE(tal);
 #endif
 	  ctx->popSymbol(ident);
 	  oqmlGarbManager::garbage(gbctx);
@@ -247,7 +247,7 @@ namespace eyedb {
 #ifdef SYNC_GARB
       tal = 0;
       s = action->eval(db, ctx, &tal);
-      delete tal;
+      OQL_DELETE(tal);
 #else
       s = action->eval(db, ctx, alist);
 #endif

@@ -352,35 +352,39 @@ namespace eyedb {
       return Success;
     }
       
-    int f = 0;
+    int found = 0;
       
     unsigned char *item_data = (unsigned char *)malloc(item_size);
 
     if (getOidC().isValid()) {
       RPCStatus rpc_status;
       rpc_status = collectionGetByInd(db->getDbHandle(), getOidC().getOid(),
-				      id, &f, item_data, item_size);
-      if (rpc_status)
+				      id, &found, item_data, item_size);
+      if (rpc_status) {
+	free(item_data);
 	return StatusMake(rpc_status);
+      }
     }
 
-    if (!f) {
+    if (!found) {
       free(item_data);
       return Exception::make(IDB_COLLECTION_SUPPRESS_ERROR, "no item found at index %d in collection '%s' [%s]", id, name, oid.getString());
     }
 
     create_cache();
     if (isref) {
-      Oid toid;
-      memcpy(&toid, item_data, sizeof(Oid));
-      cache->insert(toid, id, removed);
+      Oid item_oid;
+      Offset offset = 0;
+      oid_decode(item_data, &offset, item_oid.getOid());
+      //memcpy(&item_oid, item_data, sizeof(Oid));
+      cache->insert(item_oid, id, removed);
     }
     else
       cache->insert(Value(item_data, item_size), id, removed);
 
     v_items_cnt--;
 
-    //return StatusMake(IDB_COLLECTION_SUPPRESS_ERROR, rpc_status);
+    free(item_data);
     return Success;
   }
 

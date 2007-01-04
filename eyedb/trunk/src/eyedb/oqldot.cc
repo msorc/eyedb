@@ -2173,12 +2173,16 @@ oqmlDot::compile_continue(Database *db, oqmlContext *ctx,
 	  castcls = 0;
 	}
       
+      if (!cls)
+	return new oqmlStatus(this, "class is unknown");
+
       oqmlAtom *rcuratom;
       s = getAttr(db, ctx, cls, d->curatom, name, &attr, &rcuratom);
       if (s) return s;
       // added 28/12/00 because getAttrRealize changed
-      if (!attr)
-	return new oqmlStatus(this, not_found_fmt, name, cls->getName());
+      if (!attr) {
+	return new oqmlStatus(this, not_found_fmt, name, cls ? cls->getName() : "<unknown>");
+      }
       // ...
 
       s = dctx->add(db, ctx, attr, 0, (char *)name, rcuratom, castcls, 0);
