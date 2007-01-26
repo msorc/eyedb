@@ -26,6 +26,7 @@
 #include <assert.h>
 #include <string.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/select.h>
@@ -530,4 +531,29 @@ void rpc_socket_nodelay(int s)
 
 
   fflush(stderr);
+}
+
+void rpc_checkAFUnixPort(const char *portname)
+{
+  int r = access(portname, O_RDONLY);
+  if (r < 0)
+    return;
+
+  int sock_fd = socket(AF_UNIX, SOCK_STREAM, 0);
+  if (sock_fd < 0)
+    return;
+
+  struct sockaddr_un sock_un_name;
+  struct sockaddr *sock_addr;
+
+  sock_un_name.sun_family = AF_UNIX;
+  strcpy(sock_un_name.sun_path, portname);
+  sock_addr = (struct sockaddr *)&sock_un_name;
+
+  r = connect(sock_fd, sock_addr, sizeof(sock_un_name));
+  if (r < 0) {
+    //fprintf(stderr, "eyedb notice: unlinking unix socket %s\n", portname);
+    unlink(portname);
+  }
+  close(sock_fd);
 }

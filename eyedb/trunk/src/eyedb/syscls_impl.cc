@@ -1204,7 +1204,7 @@ namespace eyedb {
   Index::simulate(const IndexImpl &idximpl, std::string &xstats,
 		  Bool dspImpl, Bool full, const char *indent)
   {
-    IndexStats *stats;
+    IndexStats *stats = 0;
     Status s = simulate(idximpl, stats);
     if (s) return s;
     xstats = (stats ? stats->toString(dspImpl, full, indent) : std::string(""));

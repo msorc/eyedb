@@ -519,6 +519,8 @@ rpc_portOpen(rpc_Server *server, const char *servname, const char *portname,
   }
 
   if (port->domain == AF_UNIX) {
+    rpc_checkAFUnixPort(portname);
+
 #ifdef HAVE_FATTACH
     int pfd[2];
     int fd;

@@ -432,6 +432,8 @@ port_open(const char *port)
   int sockun_fd;
   int v = 1;
 
+  rpc_checkAFUnixPort(port);
+  
   if ((sockun_fd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {
     fprintf(stderr, "unable to create unix socket port `%d'\n", port);
     return -1;

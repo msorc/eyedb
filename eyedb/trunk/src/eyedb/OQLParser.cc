@@ -2756,7 +2756,7 @@ Status OQLParser::oql_send()
     }
 
     if (getOnErrorQuit()) {
-      fprintf(stderr, "exiting eyedboql\n");
+      //fprintf(stderr, "exiting eyedboql\n");
       exit(1);
     }
   }

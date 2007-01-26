@@ -2560,7 +2560,6 @@ do { \
 	o = coll_class->newObj(v.data.data, True);
       
       o->setDatabase(getDatabase());
-      o->trace();
       v.set(o);
     }
   }

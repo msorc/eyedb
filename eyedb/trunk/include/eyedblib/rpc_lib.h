@@ -162,6 +162,7 @@ extern void x2h_rpc_multiconninfo(rpc_MultiConnInfo *info);
 extern void x2h_rpc_hd(rpc_RpcHeader *rhd);
 extern void h2x_rpc_hd(rpc_RpcHeader *xrhd, const rpc_RpcHeader *hrhd);
 extern void rpc_setConnFd(int fd);
+extern void rpc_checkAFUnixPort(const char *portname);
 
 /*@@@@ #ifdef LINUX */
 #if defined(LINUX) || defined(LINUX64) || defined(LINUX_IA64) || defined(LINUX_PPC64) || defined(ORIGIN) || defined(ALPHA) || defined(AIX) 
