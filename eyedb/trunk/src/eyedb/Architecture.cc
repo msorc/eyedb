@@ -29,29 +29,31 @@
 
 namespace eyedb {
 
-static Architecture *arch_;
+  static Architecture *arch_;
 
-void Architecture::init()
-{
-  arch_ = new Architecture(eyedblib::CompileBuiltin::getArch(),
-			   eyedblib::CompileBuiltin::getCpu(),
-			   eyedblib::CompileBuiltin::getOs(),
-			   eyedblib::CompileBuiltin::getCompiler(),
+  void Architecture::init()
+  {
+    arch_ = new Architecture(eyedblib::CompileBuiltin::getArch(),
+			     eyedblib::CompileBuiltin::getCpu(),
+			     eyedblib::CompileBuiltin::getOs(),
+			     eyedblib::CompileBuiltin::getCompiler(),
 #ifdef WORDS_BIGENDIAN
-			   true
+			     true
 #else
-			   false
+			     false
 #endif
-			   );
-}
+			     );
+  }
 
-void Architecture::_release()
-{
-  delete arch_;
-}
+  void Architecture::_release()
+  {
+    delete arch_;
+  }
 
-Architecture *Architecture::getArchitecture()
-{
-  return arch_;
-}
+  Architecture *Architecture::getArchitecture()
+  {
+    if (!arch_)
+      init();
+    return arch_;
+  }
 }

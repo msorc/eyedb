@@ -736,7 +736,8 @@ namespace eyedb {
 
   IndexStats::~IndexStats()
   {
-    delete idximpl;
+    if (idximpl)
+      idximpl->release();
   }
 
   HashIndexStats::HashIndexStats()

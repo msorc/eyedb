@@ -339,6 +339,8 @@ main(int argc, char *argv[])
     return 1;
 
   if (clist->getCount()) {
+    parser->setOnErrorQuit(1);
+
     LinkedListCursor *c = clist->startScan();
 
     CFItem *item;

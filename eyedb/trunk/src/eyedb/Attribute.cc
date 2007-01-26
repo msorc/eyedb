@@ -1656,8 +1656,12 @@ void Attribute::manageCycle(Object *mo, Data _idr, int n,
 	printf("%s::%s %s setting damaged %p\n", getClassOwner()->getName(),
 	       name, (isIndirect() ? "indirect" : "direct"), mo);
 	*/
+
+	// EV : 04/01/07: as cycle are not managed correctly, I disconnect this code:
+#if 0
 	if (!isIndirect())
 	  mo->setDamaged(this);
+#endif
       }
 
       if (r.isCycle()) {

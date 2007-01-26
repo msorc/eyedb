@@ -427,8 +427,10 @@ namespace eyedb {
 
     if (!gbx_chgRefCnt)
       gbx_refcnt++;
+    /*
     else
       printf("should increment refcnt %p\n", this);
+    */
   }
 
   void
@@ -449,8 +451,10 @@ namespace eyedb {
 
     if (!gbx_chgRefCnt)
       gbx_refcnt--;
+    /*
     else
       printf("should decrement refcnt %p\n", this);
+    */
     assert(gbx_refcnt >= 0);
   }
 
@@ -471,8 +475,8 @@ namespace eyedb {
 
   gbxBool gbxCycleContext::mustClean(gbxObject *_ref)
   {
-    if (this->ref == _ref)
-      printf("mustClean: ref %p refcnt=%d\n", ref, ref->getRefCount());
+    //if (this->ref == _ref)
+      //printf("mustClean: ref %p refcnt=%d\n", ref, ref->getRefCount());
 
     //    if (this->ref == _ref && this->ref->getRefCount() == 1)
     // EV_CYCLE
@@ -484,7 +488,7 @@ namespace eyedb {
   void gbxCycleContext::manageCycle(gbxObject *_ref)
   {
     if (this->ref == _ref) {
-      printf("manage cycle %p\n", ref);
+      //printf("manage cycle %p\n", ref);
       cycle = gbxTrue;
     }
   }
