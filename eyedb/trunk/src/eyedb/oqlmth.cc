@@ -1138,6 +1138,7 @@ oqmlStatus *oqmlMethodCall::atomToArg(Database *db, oqmlContext *ctx,
     case oqmlATOM_OBJ:
       if (odl_type == OBJ_TYPE)
 	{
+	  OQL_CHECK_OBJ(a);
 	  Object *o = OQML_ATOM_OBJVAL(a);
 	  if (o) {
 	    o->incrRefCount();
@@ -1150,6 +1151,7 @@ oqmlStatus *oqmlMethodCall::atomToArg(Database *db, oqmlContext *ctx,
 	}
       else if (odl_type == OID_TYPE)
 	{
+	  OQL_CHECK_OBJ(a);
 	  Object *o = OQML_ATOM_OBJVAL(a);
 	  if (o)
 	    arg->set(o->getOid());

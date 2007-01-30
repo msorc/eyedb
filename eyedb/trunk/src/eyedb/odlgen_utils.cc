@@ -136,7 +136,7 @@ namespace eyedb {
     reserve("getClass");
     reserve("getIDR");
     reserve("getIDRSize");
-    reserve("getType");
+    //reserve("getType");
     reserve("getOid");
     reserve("getCTime");
     reserve("getMTime");

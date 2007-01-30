@@ -548,7 +548,7 @@ CollectionClass::make(Database *db, Class **cls)
   }
   
   if ((*cls)->isUnrealizable()) {
-    int type = (*cls)->getType();
+    int type = (*cls)->get_Type();
     CollectionClass *mcoll = (CollectionClass *)*cls;
     if (mcoll->dim == 1) {
       switch(type) {
@@ -747,9 +747,6 @@ Object *CollBagClass::newObj(Database *_db) const
 
   ObjectPeer::make(t, this, 0, _CollBag_Type, idr_objsz,
 		      idr_psize, idr_vsize);
-#ifndef DONT_SET_LITERAL_IN_NEWOBJ
-  t->setLiteral(True);
-#endif
   return t;
 }
 
@@ -762,9 +759,6 @@ Object *CollBagClass::newObj(Data data, Bool _copy) const
 
   ObjectPeer::make(t, this, data, _CollBag_Type, idr_objsz,
 		      idr_psize, idr_vsize, _copy);
-#ifndef DONT_SET_LITERAL_IN_NEWOBJ
-  t->setLiteral(True);
-#endif
   return t;
 }
 
@@ -836,9 +830,6 @@ Object *CollArrayClass::newObj(Database *_db) const
 
   ObjectPeer::make(t, this, 0, _CollArray_Type, idr_objsz,
 		      idr_psize, idr_vsize);
-#ifndef DONT_SET_LITERAL_IN_NEWOBJ
-  t->setLiteral(True);
-#endif
   return t;
 }
 
@@ -851,9 +842,6 @@ Object *CollArrayClass::newObj(Data data, Bool _copy) const
 
   ObjectPeer::make(t, this, data, _CollArray_Type, idr_objsz,
 		      idr_psize, idr_vsize, _copy);
-#ifndef DONT_SET_LITERAL_IN_NEWOBJ
-  t->setLiteral(True);
-#endif
   return t;
 }
 
@@ -925,9 +913,6 @@ Object *CollSetClass::newObj(Database *_db) const
 
   ObjectPeer::make(t, this, 0, _CollSet_Type, idr_objsz,
 		      idr_psize, idr_vsize);
-#ifndef DONT_SET_LITERAL_IN_NEWOBJ
-  t->setLiteral(True);
-#endif
   return t;
 }
 
@@ -940,9 +925,6 @@ Object *CollSetClass::newObj(Data data, Bool _copy) const
 
   ObjectPeer::make(t, this, data, _CollSet_Type, idr_objsz,
 		      idr_psize, idr_vsize, _copy);
-#ifndef DONT_SET_LITERAL_IN_NEWOBJ
-  t->setLiteral(True);
-#endif
   return t;
 }
 
@@ -1014,9 +996,6 @@ Object *CollListClass::newObj(Database *_db) const
 
   ObjectPeer::make(t, this, 0, _CollList_Type, idr_objsz,
 		      idr_psize, idr_vsize);
-#ifndef DONT_SET_LITERAL_IN_NEWOBJ
-  t->setLiteral(True);
-#endif
   return t;
 }
 
@@ -1029,9 +1008,6 @@ Object *CollListClass::newObj(Data data, Bool _copy) const
 
   ObjectPeer::make(t, this, data, _CollList_Type, idr_objsz,
 		      idr_psize, idr_vsize, _copy);
-#ifndef DONT_SET_LITERAL_IN_NEWOBJ
-  t->setLiteral(True);
-#endif
   return t;
 }
 

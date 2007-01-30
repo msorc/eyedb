@@ -43,10 +43,11 @@ namespace eyedb {
 				   const IndexImpl *idximpl,
 				   Object *card,
 				   Bool is_literal,
+				   Bool is_pure_literal,
 				   Data idx_data, Size idx_data_size)
   {
     return new CollSet(name, cls, idx1_oid, idx2_oid, icnt,
-		       bottom, top, idximpl, card, is_literal, idx_data, idx_data_size);
+		       bottom, top, idximpl, card, is_literal, is_pure_literal, idx_data, idx_data_size);
   }
 
   CollBag *CollectionPeer::collBag(const char *name,
@@ -62,10 +63,11 @@ namespace eyedb {
 				   const IndexImpl *idximpl,
 				   Object *card,
 				   Bool is_literal,
+				   Bool is_pure_literal,
 				   Data idx_data, Size idx_data_size)
   {
     return new CollBag(name, cls, idx1_oid, idx2_oid, icnt,
-		       bottom, top, idximpl, card, is_literal, idx_data, idx_data_size);
+		       bottom, top, idximpl, card, is_literal, is_pure_literal, idx_data, idx_data_size);
   }
 
   CollList *CollectionPeer::collList(const char *name,
@@ -81,10 +83,11 @@ namespace eyedb {
 				     const IndexImpl *idximpl,
 				     Object *card,
 				     Bool is_literal,
+				     Bool is_pure_literal,
 				     Data idx_data, Size idx_data_size)
   {
     return new CollList(name, cls, idx1_oid, idx2_oid, icnt,
-			bottom, top, idximpl, card, is_literal, idx_data, idx_data_size);
+		       bottom, top, idximpl, card, is_literal, is_pure_literal, idx_data, idx_data_size);
   }
 
   CollArray *CollectionPeer::collArray(const char *name,
@@ -100,10 +103,11 @@ namespace eyedb {
 				       const IndexImpl *idximpl,
 				       Object *card,
 				       Bool is_literal,
+				       Bool is_pure_literal,
 				       Data idx_data, Size idx_data_size)
   {
     return new CollArray(name, cls, idx1_oid, idx2_oid, icnt,
-			 bottom, top, idximpl, card, is_literal, idx_data, idx_data_size);
+			 bottom, top, idximpl, card, is_literal, is_pure_literal, idx_data, idx_data_size);
   }
 
   void CollectionPeer::setLock(Collection *coll, Bool locked)

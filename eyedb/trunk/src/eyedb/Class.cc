@@ -3211,7 +3211,7 @@ namespace eyedb {
     if (strcmp(getAliasName(), cl->getAliasName()))
       return False;
 
-    if (type != cl->getType())
+    if (type != cl->get_Type())
       return False;
 
     return True;
@@ -3250,7 +3250,7 @@ namespace eyedb {
     if (strcmp(getAliasName(), cl->getAliasName()))
       return False;
 
-    if (type != cl->getType())
+    if (type != cl->get_Type())
       return False;
 
     if (state & Realizing)

@@ -109,6 +109,10 @@ namespace eyedb {
     Object *o;
     s = oqmlObjectManager::getObject(node, db, a, o, oqml_False);
     if (s) return s;
+    if (!o) {
+      return new oqmlStatus(node, "invalid null object");
+    }
+
     cls = o->getClass();
     if (!cls->asCollectionClass()) {
       oqmlObjectManager::releaseObject(o);
@@ -452,10 +456,11 @@ namespace eyedb {
 	  is = coll->insert(((oqmlAtom_oid *)a)->oid);
       }
       else if (a->type.type == oqmlATOM_OBJ) {
+	OQL_CHECK_OBJ(a);
 	if (what == collarray)
-	  is = coll->asCollArray()->insertAt(ii, ((oqmlAtom_obj*)a)->o);
+	  is = coll->asCollArray()->insertAt(ii, OQML_ATOM_OBJVAL(a));
 	else
-	  is = coll->insert(((oqmlAtom_obj*)a)->o);
+	  is = coll->insert(OQML_ATOM_OBJVAL(a));
       }
       else {
 	  Data val;

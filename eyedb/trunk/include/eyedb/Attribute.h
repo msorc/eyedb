@@ -1065,7 +1065,7 @@ namespace eyedb {
 
 
     virtual Status copy(Object*, Bool) const;
-    void incrRefCount(Object *, Data, int) const;
+    Status incrRefCount(Object *, Data, int) const;
     void manageCycle(Object *, Data, int, gbxCycleContext &r) const;
     void garbage(Data, int) const;
 #ifdef GBX_NEW_CYCLE
@@ -1263,6 +1263,8 @@ namespace eyedb {
   private:
     Status clean_realize(Schema *, const Class *&);
     Status createComponentSet(Database *);
+
+    Status hasIndex(Database *db, bool &has_index, std::string &idx_str) const;
 
     void completeInverseItem(Schema *);
     Status completeInverse(Database *);

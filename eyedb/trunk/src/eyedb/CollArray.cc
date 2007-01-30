@@ -57,9 +57,10 @@ namespace eyedb {
 		       const IndexImpl *_idximpl,
 		       Object *_card,
 		       Bool _is_literal,
+		       Bool _is_pure_literal,
 		       Data _idx_data, Size _idx_data_size)
     : Collection(n, _class, _idx1_oid, _idx2_oid, icnt,
-		 _bottom, _top, _idximpl, _card, _is_literal, _idx_data, _idx_data_size)
+		 _bottom, _top, _idximpl, _card, _is_literal, _is_pure_literal, _idx_data, _idx_data_size)
   {
     init();
     setClass(_class);

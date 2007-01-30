@@ -307,6 +307,7 @@ namespace eyedb {
     Status getLocations(ObjectLocationArray &);
 
     Bool isLiteral() const {return is_literal;}
+    Bool isPureLiteral() const {return is_pure_literal;}
 
     virtual ~Collection();
 
@@ -341,6 +342,7 @@ namespace eyedb {
     eyedblib::int16 inv_item;
 
     Bool is_literal;
+    Bool is_pure_literal;
     Oid literal_oid;
     Size idx_data_size;
     Data idx_data;
@@ -387,7 +389,7 @@ namespace eyedb {
     Collection(const char *, Class *,
 	       const Oid&, const Oid&, int, int,
 	       int, const IndexImpl *,
-	       Object *, Bool, Data, Size);
+	       Object *, Bool, Bool, Data, Size);
     void make(const char *, Class *, Bool, const IndexImpl *);
     void make(const char *, Class *, int, const IndexImpl *);
     Status getOidElementsRealize();
@@ -415,6 +417,15 @@ namespace eyedb {
     Status failedCardinality() const;
     Status create();
     Status update();
+    Status updateLiteral();
+    Status loadLiteral();
+
+    enum {
+      CollObject = 0,
+      CollPureLiteral = 1,
+      CollLiteral = 2
+    };
+    char codeLiteral() const;
     void literalMake(Collection *o);
     std::string getStringType() const;
     Offset inv_oid_offset;
@@ -432,7 +443,8 @@ namespace eyedb {
     void validateInverse() {inverse_valid = True;}
     void unvalidReadCache();
     void emptyReadCache();
-    void setLiteral(Bool _is_literal) {is_literal = _is_literal;}
+    void setLiteral(Bool _is_literal);
+    void setPureLiteral(Bool _is_pure_literal);
     Oid getLiteralOid() const {return literal_oid;}
     void setLiteralOid(Oid _literal_oid) {literal_oid = _literal_oid;}
     Oid& getOidC() {
@@ -442,8 +454,10 @@ namespace eyedb {
       return is_literal ? literal_oid : oid;
     }
 
+    static void decodeLiteral(char c, Bool &is_literal, Bool &is_pure_literal);
     Bool isPartiallyStored() const;
-    virtual void setMasterObject(Object *_master_object);
+    virtual Status setMasterObject(Object *_master_object);
+    virtual Status releaseMasterObject();
 
     void makeValue(Value &);
 

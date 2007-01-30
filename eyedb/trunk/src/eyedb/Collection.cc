@@ -42,6 +42,8 @@ using namespace std;
 
 namespace eyedb {
 
+  static Offset LITERAL_OFFSET;
+
   extern int
   get_item_size(const Class *coll_class, int dim);
 
@@ -122,6 +124,7 @@ namespace eyedb {
     inverse_valid = True;
     literal_oid.invalidate();
     is_literal = False;
+    is_pure_literal = False;
     is_complete = True;
     idx_data = 0;
     idx_data_size = 0;
@@ -345,7 +348,7 @@ namespace eyedb {
 			 int icnt,
 			 int _bottom, int _top,
 			 const IndexImpl *_idximpl,
-			 Object *_card, Bool _is_literal,
+			 Object *_card, Bool _is_literal, Bool _is_pure_literal,
 			 Data _idx_data, Size _idx_data_size) :
     Instance()
   {
@@ -390,6 +393,7 @@ namespace eyedb {
     inverse_valid = True;
     literal_oid.invalidate();
     is_literal = _is_literal;
+    is_pure_literal = _is_pure_literal;
     is_complete = True;
     idx_data_size = _idx_data_size;
     idx_data = (idx_data_size ? (Data)malloc(idx_data_size) : 0);
@@ -538,6 +542,7 @@ namespace eyedb {
     v_items_cnt = coll.v_items_cnt;
     inverse_valid = coll.inverse_valid;
     is_literal = coll.is_literal;
+    is_pure_literal = coll.is_pure_literal;
     is_complete = coll.is_complete;
     literal_oid = coll.literal_oid;
     idx_data_size = coll.idx_data_size;
@@ -576,18 +581,184 @@ namespace eyedb {
     return s;
   }
 
-  void Collection::setMasterObject(Object *_master_object)
+  void Collection::setLiteral(Bool _is_literal)
   {
-#ifdef DONT_SET_LITERAL_IN_NEWOBJ
+    is_literal = _is_literal;
+  }
+
+  void Collection::setPureLiteral(Bool _is_pure_literal)
+  {
+    is_pure_literal = _is_pure_literal;
+  }
+
+  char Collection::codeLiteral() const
+  {
+    if (is_pure_literal)
+      return CollPureLiteral;
+
+    if (is_literal)
+      return CollLiteral;
+
+    return CollObject;
+  }
+
+  void Collection::decodeLiteral(char c, Bool &is_literal, Bool &is_pure_literal)
+  {
+    if (c == CollPureLiteral) {
+      is_pure_literal = True;
+      is_literal = True;
+    }
+    else if (c == CollLiteral) {
+      is_pure_literal = False;
+      is_literal = True;
+    }
+    else {
+      is_pure_literal = False;
+      is_literal = False;
+    }
+  }
+
+  Status Collection::loadLiteral()
+  {
+    unsigned char data[1];
+    short dspid = 0;
+    Oid toid = literal_oid;
+    if (!toid.isValid())
+      toid = getOid();
+      
+    if (!toid.isValid())
+      return Success;
+
+    RPCStatus rpc_status = dataRead(db->getDbHandle(), LITERAL_OFFSET,
+				    sizeof(char),
+				    data, &dspid, toid.getOid());
+    if (rpc_status)
+      return StatusMake(rpc_status);
+
+    Offset offset = 0;
+    char c;
+    char_decode (data, &offset, &c);
+    Collection::decodeLiteral(c, is_literal, is_pure_literal);
+
+    return Success;
+  }
+
+  Status Collection::updateLiteral()
+  {
+    if (db) {
+      char new_code = codeLiteral();
+
+      Oid toid = literal_oid;
+      if (!toid.isValid())
+	toid = getOid();
+      
+      if (toid.isValid()) {
+	Offset offset = 0;
+	Size alloc_size = sizeof(char);
+	unsigned char data[1];
+	unsigned char *pdata = data;
+	char_code(&pdata, &offset, &alloc_size, &new_code);
+	RPCStatus rpc_status = dataWrite(db->getDbHandle(), LITERAL_OFFSET,
+					 sizeof(char),
+					 data, toid.getOid());
+	
+	if (rpc_status)
+	  return StatusMake(rpc_status);
+      }
+    }
+
+    return Success;
+  }
+
+  Status Collection::setMasterObject(Object *_master_object)
+  {
+    if (is_literal) {
+      assert(master_object);
+      if (master_object->getOid().isValid() &&
+	  master_object->getOid() != _master_object->getOid())
+	return Exception::make("collection %s is already a literal attribute "
+			       "for the object",
+			       getOidC().toString(),
+			       master_object->getOid().toString());
+    }
+
+    Status s = Object::setMasterObject(_master_object);
+    if (s)
+      return s;
+
+    // must set to pure literal if and only if !getOid().isValid()
+    // -> eventually patch the Collection data with dataWrite
+    // at literal_offset
+    // pure_literal -> char=1
+    // literal but not pure -> char=2
+    // not literal and not pure -> char=0
+    char old_code = codeLiteral();
+
     setLiteral(True);
-    Object::setMasterObject(_master_object);
+
+    if (getOid().isValid())
+      setPureLiteral(False); // collection is also an object
+    else
+      setPureLiteral(True);
+
+    // EV 26/01/07
+    // copy oid to literal oid and set oid to null
+    // in main cases both oids should be invalid
+    setLiteralOid(getOid());
+
+    if (!is_pure_literal)
+      ObjectPeer::setOid(this, Oid::nullOid);
+
     if (!getDatabase())
       setDatabase(_master_object->getDatabase());
-#else
-    Object::setMasterObject(_master_object);
-    if (!getDatabase() && is_literal)
-      setDatabase(_master_object->getDatabase());
-#endif
+
+    char new_code = codeLiteral();
+    if (new_code != old_code) {
+      Status s = updateLiteral();
+      if (s)
+	return s;
+    }
+
+    return Success;
+  }
+
+  Status
+  Collection::releaseMasterObject()
+  {
+    Status s = loadLiteral();
+    if (s)
+      return s;
+
+    bool to_release = (is_pure_literal && getOidC().isValid());
+    char old_code = codeLiteral();
+
+    setLiteral(False);
+    setPureLiteral(False);
+
+    char new_code = codeLiteral();
+
+    if (new_code != old_code) {
+      s = updateLiteral();
+      if (s)
+	return s;
+    }
+
+    // EV 26/01/07
+    // copy literal oid to oid and set literal oid to null
+    // in main cases both oids should be invalid
+
+    ObjectPeer::setOid(this, getLiteralOid());
+    setLiteralOid(Oid::nullOid);
+
+    s = Object::releaseMasterObject();
+    if (s)
+      return s;
+
+    if (to_release) {
+      return remove();
+    }
+
+    return Success;
   }
 
   //
@@ -1519,8 +1690,9 @@ namespace eyedb {
     oid_code(&data, &offset, &alloc_size, inv_oid.getOid());
     int16_code(&data, &offset, &alloc_size, &inv_item);
 
-    char c = is_literal;
+    char c = codeLiteral();
     /* is_literal */
+    LITERAL_OFFSET = offset;
     char_code (&data, &offset, &alloc_size, &c);
     eyedblib::int16 sz = idx_data_size;
     int16_code (&data, &offset, &alloc_size, &sz);
@@ -1628,7 +1800,7 @@ namespace eyedb {
 
     int16_code(&data, &offset, &alloc_size, &inv_item);
 
-    c = is_literal;
+    c = codeLiteral();
     /* is_literal */
     char_code (&data, &offset, &alloc_size, &c);
     eyedblib::int16 sz = idx_data_size;
@@ -1641,7 +1813,7 @@ namespace eyedb {
 
     int16_code(&data, &offset, &alloc_size, &inv_item);
 
-    c = is_literal;
+    c = codeLiteral();
     /* is_literal */
     char_code (&data, &offset, &alloc_size, &c);
     eyedblib::int16 sz = idx_data_size;
@@ -1742,6 +1914,8 @@ namespace eyedb {
     if (_status)
       return _status;
 
+    RPCStatus rpc_status;
+
     ObjectHeader hdr;
     memset(&hdr, 0, sizeof(hdr));
 
@@ -1759,7 +1933,6 @@ namespace eyedb {
 
     object_header_code_head(temp, &hdr);
 
-    RPCStatus rpc_status;
     rpc_status = objectWrite(db->getDbHandle(), temp, getOidC().getOid());
     free(temp);
     if (!rpc_status) {
@@ -1789,8 +1962,10 @@ namespace eyedb {
 #endif
 
 #ifdef COLL_OPTIM_CREATE
-    if (is_literal && !CACHE_LIST_COUNT(cache) && !implModified)
-      return Success;
+    if (is_literal && !CACHE_LIST_COUNT(cache) && !implModified) {
+      //if (!getCount() || literal_oid.isValid())
+	return Success;
+    }
 #endif
 
     if (is_literal && !literal_oid.isValid() && getUserData() != IDB_MAGIC_COLL)
@@ -1823,18 +1998,24 @@ namespace eyedb {
 
   Status Collection::remove(const RecMode *rcm)
   {
-    Status _status;
+    Status s;
 
-    _status = Object::remove();
+    s = loadLiteral();
+    if (s)
+      return s;
 
-    if (_status == Success)
-      {
-	delete cache;
-	cache = 0;
-	p_items_cnt = v_items_cnt = 0;
-      }
+    if (is_literal)
+      return Exception::make("collection %s is a literal object: could not be removed", getOid().toString());
 
-    return _status;
+    s = Object::remove();
+
+    if (!s) {
+      delete cache;
+      cache = 0;
+      p_items_cnt = v_items_cnt = 0;
+    }
+
+    return s;
   }
 
   Status Collection::trace(FILE* fd, unsigned int flags, const RecMode *rcm) const
@@ -1963,6 +2144,13 @@ namespace eyedb {
 		    coll_class->getOid().getString());
 
 	    fprintf(fd, "%sreference = %s;\n", indent_str, (isref ? "true" : "false"));
+	    if (isPureLiteral())
+	      fprintf(fd, "%stype = pure_literal;\n", indent_str);
+	    else if (isLiteral())
+	      fprintf(fd, "%stype = object_literal;\n", indent_str);
+	    else
+	      fprintf(fd, "%stype = object;\n", indent_str);
+
 	    if (isLiteral())
 	      fprintf(fd, "%sliteral_oid = %s;\n", indent_str, getOidC().toString());
 
@@ -2818,6 +3006,7 @@ do { \
     Oid inv_oid;
     eyedblib::int16 inv_item = 0;
     Bool is_literal = False;
+    Bool is_pure_literal = False;
     Data idx_data = 0;
     Size idx_data_size = 0;
     IndexImpl *idximpl = 0;
@@ -2856,8 +3045,11 @@ do { \
 
       char c;
       /* is_literal */
+      LITERAL_OFFSET = offset;
       char_decode (temp, &offset, &c);
-      is_literal = IDBBOOL(c);
+      Collection::decodeLiteral(c, is_literal, is_pure_literal);
+
+      //is_literal = IDBBOOL(c);
       /* idx_data */
       eyedblib::int16 sz;
       int16_decode (temp, &offset, &sz);
@@ -2874,22 +3066,22 @@ do { \
     if (eyedb_is_type(*hdr, _CollSet_Type))
       *o = (Object *)CollectionPeer::collSet
 	(name, (Class *)_class, idx1_oid, idx2_oid, items_cnt,
-	 bottom, top, idximpl, card, is_literal, idx_data, idx_data_size);
+	 bottom, top, idximpl, card, is_literal, is_pure_literal, idx_data, idx_data_size);
 
     else if (eyedb_is_type(*hdr, _CollBag_Type))
       *o = (Object *)CollectionPeer::collBag
 	(name, (Class *)_class, idx1_oid, idx2_oid, items_cnt,
-	 bottom, top, idximpl, card, is_literal, idx_data, idx_data_size);
+	 bottom, top, idximpl, card, is_literal, is_pure_literal, idx_data, idx_data_size);
 
     else if (eyedb_is_type(*hdr, _CollList_Type))
       *o = (Object *)CollectionPeer::collList
 	(name, (Class *)_class, idx1_oid, idx2_oid, items_cnt,
-	 bottom, top, idximpl, card, is_literal, idx_data, idx_data_size);
+	 bottom, top, idximpl, card, is_literal, is_pure_literal, idx_data, idx_data_size);
 
     else if (eyedb_is_type(*hdr, _CollArray_Type))
       *o = (Object *)CollectionPeer::collArray
 	(name, (Class *)_class, idx1_oid, idx2_oid, items_cnt,
-	 bottom, top, idximpl, card, is_literal, idx_data, idx_data_size);
+	 bottom, top, idximpl, card, is_literal, is_pure_literal, idx_data, idx_data_size);
 
     else {
       if (idximpl)
@@ -2897,6 +3089,7 @@ do { \
       return Exception::make(IDB_INTERNAL_ERROR, "invalid collection type: "
 			     "%p", hdr->type);
     }
+
 
     if (idximpl)
       idximpl->release();
@@ -2949,7 +3142,9 @@ do { \
   void
   Collection::literalMake(Collection *o)
   {
-    is_literal = True;
+    is_literal = o->isLiteral();
+    is_pure_literal = o->isPureLiteral();
+
     assert(literal_oid == o->getOid());
     oid.invalidate();
     literal_oid = o->getOid();
@@ -3148,17 +3343,36 @@ do { \
 			    const RecMode *rcm)
   {
 #ifdef COLLTRACE
-    printf("Collection::removePerform(%p, %s)\n", this,
-	   literal_oid.toString());
+    printf("Collection::removePerform(%p, %s) should remove only if pure_literal %d %d\n", this,
+	   literal_oid.toString(), is_literal, is_pure_literal);
 #endif
 
+    Status s = loadLiteral();
+    if (s)
+      return s;
     assert(is_literal);
+
 #ifdef COLL_OPTIM_CREATE
     if (!literal_oid.isValid())
       return Success;
 #endif
-    Status s = db->removeObject(literal_oid, rcm);
-    if (s) return s;
+    Bool was_pure_literal = is_pure_literal;
+
+    is_literal = False;
+    is_pure_literal = False;
+
+    s = updateLiteral();
+    if (s)
+      return s;
+
+    if (was_pure_literal) {
+      //printf("removing...\n");
+
+      s = db->removeObject(literal_oid, rcm);
+      if (s)
+	return s;
+    }
+
     literal_oid.invalidate();
     return Success;
   }
@@ -3189,7 +3403,6 @@ do { \
     // when disconnecting nothing happens
     Oid dataoid = idx_ctx.getDataOid();
     if (!dataoid.isValid()) {
-      printf("not valid oid\n");
       dataoid = objoid;
     }
 

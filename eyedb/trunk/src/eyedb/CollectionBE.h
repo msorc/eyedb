@@ -52,6 +52,7 @@ namespace eyedb {
     IndexImpl *idximpl;
     AttrIdxContext *idx_ctx;
     Bool is_literal;
+    Bool is_pure_literal;
     IteratorAtomType type;
 
   public:
@@ -62,7 +63,8 @@ namespace eyedb {
 		 eyedblib::int16,
 		 IndexImpl *idximpl,
 		 Data idx_data, Size idx_data_size,
-		 Bool _is_literal);
+		 Bool _is_literal,
+		 Bool _is_pure_literal);
     CollectionBE(Database *, DbHandle *, const Oid *, Bool);
 
     void decode(const void* k, IteratorAtom &atom);

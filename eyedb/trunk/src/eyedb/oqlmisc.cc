@@ -139,8 +139,10 @@ oqmlStatus *oqmlClassOf::eval(Database *db, oqmlContext *ctx, oqmlAtomList **ali
 		return new oqmlStatus(this, status);
 	    }
 	}
-      else if (OQML_IS_OBJ(a))
+      else if (OQML_IS_OBJ(a)) {
+	OQL_CHECK_OBJ(a);
 	cls = (OQML_ATOM_OBJVAL(a) ? OQML_ATOM_OBJVAL(a)->getClass() : 0);
+      }
       else if (a->as_null())
 	cls = 0;
       else

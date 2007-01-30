@@ -401,7 +401,6 @@ namespace eyedb {
 
   oqmlStatus *oqmlObject::eval(Database *db, oqmlContext *ctx, oqmlAtomList **alist, oqmlComp *, oqmlAtom *)
   {
-    //*alist = new oqmlAtomList(new oqmlAtom_obj(o, idx, (o ? o->getClass() : 0)));
     *alist = new oqmlAtomList(oqmlObjectManager::registerObject(o));
     return oqmlSuccess;
   }

@@ -193,7 +193,7 @@ namespace eyedb {
     CollList(const char *, Class *,
 	     const Oid&, const Oid&, int,
 	     int, int, const IndexImpl *, Object *,
-	     Bool, Data, Size);
+	     Bool, Bool, Data, Size);
     friend class CollectionPeer;
 
     // ----------------------------------------------------------------------

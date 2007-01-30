@@ -3971,10 +3971,12 @@ namespace eyedb {
     eyedblib::int16 idx_data_size = 0;
 
     Bool is_literal = False;
+    Bool is_pure_literal = False;
     if (db->getVersionNumber() >= 20414) {
       char x;
       char_decode(idr, &offset, &x);
-      is_literal = IDBBOOL(x);
+      Collection::decodeLiteral(x, is_literal, is_pure_literal);
+      //is_literal = IDBBOOL(x);
       int16_decode(idr, &offset, &idx_data_size);
       idx_data = idr+offset;
     }
@@ -4093,7 +4095,7 @@ namespace eyedb {
       new CollectionBE(db, dbh, &_oid, cls,
 		       Oid(idx1_oid), Oid(idx2_oid), idx1, idx2,
 		       items_cnt, True, inv_oid, inv_item, idximpl,
-		       idx_data, idx_data_size, is_literal);
+		       idx_data, idx_data_size, is_literal, is_pure_literal);
 
     db->getBEQueue()->addCollection(collbe, dbh);
 
@@ -4383,14 +4385,6 @@ namespace eyedb {
       eyedblib::int32 ind;
       char state;
 
-#if 0
-      eyedbsm::Oid toid;
-      memcpy(&toid, idr + offset, sizeof(toid));
-      printf("COLLECTION_WRITE: %s -> %s %s\n", Oid(toid).toString(),
-	     Oid(idx1->oid()).toString(),
-	     (idx2 ? Oid(idx2->oid()).toString() : Oid::nullOid.toString()));
-#endif
-
       buffer_decode(idr, &offset, temp, item_size);
 
       int32_decode(idr, &offset, &ind);
@@ -4428,7 +4422,9 @@ namespace eyedb {
 	  }
 	
 	  if (idx) {
-	    se_status = idx->remove(temp, inv_oid.getOid(), &found);
+	    //se_status = idx->remove(temp, inv_oid.getOid(), &found);
+	    //se_status = idx->remove(temp, inv_temp, &found);
+	    se_status = idx->remove(i_oid.getOid(), inv_oid.getOid(), &found);
 	    if ((eyedblib::log_mask & IDB_LOG_IDX_SUPPRESS) == IDB_LOG_IDX_SUPPRESS) {
 	      IDB_LOG(IDB_LOG_IDX_SUPPRESS,
 		      ("Removing Collection index entry '%s'"
@@ -4485,7 +4481,7 @@ namespace eyedb {
 	  }
 
 	  if (idx) {
-	    se_status = idx->insert(temp, inv_oid.getOid());
+	    se_status = idx->insert(i_oid.getOid(), inv_oid.getOid());
 	    if ((eyedblib::log_mask & IDB_LOG_IDX_CREATE) ==
 		IDB_LOG_IDX_CREATE) {
 	      IDB_LOG(IDB_LOG_IDX_CREATE,
@@ -4522,7 +4518,7 @@ namespace eyedb {
 	  }
 
 	  if (idx) {
-	    se_status = idx->remove(temp, inv_oid.getOid(), &found);
+	    se_status = idx->remove(i_oid.getOid(), inv_oid.getOid(), &found);
 	    if ((eyedblib::log_mask & IDB_LOG_IDX_SUPPRESS) ==
 		IDB_LOG_IDX_SUPPRESS) {
 	      IDB_LOG(IDB_LOG_IDX_SUPPRESS,
@@ -4545,7 +4541,7 @@ namespace eyedb {
 	  }
 
 	  if (idx) {
-	    se_status = idx->insert(temp, inv_oid.getOid());
+	    se_status = idx->insert(i_oid.getOid(), inv_oid.getOid());
 	    if ((eyedblib::log_mask & IDB_LOG_IDX_CREATE) == IDB_LOG_IDX_CREATE) {
 	      IDB_LOG(IDB_LOG_IDX_CREATE,
 		      ("Inserting Collection index entry '%s'"
@@ -4566,10 +4562,6 @@ namespace eyedb {
     if (inv_item && inv_item->hasInverse() &&
 	hdr->xinfo != IDB_XINFO_INVALID_INV)
       {
-	/*
-	  printf("inv_item %s for %s\n", inv_item->getName(),
-	  Oid(oid).toString());
-	*/
 	offset = IDB_OBJ_HEAD_SIZE + sizeof(eyedblib::int32) + sizeof(eyedblib::int32);
 	for (i = 0; i < oid_cnt; i++) {
 	  eyedblib::int32 ind;

@@ -450,8 +450,9 @@ namespace eyedb {
 
   class oqmlAtom_obj : public oqmlAtom {
 
-  public:
     Object *o;
+
+  public:
     pointer_int_t idx;
 
     oqmlAtom_obj(Object *, pointer_int_t, const Class * = 0);
@@ -467,8 +468,19 @@ namespace eyedb {
     oqmlBool compare(unsigned char *, int, Bool, oqmlTYPE) const;
     virtual Value *toValue() const;
     ~oqmlAtom_obj();
+
+    Object *getObject();
+    oqmlStatus *checkObject();
+
     virtual oqmlAtom_obj    *as_obj()    {return this;}
   };
+
+#define OQL_CHECK_OBJ(A) \
+{ \
+    oqmlStatus *_s = (A)->as_obj()->checkObject(); \
+    if (_s) \
+      return _s; \
+}
 
   class oqmlAtom_bool : public oqmlAtom {
 
@@ -821,7 +833,7 @@ namespace eyedb {
 #define OQML_ATOM_BAGVAL(X)   ((X)->as_bag()->list)
 #define OQML_ATOM_ARRVAL(X)   ((X)->as_array()->list)
 #define OQML_ATOM_IDENTVAL(X) ((X)->as_ident()->shstr->s)
-#define OQML_ATOM_OBJVAL(X)   ((X)->as_obj()->o)
+#define OQML_ATOM_OBJVAL(X)   ((X)->as_obj()->getObject())
 
 #define OQML_IS(X, AS) ((X)->AS())
 
@@ -1167,7 +1179,7 @@ namespace eyedb {
 				pointer_int_t &idx);
 
     static oqmlAtom *registerObject(Object *);
-    static oqmlStatus *unregisterObject(oqmlNode *node, Object *o);
+    static oqmlStatus *unregisterObject(oqmlNode *node, Object *o, bool force = false);
     static oqmlBool isRegistered(const Object *, pointer_int_t &);
 
     static void garbageObjects();

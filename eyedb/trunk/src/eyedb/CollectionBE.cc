@@ -45,7 +45,8 @@ namespace eyedb {
 			     eyedblib::int16 _inv_num_item,
 			     IndexImpl *_idximpl,
 			     Data idx_data, Size idx_data_size,
-			     Bool _is_literal) :
+			     Bool _is_literal,
+			     Bool _is_pure_literal) :
     cls(_class),
     db(_db), dbh(_dbh), oid(*_oid),
     idx1_oid(_idx1_oid),
@@ -56,6 +57,7 @@ namespace eyedb {
     inv_item(NULL),
     idximpl(_idximpl),
     is_literal(_is_literal),
+    is_pure_literal(_is_pure_literal),
     inv_item_done(False)
   {
     status = Success;
@@ -78,7 +80,7 @@ namespace eyedb {
 
     type = (IteratorAtomType)0;
 
-    if (is_literal) {
+    if (is_pure_literal) {
       assert(inv_oid.isValid());
       assert(idx_data_size);
     }
@@ -130,16 +132,18 @@ namespace eyedb {
     int16_decode(temp, &offset, &inv_num_item);
   
     is_literal = False;
+    is_pure_literal = False;
     if (db->getVersionNumber() >= 20414) {
       offset = IDB_COLL_OFF_COLL_NAME;
       char x;
       char_decode(temp, &offset, &x);
-      is_literal = IDBBOOL(x);
+      Collection::decodeLiteral(x, is_literal, is_pure_literal);
+      //is_literal = IDBBOOL(x);
       eyedblib::int16 idx_data_size;
       int16_decode(temp, &offset, &idx_data_size);
       assert(offset == sizeof(temp));
 
-      if (is_literal) {
+      if (is_pure_literal) {
 	assert(inv_oid.isValid());
 	assert(idx_data_size);
       }
@@ -348,7 +352,7 @@ namespace eyedb {
 
     if (!inv_oid.isValid()) {
       _inv_item = 0;
-      assert(!is_literal);
+      assert(!is_pure_literal);
       return Success;
     }
   

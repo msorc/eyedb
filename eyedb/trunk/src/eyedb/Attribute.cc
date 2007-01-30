@@ -1341,20 +1341,53 @@ Attribute::convert(Database *db, ClassConversion *,
 			    class_owner->getName(), name);
 }
 
+static Oid getOid(Object *o)
+{
+  if (!o)
+    return Oid::nullOid;
+
+  if (o->getOid().isValid())
+    return o->getOid();
+
+  Collection *coll = dynamic_cast<Collection *>(o);
+  if (!coll)
+    return Oid::nullOid;
+
+  return coll->getLiteralOid();
+}
+
+static bool isAutoAffect(Object *old_o, Object *o)
+{
+  if (old_o && o && old_o == o)
+    return true;
+
+  Oid o_oid = eyedb::getOid(o);
+  Oid old_o_oid = eyedb::getOid(old_o);
+  return o_oid.isValid() && o_oid == old_o_oid;
+}
+
+static bool is_persistent(Object *o)
+{
+  return (bool)getOid(o).isValid();
+}
+
 Status
 Attribute::setValue(Object *agr,
 		       Data pvdata, // pdata or vdata
 		       Data data, Size incsize,
 		       Size,
 		       int nb, int from, Data inidata,
-		       Bool is_ind, Data vdata,
+		       Bool is_indirect, Data vdata,
 		       Bool check_class) const
 {
   Status status;
 
   CHECK_OBJ(agr);
 
-  if (!is_ind) {
+  // EV 26/01/07: just for test
+  assert(isIndirect() == is_indirect);
+
+  if (!is_indirect) {
     // pvdata is pdata
     if (!pvdata) {
       setInit(inidata, nb, from, 0);
@@ -1404,9 +1437,10 @@ Attribute::setValue(Object *agr,
   }
 
   for (int n = 0; n < nb; n++, data += sizeof(Object *)) {
-    Object *o, *old_o;
+    Object *o = 0;
+    Object *old_o = 0;
 
-    if (is_ind) {
+    if (is_indirect) {
       // pvdata is vdata
       mcp(&old_o, pvdata + ((from+n) * SIZEOFOBJECT), sizeof(Object *));
 
@@ -1466,7 +1500,49 @@ Attribute::setValue(Object *agr,
     }
     else {
       // pvdata is pdata
+
       memcpy(&o, data, sizeof(Object *)); // no XDR
+
+      bool should_release_masterobj = false;
+
+      bool auto_affect = false;
+
+      if (vdata) {
+	// no XDR
+	memcpy(&old_o, vdata + (from+n) * SIZEOFOBJECT, sizeof(Object *));
+
+	auto_affect = isAutoAffect(old_o, o);
+	if (!auto_affect) {
+	    
+#define SUPPORT_SET_LITERAL
+#ifdef SUPPORT_SET_LITERAL
+	  bool has_index = false;
+	  std::string idx_str;
+
+	  status = hasIndex(getDB(agr), has_index, idx_str);
+	  if (status)
+	    return status;
+	    
+	  if (has_index) {
+	    //if (is_persistent(old_o) && is_persistent(o) && has_index) {
+	    return Exception::make
+	      (IDB_ATTRIBUTE_ERROR,
+	       "setting attribute value '%s': "
+	       "cannot replace an indexed literal attribute '%s', must remove indexes first: %s",
+	       name, old_o->getClass()->getName(), idx_str.c_str());
+	  }
+	    
+	  should_release_masterobj = true;
+#else
+	  if (old_o != o && is_persistent(old_o))
+	    return Exception::make
+	      (IDB_ATTRIBUTE_ERROR,
+	       "setting attribute value '%s': "
+	       "cannot replace already stored literal attribute '%s'",
+	       name, old_o->getClass()->getName());
+#endif
+	}
+      }
 
       if (o) {
 	if (check_class) {
@@ -1485,17 +1561,6 @@ Attribute::setValue(Object *agr,
 	     "invalid null IDR", name, o->getClass()->getName());
 	}
 
-	if (memcmp(pvdata + ((from+n) * incsize),
-		   o->getIDR() + IDB_OBJ_HEAD_SIZE, incsize)) {
-#ifdef E_XDR_TRACE
-	  printf("%s: Attribute::setValue -> needs XDR ? no\n", name);
-#endif
-	  memcpy(pvdata + ((from+n) * incsize),
-		 o->getIDR() + IDB_OBJ_HEAD_SIZE, incsize);
-
-	  agr->touch();
-	}
-
 	// 28/01/00: put the following code outside the 'if' statement
 	// WARNING: the true test must be:
 	/*
@@ -1509,8 +1574,23 @@ Attribute::setValue(Object *agr,
 	     "cannot be shared between several objects.", name,
 	     o->getClass()->getName());
 		      
+	if (!auto_affect) {
+	  status = o->setMasterObject(agr);
+	  if (status)
+	    return status;
+	}
 
-	o->setMasterObject(agr);
+	if (memcmp(pvdata + ((from+n) * incsize),
+		   o->getIDR() + IDB_OBJ_HEAD_SIZE, incsize)) {
+#ifdef E_XDR_TRACE
+	  printf("%s: Attribute::setValue -> needs XDR ? no\n", name);
+#endif
+	  memcpy(pvdata + ((from+n) * incsize),
+		 o->getIDR() + IDB_OBJ_HEAD_SIZE, incsize);
+
+	  agr->touch();
+	}
+
 	/* WARNING: should be also:
 	   o->setMasterObjectAttribute(agr, this);
 	*/
@@ -1518,30 +1598,25 @@ Attribute::setValue(Object *agr,
       else
 	memset(pvdata + ((from+n) * incsize), 0, incsize);
 
-      if (vdata) {
-	// no XDR
-	memcpy(&old_o, vdata + (from+n) * SIZEOFOBJECT, sizeof(Object *));
-
-	if (old_o == o)
-	  continue;
-
-	if (old_o) {
-	  //old_o->setMasterObject(0); // NO! this object is dead!
-	  //setCollHints(old_o, Oid::nullOid, NULL);
-#ifdef NEW_RELEASE
-	  old_o->release_r();
-#else
-	  old_o->release();
-#endif
+      if (old_o) {
+	if (should_release_masterobj) {
+	  status = old_o->releaseMasterObject();
+	  if (status)
+	    return status;
 	}
-
-	if (o)
-	  o->gbxObject::incrRefCount();
-
-	agr->touch();
-	// no XDR
-	memcpy(vdata + ((from+n) * SIZEOFOBJECT), &o, sizeof(Object *));
+	if (o != old_o)
+	  old_o->release_r();
       }
+
+      if (old_o == o)
+	continue;
+
+      if (o)
+	o->gbxObject::incrRefCount();
+
+      agr->touch();
+      // no XDR
+      memcpy(vdata + ((from+n) * SIZEOFOBJECT), &o, sizeof(Object *));
     }
   }
 
@@ -1602,24 +1677,22 @@ Status Attribute::getValue(Database *db,
   return Success;
 }
 
-void Attribute::incrRefCount(Object *agr, Data _idr, int n) const
+Status Attribute::incrRefCount(Object *agr, Data _idr, int n) const
 {
-  for (int i = 0; i < n; i++, _idr += SIZEOFOBJECT)
-    {
-      Object *o;
-      mcp(&o, _idr, sizeof(Object *));
-      if (o)
-	{
-	  o->incrRefCount();
-	  if (!isIndirect())
-	    {
-	      /*printf("replacing master object from %p to %p\n",
-		     o->getMasterObject(), agr);
-		     */
-	      o->setMasterObject(agr);
-	    }
-	}
+  for (int i = 0; i < n; i++, _idr += SIZEOFOBJECT) {
+    Object *o;
+    mcp(&o, _idr, sizeof(Object *));
+    if (o) {
+      o->incrRefCount();
+      if (!isIndirect()) {
+	Status s = o->setMasterObject(agr);
+	if (s)
+	  return s;
+      }
     }
+  }
+
+  return Success;
 }
 
 void Attribute::manageCycle(Object *mo, Data _idr, int n,
@@ -2304,6 +2377,7 @@ Attribute::createDeferredIndex_realize(Database *db,
 
       Status s = get_index_type(this, False, ktypes, True, isCollLit);
       if (s) return s;
+
 #ifdef NEW_NOTNULL_TRACE
       ktypes_dump(this, ktypes, count);
 #endif
@@ -2740,9 +2814,9 @@ Attribute::constraintPrologue(Database *db,
 
 #ifdef TRACE_IDX
     if (notnull_component)
-      printf("found a notnull for %s\n", attrpath);
+      printf("found a notnull for %s\n", attrpath.c_str());
     if (unique_component)
-      printf("found a unique for %s\n", attrpath);
+      printf("found a unique for %s\n", attrpath.c_str());
 #endif
   }
 
@@ -3799,8 +3873,7 @@ Status Attribute::copy(Object *agr, Bool share) const
   if (!isIndirect() && is_basic_enum)
     return Success;
 
-  Attribute::incrRefCount(agr, _idr + idr_voff, typmod.pdims);
-  return Success;
+  return Attribute::incrRefCount(agr, _idr + idr_voff, typmod.pdims);
 }
 
 #ifdef GBX_NEW_CYCLE
@@ -3922,7 +3995,9 @@ AttrDirect::newObjRealize(Object *o) const
       memcpy(vdata + (j * idr_item_vsize), &oo, sizeof(Object *));
     }
     // added the 5/11/99
-    oo->setMasterObject(o);
+    Status s = oo->setMasterObject(o);
+    if (s)
+      throw *s;
   }
 }
 
@@ -5704,16 +5779,17 @@ AttrVarDim::setSize_realize(Object *agr, Data _idr, Size nsize,
       // no XDR
       memcpy(&oo, nvdata + (j * idr_item_vsize), sizeof(Object *));
 
-      if (!oo)
-	{
-	  oo = (Object *)cls->newObj(npdata + (j * idr_item_psize));
-	  oo->setMustRelease(false); // SMART_PTR
-	  // no XDR
-	  memcpy(nvdata + (j * idr_item_vsize), &oo, sizeof(Object *));
-	}
+      if (!oo) {
+	oo = (Object *)cls->newObj(npdata + (j * idr_item_psize));
+	oo->setMustRelease(false); // SMART_PTR
+	// no XDR
+	memcpy(nvdata + (j * idr_item_vsize), &oo, sizeof(Object *));
+      }
 
       // added the 5/11/99
-      oo->setMasterObject(agr);
+      Status s = oo->setMasterObject(agr);
+      if (s)
+	return s;
     }
 
   return Success;
@@ -6154,15 +6230,20 @@ Status AttrVarDim::copy(Object *agr, Bool share) const
 	      nvdata = (unsigned char *)malloc(wvsize);
 	      // needs XDR ? no
 	      memcpy(nvdata, vdata, wvsize);
-	      Attribute::incrRefCount(agr, nvdata, size);
+	      Status s = Attribute::incrRefCount(agr, nvdata, size);
+	      if (s)
+		return s;
 	    }
 	  else
 	    nvdata = 0;
 
 	  setData(agr->getDatabase(), _idr, npdata, nvdata);
 	}
-      else if (vdata)
-	Attribute::incrRefCount(agr, vdata, size);
+      else if (vdata) {
+	Status s = Attribute::incrRefCount(agr, vdata, size);
+	if (s)
+	  return s;
+      }
     }
 
   return Success;
@@ -7239,13 +7320,18 @@ Status AttrIndirectVarDim::copy(Object *agr, Bool share) const
 	  // needs XDR ? no
 	  memcpy(nvdata, vdata, wvsize);
 	  
-	  Attribute::incrRefCount(agr, nvdata, size);
+	  Status s = Attribute::incrRefCount(agr, nvdata, size);
+	  if (s)
+	    return s;
 	  
 	  setData(agr->getDatabase(), _idr, nvdata);
 	  setDataOids(_idr, npdata);
 	}
-      else if (vdata)
-	Attribute::incrRefCount(agr, vdata, size);
+      else if (vdata) {
+	Status s = Attribute::incrRefCount(agr, vdata, size);
+	  if (s)
+	    return s;
+      }
     }
 
   return Success;
@@ -7826,11 +7912,11 @@ AttrIdxContext::realizeIdxOP(Bool ok)
     IdxOperation *xop = &idx_ops[i];
     if (ok) {
       eyedbsm::Status s;
-      /*
+#ifdef TRACE_IDX
       printf("xop->op %s %s::%s\n", xop->op == IdxInsert ? "insert" : "remove", 
 	     xop->attr->getClassOwner() ? xop->attr->getClassOwner()->getName() : "<NULL>",
 	     xop->idx_t->getAttrpath().c_str());
-      */
+#endif
       if (xop->op == IdxInsert) {
 	s = xop->idx->insert(xop->data, xop->data_oid);
 	if (eyedbsm::hidx_gccnt > 20) {
@@ -8029,6 +8115,20 @@ Attribute::createComponentSet(Database *db)
   
   xclass_owner->touch();
   return xclass_owner->store();
+}
+
+Status
+Attribute::hasIndex(Database *db, bool &has_index, std::string &idx_str) const
+{
+  Status s = loadComponentSet(db, False);
+  if (s)
+    return s;
+
+  if (attr_comp_set)
+    return attr_comp_set->hasIndex(has_index, idx_str);
+
+  has_index = false;
+  return Success;
 }
 
 Status
@@ -8340,6 +8440,32 @@ AttributeComponentSet::find(const char *attrpath, Index *&index_comp)
   index_comp = (Index *)index_cache->find(attrpath);
   return Success;
 }
+
+Status
+AttributeComponentSet::hasIndex(bool &has_index, std::string &idx_str)
+{
+  Status s;
+  if (!index_cache) {
+    s = makeCache();
+    if (s)
+      return s;
+  }
+
+  printf("has_index: %d\n", index_cache->comp_count);
+
+  if (index_cache) {
+    has_index = index_cache->comp_count > 0;
+    for (int n = 0; n < index_cache->comp_count; n++) {
+      if (n > 0)
+	idx_str += ", ";
+      idx_str += index_cache->comps[n].attrpath;
+    }
+  }
+  else
+    has_index = false;
+  return Success;
+}
+
 
 Status
 AttributeComponentSet::find(const char *attrpath, NotNullConstraint *&notnull_comp)

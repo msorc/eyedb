@@ -142,7 +142,7 @@ namespace eyedb {
     return True;
   }
 
-  Bool ObjCache::deleteObject(const Oid &oid)
+  Bool ObjCache::deleteObject(const Oid &oid, bool force)
   {
     ObjCacheLink *prev = 0;
     ObjCacheLink *link = links[getIndex(oid)];
@@ -151,9 +151,11 @@ namespace eyedb {
     while (link) {
       if (oid.compare(link->oid)) {
 	assert(link->refcnt > 0);
-	if (--link->refcnt > 0) {
-	  //printf("not really\n");
-	  return True;
+	if (!force) {
+	  if (--link->refcnt > 0) {
+	    //printf("not really\n");
+	    return True;
+	  }
 	}
 
 	if (prev)
