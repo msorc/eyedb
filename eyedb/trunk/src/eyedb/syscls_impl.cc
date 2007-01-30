@@ -301,7 +301,7 @@ namespace eyedb {
   //
 
   const char *
-  getTriggerName(int ttype)
+  getTriggerName(TriggerType ttype)
   {
     if (ttype == TriggerCREATE_BEFORE)
       return "create_before";
@@ -325,7 +325,7 @@ namespace eyedb {
 
   int Trigger::getInd() const
   {
-    int _type = getType();
+    TriggerType _type = getType();
 
     if (_type == TriggerCREATE_BEFORE) 
       return Class::TrigCreateBefore_C;

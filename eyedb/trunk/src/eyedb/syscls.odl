@@ -73,6 +73,7 @@ class attribute_component_set [AttributeComponentSet] {
     Status find(const char *, CollAttrImpl *&);
     Status find(const char *, CardinalityConstraint_Test *&);
     Status getAttrComponents(const Class *, LinkedList &);
+    Status hasIndex(bool &has_index, std::string &idx_str);
 
   private:
     struct Cache {

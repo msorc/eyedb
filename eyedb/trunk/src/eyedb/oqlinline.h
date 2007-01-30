@@ -379,6 +379,11 @@ inline oqmlAtom *oqmlAtom_obj::copy()
   return oqmlObjectManager::registerObject(o);
 }
 
+inline Object *oqmlAtom_obj::getObject()
+{
+  return o;
+}
+
 inline oqmlAtom *oqmlAtom_bool::copy()
 {
   return new oqmlAtom_bool(b);
@@ -697,10 +702,12 @@ inline oqmlAtom_obj::~oqmlAtom_obj()
 {
   //printf("oqmlAtom_obj::~oqmlAtom_obj(%p, %p, %u)\n", this, o, idx);
   oqmlStatus *s = oqmlObjectManager::unregisterObject(0, o);
+#if 0
   if (s) {
     fprintf(stderr, "~oqmlAtom_obj error: %s\n", s->msg);
     abort();
   }
+#endif
   o = 0;
 }
 

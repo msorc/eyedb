@@ -59,7 +59,7 @@ namespace eyedb {
        @param oid
        @return
     */
-    Bool deleteObject(const Oid &oid);
+    Bool deleteObject(const Oid &oid, bool force = false);
 
     /**
        Not yet documented

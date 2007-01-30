@@ -840,6 +840,7 @@ do { \
 	}
       }
       else if (OQML_IS_OBJECT(x)) {
+	OQL_CHECK_OBJ(x);
 	Object *o = 0;
 	s = oqmlObjectManager::getObject(this, db, x, o, oqml_True,
 					 oqml_True);
@@ -881,7 +882,6 @@ do { \
 	  }
 	  else {
 	    xlist->append(oqmlObjectManager::registerObject(o));
-	    //xlist->append(new oqmlAtom_obj(o, 0));
 	  }
 	}
       

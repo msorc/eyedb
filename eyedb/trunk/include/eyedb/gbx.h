@@ -105,6 +105,14 @@ namespace eyedb {
     static bool isObjMapped();
     static gbxObject::Map *getObjMap() {return obj_map;}
 
+    struct OnRelease {
+      virtual void perform(gbxObject *) = 0;
+      virtual ~OnRelease() {}
+    };
+
+    void setOnRelease(OnRelease *on_release) {gbx_on_release = on_release;}
+    OnRelease *getOnRelease() {return gbx_on_release;}
+
     virtual ~gbxObject();
 
     // ----------------------------------------------------------------------
@@ -136,6 +144,7 @@ namespace eyedb {
     static int obj_cnt;
     static int heap_size;
     static Map *obj_map;
+    OnRelease *gbx_on_release;
 
     int gbx_size;
     void release_realize(gbxBool);

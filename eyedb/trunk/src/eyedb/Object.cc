@@ -163,15 +163,14 @@ namespace eyedb {
     master_object = 0;
     damaged_attr = 0;
 
-    if (_init)
-      {
-	memset(&oid, 0, sizeof(oid));
-	db = 0;
-	idr = new IDR(0);
-	cls = 0;
-	type = 0;
-      }
-
+    if (_init) {
+      memset(&oid, 0, sizeof(oid));
+      db = 0;
+      idr = new IDR(0);
+      cls = 0;
+      type = 0;
+    }
+    
     IDB_LOG(IDB_LOG_OBJ_INIT, ("Object::init(o=%p)\n", this));
   }
 
@@ -195,11 +194,10 @@ namespace eyedb {
   {
     IDB_LOG(IDB_LOG_OBJ_COPY, ("Object::operator=(o=%p <= %p [share=%s])\n",
 			       this, o, share ? "true" : "false"));
-    if (!o)
-      {
-	init(True);
-	return;
-      }
+    if (!o) {
+      init(True);
+      return;
+    }
 
     init(False);
 
@@ -588,6 +586,28 @@ namespace eyedb {
 		Argument &retarg, Bool checkArgs)
   {
     return mth->applyTo(_db, this, argarray, retarg, checkArgs);
+  }
+
+  Status
+  Object::setMasterObject(Object *_master_object)
+  {
+    master_object = _master_object;
+    return Success;
+  }
+
+  Status
+  Object::releaseMasterObject()
+  {
+    master_object = 0;
+    /*
+    printf("Release_master_object %d\n", protect_on_release_master);
+    if (getOid().isValid() && !protect_on_release_master) {
+      printf("removing %s\n", getOid().toString());
+      return remove();
+    }
+    */
+
+    return Success;
   }
 
   Status

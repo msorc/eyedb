@@ -106,6 +106,7 @@ namespace eyedb {
     gbx_must_release = true;
     gbx_locked    = gbxFalse;
     gbx_isonstack = object_isonstack;
+    gbx_on_release = 0;
 
     gbx_size      = object_size;
     gbx_tag       = 0;
@@ -188,6 +189,7 @@ namespace eyedb {
     gbx_locked = o.gbx_locked;
     gbx_tag = o.gbx_tag ? new gbxTag(*o.gbx_tag) : 0;
     gbx_must_release = o.gbx_must_release; // ??
+    gbx_on_release = 0;
 
     gbx_activeDestruction = gbxFalse;
 
@@ -381,6 +383,10 @@ namespace eyedb {
 	gbxObserver::rmvObject(this);
       }
 
+      if (gbx_on_release) {
+	//printf("GBX_ON_RELEASE %p\n", gbx_on_release);
+	gbx_on_release->perform(this);
+      }
 
       userGarbage();
       garbage();

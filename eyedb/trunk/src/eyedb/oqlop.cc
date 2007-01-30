@@ -1372,8 +1372,10 @@ oqmlStatus *oqmlAssign::eval(Database *db, oqmlContext *ctx,
 	  is = o->asCollArray()->suppressAt(idx);
 	else if (a->as_oid())
 	  is = o->asCollArray()->insertAt(idx, OQML_ATOM_OIDVAL(a));
-	else if (a->as_obj())
+	else if (a->as_obj()) {
+	  OQL_CHECK_OBJ(a);
 	  is = o->asCollArray()->insertAt(idx, OQML_ATOM_OBJVAL(a));
+	}
 	else {
 	  oqmlObjectManager::releaseObject(o, oqml_False);
 	  return new oqmlStatus(this, "left value: only support collection array of objects");

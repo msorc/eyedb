@@ -404,8 +404,9 @@ statusDesc[ST].desc = MSG
     if (handler)
       (*handler)(this, handler_user_data);
 
-    if (mode == ExceptionMode)
+    if (mode == ExceptionMode) {
       throw *this;
+    }
   }
 
   Exception::Mode Exception::setMode(Exception::Mode _mode)

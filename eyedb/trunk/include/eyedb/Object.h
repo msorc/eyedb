@@ -182,7 +182,7 @@ namespace eyedb {
        Not yet documented
        @return
     */
-    const Type getType() const {return type;}
+    const Type get_Type() const {return type;}
 
     /**
        Not yet documented
@@ -1049,11 +1049,13 @@ namespace eyedb {
 
     virtual Status remove_r(const RecMode *rcm = RecMode::NoRecurs,
 			    unsigned int flags = 0);
+
     const Object *getMasterObject() const {return master_object;}
     Object *getMasterObject() {return master_object;}
-    virtual void setMasterObject(Object *_master_object) {
-      master_object = _master_object;
-    }
+
+    virtual Status setMasterObject(Object *master_object);
+
+    virtual Status releaseMasterObject();
 
     virtual Status realizePerform(const Oid& cloid,
 				  const Oid& objoid,

@@ -117,11 +117,11 @@
 #include <eyedb/GenHashTable.h>
 
 #include <eyedb/DBM.h>
+#include <eyedb/init.h>
 #include <eyedb/syscls.h>
 #include <eyedb/utils.h>
 #include <eyedb/opts.h>
 #include <eyedb/version.h>
-#include <eyedb/init.h>
 #include <eyedb/Argument.h>
 
 #endif

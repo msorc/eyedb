@@ -3972,7 +3972,7 @@ namespace eyedb {
   {
     Oid oid;
     memcpy(&oid, &idx, sizeof(idx));
-    //printf("IDX2OID %u.%d.%d\n", oid.getNX(), oid.getDbid(), oid.getUnique());
+    //printf("IDX2OID %u.%d.%d %lld\n", oid.getNX(), oid.getDbid(), oid.getUnique(), idx);
     return oid;
   }
 
@@ -3980,7 +3980,7 @@ namespace eyedb {
   {
     Oid oid;
     memcpy(&oid, &o, sizeof(o));
-    //printf("OBJ2OID %u.%d.%d\n", oid.getNX(), oid.getDbid(), oid.getUnique());
+    //printf("OBJ2OID %u.%d.%d %llx\n", oid.getNX(), oid.getDbid(), oid.getUnique(), o);
     return oid;
   }
 
@@ -4014,9 +4014,30 @@ namespace eyedb {
     idx = (pointer_int_t)objCacheObj->getObject(OBJ2OID(o));
 
     if (!idx)
-      return new oqmlStatus(node, "invalid object '%lx:obj'", o);
+      return new oqmlStatus(node, "invalid object '0x%lx:obj'", o);
 
     return oqmlSuccess;
+  }
+
+  oqmlStatus *oqmlAtom_obj::checkObject()
+  {
+    pointer_int_t i;
+
+    if (oqmlObjectManager::isRegistered(o, i)) {
+      //printf("check object %o %lld ok\n", o, i);
+      return oqmlSuccess;
+    }
+
+
+#if 0
+    oqmlStatus *s = new oqmlStatus(0, "object released %lx -> set to null'", o);
+    o = 0;
+    return s;
+#else
+    //printf("setting %lx to null\n", o);
+    o = 0;
+    return oqmlSuccess;
+#endif
   }
 
   oqmlBool
@@ -4029,6 +4050,26 @@ namespace eyedb {
     return OQMLBOOL(idx);
   }
 
+  struct OnRelease : public gbxObject::OnRelease {
+
+    static OnRelease *instance;
+
+    static OnRelease *getInstance() {
+      if (!instance)
+	instance = new OnRelease();
+      return instance;
+    }
+
+    virtual void perform(gbxObject *o) {
+#ifdef GARB_TRACE_DETAIL
+      printf("OQL releasing %p %s\n", o, ((Object *)o)->getOid().toString());
+#endif
+      oqmlStatus *s = oqmlObjectManager::unregisterObject(0, (Object *)o, true);
+    }
+  };
+
+  OnRelease *OnRelease::instance;
+
   oqmlAtom *
   oqmlObjectManager::registerObject(Object *o)
   {
@@ -4037,7 +4078,7 @@ namespace eyedb {
 
     pointer_int_t idx = (pointer_int_t)objCacheObj->getObject(OBJ2OID(o), true);
 #ifdef GARB_TRACE_DETAIL
-    printf("register get %p: %lu\n", o, idx);
+    std::cout << "REGISTER -> " << (void *)o << " " << idx << '\n';
 #endif
     if (idx) {
       // to increase reference count
@@ -4048,33 +4089,38 @@ namespace eyedb {
     static pointer_int_t stidx = 1000;
 
 #ifdef GARB_TRACE_DETAIL
-    printf("register %p: %lu\n", o, stidx);
+    std::cout << "REGISTER: " << (void *)o << " " << stidx << " " << OBJ2OID(o).getNX() << '\n';
 #endif
     objCacheIdx->insertObject(IDX2OID(stidx), o);
     objCacheObj->insertObject(OBJ2OID(o), (void *)stidx);
+
+    o->setOnRelease(OnRelease::getInstance());
+
     return new oqmlAtom_obj(o, stidx++, o->getClass());
   }
 
   oqmlStatus *
-  oqmlObjectManager::unregisterObject(oqmlNode *node, Object *o)
+  oqmlObjectManager::unregisterObject(oqmlNode *node, Object *o, bool force)
   {
     if (!o)
       return oqmlSuccess;
 
-    static const char fmt[] = "object '%p' is not registered";
+    static const char fmt1[] = "object '%p' is not registered #1";
+    static const char fmt2[] = "object '%p' is not registered #2";
+    static const char fmt3[] = "object '%p' is not registered #3";
     pointer_int_t idx = (pointer_int_t)objCacheObj->getObject(OBJ2OID(o));
 
 #ifdef GARB_TRACE_DETAIL
-    printf("unregister %p: %lu\n", o, idx);
+    std::cout << "UNREGISTER: " << (void *)o << " " << idx << " " << OBJ2OID(o).getNX() << '\n';
 #endif
     if (!idx)
-      return new oqmlStatus(node, fmt, o);
+      return new oqmlStatus(node, fmt1, o);
 
-    if (!objCacheObj->deleteObject(OBJ2OID(o)))
-      return new oqmlStatus(node, fmt, o);
+    if (!objCacheObj->deleteObject(OBJ2OID(o), force))
+      return new oqmlStatus(node, fmt2, o);
 
-    if (!objCacheIdx->deleteObject(IDX2OID(idx)))
-      return new oqmlStatus(node, fmt, o);
+    if (!objCacheIdx->deleteObject(IDX2OID(idx), force))
+      return new oqmlStatus(node, fmt3, o);
 
     return oqmlSuccess;
   }
@@ -4091,6 +4137,7 @@ namespace eyedb {
 			 errorIfNull);
 
       if (OQML_IS_OBJ(x)) {
+	OQL_CHECK_OBJ(x);
 	o = OQML_ATOM_OBJVAL(x);
 	if (o)
 	  o->incrRefCount();

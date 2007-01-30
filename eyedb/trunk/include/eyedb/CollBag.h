@@ -103,7 +103,7 @@ namespace eyedb {
     const char *getClassName() const;
     CollBag(const char *, Class *,
 	    const Oid&, const Oid&, int,
-	    int, int, const IndexImpl *, Object *, Bool,
+	    int, int, const IndexImpl *, Object *, Bool, Bool,
 	    Data, Size);
     friend class CollectionPeer;
 

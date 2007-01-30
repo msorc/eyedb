@@ -126,6 +126,7 @@ oqml_getclass(oqmlNode *node, Database *db, oqmlContext *ctx,
 #ifdef OPTIM_TVALUE
       if (OQML_IS_OBJ(a))
 	{
+	  OQL_CHECK_OBJ(a);
 	  if (!OQML_ATOM_OBJVAL(a))
 	    return new oqmlStatus(node, "invalid null object");
 	  *cls = (Class *)OQML_ATOM_OBJVAL(a)->getClass();
@@ -514,133 +515,125 @@ oqmlDotDesc::make(Database *db, oqmlContext *ctx, oqmlDot *dot,
   mod = &attr->getTypeModifier();
 
   oqmlStatus *s = dctx->setAttrName(db, _attrname);
-  if (s) return s;
+  if (s)
+    return s;
 
-  if (oqml_is_getcount(_array))
-    {
-      mode = 0;
-      isref = False;
-      cls_orig = cls = Int32_Class;
-      key_len = sizeof(eyedblib::int32);
-      s_data = (unsigned char *)malloc(sizeof(eyedblib::int32));
-      e_data = (unsigned char *)malloc(sizeof(eyedblib::int32));
-      array = _array;
-      return oqmlSuccess;
-    }
+  if (oqml_is_getcount(_array)) {
+    mode = 0;
+    isref = False;
+    cls_orig = cls = Int32_Class;
+    key_len = sizeof(eyedblib::int32);
+    s_data = (unsigned char *)malloc(sizeof(eyedblib::int32));
+    e_data = (unsigned char *)malloc(sizeof(eyedblib::int32));
+    array = _array;
+    return oqmlSuccess;
+  }
 
   array = _array;
 
   int ndims = mod->ndims;
   int array_ndims = (array ? array->count : 0);
 
-  if ((array_ndims > ndims) || (ndims - array_ndims) > 1)
-    {
-      if (attr->getClass()->asCollectionClass() &&
-	  ((array_ndims <= ndims+1) && (ndims+1 - array_ndims) <= 1))
-	{
-	  if (s = array->checkCollArray(dot, attr->getClass(),
-					attr->getName()))
-	    return s;
+  if ((array_ndims > ndims) || (ndims - array_ndims) > 1) {
+    if (attr->getClass()->asCollectionClass() &&
+	((array_ndims <= ndims+1) && (ndims+1 - array_ndims) <= 1)) {
+      if (s = array->checkCollArray(dot, attr->getClass(),
+				    attr->getName()))
+	return s;
 
-	  is_coll = oqml_True;
-	  stop_oql();
-	}
-      else if (!ndims)
-	return new oqmlStatus(dot, "attribute '%s' is not an array",
-			      attr->getName());
-      else
-	return new oqmlStatus(dot, "array attribute '%s': "
-			      "maximum dimension allowed is %d <got %d>",
-			      attr->getName(), ndims, array_ndims);
+      is_coll = oqml_True;
+      stop_oql();
     }
+    else if (!ndims)
+      return new oqmlStatus(dot, "attribute '%s' is not an array",
+			    attr->getName());
+    else
+      return new oqmlStatus(dot, "array attribute '%s': "
+			    "maximum dimension allowed is %d <got %d>",
+			    attr->getName(), ndims, array_ndims);
+  }
   
   Size sz_comp, inisize;
-  if (is_coll)
-    {
-      eyedblib::int16 dim, item_size;
-      cls = attr->getClass()->asCollectionClass()->getCollClass
-	(&isref, &dim, &item_size);
-      cls_orig = (castcls ? castcls : attr->getClass());
+  if (is_coll) {
+    eyedblib::int16 dim, item_size;
+    cls = attr->getClass()->asCollectionClass()->getCollClass
+      (&isref, &dim, &item_size);
+    cls_orig = (castcls ? castcls : attr->getClass());
+    mode = 0;
+    sz_item = item_size*dim;
+    sz_comp = 0;
+  }
+  else {
+    isref = attr->isIndirect();
+
+    // MIND: test un peu fragile!!
+    if (ndims - array_ndims == 1)
+      mode = Attribute::composedMode;
+    else
       mode = 0;
-      sz_item = item_size*dim;
-      sz_comp = 0;
-    }
-  else
-    {
-      isref = attr->isIndirect();
 
-      // MIND: test un peu fragile!!
-      if (ndims - array_ndims == 1)
-	mode = Attribute::composedMode;
-      else
-	mode = 0;
+    cls_orig = cls = (castcls ? castcls : attr->getClass());
 
-      cls_orig = cls = (castcls ? castcls : attr->getClass());
+    // added the 27/11/00, because in some cases db field was not
+    // set in cls/cls_orig
+    if (cls && !cls->getDatabase() && db)
+      cls_orig = cls = db->getSchema()->getClass(cls->getName());
 
-      // added the 27/11/00, because in some cases db field was not
-      // set in cls/cls_orig
-      if (cls && !cls->getDatabase() && db)
-	cls_orig = cls = db->getSchema()->getClass(cls->getName());
-
-      // added the 6/12/99
-      // suppressed the 20/12/99
-      /*
+    // added the 6/12/99
+    // suppressed the 20/12/99
+    /*
       if (dctx->count > 1)
-	dctx->desc[dctx->count-1].cls_orig = 
-	  dctx->desc[dctx->count-1].cls = attr->getClassOwner();
-	  */
-      // ...
+      dctx->desc[dctx->count-1].cls_orig = 
+      dctx->desc[dctx->count-1].cls = attr->getClassOwner();
+    */
+    // ...
 
-      Size _sz_item;
-      Offset off;
-      attr->getPersistentIDR(off, _sz_item, sz_comp, inisize);
+    Size _sz_item;
+    Offset off;
+    attr->getPersistentIDR(off, _sz_item, sz_comp, inisize);
       
-      sz_comp -= inisize;
-      sz_item = _sz_item;
-    }
+    sz_comp -= inisize;
+    sz_item = _sz_item;
+  }
       
   // skip object collections for indexation
-  if (!(is_coll && attr->isIndirect()))
-    {
-      s = getIdx(db, ctx, dot);
-      if (s) return s;
-    }
+  if (!(is_coll && attr->isIndirect())) {
+    s = getIdx(db, ctx, dot);
+    if (s) return s;
+  }
 
   if (attr->isVarDim() && !idx_cnt &&
       (mode == Attribute::composedMode || !cls->asBasicClass()))
     make_key(32);
-  else
-    {
-      if (attr->isVarDim() && mode == Attribute::composedMode)
-	sz_comp = sz_item = 0x200;
-      if (mode == Attribute::composedMode)
-	key_len = sz_comp;
-      else {
-	key_len = sz_item;
-	// added 6/10/01: in fact, key_len must be at least the size
-	// of a pointer in case of a direct non basic attribute
-	if (!attr->isIndirect() && !attr->isBasicOrEnum() &&
-	    key_len < sizeof(void *))
-	  key_len = sizeof(void *);
-      }
-	  
-      if (idx_cnt)
-	key = new eyedbsm::Idx::Key(sizeof(char) + sizeof(eyedblib::int32) +
-			      key_len);
-	  
-      if (idx_cnt && mode != Attribute::composedMode)
-	{
-	  s_data = (unsigned char *)
-	    malloc(sizeof(char) + sizeof(eyedblib::int32) + key_len);
-	  e_data = (unsigned char *)
-	    malloc(sizeof(char) + sizeof(eyedblib::int32) + key_len);
-	}
-      else
-	{
-	  s_data = (unsigned char *)malloc(sizeof(char) + key_len);
-	  e_data = (unsigned char *)malloc(sizeof(char) + key_len);
-	}
+  else {
+    if (attr->isVarDim() && mode == Attribute::composedMode)
+      sz_comp = sz_item = 0x200;
+    if (mode == Attribute::composedMode)
+      key_len = sz_comp;
+    else {
+      key_len = sz_item;
+      // added 6/10/01: in fact, key_len must be at least the size
+      // of a pointer in case of a direct non basic attribute
+      if (!attr->isIndirect() && !attr->isBasicOrEnum() &&
+	  key_len < sizeof(void *))
+	key_len = sizeof(void *);
     }
+	  
+    if (idx_cnt)
+      key = new eyedbsm::Idx::Key(sizeof(char) + sizeof(eyedblib::int32) +
+				  key_len);
+	  
+    if (idx_cnt && mode != Attribute::composedMode) {
+      s_data = (unsigned char *)
+	malloc(sizeof(char) + sizeof(eyedblib::int32) + key_len);
+      e_data = (unsigned char *)
+	malloc(sizeof(char) + sizeof(eyedblib::int32) + key_len);
+    }
+    else {
+      s_data = (unsigned char *)malloc(sizeof(char) + key_len);
+      e_data = (unsigned char *)malloc(sizeof(char) + key_len);
+    }
+  }
 
   return oqmlSuccess;
 }
@@ -888,8 +881,10 @@ make_contents(oqmlDotDesc *d, oqmlNode *dot, Database *db, oqmlContext *ctx,
   oqmlStatus *s;
 
   Object *coll;
-  if (OQML_IS_OBJ(x))
+  if (OQML_IS_OBJ(x)) {
+    OQL_CHECK_OBJ(x);
     coll = OQML_ATOM_OBJVAL(x);
+  }
   else if (s = oqmlObjectManager::getObject(dot, db, x, coll, oqml_True,
 					    oqml_True))
     return s;
@@ -935,21 +930,19 @@ oqmlDotContext::eval_terminal(Database *db, oqmlContext *ctx, Object *o,
 
   xattr = o->getClass()->getAttribute(d->attrname);
 
-  if (!xattr)
-    {
-      if (n > 0 && oqml_is_subclass(desc[n-1].cls, o->getClass()))
-	return oqmlSuccess;
-      return new oqmlStatus(dot, not_found_fmt,
-			    d->attrname, o->getClass()->getName());
-    }
+  if (!xattr) {
+    if (n > 0 && oqml_is_subclass(desc[n-1].cls, o->getClass()))
+      return oqmlSuccess;
+    return new oqmlStatus(dot, not_found_fmt,
+			  d->attrname, o->getClass()->getName());
+  }
 
-  if (!d->attr)
-    {
-      s = d->make(db, ctx, dot, xattr, d->array, d->attrname, 0);
-      if (s) return s;
-      s = dot->check(db, this);
-      if (s) return s;
-    }
+  if (!d->attr) {
+    s = d->make(db, ctx, dot, xattr, d->array, d->attrname, 0);
+    if (s) return s;
+    s = dot->check(db, this);
+    if (s) return s;
+  }
 
   int nb;
 
@@ -967,256 +960,256 @@ oqmlDotContext::eval_terminal(Database *db, oqmlContext *ctx, Object *o,
   Data data = d->e_data;
 
   oqmlATOMTYPE atom_type = dot_type.type;
-  for (ind = s_ind; ind <= e_ind; ind++)
-    {
-      OQML_CHECK_INTR();
-      memset(data, 0, d->key_len);
-      Bool isnull = False;
+  for (ind = s_ind; ind <= e_ind; ind++) {
+    OQML_CHECK_INTR();
+    memset(data, 0, d->key_len);
+    Bool isnull = False;
 
-      if (value)
-	{
-	  Data val;
-	  unsigned char buff[16];
-	  Size size;
-	  int len;
+    if (value)
+      {
+	Data val;
+	unsigned char buff[16];
+	Size size;
+	int len;
 	  
-	  if (value->as_oid() && !d->isref && !xattr->getClass()->asOidClass())
-	    return new oqmlStatus(dot, "cannot assign an oid to a "
-				  "literal attribute");
+#if 1
+	if (value->as_oid() &&
+	    !(d->isref || xattr->getClass()->asOidClass() ||
+	      xattr->getClass()->asCollectionClass()))
+	  return new oqmlStatus(dot, "cannot assign an oid to a "
+				"literal attribute");
+#endif
 
-	  size = sizeof(buff);
-	  if (value->getData(buff, &val, size, len, d->cls))
-	    {
-	      if (val)
-		{
-		  if (nb > 0 && strlen((char *)val) >= nb)
-		    return new oqmlStatus(dot, "out of bound character array"
-					  "'%s': "
-					  "maximum allowed is %d <got %d>",
-					  val, nb, strlen((char *)val));
-		  else
-		    {
-		      int len = strlen((char *)val);
-		      if (len >= d->key_len)
-			{
-			  d->make_key(len+1);
-			  data = d->e_data;
-			}
-
-		      strcpy((char *)data, (char *)val);
-		    }
-
-		  if (nb < 0)
-		    nb = strlen((char *)data) + 1;
-		}
-	      else
-		data = buff;
-	      
-	      oqmlBool enough;
-	      is = oqml_check_vardim(xattr, o, OQMLBOOL(value), enough, ind,
-				     nb, xattr->getTypeModifier().pdims,
-				     OQMLCOMPLETE(value));
-
-	      if (is)
-		return new oqmlStatus(dot, is);
-
-	      if (!enough)
-		{
-		  if (value)
-		    continue;
-		  else
-		    break;
-		}
-
-	      if (d->isref && !d->is_coll)
-		{
-		  if (!OQML_IS_OID(value))
-		    {
-		      is = xattr->setValue((Agregat *)o, data, nb, ind);
-		      // added the 17/05/01
-		      if (OQML_IS_NULL(value) && !is) {
-			Oid xoid;
-			is = xattr->setOid((Agregat *)o, (Oid *)&xoid,
-					   nb, ind);
-		      }
-		      atom_type = oqmlATOM_OBJ;
-		    }
-		  else
-		    is = xattr->setOid((Agregat *)o, (Oid *)data, nb,
-				       ind);
-		}
-	      else if (oqml_is_getcount(d->array))
-		{
-		  if (!xattr->isVarDim())
-		    return new oqmlStatus(dot, "cannot set dimension "
-					  "on a non variable dimension "
-					  "attribute");
-
-		  if (oqml_is_wholecount(d->array))
-		    return new oqmlStatus(dot,
-					  "cannot set multiple dimension");
-
-
-		  if (!OQML_IS_INT(value))
-		    return oqmlStatus::expected(dot, "integer",
-						value->type.getString());
-		  Size size = OQML_ATOM_INTVAL(value);
-		  Status is = xattr->setSize(o, size);
-		  if (is) return new oqmlStatus(dot, is);
-		  // test added the 28/12/00 for non persistent object
-		  if (o->getOid().isValid())
-		    {
-		      is = o->realize();
-		      if (is) return new oqmlStatus(dot, is);
-		    }
-		  (*alist)->append(new oqmlAtom_int(size));
-		  continue;
-		}
-	      else if (d->is_coll)
-		{
-		  Collection *coll = 0;
-		  if (xattr->isIndirect())
-		    {
-		      Oid coll_oid;
-		      is = xattr->getOid((Agregat *)o, &coll_oid, 1, 0);
-		      if (!is)
-			is = db->loadObject(coll_oid, (Object *&)coll);
-		    }
-		  else
-		    is = xattr->getValue((Agregat *)o, (Data *)&coll, 1, 0);
-		  if (!is)
-		    {
-		      if (!coll->asCollArray())
-			return new oqmlStatus(dot,
-					      "array expected, got %s",
-					      coll->getClass()->getName());
-		      
-		      if (value->as_null() ||
-			  !OQML_ATOM_OIDVAL(value).isValid())
-			is = coll->asCollArray()->suppressAt(ind);
-		      else
-			is = coll->asCollArray()->insertAt
-			  (ind, OQML_ATOM_OIDVAL(value));
-		      if (!is && xattr->isIndirect())
-			{
-			  // test added the 28/12/00 for non persistent object
-			  if (coll->getOid().isValid())
-			    is = coll->realize();
-			}
-			  
-		    }
-
-		  if (xattr->isIndirect() && coll)
-		    coll->release();
-		}
-	      else {
-		if (OQML_IS_NULL(value))
-		  return new oqmlStatus(dot, "cannot set to NULL");
-		is = xattr->setValue((Agregat *)o, data, nb, ind);
+	size = sizeof(buff);
+	if (value->getData(buff, &val, size, len, d->cls)) {
+	  if (val) {
+	    if (nb > 0 && strlen((char *)val) >= nb)
+	      return new oqmlStatus(dot, "out of bound character array"
+				    "'%s': "
+				    "maximum allowed is %d <got %d>",
+				    val, nb, strlen((char *)val));
+	    else {
+	      int len = strlen((char *)val);
+	      if (len >= d->key_len) {
+		d->make_key(len+1);
+		data = d->e_data;
 	      }
+
+	      strcpy((char *)data, (char *)val);
+	    }
+
+	    if (nb < 0)
+	      nb = strlen((char *)data) + 1;
+	  }
+	  else
+	    data = buff;
 	      
-	      if (is)
-		return new oqmlStatus(dot, is);
-
-	      if (desc[n-1].isref)
-		{
-		  // test added the 28/12/00 for non persistent object
-		  if (o->getOid().isValid())
-		    {
-		      is = o->realize();
-
-		      if (is)
-			return new oqmlStatus(dot, is);
-		    }
-		}
-	    }
-	}
-      else if (oqml_is_getcount(d->array))
-	{
-	  Size size;
-	  if (xattr->isVarDim())
-	    {
-	      Status is = xattr->getSize(o, size);
-	      if (is)
-		return new oqmlStatus(dot, is);
-	    }
-	  else if (!d->mod->ndims)
-	    size = 0;
-	  else
-	    size = d->mod->dims[0];
-
-	  if (oqml_is_wholecount(d->array))
-	    {
-	      oqmlAtomList *l = new oqmlAtomList();
-	      l->append(new oqmlAtom_int(size));
-	      for (int i = 1; i < d->mod->ndims; i++)
-		l->append(new oqmlAtom_int(d->mod->dims[i]));
-
-	      (*alist)->append(new oqmlAtom_list(l));
-	    }
-	  else
-	    (*alist)->append(new oqmlAtom_int(size));
-	}
-      else
-	{
-	  if (d->isref)
-	    {
-	      is = xattr->getValue((Agregat *)o, (Data *)data, nb, ind,
-				   &isnull);
-	      if (!is)
-		{
-		  Object *tmp;
-		  mcp(&tmp, data, sizeof(Object *));
-		  if (tmp)
-		    atom_type = oqmlATOM_OBJ;
-		  else
-		    is = xattr->getOid((Agregat *)o, (Oid *)data,
-				       nb, ind);
-		}
-	    }
-	  else if (xattr->isVarDim() && d->mode == Attribute::composedMode)
-	    is = xattr->getValue((Agregat *)o, (Data *)&data,
-				Attribute::directAccess, ind, &isnull);
-	  else
-	    is = xattr->getValue((Agregat *)o, (Data *)data, nb, ind,
-				&isnull);
-
-	  if (is)
-	    {
-	      if (xattr->isVarDim())
-		{
-		  if (value)
-		    continue;
-		  else
-		    break;
-		}
-	    }
+	  oqmlBool enough;
+	  is = oqml_check_vardim(xattr, o, OQMLBOOL(value), enough, ind,
+				 nb, xattr->getTypeModifier().pdims,
+				 OQMLCOMPLETE(value));
 
 	  if (is)
 	    return new oqmlStatus(dot, is);
-	}
-      
-      // && ... added the 16/2/00
-      if (!is && !oqml_is_getcount(d->array)) {
-	if (d->is_coll && !value) {
-	  if (!isnull) {
-	    s = make_contents(d, dot, db, ctx,
-			      oqmlAtom::make_atom
-			      (data, atom_type,
-			       (dot_type.cls ? dot_type.cls :
-				xattr->getClass())),
-			      *alist);
-	    if (s) return s;
+
+	  if (!enough) {
+	    if (value)
+	      continue;
+	    else
+	      break;
+	  }
+
+	  if (d->isref && !d->is_coll) {
+	    if (!OQML_IS_OID(value)) {
+	      is = xattr->setValue((Agregat *)o, data, nb, ind);
+	      // added the 17/05/01
+	      if (OQML_IS_NULL(value) && !is) {
+		Oid xoid;
+		is = xattr->setOid((Agregat *)o, (Oid *)&xoid,
+				   nb, ind);
+	      }
+	      atom_type = oqmlATOM_OBJ;
+	    }
+	    else
+	      is = xattr->setOid((Agregat *)o, (Oid *)data, nb, ind);
+	  }
+	  else if (oqml_is_getcount(d->array)) {
+	    if (!xattr->isVarDim())
+	      return new oqmlStatus(dot, "cannot set dimension "
+				    "on a non variable dimension "
+				    "attribute");
+
+	    if (oqml_is_wholecount(d->array))
+	      return new oqmlStatus(dot,
+				    "cannot set multiple dimension");
+	      
+	      
+	    if (!OQML_IS_INT(value))
+	      return oqmlStatus::expected(dot, "integer",
+					  value->type.getString());
+
+	    Size size = OQML_ATOM_INTVAL(value);
+	    Status is = xattr->setSize(o, size);
+	    if (is)
+	      return new oqmlStatus(dot, is);
+	    // test added the 28/12/00 for non persistent object
+	    if (o->getOid().isValid()) {
+	      is = o->realize();
+	      if (is) return new oqmlStatus(dot, is);
+	    }
+	    (*alist)->append(new oqmlAtom_int(size));
+	    continue;
+	  }
+	  else if (d->is_coll) {
+	    Collection *coll = 0;
+	    if (xattr->isIndirect()) {
+	      Oid coll_oid;
+	      is = xattr->getOid((Agregat *)o, &coll_oid, 1, 0);
+	      if (!is)
+		is = db->loadObject(coll_oid, (Object *&)coll);
+	    }
+	    else
+	      is = xattr->getValue((Agregat *)o, (Data *)&coll, 1, 0);
+
+	    if (!is) {
+	      if (!coll->asCollArray())
+		return new oqmlStatus(dot,
+				      "array expected, got %s",
+				      coll->getClass()->getName());
+		      
+	      if (value->as_null() ||
+		  !OQML_ATOM_OIDVAL(value).isValid())
+		is = coll->asCollArray()->suppressAt(ind);
+	      else
+		is = coll->asCollArray()->insertAt
+		  (ind, OQML_ATOM_OIDVAL(value));
+
+	      if (!is && xattr->isIndirect()) {
+		// test added the 28/12/00 for non persistent object
+		if (coll->getOid().isValid())
+		  is = coll->realize();
+	      }
+	    }
+
+	    if (xattr->isIndirect() && coll)
+	      coll->release();
+	  }
+	  else {
+	    if (OQML_IS_NULL(value)) {
+	      /*
+	      if (xattr->getClass()->asCollectionClass()) {
+		Oid null_oid;
+		is = xattr->setOid((Agregat *)o, (Oid *)&null_oid, nb, ind);
+	      }
+	      else
+	      */
+		return new oqmlStatus(dot, "cannot set to NULL");
+	    }
+	    else if (value->as_oid()) {
+	      Object *vo = 0;
+	      Oid voi = OQML_ATOM_OIDVAL(value);
+	      s = oqmlObjectManager::getObject(dot, db, &voi, vo, oqml_True, oqml_True);
+	      if (s)
+		return s;
+	      is = xattr->setValue((Agregat *)o, (Data)&vo, nb, ind);
+	      atom_type = oqmlATOM_OID;
+	    }
+	    else
+	      is = xattr->setValue((Agregat *)o, data, nb, ind);
+	  }
+	      
+	  if (is)
+	    return new oqmlStatus(dot, is);
+
+	  if (desc[n-1].isref) {
+	    // test added the 28/12/00 for non persistent object
+	    if (o->getOid().isValid()) {
+	      is = o->realize();
+
+	      if (is)
+		return new oqmlStatus(dot, is);
+	    }
 	  }
 	}
-	else if (isnull)
-	  (*alist)->append(new oqmlAtom_null);
-	else
-	  (*alist)->append(oqmlAtom::make_atom(data, atom_type,
-					       (dot_type.cls ? dot_type.cls :
-						xattr->getClass())));
       }
+    else if (oqml_is_getcount(d->array)) {
+      Size size;
+      if (xattr->isVarDim()) {
+	Status is = xattr->getSize(o, size);
+	if (is)
+	  return new oqmlStatus(dot, is);
+      }
+      else if (!d->mod->ndims)
+	size = 0;
+      else
+	size = d->mod->dims[0];
+
+      if (oqml_is_wholecount(d->array)) {
+	oqmlAtomList *l = new oqmlAtomList();
+	l->append(new oqmlAtom_int(size));
+	for (int i = 1; i < d->mod->ndims; i++)
+	  l->append(new oqmlAtom_int(d->mod->dims[i]));
+
+	(*alist)->append(new oqmlAtom_list(l));
+      }
+      else
+	(*alist)->append(new oqmlAtom_int(size));
     }
+    else {
+      if (d->isref) {
+	is = xattr->getValue((Agregat *)o, (Data *)data, nb, ind,
+			     &isnull);
+	if (!is) {
+	  Object *tmp;
+	  mcp(&tmp, data, sizeof(Object *));
+	  if (tmp)
+	    atom_type = oqmlATOM_OBJ;
+	  else
+	    is = xattr->getOid((Agregat *)o, (Oid *)data,
+			       nb, ind);
+	}
+      }
+      else if (xattr->isVarDim() && d->mode == Attribute::composedMode)
+	is = xattr->getValue((Agregat *)o, (Data *)&data,
+			     Attribute::directAccess, ind, &isnull);
+      else
+	is = xattr->getValue((Agregat *)o, (Data *)data, nb, ind,
+			     &isnull);
+
+      if (is) {
+	if (xattr->isVarDim()) {
+	  if (value)
+	    continue;
+	  else
+	    break;
+	}
+      }
+
+      if (is)
+	return new oqmlStatus(dot, is);
+    }
+      
+    // && ... added the 16/2/00
+    if (!is && !oqml_is_getcount(d->array)) {
+      if (d->is_coll && !value) {
+	if (!isnull) {
+	  s = make_contents(d, dot, db, ctx,
+			    oqmlAtom::make_atom
+			    (data, atom_type,
+			     (dot_type.cls ? dot_type.cls :
+			      xattr->getClass())),
+			    *alist);
+	  if (s) return s;
+	}
+      }
+      else if (isnull)
+	(*alist)->append(new oqmlAtom_null);
+      else
+	(*alist)->append(oqmlAtom::make_atom(data, atom_type,
+					     (dot_type.cls ? dot_type.cls :
+					      xattr->getClass())));
+    }
+  }
   
   return oqmlSuccess;
 }

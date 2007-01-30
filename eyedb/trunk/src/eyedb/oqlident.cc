@@ -224,8 +224,12 @@ oqmlIdent::eval(Database *db, oqmlContext *ctx, oqmlAtomList **alist,
 	  else
 	    *alist = at->as_select()->list->copy();
 	}
-      else
+      else {
+	if (OQML_IS_OBJ(at)) {
+	  OQL_CHECK_OBJ(at);
+	}
 	*alist = new oqmlAtomList(at->copy());
+      }
 
       return oqmlSuccess;
     }

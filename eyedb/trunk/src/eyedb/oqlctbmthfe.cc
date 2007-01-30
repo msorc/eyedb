@@ -174,7 +174,8 @@ using namespace eyedb;
   __method__OUT_object_REF__getObject_object(eyedb::Database *_db, eyedb::FEMethod_C *_m, eyedb::Object *_o, eyedb::Object * &retarg)
    {
       retarg = _o;
-    return Success;
+      _o->incrRefCount();
+      return Success;
   }
 
   static OqlCtbDatafile *

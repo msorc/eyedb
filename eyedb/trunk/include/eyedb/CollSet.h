@@ -107,7 +107,7 @@ namespace eyedb {
     CollSet(const char *, Class *,
 	    const Oid&, const Oid&, int,
 	    int, int, const IndexImpl *,
-	    Object *, Bool, Data, Size);
+	    Object *, Bool, Bool, Data, Size);
     friend class CollectionPeer;
 
     // ----------------------------------------------------------------------
