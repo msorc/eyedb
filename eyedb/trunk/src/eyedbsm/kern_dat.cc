@@ -385,7 +385,10 @@ namespace eyedbsm {
     // LASTNSBLKALLOC(dbh, datid) = 0;
 
     dfd->__maxsize() = h2x_u32(newmaxsize);
-    mp->nslots() = h2x_u32(nslots);
+
+    // EV: 31/01/07: must not swap as it is swapped in h2x_epilogue
+    //mp->nslots() = h2x_u32(nslots);
+    mp->nslots() = nslots;
 
     h2x_epilogue(xmp, mp);
 

@@ -387,9 +387,6 @@ int munmap (void *__addr, size_t __len)
 int
 m_munmap(m_Map *map, caddr_t addr, size_t size)
 {
-  std::cout << "SIZE:" << map->size << " " << size << '\n';
-  assert(map->size == size);
-
   IDB_LOG(IDB_LOG_MMAP,
 	  ("segment unmapped file=\"%s\" segment=[%p, %p[ "
 	   "size=%lu prot=%p flags=%p fd=%d offset=%u "
@@ -397,6 +394,15 @@ m_munmap(m_Map *map, caddr_t addr, size_t size)
 	   map->file, *map->p, (*map->p)+map->size, map->size, map->prot,
 	   map->flags, map->fildes, map->off,
 	   map->startns, map->endns));
+
+  //  assert(map->size == size);
+
+  if (map->size != size) {
+    IDB_LOG(IDB_LOG_MMAP, 
+	    ("warning unmap size differ : %lu %lu",
+	     map->size, size));
+  }
+
 
 #ifdef CYGWIN
   printf("segment unmapped file=\"%s\" segment=[%p, %p[ "

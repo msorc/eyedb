@@ -8451,8 +8451,6 @@ AttributeComponentSet::hasIndex(bool &has_index, std::string &idx_str)
       return s;
   }
 
-  printf("has_index: %d\n", index_cache->comp_count);
-
   if (index_cache) {
     has_index = index_cache->comp_count > 0;
     for (int n = 0; n < index_cache->comp_count; n++) {

@@ -672,8 +672,7 @@ namespace eyedb {
 
   Status Collection::setMasterObject(Object *_master_object)
   {
-    if (is_literal) {
-      assert(master_object);
+    if (is_literal && master_object) {
       if (master_object->getOid().isValid() &&
 	  master_object->getOid() != _master_object->getOid())
 	return Exception::make("collection %s is already a literal attribute "
@@ -1055,7 +1054,7 @@ namespace eyedb {
       }
 
     if (!getOidC().isValid())
-      return Exception::make(IDB_COLLECTION_SUPPRESS_ERROR, "collection oid is invalid (Collection.has not been realized)");
+      return Exception::make(IDB_COLLECTION_SUPPRESS_ERROR, "collection oid is invalid (collection has not been stored)");
 
     int found, ind;
       
@@ -1164,7 +1163,7 @@ namespace eyedb {
       }
 
     if (!getOidC().isValid())
-      return Exception::make(IDB_COLLECTION_SUPPRESS_ERROR, "collection '%s' has not been realized", name);
+      return Exception::make(IDB_COLLECTION_SUPPRESS_ERROR, "collection oid is invalid (collection has not been stored)");
 
     int found, ind;
       
