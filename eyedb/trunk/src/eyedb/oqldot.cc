@@ -918,7 +918,7 @@ oqmlDotContext::eval_terminal(Database *db, oqmlContext *ctx, Object *o,
 			      oqmlAtom *value, int n, oqmlAtomList **alist)
 {
   oqmlDotDesc *d = &desc[n];
-  Status is;
+  Status is = Success;
   oqmlStatus *s;
   int s_ind, e_ind, ind;
 

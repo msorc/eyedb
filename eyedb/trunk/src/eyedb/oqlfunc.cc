@@ -1168,6 +1168,7 @@ namespace eyedb {
 
     s = new oqmlStatus(OQML_RETURN_MAGIC);
     s->returnAtom = r;
+    oqmlLock(s->returnAtom, oqml_True, oqml_False);
     return s;
   }
 
