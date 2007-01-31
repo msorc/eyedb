@@ -382,9 +382,12 @@ int munmap (void *__addr, size_t __len)
 }
 #endif
 
+#include <iostream>
+
 int
 m_munmap(m_Map *map, caddr_t addr, size_t size)
 {
+  std::cout << "SIZE:" << map->size << " " << size << '\n';
   assert(map->size == size);
 
   IDB_LOG(IDB_LOG_MMAP,
