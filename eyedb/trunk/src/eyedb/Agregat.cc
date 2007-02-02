@@ -257,14 +257,9 @@ Status Agregat::realize(const RecMode *rcm)
 
   Status status;
 
-  if (master_object)
-    {
-      /*
-	printf("agregat %p %s realizing master object %p\n", this,
-	getClass()->getName(), master_object);
-      */
-      return master_object->realize(rcm);
-    }
+  if (getMasterObject(true)) {
+    return getMasterObject(true)->realize(rcm);
+  }
 
   Bool creating;
 

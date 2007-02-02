@@ -759,8 +759,8 @@ namespace eyedb {
     if (!o)
       return;
 
-    if (o->getMasterObject()) {
-      incr_ref_count(o->getMasterObject());
+    if (o->getMasterObject(false)) {
+      incr_ref_count(o->getMasterObject(false));
       return;
     }
 

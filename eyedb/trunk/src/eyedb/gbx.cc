@@ -203,6 +203,9 @@ namespace eyedb {
     return ::operator new(size);
   }
 
+  static bool nodelete = getenv("EYEDB_NODELETE") ? true : false;
+  static bool noabort_on_delete = getenv("EYEDB_NOABORT_ON_DELETE") ? true : false;
+
   void gbxObject::operator delete(void *o)
   {
     if (!o)
@@ -210,7 +213,8 @@ namespace eyedb {
 
     fprintf(stderr, "gbxObject::delete: tries to use operator delete on an gbxObject * [%p]\n", o);
     fprintf(stderr, "use gbxObject::release method instead\n");
-    abort();
+    if (!noabort_on_delete)
+      abort();
   }
 
   void gbxObject::keep()
@@ -222,8 +226,6 @@ namespace eyedb {
   {
     gbxAutoGarb::keepObject(this, gbxFalse);
   }
-
-  static int nodelete = getenv("EYEDB_NODELETE") ? 1 : 0;
 
   void gbxObject::release_realize(gbxBool reentrant)
   {

@@ -1567,14 +1567,15 @@ Attribute::setValue(Object *agr,
 	  if (o->getMasterObject() && (o->getMasterObject() != agr ||
 	  o->getMasterObjectAttribute() != this))
 	*/
-	if (o->getMasterObject() && o->getMasterObject() != agr)
+	if (o->getMasterObject(false) && o->getMasterObject(false) != agr) {
 	  return Exception::make
 	    (IDB_ATTRIBUTE_ERROR,
 	     "setting attribute value '%s': object of class '%s' "
 	     "cannot be shared between several objects.", name,
 	     o->getClass()->getName());
+	}
 		      
-	if (!auto_affect) {
+	/*if (!auto_affect)*/ {
 	  status = o->setMasterObject(agr);
 	  if (status)
 	    return status;

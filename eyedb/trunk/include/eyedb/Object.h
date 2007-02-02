@@ -1005,7 +1005,6 @@ namespace eyedb {
 
     eyedblib::int64 c_time;
     eyedblib::int64 m_time;
-    Object *master_object;
 
     static void freeList(LinkedList *, Bool wipeOut);
     static LinkedList* copyList(const LinkedList *, Bool copy);
@@ -1019,6 +1018,7 @@ namespace eyedb {
 
     static Bool release_cycle_detection;
     friend class ObjectPeer;
+    Object *master_object;
 
     void copy(const Object *, Bool);
 
@@ -1050,8 +1050,8 @@ namespace eyedb {
     virtual Status remove_r(const RecMode *rcm = RecMode::NoRecurs,
 			    unsigned int flags = 0);
 
-    const Object *getMasterObject() const {return master_object;}
-    Object *getMasterObject() {return master_object;}
+    const Object *getMasterObject(bool recurs) const;
+    Object *getMasterObject(bool recurs);
 
     virtual Status setMasterObject(Object *master_object);
 

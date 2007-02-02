@@ -32,6 +32,8 @@
 #include "AttrNative.h"
 #include "Attribute_p.h"
 
+#define NEW_MASTER_OBJ
+
 #define TRY_GETELEMS_GC
 
 //#define INIT_IDR
@@ -474,6 +476,7 @@ namespace eyedb {
 #define CLONE(X) ((X) ? (X)->clone() : 0)
 #define STRDUP(X) ((X) ? strdup(X) : 0)
 
+#ifndef NEW_MASTER_OBJ
   static Object *
   get_master_object(Object *o)
   {
@@ -484,6 +487,7 @@ namespace eyedb {
 
     return o;
   }
+#endif
 
   void
   Collection::setImplementation(const IndexImpl *_idximpl)
@@ -492,8 +496,13 @@ namespace eyedb {
       if (idximpl)
 	idximpl->release();
       idximpl = _idximpl->clone();
-      if (is_literal && master_object)
-	get_master_object(master_object)->touch();
+#ifdef NEW_MASTER_OBJ
+      if (is_literal && getMasterObject(true))
+	getMasterObject(true)->touch();
+#else
+      if (is_literal && getMasterObject())
+	get_master_object(getMasterObject())->touch();
+#endif
       touch();
       implModified = True;
     }
@@ -670,15 +679,55 @@ namespace eyedb {
     return Success;
   }
 
+  Bool Collection::isLiteralObject() const
+  {
+    return is_literal && !is_pure_literal ? True : False;
+  }
+
+  Status Collection::setLiteralObject(bool reload)
+  {
+    if (reload) {
+      Status s = loadLiteral();
+      if (s)
+	return s;
+    }
+
+    if (!isLiteral())
+      return Exception::make(IDB_COLLECTION_ERROR,
+			     "collection %s is not a literal",
+			     getOid().toString());
+
+
+#if 0
+    if (isLiteralObject())
+      return Exception::make(IDB_COLLECTION_ERROR,
+			     "collection %s is already a literal object",
+			     getOid().toString());
+#endif
+
+    setPureLiteral(False);
+
+    return updateLiteral();
+  }
+
   Status Collection::setMasterObject(Object *_master_object)
   {
-    if (is_literal && master_object) {
-      if (master_object->getOid().isValid() &&
-	  master_object->getOid() != _master_object->getOid())
-	return Exception::make("collection %s is already a literal attribute "
+    Object *master_obj = 0;
+    if (is_literal && (master_obj = getMasterObject(true))) {
+      Object *r_master_object = _master_object->getMasterObject(true);
+      if (!r_master_object)
+	r_master_object = _master_object;
+
+      if ((master_obj->getOid().isValid() ||
+	   r_master_object->getOid().isValid()) &&
+	  master_obj->getOid() != r_master_object->getOid()) {
+	return Exception::make("collection setting master object %s: "
+			       "%s is already a literal attribute "
 			       "for the object",
+			       r_master_object->getOid().toString(),
 			       getOidC().toString(),
-			       master_object->getOid().toString());
+			       master_obj->getOid().toString());
+      }
     }
 
     Status s = Object::setMasterObject(_master_object);
@@ -703,7 +752,8 @@ namespace eyedb {
     // EV 26/01/07
     // copy oid to literal oid and set oid to null
     // in main cases both oids should be invalid
-    setLiteralOid(getOid());
+    if (!getLiteralOid().isValid())
+      setLiteralOid(getOid());
 
     if (!is_pure_literal)
       ObjectPeer::setOid(this, Oid::nullOid);
@@ -1776,7 +1826,11 @@ namespace eyedb {
 #endif
 
     if (is_literal) {
-      Object *o = get_master_object(master_object);
+#ifdef NEW_MASTER_OBJ
+      Object *o = getMasterObject(true);
+#else
+      Object *o = get_master_object(getMasterObject());
+#endif
       if (!inv_oid.isValid())
 	inv_oid = o->getOid();
 
@@ -1971,11 +2025,11 @@ namespace eyedb {
       {
 #ifdef COLLTRACE
 	printf("collection realizing master_object %p\n",
-	       master_object);
+	       getMasterObject(true));
 #endif
-	assert(master_object);
+	assert(getMasterObject(true));
 	void *ud = setUserData(IDB_MAGIC_COLL2);
-	Status s = master_object->realize(rcm);
+	Status s = getMasterObject(true)->realize(rcm);
 	(void)setUserData(ud);
 	return s;
       }
@@ -1998,6 +2052,10 @@ namespace eyedb {
   Status Collection::remove(const RecMode *rcm)
   {
     Status s;
+
+#ifdef COLLTRACE
+    printf("removing collection %s\n", getOidC().toString());
+#endif
 
     s = loadLiteral();
     if (s)
@@ -3138,15 +3196,28 @@ do { \
     return Success;
   }
 
-  void
+  Status
   Collection::literalMake(Collection *o)
   {
+#if 1
     is_literal = o->isLiteral();
     is_pure_literal = o->isPureLiteral();
+#endif
 
     assert(literal_oid == o->getOid());
     oid.invalidate();
     literal_oid = o->getOid();
+
+#if 0
+    //printf("o->isLiteral %d %d\n", o->isLiteral(), o->isPureLiteral());
+    Status s = loadLiteral();
+    if (s)
+      return s;
+    //printf("isLiteral %d %d\n", isLiteral(), isPureLiteral());
+
+    if (o->isLiteral() != isLiteral() || o->isPureLiteral() != isPureLiteral())
+      printf("---------------------------- ARGH -----------------------\n");
+#endif
 
 #ifdef COLLTRACE
     printf("literalMake:: literal oid is %s\n", literal_oid.toString());
@@ -3205,6 +3276,7 @@ do { \
       printf("literalMake idr=%p o_idr=%p refcnt=%d o_refcnt=%d\n",
       data, o->idr->idr, idr->refcnt, o->idr->refcnt);
     */
+    return Success;
   }
 
   //
@@ -3225,11 +3297,12 @@ do { \
 #ifdef COLLTRACE
     printf("Collection::realizePerform(%p)\n", this);
 
-    printf("master_object %p\n", master_object);
-    if (master_object)
+    Object *master_obj = getMasterObject(true);
+    printf("master_object %p\n", master_obj);
+    if (master_obj)
       printf("MASTER_OBJECT %s %s [%s]\n",
-	     master_object->getOid().toString(),
-	     master_object->getClass()->getName(), idx_ctx.getString().c_str());
+	     master_obj->getOid().toString(),
+	     master_obj->getClass()->getName(), idx_ctx.getString().c_str());
 #endif
     if (!idx_data)
       idx_data = idx_ctx.code(idx_data_size);
@@ -3271,9 +3344,10 @@ do { \
     oid_decode(idr->getIDR(), &offset, literal_oid.getOid());
 
 #ifdef COLLTRACE
+    Object *master_obj = getMasterObject(true);
     printf("master_object %p %s %s [%s]\n",
-	   master_object, master_object->getOid().toString(),
-	   master_object->getClass()->getName(),
+	   master_obj, master_object->getOid().toString(),
+	   master_obj->getClass()->getName(),
 	   (const char *)idx_ctx.getString());
 
     printf("Collection::loadPerform(%p, %s)\n", this, literal_oid.toString());
@@ -3318,13 +3392,17 @@ do { \
 #if 1
     Status s = db->loadObject_realize(&literal_oid, (Object **)&o,
 				      lockmode, rcm);
-    if (s) return s;
+    if (s)
+      return s;
 #else
     Status s = db->loadObject(literal_oid, (Object *&)o, rcm);
-    if (s) return s;
+    if (s)
+      return s;
 #endif
 
-    literalMake(o);
+    s = literalMake(o);
+    if (s)
+      return s;
     /*
       printf("releasing initial collection object o=%p refcnt=%d "
       "this=%p refcnt=%d\n",
@@ -3344,6 +3422,12 @@ do { \
 #ifdef COLLTRACE
     printf("Collection::removePerform(%p, %s) should remove only if pure_literal %d %d\n", this,
 	   literal_oid.toString(), is_literal, is_pure_literal);
+#endif
+
+#ifdef COLLTRACE
+    printf("trying to remove literal collection %s [%s]\n",
+	   literal_oid.toString(),
+	   getMasterObject(true) ? getMasterObject(true)->getOid().toString() : "<no master>");
 #endif
 
     Status s = loadLiteral();
@@ -3367,6 +3451,7 @@ do { \
     if (was_pure_literal) {
       //printf("removing...\n");
 
+      printf("removing literal collection %s\n", literal_oid.toString());
       s = db->removeObject(literal_oid, rcm);
       if (s)
 	return s;
