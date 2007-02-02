@@ -1833,7 +1833,7 @@ using namespace eyedb;
   Status
   __method__OUT_int32_getCount_collection(Database *_db, FEMethod_C *_m, Object *_o, eyedblib::int32 &retarg)
   {
-    retarg = ((Collection *)_o)->getCount();
+    retarg = dynamic_cast<Collection *>(_o)->getCount();
     return Success;
   }
 
@@ -1883,9 +1883,42 @@ using namespace eyedb;
   Status
   __method__OUT_bool_isLiteral_collection(Database *_db, FEMethod_C *_m, Object *_o, Bool &retarg)
   {
-    retarg = ((Collection *)_o)->isLiteral();
+    retarg = dynamic_cast<Collection *>(_o)->isLiteral();
     return Success;
   }
+
+//
+// bool collection::isPureLiteral() [oqlctbmthfe.cc]
+//
+
+  Status
+__method__OUT_bool_isPureLiteral_collection(eyedb::Database *_db, eyedb::FEMethod_C *_m, eyedb::Object *_o, eyedb::Bool &retarg)
+{
+
+  retarg = dynamic_cast<Collection *>(_o)->isPureLiteral();
+  return eyedb::Success;
+}
+
+//
+// bool collection::isLiteralObject() [oqlctbmthfe.cc]
+//
+
+Status
+__method__OUT_bool_isLiteralObject_collection(eyedb::Database *_db, eyedb::FEMethod_C *_m, eyedb::Object *_o, eyedb::Bool &retarg)
+{
+  retarg = dynamic_cast<Collection *>(_o)->isLiteralObject();
+  return eyedb::Success;
+}
+
+//
+// void collection::setLiteralObject() [oqlctbmthfe.cc]
+//
+
+Status
+__method__OUT_void_setLiteralObject_collection(eyedb::Database *_db, eyedb::FEMethod_C *_m, eyedb::Object *_o)
+{
+  return dynamic_cast<Collection *>(_o)->setLiteralObject(true);
+}
 
   //
   // oid collection::getLiteralOid() [oqlctbmthfe.cc]
@@ -1894,8 +1927,8 @@ using namespace eyedb;
   Status
   __method__OUT_oid_getLiteralOid_collection(Database *_db, FEMethod_C *_m, Object *_o, Oid &retarg)
   {
-    if (((Collection *)_o)->isLiteral())
-      retarg = ((Collection *)_o)->getOidC();
+    if (dynamic_cast<Collection *>(_o)->isLiteral())
+      retarg = dynamic_cast<Collection *>(_o)->getOidC();
     return Success;
   }
 
@@ -2013,6 +2046,6 @@ using namespace eyedb;
     if (idximpl)
       idximpl->release();
     if (coll->isLiteral())
-      return coll->getMasterObject()->store();
+      return coll->getMasterObject(true)->store();
     return coll->store();
   }

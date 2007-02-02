@@ -1201,6 +1201,9 @@ namespace eyedb {
   extern void
   oqmlLock(oqmlAtomList *l, oqmlBool lock, oqmlBool rm = oqml_False);
 
+  extern oqmlStatus *
+  oqml_check_logical(oqmlNode *node, oqmlAtomList *al, oqmlBool &b,
+		     bool strict = false);
   /* base node */
   class oqmlNode {
   protected:

@@ -209,6 +209,7 @@ namespace eyedb {
     dspid = o->dspid;
     c_time = o->c_time;
     m_time = o->m_time;
+    master_object = o->master_object;
 
     if (share) {
       idr = o->idr;
@@ -586,6 +587,24 @@ namespace eyedb {
 		Argument &retarg, Bool checkArgs)
   {
     return mth->applyTo(_db, this, argarray, retarg, checkArgs);
+  }
+
+  const Object *Object::getMasterObject(bool recurs) const
+  {
+    return const_cast<Object *>(this)->getMasterObject(recurs);
+  }
+
+  Object *Object::getMasterObject(bool recurs)
+  {
+    if (!recurs || !master_object)
+      return master_object;
+
+    assert(recurs && master_object);
+
+    if (master_object->getMasterObject(false)) // has an immediate master object
+      return master_object->getMasterObject(true);
+
+    return master_object;
   }
 
   Status

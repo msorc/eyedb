@@ -195,6 +195,11 @@ native collection {
   instance_method<client, called_from=OQL> oid[] getElements(in oid obj);
 
   instance_method<client, called_from=OQL> bool isLiteral();
+  instance_method<client, called_from=OQL> bool isPureLiteral();
+  instance_method<client, called_from=OQL> bool isLiteralObject();
+
+  instance_method<client, called_from=OQL> void setLiteralObject();
+
   instance_method<client, called_from=OQL> oid getLiteralOid();
 
   instance_method<client, called_from=OQL> dataspace *getDefaultDataspace();

@@ -356,17 +356,18 @@ OQML_STD_BINOP(oqmlRegIDiff, oqmlRegex, oqmlREGIDIFF, "!~~")
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 static oqmlStatus *
-oqml_logical_error(oqmlNode *node, const char *, oqmlAtomType *at)
+oqml_logical_error(oqmlNode *node, oqmlAtomType *at, bool strict)
 {
+  std::string msg = (strict ? "boolean": "boolean, int, char or double");
   if (at)
-    return oqmlStatus::expected(node, "boolean", at->getString());
+    return oqmlStatus::expected(node, msg.c_str(), at->getString());
 
-  return new oqmlStatus(node, "boolean expected");
+  return new oqmlStatus(node, (msg + " expected").c_str());
 }
 
 static oqmlStatus *
 oqml_check_type(oqmlNode *node, Database *db, oqmlContext *ctx,
-		oqmlNode *ql, const char *name)
+		oqmlNode *ql, const char *name, bool strict = false)
 {
   if (ql->getType() == oqmlASSIGN)
     return oqmlSuccess;
@@ -381,47 +382,53 @@ oqml_check_type(oqmlNode *node, Database *db, oqmlContext *ctx,
     return oqml_logical_error(node, name, &at);
     */
 
-  if (at.type != oqmlATOM_BOOL && at.type != oqmlATOM_UNKNOWN_TYPE)
-    return oqml_logical_error(node, name, &at);
+  if (at.type == oqmlATOM_UNKNOWN_TYPE)
+    return oqmlSuccess;
+
+  if (strict) {
+    if (at.type != oqmlATOM_BOOL)
+      return oqml_logical_error(node, &at, strict);
+  }
+
+  if (at.type != oqmlATOM_INT &&
+      at.type != oqmlATOM_CHAR &&
+      at.type != oqmlATOM_DOUBLE)
+    return oqml_logical_error(node, &at, strict);
 
   return oqmlSuccess;
 }
 
-static oqmlStatus *
+oqmlStatus *
 oqml_check_logical(oqmlNode *node, oqmlAtomList *al, oqmlBool &b,
-		   const char *name)
+		   bool strict)
 {
   if (al->cnt != 1)
-    return oqml_logical_error(node, name, 0);
+    return oqml_logical_error(node, 0, strict);
 
   oqmlAtom *a = al->first;
-  /*
-  if (a->type.type == oqmlATOM_INT)
-    {
+  if (a->type.type == oqmlATOM_BOOL) {
+    b = (((oqmlAtom_bool *)a)->b) ? oqml_True : oqml_False;
+    return oqmlSuccess;
+  }
+  
+  if (!strict) {
+    if (a->type.type == oqmlATOM_INT) {
       b = (((oqmlAtom_int *)a)->i) ? oqml_True : oqml_False;
       return oqmlSuccess;
     }
 
-  if (a->type.type == oqmlATOM_CHAR)
-    {
+    if (a->type.type == oqmlATOM_CHAR) {
       b = (((oqmlAtom_char *)a)->c) ? oqml_True : oqml_False;
       return oqmlSuccess;
     }
 
-  if (a->type.type == oqmlATOM_DOUBLE)
-    {
+    if (a->type.type == oqmlATOM_DOUBLE) {
       b = (((oqmlAtom_double *)a)->d) ? oqml_True : oqml_False;
       return oqmlSuccess;
     }
-    */
+  }
 
-  if (a->type.type == oqmlATOM_BOOL)
-    {
-      b = (((oqmlAtom_bool *)a)->b) ? oqml_True : oqml_False;
-      return oqmlSuccess;
-    }
-  
-  return oqml_logical_error(node, name, &a->type);
+  return oqml_logical_error(node, &a->type, strict);
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -498,7 +505,7 @@ oqmlStatus *oqmlLOr::eval(Database *db, oqmlContext *ctx, oqmlAtomList **alist, 
 
   oqmlBool b;
 
-  s = oqml_check_logical(this, al_left, b, "||");
+  s = oqml_check_logical(this, al_left, b);
   if (s)
     return s;
 
@@ -512,7 +519,7 @@ oqmlStatus *oqmlLOr::eval(Database *db, oqmlContext *ctx, oqmlAtomList **alist, 
   if (s)
     return s;
 
-  s = oqml_check_logical(this, al_right, b, "||");
+  s = oqml_check_logical(this, al_right, b);
   if (s)
     return s;
 
@@ -663,7 +670,7 @@ oqmlStatus *oqmlLAnd::eval(Database *db, oqmlContext *ctx, oqmlAtomList **alist,
 
   oqmlBool b;
 
-  s = oqml_check_logical(this, al_left, b, "&&");
+  s = oqml_check_logical(this, al_left, b);
   if (s)
     return s;
 
@@ -677,7 +684,7 @@ oqmlStatus *oqmlLAnd::eval(Database *db, oqmlContext *ctx, oqmlAtomList **alist,
   if (s)
     return s;
 
-  s = oqml_check_logical(this, al_right, b, "&&");
+  s = oqml_check_logical(this, al_right, b);
   if (s)
     return s;
 
@@ -1072,7 +1079,7 @@ oqmlStatus *oqmlLNot::eval(Database *db, oqmlContext *ctx, oqmlAtomList **alist,
 
   oqmlBool b;
 
-  s = oqml_check_logical(this, al, b, "!");
+  s = oqml_check_logical(this, al, b);
   if (s)
     return s;
 

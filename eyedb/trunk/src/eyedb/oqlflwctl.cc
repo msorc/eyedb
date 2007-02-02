@@ -24,6 +24,8 @@
 
 #include "oql_p.h"
 
+#define EXT_LOGIC
+
 namespace eyedb {
 
   int oqmlLoopLevel, oqmlBreakLevel;
@@ -66,30 +68,42 @@ namespace eyedb {
     oqmlBool *compiled = 0;
 
     s = qcond->eval(db, ctx, &al);
-    if (s) return s;
+    if (s)
+      return s;
 
-    if (!al->cnt)
-      {
+    if (!al->cnt) {
+      toeval = qelse;
+      compiled = &qelse_compiled;
+    }
+    else if (al->cnt == 1) {
+      oqmlAtom *a = al->first;
+#ifdef EXT_LOGIC
+      oqmlBool b;
+      s = oqml_check_logical(this, al, b);
+      if (s)
+	return s;
+      
+      if (b) {
+	toeval = qthen;
+	compiled = &qthen_compiled;
+      }
+      else {
 	toeval = qelse;
 	compiled = &qelse_compiled;
       }
-    else if (al->cnt == 1)
-      {
-	oqmlAtom *a = al->first;
-
-	if (!OQML_IS_BOOL(a))
-	  return new oqmlStatus(this, "boolean expected for condition");
-
-	if (OQML_ATOM_BOOLVAL(a))
-	  {
-	    toeval = qthen;
-	    compiled = &qthen_compiled;
-	  }
-	else
-	  {
-	    toeval = qelse;
-	    compiled = &qelse_compiled;
-	  }
+#else
+      if (!OQML_IS_BOOL(a))
+	return new oqmlStatus(this, "boolean expected for condition");
+      
+      if (OQML_ATOM_BOOLVAL(a)) {
+	toeval = qthen;
+	compiled = &qthen_compiled;
+      }
+      else {
+	toeval = qelse;
+	compiled = &qelse_compiled;
+      }
+#endif
       }
     else
       toeval = qthen;
@@ -353,23 +367,33 @@ namespace eyedb {
 	oqmlAtomList *al;
 
 	s = qleft->eval(db, ctx, &al);
-	if (s) break;
+	if (s)
+	  break;
 
+#ifdef EXT_LOGIC
+	oqmlBool b;
+	s = oqml_check_logical(this, al, b);
+	if (s)
+	  break;
+
+	if (!b)
+	  break;
+#else
 	if (al->cnt != 1 || !OQML_IS_BOOL(al->first))
 	  return new oqmlStatus(this, "boolean expected for condition");
 
 	if (!OQML_ATOM_BOOLVAL(al->first))
 	  break;
+#endif
 
 	OQML_CHECK_INTR();
 
-	if (qright)
-	  {
-	    gbContext *gbctx = oqmlGarbManager::peek();
-	    s = qright->eval(db, ctx, &al);
-	    oqmlGarbManager::garbage(gbctx);
-	    if (s) break;
-	  }
+	if (qright) {
+	  gbContext *gbctx = oqmlGarbManager::peek();
+	  s = qright->eval(db, ctx, &al);
+	  oqmlGarbManager::garbage(gbctx);
+	  if (s) break;
+	}
       }
 
     --oqmlLoopLevel;
@@ -446,12 +470,20 @@ namespace eyedb {
       s = qleft->eval(db, ctx, &al);
       if (s) break;
     
+#ifdef EXT_LOGIC
+      s = oqml_check_logical(this, al, b);
+      if (s)
+	break;
+
+      OQML_CHECK_INTR();
+#else
       if (al->cnt != 1 || !OQML_IS_BOOL(al->first))
 	return new oqmlStatus(this, "boolean expected for condition");
 
       OQML_CHECK_INTR();
 
       b = OQML_ATOM_BOOLVAL(al->first);
+#endif
     
       if (qright)
 	{
@@ -594,38 +626,44 @@ namespace eyedb {
     
     int level = ++oqmlLoopLevel;
 
-    for (;;)
-      {
-	if (cond)
-	  {
-	    s = cond->eval(db, ctx, &al);
-	    if (s) return s;
+    for (;;) {
+      if (cond) {
+	s = cond->eval(db, ctx, &al);
+	if (s)
+	  return s;
 
-	    if (al->cnt != 1 || !OQML_IS_BOOL(al->first))
-	      {
-		s = new oqmlStatus(this, "boolean expected for condition");
-		break;
-	      }
+#ifdef EXT_LOGIC
+	oqmlBool b;
+	s = oqml_check_logical(this, al, b);
+	if (s)
+	  break;
 
-	    if (!OQML_ATOM_BOOLVAL(al->first))
-	      break;
-	  }
+	if (!b)
+	  break;
+#else
+	if (al->cnt != 1 || !OQML_IS_BOOL(al->first)) {
+	  s = new oqmlStatus(this, "boolean expected for condition");
+	  break;
+	}
+
+	if (!OQML_ATOM_BOOLVAL(al->first))
+	  break;
+#endif
+      }
     
-	OQML_CHECK_INTR();
+      OQML_CHECK_INTR();
 
-	if (body)
-	  {
-	    gbContext *gbctx = oqmlGarbManager::peek();
-	    s = body->eval(db, ctx, &al);
-	    oqmlGarbManager::garbage(gbctx);
-	    if (s) break;
-	  }
+      if (body) {
+	gbContext *gbctx = oqmlGarbManager::peek();
+	s = body->eval(db, ctx, &al);
+	oqmlGarbManager::garbage(gbctx);
+	if (s) break;
+      }
 
-	if (next)
-	  {
-	    s = next->eval(db, ctx, &al);
-	    if (s) break;
-	  }
+      if (next) {
+	s = next->eval(db, ctx, &al);
+	if (s) break;
+      }
       }
 
     --oqmlLoopLevel;

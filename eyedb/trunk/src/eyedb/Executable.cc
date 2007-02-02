@@ -374,7 +374,7 @@ namespace eyedb {
     if (sign)
       *getSign() = *sign;
     const char *name = makeInternalName
-      (exname, sign,
+      (exname, (sign ? getSign() : 0),
        ((loc & STATIC_EXEC) ? True : False),
        //     (_class ? _class->getName() : 0));
        // changed the 19/05/99

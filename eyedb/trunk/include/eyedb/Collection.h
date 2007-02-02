@@ -308,6 +308,9 @@ namespace eyedb {
 
     Bool isLiteral() const {return is_literal;}
     Bool isPureLiteral() const {return is_pure_literal;}
+    Bool isLiteralObject() const;
+
+    Status setLiteralObject(bool force);
 
     virtual ~Collection();
 
@@ -426,7 +429,7 @@ namespace eyedb {
       CollLiteral = 2
     };
     char codeLiteral() const;
-    void literalMake(Collection *o);
+    Status literalMake(Collection *o);
     std::string getStringType() const;
     Offset inv_oid_offset;
 
