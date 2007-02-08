@@ -33,8 +33,14 @@ PKG_CHECK_MODULES(EYEDB, eyedb)
 AC_SUBST(EYEDB_CFLAGS)
 AC_SUBST(EYEDB_LIBS)
 
-PKG_CHECK_VAR(EYEDB, eyedb, LIBDIR, libdir)
-PKG_CHECK_VAR(EYEDB, eyedb, BINDIR, bindir)
+AC_MSG_CHECKING([for EyeDB pkgconfig 'libdir' variable])
+EYEDB_LIBDIR=`$PKG_CONFIG --variable=libdir eyedb`
+AC_MSG_RESULT($EYEDB_LIBDIR)
+
+AC_MSG_CHECKING([for EyeDB pkgconfig 'bindir' variable])
+EYEDB_BINDIR=`$PKG_CONFIG --variable=bindir eyedb`
+AC_MSG_RESULT($EYEDB_BINDIR)
+
 AC_SUBST(EYEDB_LIBDIR)
 AC_SUBST(EYEDB_BINDIR)
 
