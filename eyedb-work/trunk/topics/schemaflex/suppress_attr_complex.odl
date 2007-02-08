@@ -1,0 +1,186 @@
+// $Id: schema.odl 252 2006-07-07 12:40:46Z stuart $
+// (enscript --margins 14:15 -2 -f Helvetica10 -T2 schema.odl)
+
+class Bank
+{
+	string name; index on name; constraint<unique> on name;
+	int length;
+	float stdev;
+};
+
+class Clone
+{
+	string name; index on name; constraint<unique> on name;
+	Bank * bank;
+};
+
+class Read
+{
+	string name; index on name; constraint<unique> on name;
+	Clone * clone;
+	int length;
+	bool extremity1; // true iff == F
+};
+	
+class Sequence
+{
+	string<23> name;
+	index<btree> on name; constraint<unique> on name;
+	int length; index<btree> on length; // estimated for Supercontigs
+	Stage * created_in;
+};
+
+class ReadPosition
+{
+	Read * read;
+	int start_on_read;
+	int start_on_contig;
+	int length;
+	bool forward;
+};
+
+class ContinuousSequence extends Sequence
+{
+};
+
+class Contig extends ContinuousSequence
+{
+	ReadPosition reads[];
+	string consensus;
+};
+
+class Cut
+{
+	ContinuousSequence * cseq;
+	int start;
+	int stop;
+	Supercontig * source;
+};
+
+class Metacontig extends ContinuousSequence
+{
+	Cut cuts[];
+};
+
+class Region
+{
+	Sequence * sequence;
+	int gap_after; // after this sequence
+		// == -1 iff gap of unknown size
+		// == 0 iff no gap
+		// == 1 iff gap of size 0 or 1
+		// > 1 gap's size
+		// null iff last Region in Supercontig
+	bool forward; // redundant
+
+	ContinuousSequence * first; // first to be kept
+	int start_on_first;
+	ContinuousSequence * last; // last to be kept
+	int stop_on_last;
+};
+
+class CloneLinkCount
+{
+	Supercontig * sctg;
+	int n;
+};
+
+class Supercontig extends Sequence
+{
+	Region regions[];
+// fast searching
+	int nb_ctg; index<btree> on nb_ctg;
+ 	int nb_cseq; index<btree> on nb_cseq;
+
+	CloneLinkCount clone_links[];
+//	set<Supercontig *> clone_linked2;
+//	Count clone_links[]; index<btree> on clone_links.n;
+};
+
+class GroupName
+{
+	string name; index on name; constraint<unique> on name;
+	string comment;
+};
+
+class Group
+{
+	set<Supercontig *> sctgs;
+	GroupName * name; index<btree> on name;
+};
+
+enum StageType
+{
+	arachne,
+	fusion1,
+	fusion2,
+	manual,
+	division
+};
+
+class Stage
+{
+	int id; index on id; constraint<unique> on id;
+#ifndef UPDATE1
+	int t1;
+#endif
+  //	Group groups[];
+  //	implementation <type = btree> on groups.sctgs;
+	StageType stage_type;
+// fast searching
+	array<set<Supercontig *> > clone_link_counts;
+};
+class Algorithm
+{
+	string name; index on name; constraint<unique> on name;
+};
+
+class MatchSide
+{
+	ContinuousSequence * cseq;
+	int start;
+	int stop;
+	bool forward;
+};
+
+class Match
+{
+	Algorithm * algorithm;
+	MatchSide sides[2];
+	double id_ratio; // [0-1]
+};
+
+enum JunctionType
+{
+	junction_right, // = 'b'
+	junction_left, // = 'a'
+	junction_included, // = 'i'
+	junction_centre // = 'c'
+};
+
+class Junction extends Match
+{
+	JunctionType jtype[2];
+};
+
+enum ZipType
+{
+	zip_right, // = 'r'
+	zip_left, // = 'l'
+	zip_included // = 'i'
+};
+
+class ZipSide
+{
+	Supercontig * sctg;
+	bool forward;
+};
+
+class Zip
+{
+	ZipSide long_side; index on long_side.sctg;
+	ZipSide short_side; index on short_side.sctg;
+	ZipType ztype;
+	Junction * junctions[];
+};
+

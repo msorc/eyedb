@@ -1,0 +1,41 @@
+
+Data reliability 1st step
+- eyedbsm level :
+ + online backup
+ + any easy raw data reliability improvements
+- eyedb level :
+ + dump/restore off and online
+ + any easy eyedb data reliability improvements
+
+ODL Plugins
+- plugin system:
+ + specifications: is this plugin system is limited for code generation
+   or any schema operation ?
+   If it use for 
+ + API (abstract class Plugin)
+ + eyedbodl --plugin-name=c++-std [--plugin-file=....so]
+   [--plugin-args=...]
+
+- toolkit for writing plugins (API)
+- write a c++-std binding:
+ + based on the plugin system
+ + based on the STL
+ + using smart pointers
+ + enrich the eyedb API to facilitate the write of plugins and to make the
+   generated code lighter
+ [ + related work : moved parts of the current client code to server (*) ]
+
+Virtual attributes
+
+Unions
+
+Dictionaries
+
+Data reliability 2nd step
+
+Miscelleanous
+- (*) Some part of the current client code (for instance collection
+  implementation) must be moved to the server part to facilitate the write
+  of binding plugins, for instance the current Java binding.
+
+

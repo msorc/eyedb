@@ -1,0 +1,20 @@
+#ifdef UPDATE1
+class C1
+#else
+class C
+#endif
+{
+  int a;
+#ifndef UPDATE1
+  int b;
+#else
+  int b1; @renamed_from(b)
+#endif
+  int c;
+  int mth1(in string, out int);
+  static void mth2(in string, out int, in string);
+};
+#ifdef UPDATE1
+ @renamed_from(C)
+#endif
+

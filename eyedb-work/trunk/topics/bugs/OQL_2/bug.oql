@@ -1,0 +1,25 @@
+new Stage(id : 1);
+new StageType(name : "fusion");
+
+o := (select one Stage.id = 1);
+t := (select one StageType.name = "fusion");
+n := Stage(id : o.id + 1, stage_type : t);
+
+s := new set<Supercontig *>();
+add new Supercontig() to s;
+add new Supercontig() to s;
+o.clone_link_counts[0] := s;
+
+s := new set<Supercontig *>();
+add new Supercontig() to s;
+add new Supercontig() to s;
+o.clone_link_counts[1] := s;
+
+for (y in contents(o.clone_link_counts))
+{
+        i := y.index;
+        for (z in contents(y.value.s))
+//        for (z in contents(y.value))
+//          println("toutou");
+            println(string(y.value));
+};

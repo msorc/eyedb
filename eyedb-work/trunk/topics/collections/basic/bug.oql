@@ -1,0 +1,29 @@
+c := new C();
+i := new set<I *>(list(new I(), new I(), new I(), new I()));
+c.@is := i;
+ii := c.@is;
+\p all
+c.@is := i;
+c.@is := i;
+
+c1 := new C();
+i1 := new set<I *>(list(new I(), new I(), new I()));
+c1.@is := i1;
+
+c.@is := c1.@is; // normal error;
+//ii := c1.@is.getLiteralOid(); // ok;
+ii := c1.@is; // pas ok par la suite;
+jj := ii;
+contents(ii);
+c.@is := ii; // normal error;
+contents(ii);
+c1.@is := new set<I *>();
+ii;
+contents(ii);
+c.@is := ii;
+contents(ii);
+
+i2 := new set<I *>(list(new I(), new I()));
+c.@is := i2;
+i;
+\p

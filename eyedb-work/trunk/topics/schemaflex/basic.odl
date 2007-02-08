@@ -1,0 +1,31 @@
+
+class C {
+  int i;
+#ifdef UPDATE1
+  string s;
+#endif
+  int j;
+#ifdef UPDATE1
+  C *c;
+#endif
+  array<set<D *> > d1;
+
+#ifndef UPDATE1
+  int tt;
+#else  
+  int tt1; @renamed_from(tt)
+#endif
+};
+
+class D {
+  C c1[];
+  C *c2;
+};
+
+class E extends C {
+  int i;
+};
+
+class F {
+  E *e;
+};

@@ -33,8 +33,8 @@ PKG_CHECK_MODULES(EYEDB, eyedb)
 AC_SUBST(EYEDB_CFLAGS)
 AC_SUBST(EYEDB_LIBS)
 
-PKG_CHECK_VAR(EYEDB,eyedb,LIBDIR,libdir)
-PKG_CHECK_VAR(EYEDB,eyedb,BINDIR,bindir)
+PKG_CHECK_VAR(EYEDB, eyedb, LIBDIR, libdir)
+PKG_CHECK_VAR(EYEDB, eyedb, BINDIR, bindir)
 AC_SUBST(EYEDB_LIBDIR)
 AC_SUBST(EYEDB_BINDIR)
 
@@ -63,4 +63,22 @@ fi
 AC_OUTPUT(
 Makefile
 topics/Makefile
+topics/bugs/OQL_1/Makefile
+topics/bugs/OQL_2/Makefile
+topics/bugs/OQL_3/Makefile
+topics/bugs/OQL_4/Makefile
+topics/collections/basic/Makefile
+topics/collections/general/Makefile
+topics/collections/literal/Makefile
+topics/collections/set/Makefile
+topics/dict/Makefile
+topics/dump_restore/Makefile
+topics/eyedbsm/online_backup/Makefile
+topics/index/Makefile
+topics/objgarb/Makefile
+topics/odlplugin/Makefile
+topics/oql/array/Makefile
+topics/schemaflex/Makefile
+topics/union/Makefile
+topics/virtattr/Makefile
 )
