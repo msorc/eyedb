@@ -1,0 +1,5 @@
+//sctg :=(select one Supercontig.name = "sctg2_75");
+
+function f(ll){if(is_list(ll)){for(x in ll)if(3556335.14.32591:oid in x)return true;}return false;};
+
+select s.id from Stage s where  f(s.groups[?].sctgs);

@@ -1,0 +1,4 @@
+sctg :=(select one Supercontig);
+function ff(lll){{for(x in lll)if(::sctg in x)return true;}return false;};
+function f(ll){if(is_list(ll))return ff(ll);return sctg in ll;};
+select s.id from Stage s where  f(s.groups[?].sctgs);

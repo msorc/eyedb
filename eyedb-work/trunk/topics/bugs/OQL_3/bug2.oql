@@ -1,0 +1,22 @@
+a := set(221.23.790296:oid);
+b := set(174.23.774634:oid);
+a + b + a;
+a + a;
+a + b + a;
+a + b + a + a + b;
+a := list(221.23.790296:oid);
+a + a;
+a + a + b;
+b := list(174.23.774634:oid);
+a + a + b;
+b + a + a + a + b + a;
+c := b + a + a + a + b + a;
+c + b + a;
+
+// this:
+append a to a;
+// or this:
+append a to b;
+append b to a;
+
+// =>stack overflow
