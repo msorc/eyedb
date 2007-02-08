@@ -7,7 +7,6 @@ AC_INIT(scripts/newtopic)
 PACKAGE_NAME=eyedb-work
 PACKAGE_VERSION=0.0.0
 
-AC_CONFIG_MACRO_DIR(m4/extras)
 AC_CONFIG_MACRO_DIR(m4/java)
 AC_CONFIG_AUX_DIR(config)
 
