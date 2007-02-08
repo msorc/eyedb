@@ -1,0 +1,10 @@
+
+class C {
+  int i;
+  C *c;
+};
+
+class D {
+  string s;
+  set<C *> c;
+};
