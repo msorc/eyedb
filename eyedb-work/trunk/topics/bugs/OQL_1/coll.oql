@@ -1,0 +1,27 @@
+g1 := new Group();
+g2 := new Group();
+
+add new Supercontig() to  g2.sctgs;
+add new Supercontig() to  g2.sctgs;
+
+//g1.sctgs := g2.sctgs;
+// near line 3: 'g1.sctgs := g2.sctgs' => oql error: path expression 'g1.sctgs' : attribute error: setting attribute value 'sctgs': object of class 'set<Supercontig*>' cannot be shared between several objects.
+// -> erreur normale
+
+g1.sctgs := g2.sctgs.clone();
+
+g1;
+\p
+
+g2;
+\p
+
+add new Supercontig() to  g2.sctgs;
+add new Supercontig() to  g2.sctgs;
+
+g1;
+\p
+
+g2;
+\p
+

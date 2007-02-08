@@ -1,0 +1,14 @@
+
+class D {
+#ifndef UPDATE1
+  int d1;
+#endif
+  int mth();
+};
+
+class C {
+  int c1;
+  //  D d;
+  D *c_d;
+};
+

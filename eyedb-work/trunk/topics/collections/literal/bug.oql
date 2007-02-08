@@ -1,0 +1,24 @@
+
+// avec index sur C.is
+
+select C.@is[?];
+// retourne des OIDs abberants: bag(3523936256.521.3890035:oid, 3574267904.521.201456:oid, 3624599552.9.3201779:oid, 3674931200.521.1933682:oid, 3708485632.521.3624433:oid, 3758817280.777.3547633:oid, 3809148928.521.1075760:oid, 3859480576.777.4029424:oid, 3909812224.521.2522289:oid, 3960143872.9.2917296:oid)
+
+select C.@is[?].name;
+// -> ok
+
+select C.@is[?].name = "orig 1";
+// -> ne retourne rien
+
+select C.@is[?].name != "orig 1";
+// -> ne retourne rien non plus
+
+// NOTES:
+// 1. idxstats --full collbasic C.is 
+//    indique que toutes les cellules sont sur la key #0
+// 2. sans index sur C.is tout est ok
+// 3. si on fait indexdelete C.is (ou bien s'il n'y a pas d'index au depart
+//    dans schema.odl puis indexcreate C.is => tout redevient OK
+
+// -> pb endian ?
+// => test sur keith

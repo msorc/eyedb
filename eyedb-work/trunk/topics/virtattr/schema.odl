@@ -1,0 +1,21 @@
+
+class builtin {
+  static string[] split_in_words(in string str);
+};
+
+class C {
+  string name;
+
+  string f(in string s) %oql{ return s + " toutou"; %}
+
+  //virtual attribute string words[] as builtin::split_in_words(in string)(name);
+  //virtual string words[] as builtin::split_in_words(in string)(name);
+  //string words[] as builtin::split_in_words(in string)(name);
+  //string words[] as split_in_words(in string)(name); // builtin is optional
+  //index on words;
+
+  //string[] g() %oql{ return builtin::split_in_words(this.name); %}
+  //string words[] as g();
+
+  //string[] g() as builtin::split_in_words(this.name);
+};

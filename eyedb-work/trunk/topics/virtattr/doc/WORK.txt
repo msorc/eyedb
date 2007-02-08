@@ -1,0 +1,228 @@
+
+-------------------------------------------------------------------------------
+                            Topic Virtual attributes
+-------------------------------------------------------------------------------
+                                    Work
+-------------------------------------------------------------------------------
+Date: 15/09/06
+Author: Eric Viara <viara@sysra.com>
+-------------------------------------------------------------------------------
+
+
+
+
+-------------------------------------------------------------------------------
+                                   Related works
+-------------------------------------------------------------------------------
+
+class C {
+  int i[];
+};
+
+X (2.7.10) 1.
+Support of:
+  select C.i[3] = value; // avec et sans index
+  select C.i[?] = value; // avec et sans index
+  select C.i[2];
+  select C.i[?];
+
+2.
+Récupération des valeurs d'indices de [?]
+   - en C++
+   - en Java
+   - en OQL (pb de syntaxe)
+3.
+class C {
+  string s[];
+}; // ceci n'est pas accepté
+
+
+
+-------------------------------------------------------------------------------
+                                     Work
+-------------------------------------------------------------------------------
+
+---------
+ Step #1
+---------
+
+[Support des virtual attributes]
+
+class D {
+  static string f(in object);
+};
+
+class C {
+
+  string f();
+  static string g(in C);
+
+  virtual attribute string va_f as f();
+  virtual attribute string va_g as g(in C);
+  virtual attribute string va_d as D::f(in object);
+
+  int[] h();
+  static string[] i(in C);
+  void j(in string);
+  void j(in string);
+  static void k(in C, in string);
+
+  virtual attribute string va_h[] as h();
+
+  // pour le get et set
+  virtual attribute string va_i_j[] as i(in C) : j(in string);
+  virtual attribute string va_h_k[] as h() : k(in C, in string);
+};
+
+---------
+ Step #2
+---------
+
+[Indexation des virtual attributes]
+
+[Support dans OQL]
+
+
+-------------------------------------------------------------------------------
+                                   Méthodogie
+-------------------------------------------------------------------------------
+
+---------
+ Step #1
+---------
+
+[Support des virtual attributes]
+
+1. modification de la grammaire pour supporter la nouvelle construction
+   (pour get et set)
+virtual [attribute] <type> <attribute>[[]] as <method>(...)[(...)] [: <method>(...)[(...)]];
+
+2. ajout des règles syntaxiques et des classes syntaxiques ODL
+
+3. vérification de la cohérence du type de l'attribut avec la signature
+de la méthode:
+
+class <class> {
+  virtual attribute <type> <attr> as <method>(...)[(...)]
+};
+
+signature de <method> pour le get:
+
+- sans arguments d'appel:
+ + <type> <method>() // dans <class>
+ + static <type> <method>(in <superclass de <class>>) // dans <class> ou autre
+
+- avec arguments d'appel:
+ + <type> <method>(<arg_list>)(<param_list>) // dans <class>
+ + static <type> <method>(<arg_list>)(<param_list>)
+   <param_list> doit être compatible avec l'<arg_list>
+
+- note:
+ + <type> <method>() // dans <class>
+   <=> 
+   <type> <method>()() // dans <class>
+ + static <type> <method>(in <superclass de <class>>) // dans <class> ou autre
+   <=>
+   static <type> <method>(in <superclass de <class>>)(this)
+
+signature de <method> pour le set:
+
+- sans arguments d'appel:
+ + void <method>(<arg_list>)(<param_list>) // dans <class>
+ + static void <method>(<arg_list>)(<param_list>)
+   <param_list> doit être compatible avec l'<arg_list>
+   -> il est censé y avoir this.<virtattr> dans la <param_list> (donc 
+      in <type> dans la <arg_list>.
+      Doit-on obliger cela ?
+
+- avec arguments d'appel:
+ + void <method>(in <type>) // dans <class>
+
+- note:
+ + void <method>(in <type>) // dans <class>
+   <=>
+   void <method>(in <type>)(this.<virtattr>) // dans <class>
+ + static void <method>(in <superclass de <class>>, in <type>) // dans <class> ou autre
+   <=>
+   static void <method>(in <superclass de <class>>, in <type>)(this, this.<virtattr>)
+
+4. support de l'API (Attribute) pour ces attributs virtuels
+
+- stockage de l'info:
+  + runtime:
+    - virtualité
+    - oid de la méthode
+    - <arg_list>: this (object), attributs (this.<[virt]attr>), littéraux
+  + stockage de cette information dans la base
+
+- constructeurs d'attributs
+  + passage de l'info de virtualité
+
+- isVirtual() const
+
+- méthodes compare*
+
+- méthode trace
+
+- méthode getValue() -> méthode execute
+
+- méthode getTValue() ?
+
+- méthode setValue() -> méthode execute
+
+- etc.
+
+5. génération du code C++ spécifique aux attributs virtuels
+
+- a priori, seuls les constructions de classes sont concernés puisque les
+  getValue() et setValue() sont compatibles
+
+- ne générer setValue() que lorsque l'attribut supporte le 'set':
+  virtual string s as f() : g();
+
+6. à ce point, les attributs virtuels doivent être fonctionnels
+
+- en C++
+
+- en OQL (puisque tout est basé sur l'API C++)
+  select C.vattr;
+  select C.vattr = value;
+  select C.vattr_arr[?];
+  select C.vattr_arr[?] = value;
+  (mais pas en Java)
+
+- eyedbodl --gencode=ODL
+
+=> tests / mise au point
+
+7. adaptation du binding Java
+
+Estimation:
+- 5 jours 1-6
+- 2 jours pour 7
+
+---------
+ Step #2
+---------
+
+[Indexation des virtual attributs]
+
+1. indexcreate + hints
+
+2. mise à jour de l'index en cas :
+- de creation d'une instance
+- de mise à jour d'une instance
+- de destruction d'une instance
+
+[Support dans OQL]
+
+3. support OQL
+  select C.vattr = value;
+  select C.vattr_arr[?] = value;
+
+Estimation:
+- 3 jours
+
+
+Estimation total:
+- ~ 10 jours de travail

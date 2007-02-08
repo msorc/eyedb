@@ -1,0 +1,10 @@
+c := new I();
+ii := c.getObject();
+delete c;
+ii;
+\p
+
+ii.toString();
+
+ii := new I();
+

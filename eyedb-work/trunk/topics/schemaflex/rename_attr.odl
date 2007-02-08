@@ -1,0 +1,15 @@
+class C1 {
+  int a;
+#ifdef UPDATE1
+  int b1; @renamed_from(b)
+#elif defined(UPDATE2)
+  int d; @renamed_from(b1)
+#else
+ int b;
+#endif
+  int c;
+  int mth1(in string, out int);
+  static void mth2(in string, out int, in string);
+};
+// }; @renamed_from(C)
+
