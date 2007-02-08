@@ -1,0 +1,10 @@
+function f(s,ss) {
+   for (i:=0; i<s.groups[!]; i++)
+    if (ss in s.groups[i].sctgs)
+      return true;
+   return false;
+};
+
+sctg := (select one Supercontig.name="sctg1_34486");
+select s.id from Stage s where f(s, sctg);
+

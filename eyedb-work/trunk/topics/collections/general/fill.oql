@@ -1,0 +1,9 @@
+
+d := new D(str : "Hello");
+
+for (i := 0; i < 10; i++) {
+  c := new C(i : i, s : "World " + string(i));
+  add c to d.c_set;
+}
+
+;

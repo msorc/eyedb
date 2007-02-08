@@ -1,0 +1,14 @@
+c_sets := select d.c_set from D d where d.str = "Hello";
+
+for (c_set in c_sets) {
+  for (c in contents(c_set))
+    println(c->s);
+}
+;
+
+c_set := select one d.c_set from D d where d.str = "Hello";
+
+for (c in contents(c_set))
+  println(c->s);
+;
+

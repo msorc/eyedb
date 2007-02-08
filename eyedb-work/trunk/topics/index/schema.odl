@@ -1,0 +1,12 @@
+
+class C {
+  int i;
+  int ia[3];
+  int ib[];
+  int ic[3];
+
+  index on i;
+  index on ia;
+  index on ib;
+};
+

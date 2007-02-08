@@ -1,0 +1,15 @@
+b := (select Supercontig.length);
+r:=bag();	
+i:=0;
+for(x in b) {
+  if (i==0) {
+    v:=x;
+   } else if(v!=x) {
+     r := bag(list(i,v)) union r;
+     v := x;
+     i :=0;
+   };
+  i++;
+};
+
+

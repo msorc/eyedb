@@ -1,0 +1,16 @@
+// valgrind oql -d test-354 -l
+
+s:=contents((select one Stage.id=1).length_counts),s[!];
+k:=array();
+n:=0;
+for (x in s) {
+  v := x.value;
+  append x.index to k;
+//  append(contents(v.s))[!] to k;
+  a := contents(v);
+  if (n++ == 2)
+    break;
+};
+a;
+
+
