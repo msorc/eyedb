@@ -421,7 +421,7 @@ class math [OqlCtbMath] {
 
 class oql {
 
- // 26/05/01: a few examples
+// 26/05/01: a few examples
 #if 0
  instmethod<client, called_from=OQL> ostring ostring() %oql{
    return ostring::ostring();
