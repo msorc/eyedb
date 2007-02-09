@@ -438,7 +438,7 @@ bind_error(const char *portname, bool tcpip)
     fprintf(stderr, "named pipe port:\n%s\n", portname);
 
   fprintf(stderr, "\nYou may check this by launching:\n");
-  fprintf(stderr, "eyedbrc status --port=%s\n", portname);
+  fprintf(stderr, "eyedbctl status --port=%s\n", portname);
   if (!tcpip) {
     fprintf(stderr, "\nIf no, unlink this port as follows:\n");
     fprintf(stderr, "rm -f %s\n", portname);
@@ -582,7 +582,7 @@ rpc_portOpen(rpc_Server *server, const char *servname, const char *portname,
 	fprintf(stderr, "\nPerharps another eyedbd is running on port:\n%s\n",
 	port->portname);
 	fprintf(stderr, "\nYou may check this by launching:\n");
-	fprintf(stderr, "eyedbrc status --port=%s\n", port->portname);
+	fprintf(stderr, "eyedbctl status --port=%s\n", port->portname);
 	fprintf(stderr, "\nIf no, unlink this port as follows:\n");
 	fprintf(stderr, "rm -f %s\n", port->portname);
 	fprintf(stderr, "and relaunch the server.\n");
