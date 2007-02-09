@@ -32,6 +32,8 @@
 
 #include <eyedbsm/eyedbsm.h>
 #include	"BIdxBTree.h"
+#include <eyedblib/m_mem.h>
+#include "lib/m_mem_p.h"
 
 //#define USE_CACHE
 //#define USE_CACHE_CHECK
@@ -457,18 +459,18 @@ namespace eyedbsm {
   BIdx::Node *BIdx::Node::allocNode(BIdx *idx)
   {
 #ifdef NOMEMZERO
-    return (Node *)malloc(nodeSize(idx));
+    return (Node *)m_malloc(nodeSize(idx));
 #else
-    return (Node *)calloc(nodeSize(idx), 1);
+    return (Node *)m_calloc(nodeSize(idx), 1);
 #endif
   }
 
   BIdx::Node *BIdx::Node::allocNode(unsigned int degree)
   {
 #ifdef NOMEMZERO
-    return (Node *)malloc(nodeSize(degree2MaxChildren(degree)));
+    return (Node *)m_malloc(nodeSize(degree2MaxChildren(degree)));
 #else
-    return (Node *)calloc(nodeSize(degree2MaxChildren(degree)), 1);
+    return (Node *)m_calloc(nodeSize(degree2MaxChildren(degree)), 1);
 #endif
   }
 

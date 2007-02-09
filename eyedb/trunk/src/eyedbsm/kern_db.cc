@@ -742,7 +742,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 	return buf[buf_ind++];
       }
 
-    s = (char *)malloc(strlen(dir)+strlen(file)+2);
+    s = (char *)m_malloc(strlen(dir)+strlen(file)+2);
     strcpy(s, dir);
     strcat(s, "/");
     strcat(s, file);
@@ -1359,7 +1359,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     if (se = checkFileAccess(DATABASE_OPEN_FAILED, "shm file", shmfileGet(dbfile), accflags))
       return se;
 
-    vd = (DbDescription *)calloc(sizeof(DbDescription), 1);
+    vd = (DbDescription *)m_calloc(sizeof(DbDescription), 1);
 
     smdcli_conn_t *conn = smdcli_open(smd_get_port());
     if (!conn)
@@ -1658,7 +1658,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 
     ALIGN4(vd->omp_addr);
 
-    *pdbh = (DbHandle *)calloc(sizeof(DbHandle), 1);
+    *pdbh = (DbHandle *)m_calloc(sizeof(DbHandle), 1);
     (*pdbh)->vd = vd;
 
     assert(!pdblock); // 17/09/06

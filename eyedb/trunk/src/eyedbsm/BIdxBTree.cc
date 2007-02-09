@@ -24,22 +24,25 @@
 
 #include <eyedbconfig.h>
 
-#include	<stdlib.h>
-#include	<unistd.h>
-#include	<string.h>
-#include	<stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdio.h>
 
 #include <eyedbsm/eyedbsm.h>
-#include	"BIdxBTree.h"
-#include        "eyedbsm_p.h"
-#include	<assert.h>
+#include "BIdxBTree.h"
+#include "eyedbsm_p.h"
+#include <assert.h>
 
-#include        <eyedblib/machtypes.h>
-#include        <eyedblib/rpc_lib.h>
-#include        <eyedblib/xdr.h>
-#include        <eyedblib/strutils.h>
+#include <eyedblib/machtypes.h>
+#include <eyedblib/rpc_lib.h>
+#include <eyedblib/xdr.h>
+#include <eyedblib/strutils.h>
 
-#include        <eyedblib/log.h>
+#include <eyedblib/m_mem.h>
+#include "lib/m_mem_p.h"
+
+#include <eyedblib/log.h>
 
 //#define ESM_HIDX_REGISTER
 
@@ -299,7 +302,7 @@ namespace eyedbsm {
   {
     if (cnt >= alloc_cnt) {
       alloc_cnt = cnt + 32;
-      oids = (Oid *)realloc(oids, alloc_cnt * sizeof(Oid));
+      oids = (Oid *)m_realloc(oids, alloc_cnt * sizeof(Oid));
     }
 
     oids[cnt++] = oid;

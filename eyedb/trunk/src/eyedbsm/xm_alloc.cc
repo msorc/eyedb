@@ -45,6 +45,8 @@
 #endif
 
 #include "xm_alloc.h"
+#include <eyedblib/m_mem.h>
+#include "lib/m_mem_p.h"
 
 namespace eyedbsm {
 
@@ -137,7 +139,7 @@ XMInitFLIdx()
     {
       unsigned int n, idx;
       xm_max_fl_size = 1 << (XM_NFL+1);
-      xm_fl = (char *)malloc(sizeof(char) * (xm_max_fl_size+1));
+      xm_fl = (char *)m_malloc(sizeof(char) * (xm_max_fl_size+1));
       
       for (n = 0, idx = 0; n < xm_max_fl_size+1; n++)
 	{
@@ -214,7 +216,7 @@ XMMutexInit(XMHandle *xmh)
 #endif
 
 #ifdef XM_ESM_MUTEX
-  xmh->mp = (Mutex *)calloc(sizeof(Mutex), 1);
+  xmh->mp = (Mutex *)m_calloc(sizeof(Mutex), 1);
   mutexInit((DbDescription *)xmh->x, xmh->mp, &map->mp, "xm_alloc");
   /*se_mutexInit(xmh->x, 0, &map->mp, "xm_alloc");*/
 #else
@@ -230,7 +232,7 @@ XMMutexLightInit(XMHandle *xmh)
   XMMap *map = xmh->map;
 
 #ifdef XM_ESM_MUTEX
-  xmh->mp = (Mutex *)calloc(sizeof(Mutex), 1);
+  xmh->mp = (Mutex *)m_calloc(sizeof(Mutex), 1);
   mutexLightInit((DbDescription *)xmh->x, xmh->mp, &map->mp);
 #endif
 }
@@ -504,7 +506,7 @@ XMCreate(char *addr, unsigned int size, void *x)
 
   /*  utlog("LOG_ALLOC XMCreate(%p)\n", addr);*/
 
-  xmh = (XMHandle *)calloc(sizeof(XMHandle), 1);
+  xmh = (XMHandle *)m_calloc(sizeof(XMHandle), 1);
   xmh->map = (XMMap *)addr;
   xmh->x = x;
   XMHeapInit(xmh, sizeof(XMMap), size - sizeof(XMMap));
@@ -519,7 +521,7 @@ XMOpen(char *addr, void *x)
 
   XMInitFLIdx();
 
-  xmh = (XMHandle *)calloc(sizeof(XMHandle), 1);
+  xmh = (XMHandle *)m_calloc(sizeof(XMHandle), 1);
   xmh->x = x;
   xmh->map = (XMMap *)addr;
 

@@ -500,6 +500,7 @@ void m_set_maxsize(size_t maxsize)
   m_maxsize = maxsize;
   if (m_maxsize != 0 && m_maxsize < m_min_maxsize)
     m_maxsize = m_min_maxsize;
+
   reduce_memory(0);
 }
 

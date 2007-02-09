@@ -608,7 +608,7 @@ namespace eyedbsm {
 	if (copy)
 	  {
 	    cpsize = MIN(size, osize);
-	    buf = (char *)malloc(cpsize);
+	    buf = (char *)m_malloc(cpsize);
 
 	    /* 2/ copy old object into new object (at most size) */
 	    if (se = ESM_objectRead(dbh, 0, cpsize, buf, LockS, 0, 0, oid,
@@ -1140,7 +1140,7 @@ namespace eyedbsm {
       return statusMake(INVALID_OID, PR "cannot move an oid to a "
 			"physical oid type based datafile");
 
-    buf = (char *)malloc(size);
+    buf = (char *)m_malloc(size);
 
     /* 2/ copy old object into new object (at most size) */
     if (se = ESM_objectRead(dbh, 0, size, buf, LockS, 0, 0, oid, opmode))

@@ -1823,13 +1823,13 @@ struct PageStats {
     x2h_prologue(xmp, mp);
 
     totaldatpages_max = (x2h_u32(dfd->__maxsize())*ONE_K>>pgsize_pow2)+1;
-    totaldatpages = (char *)calloc(totaldatpages_max, 1);
+    totaldatpages = (char *)m_calloc(totaldatpages_max, 1);
 
     totalomppages_max = (x2h_u32(sm_h->__nbobjs())*OIDLOCSIZE>>pgsize_pow2)+1;
-    totalomppages = (char *)calloc(totalomppages_max, 1);
+    totalomppages = (char *)m_calloc(totalomppages_max, 1);
 
     totaldmppages_max = (((x2h_u32(dfd->__maxsize())*ONE_K)/(mp->sizeslot()*8))>>pgsize_pow2)+1;
-    totaldmppages = (char *)calloc(totaldmppages_max, 1);
+    totaldmppages = (char *)m_calloc(totaldmppages_max, 1);
   }
 
   void set(const ObjectLocation &objloc) {

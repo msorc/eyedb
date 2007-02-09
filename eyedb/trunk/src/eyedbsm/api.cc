@@ -34,6 +34,9 @@
 #include "lock.h"
 // added 4/05
 #include "eyedbsm_p.h"
+#include <eyedblib/m_mem.h>
+#include "lib/m_mem_p.h"
+
 namespace eyedbsm {
   /*extern "C" */ Boolean
   isPhy(DbHandle const *dbh, const Oid *oid);
@@ -140,7 +143,7 @@ return (((S).err == SUCCESS) ? Success : &(S))
   {
     Status status;
       
-    *dbh = (DbHandle *)calloc(sizeof(DbHandle), 1);
+    *dbh = (DbHandle *)m_calloc(sizeof(DbHandle), 1);
     memset(*dbh, 0, sizeof(**dbh));
 
     status = ESM_dbOpen(dbfile, flags & ~LOCAL, hints, 0, 0, 0, 0, pversion, dbh);
