@@ -41,6 +41,8 @@
 #include <eyedblib/strutils.h>
 #include <eyedbsm/xdr.h>
 #include <eyedblib/log.h>
+#include <eyedblib/m_mem.h>
+#include "lib/m_mem_p.h"
 
 namespace eyedbsm {
   class MapHeader;
@@ -934,7 +936,7 @@ HIdx::insert_realize(Hat &hat, int hat_k, const void *key,
     ovsize += osize - size;
 #endif
 
-  char *data = (char *)malloc(ovsize);
+  char *data = (char *)m_malloc(ovsize);
   if (STRTYPE(this))
     memcpy(data + sizeof(Overhead), key, strlen((char *)key)+1);
   else if (hidx.keytype == tUnsignedChar || hidx.keytype == tChar ||
@@ -1269,9 +1271,9 @@ HIdx::makeObject(Hat &hat, int hat_k, Oid &koid, int &offset,
 
 #ifdef OPTIM_LARGE_OBJECTS
   int alloc_size = sizeof(Header) + sizeof(Overhead);
-  char *d = (char *)malloc(alloc_size);
+  char *d = (char *)m_malloc(alloc_size);
 #else
-  char *d = (char *)malloc(size);
+  char *d = (char *)m_malloc(size);
 #endif
 
   offset = sizeof(Header);
@@ -2014,7 +2016,7 @@ HIdx::remove(const void *key, const void *xdata, Boolean *found)
 
       if (s) return s;
 
-      char *start = (char *)malloc(size);
+      char *start = (char *)m_malloc(size);
       s = objectRead(dbh, 0, size, start, DefaultLock, 0, 0, &koid);
       
       if (s) {
@@ -2102,7 +2104,7 @@ add(Oid *&oids, unsigned int &cnt, unsigned int &alloc_cnt,
 {
   if (cnt >= alloc_cnt) {
     alloc_cnt = cnt + 32;
-    oids = (Oid *)realloc(oids, alloc_cnt * sizeof(Oid));
+    oids = (Oid *)m_realloc(oids, alloc_cnt * sizeof(Oid));
   }
 
   oids[cnt++] = oid;
@@ -2223,7 +2225,7 @@ Status HIdx::search(const void *key, Boolean *found, void *xdata)
     unsigned int size;
     Status s = objectSizeGet(dbh, &size, DefaultLock, &koid);
     if (s) return s;
-    char *data = (char *)malloc(size);
+    char *data = (char *)m_malloc(size);
     s = objectRead(dbh, 0, size, data, DefaultLock, 0, 0, &koid);
       
     if (s) {
@@ -2350,7 +2352,7 @@ HIdx::getHashObjectBusySize(const Oid *koid, unsigned int &osize, unsigned int s
     s = objectReadNoCopy(dbh, 0, size, &data, DefaultLock, 0, 0, koid);
   }
   else {
-    data = (char *)malloc(size);
+    data = (char *)m_malloc(size);
     s = objectRead(dbh, 0, size, data, DefaultLock, 0, 0, koid);
   }
 
@@ -2859,7 +2861,7 @@ HIdxCursor::read(Boolean &eox)
   }
 
   if (!nocopy || nocopy_failed) {
-    sdata = (char *)malloc(size);
+    sdata = (char *)m_malloc(size);
     data_tofree = True;
     edata = sdata + size;
     cur = sdata + sizeof(HIdx::Header);
@@ -2881,7 +2883,7 @@ HIdxCursor::copy_key(const void *key, unsigned int keysz, Boolean isstr)
   if (keysz == HIdx::VarSize)
     return strdup((char *)key);
 
-  char *k = (char *)malloc(keysz);
+  char *k = (char *)m_malloc(keysz);
   assert((long)k > 0);
 
   if (isstr) {

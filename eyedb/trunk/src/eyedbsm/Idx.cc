@@ -32,9 +32,11 @@
 #include <assert.h>
 
 #include <iostream>
-#include        <eyedblib/log.h>
-#include        <eyedblib/machtypes.h>
-#include        <eyedblib/rpc_lib.h>
+#include <eyedblib/log.h>
+#include <eyedblib/machtypes.h>
+#include <eyedblib/rpc_lib.h>
+#include <eyedblib/m_mem.h>
+#include "lib/m_mem_p.h"
 
 #include <fstream>
 
@@ -85,7 +87,7 @@ Idx::checkOpened() const
 Idx::Key::Key(int sz)
 {
   size = sz;
-  key = (size ? malloc(size) : 0);
+  key = (size ? m_malloc(size) : 0);
 }
 
 void Idx::Key::setKey(void *k, int sz, const KeyType &keyType)
@@ -98,7 +100,7 @@ void Idx::Key::setKey(void *k, int sz, const KeyType &keyType)
   if (sz > size) {
     free(key);
     size = sz;
-    key = malloc(sz);
+    key = m_malloc(sz);
     assert(key);
   }
 

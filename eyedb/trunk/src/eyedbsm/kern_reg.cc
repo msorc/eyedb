@@ -29,7 +29,7 @@ namespace eyedbsm {
 Status
 ESM_registerStart(DbHandle const *dbh, unsigned int reg_mask)
 {
-  dbh->vd->reg = (Register *)calloc(sizeof(Register), 1);
+  dbh->vd->reg = (Register *)m_calloc(sizeof(Register), 1);
   dbh->vd->reg_alloc = 0;
   dbh->vd->reg_mask = reg_mask;
   return Success;
@@ -81,7 +81,7 @@ ESM_addToRegister(DbHandle const *dbh, OP op,
     {
       dbh->vd->reg_alloc += 1024;
       reg->entries = (RegisterEntry *)
-	realloc(reg->entries,
+	m_realloc(reg->entries,
 		sizeof(RegisterEntry)*dbh->vd->reg_alloc);
     }
 

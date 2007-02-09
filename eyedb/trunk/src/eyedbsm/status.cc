@@ -31,6 +31,8 @@
 #include <eyedblib/butils.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <eyedblib/m_mem.h>
+#include "lib/m_mem_p.h"
 
 /*extern char *eyedblib::getFBuffer(const char *fmt, va_list ap);*/
 
@@ -81,7 +83,7 @@ namespace eyedbsm {
     if (strlen(buf) >= s->err_msg_len)
       {
 	s->err_msg_len = strlen(buf)+10;
-	s->err_msg = (char *)realloc(s->err_msg, s->err_msg_len);
+	s->err_msg = (char *)m_realloc(s->err_msg, s->err_msg_len);
       }
 
     s->status.err = err;
@@ -308,7 +310,7 @@ namespace eyedbsm {
 	    if (len >= buf_len) {
 	      buf_len = len + 256;
 	      free(buf);
-	      buf = (char *)malloc(buf_len);
+	      buf = (char *)m_malloc(buf_len);
 	    }
 	    sprintf(buf, "%s: %s", _seError[status->err], s);
 	    return buf;

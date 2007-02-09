@@ -1462,7 +1462,7 @@ do { \
   trobjDataMake(XMHandle *xmh, unsigned int size)
   {
 #ifdef EYEDB_USE_DATA_VMEM
-    char *data = (char *)malloc(objDataGetSize(size));
+    char *data = (char *)m_malloc(objDataGetSize(size));
 #else
     char *data = (char *)XMAlloc(xmh, objDataGetSize(size));
 #endif
@@ -2536,7 +2536,7 @@ do { \
 
     n = 0;
 
-    trs_set = (Transaction **)calloc(sizeof(Transaction *), po->trs_cnt);
+    trs_set = (Transaction **)m_calloc(sizeof(Transaction *), po->trs_cnt);
 
     if (lockmode == LockX) {
       trs = (Transaction *)XM_ADDR(xmh, po->trs_own.trs_off);
@@ -2768,7 +2768,7 @@ do { \
     int i;
 
     if (!recovid && !getenv("EYEDB_NO_MARK_ACTIVE")) {
-      RecovArg *arg = (RecovArg *)malloc(sizeof(RecovArg));
+      RecovArg *arg = (RecovArg *)m_malloc(sizeof(RecovArg));
       arg->xid = xid;
       pthread_create(&recovid, NULL, recovfun, arg);
     }
