@@ -11,7 +11,7 @@ JAVADOC_DIR=
 endif
 
 if COND_XSLTPROC
-MANPAGES_DIR= #manpages # for now, we don't compile and install man pages
+MANPAGES_DIR= manpages 
 else
 MANPAGES_DIR= 
 endif
