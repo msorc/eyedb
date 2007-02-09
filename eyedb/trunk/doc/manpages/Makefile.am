@@ -23,10 +23,10 @@ eyedbuserlist.1 \
 eyedbuserpasswd.1 
 
 XSLTPROC=@XSLTPROC@
-XSL_STYLESHEET=http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl
+MANPAGES_XSL_STYLESHEET=@MANPAGES_XSL_STYLESHEET_DIR@/docbook.xsl
 
 %.1: $(srcdir)/%.xml
-	$(XSLTPROC) $(XSL_STYLESHEET) $(srcdir)/$*.xml
+	$(XSLTPROC) $(MANPAGES_XSL_STYLESHEET) $(srcdir)/$*.xml
 
 EXTRA_DIST= \
 eyedbadmin.xml \

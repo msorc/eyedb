@@ -1,5 +1,8 @@
 SUBDIRS=src include scripts install pkg-config examples tests doc 
 
+docdir=$(datadir)/doc/$(PACKAGE)-$(VERSION)
+doc_DATA=AUTHORS COPYING README
+
 EXTRA_DIST= AUTHORS COPYING ChangeLog README VERSION autogen.sh
 
 TAGS:
