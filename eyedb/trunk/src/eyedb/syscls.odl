@@ -40,9 +40,9 @@
 #define INDEX
 
 class attribute_component [AttributeComponent] {
-  string name; // non indispensable, mais peut être utile
-  string attrpath; // le chemin complete de l'attribut
-  class *class_owner; // à priori redondant avec le attrpath, mais...
+  string name;
+  string attrpath;
+  class *class_owner;
   bool #propagate;
   %C++{
     virtual Status m_trace(FILE *, int, unsigned int, const RecMode *) const;
@@ -449,7 +449,6 @@ class executable [Executable] {
 			       void **pdl, void **pcsym);
     %}
 
-  // 01/03/02: just for test
   constraint <notnull> on exname;
 };
 
@@ -699,7 +698,7 @@ class cardinality_constraint_test [CardinalityConstraint_Test] extends attribute
 
   %C++{
     CardinalityConstraint_Test(Database *, Class *,
-			       const char *attrpath, /*Bool propagate,*/
+			       const char *attrpath,
 			       int, int, int, int);
     Status realize(const RecMode* = NoRecurs);
     Status remove(const RecMode* = NoRecurs);
@@ -941,10 +940,3 @@ class class_conversion [ClassConversion] {
   index <propagate=off> on oid_n;
 #endif
 };
-
-/*
-  enum bool [Bool] {
-  FALSE = 0,
-  TRUE = 1
-  };
-*/

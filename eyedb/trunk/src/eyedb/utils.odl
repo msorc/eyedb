@@ -103,7 +103,7 @@ enum weekday [Weekday] {
 };
 
 class date [Date] {
-  attribute int32 julian; // julian day limité à 584554 années
+  attribute int32 julian; // julian day limited to 584554 years
 
   classmethod<client, called_from=OQL> date date(); // current date
   classmethod<client, called_from=OQL> date date(in date d); 
@@ -171,7 +171,7 @@ class date [Date] {
 };
 
 class time [Time] {
-  attribute int64 usecs; /* temps GMT limité à 24h */
+  attribute int64 usecs; // temps GMT limited to 24 hours
   attribute int16 tz; // time zone in minutes
 
   classmethod<client, called_from=OQL> void get_local_time_zone(out int16 tz_hour, out int16 tz_min);
@@ -252,7 +252,7 @@ class time [Time] {
 };
 
 class time_stamp [TimeStamp] {
-  attribute int64 usecs; // temps GMT limité à 584554 années (verifie)
+  attribute int64 usecs; // temps GMT limited to 584554 years
   attribute int16 tz; // time zone in minutes
 
   classmethod<client, called_from=OQL> time_stamp gmt_time_stamp(); // current gmt time
@@ -347,8 +347,6 @@ class time_stamp [TimeStamp] {
 class time_interval [TimeInterval] {
   attribute int64 usecs; // time interval between 2 dates
                          // days, hours, min, sec, ms, us
-
-
 
   classmethod<client, called_from=OQL> time_interval time_interval(in int64 usecs);
   classmethod<client, called_from=OQL> time_interval time_interval(in int32 day, in int16 hours, in int16 min, in int16 sec, in int16 msec, in int16 usec);
@@ -503,11 +501,6 @@ class ostring [OString] {
     static OString * ostring(Database * db, int s);
     static OString * ostring(Database * db, double s);    
     static OString * concat(Database * db, const char * s1, const char * s2);
-    /*
-    static int strlen(const char * s);
-    static int strcmp(const char * s1, const char * s2);
-    static int strstr(const char * s1, const char * s2);
-    */
     static char * substr(const char *, int offset, int len);
     static char * toLower(const char *);
     static char * toUpper(const char *);
@@ -542,7 +535,6 @@ class ostring [OString] {
     OString & assign(const char *, int len);
     OString & assign(const char *, int offset, int len);
     Status reset();
-    //    OString & resize(int len);
     
     OString & toLower();
     OString & toUpper();
