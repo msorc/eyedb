@@ -750,6 +750,7 @@ namespace eyedb {
     //setValue( "granted_dbm", "%default_dbm%");
 
     // Server Parameters
+    setValue( "maximum_memory_size", "0");
     setValue( "access_file", (sysconfdir + "/eyedb/Access").c_str());
     setValue( "smdport", (localstatedir + "/lib/eyedb/pipes/eyedbsmd").c_str());
 
@@ -814,6 +815,7 @@ namespace eyedb {
       server_map["granted_dbm"] = true;
       server_map["default_dbm"] = true;
       server_map["access_file"] = true;
+      server_map["maximum_memory_size"] = true;
       server_map["smdport"] = true;
       server_map["listen"] = true;
       server_map["oqlpath"] = true;

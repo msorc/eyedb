@@ -31,11 +31,15 @@
 #include <eyedbsm/smd.h>
 #include "oqlctb.h"
 #include <eyedb/ThreadPoolManager.h>
+#include <eyedblib/m_mem.h>
+#include "lib/m_mem_p.h"
 #include "comp_time.h"
 #include "GetOpt.h"
 #include <sstream>
 
 #define USE_GETOPT
+
+#define ONE_K 1024
 
 using namespace std;
 
@@ -180,6 +184,7 @@ do { \
     static const std::string port_opt = "port";
     static const std::string inet_opt = "inet";
     static const std::string smd_port_opt = "smd-port";
+    static const std::string maximum_server_memory_size_opt = "maximum-server-memory-size";
     static const std::string dbm_opt = "dbm";
     static const std::string granted_dbm_opt = "granted-dbm";
     static const std::string default_dbm_opt = "default-dbm";
@@ -261,6 +266,11 @@ do { \
 	     OptionDesc(std::string("eyedbsmd port") +
 			(listen ? "" : " (used for local opening)"),
 			"<port>"));
+    
+    opts[opt_cnt++] = 
+      Option(prefix + maximum_server_memory_size_opt, OptionIntType(), Option::MandatoryValue,
+	     OptionDesc("Maximum server memory size (in Mb)",
+			"<size>"));
     
     opts[opt_cnt++] = 
       Option(prefix + logdev_opt, OptionStringType(), Option::MandatoryValue,
@@ -462,6 +472,17 @@ do { \
 	s->print(stderr);
 	exit(1);
       }
+    }
+
+    if (map.find(maximum_server_memory_size_opt) != map.end()) {
+      ServerConfig::getInstance()->setValue
+	("maximum_memory_size",
+	 map[maximum_server_memory_size_opt].value.c_str());
+    }
+
+    const char *max_memsize = ServerConfig::getSValue("maximum_memory_size");
+    if (max_memsize) {
+      m_set_maxsize(atoi(max_memsize) * ONE_K * ONE_K);
     }
 
     const char *smdport = ServerConfig::getSValue("smdport");
