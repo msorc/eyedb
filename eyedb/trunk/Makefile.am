@@ -29,3 +29,4 @@ doc-archive:
 	tar cvzf eyedb-doc-$(EYEDB_VERSION).tar.gz -C /var/tmp eyedb-doc-$(EYEDB_VERSION)
 	-rm -rf /var/tmp/eyedb-doc-$(EYEDB_VERSION)
 
+AUTOMAKE_OPTIONS=dist-bzip2
