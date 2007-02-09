@@ -8,7 +8,8 @@ $(PDF_PREFIX)GettingStarted.pdf \
 $(PDF_PREFIX)JavaBinding.pdf \
 $(PDF_PREFIX)ODL.pdf \
 $(PDF_PREFIX)OQL.pdf \
-$(PDF_PREFIX)Overview.pdf
+$(PDF_PREFIX)Overview.pdf \
+$(PDF_PREFIX)Admin.pdf
 
 LATEX= TEXINPUTS=.:$(srcdir): @LATEX@
 LATEX_INPUTS=start.tex version.tex title.tex
@@ -25,7 +26,8 @@ html/GettingStarted/index.html \
 html/JavaBinding/index.html \
 html/ODL/index.html \
 html/OQL/index.html \
-html/Overview/index.html
+html/Overview/index.html \
+html/Admin/index.html
 endif
 
 LATEX2HTML=@LATEX2HTML@
@@ -55,12 +57,17 @@ html/Overview/index.html: Overview.tex
 	-test ! -d html && mkdir html ; test ! -d html/Overview && mkdir html/Overview
 	$(LATEX2HTML) $(LATEX2HTMLFLAGS) -split +2 -dir html/Overview Overview.tex
 
+html/Admin/index.html: Admin.tex
+	-test ! -d html && mkdir html ; test ! -d html/Admin && mkdir html/Admin
+	$(LATEX2HTML) $(LATEX2HTMLFLAGS) -split +2 -dir html/Admin Admin.tex
+
 CplusplusBinding.dvi: $(LATEX_INPUTS)
 GettingStarted.dvi: $(LATEX_INPUTS)
 JavaBinding.dvi: $(LATEX_INPUTS)
 ODL.dvi: $(LATEX_INPUTS)
 OQL.dvi: $(LATEX_INPUTS)
 Overview.dvi: $(LATEX_INPUTS)
+Admin.dvi: $(LATEX_INPUTS)
 
 html/CplusplusBinding/index.html: $(LATEX_INPUTS)
 html/GettingStarted/index.html: $(LATEX_INPUTS)
@@ -68,6 +75,7 @@ html/JavaBinding/index.html: $(LATEX_INPUTS)
 html/ODL/index.html: $(LATEX_INPUTS)
 html/OQL/index.html: $(LATEX_INPUTS)
 html/Overview/index.html: $(LATEX_INPUTS)
+html/Admin/index.html: $(LATEX_INPUTS)
 
 clean-local:
 	rm -f *.pdf *.ps *.dvi *.aux *.idx *.log *.toc
@@ -77,7 +85,7 @@ if COND_LATEX2HTML
 install-data-hook:
 	test -z "$(noinst_htmldir)" || $(mkinstalldirs) "$(DESTDIR)$(noinst_htmldir)"
 	-rm "$(DESTDIR)$(noinst_htmldir)/index.html"
-	for d in CplusplusBinding GettingStarted JavaBinding ODL OQL Overview ; \
+	for d in CplusplusBinding GettingStarted JavaBinding ODL OQL Overview Admin; \
 	do \
 		test -z "$(noinst_htmldir)/$$d" || $(mkinstalldirs) "$(DESTDIR)$(noinst_htmldir)/$$d" ; \
 		(cd html/$$d ; \
@@ -97,4 +105,5 @@ GettingStarted.tex \
 JavaBinding.tex \
 ODL.tex \
 OQL.tex \
-Overview.tex
+Overview.tex \
+Admin.tex

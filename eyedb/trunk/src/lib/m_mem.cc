@@ -60,7 +60,7 @@ static size_t m_tmsize, m_maxsize;
 
 static const u_int ONE_K = 1024;
 static const size_t m_min_maxsize = ONE_K * ONE_K * ONE_K; // 1 Gb
-static u_int  m_ref = 0x100,;
+static u_int  m_ref = 0x100;
 
 static int m_getunlocked()
 {
