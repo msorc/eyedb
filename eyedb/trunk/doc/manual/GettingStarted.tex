@@ -26,7 +26,7 @@ the same Unix user as the one used when installing \eyedb, in order not to be fo
 \\
 For any \eyedb operation, a server must run on your computer. To check if a server is running, use the following command:
 \verbsize \begin{verbatim}
-% eyedbrc status
+% eyedbctl status
 \end{verbatim}
 \normalsize
 If a server is running, this command will print a message like:
@@ -45,10 +45,10 @@ No EyeDB Server is running on localhost:6240
 \normalsize
 To start a server, just do this:
 \verbsize \begin{verbatim}
-% eyedbrc start
+% eyedbctl start
 \end{verbatim}
 \normalsize
-Then, you may try again \texttt{eyedbrc status}.\\
+Then, you may try again \texttt{eyedbctl status}.\\
 \\
 If you get any trouble at this step, refer to the installation and to the
 administration manuals.

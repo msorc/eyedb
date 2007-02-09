@@ -234,6 +234,7 @@ eyedbconsadmin					\
 eyedbcollimpladmin				\
 eyedbcrypt					\
 eyedbgetenv					\
+eyedbctl					\
 eyedbrc						\
 eyedbadmin
 
@@ -273,6 +274,9 @@ eyedbcrypt_LDADD= $(EYEDBCLLIBS)
 
 eyedbgetenv_SOURCES= eyedbgetenv.cc
 eyedbgetenv_LDADD= $(EYEDBCLLIBS)
+
+eyedbctl_SOURCES= eyedbctl.cc
+eyedbctl_LDADD= $(EYEDBCLLIBS)
 
 eyedbrc_SOURCES= eyedbrc.cc
 eyedbrc_LDADD= $(EYEDBCLLIBS)
