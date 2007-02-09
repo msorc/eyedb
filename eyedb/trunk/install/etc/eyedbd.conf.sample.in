@@ -2,14 +2,8 @@
 # 
 # This file is a template that you can use to override the default values.
 
-# Executables directory
-#bindir = @bindir@;
-
 # Bases directory
-#data_dir = @localstatedir@/lib/eyedb/db;
-
-# Pipes directory
-#pipedir = @localstatedir@/lib/eyedb/pipes;
+#datadir = @localstatedir@/lib/eyedb/db;
 
 # Temporary files directory
 #tmpdir = @localstatedir@/lib/eyedb/tmp;
@@ -22,6 +16,9 @@
 
 # Granted EYEDBDBM database
 #granted_dbm = %default_dbm%;
+
+# Maximum Server memory size in Mb
+#maximum_memory_size = 0;
 
 # Server access file
 #access_file = @sysconfdir@/eyedb/Access;

@@ -103,11 +103,10 @@ namespace eyedbsm {
     check_alignments();
 
     const char *logmask = getenv("IDB_LOG_MASK");
-    if (logmask)
-      {
-	utlogInit("", "stderr");
-	sscanf(logmask, "%llx", &eyedblib::log_mask);
-      }
+    if (logmask) {
+      utlogInit("", "stderr");
+      sscanf(logmask, "%llx", &eyedblib::log_mask);
+    }
 
     trs_init();
     mutexes_init();

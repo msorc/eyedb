@@ -18,7 +18,7 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
+  Author: Eric Viara <viara@sysra.com>
 */
 
 #include <eyedbconfig.h>
@@ -46,8 +46,6 @@ struct m_Map {
   off_t off;
   u_int ref;
   char locked;
-  /* changed the 23/08/99 */
-  /*pthread_t tid;*/
   void (*gtrig)(void *client_data);
   void *client_data;
   char *file;
@@ -58,103 +56,95 @@ struct m_Map {
 static pthread_mutex_t m_mp;
 static int init_done;
 static m_Map *m_head;
-static u_int m_tmsize, m_ref = 0x100, m_data_margin = 0x8000000;
+static size_t m_tmsize, m_maxsize;
 
-static int
-m_getunlocked()
+static const u_int ONE_K = 1024;
+static const size_t m_min_maxsize = ONE_K * ONE_K * ONE_K; // 1 Gb
+static u_int  m_ref = 0x100,;
+
+static int m_getunlocked()
 {
   int cnt = 0;
   m_Map *m;
 
   m = m_head;
 
-  while (m)
-    {
-      if (!m->locked)
-	cnt++;
-      m = m->next;
-    }
+  while (m) {
+    if (!m->locked)
+      cnt++;
+    m = m->next;
+  }
 
   return cnt;
 }
 
 /*#define TRACE*/
 
-static int
-m_garbage(m_Map *rm)
+static int m_garbage(m_Map *rm)
 {
   m_Map *km = rm;
 
   pthread_mutex_lock(&m_mp);
 
-  if (!rm)
-    {
-      u_int ref = 0xffffffff;
-      m_Map *m;
-      /* changed the 23/08/99 */
-      /*pthread_t tid = pthread_self();*/
+  if (!rm) {
+    u_int ref = 0xffffffff;
+    m_Map *m;
+    m = m_head;
 
-      m = m_head;
-
-      while(m)
-	{
-	  /* changed the 23/08/99 */
-	  /*if (m->tid == tid && m->ref < ref && !m->locked)*/
-	  if (m->ref < ref && !m->locked)
-	    {
-	      ref = m->ref;
-	      rm = m;
-	    }
-	  m = m->next;
-	}
-
+    while(m) {
+      if (m->ref < ref && !m->locked) {
+	ref = m->ref;
+	rm = m;
+      }
+      m = m->next;
     }
 
-  if (rm)
-    {
-      m_tmsize -= rm->size;
+  }
 
-      if (rm->prev)
-	rm->prev->next = rm->next;
-      if (rm->next)
-	rm->next->prev = rm->prev;
+  if (rm) {
+    m_tmsize -= rm->size;
 
-      if (rm == m_head)
-	m_head = rm->next;
+    if (rm->prev)
+      rm->prev->next = rm->next;
+    if (rm->next)
+      rm->next->prev = rm->prev;
 
-      pthread_mutex_unlock(&m_mp);
+    if (rm == m_head)
+      m_head = rm->next;
 
-      if (!km && rm->gtrig)
-	rm->gtrig(rm->client_data);
+    pthread_mutex_unlock(&m_mp);
 
-      IDB_LOG(IDB_LOG_MMAP_DETAIL,
-	      ("m_garbage: unmapping %p for size %u\n", *rm->p, rm->size));
+    if (!km && rm->gtrig)
+      rm->gtrig(rm->client_data);
+
+    IDB_LOG(IDB_LOG_MMAP_DETAIL,
+	    ("m_garbage: unmapping %p for size %u\n", *rm->p, rm->size));
 
 #ifdef CYGWIN
-      printf("m_garbage: unmapping %p for size %u\n", *rm->p, rm->size);
+    printf("m_garbage: unmapping %p for size %u\n", *rm->p, rm->size);
 #endif
 
-      if (munmap(*rm->p, rm->size))
-	{
-	  utlog("munmap(%p, %d)\n", *rm->p, rm->size);
-	  /*perror("munmap");*/
-	  abort();
-	}
+    if (munmap(*rm->p, rm->size)) {
+      utlog("munmap(%p, %d)\n", *rm->p, rm->size);
+      //perror("munmap")
+      abort();
+    }
 
-      *rm->p = 0;
-#if 1
-      /* 4/10/05 */
+    *rm->p = 0;
+
+    // 4/10/05
+    free(rm->file);
+    free(rm);
+
+    /*
+    if (km) { //free only when m_munmap()
       free(rm->file);
       free(rm);
-#else
-      if (km) { /* free only when m_munmap() */
-	free(rm->file);
-	free(rm);
-      }
-#endif
-
-      return 0;
     }
+    */
+
+    return 0;
+  }
 
   pthread_mutex_unlock(&m_mp);
   IDB_LOG(IDB_LOG_MMAP_DETAIL, ("m_garbage failed!\n"));
@@ -162,8 +152,7 @@ m_garbage(m_Map *rm)
   return 1;
 }
 
-static void
-m_insert(m_Map *m)
+static void m_insert(m_Map *m)
 {
   pthread_mutex_lock(&m_mp);
 
@@ -183,7 +172,7 @@ m_insert(m_Map *m)
 
 /* guess that this routine is called soon enough in the program
    so that the thought stack address (&r) is correct;
-   in the IDB/SE package, this routine is called from se_init() */
+   in the eyedbsm package, this routine is called from se_init() */
 
 /*#define USE_MADVISE*/
 
@@ -191,9 +180,7 @@ m_insert(m_Map *m)
 static int must_madvise;
 #endif
 
-
-void
-m_init(void)
+void m_init(void)
 {
   pthread_mutexattr_t mattr;
 
@@ -215,29 +202,33 @@ m_init(void)
   init_done = 1;
 }
 
-u_int
-m_data_margin_set(u_int data_margin)
+static void reduce_memory(size_t size)
 {
-  u_int o_margin = m_data_margin;
-  m_data_margin = data_margin;
-  return o_margin;
+  if (!m_maxsize)
+    return;
+
+  bool must_reduced = false;
+  while (size + m_tmsize > m_maxsize) {
+    must_reduced = true;
+    IDB_LOG(IDB_LOG_MMAP_DETAIL,
+	    ("must reduced total size: %llu\n", m_tmsize));
+    if (m_garbage(0))
+      break;
+  }
+  if (must_reduced)
+    IDB_LOG(IDB_LOG_MMAP_DETAIL, ("reduced: %llu\n", m_tmsize));
 }
 
-void
-m_gtrig_set(m_Map *m, void (*gtrig)(void *client_data), void *client_data)
+void m_gtrig_set(m_Map *m, void (*gtrig)(void *client_data), void *client_data)
 {
   m->gtrig = gtrig;
   m->client_data = client_data;
 }
 
-m_Map
-*m_mmap(caddr_t addr, size_t size, int prot, int flags,
-	int fildes, off_t off, caddr_t *p, const char *file, off_t startns,
-	off_t endns)
+m_Map *m_mmap(caddr_t addr, size_t size, int prot, int flags,
+	      int fildes, off_t off, caddr_t *p, const char *file,
+	      off_t startns, off_t endns)
 {
-  int n;
-  int ntries;
-
   if (!init_done)
     m_init();
 
@@ -259,6 +250,8 @@ m_Map
   else
     IDB_LOG_X(IDB_LOG_MMAP_DETAIL, ("\n"));
 
+  reduce_memory(size);
+
   /* disconnected the 25/07/01 */
 #if 0
   /* re-added the 8/12/99 */
@@ -268,7 +261,7 @@ m_Map
   /* ... */
 #endif
 
-  for (ntries = 0;; ntries++) {
+  for (unsigned int ntries = 0;; ntries++) {
     if ((*p = (caddr_t)mmap(addr, size, prot, flags, fildes, off)) != MAP_FAILED) {
       m_Map *m = (m_Map *)calloc(sizeof(m_Map), 1);
 	  
@@ -283,8 +276,6 @@ m_Map
       m->file = strdup(file);
       m->startns = startns;
       m->endns = endns;
-      /* changed the 23/08/99 */
-      /*m->tid = pthread_self();*/
 
       m_insert(m);
 
@@ -356,36 +347,22 @@ m_Map
   return 0;
 }
 
-void
-m_lock(m_Map *m)
+void m_lock(m_Map *m)
 {
   m->locked = 1;
 }
 
-void
-m_unlock(m_Map *m)
+void m_unlock(m_Map *m)
 {
   m->locked = 0;
 }
 
-void
-m_access(m_Map *m)
+void m_access(m_Map *m)
 {
   m->ref = ++m_ref;
 }
 
-#ifdef CYGWIN
-int munmap (void *__addr, size_t __len)
-{
-  printf("UNMAPPING %p %d\n", __addr, __len);
-  return 0;
-}
-#endif
-
-#include <iostream>
-
-int
-m_munmap(m_Map *map, caddr_t addr, size_t size)
+int m_munmap(m_Map *map, caddr_t addr, size_t size)
 {
   IDB_LOG(IDB_LOG_MMAP,
 	  ("segment unmapped file=\"%s\" segment=[%p, %p[ "
@@ -416,34 +393,31 @@ m_munmap(m_Map *map, caddr_t addr, size_t size)
   return m_garbage(map);
 }
 
-void
-*m_malloc(size_t size)
+void *m_malloc(size_t size)
 {
   void *p;
 
   if (!init_done)
     m_init();
 
-  /* added: 21/12/04 */
   if (!size)
     size = 4;
 
-  while ( !(p = malloc(size)) )
+  while (!(p = malloc(size)))
     if (errno != ENOMEM || m_garbage(0)) /* really ? */
       m_abort_msg("malloc(%lu) failed [errno %d]\n", size, errno);
 
   return p;
 }
 
-void
-*m_calloc(size_t nelem, size_t elsize)
+void *m_calloc(size_t nelem, size_t elsize)
 {
   void *p;
 
   if (!init_done)
     m_init();
 
-  while ( !(p = calloc(nelem, elsize)) )
+  while (!(p = calloc(nelem, elsize)))
     if (errno != ENOMEM || m_garbage(0))
       m_abort_msg("calloc(%d, %lu) failed [errno %d]\n", nelem, elsize, 
 		  errno);
@@ -451,15 +425,14 @@ void
   return p;
 }
 
-void
-*m_realloc(void *ptr, size_t size)
+void *m_realloc(void *ptr, size_t size)
 {
   void *p;
 
   if (!init_done)
     m_init();
 
-  while ( !(p = realloc(ptr, size)) )
+  while (!(p = realloc(ptr, size)))
     if (errno != ENOMEM || m_garbage(0))
       m_abort_msg("realloc(%p, %lu) failed [errno %d]\n", ptr, size,
 		  errno);
@@ -467,58 +440,70 @@ void
   return p;
 }
 
-void
-m_free(void *ptr)
+void m_free(void *ptr)
 {
   free(ptr);
 }
 
-void
-m_abort_msg(const char *fmt, ...)
+void m_abort_msg(const char *fmt, ...)
 {
   va_list ap;
   va_start(ap, fmt);
-  m_maptrace(stderr);
+  m_maptrace(std::cerr);
   vfprintf(stderr, fmt, ap);
   m_abort();
   va_end(ap);
 }
 
-void
-m_abort()
+void m_abort()
 {
   m_mmaps_garbage();
   abort();
 }
 
-void
-m_mmaps_garbage()
+void m_mmaps_garbage()
 {
   m_Map *m = m_head, *next;
 
-  while (m)
-    {
-      next = m->next;
-      m_garbage(m);
-      m = next;
-    }
+  while (m) {
+    next = m->next;
+    m_garbage(m);
+    m = next;
+  }
 }
  
-void
-m_maptrace(FILE *fd)
+void m_maptrace(std::ostream &os)
 {
   m_Map *m = m_head;
 
-  fprintf(fd, "------------------- M_MAP ---------------------\n");
-  while (m)
-    {
-      fprintf(fd, " addr %p size %lu [%d Kb]\n",
-	      *m->p, m->size, m->size/1024);
-      m = m->next;
-    }
-  /*
-  fprintf(fd, " data used 0x%x [%lu Kb]\n", data_size_used(),
-	  data_size_used()/1024);
-  */
-  fprintf(fd, " mmap used 0x%x [%lu Kb]\n", m_tmsize, m_tmsize/1024);
+  os << "----------------------- eyedb memory map manager ---------------------\n";
+
+  while (m) {
+    os << " addr " << *m->p << " size " << m->size << "[" <<
+      (m->size/ONE_K) << " kb\n";
+    m = m->next;
+  }
+
+  os << " total memory used: " << (m_tmsize/ONE_K) << " kb\n";
+  if (m_maxsize)
+    os << " maximum memory size: " << (m_maxsize/ONE_K) << " kb\n";
+    
+}
+
+size_t m_get_totalsize()
+{
+  return m_tmsize;
+}
+
+void m_set_maxsize(size_t maxsize)
+{
+  m_maxsize = maxsize;
+  if (m_maxsize != 0 && m_maxsize < m_min_maxsize)
+    m_maxsize = m_min_maxsize;
+  reduce_memory(0);
+}
+
+size_t m_get_maxsize()
+{
+  return m_maxsize;
 }

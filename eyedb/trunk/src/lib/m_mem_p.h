@@ -22,11 +22,7 @@
 */
 
 #include <sys/types.h>
-#include <stdio.h>
-
-static char* msg_3 = __FILE__;
-#define TTT(S) (write( 1, S, strlen(S)))
-static int dummy_off_t_3 = (sizeof(off_t) != 8 ? (TTT(msg_3), *(char *)0 = 0) : 1);
+#include <iostream>
 
 extern m_Map *m_mmap(caddr_t addr, size_t len, int prot, int flags,
 		     int fildes, off_t off, caddr_t *p, const char *file,
@@ -50,5 +46,8 @@ extern void m_free(void *ptr);
 extern void m_abort(void);
 extern void m_abort_msg(const char *fmt, ...);
 extern void m_mmaps_garbage(void);
-extern void m_maptrace(FILE *fd);
+extern void m_maptrace(std::ostream &);
 
+extern size_t m_get_totalsize();
+extern size_t m_get_maxsize();
+extern void m_set_maxsize(size_t);
