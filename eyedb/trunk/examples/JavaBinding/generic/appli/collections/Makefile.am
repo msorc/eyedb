@@ -1,4 +1,4 @@
-eyedbexamplesdir=$(datadir)/doc/$(PACKAGE)/examples/JavaBinding/generic/appli/collections
+eyedbexamplesdir=$(datadir)/doc/$(PACKAGE)-$(VERSION)/examples/JavaBinding/generic/appli/collections
 dist_eyedbexamples_DATA=Collections.java
 eyedbexamples_DATA=Makefile.eyedb-examples
 

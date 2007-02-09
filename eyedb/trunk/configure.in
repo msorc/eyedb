@@ -326,24 +326,43 @@ AM_CONDITIONAL(COND_SWIG, test x"$COND_SWIG" = xyes)
 # Documentation building
 # ========================================
 # check for needed programs
+
+# Doxygen for C++ API documentation
 AC_PATH_PROG(DOXYGEN, doxygen)
 if test x"$DOXYGEN" != x ; then
 COND_DOXYGEN="yes"
 fi
 AM_CONDITIONAL(COND_DOXYGEN, test x"$COND_DOXYGEN" = xyes)
 
+# Java API documentation
 AC_PATH_PROG(JAVADOC, javadoc)
 if test x"$JAVADOC" != x ; then
 COND_JAVADOC="yes"
 fi
 AM_CONDITIONAL(COND_JAVADOC, test x"$COND_JAVADOC" = xyes)
 
+# Docbook manpages
 AC_PATH_PROG(XSLTPROC, xsltproc)
 if test x"$XSLTPROC" != x ; then
 COND_XSLTPROC="yes"
 fi
 AM_CONDITIONAL(COND_XSLTPROC, test x"$COND_XSLTPROC" = xyes)
+# Look for XSL stylesheet
+MANPAGES_XSL_STYLESHEET_LOCATIONS="/usr/share/sgml/docbook/xsl-stylesheets/manpages"
+AC_MSG_CHECKING(for Docbook manpages XSL stylesheet)
+for d in $MANPAGES_XSL_STYLESHEET_LOCATIONS; do
+if test -f $d/docbook.xsl ; then
+MANPAGES_XSL_STYLESHEET_DIR=$d
+break
+fi
+done
+if test x"$MANPAGES_XSL_STYLESHEET_DIR" = x ; then
+MANPAGES_XSL_STYLESHEET_DIR=http://docbook.sourceforge.net/release/xsl/current/manpages/
+fi
+AC_MSG_RESULT("$MANPAGES_XSL_STYLESHEET_DIR")
+AC_SUBST(MANPAGES_XSL_STYLESHEET_DIR)
 
+# Manuals
 AC_PATH_PROG(LATEX, latex)
 AC_PATH_PROG(DVIPS, dvips)
 AC_PATH_PROG(PS2PDF, ps2pdf)
@@ -487,6 +506,7 @@ include/eyedbsm/Makefile
 install/Makefile
 install/etc/Makefile
 pkg-config/Makefile
+pkg/rpm/eyedb.spec
 scripts/Makefile
 scripts/eyedb-postinstall.sh
 scripts/eyedbjrun

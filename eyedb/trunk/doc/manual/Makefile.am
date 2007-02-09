@@ -1,6 +1,6 @@
 DIST_SUBDIRS=figures
 
-manualdir=$(datadir)/doc/$(PACKAGE)/manual/pdf
+manualdir=$(datadir)/doc/$(PACKAGE)-$(VERSION)/manual/pdf
 PDF_PREFIX=EyeDB
 manual_DATA=\
 $(PDF_PREFIX)CplusplusBinding.pdf \
@@ -18,7 +18,7 @@ DVIPSFLAGS= -f -Ppdf -G0
 PS2PDF=@PS2PDF@
 PS2PDFFLAGS= -dPDFsettings=/prepress 
 
-noinst_htmldir=$(datadir)/doc/$(PACKAGE)/manual/html
+noinst_htmldir=$(datadir)/doc/$(PACKAGE)-$(VERSION)/manual/html
 if COND_LATEX2HTML
 noinst_html_DATA= \
 html/CplusplusBinding/index.html \
