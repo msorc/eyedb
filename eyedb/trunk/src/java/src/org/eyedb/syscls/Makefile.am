@@ -57,9 +57,9 @@ EYEDBODLFLAGS_syscls = --export --package=org.eyedb.syscls \
 JAVA_ODL_FILES= \
 $(top_srcdir)/src/java/src/org/eyedb/syscls/Database.java 
 
-$(JAVA_ODL_FILES): syscls.odl
+$(JAVA_ODL_FILES): $(top_srcdir)/src/eyedb/syscls.odl
 	@if test -x $(EYEDBODL_exe) ; then \
-		echo $(EYEDBODL) $(EYEDBODLFLAGS_syscls) $< ; $(EYEDBODL) $(EYEDBODLFLAGS_utils) $< ; \
+		echo $(EYEDBODL) $(EYEDBODLFLAGS_syscls) $< ; $(EYEDBODL) $(EYEDBODLFLAGS_syscls) $< ; \
 	else \
 		echo Warning: $(EYEDBODL) not found, using existing $@; touch $@ ; \
 	fi

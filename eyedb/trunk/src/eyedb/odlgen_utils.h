@@ -105,6 +105,7 @@ namespace eyedb {
     Bool gen_down_casting;
     Bool class_enums;
     Bool attr_cache;
+    Bool gen_date;
     ErrorPolicy error_policy;
     char *dirname, *fileprefix;
     const char *stubs;

@@ -195,6 +195,7 @@ namespace eyedb {
     stubs            = NULL;
     c_suffix         = strdup(".cc");
     h_suffix         = strdup(".h");
+    gen_date         = True;
 
     init_reserved_words();
   }

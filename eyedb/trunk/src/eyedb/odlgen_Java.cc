@@ -150,6 +150,9 @@ namespace eyedb {
     if (!strcmp(name, "URL"))
       return "org.eyedb.utils.URL";
 
+    if (!strcmp(name, "CURL"))
+      return "org.eyedb.utils.CURL";
+
     if (!strcmp(name, "date"))
       return "org.eyedb.utils.Date";
 
@@ -235,6 +238,7 @@ namespace eyedb {
     if (!strcmp(name, "image"))
       return "Image";
 
+    oups
     if (!strcmp(name, "URL"))
       return "URL";
 

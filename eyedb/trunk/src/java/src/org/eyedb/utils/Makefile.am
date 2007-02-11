@@ -11,7 +11,6 @@ Root.java \
 TimeInterval.java \
 Time.java \
 TimeStamp.java \
-URL.java \
 WConfig.java \
 Weekday.java
 
@@ -30,7 +29,7 @@ EYEDBODLFLAGS_utils = --export --package=org.eyedb.utils \
 JAVA_ODL_FILES= \
 $(top_srcdir)/src/java/src/org/eyedb/utils/Database.java 
 
-$(JAVA_ODL_FILES): utils.odl
+$(JAVA_ODL_FILES): $(top_srcdir)/src/eyedb/utils.odl
 	@if test -x $(EYEDBODL_exe) ; then \
 		echo $(EYEDBODL) $(EYEDBODLFLAGS_utils) $< ; $(EYEDBODL) $(EYEDBODLFLAGS_utils) $< ; \
 	else \
