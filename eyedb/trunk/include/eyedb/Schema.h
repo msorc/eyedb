@@ -407,7 +407,7 @@ namespace eyedb {
     void hashTableInvalidate();
 
     const char *generateStubs_C(Bool, Class *, const char *,
-				const char *);
+				const char *, const GenCodeHints &hints);
 
     Status generateCode_C(const char *package, const char *schname,
 			  const char *c_namespace,

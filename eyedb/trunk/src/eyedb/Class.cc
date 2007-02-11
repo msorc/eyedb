@@ -52,7 +52,6 @@ namespace eyedb {
 
   void Class::_init(const char *s)
   {
-    //printf("Class::Class(this=%p, %s)\n", this, s);
     name = NULL;
     num = 0;
     aliasname = NULL;
@@ -538,6 +537,8 @@ namespace eyedb {
       return prefix + (prefix_sep ? "utils." : "") + "Image";
     if (!strcmp(name, "URL"))
       return prefix + (prefix_sep ? "utils." : "") + "CURL";
+    //if (!strcmp(name, "CURL"))
+    //return prefix + (prefix_sep ? "utils." : "") + "CURL";
     if (!strcmp(name, "w_config"))
       return prefix + (prefix_sep ? "utils." : "") + "WConfig";
     if (!strcmp(name, "month"))
@@ -744,6 +745,7 @@ namespace eyedb {
     if (!strcmp(name, "datafile"))
       return "OqlCtbDatafile";
 
+    oups
     if (!strcmp(name, "URL"))
       return DEF_PREFIX1 "URL";
 

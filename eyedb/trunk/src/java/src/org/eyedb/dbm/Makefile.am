@@ -27,9 +27,9 @@ EYEDBODLFLAGS_dbm = --export --package=org.eyedb.dbm \
 JAVA_ODL_FILES= \
 $(top_srcdir)/src/java/src/org/eyedb/dbm/Database.java 
 
-$(JAVA_ODL_FILES): DBM.odl
+$(JAVA_ODL_FILES): $(top_srcdir)/src/eyedb/DBM.odl
 	@if test -x $(EYEDBODL_exe) ; then \
-		echo $(EYEDBODL) $(EYEDBODLFLAGS_dbm) $< ; $(EYEDBODL) $(EYEDBODLFLAGS_utils) $< ; \
+		echo $(EYEDBODL) $(EYEDBODLFLAGS_dbm) $< ; $(EYEDBODL) $(EYEDBODLFLAGS_dbm) $< ; \
 	else \
 		echo Warning: $(EYEDBODL) not found, using existing $@; touch $@ ; \
 	fi
