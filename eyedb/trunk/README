@@ -109,10 +109,10 @@ Running EyeDB
 -------------
 
 To run EyeDB, you need first to start the server by:
-eyedbrc start
+eyedbctl start
 
 You can then check that the server is running by:
-eyedbrc status
+eyedbctl status
 
 To check that EyeDB runs, after starting the server, you can run the
 following command:
