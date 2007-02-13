@@ -25,24 +25,46 @@ printf( "    <refname>&%s;</refname>\n", cmd);
 print "    <refpurpose>command purpose</refpurpose>";
 print "  </refnamediv>";
 print "";
+
 }
-{
+/usage:/ {
 print "  <refsynopsisdiv>";
 print "    <cmdsynopsis>";
 printf( "      <code><![CDATA[%s]]></code>\n", $0);
 printf( "      %s\n", cmd);
-# TODO
+
+delete options;
+n_options = 0;
 for (i = 3; i <= NF; i++) {
 #      <arg choice="req"><replaceable>dbname</replaceable></arg>
 #      <arg choice="req">r|rw|rx|rwx|admin|no</arg>
   a = $i
   gsub( "<", "@lt;replaceable@gt;", a);
   gsub( ">", "@lt;/replaceable@gt;", a);
+  if (match(a,"^\\[") > 0 && match(a,"\\]$") > 0)
+    argtype = "optional";
+  else
+    argtype = "required"
+
+  gsub( "\\[", "@lt;arg@gt;", a);
+  gsub( "\\]", "@lt;/arg@gt;", a);
+
   gsub( "@lt;", "<", a);
   gsub( "@gt;", ">", a);
-  printf( "      <arg>%s</arg>\n", a);
+
+  if (argtype == "required")
+    opt = "<arg choice=\"plain\">" a "</arg>";
+  else
+    opt = a;
+
+  options[n_options++] = opt;
 }
-# /TODO
+
+for (n = 0; n < n_options; n++) {
+  printf( "      %s\n", options[n]);
+  print "options[" n "]=" options[n] > "/dev/stderr";
+}
+
 print "    </cmdsynopsis>";
 print "  </refsynopsisdiv>";
 print "";
@@ -56,14 +78,18 @@ print "  <refsect1>";
 print "    <title>Options</title>";
 print "";
 print "    <variablelist>";
-print "      <varlistentry>";
-# TODO
-print "	<term>--option</term>";
-print "	<listitem>";
-print "	  <para>option_description</para>";
-print "	</listitem>";
-# /TODO
-print "      </varlistentry>";
+print ""
+
+for (n = 0; n < n_options; n++) {
+  print "      <varlistentry>";
+  print "	<term>" options[n] "</term>";
+  print "	<listitem>";
+  print "	  <para>option_description</para>";
+  print "	</listitem>";
+  print "      </varlistentry>";
+  print ""
+}
+
 print "    </variablelist>";
 print "";
 print "  </refsect1>";
