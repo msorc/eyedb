@@ -60,6 +60,8 @@
 #include <eyedblib/log.h>
 #include <kern_p.h>
 
+#define USE_INODE
+
 using namespace eyedbsm;
 
 static int smd_refcnt;
@@ -179,14 +181,34 @@ public:
 #endif
 
 class DbFile : public Reference {
+#ifdef USE_INODE
+  ino_t ino;
+  dev_t dev; 
+#else
   char *dbfile;
+#endif
+
 #ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
   Semaphore *sm[ESM_NSEMS];
 #endif
   static std::list<DbFile *> dbfile_list;
 
   DbFile(const char *_dbfile) : Reference() {
+#ifdef USE_INODE
+    struct stat st;
+    if (stat(_dbfile, &st) < 0) {
+      fprintf(stderr, "cannot stat file %s\n", _dbfile);
+      ino = 0;
+      dev = 0;
+      return;
+    }
+
+    ino = st.st_ino;
+    dev = st.st_dev;
+#else
     dbfile = strdup(_dbfile);
+#endif
+
 #ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
     sm[0] = Semaphore::find(1);
     sm[1] = Semaphore::find(0);
@@ -201,7 +223,7 @@ class DbFile : public Reference {
 
   ~DbFile() {
 #ifdef TRACE
-    fprintf(stderr, "deleting dbfile %s\n", dbfile);
+    fprintf(stderr, "deleting dbfile %s\n", getDbfile());
 #endif
 #ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
     for (int i = 0; i < ESM_NSEMS; i++)
@@ -220,19 +242,29 @@ public:
   }
 #endif
 
+#ifdef USE_INODE
+  const char *getDbfile() const {
+    static std::string st_dbfile;
+    char buf[64];
+    sprintf(buf, "dev=%d,ino=%d", dev, ino);
+    st_dbfile = buf;
+    return st_dbfile.c_str();
+  }
+#else
   const char *getDbfile() const {
     return dbfile;
   }
+#endif
 
   void release() {
 #ifdef TRACE
-    fprintf(stderr, "releasing dbfile %s [refcnt:%d]\n", dbfile, getRefCount());
+    fprintf(stderr, "releasing dbfile %s [refcnt:%d]\n", getDbfile(), getRefCount());
 #endif
     if (!decrRefCount()) {
       bool r = std_list_erase(dbfile_list, this);
 #ifdef TRACE
       if (!r)
-	std::cerr << "Warning: DbFile::release " << dbfile << "not found\n";
+	std::cerr << "Warning: DbFile::release " << getDbfile() << "not found\n";
 #endif
       delete this;
     }
@@ -242,6 +274,33 @@ public:
     std::list<DbFile *>::const_iterator begin = dbfile_list.begin();
     std::list<DbFile *>::const_iterator end = dbfile_list.end();
     DbFile *dbf;
+
+#ifdef USE_INODE
+    struct stat st;
+    ino_t ino;
+    dev_t dev; 
+    if (stat(dbfile, &st) < 0) {
+      fprintf(stderr, "cannot stat file %s\n", dbfile);
+      ino = 0;
+      dev = 0;
+      return 0;
+    }
+
+    ino = st.st_ino;
+    dev = st.st_dev;
+
+    while (begin != end) {
+      dbf = *begin;
+      if (dbf->ino == ino && dbf->dev == dev) {
+	if (get_sems)
+	  dbf->incrRefCount();
+	found = 1;
+	return dbf;
+      }
+      ++begin;
+    }
+
+#else
 
     while (begin != end) {
       dbf = *begin;
@@ -253,6 +312,7 @@ public:
       }
       ++begin;
     }
+#endif
 
     found = 0;
     if (get_sems) {
@@ -276,7 +336,7 @@ public:
   }
 
   void trace() {
-    fprintf(stderr, "%s, ", dbfile);
+    fprintf(stderr, "%s, ", getDbfile());
 #ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
     for (int i = 0; i < ESM_NSEMS; i++) {
       if (i) fprintf(stderr, ", ");
