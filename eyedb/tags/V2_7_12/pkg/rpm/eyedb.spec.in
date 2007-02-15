@@ -1,0 +1,228 @@
+# -*-rpm-spec-*-
+
+%define name    eyedb
+%define version @EYEDB_VERSION@ 
+%define release %mkrel 1 
+%define group   Databases
+
+%define _unpackaged_files_terminate_build	0
+%define _missing_doc_files_terminate_build	0
+
+Name:           %{name} 
+Summary:        EyeDB is an Object Database Management System
+Version:        %{version} 
+Release:        %{release} 
+URL:            http://www.eyedb.org
+License:        LGPL
+Group:          %{group}
+Source0:        %{name}-%{version}.tar.bz2
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-buildroot 
+
+%description
+EyeDB is an Object Database Management System (ODBMS).
+
+%package common
+Summary: EyeDB client and server common libraries
+Group: %{group}
+Provides: %{name}-common = %{version}
+%description common
+EyeDB client and server common libraries
+
+%package client
+Summary: EyeDB client libraries and binaries
+Group: %{group}
+Provides: %{name}-client = %{version}
+%description client
+EyeDB client libraries and binaries
+
+%package server
+Summary: EyeDB server libraries and binaries
+Group: %{group}
+Provides: %{name}-server = %{version}
+%description server
+EyeDB server libraries and binaries
+
+%package devel
+Summary: EyeDB headers files
+Group: %{group}
+Provides: %{name}-devel = %{version}
+%description devel
+EyeDB headers files
+
+%package doc
+Summary: EyeDB documentation
+Group: %{group}
+Provides: %{name}-doc = %{version}
+%description doc
+EyeDB documentation
+
+# other packages: -java, -www
+
+%prep 
+%setup -q
+
+%build 
+%configure 
+%make -j 32
+
+%install
+rm -rf $RPM_BUILD_ROOT
+make DESTDIR=$RPM_BUILD_ROOT install
+
+%clean 
+rm -rf $RPM_BUILD_ROOT 
+rm -rf $RPM_BUILD_DIR/jmax-%{version}
+
+%post
+# create eyedb user
+# ...
+# create DBM
+/usr/share/eyedb/tools/eyedb-postinstall.sh
+
+%files common
+%defattr(-,root,root)
+%{_libdir}/libeyedb-%{version}.so
+%{_libdir}/libeyedb.so
+%{_libdir}/libeyedbsm-%{version}.so
+%{_libdir}/libeyedbsm.so
+%{_libdir}/libeyedbutils-%{version}.so
+%{_libdir}/libeyedbutils.so
+%{_libdir}/libeyedbrpcfe-%{version}.so
+%{_libdir}/libeyedbrpcfe.so
+%{_libdir}/eyedb/oqlctbmthfe-%{version}.so
+%{_libdir}/eyedb/oqlctbmthfe.so
+%{_libdir}/eyedb/sysclsmthfe-%{version}.so
+%{_libdir}/eyedb/sysclsmthfe.so
+%{_libdir}/eyedb/utilsmthfe-%{version}.so
+%{_libdir}/eyedb/utilsmthfe.so
+%{_docdir}/%{name}-%{version}/AUTHORS
+%{_docdir}/%{name}-%{version}/COPYING
+%{_docdir}/%{name}-%{version}/README
+
+%files client
+%defattr(-,root,root)
+%{_bindir}/eyedbadmin
+%{_bindir}/eyedbcollimpladmin
+%{_bindir}/eyedbcollimplgetdef
+%{_bindir}/eyedbcollimpllist
+%{_bindir}/eyedbcollimplsetdef
+%{_bindir}/eyedbcollimplsimulate
+%{_bindir}/eyedbcollimplstats
+%{_bindir}/eyedbcollimplupdate
+%{_bindir}/eyedbconsadmin
+%{_bindir}/eyedbconscreate
+%{_bindir}/eyedbconsdelete
+%{_bindir}/eyedbconslist
+%{_bindir}/eyedbdatcreate
+%{_bindir}/eyedbdatdefragment
+%{_bindir}/eyedbdatdelete
+%{_bindir}/eyedbdatlist
+%{_bindir}/eyedbdatmove
+%{_bindir}/eyedbdatrename
+%{_bindir}/eyedbdatresize
+%{_bindir}/eyedbdbaccess
+%{_bindir}/eyedbdbcopy
+%{_bindir}/eyedbdbcreate
+%{_bindir}/eyedbdbdelete
+%{_bindir}/eyedbdbexport
+%{_bindir}/eyedbdbimport
+%{_bindir}/eyedbdblist
+%{_bindir}/eyedbdbmcreate
+%{_bindir}/eyedbdbmove
+%{_bindir}/eyedbdbrename
+%{_bindir}/eyedbdspcreate
+%{_bindir}/eyedbdspdelete
+%{_bindir}/eyedbdspgetcurdat
+%{_bindir}/eyedbdspgetdefault
+%{_bindir}/eyedbdsplist
+%{_bindir}/eyedbdsprename
+%{_bindir}/eyedbdspsetcurdat
+%{_bindir}/eyedbdspsetdefault
+%{_bindir}/eyedbdspupdate
+%{_bindir}/eyedbgetattrloca
+%{_bindir}/eyedbgetcollloca
+%{_bindir}/eyedbgetdefattrdsp
+%{_bindir}/eyedbgetdefcolldsp
+%{_bindir}/eyedbgetdefdsp
+%{_bindir}/eyedbgetdefidxdsp
+%{_bindir}/eyedbgetdefinstdsp
+%{_bindir}/eyedbgetenv
+%{_bindir}/eyedbgetidxloca
+%{_bindir}/eyedbgetinstloca
+%{_bindir}/eyedbgetobjloca
+%{_bindir}/eyedbidxadmin
+%{_bindir}/eyedbidxcreate
+%{_bindir}/eyedbidxdelete
+%{_bindir}/eyedbidxlist
+%{_bindir}/eyedbidxsimulate
+%{_bindir}/eyedbidxstats
+%{_bindir}/eyedbidxupdate
+%{_bindir}/eyedbjrun
+%{_bindir}/eyedbloca
+%{_bindir}/eyedbmvattr
+%{_bindir}/eyedbmvcoll
+%{_bindir}/eyedbmvidx
+%{_bindir}/eyedbmvinst
+%{_bindir}/eyedbmvobj
+%{_bindir}/eyedbodl
+%{_bindir}/eyedboql
+%{_bindir}/eyedbpasswd
+%{_bindir}/eyedbprotadmin
+%{_bindir}/eyedbputimage
+%{_bindir}/eyedbsetdefattrdsp
+%{_bindir}/eyedbsetdefcolldsp
+%{_bindir}/eyedbsetdefdsp
+%{_bindir}/eyedbsetdefidxdsp
+%{_bindir}/eyedbsetdefinstdsp
+%{_bindir}/eyedbsysaccess
+%{_bindir}/eyedbuseradd
+%{_bindir}/eyedbuserdbaccess
+%{_bindir}/eyedbuserdelete
+%{_bindir}/eyedbuserlist
+%{_bindir}/eyedbuserpasswd
+%{_datadir}/%{name}/eyedb.conf.sample
+# man pages
+
+%files server
+%defattr(-,root,root)
+%{_bindir}/eyedbctl
+%{_bindir}/eyedbd
+%{_bindir}/eyedbrc
+%{_bindir}/eyedbsmd
+%{_bindir}/eyedbsmtool
+%{_libdir}/libeyedbrpcbe-%{version}.so
+%{_libdir}/libeyedbrpcbe.so
+%{_libdir}/eyedb/oqlctbmthbe-%{version}.so
+%{_libdir}/eyedb/oqlctbmthbe.so
+%{_libdir}/eyedb/sysclsmthbe-%{version}.so
+%{_libdir}/eyedb/sysclsmthbe.so
+%{_libdir}/eyedb/utilsmthbe-%{version}.so
+%{_libdir}/eyedb/utilsmthbe.so
+%{_libdir}/eyedb/oql/stdlib.oql
+%{_datadir}/%{name}/eyedbd.conf.sample
+%{_datadir}/%{name}/Access.sample
+%{_datadir}/%{name}/tools/eyedb-postinstall.sh
+#%{_sysconfdir}/rc.d/init.d/eyedb
+# man pages
+
+%files devel
+%defattr(-,root,root)
+%{_includedir}/eyedb/*.h
+%{_includedir}/eyedb/internals/*.h
+%{_includedir}/eyedblib/*.h
+%{_includedir}/eyedbsm/*.h
+%{_libdir}/pkgconfig/eyedb.pc
+# must add .la libraries
+
+%files doc
+%defattr(-,root,root)
+%{_docdir}/%{name}-%{version}/index.html
+%{_docdir}/%{name}-%{version}/eyedbdoc.css
+%{_docdir}/%{name}-%{version}/api
+%{_docdir}/%{name}-%{version}/examples
+%{_docdir}/%{name}-%{version}/images
+%{_docdir}/%{name}-%{version}/manual
+
+%changelog 
+* Fri Feb 9 2007 Francois Dechelle <francois@dechelle.net>
+- initial spec file
