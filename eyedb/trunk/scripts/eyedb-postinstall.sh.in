@@ -48,7 +48,7 @@ ECHO()
 start_server()
 {
     echo ==== Starting EyeDB server
-    $bindir/eyedbrc start --creating-dbm --nod
+    $bindir/eyedbctl start --creating-dbm --nod
 }
 
 create_dbm()
@@ -62,13 +62,13 @@ create_dbm()
 stop_server()
 {
     echo ==== Stopping EyeDB server
-    $bindir/eyedbrc stop
+    $bindir/eyedbctl stop
 }
 
 clean_exit()
 {
     SAVED_STATUS=$?
-    $bindir/eyedbrc stop
+    $bindir/eyedbctl stop
     exit $SAVED_STATUS
 }
 
