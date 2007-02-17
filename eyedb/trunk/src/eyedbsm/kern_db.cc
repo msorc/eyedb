@@ -35,6 +35,7 @@
 
 #include <iostream>
 #include <sys/types.h>
+#include <grp.h>
 
 #include "eyedblib/filelib.h"
 #include "eyedblib/rpc_lib.h"
@@ -107,12 +108,32 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
   }
 
   static int
-  dbsfileCreate(const char *dbfile)
+  fileCreate(const char *file, mode_t file_mode, gid_t file_gid)
+  {
+    int fd;
+
+    umask(0);
+
+    if ((fd = creat(file, file_mode)) < 0)
+      return -1;
+
+    if (file_gid != (gid_t)-1) {
+      if (chown(file, (uid_t)-1, file_gid) < 0) {
+	close(fd);
+	unlink(file);
+	return -2;
+      }
+    }
+    return fd;
+  }
+
+  static int
+  dbsfileCreate(const char *dbfile, mode_t file_mode, gid_t file_gid)
   {
     int dbsfd;
 
-    if ((dbsfd = creat(dbfile, DEFAULT_CREATION_MODE)) < 0)
-      return -1;
+    if ((dbsfd = fileCreate(dbfile, file_mode, file_gid)) < 0)
+      return dbsfd;
 
     if (ftruncate(dbsfd, DBS_DEFSIZE) < 0)
       return -1;
@@ -120,12 +141,12 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
   }
 
   static int
-  shmfileCreate(const char *dbfile)
+  shmfileCreate(const char *dbfile, mode_t file_mode, gid_t file_gid)
   {
     int shmfd;
 
-    if ((shmfd = creat(shmfileGet(dbfile), DEFAULT_CREATION_MODE)) < 0)
-      return -1;
+    if ((shmfd = fileCreate(shmfileGet(dbfile), file_mode, file_gid)) < 0)
+      return shmfd;
 
     if (ftruncate(shmfd, SHM_DEFSIZE) < 0)
       return -1;
@@ -169,7 +190,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
   }
     
   static Status
-  check_dbCreate_2(const char *pr, const char *dbfile, DBFD *dbfd)
+  check_dbCreate_2(const char *pr, const char *dbfile, DBFD *dbfd, mode_t file_mode, gid_t file_gid)
   {
     if ((dbfd->dbsfd = open(dbfile, O_RDONLY)) >= 0)
       return statusMake(INVALID_DBFILE,
@@ -186,31 +207,31 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 			"%sshm file already exists: '%s'",
 			pr, shmfileGet(dbfile));
 
-    if ((dbfd->dbsfd = dbsfileCreate(dbfile)) < 0)
+    if ((dbfd->dbsfd = dbsfileCreate(dbfile, file_mode, file_gid)) < 0)
       return statusMake(INVALID_DBFILE,
-			"%scannot create database system file: '%s'",
-			pr, dbfile);
+			"%scannot create database system file: '%s' [%s]",
+			pr, dbfile, strerror(errno));
 
     return Success;
   }
 
   static Status
-  check_dbCreate_3(const char *pr, const char *dbfile, DBFD *dbfd)
+  check_dbCreate_3(const char *pr, const char *dbfile, DBFD *dbfd, mode_t file_mode, gid_t file_gid)
   {
-    if ((dbfd->ompfd = creat(objmapfileGet(dbfile), DEFAULT_CREATION_MODE))
+    if ((dbfd->ompfd = fileCreate(objmapfileGet(dbfile), file_mode, file_gid))
 	< 0)
       return statusMake(INVALID_DBFILE,
-			"%scannot create map file: '%s'",
-			pr, objmapfileGet(dbfile));
+			"%scannot create map file: '%s' [%s]",
+			pr, objmapfileGet(dbfile), strerror(errno));
 
 #ifdef CYGWIN
     ftruncate(dbfd->ompfd, 1);
 #endif
 
-    if ((dbfd->shmfd = shmfileCreate(dbfile)) < 0)
+    if ((dbfd->shmfd = shmfileCreate(dbfile, file_mode, file_gid)) < 0)
       return statusMake(INVALID_SHMFILE,
-			"%scannot create shm file: '%s'",
-			pr, shmfileGet(dbfile));
+			"%scannot create shm file: '%s' [%s]",
+			pr, shmfileGet(dbfile), strerror(errno));
 
     return Success;
   }
@@ -218,7 +239,9 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
   Status
   checkDatafile(const char *pr, const char *dbfile, DbHeader *dbh,
 		const DbCreateDescription *dbc,
-		int i, DBFD *dbfd, Boolean can_be_null,
+		int i, DBFD *dbfd,
+		mode_t file_mode, gid_t file_gid,
+		Boolean can_be_null,
 		Boolean *is_null, Boolean out_place)
   {
     if (!*dbc->dat[i].file) {
@@ -284,21 +307,21 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     }
 
   
-    if ((dbfd->fd_dat[i] = creat(dbc->dat[i].file, DEFAULT_CREATION_MODE)) <
+    if ((dbfd->fd_dat[i] = fileCreate(dbc->dat[i].file, file_mode, file_gid)) <
 	0) {
       pop_dir(pwd);
       return statusMake(INVALID_DATAFILE, 
-			"%scannot create volume file: '%s'",
-			pr, dbc->dat[i].file);
+			"%scannot create volume file: '%s' [%s]",
+			pr, dbc->dat[i].file, strerror(errno));
     }
   
-    if ((dbfd->fd_dmp[i] = creat(dmpfile, DEFAULT_CREATION_MODE)) <
+    if ((dbfd->fd_dmp[i] = fileCreate(dmpfile, file_mode, file_gid)) <
 	0) {
       unlink(dbc->dat[i].file);
       pop_dir(pwd);
       return statusMake(INVALID_DMPFILE, 
-			"%scannot create data map file: '%s'",
-			pr, dmpfile);
+			"%scannot create data map file: '%s' [%s]",
+			pr, dmpfile, strerror(errno));
     }
   
 #ifdef CYGWIN
@@ -431,8 +454,25 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
   }
 
   Status
+  getFileMaskGroup(mode_t &file_mode, gid_t &file_gid, mode_t file_mask, const char *file_group)
+  {
+    file_mode = (file_mask | DEFAULT_CREATION_MODE);
+    if (file_group && *file_group) {
+      struct group *grp = getgrnam(file_group);
+      if (!grp) {
+	return statusMake(DATABASE_CREATION_ERROR, "invalid file group: %s", file_group);
+      }
+      file_gid = grp->gr_gid;
+    }
+    else
+      file_gid = (gid_t)-1;
+
+    return Success;
+  }
+
+  Status
   dbCreate(const char *dbfile, unsigned int version,
-	   const DbCreateDescription *dbc)
+	   const DbCreateDescription *dbc, mode_t file_mask, const char *file_group)
   {
     DBFD dbfd;
     int dbid = dbc->dbid, sizeslot, i,
@@ -450,15 +490,21 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 
 #undef PR
 #define PR "dbCreate: "
+    mode_t file_mode;
+    gid_t file_gid;
+    status = getFileMaskGroup(file_mode, file_gid, file_mask, file_group);
+    if (status)
+      return status;
+
     status = check_dbCreate_1(PR, dbid, dbfile, nbobjs, ndat);
     if (status)
       return status;
 
-    status = check_dbCreate_2(PR, dbfile, &dbfd);
+    status = check_dbCreate_2(PR, dbfile, &dbfd, file_mode, file_gid);
     if (status)
       return status;
 
-    status = check_dbCreate_3(PR, dbfile, &dbfd);
+    status = check_dbCreate_3(PR, dbfile, &dbfd, file_mode, file_gid);
     if (status)
       return dbcreate_error(status, dbfile, dbc, 0, &dbfd);
 
@@ -483,8 +529,8 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     dbh.__magic() = MAGIC;
     for (i = 0; i < ndat; i++) {
       Boolean is_null;
-      status = checkDatafile(PR, dbfile, &dbh, dbc, i, &dbfd, True,
-			     &is_null);
+      status = checkDatafile(PR, dbfile, &dbh, dbc, i, &dbfd,
+			     file_mode, file_gid, True, &is_null);
       if (!is_null) ok = True;
       if (status) {
 	pop_dir(pwd);

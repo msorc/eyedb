@@ -28,9 +28,10 @@
 namespace eyedbsm {
 
   Status Database::dbCreate(const char *dbfile, unsigned int version,
-			    const DbCreateDescription &dbc)
+			    const DbCreateDescription &dbc,
+			    mode_t file_mask, const char *file_group)
   {
-    return eyedbsm::dbCreate(dbfile, version, &dbc);
+    return eyedbsm::dbCreate(dbfile, version, &dbc, file_mask, file_group);
   }
 
   Status Database::dbDelete(const char *dbfile)
@@ -305,10 +306,11 @@ namespace eyedbsm {
 
   Status Database::datCreate(const char *file, const char *name,
 			     unsigned long long maxsize, MapType mtype,
-			     unsigned int sizeslot, DatType type)
+			     unsigned int sizeslot, DatType type,
+			     mode_t file_mask, const char *file_group)
   {
     return eyedbsm::datCreate(dbh, file, name, maxsize, mtype,
-			      sizeslot, type);
+			      sizeslot, type, file_mask, file_group);
   }
 
 
@@ -343,9 +345,10 @@ namespace eyedbsm {
   }
 
 		    
-  Status Database::datDefragment(const char *datfile)
+  Status Database::datDefragment(const char *datfile,
+				 mode_t file_mask, const char *file_group)
   {
-    return eyedbsm::datDefragment(dbh, datfile);
+    return eyedbsm::datDefragment(dbh, datfile, file_mask, file_group);
   }
 
 

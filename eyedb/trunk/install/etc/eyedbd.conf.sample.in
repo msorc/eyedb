@@ -17,7 +17,13 @@
 # Granted EYEDBDBM database
 #granted_dbm = %default_dbm%;
 
-# Maximum Server memory size in Mb
+# Default file mask
+#default_file_mask = "0";
+
+# Default file group
+#default_file_group = "";
+
+# Maximum server memory size in Mb
 #maximum_memory_size = 0;
 
 # Server access file

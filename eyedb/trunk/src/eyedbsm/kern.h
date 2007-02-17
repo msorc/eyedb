@@ -147,7 +147,7 @@ extern Status
 
   ESM_datCreate(DbHandle const *dbh, const char *file, const char *name,
 		unsigned long long maxsize, MapType mtype, unsigned int sizeslot,
-		DatType),
+		DatType, mode_t file_mask, const char *file_group),
 
   ESM_datMove(DbHandle const *dbh, const char *datfile,
 	     const char *newdatfile, Boolean force),
@@ -163,7 +163,7 @@ extern Status
   ESM_datMoveObjects(DbHandle const *dbh, const char *dat_src,
 		    const char *dat_dest),
 		    
-  ESM_datDefragment(DbHandle const *dbh, const char *datfile),
+  ESM_datDefragment(DbHandle const *dbh, const char *datfile, mode_t file_mask, const char *file_group),
 
   ESM_datsCompress(DbHandle const *dbh),
 

@@ -561,11 +561,11 @@ return (((S).err == SUCCESS) ? Success : &(S))
   Status
   datCreate(DbHandle const *dbh, const char *file, const char *name,
 	    unsigned long long maxsize, MapType mtype, unsigned int sizeslot,
-	    DatType dtype)
+	    DatType dtype, mode_t file_mask, const char *file_group)
   {
     if (!dbh->tr_cnt)
       return statusMake(TRANSACTION_NEEDED, "datCreate");
-    return ESM_datCreate((DbHandle *)dbh, file, name, maxsize, mtype, sizeslot, dtype);
+    return ESM_datCreate((DbHandle *)dbh, file, name, maxsize, mtype, sizeslot, dtype, file_mask, file_group);
   }
 
 
@@ -595,11 +595,11 @@ return (((S).err == SUCCESS) ? Success : &(S))
   }
 
   Status
-  datDefragment(DbHandle const *dbh, const char *datfile)
+  datDefragment(DbHandle const *dbh, const char *datfile, mode_t file_mask, const char *file_group)
   {
     if (!dbh->tr_cnt)
       return statusMake(TRANSACTION_NEEDED, "datDefragment");
-    return ESM_datDefragment((DbHandle *)dbh, datfile);
+    return ESM_datDefragment((DbHandle *)dbh, datfile, file_mask, file_group);
   }
 
   Status
