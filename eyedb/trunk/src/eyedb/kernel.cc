@@ -643,6 +643,21 @@ namespace eyedb {
     return rpc_status;
   }
 
+  static RPCStatus get_file_mask_group(mode_t &file_mask, const char *&file_group)
+  {
+    file_mask = 0;
+    const char *file_mask_str = ServerConfig::getSValue("default_file_mask");
+    if (file_mask_str && strcmp(file_mask_str, "0")) {
+      sscanf(file_mask_str, "%o", &file_mask);
+      if (!file_mask) {
+	return rpcStatusMake(IDB_ERROR, "invalid file mode: %s", file_mask_str);
+      }
+    }
+
+    file_group = ServerConfig::getSValue("default_file_group");
+    return RPCSuccess;
+  }
+
   RPCStatus
   IDB_dbCreate_realize(ConnHandle *ch, DBM_Database *dbm, int dbid,
 		       const char *dbmdb, const char *userauth,
@@ -660,8 +675,14 @@ namespace eyedb {
       dbfile = dbs.c_str();
     }
 
+    mode_t file_mask;
+    const char *file_group;
+    RPCStatus rpc_status = get_file_mask_group(file_mask, file_group);
+    if (rpc_status)
+      return rpc_status;
+
     se_status = eyedbsm::dbCreate(dbfile, eyedb::getVersionNumber(),
-				  sedbdesc);
+				  sedbdesc, file_mask, file_group);
 
     if (!se_status) {
 	RPCStatus rpc_status;
@@ -7097,8 +7118,15 @@ do { \
   RPCStatus
   IDB_createDatafile(DbHandle * dbh, const char * datfile, const char * name, int maxsize, int slotsize, int dtype)
   {
+    mode_t file_mask;
+    const char *file_group;
+    RPCStatus rpc_status = get_file_mask_group(file_mask, file_group);
+    if (rpc_status)
+      return rpc_status;
+
     eyedbsm::Status s = eyedbsm::datCreate(dbh->sedbh, datfile, name, maxsize,
-					   eyedbsm::BitmapType, slotsize, (eyedbsm::DatType)dtype);
+					   eyedbsm::BitmapType, slotsize,
+					   (eyedbsm::DatType)dtype, file_mask, file_group);
 
     return rpcStatusMake_se(s);
   }
@@ -7123,8 +7151,14 @@ do { \
   RPCStatus
   IDB_defragmentDatafile(DbHandle * dbh, int datid)
   {
+    mode_t file_mask;
+    const char *file_group;
+    RPCStatus rpc_status = get_file_mask_group(file_mask, file_group);
+    if (rpc_status)
+      return rpc_status;
+
     eyedbsm::Status s = eyedbsm::datDefragment(dbh->sedbh,
-					       str_convert((long)datid).c_str());
+					       str_convert((long)datid).c_str(), file_mask, file_group);
     return rpcStatusMake_se(s);
   }
 
@@ -7448,7 +7482,12 @@ do { \
     int i;
 
     string_code(&idr, &offset, &alloc_size, dbdesc->dbfile);
-    //int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&d->sizeslot);
+    /*
+    eyedblib::int32 mode = d->file_mode;
+    int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&mode);
+    string_code(&idr, &offset, &alloc_size, d->file_group);
+    */
+
     int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&d->dbid);
     int32_code(&idr, &offset, &alloc_size, (eyedblib::int32 *)&d->nbobjs);
     int64_code(&idr, &offset, &alloc_size, (eyedblib::int64 *)&d->dbsfilesize);
@@ -7607,7 +7646,19 @@ do { \
     lock_data(&idr, xdata);
     string_decode(idr, &offset, &s);
     strcpy(dbdesc->dbfile, s);
-    //  int32_decode(idr, &offset, (eyedblib::int32 *)&d->sizeslot);
+
+    /*
+    eyedblib::int32 mode;
+    int32_decode(idr, &offset, (eyedblib::int32 *)&mode);
+    d->file_mode = mode;
+    string_decode(idr, &offset, &s);
+    int len = strlen(s);
+    if (len > sizeof(d->file_group)-1)
+      len = sizeof(d->file_group);
+    strncpy(d->file_group, s, len);
+    d->file_group[len] = 0;
+    */
+
     int32_decode(idr, &offset, (eyedblib::int32 *)&d->dbid);
     int32_decode(idr, &offset, (eyedblib::int32 *)&d->nbobjs);
     int64_decode(idr, &offset, (eyedblib::int64 *)&d->dbsfilesize);

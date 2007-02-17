@@ -37,6 +37,8 @@
 #include "GetOpt.h"
 #include <sstream>
 
+#define USE_POSTINIT
+
 #define USE_GETOPT
 
 #define ONE_K 1024
@@ -185,6 +187,8 @@ do { \
     static const std::string inet_opt = "inet";
     static const std::string smd_port_opt = "smd-port";
     static const std::string maximum_server_memory_size_opt = "maximum-server-memory-size";
+    static const std::string default_file_mask_opt = "default-file-mask";
+    static const std::string default_file_group_opt = "default-file-group";
     static const std::string dbm_opt = "dbm";
     static const std::string granted_dbm_opt = "granted-dbm";
     static const std::string default_dbm_opt = "default-dbm";
@@ -266,6 +270,14 @@ do { \
 	     OptionDesc(std::string("eyedbsmd port") +
 			(listen ? "" : " (used for local opening)"),
 			"<port>"));
+    
+    opts[opt_cnt++] = 
+      Option(prefix + default_file_mask_opt, OptionIntType(), Option::MandatoryValue,
+	     OptionDesc("Default file mask", "<mask>"));
+    
+    opts[opt_cnt++] = 
+      Option(prefix + default_file_group_opt, OptionStringType(), Option::MandatoryValue,
+	     OptionDesc("Default file group", "<group>"));
     
     opts[opt_cnt++] = 
       Option(prefix + maximum_server_memory_size_opt, OptionIntType(), Option::MandatoryValue,
@@ -474,26 +486,43 @@ do { \
       }
     }
 
+    if (map.find(default_file_mask_opt) != map.end()) {
+      ServerConfig::getInstance()->setValue
+	("default_file_mask", map[default_file_mask_opt].value.c_str());
+    }
+
+    if (map.find(default_file_group_opt) != map.end()) {
+      ServerConfig::getInstance()->setValue
+	("default_file_group", map[default_file_group_opt].value.c_str());
+    }
+
     if (map.find(maximum_server_memory_size_opt) != map.end()) {
       ServerConfig::getInstance()->setValue
 	("maximum_memory_size",
 	 map[maximum_server_memory_size_opt].value.c_str());
     }
 
+#ifndef USE_POSTINIT
     const char *max_memsize = ServerConfig::getSValue("maximum_memory_size");
     if (max_memsize) {
       m_set_maxsize(atoi(max_memsize) * ONE_K * ONE_K);
     }
-
-    const char *smdport = ServerConfig::getSValue("smdport");
-    if (smdport)
-      smd_set_port(smdport);
+#endif
 
     if (map.find(smd_port_opt) != map.end()) {
+#ifndef USE_POSTINIT
       smd_set_port(map[smd_port_opt].value.c_str());
+#endif
       ServerConfig::getInstance()->setValue("smdport",
 					    map[smd_port_opt].value.c_str());
     }
+#ifndef USE_POSTINIT
+    else {
+      const char *smdport = ServerConfig::getSValue("smdport");
+      if (smdport)
+	smd_set_port(smdport);
+    }
+#endif
 
     if (map.find(trans_def_mag_opt) != map.end())
       TransactionParams::setGlobalDefaultMagOrder(atoi(map[trans_def_mag_opt].value.c_str()));
@@ -514,8 +543,6 @@ do { \
       else
 	exit(1);
     }
-
-    Connection::init();
   }
 
    void print_standard_usage(GetOpt &getopt, const std::string &append,
@@ -671,7 +698,7 @@ do { \
     eyedb::release();
   }
 
-  void init()
+  static void preinit()
   {
     static bool initialized = false;
 
@@ -719,6 +746,21 @@ do { \
     */
 
     ios::sync_with_stdio();
+  }
+
+
+  static void postinit()
+  {
+    const char *smdport = ServerConfig::getSValue("smdport");
+    if (smdport)
+      smd_set_port(smdport);
+
+    const char *max_memsize = ServerConfig::getSValue("maximum_memory_size");
+    if (max_memsize) {
+      m_set_maxsize(atoi(max_memsize) * ONE_K * ONE_K);
+    }
+
+    Connection::init();
   }
 
   void release()
@@ -784,11 +826,11 @@ do { \
 
     initialized = true;
 
-    init();
+    preinit();
 
     make_options(argc, argv, 0, 0, listen, purgeargv); 
 
-    Connection::init();
+    postinit();
 
     Status status = Log::init(argv[0], LogName);
     if (status)
@@ -803,6 +845,11 @@ do { \
   void init(int &argc, char *argv[])
   {
     init(argc, argv, 0, true);
+  }
+
+  void init() {
+    preinit();
+    postinit();
   }
 
   void idbRelease(void)

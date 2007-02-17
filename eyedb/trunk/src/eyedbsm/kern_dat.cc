@@ -229,7 +229,7 @@ namespace eyedbsm {
   Status
   ESM_datCreate(DbHandle const *dbh, const char *file, const char *name,
 		unsigned long long maxsize, MapType mtype, unsigned int sizeslot,
-		DatType dtype)
+		DatType dtype, mode_t file_mask, const char *file_group)
   {
     CHECK_X(dbh, "creating a datafile");
 
@@ -260,9 +260,15 @@ namespace eyedbsm {
     dbc.dat[datid].sizeslot = sizeslot;
     dbc.dat[datid].dtype = dtype;
 
+    mode_t file_mode;
+    gid_t file_gid;
+    Status s = getFileMaskGroup(file_mode, file_gid, file_mask, file_group);
+    if (s)
+      return s;
+
     DBFD dbfd;
-    Status s = checkDatafile(PR, dbh->dbfile, &_dbh, &dbc,
-			     datid, &dbfd, False, 0, True);
+    s = checkDatafile(PR, dbh->dbfile, &_dbh, &dbc,
+		      datid, &dbfd, file_mode, file_gid, False, 0, True);
 
     if (s) return s;
 
@@ -503,7 +509,7 @@ namespace eyedbsm {
   }
 
   Status
-  ESM_datDefragment(DbHandle const *dbh, const char *datfile)
+  ESM_datDefragment(DbHandle const *dbh, const char *datfile, mode_t file_mask, const char *file_group)
   {
     CHECK_X(dbh, "defragmenting a datafile");
 
@@ -529,7 +535,7 @@ namespace eyedbsm {
     const char *tmp_datfile = get_tmp_datfile(dfd->file());
     if (s = ESM_datCreate(dbh, tmp_datfile, "", x2h_u32(dfd->__maxsize()),
 			  (MapType)x2h_u16(mp->mtype()), x2h_u32(mp->sizeslot()),
-			  dtype))
+			  dtype, file_mask, file_group))
       return s;
 
     DbHandle *dbh_n;

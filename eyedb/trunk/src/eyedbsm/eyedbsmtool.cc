@@ -401,7 +401,7 @@ databacreate_realize(int argc, char *argv[])
       dbc.ndat++;
     }	  
   
-  return sm_CHECK(dbCreate(dbfile, 205015, &dbc), "database create");
+  return sm_CHECK(dbCreate(dbfile, 205015, &dbc, 0, 0), "database create");
 }
 
 static int
@@ -721,7 +721,7 @@ datafile_create_realize(int argc, char *argv[])
     }
 
   s = datCreate(dbh, argv[1], argv[2], atoi(argv[3]), mtype,
-		   sizeslot, dtype);
+		   sizeslot, dtype, 0, 0);
   END(s, "datafile create");
 }
 
@@ -776,7 +776,7 @@ datafile_defragment_realize(int argc, char *argv[])
   OPEN(argv[0], VOLRW);
   BEGIN_X(s);
 
-  s = datDefragment(dbh, argv[1]);
+  s = datDefragment(dbh, argv[1], 0, 0);
   END(s, "datafile defragment");
 }
 

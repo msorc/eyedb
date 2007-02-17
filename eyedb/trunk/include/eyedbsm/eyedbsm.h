@@ -27,6 +27,7 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <sys/stat.h>
 
 namespace eyedbsm {
 
@@ -411,7 +412,7 @@ namespace eyedbsm {
 
     // functional API : should disapear
     dbCreate(const char *dbfile, unsigned int version,
-	     const DbCreateDescription *dbc),
+	     const DbCreateDescription *dbc, mode_t file_mask, const char *file_group),
     dbDelete(const char *dbfile),
     dbMove(const char *dbfile, const DbMoveDescription *dmv),
     dbCopy(const char *dbfile, const DbCopyDescription *dcp),
@@ -516,7 +517,7 @@ namespace eyedbsm {
 
     datCreate(DbHandle const *dbh, const char *file, const char *name,
 	      unsigned long long maxsize, MapType mtype, unsigned int sizeslot,
-	      DatType type),
+	      DatType type, mode_t file_mask, const char *file_group),
 
     datMove(DbHandle const *dbh, const char *datfile,
 	    const char *newdatfile),
@@ -532,7 +533,7 @@ namespace eyedbsm {
     datCheck(DbHandle const *dbh, const char *datfile,
 	     short *datid, short *dspid),
 		    
-    datDefragment(DbHandle const *dbh, const char *datfile),
+    datDefragment(DbHandle const *dbh, const char *datfile, mode_t file_mask, const char *file_group),
 
     datRename(DbHandle const *dbh, const char *datfile, const char *name),
 
@@ -660,10 +661,13 @@ namespace eyedbsm {
 	 @param dbfile
 	 @param version
 	 @param dbc
+	 @param file_mask
+	 @param file_group
 	 @return
       */
-      static Status dbCreate(const char *dbfile, unsigned int version,
-			     const DbCreateDescription &dbc);
+    static Status dbCreate(const char *dbfile, unsigned int version,
+			   const DbCreateDescription &dbc,
+			   mode_t file_mask, const char *file_group);
     
     /**
        Not yet documented
@@ -1042,12 +1046,15 @@ namespace eyedbsm {
        @param mtype
        @param sizeslot
        @param type
+       @param file_mask
+       @param file_group
        @return
     */
     Status datCreate(const char *file, const char *name,
 		     unsigned long long maxsize, MapType mtype,
 		     unsigned int sizeslot,
-		     DatType type);
+		     DatType type,
+		     mode_t file_mask, const char *file_group);
 
     /**
        Not yet documented
@@ -1093,9 +1100,12 @@ namespace eyedbsm {
     /**
        Not yet documented
        @param datfile
+       @param file_mask
+       @param file_group
        @return
     */
-    Status datDefragment(const char *datfile);
+    Status datDefragment(const char *datfile,
+			 mode_t file_mask, const char *file_group);
 
     /**
        Not yet documented

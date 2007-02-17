@@ -93,12 +93,16 @@ namespace eyedbsm {
   extern Status
   checkDatafile(const char *pr, const char *dbfile, DbHeader *dbh,
 		const DbCreateDescription *dbc,
-		int i, DBFD *dbfd, Boolean can_be_null = False,
+		int i, DBFD *dbfd, mode_t file_mode, gid_t file_gid,
+		Boolean can_be_null = False,
 		Boolean *is_null = 0, Boolean in_place = False);
 
   extern Status
   checkNewDatafile(DbHeader *dbh, const char *file,
 		   const char *name);
+
+  extern Status
+  getFileMaskGroup(mode_t &file_mode, gid_t &file_gid, mode_t file_mask, const char *file_group);
 
   extern int
   shmfileOpen(const char *dbfile);
