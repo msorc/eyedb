@@ -702,7 +702,7 @@ namespace eyedb {
     std::string localstatedir = eyedblib::CompileBuiltin::getLocalstatedir();
 
     // Port
-    setValue( "port", (localstatedir + "/eyedb/pipes/eyedbd").c_str());
+    setValue( "port", (localstatedir + "/lib/eyedb/pipes/eyedbd").c_str());
 
     // TCP Port
     setValue( "tcp_port", tcp_port.c_str());
@@ -714,7 +714,7 @@ namespace eyedb {
     setValue( "user", "@");
 
     // EYEDBDBM Database
-    //setValue( "dbm", (localstatedir + "/eyedb/db/dbmdb.dbs").c_str());
+    //setValue( "dbm", (localstatedir + "/lib/eyedb/db/dbmdb.dbs").c_str());
     setValue( "dbm", "default");
   }
 
@@ -729,22 +729,22 @@ namespace eyedb {
     //setValue( "bindir", eyedblib::CompileBuiltin::getBindir());
 
     // Bases directory
-    setValue( "datadir", (localstatedir + "/eyedb/db").c_str());
+    setValue( "datadir", (localstatedir + "/lib/eyedb/db").c_str());
 
     // pipes:
-    // setValue( "pipedir", (localstatedir + "/eyedb/pipes").c_str());
+    // setValue( "pipedir", (localstatedir + "/lib/eyedb/pipes").c_str());
 
     // tmpdir
-    setValue( "tmpdir", (localstatedir + "/eyedb/tmp").c_str());
+    setValue( "tmpdir", (localstatedir + "/lib/eyedb/tmp").c_str());
 
     // sopath
     setValue( "sopath", (libdir + "/eyedb").c_str());
 
     // Default EYEDBDBM Databases
-    setValue( "default_dbm", (localstatedir + "/eyedb/db/dbmdb.dbs").c_str());
+    setValue( "default_dbm", (localstatedir + "/lib/eyedb/db/dbmdb.dbs").c_str());
 
     // Granted EYEDBDBM Databases
-    //setValue( "granted_dbm", (localstatedir + "/eyedb/db/dbmdb.dbs").c_str());
+    //setValue( "granted_dbm", (localstatedir + "/lib/eyedb/db/dbmdb.dbs").c_str());
     // EV : 22/01/06
     // when variable expansion will be done in getValue(), granted_dbm will be:
     //setValue( "granted_dbm", "%default_dbm%");
@@ -752,10 +752,10 @@ namespace eyedb {
     // Server Parameters
     setValue( "maximum_memory_size", "0");
     setValue( "access_file", (sysconfdir + "/eyedb/Access").c_str());
-    setValue( "smdport", (localstatedir + "/eyedb/pipes/eyedbsmd").c_str());
+    setValue( "smdport", (localstatedir + "/lib/eyedb/pipes/eyedbsmd").c_str());
 
     // Server Parameters
-    setValue( "listen", ("localhost:" + tcp_port + "," + localstatedir + "/eyedb/pipes/eyedbd").c_str());
+    setValue( "listen", ("localhost:" + tcp_port + "," + localstatedir + "/lib/eyedb/pipes/eyedbd").c_str());
 
     // OQL path
     setValue( "oqlpath", (libdir + "/eyedb/oql").c_str());
