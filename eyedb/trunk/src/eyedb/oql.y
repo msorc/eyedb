@@ -69,11 +69,7 @@ static oqmlNode *oqml_forin_realize(char *ident, oqmlNode *from, int op,
 
 int yylex();
 
-#if defined(LINUX) || defined(CYGWIN)
-extern "C" void yyerror(const char *);
-#else
 extern void yyerror(const char *);
-#endif
 /* end of support for bison */
 
 %}
@@ -1978,19 +1974,6 @@ yypurgestring(unsigned char *s)
 
   *p = 0;
 }
-
-/*
-#if defined(SOLARIS) && USEFLEX != 1
-
-#undef input
-#undef unput
-
-#define input()  (*__oqmlbuf++)
-#define unput(c) (*--__oqmlbuf = (c))
-
-#define yyinput input
-#endif
-*/
 
 static int
 yyskipcomments()

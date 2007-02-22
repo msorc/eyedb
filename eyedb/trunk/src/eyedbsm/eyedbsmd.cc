@@ -735,19 +735,6 @@ notice(int status)
 static void
 init()
 {
-  // It looks like that this code is useless: 
-  // after calling setrlimit and before calling setrlimit, rlp.rlim_cur == rlp.rlim_max == 64
-#if 0
-#if defined(SOLARIS) || defined(ULTRASOL7)  
-  struct rlimit rlp;
-
-  if (!getrlimit(RLIMIT_NOFILE, &rlp)) {
-    rlp.rlim_cur = rlp.rlim_max;
-    setrlimit(RLIMIT_NOFILE, &rlp);
-  }
-#endif
-#endif
-
   signal(SIGHUP,  SIG_IGN);
   signal(SIGINT,  SIG_IGN);
   signal(SIGTERM, signal_handler);

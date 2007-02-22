@@ -255,27 +255,13 @@ esac
 
 # must disappear
 case "$host" in
-i*86-*-linux*)
-	DEFINES="-DLINUX -DX86"
-	;;
-
-x86_64-*-linux*)
-	DEFINES="-DLINUX"
-	;;
-
 sparc-sun-solaris2.9)
-	if test "$ac_cv_cxx_compiler_gnu" = "yes"
-	then
-		DEFINES="-DSOLARIS -DSPARCV9"
-	else
-		DEFINES="-DSOLARIS -DSPARCV9"
-	fi
-	;;
+	ARCH_DEFINES="-DSOLARIS -DSPARCV9"
 esac
 
 # -D are taken verbatim for now. Later, may use autodetection and/or command line flags
-DEFINES="$DEFINES -DOPTOPEN -DMOZILLA -DNEW_COLL_XDR -DNEW_COLL_XDR2 -DSUPPORT_NON_BASIC_LITERAL_COLL -DSTUART_AUTH"
-CXXFLAGS="$CXXFLAGS $DEFINES"
+DEFINES="-DOPTOPEN -DMOZILLA -DNEW_COLL_XDR -DNEW_COLL_XDR2 -DSUPPORT_NON_BASIC_LITERAL_COLL -DSTUART_AUTH"
+CXXFLAGS="$CXXFLAGS $DEFINES $ARCH_DEFINES"
 
 # ========================================
 # JAVA compilation

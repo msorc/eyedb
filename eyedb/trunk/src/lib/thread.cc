@@ -351,12 +351,12 @@ namespace eyedblib {
     name = strdup(_name);
     user_data = 0;
     assert (!pthread_attr_init(&attr));
-#ifndef CYGWIN
+
     if (type == SCOPE_SYSTEM)
       assert (!pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM));
     else
       assert (!pthread_attr_setscope(&attr, PTHREAD_SCOPE_PROCESS));
-#endif
+
     assert (!pthread_create(&tid, &attr, run, this));
     pid = rpc_getpid();
     idle = true;

@@ -68,11 +68,7 @@ namespace eyedb {
     eyedbsm::XMOffset conn_first;
   };
 
-#if defined(SOLARIS_SPARCV9_CC) || defined(DEBUG_SOLARIS_SPARCV9_CC)
-#define MAXDBS 400
-#else
 #define MAXDBS 8
-#endif
 
   struct ClientInfo {
     time_t start;

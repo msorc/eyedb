@@ -224,10 +224,6 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 			"%scannot create map file: '%s' [%s]",
 			pr, objmapfileGet(dbfile), strerror(errno));
 
-#ifdef CYGWIN
-    ftruncate(dbfd->ompfd, 1);
-#endif
-
     if ((dbfd->shmfd = shmfileCreate(dbfile, file_mode, file_gid)) < 0)
       return statusMake(INVALID_SHMFILE,
 			"%scannot create shm file: '%s' [%s]",
@@ -324,11 +320,6 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 			pr, dmpfile, strerror(errno));
     }
   
-#ifdef CYGWIN
-    ftruncate(dbfd->fd_dat[i], 1);
-    ftruncate(dbfd->fd_dmp[i], 1);
-#endif
-
     if (status = syscheck(pr, close(dbfd->fd_dat[i]),
 			  "closing volume file: '%s'",
 			  dbc->dat[i].file)) {
