@@ -120,10 +120,6 @@ static int m_garbage(m_Map *rm)
     IDB_LOG(IDB_LOG_MMAP_DETAIL,
 	    ("m_garbage: unmapping %p for size %u\n", *rm->p, rm->size));
 
-#ifdef CYGWIN
-    printf("m_garbage: unmapping %p for size %u\n", *rm->p, rm->size);
-#endif
-
     if (munmap(*rm->p, rm->size)) {
       utlog("munmap(%p, %d)\n", *rm->p, rm->size);
       //perror("munmap")
@@ -237,12 +233,6 @@ m_Map *m_mmap(caddr_t addr, size_t size, int prot, int flags,
 	   "flags=%p fd=%d offset=%u",
 	   file, size, prot, flags, fildes, off));
 
-#ifdef CYGWIN
-  printf("... mapping attempt file=\"%s\" size=%lu prot=%p "
-	 "flags=%p fd=%d offset=%u\n",
-	 file, size, prot, flags, fildes, off);
-#endif
-
   errno = 0;
 
   if (endns > 0)
@@ -284,16 +274,6 @@ m_Map *m_mmap(caddr_t addr, size_t size, int prot, int flags,
 	       "size=%lu prot=%p flags=%p fd=%d offset=%u",
 	       file, *p, (*p)+size, size, prot, flags, fildes, off));
 
-#ifdef CYGWIN
-      printf("segment mapped file=\"%s\" segment=[%p, %p[ "
-	     "size=%lu prot=%p flags=%p fd=%d offset=%u\n",
-	     file, *p, (*p)+size, size, prot, flags, fildes, off);
-
-      printf("*%p = %d\n", *p, **p);
-      if (size > 0x400)
-	printf("--> *%p = %d\n", (*p)+0x400, *((*p)+0x400));
-#endif
-
       if (endns > 0)
 	IDB_LOG_X(IDB_LOG_MMAP,
 		  (" startns=%d endns=%d\n", startns, endns));
@@ -316,12 +296,6 @@ m_Map *m_mmap(caddr_t addr, size_t size, int prot, int flags,
 	     file, size, prot, flags, fildes, off, ntries));
 
     //perror("m_mem.c: mmap");
-
-#ifdef CYGWIN
-    printf("mapping failed file=\"%s\" size=%lu prot=%p flags=%p "
-	   "fd=%d offset=%u attempt=#%d\n",
-	   file, size, prot, flags, fildes, off, ntries);
-#endif
 
     if (endns > 0)
       IDB_LOG_X(IDB_LOG_MMAP_DETAIL,
@@ -380,15 +354,6 @@ int m_munmap(m_Map *map, caddr_t addr, size_t size)
 	     map->size, size));
   }
 
-
-#ifdef CYGWIN
-  printf("segment unmapped file=\"%s\" segment=[%p, %p[ "
-	 "size=%lu prot=%p flags=%p fd=%d offset=%u "
-	 "startns=%d endns=%d\n",
-	 map->file, *map->p, (*map->p)+map->size, map->size, map->prot,
-	 map->flags, map->fildes, map->off,
-	 map->startns, map->endns);
-#endif
 
   return m_garbage(map);
 }

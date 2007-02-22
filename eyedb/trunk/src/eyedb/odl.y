@@ -139,11 +139,7 @@ rootclass_manage(odlAgregSpec agreg_spec)
 
 int yylex();
 
-#if defined(LINUX) || defined(CYGWIN)
-extern "C" void yyerror(const char *);
-#else
 extern void yyerror(const char *);
-#endif
 /* end of support for bison */
 
 %}

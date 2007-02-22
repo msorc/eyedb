@@ -27,14 +27,6 @@ static int yyskipcomments();
 static char *yygetquotedseq(char sep = '}');
 int yycgid(wchar_t c);
 void yywunput(wchar_t wc);
-//extern "C" void yyerror(const char *);
-/*
-#ifdef LINUX
-extern "C" void yyerror(const char *);
-#else
-extern void yyerror(const char *);
-#endif
-*/
 %}
 
 STRING    \"([^"]|\\\")*\"
