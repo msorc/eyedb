@@ -359,7 +359,7 @@ namespace eyedb {
     struct timeval now;
     gettimeofday(&now, 0);
 
-    struct tm * time = gmtime(&(now.tv_sec));
+    struct tm * time = gmtime((time_t*)&(now.tv_sec));
 
     eyedblib::int64 usec = 0;
     clock2usec(&usec, time->tm_hour, time->tm_min, time->tm_sec, 0, 0);

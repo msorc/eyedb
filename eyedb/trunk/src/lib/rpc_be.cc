@@ -775,7 +775,9 @@ rpc_makeNewConnection(rpc_Server *server, int new_fd[], int fd_cnt,
       rpc_serverEnd(server, rpc_ci);
     }
     else if (server->mode == rpc_MultiProcs) {
-      if ((ci->tid[0] = fork()) == 0) {
+      pid_t child_pid;
+
+      if ((child_pid = fork()) == 0) {
 	rpc_pid = getpid();
 	const char *w;
 	if ((w = getenv("EYEDBWAIT"))) {
@@ -817,7 +819,7 @@ rpc_makeNewConnection(rpc_Server *server, int new_fd[], int fd_cnt,
 
       wait_thr_cond = new eyedblib::Condition();
       pthread_t wait_thr_p;
-      pid_t *pid = new pid_t(ci->tid[0]);
+      pid_t *pid = new pid_t(child_pid);
       errno = 0;
       if (!pthread_create(&wait_thr_p, 0, wait_thr, pid))
 	wait_thr_cond->wait();
