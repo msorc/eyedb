@@ -412,11 +412,8 @@ idbWDBContext::checkCookie(idbWProcess *p, const char *cookie,
 static Bool
 idbWCheckUser(rpc_ConnInfo *ci, const char *user)
 {
-#ifdef STUART_AUTH
   rpc_TcpIp *tcpip = &ci->tcpip;
-#else
-  rpc_TcpIp *tcpip = &ci->u.tcpip;
-#endif
+
   Bool auth = False;
 
   for (int i = 0; i < tcpip->user_cnt; i++)

@@ -621,10 +621,9 @@ do { \
     strcpy(file_stream, s);
     free(s);
 
-    //tmpnam_r(file_stream);
-
     fd_stream = fopen(file_stream, "w");
-    fclose(fd_stream);
+    if (fd_stream)
+      fclose(fd_stream);
     fd_stream = fopen(file_stream, "r+");
   }
 

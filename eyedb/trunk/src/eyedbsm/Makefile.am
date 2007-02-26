@@ -28,7 +28,6 @@ kern_reg.cc					\
 kern_root.cc					\
 kern_utils.cc					\
 api_lib.cc					\
-privileges.cc					\
 oapi.cc						\
 status.cc					\
 xdr.cc						\

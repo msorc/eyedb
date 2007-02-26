@@ -82,12 +82,7 @@ namespace eyedb {
     else if (!strcmp(name, "float"))
       t = oqmlATOM_DOUBLE;
     else {
-#ifdef SUPPORT_NON_BASIC_LITERAL_COLL
       t = oqmlATOM_OBJ;
-#else
-      return new oqmlStatus("OQL cannot deal with collection of non "
-			    "basic types");
-#endif
     }
 
     return oqmlSuccess;

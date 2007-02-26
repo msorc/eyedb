@@ -280,11 +280,7 @@ namespace eyedb {
 
     IDB_COLL_LOAD_DEFERRED();
     touch();
-#ifdef NEW_COLL_XDR2
     Data item_data = make_data(val, size, True);
-#else
-    Data item_data = make_data(val, size);
-#endif
  
     ValueItem *item;
 
@@ -421,9 +417,8 @@ namespace eyedb {
       }
       else
 	item_oid = Oid::nullOid;
-#ifdef NEW_COLL_XDR2
+
       decode((Data)item_oid.getOid());
-#endif
       return Success;
     }
       
@@ -495,9 +490,8 @@ namespace eyedb {
 	else
 	  item_oid = Oid::nullOid;
 	
-#ifdef NEW_COLL_XDR2
 	decode((Data)item_oid.getOid());
-#endif
+
 	if (item_oid.isValid())	{
 	  if (db)
 	    return db->loadObject(item_oid, o, rcm);
@@ -572,9 +566,8 @@ namespace eyedb {
     if (cache && (item = cache->get(id)) && item->getState() != removed) {
       memcpy(data, item->getValue().getData(), size);
 
-#ifdef NEW_COLL_XDR2
       decode(data);
-#endif
+
       return Success;
     }
       
@@ -591,15 +584,10 @@ namespace eyedb {
     rpc_status = collectionGetByInd(db->getDbHandle(), getOidC().getOid(),
 					id, &found, (Data)data, size);
   
-#ifdef NEW_COLL_XDR2
     if (found)
       decode(data);
     else
       memset(data, 0, size);
-#else
-    if (!found)
-      memset(data, 0, size);
-#endif
 
     return StatusMake(IDB_COLLECTION_IS_IN_ERROR, rpc_status);
   }

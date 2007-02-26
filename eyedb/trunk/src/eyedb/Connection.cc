@@ -148,7 +148,6 @@ namespace eyedb {
 
 	char hostname[256];
 	gethostname(hostname, sizeof(hostname)-1);
-#ifdef STUART_AUTH
 	char *challenge;
 	RPCStatus rpc_status = 
 	  set_conn_info(connh, (std::string(host) + ":" + port).c_str(),
@@ -170,12 +169,7 @@ namespace eyedb {
 	    unlink(file.c_str());
 	  }
 	}
-#else
-	RPCStatus rpc_status = 
-	  set_conn_info(connh, (std::string(host) + ":" + port).c_str(),
-			getUserName(), prog_name,
-			&sv_pid, &sv_uid, getVersionNumber());
-#endif
+
 	if (rpc_status)
 	  return Exception::make(IDB_CONNECTION_FAILURE, rpc_status->err_msg);
 

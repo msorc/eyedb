@@ -1079,28 +1079,6 @@ collectionClassMake(Database *db, const Oid *oid, Object **o,
   if (status) return status;
 
   CollectionClass *mcoll;
-#ifndef OPTOPEN
-  if (db->getSchema() &&
-      (mcoll = (CollectionClass *)db->getSchema()->getClass(s)))
-    {
-
-      *o = (Object *)mcoll;
-      Status status = ClassPeer::makeColls(db, mcoll, temp);
-      if (!idr)
-	{
-	  if (!status)
-	    ObjectPeer::setIDR(*o, temp, hdr->size);
-	}
-
-      mcoll->setExtentImplementation(idximpl, True);
-      if (idximpl)
-	idximpl->release();
-      mcoll->setInstanceDspid(dspid);
-
-      ClassPeer::setMType(mcoll, (Class::MType)mt);
-      return status;
-    }
-#endif
 
   eyedbsm::Oid _cl_oid;
   oid_decode(temp, &offset, &_cl_oid);
@@ -1158,7 +1136,6 @@ collectionClassMake(Database *db, const Oid *oid, Object **o,
   //mcoll->setMagOrder(mag_order);
   mcoll->setInstanceDspid(dspid);
 
-#ifdef OPTOPEN
   Bool addedClass = False;
   if (!db->getSchema()->getClass(*oid))
     {
@@ -1166,16 +1143,11 @@ collectionClassMake(Database *db, const Oid *oid, Object **o,
       db->getSchema()->addClass_nocheck(mcoll, True);
       addedClass = True;
     }
-#endif
 
   Class *cl = NULL;
   Bool classAdded = False;
   if (!db->isOpeningState() && !db->isBackEnd())
     {
-#ifndef OPTOPEN
-      db->getSchema()->addClass(mcoll);
-#endif
-
       status = mcoll->setDatabase(db);
       if (status)
 	return status;
@@ -1188,22 +1160,14 @@ collectionClassMake(Database *db, const Oid *oid, Object **o,
       void (*handler)(Status, void *) = Exception::getHandler();
       Exception::setHandler(NULL);
 
-#ifndef OPTOPEN
-      db->getSchema()->addClass(mcoll);
-#endif
       Exception::setHandler(handler);
       Exception::setMode(mode);
     }
 
   status = ClassPeer::makeColls(db, mcoll, temp);
 
-#ifdef OPTOPEN
   if (addedClass)
     db->getSchema()->suppressClass(mcoll);
-#else
-  if (!cl && !(!db->isOpeningState() && !db->isBackEnd()))
-    db->getSchema()->suppressClass(mcoll);
-#endif
 
   *o = (Object *)mcoll;
 

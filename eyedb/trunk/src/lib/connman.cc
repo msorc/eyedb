@@ -316,11 +316,7 @@ rpc_check_addr(struct in_addr *addr)
   for (i = 0; i < access_cnt; i++) {
     if (cmp_addr(&rpc_access[i].addr, addr)) {
       rpc_ConnInfo *ci = (rpc_ConnInfo *)calloc(sizeof(rpc_ConnInfo), 1);
-#ifdef STUART_AUTH
       ci->tcpip = rpc_access[i].tcpip;
-#else
-      ci->u.tcpip = rpc_access[i].tcpip;
-#endif
       ci->peer_addr = *addr;
       ci->is_localhost = rpc_is_localhost(&ci->peer_addr);;
       return ci;
@@ -370,13 +366,8 @@ rpc_make_stream_conninfo(int fd, struct strrecvfd *info)
 
   if (ci) {
     ci->mode = rpc_ConnInfo::STREAM;
-#ifdef STUART_AUTH
     ci->auth.uid = info->uid;
     ci->auth.gid = info->gid;
-#else
-    ci->u.stream.uid = info->uid;
-    ci->u.stream.gid = info->gid;
-#endif
     ci->peer_addr = addr;
     ci->is_localhost = rpc_is_localhost(&ci->peer_addr);;
   }

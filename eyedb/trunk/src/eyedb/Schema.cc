@@ -498,12 +498,6 @@ namespace eyedb {
 
     touch();
     mc->sch = this;
-    // added the 10/12/99
-#ifndef OPTOPEN
-    mc->attrsComplete();
-#endif
-    // ...
-
     // added the 30/03/00
     mc->db = db;
     // ...

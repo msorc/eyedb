@@ -1448,19 +1448,13 @@ namespace eyedb {
   rpc_RpcDescription *
   makeSET_CONN_INFO(void)
   {
-#ifdef STUART_AUTH
     rpc_RpcDescription *rd = rpc_newRpcDescription(IDB_SET_CONN_INFO, 10);
-#else
-    rpc_RpcDescription *rd = rpc_newRpcDescription(IDB_SET_CONN_INFO, 8);
-#endif
     int n = 0;
 
     rd->args[n].type = rpc_StringType; /* hostname */
     rd->args[n++].send_rcv = rpc_Send; 
-#ifdef STUART_AUTH
     rd->args[n].type = rpc_Int32Type; /* uid */ // no more useful
     rd->args[n++].send_rcv = rpc_Send; 
-#endif
     rd->args[n].type = rpc_StringType; /* username */
     rd->args[n++].send_rcv = rpc_Send;
     rd->args[n].type = rpc_StringType; /* progname */
@@ -1474,10 +1468,8 @@ namespace eyedb {
     rd->args[n].type = rpc_Int32Type; /* server version */
     rd->args[n++].send_rcv = rpc_Send;
 
-#ifdef STUART_AUTH
     rd->args[n].type = rpc_StringType; /* challenge */
     rd->args[n++].send_rcv = rpc_Rcv;
-#endif
     makeSTATUS(rd, n);
     return rd;
   }

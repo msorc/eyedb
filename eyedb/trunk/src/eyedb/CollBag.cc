@@ -209,11 +209,7 @@ namespace eyedb {
 	if (s || is_in) return s;
       }
 
-#ifdef NEW_COLL_XDR2
     Data item_data = make_data(val, size, True);
-#else
-    Data item_data = make_data(val, size);
-#endif
 
     create_cache();
     //    cache->insert(Value(item_data, item_size), v_items_cnt, added);

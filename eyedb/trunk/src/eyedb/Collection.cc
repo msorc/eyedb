@@ -222,7 +222,6 @@ namespace eyedb {
       strcpy((char *)item_data, (char *)data);
       memset((char *)item_data+len, 0, item_size-len);
     }
-#ifdef NEW_COLL_XDR
     else if (swap) {
       if (isref)
 	oid_code(item_data, data);
@@ -241,7 +240,6 @@ namespace eyedb {
 	  memset(item_data+size, 0, item_size-size);
       }
     }
-#endif
     else {
       memcpy(item_data, data, size);
 
@@ -521,11 +519,8 @@ namespace eyedb {
     bottom = coll.bottom;
     top = coll.top;
   
-#ifdef OPTOPEN
     coll_class = coll.coll_class;
-#else
-    coll_class = (Class *)CLONE(coll.coll_class);
-#endif
+
     isref = coll.isref;
     dim = coll.dim;
     item_size = coll.item_size;
@@ -2658,13 +2653,6 @@ do { \
       if (q.getStatus())
 	return q.getStatus();
       
-#ifndef SUPPORT_NON_BASIC_LITERAL_COLL
-      if (!isref && !coll_class->asBasicClass())
-	return Exception::make(IDB_COLLECTION_ERROR,
-			       "unexpected type for collection '%s'",
-			       coll_class->getName());
-#endif
-
       Status s = q.scan(*read_cache.val_arr);
       
       if (s) return s;
@@ -2970,28 +2958,6 @@ do { \
 	  
 	  oid_code(&temp, &offset, &alloc_size, _oid.getOid());
 	}
-#ifndef NEW_COLL_XDR2
-	else if (coll_class->asInt16Class()) {
-	  eyedblib::int16 i16;
-	  memcpy(&i16, item->getData(), sizeof(i16));
-	  int16_code (&temp, &offset, &alloc_size, &i16);
-	}
-	else if (coll_class->asInt32Class()) {
-	  eyedblib::int32 i32;
-	  memcpy(&i32, item->getData(), sizeof(i32));
-	  int32_code (&temp, &offset, &alloc_size, &i32);
-	}
-	else if (coll_class->asInt64Class()) {
-	  eyedblib::int64 i64;
-	  memcpy(&i64, item->getData(), sizeof(i64));
-	  int64_code (&temp, &offset, &alloc_size, &i64);
-	}
-	else if (coll_class->asFloatClass()) {
-	  eyedblib::float64 f64;
-	  memcpy(&f64, item->getData(), sizeof(f64));
-	  double_code (&temp, &offset, &alloc_size, &f64);
-	}
-#endif
 	else {
 	  buffer_code   (&temp, &offset, &alloc_size, v.getData(),
 			 item_size);
