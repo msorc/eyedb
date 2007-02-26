@@ -75,7 +75,7 @@ clean_exit()
 PROGNAME=`basename $0`
 decrypt_options $*
 
-set -eE
+set -e
 trap clean_exit ERR
 start_server
 sleep 4
