@@ -18,7 +18,7 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
+  Author: Eric Viara <viara@sysra.com>
 */
 
 
@@ -179,7 +179,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 
     if (ndat <= 0)
       return statusMake(INVALID_DATAFILE_CNT,
-			"%sinvalid negative volume files number: `%d'",
+			"%sinvalid volume files number: `%d'",
 			pr, ndat);
 
     if (ndat >= MAX_DATAFILES)
@@ -617,20 +617,19 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 
     DbHeader _dbh(DBSADDR(dbh));;
     unsigned int ndat = x2h_u32(_dbh.__ndat());
-    for (i = 0; i < ndat; i++)
-      {
-	if (*_dbh.dat(i).file()) {
-	  if (unlink(_dbh.dat(i).file()) < 0) {
-	    pop_dir(pwd);
-	    return fcouldnot(PR, "unlink", _dbh.dat(i).file());
-	  }
+    for (i = 0; i < ndat; i++) {
+      if (*_dbh.dat(i).file()) {
+	if (unlink(_dbh.dat(i).file()) < 0) {
+	  pop_dir(pwd);
+	  return fcouldnot(PR, "unlink", _dbh.dat(i).file());
+	}
 
-	  if (unlink(dmpfileGet(_dbh.dat(i).file())) < 0) {
-	    pop_dir(pwd);
-	    return fcouldnot(PR, "unlink", dmpfileGet(_dbh.dat(i).file()));
-	  }
+	if (unlink(dmpfileGet(_dbh.dat(i).file())) < 0) {
+	  pop_dir(pwd);
+	  return fcouldnot(PR, "unlink", dmpfileGet(_dbh.dat(i).file()));
 	}
       }
+    }
 
     ESM_dbClose(dbh);
 
@@ -675,15 +674,14 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     DbHeader dbh;
     x2h_dbHeader(&dbh, &xdbh);
 
-    if (dbh.__magic() != MAGIC)
-      {
-	if (se = syscheck(PR, close(fd), "closing database file: '%s'",
-			  dbfile))
-	  return se;
-	return statusMake(INVALID_DBFILE,
-			  PR "database file '%s' is not a valid eyedbsm database "
-			  "file", dbfile);
-      }
+    if (dbh.__magic() != MAGIC) {
+      if (se = syscheck(PR, close(fd), "closing database file: '%s'",
+			dbfile))
+	return se;
+      return statusMake(INVALID_DBFILE,
+			PR "database file '%s' is not a valid eyedbsm database "
+			"file", dbfile);
+    }
       
     /*
       if (se = syscheck(PR, lseek(fd, 0, 0), "lseek on database file: '%s'",
@@ -715,40 +713,38 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     if (se = syscheck(PR, close(fd), "closing database file: '%s'", dbfile))
       return se;
 
-    for (int i = 0; i < dbh.__ndsp(); i++)
-      {
-	Dataspace *ds = &info->dsp[i];
-	DataspaceDesc _dsd = dbh.dsp(i);
-	DataspaceDesc *dsd = &_dsd;
+    for (int i = 0; i < dbh.__ndsp(); i++) {
+      Dataspace *ds = &info->dsp[i];
+      DataspaceDesc _dsd = dbh.dsp(i);
+      DataspaceDesc *dsd = &_dsd;
 
-	strcpy(ds->name, dsd->name());
-	ds->ndat = dsd->__ndat();
-	memcpy(ds->datid, dsd->__datid_ref(), sizeof(short) * dsd->__ndat());
-      }
+      strcpy(ds->name, dsd->name());
+      ds->ndat = dsd->__ndat();
+      memcpy(ds->datid, dsd->__datid_ref(), sizeof(short) * dsd->__ndat());
+    }
 
-    for (int i = 0; i < dbh.__ndat(); i++)
-      {
-	Datafile *df = &info->dat[i];
-	DatafileDesc _dfd = dbh.dat(i);
-	DatafileDesc *dfd = &_dfd;
+    for (int i = 0; i < dbh.__ndat(); i++) {
+      Datafile *df = &info->dat[i];
+      DatafileDesc _dfd = dbh.dat(i);
+      DatafileDesc *dfd = &_dfd;
 
-	strcpy(df->file, dfd->file());
-	strcpy(df->name, dfd->name());
-	df->dspid = getDataspace_inplace(&dbh, i); // dfd->__dspid;
-	df->dtype = getDatType_inplace(&dbh, i);
-	df->maxsize = dfd->__maxsize();
-	df->mtype = dfd->mp()->mtype();
-	df->sizeslot = dfd->mp()->sizeslot();
+      strcpy(df->file, dfd->file());
+      strcpy(df->name, dfd->name());
+      df->dspid = getDataspace_inplace(&dbh, i); // dfd->__dspid;
+      df->dtype = getDatType_inplace(&dbh, i);
+      df->maxsize = dfd->__maxsize();
+      df->mtype = dfd->mp()->mtype();
+      df->sizeslot = dfd->mp()->sizeslot();
 
-	if (!access(df->file, R_OK|W_OK))
-	  df->extflags = R_OK|W_OK;
-	else if (!access(df->file, W_OK))
-	  df->extflags = W_OK;
-	else if (!access(df->file, R_OK))
-	  df->extflags = R_OK;
-	else
-	  df->extflags = 0;
-      }
+      if (!access(df->file, R_OK|W_OK))
+	df->extflags = R_OK|W_OK;
+      else if (!access(df->file, W_OK))
+	df->extflags = W_OK;
+      else if (!access(df->file, R_OK))
+	df->extflags = R_OK;
+      else
+	df->extflags = 0;
+    }
 
     return Success;
   }
@@ -773,11 +769,10 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 
     free(buf[buf_ind]);
 
-    if (!dir || !*dir || *file == '/')
-      {
-	buf[buf_ind] = strdup(file);
-	return buf[buf_ind++];
-      }
+    if (!dir || !*dir || *file == '/') {
+      buf[buf_ind] = strdup(file);
+      return buf[buf_ind++];
+    }
 
     s = (char *)m_malloc(strlen(dir)+strlen(file)+2);
     strcpy(s, dir);
@@ -896,23 +891,22 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     printf("renaming '%s' to '%s' [%s . %s]\n", from, to, fromdbdir, todbdir);
 #endif
 
-    if (rename(xfrom, xto) < 0)
-      {
-	Status se;
-	if (errno != EXDEV)
-	  return syserror("renaming file '%s' to '%s'", xfrom, xto);
+    if (rename(xfrom, xto) < 0) {
+      Status se;
+      if (errno != EXDEV)
+	return syserror("renaming file '%s' to '%s'", xfrom, xto);
 
 #ifdef MVCP_TRACE
-	printf("cannot rename file across 2 file systems\n");
+      printf("cannot rename file across 2 file systems\n");
 #endif
 
-	se = copyfile(from, to, fromdbdir, todbdir, sparsify);
-	if (se)
-	  return statusMake(se->err, "renaming file '%s' to '%s': %s", xfrom, xto, se->err_msg);
+      se = copyfile(from, to, fromdbdir, todbdir, sparsify);
+      if (se)
+	return statusMake(se->err, "renaming file '%s' to '%s': %s", xfrom, xto, se->err_msg);
 
-	if (unlink(xfrom) < 0)
-	  return syserror("unlinking file '%s'", xfrom);
-      }
+      if (unlink(xfrom) < 0)
+	return syserror("unlinking file '%s'", xfrom);
+    }
 
     return Success;
   }
@@ -944,40 +938,38 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
   {
     int i;
     Status s;
-    for (i = 0; i < dbc->ndat; i++)
-      {
-	DbHeader _dbh(DBSADDR(dbh));
-	char *from = makefile(fromdbdir, _dbh.dat(i).file());
-	char *to = makefile(todbdir, dbc->dat[i].file);
+    for (i = 0; i < dbc->ndat; i++) {
+      DbHeader _dbh(DBSADDR(dbh));
+      char *from = makefile(fromdbdir, _dbh.dat(i).file());
+      char *to = makefile(todbdir, dbc->dat[i].file);
 
-	if (strcmp(from, to))
-	  {
-	    if (s = mvcp(_dbh.dat(i).file(),
-			 dbc->dat[i].file, fromdbdir, todbdir, 0))
-	      return statusMake(INVALID_DATAFILES_COPY,
-				"%s operation failed between "
-				"'%s' and '%s': %s",
-				XSTR(flag), from, to, s->err_msg);
+      if (strcmp(from, to)) {
+	if (s = mvcp(_dbh.dat(i).file(),
+		     dbc->dat[i].file, fromdbdir, todbdir, 0))
+	  return statusMake(INVALID_DATAFILES_COPY,
+			    "%s operation failed between "
+			    "'%s' and '%s': %s",
+			    XSTR(flag), from, to, s->err_msg);
 
-	    if (s = mvcp(dmpfileGet(_dbh.dat(i).file()),
-			 dmpfileGet(dbc->dat[i].file), fromdbdir, todbdir, 0))
-	      return statusMake(INVALID_DATAFILES_COPY,
-				"%s operation failed between "
-				"'%s' and '%s': %s",
-				XSTR(flag),
-				dmpfileGet(from),
-				dmpfileGet(to),
-				s->err_msg);
-	  }
-
-	strcpy(db_header->dat(i).file(), dbc->dat[i].file);
-
-	if (lseek(fd, 0, 0) < 0)
-	  return syserror("rewing database file '%s'", dbfile);
-
-	if (write(fd, db_header->_addr(), DbHeader_SIZE) != DbHeader_SIZE)
-	  return syserror("writing database file '%s'", dbfile);
+	if (s = mvcp(dmpfileGet(_dbh.dat(i).file()),
+		     dmpfileGet(dbc->dat[i].file), fromdbdir, todbdir, 0))
+	  return statusMake(INVALID_DATAFILES_COPY,
+			    "%s operation failed between "
+			    "'%s' and '%s': %s",
+			    XSTR(flag),
+			    dmpfileGet(from),
+			    dmpfileGet(to),
+			    s->err_msg);
       }
+
+      strcpy(db_header->dat(i).file(), dbc->dat[i].file);
+
+      if (lseek(fd, 0, 0) < 0)
+	return syserror("rewing database file '%s'", dbfile);
+
+      if (write(fd, db_header->_addr(), DbHeader_SIZE) != DbHeader_SIZE)
+	return syserror("writing database file '%s'", dbfile);
+    }
 
     return Success;
   }
@@ -999,58 +991,54 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 			"%s: different volume files number: `%d' vs. `%d'",
 			fname, dbc->ndat, ndat);
 
-    for (i = 0; i < dbc->ndat; i++)
-      {
-	unsigned int maxsize = x2h_u32(_dbh.dat(i).__maxsize());
-	if (!dbc->dat[i].maxsize)
-	  dbc->dat[i].maxsize = maxsize;
-	else if (dbc->dat[i].maxsize != maxsize)
-	  return statusMake(INVALID_MAXSIZE,
-			    "%s: different maximum size: `%d' vs. `%d' "
-			    "on volume file #%d",
-			    fname, dbc->dat[i].maxsize,
-			    maxsize, i);
-      }
+    for (i = 0; i < dbc->ndat; i++) {
+      unsigned int maxsize = x2h_u32(_dbh.dat(i).__maxsize());
+      if (!dbc->dat[i].maxsize)
+	dbc->dat[i].maxsize = maxsize;
+      else if (dbc->dat[i].maxsize != maxsize)
+	return statusMake(INVALID_MAXSIZE,
+			  "%s: different maximum size: `%d' vs. `%d' "
+			  "on volume file #%d",
+			  fname, dbc->dat[i].maxsize,
+			  maxsize, i);
+    }
   
-    if (!strcmp(dbfile, ndbfile))
-      {
-	if (flag)
-	  return statusMake(DBFILES_IDENTICAL,
-			    "%s: identical database files: '%s'",
-			    fname, dbfile);
-      }
+    if (!strcmp(dbfile, ndbfile)) {
+      if (flag)
+	return statusMake(DBFILES_IDENTICAL,
+			  "%s: identical database files: '%s'",
+			  fname, dbfile);
+    }
 
-    if (flag)
-      {
-	if (!access(ndbfile, F_OK))
-	  return statusMake(DBFILE_ALREADY_EXISTS,
-			    "%s: target database file already exists: '%s'",
-			    fname, ndbfile);
-	if (!access(shmfileGet(ndbfile), F_OK))
-	  return statusMake(SHMFILE_ALREADY_EXISTS,
-			    "%s: target shm file already exists: '%s'",
-			    fname, shmfileGet(ndbfile));
-	if (!access(objmapfileGet(ndbfile), F_OK))
-	  return statusMake(OBJMAPFILE_ALREADY_EXISTS,
-			    "%s: target oid map file already exists: '%s'",
-			    fname, objmapfileGet(ndbfile));
-      }
+    if (flag) {
+      if (!access(ndbfile, F_OK))
+	return statusMake(DBFILE_ALREADY_EXISTS,
+			  "%s: target database file already exists: '%s'",
+			  fname, ndbfile);
+      if (!access(shmfileGet(ndbfile), F_OK))
+	return statusMake(SHMFILE_ALREADY_EXISTS,
+			  "%s: target shm file already exists: '%s'",
+			  fname, shmfileGet(ndbfile));
+      if (!access(objmapfileGet(ndbfile), F_OK))
+	return statusMake(OBJMAPFILE_ALREADY_EXISTS,
+			  "%s: target oid map file already exists: '%s'",
+			  fname, objmapfileGet(ndbfile));
+    }
 
 	    
-    for (i = 0; i < dbc->ndat; i++)
-      {
-	char *to = makefile(todbdir, dbc->dat[i].file);
-	char *from = makefile(fromdbdir, _dbh.dat(i).file());
+    for (i = 0; i < dbc->ndat; i++) {
+      char *to = makefile(todbdir, dbc->dat[i].file);
+      char *from = makefile(fromdbdir, _dbh.dat(i).file());
 
-	if (flag && !strcmp(from, to))
-	  return statusMake(DATAFILES_IDENTICAL,
-			    "%s: identical data files: '%s'",
-			    fname, to);
-	if (strcmp(from, to) && !access(to, F_OK))
-	  return statusMake(DATAFILE_ALREADY_EXISTS,
-			    "%s: target data file already exists: '%s'",
-			    fname, to);
-      }
+      if (flag && !strcmp(from, to))
+	return statusMake(DATAFILES_IDENTICAL,
+			  "%s: identical data files: '%s'",
+			  fname, to);
+      if (strcmp(from, to) && !access(to, F_OK))
+	return statusMake(DATAFILE_ALREADY_EXISTS,
+			  "%s: target data file already exists: '%s'",
+			  fname, to);
+    }
     return Success;
   }
 
@@ -1078,21 +1066,19 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 
     mvcp = (flag ? copyfile : renamefile);
 
-    if (strcmp(dbfile, dmv.dbfile))
-      {
-	if (s = mvcp(dbfile, dmv.dbfile, fromdbdir, todbdir, 1))
-	  return statusMake(INVALID_DBFILES_COPY,
-			    "%s operation failed between "
-			    "'%s' and '%s': %s",
-			    XSTR(flag), dbfile, dmv.dbfile,
-			    s->err_msg);
-      }
+    if (strcmp(dbfile, dmv.dbfile)) {
+      if (s = mvcp(dbfile, dmv.dbfile, fromdbdir, todbdir, 1))
+	return statusMake(INVALID_DBFILES_COPY,
+			  "%s operation failed between "
+			  "'%s' and '%s': %s",
+			  XSTR(flag), dbfile, dmv.dbfile,
+			  s->err_msg);
+    }
 
-    if ((fd = open(dmv.dbfile, O_RDWR)) >= 0)
-      {
-	if (read(fd, db_header._addr(), DbHeader_SIZE) != DbHeader_SIZE)
-	  return syserror("reading database file '%s'", dmv.dbfile);
-      }
+    if ((fd = open(dmv.dbfile, O_RDWR)) >= 0) {
+      if (read(fd, db_header._addr(), DbHeader_SIZE) != DbHeader_SIZE)
+	return syserror("reading database file '%s'", dmv.dbfile);
+    }
     else
       return statusMake(INVALID_DBFILE_ACCESS,
 			"cannot open database file for writing: '%s'",
@@ -1162,11 +1148,10 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
       return se;
     */
 
-    if (rel->ndat != dbh.__ndat())
-      {
-	close(fd);
-	return statusMake_s(INVALID_DATAFILE_CNT);
-      }
+    if (rel->ndat != dbh.__ndat()) {
+      close(fd);
+      return statusMake_s(INVALID_DATAFILE_CNT);
+    }
 
     for (i = 0; i < dbh.__ndat(); i++)
       strcpy(dbh.dat(i).file(), rel->file[i]);
@@ -1199,23 +1184,21 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 #ifndef MAP_NORESERVE
 #define MAP_NORESERVE 0
 #endif
-    for (x = 0; ; x++)
-      {
-	if (*pm_shm = m_mmap(0, size, (PROT_READ|PROT_WRITE),
-			     MAP_NORESERVE|MAP_SHARED, shmfd,
-			     0, (char **)pshm_addr, shmfileGet(dbfile), 0, 0))
-	  {
-	    if (x)
-	      IDB_LOG(IDB_LOG_MMAP, ("m_mmap successfull in shmMap after %d attemps\n",
-				     x));
-	    break;
-	  }
-
-	if (x == MAXTRIES)
-	  return statusMake(MAP_ERROR, PR "shmfile '%s' cannot be mapped by eyedbsm server", shmfileGet(dbfile));
-	IDB_LOG(IDB_LOG_MMAP, ("m_mmap failed in shmMap, tries again\n"));
-	sleep(1);
+    for (x = 0; ; x++) {
+      if (*pm_shm = m_mmap(0, size, (PROT_READ|PROT_WRITE),
+			   MAP_NORESERVE|MAP_SHARED, shmfd,
+			   0, (char **)pshm_addr, shmfileGet(dbfile), 0, 0)) {
+	if (x)
+	  IDB_LOG(IDB_LOG_MMAP, ("m_mmap successfull in shmMap after %d attemps\n",
+				 x));
+	break;
       }
+
+      if (x == MAXTRIES)
+	return statusMake(MAP_ERROR, PR "shmfile '%s' cannot be mapped by eyedbsm server", shmfileGet(dbfile));
+      IDB_LOG(IDB_LOG_MMAP, ("m_mmap failed in shmMap, tries again\n"));
+      sleep(1);
+    }
 
     m_lock(*pm_shm);
 
@@ -1288,24 +1271,22 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     //MUTEX_LOCK(mp, 0);
     xmh = XMOpen(((char *)shmh) + SHM_HEADSIZE, vd);
 
-    if (!xmh)
-      {
-	//MUTEX_UNLOCK(mp, 0);
-	return statusMake(INVALID_SHMFILE, PR "shm file is not a valid eyedbsm shm file: '%s'", shmfileGet(dbfile));
-      }
+    if (!xmh) {
+      //MUTEX_UNLOCK(mp, 0);
+      return statusMake(INVALID_SHMFILE, PR "shm file is not a valid eyedbsm shm file: '%s'", shmfileGet(dbfile));
+    }
 
     Boolean mustUnlock = True;
     if (x2h_u32((unsigned int)shmh->hostid) != (unsigned int)gethostid() ||
-	strncmp(shmh->arch, eyedblib::CompileBuiltin::getArch(), sizeof( shmh->arch)))
-      {
-	//MUTEX_UNLOCK(mp, 0);
-	return statusMake(DATABASE_OPEN_FAILED,
-			  "cannot open database %s on "
-			  "computer %s [architecture %s]: "
-			  "database hold by computer %s [architecture %s]",
-			  dbfile, hostname, eyedblib::CompileBuiltin::getArch(), shmh->hostname,
-			  shmh->arch);
-      }
+	strncmp(shmh->arch, eyedblib::CompileBuiltin::getArch(), sizeof( shmh->arch))) {
+      //MUTEX_UNLOCK(mp, 0);
+      return statusMake(DATABASE_OPEN_FAILED,
+			"cannot open database %s on "
+			"computer %s [architecture %s]: "
+			"database hold by computer %s [architecture %s]",
+			dbfile, hostname, eyedblib::CompileBuiltin::getArch(), shmh->hostname,
+			shmh->arch);
+    }
 
     if (backend) {
       *pxid = rpc_getpid();
@@ -1369,9 +1350,9 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 
     // for compilation test
     /*
-    unsigned int nss = MapHeader_nslots((unsigned char *)0);
-    DbHeader__ dbh_(0);
-    unsigned int xxx = dbh_.__magic();
+      unsigned int nss = MapHeader_nslots((unsigned char *)0);
+      DbHeader__ dbh_(0);
+      unsigned int xxx = dbh_.__magic();
     */
 
     if (!hints)
@@ -1386,8 +1367,6 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 #ifdef TRACE
     utshm("ESM_dbOpen(%s)\n", dbfile);
 #endif
-    if ((se = privilegeCheck()) != Success)
-      return se;
 
     if (flags != VOLREAD &&
 	flags != VOLRW)
@@ -1399,104 +1378,93 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     vd = (DbDescription *)m_calloc(sizeof(DbDescription), 1);
 
     smdcli_conn_t *conn = smdcli_open(smd_get_port());
-    if (!conn)
-      {
-	free(vd);
-	return statusMake(ERROR, "cannot connect to eyedbsmd on port "
-			  "%s", smd_get_port());
-      }
+    if (!conn) {
+      free(vd);
+      return statusMake(ERROR, "cannot connect to eyedbsmd on port "
+			"%s", smd_get_port());
+    }
 
 #ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
-    if (smdcli_init_getsems(conn, dbfile, vd->semkeys))
-      {
-	free(vd);
-	free(conn);
-	return statusMake(ERROR, "protocol error with eyedbsmd on port "
-			  "%s", smd_get_port());
-      }
+    if (smdcli_init_getsems(conn, dbfile, vd->semkeys)) {
+      free(vd);
+      free(conn);
+      return statusMake(ERROR, "protocol error with eyedbsmd on port "
+			"%s", smd_get_port());
+    }
 #else
-    if (smdcli_init(conn, dbfile))
-      {
-	free(vd);
-	free(conn);
-	return statusMake(ERROR, "protocol error with eyedbsmd on port "
-			  "%s", smd_get_port());
-      }
+    if (smdcli_init(conn, dbfile)) {
+      free(vd);
+      free(conn);
+      return statusMake(ERROR, "protocol error with eyedbsmd on port "
+			"%s", smd_get_port());
+    }
 #endif
 
-    if ((shmfd = shmfileOpen(dbfile)) < 0)
-      {
-	free(vd);
-	return statusMake(INVALID_SHMFILE_ACCESS, PR "shm file '%s'",
-			  shmfileGet(dbfile));
-      }
+    if ((shmfd = shmfileOpen(dbfile)) < 0) {
+      free(vd);
+      return statusMake(INVALID_SHMFILE_ACCESS, PR "shm file '%s'",
+			shmfileGet(dbfile));
+    }
 
     vd->shmfd = shmfd;
     vd->conn = conn;
 
-    if ((ompfd = objmapfileOpen(dbfile, opf)) < 0)
-      {
-	free(vd);
-	return statusMake(INVALID_OBJMAP_ACCESS, PR "objmap file '%s'",
-			  objmapfileGet(dbfile));
-      }
+    if ((ompfd = objmapfileOpen(dbfile, opf)) < 0) {
+      free(vd);
+      return statusMake(INVALID_OBJMAP_ACCESS, PR "objmap file '%s'",
+			objmapfileGet(dbfile));
+    }
 
     shmsize = fdSizeGet(shmfd);
 
     if ((se = shmMap(dbfile, shmsize, shmfd, (void **)&vd->shm_addr,
-		     &vd->m_shm)) != Success)
-      {
-	free(vd);
-	return se;
-      }
+		     &vd->m_shm)) != Success) {
+      free(vd);
+      return se;
+    }
 
     shm_addr = vd->shm_addr;
 
-    if (se = checkFileAccess(DATABASE_OPEN_FAILED, "database file", dbfile, accflags))
-      {
-	free(vd);
-	return se;
-      }
+    if (se = checkFileAccess(DATABASE_OPEN_FAILED, "database file", dbfile, accflags)) {
+      free(vd);
+      return se;
+    }
 
-    if ((se = dopen(PR, dbfile, opf, &hdfd, &suser)) != Success)
-      {
-	free(vd);
-	return se;
-      }
+    if ((se = dopen(PR, dbfile, opf, &hdfd, &suser)) != Success) {
+      free(vd);
+      return se;
+    }
 
     DbHeader xdbh;
-    if (se = syscheckn(PR, read(hdfd, xdbh._addr(), DbHeader_SIZE), DbHeader_SIZE, ""))
-      {
-	free(vd);
-	free(dbh);
-	return se;
-      }
+    if (se = syscheckn(PR, read(hdfd, xdbh._addr(), DbHeader_SIZE), DbHeader_SIZE, "")) {
+      free(vd);
+      free(dbh);
+      return se;
+    }
 
     dbh = new DbHeader();
     x2h_dbHeader(dbh, &xdbh);
 
-    if (dbh->__magic() != MAGIC)
-      {
-	free(vd);
-	delete dbh;
-	return statusMake(INVALID_DBFILE, PR "database file '%s' is not a valid eyedbsm database file", dbfile);
-      }
+    if (dbh->__magic() != MAGIC) {
+      free(vd);
+      delete dbh;
+      return statusMake(INVALID_DBFILE, PR "database file '%s' is not a valid eyedbsm database file", dbfile);
+    }
 
     version = x2h_u32(((DbShmHeader *)shm_addr)->version);
 
-    if (pversion && *pversion && version > *pversion)
-      {
-	char str_version[32];
-	char str_pversion[32];
-	strcpy(str_version, string_version(version));
-	strcpy(str_pversion, string_version(*pversion));
-	free(vd);
-	delete dbh;
-	return statusMake(ERROR, "version of database '%s' (%s) is upper "
-			  "than the EyeDB version (%s): cannot be opened",
-			  dbfile, 
-			  str_version, str_pversion);
-      }
+    if (pversion && *pversion && version > *pversion) {
+      char str_version[32];
+      char str_pversion[32];
+      strcpy(str_version, string_version(version));
+      strcpy(str_pversion, string_version(*pversion));
+      free(vd);
+      delete dbh;
+      return statusMake(ERROR, "version of database '%s' (%s) is upper "
+			"than the EyeDB version (%s): cannot be opened",
+			dbfile, 
+			str_version, str_pversion);
+    }
 
 
     fop = ((flags & VOLREAD) ? PROT_READ : PROT_READ|PROT_WRITE);
@@ -1510,13 +1478,12 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 #endif
     /* maps dbs file */
     if (!(vd->m_dbs = m_mmap(0, DBS_DEFSIZE, fop, MAP_SHARED, hdfd, 0,
-			     (char **)&vd->dbs_addr, dbfile, 0, 0)))
-      {
-	shmUnmap(dbfile, vd, shmsize);
-	free(vd);
-	delete dbh;
-	return statusMake(MAP_ERROR, "unexpected and unrecoverable mmap error in database opening process: '%s'", dbfile);
-      }
+			     (char **)&vd->dbs_addr, dbfile, 0, 0))) {
+      shmUnmap(dbfile, vd, shmsize);
+      free(vd);
+      delete dbh;
+      return statusMake(MAP_ERROR, "unexpected and unrecoverable mmap error in database opening process: '%s'", dbfile);
+    }
 
     m_lock(vd->m_dbs);
 
@@ -1618,23 +1585,22 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
       }
     
       if ((status = dopen(PR, dbh->dat(i).file(), opf, &vd->dmd[i].fd,
-			  &vd->suser)) != Success)
-	{
-	  int j;
-	  for (j = 0; j < i; j++)
-	    if (vd->dmd[j].fd >= 0 &&
-		(se = syscheck(PR, close(vd->dmd[j].fd), ""))) {
-	      delete dbh;
-	      free(vd);
-	      pop_dir(pwd);
-	      return se;
-	    }
+			  &vd->suser)) != Success) {
+	int j;
+	for (j = 0; j < i; j++)
+	  if (vd->dmd[j].fd >= 0 &&
+	      (se = syscheck(PR, close(vd->dmd[j].fd), ""))) {
+	    delete dbh;
+	    free(vd);
+	    pop_dir(pwd);
+	    return se;
+	  }
 	
-	  delete dbh;
-	  free(vd);
-	  pop_dir(pwd);
-	  return status;
-	}
+	delete dbh;
+	free(vd);
+	pop_dir(pwd);
+	return status;
+      }
 
       /*
 	printf("opening datafile %s -> fd=%d, maxsize=%llu\n", dbh->dat[i].file,
@@ -1685,13 +1651,12 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     se = ESM_dbOpenPrologue(vd, (DbShmHeader *)shm_addr, shmsize, dbfile, flags,
 			    &xid);
   
-    if (se)
-      {
-	delete dbh;
-	free(vd);
-	pop_dir(pwd);
-	return se;
-      }
+    if (se) {
+      delete dbh;
+      free(vd);
+      pop_dir(pwd);
+      return se;
+    }
 
     ALIGN4(vd->omp_addr);
 
@@ -1728,14 +1693,13 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 
     (*pdbh)->dbfile = strdup(dbfile);
 
-    if (flags == VOLRW) /* changed the 6/7/99 */
-      {
-	se = ESM_transactionsGarbage(*pdbh, True);
-	if (se) {
-	  pop_dir(pwd);
-	  return se;
-	}
+    if (flags == VOLRW) {
+      se = ESM_transactionsGarbage(*pdbh, True);
+      if (se) {
+	pop_dir(pwd);
+	return se;
       }
+    }
 
     // 09/03/06: it seems to me that (*pdbh)->vd->dbs_addr->state
     // must be swapped !!
@@ -1806,27 +1770,26 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 
     DbHeader _dbh(DBSADDR(dbh));
     unsigned int ndat = x2h_u32(_dbh.__ndat());
-    for (i = 0; i < ndat; i++)
-      {
-	MmapDesc *mmd, *mmend = &dbh->vd->dmd[i].mmd[MAX_MMAP_SEGMENTS];
+    for (i = 0; i < ndat; i++) {
+      MmapDesc *mmd, *mmend = &dbh->vd->dmd[i].mmd[MAX_MMAP_SEGMENTS];
 
-	if (dbh->vd->m_dmp[i]) {
-	  int mtype = x2h_u16(_dbh.dat(i).mp()->mtype());
-	  int nslots = x2h_u32(_dbh.dat(i).mp()->nslots());
-	  unsigned int size = DMP_SIZE(mtype, nslots);
-	  if (m_munmap(dbh->vd->m_dmp[i], dbh->vd->dmp_addr[i], size))
-	    return statusMake(MAP_ERROR, PR "cannot unmap dmp file");
-	}
-
-	if (dbh->vd->dmd[i].fd >= 0 &&
-	    (se = syscheck(PR, close(dbh->vd->dmd[i].fd), "")))
-	  return se;
-
-	for (mmd = dbh->vd->dmd[i].mmd; mmd < mmend; mmd++) {
-	  if (mmd->ismapped)
-	    SEGMENT_UNMAP(mmd);
-	}
+      if (dbh->vd->m_dmp[i]) {
+	int mtype = x2h_u16(_dbh.dat(i).mp()->mtype());
+	int nslots = x2h_u32(_dbh.dat(i).mp()->nslots());
+	unsigned int size = DMP_SIZE(mtype, nslots);
+	if (m_munmap(dbh->vd->m_dmp[i], dbh->vd->dmp_addr[i], size))
+	  return statusMake(MAP_ERROR, PR "cannot unmap dmp file");
       }
+
+      if (dbh->vd->dmd[i].fd >= 0 &&
+	  (se = syscheck(PR, close(dbh->vd->dmd[i].fd), "")))
+	return se;
+
+      for (mmd = dbh->vd->dmd[i].mmd; mmd < mmend; mmd++) {
+	if (mmd->ismapped)
+	  SEGMENT_UNMAP(mmd);
+      }
+    }
 
     unsigned int nbobjs = x2h_u32(_dbh.__nbobjs());
     m_munmap(dbh->vd->m_omp, (char *)dbh->vd->omp_addr, OIDMAP_SIZE(nbobjs));

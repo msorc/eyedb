@@ -491,8 +491,10 @@ dbcreate_prologue(Database *db, const char *dbname,
   if (!dbfile) {
     if (strcmp(dbname, DBM_Database::getDbName()))
       dbfile = strdup((dirname + dbname + ".dbs").c_str());
-    else
-      dbfile = strdup(Database::getDefaultDBMDB());
+    else {
+      dbfile = strdup(Database::getDefaultServerDBMDB());
+      //dbfile = strdup(Database::getDefaultDBMDB());
+    }
   }
   else if (dbfile[0] != '/')
     dbfile = strdup((dirname + dbfile).c_str());
@@ -503,8 +505,9 @@ dbcreate_prologue(Database *db, const char *dbname,
   if (!dbfile) {
     if (strcmp(dbname, DBM_Database::getDbName()))
       dbfile = strdup((dirname + "/" + dbname + ".dbs").c_str());
-    else
+    else {
       dbfile = strdup(Database::getDefaultDBMDB());
+    }
   }
   else if (dbfile[0] != '/')
     dbfile = strdup((dirname + "/" + dbfile).c_str());
@@ -516,45 +519,43 @@ dbcreate_prologue(Database *db, const char *dbname,
   d->dbid     = dbid;
   d->nbobjs   = nbobjs;
 
-  if (!datafiles_cnt)
-    {
-      datafiles_cnt = 5;
-      datafiles[0] = strdup(getDatafile(dbname, dbfile).c_str());
-      datafiles[1] = "";
-      datafiles[2] = DEF_DATSIZE_STR;
-      datafiles[3] = (char *)DEF_SIZESLOT_STR;
-      datafiles[4] = (char *)DEF_DATTYPE_STR;
-    }
+  if (!datafiles_cnt) {
+    datafiles_cnt = 5;
+    datafiles[0] = strdup(getDatafile(dbname, dbfile).c_str());
+    datafiles[1] = "";
+    datafiles[2] = DEF_DATSIZE_STR;
+    datafiles[3] = (char *)DEF_SIZESLOT_STR;
+    datafiles[4] = (char *)DEF_DATTYPE_STR;
+  }
 
   assert(!(datafiles_cnt%5));
   d->ndat = datafiles_cnt/5;
-  for (int i = 0, j = 0; i < datafiles_cnt; i += 5, j++)
-    {
-      strcpy(d->dat[j].file, datafiles[i]);
-      strcpy(d->dat[j].name, datafiles[i+1]);
+  for (int i = 0, j = 0; i < datafiles_cnt; i += 5, j++) {
+    strcpy(d->dat[j].file, datafiles[i]);
+    strcpy(d->dat[j].name, datafiles[i+1]);
 #ifdef DATSZ_IN_M
-      d->dat[j].maxsize = atoi(datafiles[i+2]) * 1024;
+    d->dat[j].maxsize = atoi(datafiles[i+2]) * 1024;
 #else
-      d->dat[j].maxsize = atoi(datafiles[i+2]);
+    d->dat[j].maxsize = atoi(datafiles[i+2]);
 #endif
-      if (*d->dat[j].file && check_datafile_size(j, &d->dat[j]))
-	return 1;
+    if (*d->dat[j].file && check_datafile_size(j, &d->dat[j]))
+      return 1;
+    
+    d->dat[j].mtype = eyedbsm::BitmapType;
+    d->dat[j].sizeslot = atoi(datafiles[i+3]);
 
-      d->dat[j].mtype = eyedbsm::BitmapType;
-      d->dat[j].sizeslot = atoi(datafiles[i+3]);
+    // added 20/10/05
+    d->dat[j].dspid = 0;
+    // changed 2/12/05
+    d->dat[j].dspid = j;
 
-      // added 20/10/05
-      d->dat[j].dspid = 0;
-      // changed 2/12/05
-      d->dat[j].dspid = j;
-
-      if (!strcasecmp(datafiles[i+4], "phy"))
-	d->dat[j].dtype = eyedbsm::PhysicalOidType;
-      else if (!strcasecmp(datafiles[i+4], "log"))
-	d->dat[j].dtype = eyedbsm::LogicalOidType;
-      else
-	return 1;
-    }
+    if (!strcasecmp(datafiles[i+4], "phy"))
+      d->dat[j].dtype = eyedbsm::PhysicalOidType;
+    else if (!strcasecmp(datafiles[i+4], "log"))
+      d->dat[j].dtype = eyedbsm::LogicalOidType;
+    else
+      return 1;
+  }
 
   return 0;
 }
@@ -3276,7 +3277,7 @@ admin_realize(int start, int argc, char *argv[])
   */
 
   if (!*username) {
-    fprintf(stderr, "%s: a username cannot be the empty string", argv[0]);
+    fprintf(stderr, "%s: a username cannot be an empty string\n", argv[0]);
     return 1;
   }
 

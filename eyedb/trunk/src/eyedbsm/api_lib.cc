@@ -114,7 +114,7 @@ namespace eyedbsm {
     pgsize_pow2 = power2(pgsize);
     m_init();
 
-    return privilegeInit();
+    return Success;
   }
 
   Status release()

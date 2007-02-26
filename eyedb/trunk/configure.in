@@ -260,7 +260,7 @@ sparc-sun-solaris2.9)
 esac
 
 # -D are taken verbatim for now. Later, may use autodetection and/or command line flags
-DEFINES="-DOPTOPEN -DMOZILLA -DNEW_COLL_XDR -DNEW_COLL_XDR2 -DSUPPORT_NON_BASIC_LITERAL_COLL -DSTUART_AUTH"
+DEFINES=""
 CXXFLAGS="$CXXFLAGS $DEFINES $ARCH_DEFINES"
 
 # ========================================

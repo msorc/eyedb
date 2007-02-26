@@ -283,11 +283,7 @@ namespace eyedb {
     touch();
     ValueItem *item;
 
-#ifdef NEW_COLL_XDR2
     Data item_data = make_data(val, size, True);
-#else
-    Data item_data = make_data(val, size);
-#endif
 
     if (!item_data)
       return Exception::make(IDB_COLLECTION_ERROR, "data too long for collection insertion");

@@ -1148,11 +1148,7 @@ namespace eyedb {
     superuser = False;
 
     if (conn_ctx.ci && conn_ctx.ci->auth.uid >= 0) {
-#ifdef STUART_AUTH
       int uid = (conn_ctx.ci ? conn_ctx.ci->auth.uid : getuid());
-#else
-      int uid = (conn_ctx.ci ? conn_ctx.ci->u.stream.uid : getuid());
-#endif
       passwd *pwd = getpwuid(uid);
       const char *authusername = (pwd ? pwd->pw_name : "");
       if (!*username || !strcmp(username, authusername)) {
@@ -1169,11 +1165,7 @@ namespace eyedb {
 
     if (true) { //conn_ctx.ci->mode == rpc_ConnInfo::TCPIP) {
       const char *chuser = 0;
-#ifdef STUART_AUTH
       tcpip = &conn_ctx.ci->tcpip;
-#else
-      tcpip = &conn_ctx.ci->u.tcpip;
-#endif
 
       for (i = 0; i < tcpip->user_cnt; i++) {
 	if (!*username) {
@@ -4784,9 +4776,6 @@ namespace eyedb {
     if (!(se_status = idx2->search(&ind, &sefound, idr))) {
       if (sefound) {
 	*found = 1;
-#ifndef NEW_COLL_XDR2
-	collbe->decode(idr, idr);
-#endif
       }
     }
     else {
@@ -5384,12 +5373,8 @@ namespace eyedb {
     eyedblib::int32 ind = 1;
     eyedbsm::Status se_status;
 
-#if defined(E_XDR) && defined(NEW_COLL_XDR)
     unsigned char data[sizeof(eyedbsm::Oid)];
     oid_code(data, (Data)oid);
-#else
-    Data data = (Data)oid;
-#endif
 
     if (insert)
       se_status = idx1->insert(data, &ind);
@@ -6200,64 +6185,9 @@ namespace eyedb {
     eyedbsm::Status se_status;
     Oid toid(oid);
 
-#ifdef NEW_COLL_XDR
     RPCStatus rpc_status = IDB_collClassUpdate(dbh, idr, oid, 0, False);
     if (rpc_status)
       return rpc_status;
-#else
-    if (cl) {
-      Collection *extent;
-      Status status = cl->getExtent(extent);
-      if (status) return rpcStatusMake(status);
-      if (extent)	{
-	eyedbsm::Oid colloid = *extent->getOid().getOid();
-	CollectionBE *collbe;
-	  
-	Status status;
-	if (!(collbe = IDB_getCollBE("instanceDelete", db, dbh, &colloid, &status, True)))
-	  return rpcStatusMake(status);
-	  
-	eyedbsm::Idx *idx1;
-	collbe->getIdx(&idx1, 0);
-
-	eyedblib::int32 ind = 1;
-	eyedbsm::Boolean found;
-	se_status = idx1->remove(oid, &ind, &found);
-	if (se_status)
-	  return rpcStatusMake_se(se_status);
-
-	if (!found)
-	  return rpcStatusMake(IDB_ERROR,
-			       "instance delete: oid %s not found "
-			       "in collection",
-			       getOidString(oid));
-
-	int items_cnt;
-	se_status = eyedbsm::objectRead(dbh->sedbh, IDB_COLL_OFF_ITEMS_CNT,
-					sizeof(eyedblib::int32), &items_cnt,
-					eyedbsm::DefaultLock, 0, 0, &colloid);
-	items_cnt = x2h_32(items_cnt);
-
-	if (se_status)
-	  return rpcStatusMake_se(se_status);
-	  
-	items_cnt--;
-
-	collbe->setItemsCount(items_cnt);
-  
-#ifdef E_XDR
-	eyedblib::int32 items_cnt_x = h2x_32(items_cnt);
-#else
-	eyedblib::int32 items_cnt_x = items_cnt;
-#endif
-	se_status = eyedbsm::objectWrite(dbh->sedbh, IDB_COLL_OFF_ITEMS_CNT,
-					 sizeof(eyedblib::int32), &items_cnt_x, &colloid);
-	if (se_status)
-	  return rpcStatusMake_se(se_status);
-      }
-    }
-#endif
-
 
 #define DELETED_KEEP
     /*

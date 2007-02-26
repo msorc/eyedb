@@ -1724,12 +1724,11 @@ RPCStatus
 collectionGetByOid(DbHandle *dbh, const eyedbsm::Oid *oid,
 		       const eyedbsm::Oid *loid, int *found, int *ind)
 {
-#ifdef NEW_COLL_XDR
   unsigned char data[sizeof(*loid)];
   oid_code(data, (Data)loid);
   return collectionGetByValue(dbh, oid, data,
 				  sizeof(eyedbsm::Oid), found, ind);
-#endif
+
   return collectionGetByValue(dbh, oid, (Data)loid,
 				  sizeof(eyedbsm::Oid), found, ind);
 }
@@ -2249,7 +2248,6 @@ execGetExtRefPath(ConnHandle *ch, const char *user,
     }
 }
 
-#ifdef STUART_AUTH
 RPCStatus
 checkAuth(ConnHandle *ch, const char *file)
 {
@@ -2303,40 +2301,6 @@ set_conn_info(ConnHandle *ch, const char *hostname,
       STATUS_RETURN(status_r);
     }
 }
-#else
-RPCStatus
-set_conn_info(ConnHandle *ch, const char *hostname,
-	      int uid, const char *username, const char *progname,
-	      int *sv_pid, int *sv_uid, int sv_version, char **challenge)
-{
-  if (!ch)
-    return IDB_setConnInfo(hostname, username, progname, getpid(),
-			   sv_pid, sv_uid, sv_version);
-  else {
-      ClientArg ua[IDB_MAXARGS], *pua = ua;
-      int r, min;
-
-      start_rpc();
-
-      pua++->a_string = (char *)hostname;
-      pua++->a_string = (char *)username;
-      pua++->a_string = (char *)progname;
-      pua++->a_int    = getpid();
-      pua++;            /* sv_pid */
-      pua++;            /* sv_uid */
-      pua++->a_int    = sv_version;
-
-      RPC_RPCMAKE(ch->ch, SET_CONN_INFO_RPC, ua);
-
-      *sv_pid = ua[4].a_int;
-      *sv_uid = ua[5].a_int;
-
-      status_copy(status_r, ua[7].a_status);
-
-      STATUS_RETURN(status_r);
-    }
-}
-#endif
 
 RPCStatus
 setLogMask(ConnHandle *ch, eyedblib::int64 logmask)

@@ -916,12 +916,7 @@ if ((mode) !=  NoDBAccessMode && \
     if ((status = loadObject(&sch_oid,
 			     (Object **)&sch)) ==
 	Success)
-#ifdef OPTOPEN
       status = Success;
-#else
-    //    status = sch->complete(True, False);
-    status = sch->complete(False, False); // changed on 14/10/00
-#endif
     else {
       /*
 	fprintf(stderr, "error here!\n");
@@ -990,11 +985,7 @@ if ((mode) !=  NoDBAccessMode && \
     if ((status = reloadObject(sch_oid,
 			       (Object **)&sch)) ==
 	Success)
-#ifdef OPTOPEN
       ;
-#else
-    sch->complete(False);
-#endif
 
     open_state = False;
 

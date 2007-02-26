@@ -148,11 +148,11 @@ namespace eyedbsm {
 	_seError[DATABASE_OPEN_FAILED] =
 	  PREFIX "database open failed";
 	_seError[INVALID_DATAFILE_CNT] =
-	  PREFIX "too many datafiles";
+	  PREFIX "invalid datafile count";
 	_seError[INVALID_DATASPACE_CNT] =
-	  PREFIX "too many dataspaces";
+	  PREFIX "invalid dataspace count";
 	_seError[INVALID_DATAFILE_CNT_IN_DATASPACE] =
-	  PREFIX "too many datafiles in a dataspace";
+	  PREFIX "invalid datafile count in a dataspace";
 	_seError[INVALID_DBFILE] =
 	  PREFIX "invalid database file";
 	_seError[INVALID_DBFILE_ACCESS] =

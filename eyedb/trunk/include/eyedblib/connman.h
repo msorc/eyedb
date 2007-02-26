@@ -31,17 +31,10 @@
 
 #include <netinet/in.h>
 
-#ifdef STUART_AUTH
 struct rpc_Auth {
   int uid;
   int gid;
 };
-#else
-typedef struct {
-  int uid;
-  int gid;
-} rpc_Stream;
-#endif
 
 struct rpc_User {
   enum {
@@ -58,7 +51,6 @@ struct rpc_TcpIp {
   rpc_User *users;
 };
 
-#ifdef STUART_AUTH
 struct rpc_ConnInfo {
 
   rpc_Auth auth;
@@ -74,21 +66,6 @@ struct rpc_ConnInfo {
 
   rpc_TcpIp tcpip;
 };
-#else
-typedef struct {
-
-  enum {
-    STREAM,
-    UNIX,
-    TCPIP
-  } mode;
-
-  union {
-    rpc_Stream stream;
-    rpc_TcpIp tcpip;
-  } u;
-} rpc_ConnInfo;
-#endif
 
 extern int
 rpc_connman_init(const char *access_file);
