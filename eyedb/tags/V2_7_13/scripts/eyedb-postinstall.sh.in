@@ -1,0 +1,85 @@
+#!/bin/bash
+#
+# eyedb-postinstall.sh
+#
+#
+
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+bindir=@bindir@
+
+PROGNAME=
+
+decrypt_options()
+{
+    for arg in $@
+    do
+      case $arg in
+	  \-help | \-h)
+          usage
+	  exit 0
+	  ;;
+	  *)
+          usage
+	  exit 2
+	  ;;
+      esac
+   done
+}
+
+usage()
+{
+    echo "$PROGNAME creates the EYEDBDBM system database."
+    echo
+    echo "This script must be run after installing EyeDB in a previously empty directory."
+    echo
+    echo "usage: $PROGNAME [OPTION]"
+    echo
+    echo "Options:"
+    echo "  -h, --help               display this help and exit"
+    echo
+}
+
+ECHO()
+{
+    echo "$PROGNAME: $*"
+}
+
+start_server()
+{
+    echo ==== Starting EyeDB server
+    $bindir/eyedbctl start --creating-dbm --nod
+}
+
+create_dbm()
+{
+    echo ==== Creating EYEDBDBM database
+    $bindir/eyedbdbmcreate --strict-unix=@
+    echo ==== Setting EYEDBDBM database permissions
+    $bindir/eyedbdbaccess EYEDBDBM r --user=@
+}
+
+stop_server()
+{
+    echo ==== Stopping EyeDB server
+    $bindir/eyedbctl stop
+}
+
+clean_exit()
+{
+    SAVED_STATUS=$?
+    $bindir/eyedbctl stop
+    exit $SAVED_STATUS
+}
+
+PROGNAME=`basename $0`
+decrypt_options $*
+
+set -e
+trap clean_exit ERR
+start_server
+sleep 4
+create_dbm
+stop_server
+exit 0
+

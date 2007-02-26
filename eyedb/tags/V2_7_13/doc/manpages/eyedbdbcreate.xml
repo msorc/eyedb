@@ -1,0 +1,110 @@
+<?xml version="1.0"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+<!ENTITY eyedbdbcreate "<command>eyedbdbcreate</command>">
+]>
+
+<refentry id="eyedbdbcreate">
+  <refentryinfo>
+    <date>12 February 2007</date>
+  </refentryinfo>
+
+  <refmeta>
+    <refentrytitle>eyedbdbcreate</refentrytitle>
+    <manvolnum>1</manvolnum>
+    <refmiscinfo>eyedb database</refmiscinfo>
+  </refmeta>
+
+  <refnamediv>
+    <refname>&eyedbdbcreate;</refname>
+    <refpurpose>command purpose</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbdbcreate <dbname> [--dbfile=<dbfile>] [--datafiles={<datafile>[:name[:<sizeMb>[:sizeslot[:phy|log]]]]}] [--filedir=<filedir>] [--object-count=<objcnt>]]]></code>
+      eyedbdbcreate
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
+      <arg>--dbfile=<replaceable>dbfile</replaceable></arg>
+      <arg>--datafiles={<replaceable>datafile</replaceable><arg>:name<arg>:<replaceable>sizeMb</replaceable><arg>:sizeslot<arg>:phy|log</arg></arg></arg></arg>}</arg>
+      <arg>--filedir=<replaceable>filedir</replaceable></arg>
+      <arg>--object-count=<replaceable>objcnt</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbdbcreate; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>--dbfile=<replaceable>dbfile</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>--datafiles={<replaceable>datafile</replaceable><arg>:name<arg>:<replaceable>sizeMb</replaceable><arg>:sizeslot<arg>:phy|log</arg></arg></arg></arg>}</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>--filedir=<replaceable>filedir</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>--object-count=<replaceable>objcnt</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsect1>
+    <title>Environment</title>
+    See eyedb-options
+  </refsect1>
+
+  <refsect1>
+    <title>Exit status</title>
+  </refsect1>
+
+  <refsect1>
+    <title>Examples</title>
+  </refsect1>
+
+  <refsect1>
+    <title>See also</title>
+  </refsect1>
+
+  <refsect1>
+    <title>Bugs</title>
+  </refsect1>
+
+  <refsect1>
+    <title>Authors</title>
+  </refsect1>
+
+</refentry>
