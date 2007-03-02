@@ -3415,9 +3415,6 @@ do { \
       return s;
 
     if (was_pure_literal) {
-      //printf("removing...\n");
-
-      printf("removing literal collection %s\n", literal_oid.toString());
       s = db->removeObject(literal_oid, rcm);
       if (s)
 	return s;

@@ -29,6 +29,8 @@
 
 #include "oql_p.h"
 
+// PATCH p2312
+
 namespace eyedb {
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -358,7 +360,7 @@ OQML_STD_BINOP(oqmlRegIDiff, oqmlRegex, oqmlREGIDIFF, "!~~")
 static oqmlStatus *
 oqml_logical_error(oqmlNode *node, oqmlAtomType *at, bool strict)
 {
-  std::string msg = (strict ? "boolean": "boolean, int, char or double");
+  std::string msg = (strict ? "bool": "bool, int, char or double");
   if (at)
     return oqmlStatus::expected(node, msg.c_str(), at->getString());
 
@@ -392,7 +394,8 @@ oqml_check_type(oqmlNode *node, Database *db, oqmlContext *ctx,
 
   if (at.type != oqmlATOM_INT &&
       at.type != oqmlATOM_CHAR &&
-      at.type != oqmlATOM_DOUBLE)
+      at.type != oqmlATOM_DOUBLE &&
+      at.type != oqmlATOM_BOOL)
     return oqml_logical_error(node, &at, strict);
 
   return oqmlSuccess;
@@ -753,7 +756,7 @@ public:
       if (s) return s;
 
       if (al->cnt != 1 || !OQML_IS_BOOL(al->first))
-	return new oqmlStatus(node, "and hint: boolean expected, got %s",
+	return new oqmlStatus(node, "and hint: bool expected, got %s",
 			      al->first ? al->first->type.getString() :
 			      "nothing");
 
