@@ -67,7 +67,7 @@ using namespace eyedbsm;
 static int smd_refcnt;
 
 //#define TRACE
-static void clean_exit();
+static void clean_exit(int from);
 
 class Reference {
 
@@ -103,7 +103,7 @@ class Semaphore : public Reference {
     key = _key;
     excl = _excl;
 #ifdef TRACE
-    fprintf(stderr, "creating semaphore ");
+    fprintf(stderr, "eyedbsmd: creating semaphore ");
     trace();
     fprintf(stderr, "\n");
 #endif
@@ -121,7 +121,7 @@ public:
 
   void release() {
 #ifdef TRACE
-    fprintf(stderr, "releasing semaphore 0x%08x [refcnt:%d]\n", key, getRefCount());
+    fprintf(stderr, "eyedbsmd: releasing semaphore 0x%08x [refcnt:%d]\n", key, getRefCount());
 #endif
     if (!decrRefCount()) {
       bool r = std_list_erase(sem_list, this);
@@ -133,13 +133,13 @@ public:
 
   ~Semaphore() {
 #ifdef TRACE
-    fprintf(stderr, "deleting key 0x%08x\n", key);
+    fprintf(stderr, "eyedbsmd: deleting key 0x%08x\n", key);
 #endif
     ut_sem_rm(ut_sem_open(key));
   }
 
   void trace() {
-    fprintf(stderr, "key 0x%08x [%s]", key, (excl ? "excl" : "shared"));
+    fprintf(stderr, "eyedbsmd: key 0x%08x [%s]", key, (excl ? "excl" : "shared"));
   }
 
   static Semaphore *find(int excl) {
@@ -162,7 +162,7 @@ public:
     }
 
 #ifdef TRACE
-    fprintf(stderr, "cannot find any semaphore\n");
+    fprintf(stderr, "eyedbsmd: cannot find any semaphore\n");
 #endif
     return 0;
   }
@@ -184,6 +184,7 @@ class DbFile : public Reference {
 #ifdef USE_INODE
   ino_t ino;
   dev_t dev; 
+  char *dbfile;
 #else
   char *dbfile;
 #endif
@@ -196,15 +197,19 @@ class DbFile : public Reference {
   DbFile(const char *_dbfile) : Reference() {
 #ifdef USE_INODE
     struct stat st;
-    if (stat(_dbfile, &st) < 0) {
-      fprintf(stderr, "cannot stat file %s\n", _dbfile);
+    if (stat(_dbfile, &st) >= 0) {
+      ino = st.st_ino;
+      dev = st.st_dev;
+    }
+    else {
+#ifdef TRACE
+      fprintf(stderr, "eyedbsmd: cannot stat file %s\n", _dbfile);
+#endif
       ino = 0;
       dev = 0;
-      return;
     }
 
-    ino = st.st_ino;
-    dev = st.st_dev;
+    dbfile = strdup(_dbfile);
 #else
     dbfile = strdup(_dbfile);
 #endif
@@ -215,15 +220,16 @@ class DbFile : public Reference {
 #endif
     dbfile_list.push_back(this);
 #ifdef TRACE
-    fprintf(stderr, "creating dbfile ");
+    fprintf(stderr, "eyedbsmd: creating dbfile ");
     trace();
     fprintf(stderr, "\n");
 #endif
   }
 
   ~DbFile() {
+    free(dbfile);
 #ifdef TRACE
-    fprintf(stderr, "deleting dbfile %s\n", getDbfile());
+    fprintf(stderr, "eyedbsmd: deleting dbfile %s\n", getDbfile());
 #endif
 #ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
     for (int i = 0; i < ESM_NSEMS; i++)
@@ -242,7 +248,7 @@ public:
   }
 #endif
 
-#ifdef USE_INODE
+#if 0
   const char *getDbfile() const {
     static std::string st_dbfile;
     char buf[64];
@@ -258,7 +264,7 @@ public:
 
   void release() {
 #ifdef TRACE
-    fprintf(stderr, "releasing dbfile %s [refcnt:%d]\n", getDbfile(), getRefCount());
+    fprintf(stderr, "eyedbsmd: releasing dbfile %s [refcnt:%d]\n", getDbfile(), getRefCount());
 #endif
     if (!decrRefCount()) {
       bool r = std_list_erase(dbfile_list, this);
@@ -279,29 +285,37 @@ public:
     struct stat st;
     ino_t ino;
     dev_t dev; 
-    if (stat(dbfile, &st) < 0) {
-      fprintf(stderr, "cannot stat file %s\n", dbfile);
+
+    if (stat(dbfile, &st) >= 0) {
+      ino = st.st_ino;
+      dev = st.st_dev;
+    }
+    else {
       ino = 0;
       dev = 0;
-      return 0;
     }
-
-    ino = st.st_ino;
-    dev = st.st_dev;
 
     while (begin != end) {
       dbf = *begin;
-      if (dbf->ino == ino && dbf->dev == dev) {
-	if (get_sems)
-	  dbf->incrRefCount();
-	found = 1;
-	return dbf;
+      if (ino && dev) {
+	if (dbf->ino == ino && dbf->dev == dev) {
+	  if (get_sems)
+	    dbf->incrRefCount();
+	  found = 1;
+	  return dbf;
+	}
+      }
+      else {
+	if (!strcmp(dbf->dbfile, dbfile)) {
+	  if (get_sems)
+	    dbf->incrRefCount();
+	  found = 1;
+	  return dbf;
+	}
       }
       ++begin;
     }
-
 #else
-
     while (begin != end) {
       dbf = *begin;
       if (!strcmp(dbf->dbfile, dbfile)) {
@@ -317,11 +331,6 @@ public:
     found = 0;
     if (get_sems) {
       dbf = new DbFile(dbfile);
-      /*
-      time_t t0 = time(0);
-      fprintf(stderr, "Cleaning database %s at %s", dbfile, ctime(&t0));
-      fflush(stderr);
-      */
       
       Status s = dbCleanup(dbfile);
       if (s && s->err != CANNOT_LOCK_SHMFILE)
@@ -336,7 +345,7 @@ public:
   }
 
   void trace() {
-    fprintf(stderr, "%s, ", getDbfile());
+    fprintf(stderr, "eyedbsmd: %s, ", getDbfile());
 #ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
     for (int i = 0; i < ESM_NSEMS; i++) {
       if (i) fprintf(stderr, ", ");
@@ -369,7 +378,7 @@ public:
   Client(int _fd) {
     fd = _fd;
 #ifdef TRACE
-    fprintf(stderr, "creating client %d\n", fd);
+    fprintf(stderr, "eyedbsmd: creating client %d\n", fd);
 #endif
     client_list.push_back(this);
   }
@@ -378,14 +387,20 @@ public:
     dbfile_list.push_back(dbf);
 
 #ifdef TRACE
-    fprintf(stderr, "adding dbfile %s to client %d [refcnt:%d]\n", dbf->getDbfile(), fd,
-	   dbf->getRefCount());
+    if (dbf)
+      fprintf(stderr, "eyedbsmd: adding dbfile %s to client %d [refcnt:%d]\n", dbf->getDbfile(), fd,
+	      dbf->getRefCount());
+    else
+      fprintf(stderr, "eyedbsmd: adding null dbfile\n");
 #endif
   }
 
   void rmDbFile(DbFile *dbf) {
 #ifdef TRACE
-    fprintf(stderr, "removing dbfile %s from client %d\n", dbf->getDbfile(), fd);
+    if (dbf)
+      fprintf(stderr, "eyedbsmd: removing dbfile %s from client %d\n", dbf->getDbfile(), fd);
+    else
+      fprintf(stderr, "eyedbsmd: removing null dbfile\n");
 #endif
     std::list<DbFile *>::iterator db_begin = dbfile_list.begin();
     std::list<DbFile *>::iterator db_end = dbfile_list.end();
@@ -404,13 +419,13 @@ public:
     }
 
 #ifdef TRACE
-    fprintf(stderr, "dbfile %s not found in client %d\n", dbf->getDbfile(), fd);
+    fprintf(stderr, "eyedbsmd: dbfile %s not found in client %d\n", dbf->getDbfile(), fd);
 #endif
   }
 
   ~Client() {
 #ifdef TRACE
-    fprintf(stderr, "releasing client %d\n", fd);
+    fprintf(stderr, "eyedbsmd: releasing client %d\n", fd);
 #endif
     std::list<DbFile *>::iterator db_begin = dbfile_list.begin();
     std::list<DbFile *>::iterator db_end = dbfile_list.end();
@@ -495,13 +510,13 @@ port_open(const char *port)
   rpc_checkAFUnixPort(port);
   
   if ((sockun_fd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {
-    fprintf(stderr, "unable to create unix socket port `%d'\n", port);
+    fprintf(stderr, "eyedbsmd: unable to create unix socket port `%d'\n", port);
     return -1;
   }
   
   if (setsockopt(sockun_fd, SOL_SOCKET, SO_REUSEADDR, (char *)&v, sizeof(v)) <
       0) {
-    fprintf(stderr, "setsockopt reuseaddr\n");
+    fprintf(stderr, "eyedbsmd: setsockopt reuseaddr\n");
     return -1;
   }
 
@@ -510,7 +525,7 @@ port_open(const char *port)
 
   if (bind(sockun_fd, (struct sockaddr *)&sock_un_name,
 	   sizeof(sock_un_name)) < 0 ) {
-    fprintf(stderr, "bind: failing on port %s (%s)\n", port,
+    fprintf(stderr, "eyedbsmd: bind: failing on port %s (%s)\n", port,
 	    strerror(errno));
     fprintf(stderr, "\nPerharps another eyedbsmd is running on port:\n%s\n",
 	    port);
@@ -522,7 +537,7 @@ port_open(const char *port)
 
   chmod(port, 0777);
   if (sockun_fd >= 0 && listen(sockun_fd, 2) < 0 ) {
-    fprintf(stderr, "listen: failing on port %s (%s)\n", port,
+    fprintf(stderr, "eyedbsmd: listen: failing on port %s (%s)\n", port,
 	    strerror(errno));
     return -1;
   }
@@ -623,7 +638,7 @@ manage_message(int fd)
       client->rmDbFile(dbf);
   }
   else if (msg == SMD_STATUS) {
-    fprintf(stderr, "Reference Count: %d\n", smd_refcnt);
+    fprintf(stderr, "eyedbsmd: Reference Count: %d\n", smd_refcnt);
     DbFile::traceList();
 #ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
     Semaphore::traceList();
@@ -637,14 +652,14 @@ manage_message(int fd)
   }
   else if (msg == SMD_STOP) {
 #ifdef TRACE
-    fprintf(stderr, "smd_refcnt %d\n", smd_refcnt);
+    fprintf(stderr, "eyedbsmd: smd_refcnt %d\n", smd_refcnt);
 #endif
     Client::clean_all();
-    clean_exit();
+    clean_exit(1);
     exit(0);
   }
   else {
-    fprintf(stderr, "unknown message %x\n", msg);
+    fprintf(stderr, "eyedbsmd: unknown message %x\n", msg);
     return 0;
   }
 
@@ -662,7 +677,7 @@ net_main_loop(int sock_fd)
   
   for (;;) {
 #ifdef TRACE
-    fprintf(stderr, "\nwaiting on socket %d, maxfd %d\n", sock_fd, max_fd);
+    fprintf(stderr, "eyedbsmd: \nwaiting on socket %d, maxfd %d\n", sock_fd, max_fd);
 #endif
     fd_set fdt = fds;
     if (select (max_fd+1, &fdt, 0, 0, 0) < 0) {
@@ -705,15 +720,22 @@ net_main_loop(int sock_fd)
 static const char *port;
 
 static void
-clean_exit()
+clean_exit(int from)
 {
+#ifdef TRACE
+  fprintf(stderr, "eyedbsmd: clean_exit(%d)\n", from);
+#endif
   unlink(port);
 }
 
 static void
 signal_handler(int sig) 
 {
-  clean_exit();
+#ifdef TRACE
+  fprintf(stderr, "eyedbsmd: receive signal #%d\n", sig);
+#endif
+  sleep(1000);
+  clean_exit(2);
   exit(sig);
 }
 
@@ -825,6 +847,6 @@ main(int argc, char *argv[])
 #endif
   net_main_loop(sock_fd);
 
-  clean_exit();
+  clean_exit(3);
   return notice(0);
 }
