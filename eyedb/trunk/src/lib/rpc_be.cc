@@ -549,13 +549,14 @@ rpc_portOpen(rpc_Server *server, const char *servname, const char *portname,
       PERROR(msg_make("eyedb fatal error: unable to create pipe"));
       return rpc_Error;
     }
-#if defined(SOLARIS) || defined(ULTRASOL7)
+
+    // solaris platform only ?
     if (ioctl(pfd[0], I_PUSH, "connld") < 0) {
       if (created) unlink(portname);
       PERROR(msg_make("eyedb fatal error: unable to configure pipe"));
       return rpc_Error;
     }
-#endif
+    //
 
     if (fattach(pfd[0], port->portname) < 0) {
       if (created) unlink(portname);

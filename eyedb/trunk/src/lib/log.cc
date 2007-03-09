@@ -43,10 +43,14 @@
 #include <eyedblib/log.h>
 #include <eyedblib/rpc_lib.h>
 
-#ifdef HAVE_CTIME_R_3
-#define M_ctime_r(T,S,L) ctime_r(T,S,L)
+#ifndef HAVE_CTIME_R
+#define CTIME_R(T, S, L) S = ctime(T)
 #else
-#define M_ctime_r(T,S,L) ctime_r(T,S)
+#ifdef HAVE_CTIME_R_3
+#define CTIME_R(T, S, L) ctime_r(T, S, L)
+#else
+#define CTIME_R(T, S, L) ctime_r(T, S)
+#endif
 #endif
 
 static FILE *logfd;
@@ -80,17 +84,15 @@ utlogInit(const char *progName, const char *devname)
     logfd = stderr;
   else if (!strcmp(devname, "stdout"))
     logfd = stdout;
-  else
-    {
-      logfd = fopen(devname, "w");
+  else {
+    logfd = fopen(devname, "w");
 
-      if (!logfd)
-	{
-	  fprintf(stderr, "%s: cannot open log file '%s' for writing\n",
-		  logProgName, devname);
-	  /*exit(1);*/
-	}
+    if (!logfd) {
+      fprintf(stderr, "%s: cannot open log file '%s' for writing\n",
+	      logProgName, devname);
+      /*exit(1);*/
     }
+  }
 }
 
 FILE *
@@ -177,30 +179,30 @@ utlog(const char *fmt, ...)
   struct timeval tv;
   unsigned long long ms;
   time_t t;
-  char s[64];
+#ifdef HAVE_CTIME_R
+  char time_str[64];
+#else
+  char *time_str;
+#endif
 
   if (!logfd || rpc_from_core)
     return;
 
-  if (log_date)
-    {
-      time(&t);
-      M_ctime_r(&t, s, sizeof(s)-1);
-      s[strlen(s)-1] = 0;
-      fprintf(logfd, "%s ", s);
-    }
-  else
-    *s = 0;
+  if (log_date) {
+    time(&t);
+    CTIME_R(&t, time_str, sizeof(time_str)-1);
+    time_str[strlen(time_str)-1] = 0;
+    fprintf(logfd, "%s ", time_str);
+  }
 
-  if (log_timer)
-    {
-      gettimeofday(&tv, NULL);
-      ms = (unsigned long long)tv.tv_sec * 1000ULL +
-	(unsigned long long)tv.tv_usec / 1000ULL;
-      if (!ms_start)
-	ms_start = ms;
-      fprintf(logfd, "%llu ms ", ms-ms_start);
-    }
+  if (log_timer) {
+    gettimeofday(&tv, NULL);
+    ms = (unsigned long long)tv.tv_sec * 1000ULL +
+      (unsigned long long)tv.tv_usec / 1000ULL;
+    if (!ms_start)
+      ms_start = ms;
+    fprintf(logfd, "%llu ms ", ms-ms_start);
+  }
 
 
   if (log_pid)

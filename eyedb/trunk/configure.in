@@ -195,14 +195,13 @@ AC_CHECK_MEMBERS(struct in_addr._S_un,,,[#include <netinet/in.h>])
 AC_CHECK_FUNCS(strsignal)
 AC_CHECK_FUNCS(fattach)
 # check if function ctime_r exists and has 2 or 3 arguments
+AC_CHECK_FUNCS(ctime_r)
 AC_FUNC_CTIME_R_3_ARGS
 # check for regular expressions functions
 AC_CHECK_FUNC(regcomp,AC_DEFINE([HAVE_REGCOMP],1,[Defined if function regcomp exists]),,[#include <regex.h>])
 AC_CHECK_FUNC(regexec,AC_DEFINE([HAVE_REGEXEC],1,[Defined if function regexec exists]),,[#include <regex.h>])
 AC_CHECK_FUNC(regcmp,AC_DEFINE([HAVE_REGCMP],1,[Defined if function regcmp exists]),,[#include <libgen.h>])
 AC_CHECK_FUNC(regex,AC_DEFINE([HAVE_REGEX],1,[Defined if function regex exists]),,[#include <libgen.h>])
-# check for isnan
-AC_ISNAN
 
 # check for tzset and long timezone
 AC_CHECK_FUNC(tzset,AC_DEFINE([HAVE_TZSET],1,[Defined if function tzset exists]),,[#include <time.h>])
