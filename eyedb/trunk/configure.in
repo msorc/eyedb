@@ -338,7 +338,7 @@ AM_CONDITIONAL(COND_JAVADOC, test x"$COND_JAVADOC" = xyes)
 AC_PATH_PROG(XSLTPROC, xsltproc)
 # Look for XSL stylesheet
 AC_MSG_CHECKING(for Docbook manpages XSL stylesheet)
-MANPAGES_XSL_STYLESHEET_LOCATIONS="/usr/share/sgml/docbook/xsl-stylesheets/manpages"
+MANPAGES_XSL_STYLESHEET_LOCATIONS="/usr/share/sgml/docbook/xsl-stylesheets/manpages /usr/share/xml/docbook/stylesheet/nwalsh/manpages"
 for d in $MANPAGES_XSL_STYLESHEET_LOCATIONS ; do
     if test -f $d/docbook.xsl ; then
        MANPAGES_XSL_STYLESHEET_DIR=$d
