@@ -24,9 +24,7 @@
     <cmdsynopsis>
       <code><![CDATA[usage: eyedbuserdbaccess <user> <dbname> r|rw|rx|rwx|admin|no]]></code>
       eyedbuserdbaccess
-      <arg choice="plain"><replaceable>user</replaceable></arg>
-      <arg choice="plain"><replaceable>dbname</replaceable></arg>
-      <arg choice="plain">r|rw|rx|rwx|admin|no</arg>
+<arg choice="plain"><replaceable>user</replaceable><replaceable>dbname</replaceable>r|rw|rx|rwx|admin|no</arg>
     </cmdsynopsis>
   </refsynopsisdiv>
 
@@ -42,21 +40,7 @@
     <variablelist>
 
       <varlistentry>
-	<term><arg choice="plain"><replaceable>user</replaceable></arg></term>
-	<listitem>
-	  <para>option_description</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
-	<listitem>
-	  <para>option_description</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term><arg choice="plain">r|rw|rx|rwx|admin|no</arg></term>
+	<term><arg choice="plain"><replaceable>user</replaceable><replaceable>dbname</replaceable>r|rw|rx|rwx|admin|no</arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>

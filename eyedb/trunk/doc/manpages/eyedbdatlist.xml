@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+  "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+  <!ENTITY eyedbdatlist "<command>eyedbdatlist</command>">
+]>
+
+<refentry id="eyedbdatlist">
+  <refentryinfo>
+    <date>March 2007</date>
+  </refentryinfo>
+
+  <refmeta>
+    <refentrytitle>eyedbdatlist</refentrytitle>
+    <manvolnum>1</manvolnum>
+    <refmiscinfo>eyedb database</refmiscinfo>
+  </refmeta>
+
+  <refnamediv>
+    <refname>&eyedbdatlist;</refname>
+    <refpurpose>command purpose</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbdatlist <dbname> [--stats|--all] [{<datid>|<datname>}]]]></code>
+      eyedbdatlist
+<arg choice="plain"><replaceable>dbname</replaceable></arg>
+<arg choice="optional">--stats|--all</arg>
+<arg choice="optional">{<replaceable>datid</replaceable>|<replaceable>datname</replaceable>}</arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbdatlist; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="optional">--stats|--all</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="optional">{<replaceable>datid</replaceable>|<replaceable>datname</replaceable>}</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+<refsect1>
+  <title>Environment</title>
+  See eyedb-options(7)
+</refsect1>
+
+<refsect1>
+  <title>Exit status</title>
+</refsect1>
+
+<refsect1>
+  <title>Examples</title>
+</refsect1>
+
+<refsect1>
+  <title>See also</title>
+</refsect1>
+
+<refsect1>
+  <title>Bugs</title>
+</refsect1>
+
+<refsect1>
+  <title>Authors</title>
+</refsect1>
+
+</refentry>

@@ -24,9 +24,8 @@
     <cmdsynopsis>
       <code><![CDATA[usage: eyedbuserpasswd <user> [<new passwd>]]]></code>
       eyedbuserpasswd
-      <arg choice="plain"><replaceable>user</replaceable></arg>
-      <arg choice="plain"><arg><replaceable>new</arg>
-      <arg choice="plain">passwd</replaceable></arg></arg>
+<arg choice="plain"><replaceable>user</replaceable></arg>
+<arg choice="optional"><replaceable>newpasswd</replaceable></arg>
     </cmdsynopsis>
   </refsynopsisdiv>
 
@@ -49,14 +48,7 @@
       </varlistentry>
 
       <varlistentry>
-	<term><arg choice="plain"><arg><replaceable>new</arg></term>
-	<listitem>
-	  <para>option_description</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term><arg choice="plain">passwd</replaceable></arg></arg></term>
+	<term><arg choice="optional"><replaceable>newpasswd</replaceable></arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>

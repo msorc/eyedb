@@ -24,10 +24,15 @@
     <cmdsynopsis>
       <code><![CDATA[usage: eyedbdbmcreate [--strict-unix=<user>|@] [<user> [<passwd>]] [--datafiles={<datafile>[:name[:<sizeMb>[:sizeslot[:phy|log]]]]}]]]></code>
       eyedbdbmcreate
-      <arg>--strict-unix=<replaceable>user</replaceable>|@</arg>
-      <arg choice="plain"><arg><replaceable>user</replaceable></arg>
-      <arg><replaceable>passwd</replaceable></arg></arg>
-      <arg>--datafiles={<replaceable>datafile</replaceable><arg>:name<arg>:<replaceable>sizeMb</replaceable><arg>:sizeslot<arg>:phy|log</arg></arg></arg></arg>}</arg>
+<arg choice="optional">--strict-unix=<replaceable>user</replaceable>|@</arg>
+<arg choice="optional"><replaceable>user</replaceable></arg>
+<arg choice="optional"><replaceable>passwd</replaceable></arg>
+<arg choice="optional">--datafiles={<replaceable>datafile</replaceable></arg>
+<arg choice="optional">:name</arg>
+<arg choice="optional">:<replaceable>sizeMb</replaceable></arg>
+<arg choice="optional">:sizeslot</arg>
+<arg choice="optional">:phy|log</arg>
+<arg choice="optional">}</arg>
     </cmdsynopsis>
   </refsynopsisdiv>
 
@@ -43,28 +48,63 @@
     <variablelist>
 
       <varlistentry>
-	<term><arg>--strict-unix=<replaceable>user</replaceable>|@</arg></term>
+	<term><arg choice="optional">--strict-unix=<replaceable>user</replaceable>|@</arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term><arg choice="plain"><arg><replaceable>user</replaceable></arg></term>
+	<term><arg choice="optional"><replaceable>user</replaceable></arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term><arg><replaceable>passwd</replaceable></arg></arg></term>
+	<term><arg choice="optional"><replaceable>passwd</replaceable></arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term><arg>--datafiles={<replaceable>datafile</replaceable><arg>:name<arg>:<replaceable>sizeMb</replaceable><arg>:sizeslot<arg>:phy|log</arg></arg></arg></arg>}</arg></term>
+	<term><arg choice="optional">--datafiles={<replaceable>datafile</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="optional">:name</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="optional">:<replaceable>sizeMb</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="optional">:sizeslot</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="optional">:phy|log</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="optional">}</arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>

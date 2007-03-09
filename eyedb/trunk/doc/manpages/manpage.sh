@@ -2,6 +2,42 @@
 
 function manpage() {
     $1 --help 2>&1 | grep usage | awk --assign cmd=$1 '
+function token( c, n) {
+      r["tok"] = c;
+      r["n"] = n;
+
+      return 1;
+}
+
+function next_token( line, n) {
+  word = "";
+  for ( ;;n++) {
+    c = substr( line, n, 1);
+
+    if (n > length(line)) {
+      if (word)
+        return token(word,n);
+      else
+        return "";
+    }
+
+    if (c == " ") {
+      if (word)
+        return token(word,n);
+      else
+        continue;
+    }
+    if (c == "[" || c == "]") {
+      if (word)
+        return token(word,n);
+      else
+        return token(c,n+1);
+      }
+    else
+      word = word c;
+  }
+}
+
 BEGIN {
 print "<?xml version=\"1.0\"?>";
 print "<!DOCTYPE refentry PUBLIC \"-//OASIS//DTD DocBook XML V4.1.2//EN\"";
@@ -25,44 +61,47 @@ printf( "    <refname>&%s;</refname>\n", cmd);
 print "    <refpurpose>command purpose</refpurpose>";
 print "  </refnamediv>";
 print "";
-
 }
+
 /usage:/ {
 print "  <refsynopsisdiv>";
 print "    <cmdsynopsis>";
 printf( "      <code><![CDATA[%s]]></code>\n", $0);
 printf( "      %s\n", cmd);
 
-delete options;
-n_options = 0;
-for (i = 3; i <= NF; i++) {
-#      <arg choice="req"><replaceable>dbname</replaceable></arg>
-#      <arg choice="req">r|rw|rx|rwx|admin|no</arg>
-  a = $i
-  gsub( "<", "@lt;replaceable@gt;", a);
-  gsub( ">", "@lt;/replaceable@gt;", a);
-  if (match(a,"^\\[") > 0 && match(a,"\\]$") > 0)
-    argtype = "optional";
-  else
-    argtype = "required"
+line = "";
+for (i = 3; i <= NF; i++)
+  line = line $i;
 
-  gsub( "\\[", "@lt;arg@gt;", a);
-  gsub( "\\]", "@lt;/arg@gt;", a);
+n = 1;
+optional = 0;
+opt_cnt = 0;
+print "line" line > /dev/stderr;
+for (;;) {
+  t = next_token( line, n);
+  print "token " r["tok"] > /dev/stderr;
+  if (!t)
+    break;
+  n = r["n"];
 
-  gsub( "@lt;", "<", a);
-  gsub( "@gt;", ">", a);
-
-  if (argtype == "required")
-    opt = "<arg choice=\"plain\">" a "</arg>";
-  else
-    opt = a;
-
-  options[n_options++] = opt;
+  if (r["tok"] == "[")
+    optional++;
+  else if (r["tok"] == "]")
+    optional--;
+  else {
+    opt[opt_cnt] = r["tok"];
+    opt_type[opt_cnt] = optional;
+    opt_cnt++;
+  }    
 }
 
-for (n = 0; n < n_options; n++) {
-  printf( "      %s\n", options[n]);
-#  print "options[" n "]=" options[n] > "/dev/stderr";
+for ( n = 0; n < opt_cnt; n++) {
+  arg_type = (opt_type[n]) ? "optional" : "plain";
+  gsub( "<", "@lt;replaceable@gt;", opt[n]);
+  gsub( ">", "@lt;/replaceable@gt;", opt[n]);
+  gsub( "@lt;", "<", opt[n]);
+  gsub( "@gt;", ">", opt[n]);
+  print "<arg choice=\"" arg_type "\">" opt[n] "</arg>";
 }
 
 print "    </cmdsynopsis>";
@@ -80,9 +119,10 @@ print "";
 print "    <variablelist>";
 print ""
 
-for (n = 0; n < n_options; n++) {
+for ( n = 0; n < opt_cnt; n++) {
+  arg_type = (opt_type[n]) ? "optional" : "plain";
   print "      <varlistentry>";
-  print "	<term>" options[n] "</term>";
+  print "	<term>" "<arg choice=\"" arg_type "\">" opt[n] "</arg>" "</term>";
   print "	<listitem>";
   print "	  <para>option_description</para>";
   print "	</listitem>";
@@ -135,5 +175,3 @@ do
      manpage $i > $i.xml
   fi
 done
-
-

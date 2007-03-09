@@ -1,0 +1,110 @@
+<?xml version="1.0"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+  "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+  <!ENTITY eyedbdbimport "<command>eyedbdbimport</command>">
+]>
+
+<refentry id="eyedbdbimport">
+  <refentryinfo>
+    <date>March 2007</date>
+  </refentryinfo>
+
+  <refmeta>
+    <refentrytitle>eyedbdbimport</refentrytitle>
+    <manvolnum>1</manvolnum>
+    <refmiscinfo>eyedb database</refmiscinfo>
+  </refmeta>
+
+  <refnamediv>
+    <refname>&eyedbdbimport;</refname>
+    <refpurpose>command purpose</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbdbimport [-l] <file>|- [-d <dbname> [--filedir=<filedir>] [--mthdir==<mthdir>]]]]></code>
+      eyedbdbimport
+<arg choice="optional">-l</arg>
+<arg choice="plain"><replaceable>file</replaceable>|-</arg>
+<arg choice="optional">-d<replaceable>dbname</replaceable></arg>
+<arg choice="optional">--filedir=<replaceable>filedir</replaceable></arg>
+<arg choice="optional">--mthdir==<replaceable>mthdir</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbdbimport; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="optional">-l</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>file</replaceable>|-</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="optional">-d<replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="optional">--filedir=<replaceable>filedir</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="optional">--mthdir==<replaceable>mthdir</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+<refsect1>
+  <title>Environment</title>
+  See eyedb-options(7)
+</refsect1>
+
+<refsect1>
+  <title>Exit status</title>
+</refsect1>
+
+<refsect1>
+  <title>Examples</title>
+</refsect1>
+
+<refsect1>
+  <title>See also</title>
+</refsect1>
+
+<refsect1>
+  <title>Bugs</title>
+</refsect1>
+
+<refsect1>
+  <title>Authors</title>
+</refsect1>
+
+</refentry>

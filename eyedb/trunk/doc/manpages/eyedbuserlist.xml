@@ -24,7 +24,7 @@
     <cmdsynopsis>
       <code><![CDATA[usage: eyedbuserlist [<users>]]]></code>
       eyedbuserlist
-      <arg><replaceable>users</replaceable></arg>
+<arg choice="optional"><replaceable>users</replaceable></arg>
     </cmdsynopsis>
   </refsynopsisdiv>
 
@@ -40,7 +40,7 @@
     <variablelist>
 
       <varlistentry>
-	<term><arg><replaceable>users</replaceable></arg></term>
+	<term><arg choice="optional"><replaceable>users</replaceable></arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>

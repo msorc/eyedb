@@ -24,13 +24,16 @@
     <cmdsynopsis>
       <code><![CDATA[usage: eyedbdbcopy <dbname> <new dbname> [--dbfile=<dbfile>] [--datafiles={<datafile>[:name[:<sizeMb>[:sizeslot[:phy|log]]]]}] [--filedir=<filedir>] [--new-dbid]]]></code>
       eyedbdbcopy
-      <arg choice="plain"><replaceable>dbname</replaceable></arg>
-      <arg choice="plain"><replaceable>new</arg>
-      <arg choice="plain">dbname</replaceable></arg>
-      <arg>--dbfile=<replaceable>dbfile</replaceable></arg>
-      <arg>--datafiles={<replaceable>datafile</replaceable><arg>:name<arg>:<replaceable>sizeMb</replaceable><arg>:sizeslot<arg>:phy|log</arg></arg></arg></arg>}</arg>
-      <arg>--filedir=<replaceable>filedir</replaceable></arg>
-      <arg>--new-dbid</arg>
+<arg choice="plain"><replaceable>dbname</replaceable><replaceable>newdbname</replaceable></arg>
+<arg choice="optional">--dbfile=<replaceable>dbfile</replaceable></arg>
+<arg choice="optional">--datafiles={<replaceable>datafile</replaceable></arg>
+<arg choice="optional">:name</arg>
+<arg choice="optional">:<replaceable>sizeMb</replaceable></arg>
+<arg choice="optional">:sizeslot</arg>
+<arg choice="optional">:phy|log</arg>
+<arg choice="optional">}</arg>
+<arg choice="optional">--filedir=<replaceable>filedir</replaceable></arg>
+<arg choice="optional">--new-dbid</arg>
     </cmdsynopsis>
   </refsynopsisdiv>
 
@@ -46,49 +49,70 @@
     <variablelist>
 
       <varlistentry>
-	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<term><arg choice="plain"><replaceable>dbname</replaceable><replaceable>newdbname</replaceable></arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term><arg choice="plain"><replaceable>new</arg></term>
+	<term><arg choice="optional">--dbfile=<replaceable>dbfile</replaceable></arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term><arg choice="plain">dbname</replaceable></arg></term>
+	<term><arg choice="optional">--datafiles={<replaceable>datafile</replaceable></arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term><arg>--dbfile=<replaceable>dbfile</replaceable></arg></term>
+	<term><arg choice="optional">:name</arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term><arg>--datafiles={<replaceable>datafile</replaceable><arg>:name<arg>:<replaceable>sizeMb</replaceable><arg>:sizeslot<arg>:phy|log</arg></arg></arg></arg>}</arg></term>
+	<term><arg choice="optional">:<replaceable>sizeMb</replaceable></arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term><arg>--filedir=<replaceable>filedir</replaceable></arg></term>
+	<term><arg choice="optional">:sizeslot</arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term><arg>--new-dbid</arg></term>
+	<term><arg choice="optional">:phy|log</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="optional">}</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="optional">--filedir=<replaceable>filedir</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="optional">--new-dbid</arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>

@@ -17,15 +17,15 @@
 
   <refnamediv>
     <refname>&eyedbadmin;</refname>
-    <refpurpose>client for administering a EyeDB server</refpurpose>
+    <refpurpose>client for administering EyeDB databases</refpurpose>
   </refnamediv>
 
   <refsynopsisdiv>
     <cmdsynopsis>
       &eyedbadmin;
-      <arg choice="req"><replaceable>command</replaceable></arg> 
+      <arg choice="req"><replaceable>subcommand</replaceable></arg> 
       <arg choice="opt"><replaceable>common-options</replaceable></arg> 
-      <arg choice="opt"><replaceable>command-options</replaceable></arg> 
+      <arg choice="opt"><replaceable>subcommand-options</replaceable></arg> 
     </cmdsynopsis>
   </refsynopsisdiv>
 
@@ -34,20 +34,27 @@
 
     <para>&eyedbadmin; is a client for performing administrative operations on EyeDB databases.</para>
 
-    <para>&eyedbadmin; accepts the following commands:
+    <para>&eyedbadmin; accepts the following sub-commands:
     <variablelist>
       <varlistentry>
-	<term><arg choice="plain">dbmcreate</arg></term>
-	<listitem>See eyedbdbmcreate(1)</listitem>
-</varlistentry>
-<varlistentry>
-<term><arg choice="plain">dbcreate</arg></term>
-<listitem>See eyedbdbcreate(1)</listitem>
-</varlistentry>
+	<term><command>dbmcreate</command></term>
+	<listitem>
+	  <para>See <command>eyedbdbmcreate(1)</command></para>
+	</listitem>
+      </varlistentry>
 
       <varlistentry>
-	<term><arg choice="plain">dbdelete</arg></term>
-	<listitem>See eyedbdbdelete(1)</listitem>
+	<term><command>dbcreate</command></term>
+	<listitem>
+	  <para>See <command>eyedbdbcreate(1)</command></para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>dbdelete</command></term>
+	<listitem>
+	  <para>See <command>eyedbdbdelete(1)</command></para>
+	</listitem>
       </varlistentry>
 
     </variablelist>

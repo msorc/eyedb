@@ -24,9 +24,9 @@
     <cmdsynopsis>
       <code><![CDATA[usage: eyedbdblist [--dbname|--dbid|--dbfile|--object-count|--datafiles|--dbaccess|--userdbaccess|--all] [<databases>] [--stats]]]></code>
       eyedbdblist
-      <arg>--dbname|--dbid|--dbfile|--object-count|--datafiles|--dbaccess|--userdbaccess|--all</arg>
-      <arg><replaceable>databases</replaceable></arg>
-      <arg>--stats</arg>
+<arg choice="optional">--dbname|--dbid|--dbfile|--object-count|--datafiles|--dbaccess|--userdbaccess|--all</arg>
+<arg choice="optional"><replaceable>databases</replaceable></arg>
+<arg choice="optional">--stats</arg>
     </cmdsynopsis>
   </refsynopsisdiv>
 
@@ -42,21 +42,21 @@
     <variablelist>
 
       <varlistentry>
-	<term><arg>--dbname|--dbid|--dbfile|--object-count|--datafiles|--dbaccess|--userdbaccess|--all</arg></term>
+	<term><arg choice="optional">--dbname|--dbid|--dbfile|--object-count|--datafiles|--dbaccess|--userdbaccess|--all</arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term><arg><replaceable>databases</replaceable></arg></term>
+	<term><arg choice="optional"><replaceable>databases</replaceable></arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term><arg>--stats</arg></term>
+	<term><arg choice="optional">--stats</arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>

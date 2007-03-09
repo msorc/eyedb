@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+  "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+  <!ENTITY eyedbgetdefdsp "<command>eyedbgetdefdsp</command>">
+]>
+
+<refentry id="eyedbgetdefdsp">
+  <refentryinfo>
+    <date>March 2007</date>
+  </refentryinfo>
+
+  <refmeta>
+    <refentrytitle>eyedbgetdefdsp</refentrytitle>
+    <manvolnum>1</manvolnum>
+    <refmiscinfo>eyedb database</refmiscinfo>
+  </refmeta>
+
+  <refnamediv>
+    <refname>&eyedbgetdefdsp;</refname>
+    <refpurpose>command purpose</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbgetdefdsp <dbname>]]></code>
+      eyedbgetdefdsp
+<arg choice="plain"><replaceable>dbname</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbgetdefdsp; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+<refsect1>
+  <title>Environment</title>
+  See eyedb-options(7)
+</refsect1>
+
+<refsect1>
+  <title>Exit status</title>
+</refsect1>
+
+<refsect1>
+  <title>Examples</title>
+</refsect1>
+
+<refsect1>
+  <title>See also</title>
+</refsect1>
+
+<refsect1>
+  <title>Bugs</title>
+</refsect1>
+
+<refsect1>
+  <title>Authors</title>
+</refsect1>
+
+</refentry>

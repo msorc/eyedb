@@ -24,14 +24,10 @@
     <cmdsynopsis>
       <code><![CDATA[usage: eyedbpasswd <user> [<passwd>] [<new passwd>] (primary authentication not required)]]></code>
       eyedbpasswd
-      <arg choice="plain"><replaceable>user</replaceable></arg>
-      <arg><replaceable>passwd</replaceable></arg>
-      <arg choice="plain"><arg><replaceable>new</arg>
-      <arg choice="plain">passwd</replaceable></arg></arg>
-      <arg choice="plain">(primary</arg>
-      <arg choice="plain">authentication</arg>
-      <arg choice="plain">not</arg>
-      <arg choice="plain">required)</arg>
+<arg choice="plain"><replaceable>user</replaceable></arg>
+<arg choice="optional"><replaceable>passwd</replaceable></arg>
+<arg choice="optional"><replaceable>newpasswd</replaceable></arg>
+<arg choice="plain">(primaryauthenticationnotrequired)</arg>
     </cmdsynopsis>
   </refsynopsisdiv>
 
@@ -54,49 +50,21 @@
       </varlistentry>
 
       <varlistentry>
-	<term><arg><replaceable>passwd</replaceable></arg></term>
+	<term><arg choice="optional"><replaceable>passwd</replaceable></arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term><arg choice="plain"><arg><replaceable>new</arg></term>
+	<term><arg choice="optional"><replaceable>newpasswd</replaceable></arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term><arg choice="plain">passwd</replaceable></arg></arg></term>
-	<listitem>
-	  <para>option_description</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term><arg choice="plain">(primary</arg></term>
-	<listitem>
-	  <para>option_description</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term><arg choice="plain">authentication</arg></term>
-	<listitem>
-	  <para>option_description</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term><arg choice="plain">not</arg></term>
-	<listitem>
-	  <para>option_description</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term><arg choice="plain">required)</arg></term>
+	<term><arg choice="plain">(primaryauthenticationnotrequired)</arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>

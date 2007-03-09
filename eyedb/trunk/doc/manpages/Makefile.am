@@ -1,15 +1,3 @@
-man7_MANS= \
-eyedb-options.7 \
-eyedb.7
-
-man5_MANS= \
-eyedb-config.5
-
-man8_MANS= \
-eyedbd.8 \
-eyedbsmd.8 \
-eyedbctl.8
-
 man1_MANS= \
 eyedbgetenv.1 \
 eyedbadmin.1 \
@@ -90,6 +78,18 @@ eyedbconscreate.1 \
 eyedbconsdelete.1 \
 eyedbconslist.1
 
+man5_MANS= \
+eyedb-config.5
+
+man7_MANS= \
+eyedb-options.7 \
+eyedb.7
+
+man8_MANS= \
+eyedbd.8 \
+eyedbsmd.8 \
+eyedbctl.8
+
 XSLTPROC=@XSLTPROC@
 MANPAGES_XSL_STYLESHEET=@MANPAGES_XSL_STYLESHEET_DIR@/docbook.xsl
 
@@ -100,6 +100,9 @@ MANPAGES_XSL_STYLESHEET=@MANPAGES_XSL_STYLESHEET_DIR@/docbook.xsl
 	$(XSLTPROC) $(MANPAGES_XSL_STYLESHEET) $(srcdir)/$*.xml
 
 %.7: $(srcdir)/%.xml
+	$(XSLTPROC) $(MANPAGES_XSL_STYLESHEET) $(srcdir)/$*.xml
+
+%.8: $(srcdir)/%.xml
 	$(XSLTPROC) $(MANPAGES_XSL_STYLESHEET) $(srcdir)/$*.xml
 
 EXTRA_DIST= \

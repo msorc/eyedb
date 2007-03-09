@@ -24,11 +24,9 @@
     <cmdsynopsis>
       <code><![CDATA[usage: eyedbsysaccess <user> ['+' combination of] dbcreate|adduser|deleteuser|setuserpasswd|admin|superuser|no]]></code>
       eyedbsysaccess
-      <arg choice="plain"><replaceable>user</replaceable></arg>
-      <arg choice="plain"><arg>'+'</arg>
-      <arg choice="plain">combination</arg>
-      <arg choice="plain">of</arg></arg>
-      <arg choice="plain">dbcreate|adduser|deleteuser|setuserpasswd|admin|superuser|no</arg>
+<arg choice="plain"><replaceable>user</replaceable></arg>
+<arg choice="optional">'+'combinationof</arg>
+<arg choice="plain">dbcreate|adduser|deleteuser|setuserpasswd|admin|superuser|no</arg>
     </cmdsynopsis>
   </refsynopsisdiv>
 
@@ -51,21 +49,7 @@
       </varlistentry>
 
       <varlistentry>
-	<term><arg choice="plain"><arg>'+'</arg></term>
-	<listitem>
-	  <para>option_description</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term><arg choice="plain">combination</arg></term>
-	<listitem>
-	  <para>option_description</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term><arg choice="plain">of</arg></arg></term>
+	<term><arg choice="optional">'+'combinationof</arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>
