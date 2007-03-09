@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
   "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
-<!ENTITY eyedboql "<command>eyedboql</command>">
+  <!ENTITY eyedboql "<command>eyedboql</command>">
 ]>
 
 <refentry id="eyedboql">
   <refentryinfo>
-    <date>14 November 2005</date>
+    <date>March 2007</date>
   </refentryinfo>
 
   <refmeta>
@@ -22,22 +22,24 @@
 
   <refsynopsisdiv>
     <cmdsynopsis>
-      <!-- eyedboql [-d <name>|- -database=<name>] [-r|- -read] [-w|- -read-write] [-s|- -strict-read] [-l|- -local] [-c <command>|- -command=<command>] [-p|- -print] [- -full] [- -commit] [-i|- -interact] [-e|- -echo] [- -admin] [-h|- -help] [{<file>}] -->
-      eyedboql 
-      <arg choice="opt">-d <replaceable>name</replaceable>|--database=<replaceable>name</replaceable></arg>
-      <arg choice="opt">-r|--read</arg> 
-      <arg choice="opt">-w|--read-write</arg> 
-      <arg choice="opt">-s|--strict-read</arg> 
-      <arg choice="opt">-l|--local</arg> 
-      <arg choice="opt">-c <replaceable>command</replaceable>|--command=<replaceable>command</replaceable></arg>
-      <arg choice="opt">-p|--print</arg> 
-      <arg choice="opt">--full</arg> 
-      <arg choice="opt">--commit</arg> 
-      <arg choice="opt">-i|--interact</arg> 
-      <arg choice="opt">-e|--echo</arg> 
-      <arg choice="opt">--admin</arg> 
-      <arg choice="opt">-h|--help</arg> 
-      <arg choice="opt">{<replaceable>file</replaceable>}</arg>
+      <code><![CDATA[usage: eyedboql [-d <name>|--database=<name>] [-r|--read] [-w|--read-write] [-s|--strict-read] [-l|--local] [-c <command>|--command=<command>] [-p|--print] [--full] [--commit] [-i|--interact] [-e|--echo] [--admin] [-h|--help] [{<file>}]]]></code>
+      eyedboql
+      <arg choice="plain"><arg>-d</arg>
+      <arg choice="plain"><replaceable>name</replaceable>|--database=<replaceable>name</replaceable></arg></arg>
+      <arg>-r|--read</arg>
+      <arg>-w|--read-write</arg>
+      <arg>-s|--strict-read</arg>
+      <arg>-l|--local</arg>
+      <arg choice="plain"><arg>-c</arg>
+      <arg choice="plain"><replaceable>command</replaceable>|--command=<replaceable>command</replaceable></arg></arg>
+      <arg>-p|--print</arg>
+      <arg>--full</arg>
+      <arg>--commit</arg>
+      <arg>-i|--interact</arg>
+      <arg>-e|--echo</arg>
+      <arg>--admin</arg>
+      <arg>-h|--help</arg>
+      <arg>{<replaceable>file</replaceable>}</arg>
     </cmdsynopsis>
   </refsynopsisdiv>
 
@@ -51,40 +53,146 @@
     <title>Options</title>
 
     <variablelist>
+
       <varlistentry>
-	<term>--option</term>
+	<term><arg choice="plain"><arg>-d</arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>
       </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>name</replaceable>|--database=<replaceable>name</replaceable></arg></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>-r|--read</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>-w|--read-write</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>-s|--strict-read</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>-l|--local</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><arg>-c</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>command</replaceable>|--command=<replaceable>command</replaceable></arg></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>-p|--print</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>--full</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>--commit</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>-i|--interact</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>-e|--echo</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>--admin</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>-h|--help</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>{<replaceable>file</replaceable>}</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
     </variablelist>
 
   </refsect1>
 
-  <refsect1>
-    <title>Environment</title>
-    See eyedb-options
-  </refsect1>
+<refsect1>
+  <title>Environment</title>
+  See eyedb-options(7)
+</refsect1>
 
-  <refsect1>
-    <title>Exit status</title>
-  </refsect1>
+<refsect1>
+  <title>Exit status</title>
+</refsect1>
 
-  <refsect1>
-    <title>Examples</title>
-  </refsect1>
+<refsect1>
+  <title>Examples</title>
+</refsect1>
 
-  <refsect1>
-    <title>See also</title>
-  </refsect1>
+<refsect1>
+  <title>See also</title>
+</refsect1>
 
-  <refsect1>
-    <title>Bugs</title>
-  </refsect1>
+<refsect1>
+  <title>Bugs</title>
+</refsect1>
 
-  <refsect1>
-    <title>Authors</title>
-  </refsect1>
+<refsect1>
+  <title>Authors</title>
+</refsect1>
 
 </refentry>
-

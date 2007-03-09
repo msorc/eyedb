@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
   "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
-<!ENTITY eyedbgetenv "<command>eyedbgetenv</command>">
+  <!ENTITY eyedbgetenv "<command>eyedbgetenv</command>">
 ]>
 
 <refentry id="eyedbgetenv">
   <refentryinfo>
-    <date>14 November 2005</date>
+    <date>March 2007</date>
   </refentryinfo>
 
   <refmeta>
@@ -22,10 +22,13 @@
 
   <refsynopsisdiv>
     <cmdsynopsis>
-      <!-- eyedbgetenv [ -sh|-csh [-export] ] [<variables>] -->
-      eyedbgetenv 
-      <arg choice="opt"> -sh|-csh <arg choice="opt">-export</arg> </arg>
-      <arg choice="opt"><replaceable>variables</replaceable></arg>
+      <code><![CDATA[usage: eyedbgetenv [--server] [--config|--csh|--sh [--export]] [--expand-user] [<variables>]]]></code>
+      eyedbgetenv
+      <arg>--server</arg>
+      <arg choice="plain"><arg>--config|--csh|--sh</arg>
+      <arg>--export</arg></arg>
+      <arg>--expand-user</arg>
+      <arg><replaceable>variables</replaceable></arg>
     </cmdsynopsis>
   </refsynopsisdiv>
 
@@ -39,40 +42,69 @@
     <title>Options</title>
 
     <variablelist>
+
       <varlistentry>
-	<term>--option</term>
+	<term><arg>--server</arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>
       </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><arg>--config|--csh|--sh</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>--export</arg></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>--expand-user</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg><replaceable>variables</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
     </variablelist>
 
   </refsect1>
 
-  <refsect1>
-    <title>Environment</title>
-    See eyedb-options
-  </refsect1>
+<refsect1>
+  <title>Environment</title>
+  See eyedb-options(7)
+</refsect1>
 
-  <refsect1>
-    <title>Exit status</title>
-  </refsect1>
+<refsect1>
+  <title>Exit status</title>
+</refsect1>
 
-  <refsect1>
-    <title>Examples</title>
-  </refsect1>
+<refsect1>
+  <title>Examples</title>
+</refsect1>
 
-  <refsect1>
-    <title>See also</title>
-  </refsect1>
+<refsect1>
+  <title>See also</title>
+</refsect1>
 
-  <refsect1>
-    <title>Bugs</title>
-  </refsect1>
+<refsect1>
+  <title>Bugs</title>
+</refsect1>
 
-  <refsect1>
-    <title>Authors</title>
-  </refsect1>
+<refsect1>
+  <title>Authors</title>
+</refsect1>
 
 </refentry>
-
