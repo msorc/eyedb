@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
-"http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
-<!ENTITY eyedbdbcreate "<command>eyedbdbcreate</command>">
+  "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+  <!ENTITY eyedbdbcreate "<command>eyedbdbcreate</command>">
 ]>
 
 <refentry id="eyedbdbcreate">
   <refentryinfo>
-    <date>12 February 2007</date>
+    <date>March 2007</date>
   </refentryinfo>
 
   <refmeta>
@@ -82,29 +82,29 @@
 
   </refsect1>
 
-  <refsect1>
-    <title>Environment</title>
-    See eyedb-options
-  </refsect1>
+<refsect1>
+  <title>Environment</title>
+  See eyedb-options
+</refsect1>
 
-  <refsect1>
-    <title>Exit status</title>
-  </refsect1>
+<refsect1>
+  <title>Exit status</title>
+</refsect1>
 
-  <refsect1>
-    <title>Examples</title>
-  </refsect1>
+<refsect1>
+  <title>Examples</title>
+</refsect1>
 
-  <refsect1>
-    <title>See also</title>
-  </refsect1>
+<refsect1>
+  <title>See also</title>
+</refsect1>
 
-  <refsect1>
-    <title>Bugs</title>
-  </refsect1>
+<refsect1>
+  <title>Bugs</title>
+</refsect1>
 
-  <refsect1>
-    <title>Authors</title>
-  </refsect1>
+<refsect1>
+  <title>Authors</title>
+</refsect1>
 
 </refentry>
