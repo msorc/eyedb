@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # eyedb-postinstall.sh
 #
@@ -76,10 +76,12 @@ PROGNAME=`basename $0`
 decrypt_options $*
 
 set -e
-trap clean_exit ERR
-start_server
-sleep 4
-create_dbm
-stop_server
-exit 0
+trap clean_exit 0
 
+start_server
+
+sleep 4
+
+create_dbm
+
+stop_server

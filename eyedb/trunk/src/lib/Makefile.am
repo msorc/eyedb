@@ -9,6 +9,7 @@ m_mem.cc \
 performer.cc \
 semlib.cc \
 thread.cc \
+math.cc \
 xdr.cc
 
 libeyedbutils_la_LIBADD=compile_builtin.lo
