@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
   "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
-<!ENTITY eyedbdblist "<command>eyedbdblist</command>">
+  <!ENTITY eyedbdblist "<command>eyedbdblist</command>">
 ]>
 
 <refentry id="eyedbdblist">
   <refentryinfo>
-    <date>14 November 2005</date>
+    <date>March 2007</date>
   </refentryinfo>
 
   <refmeta>
@@ -22,11 +22,11 @@
 
   <refsynopsisdiv>
     <cmdsynopsis>
-      <!-- eyedbdblist [- -dbname|- -dbid|- -dbfile|- -object-count|- -datafiles|- -dbaccess|- -userdbaccess|- -all] [<databases>] [- -stats] -->
-      eyedbdblist 
-      <arg choice="opt">--dbname|--dbid|--dbfile|--object-count|--datafiles|--dbaccess|--userdbaccess|--all</arg> 
-      <arg choice="opt"><replaceable>databases</replaceable></arg> 
-      <arg choice="opt">--stats</arg>
+      <code><![CDATA[usage: eyedbdblist [--dbname|--dbid|--dbfile|--object-count|--datafiles|--dbaccess|--userdbaccess|--all] [<databases>] [--stats]]]></code>
+      eyedbdblist
+      <arg>--dbname|--dbid|--dbfile|--object-count|--datafiles|--dbaccess|--userdbaccess|--all</arg>
+      <arg><replaceable>databases</replaceable></arg>
+      <arg>--stats</arg>
     </cmdsynopsis>
   </refsynopsisdiv>
 
@@ -40,12 +40,28 @@
     <title>Options</title>
 
     <variablelist>
+
       <varlistentry>
-	<term>--option</term>
+	<term><arg>--dbname|--dbid|--dbfile|--object-count|--datafiles|--dbaccess|--userdbaccess|--all</arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>
       </varlistentry>
+
+      <varlistentry>
+	<term><arg><replaceable>databases</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>--stats</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
     </variablelist>
 
   </refsect1>
@@ -76,4 +92,3 @@
   </refsect1>
 
 </refentry>
-

@@ -11,7 +11,7 @@ print "]>"
 print "";
 printf( "<refentry id=\"%s\">\n", cmd);
 print "  <refentryinfo>";
-print "    <date>12 February 2007</date>";
+print "    <date>March 2007</date>";
 print "  </refentryinfo>";
 print "";
 print "  <refmeta>";
@@ -62,7 +62,7 @@ for (i = 3; i <= NF; i++) {
 
 for (n = 0; n < n_options; n++) {
   printf( "      %s\n", options[n]);
-  print "options[" n "]=" options[n] > "/dev/stderr";
+#  print "options[" n "]=" options[n] > "/dev/stderr";
 }
 
 print "    </cmdsynopsis>";
@@ -96,35 +96,44 @@ print "  </refsect1>";
 print "";
 }
 END {
-print "  <refsect1>";
-print "    <title>Environment</title>";
-print "    See eyedb-options";
-print "  </refsect1>";
+print "<refsect1>";
+print "  <title>Environment</title>";
+print "  See eyedb-options(7)";
+print "</refsect1>";
 print "";
-print "  <refsect1>";
-print "    <title>Exit status</title>";
-print "  </refsect1>";
+print "<refsect1>";
+print "  <title>Exit status</title>";
+print "</refsect1>";
 print "";
-print "  <refsect1>";
-print "    <title>Examples</title>";
-print "  </refsect1>";
+print "<refsect1>";
+print "  <title>Examples</title>";
+print "</refsect1>";
 print "";
-print "  <refsect1>";
-print "    <title>See also</title>";
-print "  </refsect1>";
+print "<refsect1>";
+print "  <title>See also</title>";
+print "</refsect1>";
 print "";
-print "  <refsect1>";
-print "    <title>Bugs</title>";
-print "  </refsect1>";
+print "<refsect1>";
+print "  <title>Bugs</title>";
+print "</refsect1>";
 print "";
-print "  <refsect1>";
-print "    <title>Authors</title>";
-print "  </refsect1>";
+print "<refsect1>";
+print "  <title>Authors</title>";
+print "</refsect1>";
 print "";
 print "</refentry>";
 }
 '
 }
 
-manpage $1 > $1.new.xml
+for i in $*
+do
+  type $i > /dev/null 2>&1
+  if [ $? = 0 ] ; then 
+     if [ -r $i.xml ] ; then mv -f $i.xml $i.xml.bak; fi
+     echo Generate $i.xml...
+     manpage $i > $i.xml
+  fi
+done
+
 

@@ -1,14 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
   "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
-
-<!ENTITY eyedbadmin "<command>eyedbadmin</command>">
-
+  <!ENTITY eyedbadmin "<command>eyedbadmin</command>">
 ]>
 
 <refentry id="eyedbadmin">
   <refentryinfo>
-    <date>04 October 2005</date>
+    <date>March 2007</date>
   </refentryinfo>
 
   <refmeta>
@@ -19,13 +17,18 @@
 
   <refnamediv>
     <refname>&eyedbadmin;</refname>
-    <refpurpose>administer eyedb database</refpurpose>
+    <refpurpose>command purpose</refpurpose>
   </refnamediv>
 
   <refsynopsisdiv>
     <cmdsynopsis>
-      &eyedbadmin;
-      <arg choice="req"><replaceable>command</replaceable></arg>
+      <code><![CDATA[usage: eyedbadmin dbmcreate [--strict-unix=<user>] [<user> [<passwd>]] [--datafiles={<datafile>[:name[:<sizeMb>[:sizeslot[:phy|log]]]]}]]]></code>
+      eyedbadmin
+      <arg choice="plain">dbmcreate</arg>
+      <arg>--strict-unix=<replaceable>user</replaceable></arg>
+      <arg choice="plain"><arg><replaceable>user</replaceable></arg>
+      <arg><replaceable>passwd</replaceable></arg></arg>
+      <arg>--datafiles={<replaceable>datafile</replaceable><arg>:name<arg>:<replaceable>sizeMb</replaceable><arg>:sizeslot<arg>:phy|log</arg></arg></arg></arg>}</arg>
     </cmdsynopsis>
   </refsynopsisdiv>
 
@@ -39,43 +42,1829 @@
     <title>Options</title>
 
     <variablelist>
+
       <varlistentry>
-	<term>-eyedbroot</term>
+	<term><arg choice="plain">dbmcreate</arg></term>
 	<listitem>
-	  <para>gives the root directory of the Eyedb installation</para>
+	  <para>option_description</para>
 	</listitem>
       </varlistentry>
+
+      <varlistentry>
+	<term><arg>--strict-unix=<replaceable>user</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><arg><replaceable>user</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg><replaceable>passwd</replaceable></arg></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>--datafiles={<replaceable>datafile</replaceable><arg>:name<arg>:<replaceable>sizeMb</replaceable><arg>:sizeslot<arg>:phy|log</arg></arg></arg></arg>}</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
     </variablelist>
 
   </refsect1>
 
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin dbcreate <dbname> [--dbfile=<dbfile>] [--datafiles={<datafile>[:name[:<sizeMb>[:sizeslot[:phy|log]]]]}] [--filedir=<filedir>] [--object-count=<objcnt>]]]></code>
+      eyedbadmin
+      <arg choice="plain">dbcreate</arg>
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
+      <arg>--dbfile=<replaceable>dbfile</replaceable></arg>
+      <arg>--datafiles={<replaceable>datafile</replaceable><arg>:name<arg>:<replaceable>sizeMb</replaceable><arg>:sizeslot<arg>:phy|log</arg></arg></arg></arg>}</arg>
+      <arg>--filedir=<replaceable>filedir</replaceable></arg>
+      <arg>--object-count=<replaceable>objcnt</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
   <refsect1>
-    <title>Examples</title>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
   </refsect1>
 
   <refsect1>
-    <title>Files</title>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">dbcreate</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>--dbfile=<replaceable>dbfile</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>--datafiles={<replaceable>datafile</replaceable><arg>:name<arg>:<replaceable>sizeMb</replaceable><arg>:sizeslot<arg>:phy|log</arg></arg></arg></arg>}</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>--filedir=<replaceable>filedir</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>--object-count=<replaceable>objcnt</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin dbdelete <dbname>]]></code>
+      eyedbadmin
+      <arg choice="plain">dbdelete</arg>
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
   </refsect1>
 
   <refsect1>
-    <title>Environment</title>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">dbdelete</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin dbrename <dbname> <new dbname>]]></code>
+      eyedbadmin
+      <arg choice="plain">dbrename</arg>
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
+      <arg choice="plain"><replaceable>new</arg>
+      <arg choice="plain">dbname</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
   </refsect1>
 
   <refsect1>
-    <title>See also</title>
+    <title>Options</title>
 
-    <simplelist>
-      <member><command>eyedbdbcreate</command></member>
-    </simplelist>
+    <variablelist>
 
+      <varlistentry>
+	<term><arg choice="plain">dbrename</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>new</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain">dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin dbmove <dbname> [--dbfile=<dbfile>] [--datafiles={<datafile>[:name[:<sizeMb>[:sizeslot[:phy|log]]]]}] [--filedir=<filedir>]]]></code>
+      eyedbadmin
+      <arg choice="plain">dbmove</arg>
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
+      <arg>--dbfile=<replaceable>dbfile</replaceable></arg>
+      <arg>--datafiles={<replaceable>datafile</replaceable><arg>:name<arg>:<replaceable>sizeMb</replaceable><arg>:sizeslot<arg>:phy|log</arg></arg></arg></arg>}</arg>
+      <arg>--filedir=<replaceable>filedir</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
   </refsect1>
 
   <refsect1>
-    <title>Bugs</title>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">dbmove</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>--dbfile=<replaceable>dbfile</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>--datafiles={<replaceable>datafile</replaceable><arg>:name<arg>:<replaceable>sizeMb</replaceable><arg>:sizeslot<arg>:phy|log</arg></arg></arg></arg>}</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>--filedir=<replaceable>filedir</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin dbcopy <dbname> <new dbname> [--dbfile=<dbfile>] [--datafiles={<datafile>[:name[:<sizeMb>[:sizeslot[:phy|log]]]]}] [--filedir=<filedir>] [--new-dbid]]]></code>
+      eyedbadmin
+      <arg choice="plain">dbcopy</arg>
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
+      <arg choice="plain"><replaceable>new</arg>
+      <arg choice="plain">dbname</replaceable></arg>
+      <arg>--dbfile=<replaceable>dbfile</replaceable></arg>
+      <arg>--datafiles={<replaceable>datafile</replaceable><arg>:name<arg>:<replaceable>sizeMb</replaceable><arg>:sizeslot<arg>:phy|log</arg></arg></arg></arg>}</arg>
+      <arg>--filedir=<replaceable>filedir</replaceable></arg>
+      <arg>--new-dbid</arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
   </refsect1>
 
   <refsect1>
-    <title>Authors</title>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">dbcopy</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>new</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain">dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>--dbfile=<replaceable>dbfile</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>--datafiles={<replaceable>datafile</replaceable><arg>:name<arg>:<replaceable>sizeMb</replaceable><arg>:sizeslot<arg>:phy|log</arg></arg></arg></arg>}</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>--filedir=<replaceable>filedir</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>--new-dbid</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
   </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin dbexport <dbname> <file>|-]]></code>
+      eyedbadmin
+      <arg choice="plain">dbexport</arg>
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
+      <arg choice="plain"><replaceable>file</replaceable>|-</arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">dbexport</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>file</replaceable>|-</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin dbimport [-l] <file>|- [-d <dbname> [--filedir=<filedir>] [--mthdir==<mthdir>]]]]></code>
+      eyedbadmin
+      <arg choice="plain">dbimport</arg>
+      <arg>-l</arg>
+      <arg choice="plain"><replaceable>file</replaceable>|-</arg>
+      <arg choice="plain"><arg>-d</arg>
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
+      <arg>--filedir=<replaceable>filedir</replaceable></arg>
+      <arg>--mthdir==<replaceable>mthdir</replaceable></arg></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">dbimport</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>-l</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>file</replaceable>|-</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><arg>-d</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>--filedir=<replaceable>filedir</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>--mthdir==<replaceable>mthdir</replaceable></arg></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin datcreate <dbname> [--filedir=<filedir>] {<datafile>[:name[:<sizeMb>[:sizeslot[:phy|log]]]]}]]></code>
+      eyedbadmin
+      <arg choice="plain">datcreate</arg>
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
+      <arg>--filedir=<replaceable>filedir</replaceable></arg>
+      <arg choice="plain">{<replaceable>datafile</replaceable><arg>:name<arg>:<replaceable>sizeMb</replaceable><arg>:sizeslot<arg>:phy|log</arg></arg></arg></arg>}</arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">datcreate</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>--filedir=<replaceable>filedir</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain">{<replaceable>datafile</replaceable><arg>:name<arg>:<replaceable>sizeMb</replaceable><arg>:sizeslot<arg>:phy|log</arg></arg></arg></arg>}</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin datdelete <dbname> <datid>|<datname>]]></code>
+      eyedbadmin
+      <arg choice="plain">datdelete</arg>
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
+      <arg choice="plain"><replaceable>datid</replaceable>|<replaceable>datname</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">datdelete</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>datid</replaceable>|<replaceable>datname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin datmove <dbname> <datid>|<datname> <new datafile>|--filedir=<filedir>]]></code>
+      eyedbadmin
+      <arg choice="plain">datmove</arg>
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
+      <arg choice="plain"><replaceable>datid</replaceable>|<replaceable>datname</replaceable></arg>
+      <arg choice="plain"><replaceable>new</arg>
+      <arg choice="plain">datafile</replaceable>|--filedir=<replaceable>filedir</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">datmove</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>datid</replaceable>|<replaceable>datname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>new</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain">datafile</replaceable>|--filedir=<replaceable>filedir</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin datresize <dbname> <datid>|<datname> <new sizeMb>]]></code>
+      eyedbadmin
+      <arg choice="plain">datresize</arg>
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
+      <arg choice="plain"><replaceable>datid</replaceable>|<replaceable>datname</replaceable></arg>
+      <arg choice="plain"><replaceable>new</arg>
+      <arg choice="plain">sizeMb</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">datresize</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>datid</replaceable>|<replaceable>datname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>new</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain">sizeMb</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin datdefragment <dbname> <datid>|<datname>]]></code>
+      eyedbadmin
+      <arg choice="plain">datdefragment</arg>
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
+      <arg choice="plain"><replaceable>datid</replaceable>|<replaceable>datname</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">datdefragment</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>datid</replaceable>|<replaceable>datname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin datlist <dbname> [--stats|--all] [{<datid>|<datname>}]]]></code>
+      eyedbadmin
+      <arg choice="plain">datlist</arg>
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
+      <arg>--stats|--all</arg>
+      <arg>{<replaceable>datid</replaceable>|<replaceable>datname</replaceable>}</arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">datlist</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>--stats|--all</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>{<replaceable>datid</replaceable>|<replaceable>datname</replaceable>}</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin datrename <dbname> <datid>|<datname> <new name>]]></code>
+      eyedbadmin
+      <arg choice="plain">datrename</arg>
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
+      <arg choice="plain"><replaceable>datid</replaceable>|<replaceable>datname</replaceable></arg>
+      <arg choice="plain"><replaceable>new</arg>
+      <arg choice="plain">name</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">datrename</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>datid</replaceable>|<replaceable>datname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>new</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain">name</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin dspcreate <dbname> <dspname> {<datid>|<datname>}]]></code>
+      eyedbadmin
+      <arg choice="plain">dspcreate</arg>
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
+      <arg choice="plain"><replaceable>dspname</replaceable></arg>
+      <arg choice="plain">{<replaceable>datid</replaceable>|<replaceable>datname</replaceable>}</arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">dspcreate</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dspname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain">{<replaceable>datid</replaceable>|<replaceable>datname</replaceable>}</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin dspupdate <dbname> <dspname> {<datid>|<datname>}]]></code>
+      eyedbadmin
+      <arg choice="plain">dspupdate</arg>
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
+      <arg choice="plain"><replaceable>dspname</replaceable></arg>
+      <arg choice="plain">{<replaceable>datid</replaceable>|<replaceable>datname</replaceable>}</arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">dspupdate</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dspname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain">{<replaceable>datid</replaceable>|<replaceable>datname</replaceable>}</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin dspdelete <dbname> <dspname>]]></code>
+      eyedbadmin
+      <arg choice="plain">dspdelete</arg>
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
+      <arg choice="plain"><replaceable>dspname</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">dspdelete</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dspname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin dsprename <dbname> <dspname> <new dspname>]]></code>
+      eyedbadmin
+      <arg choice="plain">dsprename</arg>
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
+      <arg choice="plain"><replaceable>dspname</replaceable></arg>
+      <arg choice="plain"><replaceable>new</arg>
+      <arg choice="plain">dspname</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">dsprename</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dspname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>new</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain">dspname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin dsplist <dbname> [{<dspname>}]]]></code>
+      eyedbadmin
+      <arg choice="plain">dsplist</arg>
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
+      <arg>{<replaceable>dspname</replaceable>}</arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">dsplist</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>{<replaceable>dspname</replaceable>}</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin dspsetdefault <dbname> <dspname>]]></code>
+      eyedbadmin
+      <arg choice="plain">dspsetdefault</arg>
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
+      <arg choice="plain"><replaceable>dspname</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">dspsetdefault</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dspname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin dspgetdefault <dbname>]]></code>
+      eyedbadmin
+      <arg choice="plain">dspgetdefault</arg>
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">dspgetdefault</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin dspsetcurdat <dbname> <dspname> <datid>|<datname> ]]></code>
+      eyedbadmin
+      <arg choice="plain">dspsetcurdat</arg>
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
+      <arg choice="plain"><replaceable>dspname</replaceable></arg>
+      <arg choice="plain"><replaceable>datid</replaceable>|<replaceable>datname</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">dspsetcurdat</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dspname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>datid</replaceable>|<replaceable>datname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin dspgetcurdat <dbname> <dspname> ]]></code>
+      eyedbadmin
+      <arg choice="plain">dspgetcurdat</arg>
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
+      <arg choice="plain"><replaceable>dspname</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">dspgetcurdat</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dspname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin useradd [--unix|--strict-unix=]<user> [<passwd>]]]></code>
+      eyedbadmin
+      <arg choice="plain">useradd</arg>
+      <arg choice="plain"><arg>--unix|--strict-unix=</arg><replaceable>user</replaceable></arg>
+      <arg><replaceable>passwd</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">useradd</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><arg>--unix|--strict-unix=</arg><replaceable>user</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg><replaceable>passwd</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin userdelete <user>]]></code>
+      eyedbadmin
+      <arg choice="plain">userdelete</arg>
+      <arg choice="plain"><replaceable>user</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">userdelete</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>user</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin userpasswd <user> [<new passwd>]]]></code>
+      eyedbadmin
+      <arg choice="plain">userpasswd</arg>
+      <arg choice="plain"><replaceable>user</replaceable></arg>
+      <arg choice="plain"><arg><replaceable>new</arg>
+      <arg choice="plain">passwd</replaceable></arg></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">userpasswd</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>user</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><arg><replaceable>new</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain">passwd</replaceable></arg></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin passwd <user> [<passwd>] [<new passwd>] (primary authentication not required)]]></code>
+      eyedbadmin
+      <arg choice="plain">passwd</arg>
+      <arg choice="plain"><replaceable>user</replaceable></arg>
+      <arg><replaceable>passwd</replaceable></arg>
+      <arg choice="plain"><arg><replaceable>new</arg>
+      <arg choice="plain">passwd</replaceable></arg></arg>
+      <arg choice="plain">(primary</arg>
+      <arg choice="plain">authentication</arg>
+      <arg choice="plain">not</arg>
+      <arg choice="plain">required)</arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">passwd</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>user</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg><replaceable>passwd</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><arg><replaceable>new</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain">passwd</replaceable></arg></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain">(primary</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain">authentication</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain">not</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain">required)</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin dbaccess <dbname> r|rw|rx|rwx|admin|no]]></code>
+      eyedbadmin
+      <arg choice="plain">dbaccess</arg>
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
+      <arg choice="plain">r|rw|rx|rwx|admin|no</arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">dbaccess</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain">r|rw|rx|rwx|admin|no</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin userdbaccess <user> <dbname> r|rw|rx|rwx|admin|no]]></code>
+      eyedbadmin
+      <arg choice="plain">userdbaccess</arg>
+      <arg choice="plain"><replaceable>user</replaceable></arg>
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
+      <arg choice="plain">r|rw|rx|rwx|admin|no</arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">userdbaccess</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>user</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain">r|rw|rx|rwx|admin|no</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin sysaccess <user> ['+' combination of] dbcreate|adduser|deleteuser|setuserpasswd|admin|superuser|no]]></code>
+      eyedbadmin
+      <arg choice="plain">sysaccess</arg>
+      <arg choice="plain"><replaceable>user</replaceable></arg>
+      <arg choice="plain"><arg>'+'</arg>
+      <arg choice="plain">combination</arg>
+      <arg choice="plain">of</arg></arg>
+      <arg choice="plain">dbcreate|adduser|deleteuser|setuserpasswd|admin|superuser|no</arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">sysaccess</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>user</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><arg>'+'</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain">combination</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain">of</arg></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain">dbcreate|adduser|deleteuser|setuserpasswd|admin|superuser|no</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin userlist [<users>]]]></code>
+      eyedbadmin
+      <arg choice="plain">userlist</arg>
+      <arg><replaceable>users</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">userlist</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg><replaceable>users</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <code><![CDATA[usage: eyedbadmin dblist [--dbname|--dbid|--dbfile|--object-count|--datafiles|--dbaccess|--userdbaccess|--all] [<databases>] [--stats]]]></code>
+      eyedbadmin
+      <arg choice="plain">dblist</arg>
+      <arg>--dbname|--dbid|--dbfile|--object-count|--datafiles|--dbaccess|--userdbaccess|--all</arg>
+      <arg><replaceable>databases</replaceable></arg>
+      <arg>--stats</arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>&eyedbadmin; ...</para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <variablelist>
+
+      <varlistentry>
+	<term><arg choice="plain">dblist</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>--dbname|--dbid|--dbfile|--object-count|--datafiles|--dbaccess|--userdbaccess|--all</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg><replaceable>databases</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg>--stats</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </refsect1>
+
+<refsect1>
+  <title>Environment</title>
+  See eyedb-options(7)
+</refsect1>
+
+<refsect1>
+  <title>Exit status</title>
+</refsect1>
+
+<refsect1>
+  <title>Examples</title>
+</refsect1>
+
+<refsect1>
+  <title>See also</title>
+</refsect1>
+
+<refsect1>
+  <title>Bugs</title>
+</refsect1>
+
+<refsect1>
+  <title>Authors</title>
+</refsect1>
 
 </refentry>
