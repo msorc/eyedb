@@ -20,12 +20,16 @@ eyedbuseradd.1 \
 eyedbuserdbaccess.1 \
 eyedbuserdelete.1 \
 eyedbuserlist.1 \
-eyedbuserpasswd.1 
+eyedbuserpasswd.1 \
+eyedb-options.7 
 
 XSLTPROC=@XSLTPROC@
 MANPAGES_XSL_STYLESHEET=@MANPAGES_XSL_STYLESHEET_DIR@/docbook.xsl
 
 %.1: $(srcdir)/%.xml
+	$(XSLTPROC) $(MANPAGES_XSL_STYLESHEET) $(srcdir)/$*.xml
+
+%.7: $(srcdir)/%.xml
 	$(XSLTPROC) $(MANPAGES_XSL_STYLESHEET) $(srcdir)/$*.xml
 
 EXTRA_DIST= \
@@ -50,4 +54,5 @@ eyedbuseradd.xml \
 eyedbuserdbaccess.xml \
 eyedbuserdelete.xml \
 eyedbuserlist.xml \
-eyedbuserpasswd.xml
+eyedbuserpasswd.xml \
+eyedb-options.xml
