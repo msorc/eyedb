@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
   "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
-<!ENTITY eyedbuserdbaccess "<command>eyedbuserdbaccess</command>">
+  <!ENTITY eyedbuserdbaccess "<command>eyedbuserdbaccess</command>">
 ]>
 
 <refentry id="eyedbuserdbaccess">
   <refentryinfo>
-    <date>14 November 2005</date>
+    <date>March 2007</date>
   </refentryinfo>
 
   <refmeta>
@@ -22,11 +22,11 @@
 
   <refsynopsisdiv>
     <cmdsynopsis>
-      <!-- eyedbuserdbaccess <username> <dbname> r|rw|rx|rwx|admin|no -->
-      eyedbuserdbaccess 
-      <arg choice="req"><replaceable>username</replaceable></arg> 
-      <arg choice="req"><replaceable>dbname</replaceable></arg> 
-      <arg choice="req">r|rw|rx|rwx|admin|no</arg>  
+      <code><![CDATA[usage: eyedbuserdbaccess <user> <dbname> r|rw|rx|rwx|admin|no]]></code>
+      eyedbuserdbaccess
+      <arg choice="plain"><replaceable>user</replaceable></arg>
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
+      <arg choice="plain">r|rw|rx|rwx|admin|no</arg>
     </cmdsynopsis>
   </refsynopsisdiv>
 
@@ -40,40 +40,55 @@
     <title>Options</title>
 
     <variablelist>
+
       <varlistentry>
-	<term>--option</term>
+	<term><arg choice="plain"><replaceable>user</replaceable></arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>
       </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain">r|rw|rx|rwx|admin|no</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
     </variablelist>
 
   </refsect1>
 
-  <refsect1>
-    <title>Environment</title>
-    See eyedb-options
-  </refsect1>
+<refsect1>
+  <title>Environment</title>
+  See eyedb-options(7)
+</refsect1>
 
-  <refsect1>
-    <title>Exit status</title>
-  </refsect1>
+<refsect1>
+  <title>Exit status</title>
+</refsect1>
 
-  <refsect1>
-    <title>Examples</title>
-  </refsect1>
+<refsect1>
+  <title>Examples</title>
+</refsect1>
 
-  <refsect1>
-    <title>See also</title>
-  </refsect1>
+<refsect1>
+  <title>See also</title>
+</refsect1>
 
-  <refsect1>
-    <title>Bugs</title>
-  </refsect1>
+<refsect1>
+  <title>Bugs</title>
+</refsect1>
 
-  <refsect1>
-    <title>Authors</title>
-  </refsect1>
+<refsect1>
+  <title>Authors</title>
+</refsect1>
 
 </refentry>
-

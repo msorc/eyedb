@@ -66,29 +66,29 @@
 
   </refsect1>
 
-  <refsect1>
-    <title>Environment</title>
-    See eyedb-options
-  </refsect1>
+<refsect1>
+  <title>Environment</title>
+  See eyedb-options(7)
+</refsect1>
 
-  <refsect1>
-    <title>Exit status</title>
-  </refsect1>
+<refsect1>
+  <title>Exit status</title>
+</refsect1>
 
-  <refsect1>
-    <title>Examples</title>
-  </refsect1>
+<refsect1>
+  <title>Examples</title>
+</refsect1>
 
-  <refsect1>
-    <title>See also</title>
-  </refsect1>
+<refsect1>
+  <title>See also</title>
+</refsect1>
 
-  <refsect1>
-    <title>Bugs</title>
-  </refsect1>
+<refsect1>
+  <title>Bugs</title>
+</refsect1>
 
-  <refsect1>
-    <title>Authors</title>
-  </refsect1>
+<refsect1>
+  <title>Authors</title>
+</refsect1>
 
 </refentry>

@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
   "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
-<!ENTITY eyedbpasswd "<command>eyedbpasswd</command>">
+  <!ENTITY eyedbpasswd "<command>eyedbpasswd</command>">
 ]>
 
 <refentry id="eyedbpasswd">
   <refentryinfo>
-    <date>14 November 2005</date>
+    <date>March 2007</date>
   </refentryinfo>
 
   <refmeta>
@@ -22,11 +22,16 @@
 
   <refsynopsisdiv>
     <cmdsynopsis>
-      <!-- eyedbpasswd <username> [<passwd>] [<new passwd>] (primary authentication not required) -->
-      eyedbpasswd 
-      <arg choice="req"><replaceable>username</replaceable></arg> 
-      <arg choice="opt"><replaceable>passwd</replaceable></arg> 
-      <arg choice="opt"><replaceable>new passwd</replaceable></arg> (primary authentication not required)
+      <code><![CDATA[usage: eyedbpasswd <user> [<passwd>] [<new passwd>] (primary authentication not required)]]></code>
+      eyedbpasswd
+      <arg choice="plain"><replaceable>user</replaceable></arg>
+      <arg><replaceable>passwd</replaceable></arg>
+      <arg choice="plain"><arg><replaceable>new</arg>
+      <arg choice="plain">passwd</replaceable></arg></arg>
+      <arg choice="plain">(primary</arg>
+      <arg choice="plain">authentication</arg>
+      <arg choice="plain">not</arg>
+      <arg choice="plain">required)</arg>
     </cmdsynopsis>
   </refsynopsisdiv>
 
@@ -40,40 +45,90 @@
     <title>Options</title>
 
     <variablelist>
+
       <varlistentry>
-	<term>--option</term>
+	<term><arg choice="plain"><replaceable>user</replaceable></arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>
       </varlistentry>
+
+      <varlistentry>
+	<term><arg><replaceable>passwd</replaceable></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain"><arg><replaceable>new</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain">passwd</replaceable></arg></arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain">(primary</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain">authentication</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain">not</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="plain">required)</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
     </variablelist>
 
   </refsect1>
 
-  <refsect1>
-    <title>Environment</title>
-    See eyedb-options
-  </refsect1>
+<refsect1>
+  <title>Environment</title>
+  See eyedb-options(7)
+</refsect1>
 
-  <refsect1>
-    <title>Exit status</title>
-  </refsect1>
+<refsect1>
+  <title>Exit status</title>
+</refsect1>
 
-  <refsect1>
-    <title>Examples</title>
-  </refsect1>
+<refsect1>
+  <title>Examples</title>
+</refsect1>
 
-  <refsect1>
-    <title>See also</title>
-  </refsect1>
+<refsect1>
+  <title>See also</title>
+</refsect1>
 
-  <refsect1>
-    <title>Bugs</title>
-  </refsect1>
+<refsect1>
+  <title>Bugs</title>
+</refsect1>
 
-  <refsect1>
-    <title>Authors</title>
-  </refsect1>
+<refsect1>
+  <title>Authors</title>
+</refsect1>
 
 </refentry>
-
