@@ -119,13 +119,13 @@ namespace eyedb {
        Not yet documented
        @return
     */
-    unsigned int getKeycount() const {return hash.keycount;}
+    unsigned int getKeycount() const {return u.hash.keycount;}
 
     /**
        Not yet documented
        @return
     */
-    BEMethod_C *getHashMethod() const {return hash.mth;}
+    BEMethod_C *getHashMethod() const {return u.hash.mth;}
 
     /**
        Not yet documented
@@ -144,7 +144,7 @@ namespace eyedb {
        Not yet documented
        @return
     */
-    unsigned int getDegree() const {return degree;}
+    unsigned int getDegree() const {return u.degree;}
 
     /**
        Not yet documented
@@ -195,7 +195,7 @@ namespace eyedb {
 	BEMethod_C *mth;
       } hash;
       unsigned int degree;
-    };
+    } u;
 
     const Dataspace *dataspace;
     int *impl_hints;

@@ -60,60 +60,60 @@ getSize(const Argument *arg)
   else if (type == CHAR_TYPE)
     size += sizeof(char);
   else if (type == STRING_TYPE)
-    size += sizeof(int) + strlen(arg->s)+1;
+    size += sizeof(int) + strlen(arg->u.s)+1;
   else if (type == FLOAT_TYPE)
     size += sizeof(double);
   else if (type == OID_TYPE)
     size += sizeof(Oid);
   else if (type == OBJ_TYPE)
-    size += sizeof(int) + (arg->o ? 2 * sizeof(Oid) +
-			   arg->o->getIDRSize() : 0);
+    size += sizeof(int) + (arg->u.o ? 2 * sizeof(Oid) +
+			   arg->u.o->getIDRSize() : 0);
   else if (type == ARRAY_TYPE)
-    size += getSize(arg->array);
+    size += getSize(arg->u.array);
   else if (type == RAW_TYPE)
-    size += sizeof(int) + arg->raw.size;
+    size += sizeof(int) + arg->u.raw.size;
   else if (type == (ARRAY_TYPE|INT16_TYPE))
     {
       size += sizeof(int); // cnt
-      size += sizeof(eyedblib::int16) * arg->arr_i16.cnt;
+      size += sizeof(eyedblib::int16) * arg->u.arr_i16.cnt;
     }
   else if (type == (ARRAY_TYPE|INT32_TYPE))
     {
       size += sizeof(int); // cnt
-      size += sizeof(eyedblib::int32) * arg->arr_i32.cnt;
+      size += sizeof(eyedblib::int32) * arg->u.arr_i32.cnt;
     }
   else if (type == (ARRAY_TYPE|INT64_TYPE))
     {
       size += sizeof(int); // cnt
-      size += sizeof(eyedblib::int64) * arg->arr_i64.cnt;
+      size += sizeof(eyedblib::int64) * arg->u.arr_i64.cnt;
     }
   else if (type == (ARRAY_TYPE|CHAR_TYPE))
     {
       size += sizeof(int); // cnt
-      size += sizeof(char) * arg->arr_c.cnt;
+      size += sizeof(char) * arg->u.arr_c.cnt;
     }
   else if (type == (ARRAY_TYPE|FLOAT_TYPE))
     {
       size += sizeof(int); // cnt
-      size += sizeof(double) * arg->arr_d.cnt;
+      size += sizeof(double) * arg->u.arr_d.cnt;
     }
   else if (type == (ARRAY_TYPE|STRING_TYPE))
     {
       size += sizeof(int); // cnt
-      for (int i = 0; i < arg->arr_s.cnt; i++)
-	size += sizeof(int) + strlen(arg->arr_s.s[i]) + 1;
+      for (int i = 0; i < arg->u.arr_s.cnt; i++)
+	size += sizeof(int) + strlen(arg->u.arr_s.s[i]) + 1;
     }
   else if (type == (ARRAY_TYPE|OBJ_TYPE))
     {
       size += sizeof(int); // cnt
-      for (int i = 0; i < arg->arr_o.cnt; i++)
-	size += sizeof(int) + (arg->arr_o.o[i] ? 2 * sizeof(Oid) +
-			       arg->arr_o.o[i]->getIDRSize() : 0);
+      for (int i = 0; i < arg->u.arr_o.cnt; i++)
+	size += sizeof(int) + (arg->u.arr_o.o[i] ? 2 * sizeof(Oid) +
+			       arg->u.arr_o.o[i]->getIDRSize() : 0);
     }
   else if (type == (ARRAY_TYPE|OID_TYPE))
     {
       size += sizeof(int); // cnt
-      size += sizeof(Oid) * arg->arr_oid.cnt;
+      size += sizeof(Oid) * arg->u.arr_oid.cnt;
     }
   else if (type == VOID_TYPE)
     ;
@@ -200,86 +200,86 @@ code_arg(const Argument *arg, char * &p)
 
   if (type == INT16_TYPE)
     {
-      mcp(p, &arg->i16, sizeof(eyedblib::int16));
+      mcp(p, &arg->u.i16, sizeof(eyedblib::int16));
       p += sizeof(eyedblib::int16);
     }
   else if (type == INT32_TYPE)
     {
-      mcp(p, &arg->i32, sizeof(eyedblib::int32));
+      mcp(p, &arg->u.i32, sizeof(eyedblib::int32));
       p += sizeof(eyedblib::int32);
     }
   else if (type == INT64_TYPE)
     {
-      mcp(p, &arg->i64, sizeof(eyedblib::int64));
+      mcp(p, &arg->u.i64, sizeof(eyedblib::int64));
       p += sizeof(eyedblib::int64);
     }
   else if (type == CHAR_TYPE)
     {
-      mcp(p, &arg->c, sizeof(char));
+      mcp(p, &arg->u.c, sizeof(char));
       p += sizeof(char);
     }
   else if (type == STRING_TYPE)
-    code_arg(arg->s, p);
+    code_arg(arg->u.s, p);
   else if (type == RAW_TYPE)
     {
-      mcp(p, &arg->raw.size, sizeof(int));
+      mcp(p, &arg->u.raw.size, sizeof(int));
       p += sizeof(int);
-      mcp(p, arg->raw.data, arg->raw.size);
-      p += arg->raw.size;
+      mcp(p, arg->u.raw.data, arg->u.raw.size);
+      p += arg->u.raw.size;
     }
   else if (type == FLOAT_TYPE)
     {
-      mcp(p, &arg->d, sizeof(double));
+      mcp(p, &arg->u.d, sizeof(double));
       p += sizeof(double);
     }
   else if (type == OID_TYPE)
     {
-      mcp(p, arg->oid, sizeof(Oid));
+      mcp(p, arg->u.oid, sizeof(Oid));
       p += sizeof(Oid);
     }
   else if (type == OBJ_TYPE)
-    code_arg(arg->o, p);
+    code_arg(arg->u.o, p);
   else if (type == ARRAY_TYPE)
-    code_arg(arg->array, p);
+    code_arg(arg->u.array, p);
   else if (type == (ARRAY_TYPE|INT16_TYPE))
     {
-      CODE_SIMPLE_ARRAY(arg->arr_i16, i, eyedblib::int16, p);
+      CODE_SIMPLE_ARRAY(arg->u.arr_i16, i, eyedblib::int16, p);
     }
   else if (type == (ARRAY_TYPE|INT32_TYPE))
     {
-      CODE_SIMPLE_ARRAY(arg->arr_i32, i, eyedblib::int32, p);
+      CODE_SIMPLE_ARRAY(arg->u.arr_i32, i, eyedblib::int32, p);
     }
   else if (type == (ARRAY_TYPE|INT64_TYPE))
     {
-      CODE_SIMPLE_ARRAY(arg->arr_i64, i, eyedblib::int64, p);
+      CODE_SIMPLE_ARRAY(arg->u.arr_i64, i, eyedblib::int64, p);
     }
   else if (type == (ARRAY_TYPE|CHAR_TYPE))
     {
-      CODE_SIMPLE_ARRAY(arg->arr_c, c, char, p);
+      CODE_SIMPLE_ARRAY(arg->u.arr_c, c, char, p);
     }
   else if (type == (ARRAY_TYPE|FLOAT_TYPE))
     {
-      CODE_SIMPLE_ARRAY(arg->arr_d, d, double, p);
+      CODE_SIMPLE_ARRAY(arg->u.arr_d, d, double, p);
     }
   else if (type == (ARRAY_TYPE|OID_TYPE))
     {
-      CODE_SIMPLE_ARRAY(arg->arr_oid, oid, Oid, p);
+      CODE_SIMPLE_ARRAY(arg->u.arr_oid, oid, Oid, p);
     }
   else if (type == (ARRAY_TYPE|STRING_TYPE))
     {
-      mcp(p, &arg->arr_s.cnt, sizeof(int));
+      mcp(p, &arg->u.arr_s.cnt, sizeof(int));
       p += sizeof(int);
 
-      for (int i = 0; i < arg->arr_s.cnt; i++)
-	code_arg(arg->arr_s.s[i], p);
+      for (int i = 0; i < arg->u.arr_s.cnt; i++)
+	code_arg(arg->u.arr_s.s[i], p);
     }
   else if (type == (ARRAY_TYPE|OBJ_TYPE))
     {
-      mcp(p, &arg->arr_o.cnt, sizeof(int));
+      mcp(p, &arg->u.arr_o.cnt, sizeof(int));
       p += sizeof(int);
 
-      for (int i = 0; i < arg->arr_o.cnt; i++)
-	code_arg(arg->arr_o.o[i], p);
+      for (int i = 0; i < arg->u.arr_o.cnt; i++)
+	code_arg(arg->u.arr_o.o[i], p);
     }
   else if (type == VOID_TYPE)
     ;

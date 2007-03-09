@@ -117,6 +117,11 @@ namespace eyedb {
       Struct& operator=(const Struct &);
     };
 
+    struct V_Data {
+      Data data;
+      Size size;
+    };
+
     union {
       Bool b;
       unsigned char by;
@@ -126,10 +131,7 @@ namespace eyedb {
       eyedblib::int64 l;
       double d;
       char *str;
-      struct {
-	Data data;
-	Size size;
-      } data;
+      V_Data data;
       Oid *oid;
       Object *o;
       ObjectPtr *o_ptr;

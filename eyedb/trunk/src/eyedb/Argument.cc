@@ -290,56 +290,56 @@ namespace eyedb {
   {
     garbage();
     init(INT16_TYPE);
-    i16 = _i;
+    u.i16 = _i;
   }
 
   void Argument::set(eyedblib::int32 _i)
   {
     garbage();
     init(INT32_TYPE);
-    i32 = _i;
+    u.i32 = _i;
   }
 
   void Argument::set(eyedblib::int64 _i)
   {
     garbage();
     init(INT64_TYPE);
-    i64 = _i;
+    u.i64 = _i;
   }
 
   void Argument::set(const char *_s)
   {
     garbage();
     init(STRING_TYPE);
-    s = (char *)_s;
+    u.s = (char *)_s;
   }
 
   void Argument::set(char _c)
   {
     garbage();
     init(CHAR_TYPE);
-    c = _c;
+    u.c = _c;
   }
 
   void Argument::set(unsigned char _by)
   {
     garbage();
     init(BYTE_TYPE);
-    by = _by;
+    u.by = _by;
   }
 
   void Argument::set(double _d)
   {
     garbage();
     init(FLOAT_TYPE);
-    d = _d;
+    u.d = _d;
   }
 
   void Argument::set(const Oid &_oid, Database *_db)
   {
     garbage();
     init(OID_TYPE);
-    oid = new Oid(_oid.getOid());
+    u.oid = new Oid(_oid.getOid());
     db = _db;
   }
 
@@ -347,32 +347,32 @@ namespace eyedb {
   {
     garbage();
     init(OBJ_TYPE);
-    o = (Object *)_o;
-    if (o)
-      type->setClname(o->getClass()->getName());
-    db = (o ? o->getDatabase() : NULL);
+    u.o = (Object *)_o;
+    if (u.o)
+      type->setClname(u.o->getClass()->getName());
+    db = (u.o ? u.o->getDatabase() : NULL);
   }
 
   void Argument::set(const unsigned char *_raw, int size)
   {
     garbage();
     init(RAW_TYPE);
-    raw.data = (unsigned char *)_raw;
-    raw.size = size;
+    u.raw.data = (unsigned char *)_raw;
+    u.raw.size = size;
   }
 
   void Argument::set(void *_x)
   {
     garbage();
     init(ANY_TYPE);
-    x = _x;
+    u.x = _x;
   }
 
   void Argument::set(const ArgArray *_array)
   {
     garbage();
     init(ARRAY_TYPE);
-    array = (ArgArray *)_array;
+    u.array = (ArgArray *)_array;
   }
 
   // basic types : without copy and with garbage according to garbage policy
@@ -380,19 +380,19 @@ namespace eyedb {
   {
     garbage();
     init(OBJ_TYPE);
-    o = _o;
-    if (o)
-      type->setClname(o->getClass()->getName());
+    u.o = _o;
+    if (u.o)
+      type->setClname(u.o->getClass()->getName());
 
     policy = _policy;
-    db = (o ? o->getDatabase() : NULL);
+    db = (u.o ? u.o->getDatabase() : NULL);
   }
 
   void Argument::set(char *_s, Argument::GarbagePolicy _policy)
   {
     garbage();
     init(STRING_TYPE);
-    s = _s;
+    u.s = _s;
     policy = _policy;
   }
 
@@ -401,8 +401,8 @@ namespace eyedb {
   {
     garbage();
     init(RAW_TYPE);
-    raw.data = _raw;
-    raw.size = size;
+    u.raw.data = _raw;
+    u.raw.size = size;
     policy = _policy;
   }
 
@@ -410,7 +410,7 @@ namespace eyedb {
   {
     garbage();
     init(ARRAY_TYPE);
-    array = _array;
+    u.array = _array;
     policy = _policy;
   }
 
@@ -420,56 +420,56 @@ namespace eyedb {
   {
     garbage();
     init((ArgType_Type)(ARRAY_TYPE | INT16_TYPE));
-    arr_i16.i = (eyedblib::int16 *)_i;
-    arr_i16.cnt = cnt;
+    u.arr_i16.i = (eyedblib::int16 *)_i;
+    u.arr_i16.cnt = cnt;
   }
 
   void Argument::set(const eyedblib::int32 *_i, int cnt)
   {
     garbage();
     init((ArgType_Type)(ARRAY_TYPE | INT32_TYPE));
-    arr_i32.i = (eyedblib::int32 *)_i;
-    arr_i32.cnt = cnt;
+    u.arr_i32.i = (eyedblib::int32 *)_i;
+    u.arr_i32.cnt = cnt;
   }
 
   void Argument::set(const eyedblib::int64 *_i, int cnt)
   {
     garbage();
     init((ArgType_Type)(ARRAY_TYPE | INT64_TYPE));
-    arr_i64.i = (eyedblib::int64 *)_i;
-    arr_i64.cnt = cnt;
+    u.arr_i64.i = (eyedblib::int64 *)_i;
+    u.arr_i64.cnt = cnt;
   }
 
   void Argument::set(const char *_c, int cnt)
   {
     garbage();
     init((ArgType_Type)(ARRAY_TYPE | CHAR_TYPE));
-    arr_c.c = (char *)_c;
-    arr_c.cnt = cnt;
+    u.arr_c.c = (char *)_c;
+    u.arr_c.cnt = cnt;
   }
 
   void Argument::set(char **_s, int cnt)
   {
     garbage();
     init((ArgType_Type)(ARRAY_TYPE | STRING_TYPE));
-    arr_s.s = (char **)_s;
-    arr_s.cnt = cnt;
+    u.arr_s.s = (char **)_s;
+    u.arr_s.cnt = cnt;
   }
 
   void Argument::set(const double *_d, int cnt)
   {
     garbage();
     init((ArgType_Type)(ARRAY_TYPE | FLOAT_TYPE));
-    arr_d.d = (double *)_d;
-    arr_d.cnt = cnt;
+    u.arr_d.d = (double *)_d;
+    u.arr_d.cnt = cnt;
   }
 
   void Argument::set(const Oid *_oid, int cnt, Database *_db)
   {
     garbage();
     init((ArgType_Type)(ARRAY_TYPE | OID_TYPE));
-    arr_oid.oid = (Oid *)_oid;
-    arr_oid.cnt = cnt;
+    u.arr_oid.oid = (Oid *)_oid;
+    u.arr_oid.cnt = cnt;
     db = _db;
   }
 
@@ -477,16 +477,16 @@ namespace eyedb {
   {
     garbage();
     init((ArgType_Type)(ARRAY_TYPE | OBJ_TYPE));
-    arr_o.o = (Object **)_o;
-    arr_o.cnt = cnt;
+    u.arr_o.o = (Object **)_o;
+    u.arr_o.cnt = cnt;
   }
 
   void Argument::set(eyedblib::int16 *_i, int cnt, Argument::GarbagePolicy _policy)
   {
     garbage();
     init((ArgType_Type)(ARRAY_TYPE | INT16_TYPE));
-    arr_i16.i = _i;
-    arr_i16.cnt = cnt;
+    u.arr_i16.i = _i;
+    u.arr_i16.cnt = cnt;
     policy = _policy;
   }
 
@@ -494,8 +494,8 @@ namespace eyedb {
   {
     garbage();
     init((ArgType_Type)(ARRAY_TYPE | INT32_TYPE));
-    arr_i32.i = _i;
-    arr_i32.cnt = cnt;
+    u.arr_i32.i = _i;
+    u.arr_i32.cnt = cnt;
     policy = _policy;
   }
 
@@ -503,8 +503,8 @@ namespace eyedb {
   {
     garbage();
     init((ArgType_Type)(ARRAY_TYPE | INT64_TYPE));
-    arr_i64.i = _i;
-    arr_i64.cnt = cnt;
+    u.arr_i64.i = _i;
+    u.arr_i64.cnt = cnt;
     policy = _policy;
   }
 
@@ -512,8 +512,8 @@ namespace eyedb {
   {
     garbage();
     init((ArgType_Type)(ARRAY_TYPE | CHAR_TYPE));
-    arr_c.c = _c;
-    arr_c.cnt = cnt;
+    u.arr_c.c = _c;
+    u.arr_c.cnt = cnt;
     policy = _policy;
   }
 
@@ -521,8 +521,8 @@ namespace eyedb {
   {
     garbage();
     init((ArgType_Type)(ARRAY_TYPE | STRING_TYPE));
-    arr_s.s = _s;
-    arr_s.cnt = cnt;
+    u.arr_s.s = _s;
+    u.arr_s.cnt = cnt;
     policy = _policy;
   }
 
@@ -530,8 +530,8 @@ namespace eyedb {
   {
     garbage();
     init((ArgType_Type)(ARRAY_TYPE | FLOAT_TYPE));
-    arr_d.d = _d;
-    arr_d.cnt = cnt;
+    u.arr_d.d = _d;
+    u.arr_d.cnt = cnt;
     policy = _policy;
   }
 
@@ -540,8 +540,8 @@ namespace eyedb {
   {
     garbage();
     init((ArgType_Type)(ARRAY_TYPE | OID_TYPE));
-    arr_oid.oid = _oid;
-    arr_oid.cnt = cnt;
+    u.arr_oid.oid = _oid;
+    u.arr_oid.cnt = cnt;
     policy = _policy;
     db = _db;
   }
@@ -556,8 +556,8 @@ namespace eyedb {
   {
     garbage();
     init((ArgType_Type)(ARRAY_TYPE | OBJ_TYPE));
-    arr_o.o = _o;
-    arr_o.cnt = cnt;
+    u.arr_o.o = _o;
+    u.arr_o.cnt = cnt;
     policy = _policy;
   }
 
@@ -571,13 +571,13 @@ namespace eyedb {
     int t = type->getType();
 
     if (t == INT16_TYPE)
-      return i16;
+      return u.i16;
 
     if (t == INT32_TYPE)
-      return i32;
+      return u.i32;
 
     if (t == INT64_TYPE)
-      return i64;
+      return u.i64;
 
     return -1; // should send an exception!
   }
@@ -585,12 +585,12 @@ namespace eyedb {
   const Object *Argument::getObject() const
   {
     if (type->getType() == OBJ_TYPE)
-      return o;
+      return u.o;
 
     if (type->getType() == OID_TYPE && db) {
       Object *xo = 0;
       db->transactionBegin();
-      db->loadObject(*oid, xo);
+      db->loadObject(*u.oid, xo);
       db->transactionCommit();
       return xo;
     }
@@ -608,8 +608,8 @@ namespace eyedb {
     if (type->getType() != (INT16_TYPE|ARRAY_TYPE))
       return NULL;
 
-    cnt = arr_i16.cnt;
-    return arr_i16.i;
+    cnt = u.arr_i16.cnt;
+    return u.arr_i16.i;
   }
 
   const eyedblib::int32 *Argument::getIntegers32(int &cnt) const
@@ -617,8 +617,8 @@ namespace eyedb {
     if (type->getType() != (INT32_TYPE|ARRAY_TYPE))
       return NULL;
 
-    cnt = arr_i32.cnt;
-    return arr_i32.i;
+    cnt = u.arr_i32.cnt;
+    return u.arr_i32.i;
   }
 
   const eyedblib::int64 *Argument::getIntegers64(int &cnt) const
@@ -626,8 +626,8 @@ namespace eyedb {
     if (type->getType() != (INT64_TYPE|ARRAY_TYPE))
       return NULL;
 
-    cnt = arr_i64.cnt;
-    return arr_i64.i;
+    cnt = u.arr_i64.cnt;
+    return u.arr_i64.i;
   }
 
   const char *Argument::getChars(int &cnt) const
@@ -635,8 +635,8 @@ namespace eyedb {
     if (type->getType() != (CHAR_TYPE|ARRAY_TYPE))
       return NULL;
 
-    cnt = arr_c.cnt;
-    return arr_c.c;
+    cnt = u.arr_c.cnt;
+    return u.arr_c.c;
   }
 
   const double *Argument::getFloats(int &cnt) const
@@ -644,8 +644,8 @@ namespace eyedb {
     if (type->getType() != (FLOAT_TYPE|ARRAY_TYPE))
       return NULL;
 
-    cnt = arr_d.cnt;
-    return arr_d.d;
+    cnt = u.arr_d.cnt;
+    return u.arr_d.d;
   }
 
   const Oid *Argument::getOids(int &cnt) const
@@ -653,8 +653,8 @@ namespace eyedb {
     if (type->getType() != (OID_TYPE|ARRAY_TYPE))
       return NULL;
 
-    cnt = arr_oid.cnt;
-    return arr_oid.oid;
+    cnt = u.arr_oid.cnt;
+    return u.arr_oid.oid;
   }
 
   char **Argument::getStrings(int &cnt) const
@@ -662,8 +662,8 @@ namespace eyedb {
     if (type->getType() != (STRING_TYPE|ARRAY_TYPE))
       return NULL;
 
-    cnt = arr_s.cnt;
-    return (char **)arr_s.s;
+    cnt = u.arr_s.cnt;
+    return (char **)u.arr_s.s;
   }
 
   Object **Argument::getObjects(int &cnt) const
@@ -671,8 +671,8 @@ namespace eyedb {
     if (type->getType() != (OBJ_TYPE|ARRAY_TYPE))
       return NULL;
 
-    cnt = arr_o.cnt;
-    return (Object **)arr_o.o;
+    cnt = u.arr_o.cnt;
+    return (Object **)u.arr_o.o;
   }
 
   Argument &Argument::operator=(const Argument &arg)
@@ -680,64 +680,64 @@ namespace eyedb {
     int _type = arg.type->getType();
 
     if (_type == INT16_TYPE)
-      set(arg.i16);
+      set(arg.u.i16);
 
     else if (_type == INT32_TYPE)
-      set(arg.i32);
+      set(arg.u.i32);
 
     else if (_type == INT64_TYPE)
-      set(arg.i64);
+      set(arg.u.i64);
 
     else if (_type == STRING_TYPE)
-      set(const_cast<const char *>(arg.s));
+      set(const_cast<const char *>(arg.u.s));
 
     else if (_type == CHAR_TYPE)
-      set(arg.c);
+      set(arg.u.c);
 
     else if (_type == BYTE_TYPE)
-      set(arg.by);
+      set(arg.u.by);
 
     else if (_type == FLOAT_TYPE)
-      set(arg.d);
+      set(arg.u.d);
 
     else if (_type == OID_TYPE)
-      set(*arg.oid);
+      set(*arg.u.oid);
 
     else if (_type == OBJ_TYPE)
-      set(const_cast<Object *>(arg.o));
+      set(const_cast<Object *>(arg.u.o));
 
     else if (_type == ARRAY_TYPE)
-      set(arg.array);
+      set(arg.u.array);
 
     else if (_type == RAW_TYPE)
-      set((const unsigned char *)arg.raw.data, arg.raw.size);
+      set((const unsigned char *)arg.u.raw.data, arg.u.raw.size);
 
     else if (_type == ANY_TYPE)
-      set(arg.x);
+      set(arg.u.x);
 
     else if (_type == (ARRAY_TYPE|INT16_TYPE))
-      set(const_cast<const eyedblib::int16 *>(arg.arr_i16.i), arg.arr_i16.cnt);
+      set(const_cast<const eyedblib::int16 *>(arg.u.arr_i16.i), arg.u.arr_i16.cnt);
 
     else if (_type == (ARRAY_TYPE|INT32_TYPE))
-      set(const_cast<const eyedblib::int32 *>(arg.arr_i32.i), arg.arr_i32.cnt);
+      set(const_cast<const eyedblib::int32 *>(arg.u.arr_i32.i), arg.u.arr_i32.cnt);
 
     else if (_type == (ARRAY_TYPE|INT64_TYPE))
-      set(const_cast<const eyedblib::int64 *>(arg.arr_i64.i), arg.arr_i64.cnt);
+      set(const_cast<const eyedblib::int64 *>(arg.u.arr_i64.i), arg.u.arr_i64.cnt);
 
     else if (_type == (ARRAY_TYPE|CHAR_TYPE))
-      set(const_cast<const char *>(arg.arr_c.c), arg.arr_c.cnt);
+      set(const_cast<const char *>(arg.u.arr_c.c), arg.u.arr_c.cnt);
 
     else if (_type == (ARRAY_TYPE|FLOAT_TYPE))
-      set(const_cast<const double *>(arg.arr_d.d), arg.arr_d.cnt);
+      set(const_cast<const double *>(arg.u.arr_d.d), arg.u.arr_d.cnt);
 
     else if (_type == (ARRAY_TYPE|OID_TYPE))
-      set(const_cast<const Oid *>(arg.arr_oid.oid), arg.arr_oid.cnt);
+      set(const_cast<const Oid *>(arg.u.arr_oid.oid), arg.u.arr_oid.cnt);
 
     else if (_type == (ARRAY_TYPE|STRING_TYPE))
-      set(const_cast<char **>(arg.arr_s.s), arg.arr_s.cnt);
+      set(const_cast<char **>(arg.u.arr_s.s), arg.u.arr_s.cnt);
 
     else if (_type == (ARRAY_TYPE|OBJ_TYPE))
-      set(const_cast<const Object **>(arg.arr_o.o), arg.arr_o.cnt);
+      set(const_cast<const Object **>(arg.u.arr_o.o), arg.u.arr_o.cnt);
 
     else if (_type == VOID_TYPE)
       {
@@ -869,54 +869,54 @@ namespace eyedb {
 
     if (t == INT16_TYPE)
       {
-	sprintf(buf, "%d", i16);
+	sprintf(buf, "%d", u.i16);
 	return (((Argument *)this)->str = strdup(buf));
       }
 
     if (t == INT32_TYPE)
       {
-	sprintf(buf, "%ld", i32);
+	sprintf(buf, "%ld", u.i32);
 	return (((Argument *)this)->str = strdup(buf));
       }
 
     if (t == INT64_TYPE)
       {
-	sprintf(buf, "%lld", i64);
+	sprintf(buf, "%lld", u.i64);
 	return (((Argument *)this)->str = strdup(buf));
       }
 
     if (t == STRING_TYPE)
-      return s;
+      return u.s;
 
     if (t == CHAR_TYPE)
       {
-	sprintf(buf, "'%c'", c);
+	sprintf(buf, "'%c'", u.c);
 	return (((Argument *)this)->str = strdup(buf));
       }
   
     if (t == BYTE_TYPE)
       {
-	sprintf(buf, "'\\%3o'", by);
+	sprintf(buf, "'\\%3o'", u.by);
 	return (((Argument *)this)->str = strdup(buf));
       }
   
     if (t == FLOAT_TYPE)
       {
-	sprintf(buf, "%f", d);
+	sprintf(buf, "%f", u.d);
 	return (((Argument *)this)->str = strdup(buf));
       }
   
     if (t == OID_TYPE)
-      return oid->getString();
+      return u.oid->getString();
   
     if (t == OBJ_TYPE)
       {
-	sprintf(buf, "%p:%s", o, type->getClname().c_str());
+	sprintf(buf, "%p:%s", u.o, type->getClname().c_str());
 	return (((Argument *)this)->str = strdup(buf));
       }
   
     if (t == ARRAY_TYPE)
-      return (((Argument *)this)->str = strdup(array->toString()));
+      return (((Argument *)this)->str = strdup(u.array->toString()));
 
     return "<type not supported>";
   }
@@ -930,44 +930,44 @@ namespace eyedb {
     int t = type->getType();
 
     if (t == OID_TYPE)
-      delete oid;
+      delete u.oid;
     else if (policy != NoGarbage) {
       int _i;
       if (t == OBJ_TYPE) {
-	if (o && !gbxAutoGarb::isObjectDeleted(o))
-	  o->release();
+	if (u.o && !gbxAutoGarb::isObjectDeleted(u.o))
+	  u.o->release();
       }
       else if (t == STRING_TYPE)
-	::free(s);
+	::free(u.s);
       else if (t == RAW_TYPE)
-	::free(raw.data);
+	::free(u.raw.data);
       else if (t == ARRAY_TYPE) {
-	if (array && !gbxAutoGarb::isObjectDeleted(array))
-	  array->release();
+	if (u.array && !gbxAutoGarb::isObjectDeleted(u.array))
+	  u.array->release();
       }
       else if (t == (ARRAY_TYPE|INT16_TYPE))
-	::free(arr_i16.i);
+	::free(u.arr_i16.i);
       else if (t == (ARRAY_TYPE|INT32_TYPE))
-	::free(arr_i32.i);
+	::free(u.arr_i32.i);
       else if (t == (ARRAY_TYPE|INT64_TYPE))
-	::free(arr_i64.i);
+	::free(u.arr_i64.i);
       else if (t == (ARRAY_TYPE|CHAR_TYPE))
-	::free(arr_c.c);
+	::free(u.arr_c.c);
       else if (t == (ARRAY_TYPE|STRING_TYPE)) {
 	if (policy == AutoFullGarbage)
-	  for (_i = 0; _i < arr_s.cnt; _i++)
-	    ::free(arr_s.s[_i]);
-	::free(arr_s.s);
+	  for (_i = 0; _i < u.arr_s.cnt; _i++)
+	    ::free(u.arr_s.s[_i]);
+	::free(u.arr_s.s);
       }
       else if (t == (ARRAY_TYPE|OBJ_TYPE)) {
 	if (policy == AutoFullGarbage)
-	  for (_i = 0; _i < arr_o.cnt; _i++)
-	    if (arr_o.o[_i] && !gbxAutoGarb::isObjectDeleted(arr_o.o[_i]))
-	      arr_o.o[_i]->release();
-	::free(arr_o.o);
+	  for (_i = 0; _i < u.arr_o.cnt; _i++)
+	    if (u.arr_o.o[_i] && !gbxAutoGarb::isObjectDeleted(u.arr_o.o[_i]))
+	      u.arr_o.o[_i]->release();
+	::free(u.arr_o.o);
       }
       else if (t == (ARRAY_TYPE|OID_TYPE))
-	::free(arr_oid.oid);
+	::free(u.arr_oid.oid);
     }
 
     ::free(str);

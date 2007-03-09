@@ -1018,8 +1018,8 @@ idbWGetTagPerform(Object *o, const char *&tag, idbWTextMode textmod, int &len)
       return idbWGetTagRealize(o, tag, textmod, len);
     }
 
-  len = strlen(retarg.s);
-  tag = idbWMakeTag(o->getOid(), retarg.s, textmod, len);
+  len = strlen(retarg.u.s);
+  tag = idbWMakeTag(o->getOid(), retarg.u.s, textmod, len);
 
   return Success;
 }

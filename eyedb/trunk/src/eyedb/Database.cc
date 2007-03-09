@@ -2623,7 +2623,7 @@ if ((mode) !=  NoDBAccessMode && \
 
   void Database::markCreatedEmpty()
   {
-    return mark_created.erase(mark_created.begin(), mark_created.end());
+    mark_created.erase(mark_created.begin(), mark_created.end());
   }
 
 }

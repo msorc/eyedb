@@ -25,18 +25,19 @@
 #ifndef _EYEDBLIB_STDLIST_H
 #define _EYEDBLIB_STDLIST_H
 
+#include <algorithm>
 #include <list>
 
 template <class T>
 bool std_list_contains(std::list<T> &l, T o)
 {
-  return find(l.begin(), l.end(), o) != l.end();
+  return std::find(l.begin(), l.end(), o) != l.end();
 }
 
 template <class T>
 bool std_list_erase(std::list<T> &l, T o)
 {
-  typename std::list<T>::iterator it = find(l.begin(), l.end(), o);
+  typename std::list<T>::iterator it = std::find(l.begin(), l.end(), o);
 
   if (it != l.end()) {
     l.erase(it);

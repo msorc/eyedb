@@ -725,35 +725,35 @@ oqmlMethodCall::fillArgArray(Signature *sign,
   switch(odl_type)
     {
     case INT16_TYPE:
-      arg->arr_i16.i[j] = *tmp.getInteger16();
+      arg->u.arr_i16.i[j] = *tmp.getInteger16();
       break;
 
     case INT32_TYPE:
-      arg->arr_i32.i[j] = *tmp.getInteger32();
+      arg->u.arr_i32.i[j] = *tmp.getInteger32();
       break;
 
     case INT64_TYPE:
-      arg->arr_i64.i[j] = *tmp.getInteger64();
+      arg->u.arr_i64.i[j] = *tmp.getInteger64();
       break;
 
     case STRING_TYPE:
-      arg->arr_s.s[j] = strdup(tmp.getString());
+      arg->u.arr_s.s[j] = strdup(tmp.getString());
       break;
 
     case CHAR_TYPE:
-      arg->arr_c.c[j] = *tmp.getChar();
+      arg->u.arr_c.c[j] = *tmp.getChar();
       break;
 
     case FLOAT_TYPE:
-      arg->arr_d.d[j] = *tmp.getFloat();
+      arg->u.arr_d.d[j] = *tmp.getFloat();
       break;
 
     case OID_TYPE:
-      arg->arr_oid.oid[j] = *tmp.getOid();
+      arg->u.arr_oid.oid[j] = *tmp.getOid();
       break;
 
     case OBJ_TYPE:
-      arg->arr_o.o[j] = tmp.getObject();
+      arg->u.arr_o.o[j] = tmp.getObject();
       break;
 
     case VOID_TYPE:
@@ -783,35 +783,35 @@ oqmlMethodCall::makeArg(Argument &tmp, ArgType_Type odl_type,
   switch(odl_type)
     {
     case INT16_TYPE:
-      tmp.set(arg->arr_i16.i[j]);
+      tmp.set(arg->u.arr_i16.i[j]);
       break;
 
     case INT32_TYPE:
-      tmp.set(arg->arr_i32.i[j]);
+      tmp.set(arg->u.arr_i32.i[j]);
       break;
 
     case INT64_TYPE:
-      tmp.set(arg->arr_i64.i[j]);
+      tmp.set(arg->u.arr_i64.i[j]);
       break;
 
     case STRING_TYPE:
-      tmp.set(arg->arr_s.s[j]);
+      tmp.set(arg->u.arr_s.s[j]);
       break;
 
     case CHAR_TYPE:
-      tmp.set(arg->arr_c.c[j]);
+      tmp.set(arg->u.arr_c.c[j]);
       break;
 
     case FLOAT_TYPE:
-      tmp.set(arg->arr_d.d[j]);
+      tmp.set(arg->u.arr_d.d[j]);
       break;
 
     case OID_TYPE:
-      tmp.set(arg->arr_oid.oid[j]);
+      tmp.set(arg->u.arr_oid.oid[j]);
       break;
 
     case OBJ_TYPE:
-      tmp.set(arg->arr_o.o[j]);
+      tmp.set(arg->u.arr_o.o[j]);
       break;
 
     default:
@@ -834,28 +834,28 @@ oqmlMethodCall::getArgCount(const Argument *arg, ArgType_Type odl_type)
   switch(odl_type)
     {
     case INT16_TYPE:
-      return arg->arr_i16.cnt;
+      return arg->u.arr_i16.cnt;
 
     case INT32_TYPE:
-      return arg->arr_i32.cnt;
+      return arg->u.arr_i32.cnt;
 
     case INT64_TYPE:
-      return arg->arr_i64.cnt;
+      return arg->u.arr_i64.cnt;
 
     case STRING_TYPE:
-      return arg->arr_s.cnt;
+      return arg->u.arr_s.cnt;
 
     case CHAR_TYPE:
-      return arg->arr_c.cnt;
+      return arg->u.arr_c.cnt;
 
     case FLOAT_TYPE:
-      return arg->arr_d.cnt;
+      return arg->u.arr_d.cnt;
 
     case OID_TYPE:
-      return arg->arr_oid.cnt;
+      return arg->u.arr_oid.cnt;
 
     case OBJ_TYPE:
-      return arg->arr_o.cnt;
+      return arg->u.arr_o.cnt;
 
     default:
       assert(0);
