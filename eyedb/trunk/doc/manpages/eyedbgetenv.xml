@@ -24,11 +24,11 @@
     <cmdsynopsis>
       <code><![CDATA[usage: eyedbgetenv [--server] [--config|--csh|--sh [--export]] [--expand-user] [<variables>]]]></code>
       eyedbgetenv
-      <arg>--server</arg>
-      <arg choice="plain"><arg>--config|--csh|--sh</arg>
-      <arg>--export</arg></arg>
-      <arg>--expand-user</arg>
-      <arg><replaceable>variables</replaceable></arg>
+<arg choice="optional">--server</arg>
+<arg choice="optional">--config|--csh|--sh</arg>
+<arg choice="optional">--export</arg>
+<arg choice="optional">--expand-user</arg>
+<arg choice="optional"><replaceable>variables</replaceable></arg>
     </cmdsynopsis>
   </refsynopsisdiv>
 
@@ -44,35 +44,35 @@
     <variablelist>
 
       <varlistentry>
-	<term><arg>--server</arg></term>
+	<term><arg choice="optional">--server</arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term><arg choice="plain"><arg>--config|--csh|--sh</arg></term>
+	<term><arg choice="optional">--config|--csh|--sh</arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term><arg>--export</arg></arg></term>
+	<term><arg choice="optional">--export</arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term><arg>--expand-user</arg></term>
+	<term><arg choice="optional">--expand-user</arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term><arg><replaceable>variables</replaceable></arg></term>
+	<term><arg choice="optional"><replaceable>variables</replaceable></arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>

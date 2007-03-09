@@ -24,8 +24,9 @@
     <cmdsynopsis>
       <code><![CDATA[usage: eyedbuseradd [--unix|--strict-unix=]<user>|@ [<passwd>]]]></code>
       eyedbuseradd
-      <arg choice="plain"><arg>--unix|--strict-unix=</arg><replaceable>user</replaceable>|@</arg>
-      <arg><replaceable>passwd</replaceable></arg>
+<arg choice="optional">--unix|--strict-unix=</arg>
+<arg choice="plain"><replaceable>user</replaceable>|@</arg>
+<arg choice="optional"><replaceable>passwd</replaceable></arg>
     </cmdsynopsis>
   </refsynopsisdiv>
 
@@ -41,14 +42,21 @@
     <variablelist>
 
       <varlistentry>
-	<term><arg choice="plain"><arg>--unix|--strict-unix=</arg><replaceable>user</replaceable>|@</arg></term>
+	<term><arg choice="optional">--unix|--strict-unix=</arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term><arg><replaceable>passwd</replaceable></arg></term>
+	<term><arg choice="plain"><replaceable>user</replaceable>|@</arg></term>
+	<listitem>
+	  <para>option_description</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><arg choice="optional"><replaceable>passwd</replaceable></arg></term>
 	<listitem>
 	  <para>option_description</para>
 	</listitem>

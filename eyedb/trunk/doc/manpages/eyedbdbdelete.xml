@@ -24,7 +24,7 @@
     <cmdsynopsis>
       <code><![CDATA[usage: eyedbdbdelete <dbname>]]></code>
       eyedbdbdelete
-      <arg choice="plain"><replaceable>dbname</replaceable></arg>
+<arg choice="plain"><replaceable>dbname</replaceable></arg>
     </cmdsynopsis>
   </refsynopsisdiv>
 

@@ -24,7 +24,7 @@
     <cmdsynopsis>
       <code><![CDATA[usage: eyedbuserdelete <user>]]></code>
       eyedbuserdelete
-      <arg choice="plain"><replaceable>user</replaceable></arg>
+<arg choice="plain"><replaceable>user</replaceable></arg>
     </cmdsynopsis>
   </refsynopsisdiv>
 
