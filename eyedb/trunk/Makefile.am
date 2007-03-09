@@ -1,4 +1,9 @@
-SUBDIRS=src include scripts install pkg-config examples tests doc 
+if COND_DOC
+DOC_SRC_DIR=doc
+else
+DOC_SRC_DIR=
+endif
+SUBDIRS=src include scripts install pkg-config examples tests $(DOC_SRC_DIR) 
 
 docdir=$(datadir)/doc/$(PACKAGE)-$(VERSION)
 doc_DATA=AUTHORS COPYING README
