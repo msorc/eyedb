@@ -35,19 +35,19 @@ namespace eyedb {
   Status
   eyedb_CHECKObjRefType(Database *db, Argument &arg, const char *which)
   {
-    if (!arg.o->isModify())
+    if (!arg.u.o->isModify())
       {
-	arg.set(arg.o->getOid(), db); // requalification
+	arg.set(arg.u.o->getOid(), db); // requalification
 	return Success;
       }
 
-    if (!arg.o->getClass()->isFlatStructure())
+    if (!arg.u.o->getClass()->isFlatStructure())
       return Exception::make(IDB_ERROR,
 			     "argument %s : object '%s' of class '%s' "
 			     "is not consistent with database "
 			     ": cannot be transmitted",
-			     which, arg.o->getOid().getString(),
-			     arg.o->getClass()->getName());
+			     which, arg.u.o->getOid().getString(),
+			     arg.u.o->getClass()->getName());
     return Success;
   }
 
@@ -62,31 +62,31 @@ namespace eyedb {
     if (t->getType() != OBJ_TYPE)
       return Success;
 
-    if (!arg.o)
+    if (!arg.u.o)
       return Success;
 
-    if (arg.o->getOid().isValid())
+    if (arg.u.o->getOid().isValid())
       return eyedb_CHECKObjRefType(db, arg, which);
 
-    if (!arg.o->getClass()->isFlatStructure() &&
+    if (!arg.u.o->getClass()->isFlatStructure() &&
 	!(db->getOpenFlag() & _DBOpenLocal) &&
 	!db->isBackEnd()) // the two && conditions added the 12/06/01
       return Exception::make(IDB_ERROR,
 			     "argument %s : non persistent object of "
 			     "class '%s' is not a flat structure : "
 			     "cannot be transmitted",
-			     which, arg.o->getClass()->getName());
+			     which, arg.u.o->getClass()->getName());
     return Success;
   }
 
   Status
   eyedb_CHECKObjArrayType(Database *db, Argument &arg, const char *which)
   {
-    int cnt = arg.array->getCount();
+    int cnt = arg.u.array->getCount();
 
     for (int i = 0; i < cnt; i++)
       {
-	Status s = eyedb_CHECKObjType(db, *((*arg.array)[i]), which);
+	Status s = eyedb_CHECKObjType(db, *((*arg.u.array)[i]), which);
 	if (s) return s;
       }
 
@@ -113,7 +113,7 @@ namespace eyedb {
 
       if (t1 != t2) {
 	if (t1.getType() == OBJ_TYPE && t2.getType() == OBJ_TYPE) {
-	  if (!arg.o) // means nil objects
+	  if (!arg.u.o) // means nil objects
 	    return Success;
 	  const Class *m1, *m2;
 	  m1 = db->getSchema()->getClass(t1.getClname().c_str());

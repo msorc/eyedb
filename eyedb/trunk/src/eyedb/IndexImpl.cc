@@ -418,16 +418,16 @@ namespace eyedb {
     type = _type;
     dataspace = _dataspace;
 
-    hash.mth = 0;
-    hash.keycount = 0;
-    degree = 0;
+    u.hash.mth = 0;
+    u.hash.keycount = 0;
+    u.degree = 0;
 
     if (type == Hash) {
-      hash.keycount = keycount_or_degree;
-      hash.mth = mth;
+      u.hash.keycount = keycount_or_degree;
+      u.hash.mth = mth;
     }
     else {
-      degree = keycount_or_degree;
+      u.degree = keycount_or_degree;
     }
 
     impl_hints_cnt = _impl_hints_cnt;
@@ -481,23 +481,23 @@ namespace eyedb {
     }
 
     if (type == BTree) {
-      if (degree) {
+      if (u.degree) {
 	if (hints.size()) hints += " ";
-	hints += std::string("degree = ") + str_convert((long)degree) + ";";
+	hints += std::string("degree = ") + str_convert((long)u.degree) + ";";
       }
       return hints;
     }
 
-    if (hash.keycount) {
+    if (u.hash.keycount) {
       if (hints.size()) hints += " ";
-      hints += std::string("key_count = ") + str_convert((long)hash.keycount) + ";";
+      hints += std::string("key_count = ") + str_convert((long)u.hash.keycount) + ";";
     }
 
-    if (hash.mth) {
+    if (u.hash.mth) {
       if (hints.size()) hints += " ";
       hints += std::string("key_function = ") +
-	hash.mth->getClassOwner()->getName() + "::" +
-	hash.mth->getEx()->getExname() + ";";
+	u.hash.mth->getClassOwner()->getName() + "::" +
+	u.hash.mth->getEx()->getExname() + ";";
     }
 
     int cnt = impl_hints_cnt;
@@ -529,8 +529,8 @@ namespace eyedb {
 	  (*dspname ? std::string(dspname) :
 	   str_convert((long)dataspace->getId())) + "\n";
       }
-      if (degree)
-	hints += indent + "Degree: " + str_convert((long)degree) + "\n";
+      if (u.degree)
+	hints += indent + "Degree: " + str_convert((long)u.degree) + "\n";
       return hints;
     }
 
@@ -542,14 +542,14 @@ namespace eyedb {
 	 str_convert((long)dataspace->getId())) + "\n";
     }
 
-    if (hash.keycount)
-      hints += indent + "Key Count: " + str_convert((long)hash.keycount) + "\n";
+    if (u.hash.keycount)
+      hints += indent + "Key Count: " + str_convert((long)u.hash.keycount) + "\n";
 
 
-    if (hash.mth) {
+    if (u.hash.mth) {
       hints += indent + "Key Function: " +
-	hash.mth->getClassOwner()->getName() + "::" +
-	hash.mth->getEx()->getExname() + "\n";
+	u.hash.mth->getClassOwner()->getName() + "::" +
+	u.hash.mth->getEx()->getExname() + "\n";
     }
 
     int cnt = impl_hints_cnt;
@@ -571,10 +571,10 @@ namespace eyedb {
   {
     assert(getRefCount() > 0);
     if (type == Hash)
-      return new IndexImpl(type, dataspace, hash.keycount, hash.mth,
+      return new IndexImpl(type, dataspace, u.hash.keycount, u.hash.mth,
 			   impl_hints, impl_hints_cnt);
 
-    return new IndexImpl(type, dataspace, degree, 0,
+    return new IndexImpl(type, dataspace, u.degree, 0,
 			 impl_hints, impl_hints_cnt);
   }
 
@@ -586,17 +586,17 @@ namespace eyedb {
 
     if (type == Hash)
       return IDBBOOL
-	(!(idximpl->hash.keycount != hash.keycount ||
-	   (idximpl->hash.mth && !hash.mth) ||
-	   (!idximpl->hash.mth && hash.mth) ||
-	   (hash.mth && (idximpl->hash.mth->getOid() != hash.mth->getOid() ||
-			 idximpl->hash.mth != hash.mth)) ||
+	(!(idximpl->u.hash.keycount != u.hash.keycount ||
+	   (idximpl->u.hash.mth && !u.hash.mth) ||
+	   (!idximpl->u.hash.mth && u.hash.mth) ||
+	   (u.hash.mth && (idximpl->u.hash.mth->getOid() != u.hash.mth->getOid() ||
+			 idximpl->u.hash.mth != u.hash.mth)) ||
 	   idximpl->impl_hints_cnt != impl_hints_cnt ||
 	   memcmp(idximpl->impl_hints, impl_hints,
 		  impl_hints_cnt * sizeof(impl_hints[0]))));
 
     return IDBBOOL
-      (!(idximpl->degree != degree ||
+      (!(idximpl->u.degree != u.degree ||
 	 idximpl->impl_hints_cnt != impl_hints_cnt ||
 	 memcmp(idximpl->impl_hints, impl_hints,
 		impl_hints_cnt * sizeof(impl_hints[0]))));
@@ -606,15 +606,15 @@ namespace eyedb {
   IndexImpl::getMagorder(unsigned int def_magorder) const
   {
     if (type == Hash) {
-      if (!hash.keycount)
+      if (!u.hash.keycount)
 	return def_magorder;
-      return eyedbsm::HIdx::getMagOrder(hash.keycount);
+      return eyedbsm::HIdx::getMagOrder(u.hash.keycount);
     }
 
-    if (!degree)
+    if (!u.degree)
       return def_magorder;
 
-    return eyedbsm::BIdx::getMagOrder(degree);
+    return eyedbsm::BIdx::getMagOrder(u.degree);
   }
 
   unsigned int
@@ -688,7 +688,7 @@ namespace eyedb {
   IndexImpl::setHashMethod(BEMethod_C *mth)
   {
     if (type == Hash)
-      hash.mth = mth;
+      u.hash.mth = mth;
   }
 
   Status

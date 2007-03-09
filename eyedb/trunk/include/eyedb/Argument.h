@@ -524,7 +524,7 @@ namespace eyedb {
        @return
     */
     const eyedblib::int16 *getInteger16() const {
-      return type->getType() == INT16_TYPE ? &i16 : NULL;
+      return type->getType() == INT16_TYPE ? &u.i16 : NULL;
     }
 
     /**
@@ -532,7 +532,7 @@ namespace eyedb {
        @return
     */
     const eyedblib::int32 *getInteger32() const {
-      return type->getType() == INT32_TYPE ? &i32 : NULL;
+      return type->getType() == INT32_TYPE ? &u.i32 : NULL;
     }
 
     /**
@@ -540,7 +540,7 @@ namespace eyedb {
        @return
     */
     const eyedblib::int64 *getInteger64() const {
-      return type->getType() == INT64_TYPE ? &i64 : NULL;
+      return type->getType() == INT64_TYPE ? &u.i64 : NULL;
     }
 
     /**
@@ -554,7 +554,7 @@ namespace eyedb {
        @return
     */
     const char *getChar() const {
-      return type->getType() == CHAR_TYPE ? &c : NULL;
+      return type->getType() == CHAR_TYPE ? &u.c : NULL;
     }
 
     /**
@@ -562,7 +562,7 @@ namespace eyedb {
        @return
     */
     const unsigned char *getByte() const {
-      return type->getType() == BYTE_TYPE ? &by : NULL;
+      return type->getType() == BYTE_TYPE ? &u.by : NULL;
     }
 
     /**
@@ -570,7 +570,7 @@ namespace eyedb {
        @return
     */
     const double *getFloat() const  {
-      return type->getType() == FLOAT_TYPE ? &d : NULL;
+      return type->getType() == FLOAT_TYPE ? &u.d : NULL;
     }
 
     /**
@@ -578,7 +578,7 @@ namespace eyedb {
        @return
     */
     const Oid *getOid() const {
-      return type->getType() == OID_TYPE ? oid : NULL;
+      return type->getType() == OID_TYPE ? u.oid : NULL;
     }
 
     /**
@@ -586,7 +586,7 @@ namespace eyedb {
        @return
     */
     const char *getString() const {
-      return type->getType() == STRING_TYPE ? s : NULL;
+      return type->getType() == STRING_TYPE ? u.s : NULL;
     }
 
     /**
@@ -602,8 +602,8 @@ namespace eyedb {
     */
     const unsigned char *getRaw(int &size) const {
       if (type->getType() == RAW_TYPE) {
-	size = raw.size;
-	return raw.data;
+	size = u.raw.size;
+	return u.raw.data;
       }
       return NULL;
     }
@@ -622,7 +622,7 @@ namespace eyedb {
        @return
     */
     const void *getX() const {
-      return type->getType() == ANY_TYPE ? x : NULL;
+      return type->getType() == ANY_TYPE ? u.x : NULL;
     }
 
     /**
@@ -630,7 +630,7 @@ namespace eyedb {
        @return
     */
     char *getString() {
-      return type->getType() == STRING_TYPE ? s : NULL;
+      return type->getType() == STRING_TYPE ? u.s : NULL;
     }
 
     /**
@@ -644,7 +644,7 @@ namespace eyedb {
        @return
     */
     void *getX() {
-      return type->getType() == ANY_TYPE ? x : NULL;
+      return type->getType() == ANY_TYPE ? u.x : NULL;
     }
 
     /**
@@ -1016,7 +1016,7 @@ namespace eyedb {
 	int cnt;
 	Object **o;
       } arr_o;
-    };
+    } u;
   };
 
   /**
