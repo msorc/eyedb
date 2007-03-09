@@ -10,7 +10,7 @@ else
 JAVADOC_DIR= 
 endif
 
-if COND_XSLTPROC
+if COND_DOCBOOK_MANPAGES
 MANPAGES_DIR= manpages 
 else
 MANPAGES_DIR= 

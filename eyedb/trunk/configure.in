@@ -61,6 +61,12 @@ AM_CONFIG_HEADER(eyedbconfig.h)
 # by default we install in /usr
 AC_PREFIX_DEFAULT(/usr)
 
+# check for GNU make
+CHECK_GNU_MAKE
+if test x"$_cv_gnu_make_command" = x ; then
+    AC_MSG_ERROR(you must use GNU make to compile EyeDB)
+fi
+
 # check for compilers
 AC_PROG_CXX
 
@@ -328,25 +334,24 @@ fi
 AM_CONDITIONAL(COND_JAVADOC, test x"$COND_JAVADOC" = xyes)
 
 # Docbook manpages
+# Look for xsltproc
 AC_PATH_PROG(XSLTPROC, xsltproc)
-if test x"$XSLTPROC" != x ; then
-COND_XSLTPROC="yes"
-fi
-AM_CONDITIONAL(COND_XSLTPROC, test x"$COND_XSLTPROC" = xyes)
 # Look for XSL stylesheet
-MANPAGES_XSL_STYLESHEET_LOCATIONS="/usr/share/sgml/docbook/xsl-stylesheets/manpages"
 AC_MSG_CHECKING(for Docbook manpages XSL stylesheet)
-for d in $MANPAGES_XSL_STYLESHEET_LOCATIONS; do
-if test -f $d/docbook.xsl ; then
-MANPAGES_XSL_STYLESHEET_DIR=$d
-break
-fi
+MANPAGES_XSL_STYLESHEET_LOCATIONS="/usr/share/sgml/docbook/xsl-stylesheets/manpages"
+for d in $MANPAGES_XSL_STYLESHEET_LOCATIONS ; do
+    if test -f $d/docbook.xsl ; then
+       MANPAGES_XSL_STYLESHEET_DIR=$d
+       break
+    fi
 done
-if test x"$MANPAGES_XSL_STYLESHEET_DIR" = x ; then
-MANPAGES_XSL_STYLESHEET_DIR=http://docbook.sourceforge.net/release/xsl/current/manpages/
-fi
-AC_MSG_RESULT("$MANPAGES_XSL_STYLESHEET_DIR")
+AC_MSG_RESULT($MANPAGES_XSL_STYLESHEET_DIR)
 AC_SUBST(MANPAGES_XSL_STYLESHEET_DIR)
+
+if test x"$XSLTPROC" != x -a x"$MANPAGES_XSL_STYLESHEET_DIR" != x ; then
+COND_DOCBOOK_MANPAGES="yes"
+fi
+AM_CONDITIONAL(COND_DOCBOOK_MANPAGES, test x"$COND_DOCBOOK_MANPAGES" = xyes)
 
 # Manuals
 AC_PATH_PROG(LATEX, latex)
@@ -565,7 +570,7 @@ echo
 echo "  *** EyeDB documentation ***" 
 echo "  Generate doxygen C++ api documentation: ${COND_DOXYGEN:-no}"
 echo "  Generate javadoc Java api documentation: ${COND_JAVADOC:-no}"
-echo "  Generate docbook man pages: ${COND_XSLTPROC:-no}"
+echo "  Generate docbook man pages: ${COND_DOCBOOK_MANPAGES:-no}"
 echo "  Generate LaTEX manual: ${COND_LATEX:-no}"
 echo "  Generate html LaTEX manual: ${COND_LATEX2HTML:-no}"
 echo ""
