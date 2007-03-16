@@ -30,7 +30,7 @@
   </refsynopsisdiv>
 
   <refsect1>
-    <title>Description</title>
+    <title>DESCRIPTION</title>
 
     <para>&eyedbadmin; is a client for performing administrative operations on EyeDB databases.</para>
 
@@ -38,23 +38,167 @@
     <variablelist>
       <varlistentry>
 	<term><command>dbmcreate</command></term>
-	<listitem>
-	  <para>See <command>eyedbdbmcreate(1)</command></para>
-	</listitem>
+	<listitem><para>See <command>eyedbdbmcreate(1)</command></para></listitem>
       </varlistentry>
 
       <varlistentry>
 	<term><command>dbcreate</command></term>
-	<listitem>
-	  <para>See <command>eyedbdbcreate(1)</command></para>
-	</listitem>
+	<listitem><para>See <command>eyedbdbcreate(1)</command></para></listitem>
       </varlistentry>
 
       <varlistentry>
 	<term><command>dbdelete</command></term>
-	<listitem>
-	  <para>See <command>eyedbdbdelete(1)</command></para>
-	</listitem>
+	<listitem><para>See <command>eyedbdbdelete(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>dbrename</command></term>
+	<listitem><para>See <command>eyedbdbrename(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>dbmove</command></term>
+	<listitem><para>See <command>eyedbdbmove(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>dbcopy</command></term>
+	<listitem><para>See <command>eyedbdbcopy(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>dbexport</command></term>
+	<listitem><para>See <command>eyedbdbexport(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>dbimport</command></term>
+	<listitem><para>See <command>eyedbdbimport(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>datcreate</command></term>
+	<listitem><para>See <command>eyedbdatcreate(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>datdelete</command></term>
+	<listitem><para>See <command>eyedbdatdelete(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>datmove</command></term>
+	<listitem><para>See <command>eyedbdatmove(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>datresize</command></term>
+	<listitem><para>See <command>eyedbdatresize(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>datdefragment</command></term>
+	<listitem><para>See <command>eyedbdatdefragment(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>datlist</command></term>
+	<listitem><para>See <command>eyedbdatlist(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>datrename</command></term>
+	<listitem><para>See <command>eyedbdatrename(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>dspcreate</command></term>
+	<listitem><para>See <command>eyedbdspcreate(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>dspupdate</command></term>
+	<listitem><para>See <command>eyedbdspupdate(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>dspdelete</command></term>
+	<listitem><para>See <command>eyedbdspdelete(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>dsprename</command></term>
+	<listitem><para>See <command>eyedbdsprename(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>dsplist</command></term>
+	<listitem><para>See <command>eyedbdsplist(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>dspsetdefault</command></term>
+	<listitem><para>See <command>eyedbdspsetdefault(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>dspgetdefault</command></term>
+	<listitem><para>See <command>eyedbdspgetdefault(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>dspsetcurdat</command></term>
+	<listitem><para>See <command>eyedbdspsetcurdat(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>dspgetcurdat</command></term>
+	<listitem><para>See <command>eyedbdspgetcurdat(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>useradd</command></term>
+	<listitem><para>See <command>eyedbuseradd(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>userdelete</command></term>
+	<listitem><para>See <command>eyedbuserdelete(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>userpasswd</command></term>
+	<listitem><para>See <command>eyedbuserpasswd(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>passwd</command></term>
+	<listitem><para>See <command>eyedbpasswd(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>dbaccess</command></term>
+	<listitem><para>See <command>eyedbdbaccess(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>userdbaccess</command></term>
+	<listitem><para>See <command>eyedbuserdbaccess(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>sysaccess</command></term>
+	<listitem><para>See <command>eyedbsysaccess(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>userlist</command></term>
+	<listitem><para>See <command>eyedbuserlist(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>dblist</command></term>
+	<listitem><para>See <command>eyedbdblist(1)</command></para></listitem>
       </varlistentry>
 
     </variablelist>
@@ -71,11 +215,11 @@
   </refsect1>
 
   <refsect1>
-    <title>See also</title>
+    <title>SEE ALSO</title>
   </refsect1>
 
   <refsect1>
-    <title>Authors</title>
+    <title>AUTHORS</title>
   </refsect1>
 
 </refentry>
