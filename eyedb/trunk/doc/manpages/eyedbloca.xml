@@ -36,25 +36,105 @@
 
     <para>&eyedbloca; accepts the following sub-commands:
     <variablelist>
+
       <varlistentry>
-	<term><command>dbmcreate</command></term>
-	<listitem>
-	  <para>See <command>eyedbdbmcreate(1)</command></para>
-	</listitem>
+	<term><command>getattrloca</command></term>
+	<listitem><para>See <command>eyedbgetattrloca(1)</command></para></listitem>
       </varlistentry>
 
       <varlistentry>
-	<term><command>dbcreate</command></term>
-	<listitem>
-	  <para>See <command>eyedbdbcreate(1)</command></para>
-	</listitem>
+	<term><command>getcollloca</command></term>
+	<listitem><para>See <command>eyedbgetcollloca(1)</command></para></listitem>
       </varlistentry>
 
       <varlistentry>
-	<term><command>dbdelete</command></term>
-	<listitem>
-	  <para>See <command>eyedbdbdelete(1)</command></para>
-	</listitem>
+	<term><command>getdefattrdsp</command></term>
+	<listitem><para>See <command>eyedbgetdefattrdsp(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>getdefcolldsp</command></term>
+	<listitem><para>See <command>eyedbgetdefcolldsp(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>getdefdsp</command></term>
+	<listitem><para>See <command>eyedbgetdefdsp(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>getdefidxdsp</command></term>
+	<listitem><para>See <command>eyedbgetdefidxdsp(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>getdefinstdsp</command></term>
+	<listitem><para>See <command>eyedbgetdefinstdsp(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>getidxloca</command></term>
+	<listitem><para>See <command>eyedbgetidxloca(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>getinstloca</command></term>
+	<listitem><para>See <command>eyedbgetinstloca(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>getobjloca</command></term>
+	<listitem><para>See <command>eyedbgetobjloca(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>setdefattrdsp</command></term>
+	<listitem><para>See <command>eyedbsetdefattrdsp(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>setdefcolldsp</command></term>
+	<listitem><para>See <command>eyedbsetdefcolldsp(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>setdefdsp</command></term>
+	<listitem><para>See <command>eyedbsetdefdsp(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>setdefidxdsp</command></term>
+	<listitem><para>See <command>eyedbsetdefidxdsp(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>setdefinstdsp</command></term>
+	<listitem><para>See <command>eyedbsetdefinstdsp(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>mvattr</command></term>
+	<listitem><para>See <command>eyedbmvattr(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>mvcoll</command></term>
+	<listitem><para>See <command>eyedbmvcoll(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>mvidx</command></term>
+	<listitem><para>See <command>eyedbmvidx(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>mvinst</command></term>
+	<listitem><para>See <command>eyedbmvinst(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>mvobj</command></term>
+	<listitem><para>See <command>eyedbmvobj(1)</command></para></listitem>
       </varlistentry>
 
     </variablelist>
