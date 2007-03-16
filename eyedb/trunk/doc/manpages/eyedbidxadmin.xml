@@ -36,25 +36,40 @@
 
     <para>&eyedbidxadmin; accepts the following sub-commands:
     <variablelist>
+
       <varlistentry>
-	<term><command>dbmcreate</command></term>
-	<listitem>
-	  <para>See <command>eyedbdbmcreate(1)</command></para>
-	</listitem>
+	<term><command>create</command></term>
+	<listitem><para>See <command>eyedbidxcreate(1)</command></para></listitem>
       </varlistentry>
 
       <varlistentry>
-	<term><command>dbcreate</command></term>
-	<listitem>
-	  <para>See <command>eyedbdbcreate(1)</command></para>
-	</listitem>
+	<term><command>delete</command></term>
+	<listitem><para>See <command>eyedbidxdelete(1)</command></para></listitem>
       </varlistentry>
 
       <varlistentry>
-	<term><command>dbdelete</command></term>
-	<listitem>
-	  <para>See <command>eyedbdbdelete(1)</command></para>
-	</listitem>
+	<term><command>list</command></term>
+	<listitem><para>See <command>eyedbidxlist(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>stats</command></term>
+	<listitem><para>See <command>eyedbidxstats(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>update</command></term>
+	<listitem><para>See <command>eyedbidxupdate(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command>simulate</command></term>
+	<listitem><para>See <command>eyedbidxsimulate(1)</command></para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><command></command></term>
+	<listitem><para>See <command>(1)</command></para></listitem>
       </varlistentry>
 
     </variablelist>

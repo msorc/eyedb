@@ -32,7 +32,7 @@
   <refsect1>
     <title>DESCRIPTION</title>
 
-    <para>&eyedbadmin; is a client for performing administrative operations on EyeDB databases.</para>
+    <para><see>&eyedbadmin;</see> is a client for performing administrative operations on EyeDB databases.</para>
 
     <para>&eyedbadmin; accepts the following sub-commands:
     <variablelist>
