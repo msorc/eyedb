@@ -32,7 +32,7 @@
   <refsect1>
     <title>DESCRIPTION</title>
 
-    <para><see>&eyedbadmin;</see> is a client for performing administrative operations on EyeDB databases.</para>
+    <para>&eyedbadmin; is a client for performing administrative operations on EyeDB databases.</para>
 
     <para>&eyedbadmin; accepts the following sub-commands:
     <variablelist>
@@ -207,19 +207,22 @@
   </refsect1>
 
   <refsect1>
-    <title>Exit status</title>
-  </refsect1>
-
-  <refsect1>
-    <title>Examples</title>
-  </refsect1>
-
-  <refsect1>
     <title>SEE ALSO</title>
-  </refsect1>
 
-  <refsect1>
-    <title>AUTHORS</title>
+    <para>
+      eyedbdbmcreate(1), eyedbdbcreate(1), eyedbdbdelete(1), eyedbdbrename(1), 
+      eyedbdbmove(1), eyedbdbcopy(1), eyedbdbexport(1), eyedbdbimport(1), 
+      eyedbdatcreate(1), eyedbdatdelete(1), eyedbdatmove(1), eyedbdatresize(1), 
+      eyedbdatdefragment(1), eyedbdatlist(1), eyedbdatrename(1), 
+      eyedbdspcreate(1), eyedbdspupdate(1), eyedbdspdelete(1), eyedbdsprename(1), 
+      eyedbdsplist(1), eyedbdspsetdefault(1), eyedbdspgetdefault(1), 
+      eyedbdspsetcurdat(1), eyedbdspgetcurdat(1), 
+      eyedbuseradd(1), eyedbuserdelete(1), eyedbuserpasswd(1), eyedbpasswd(1), 
+      eyedbdbaccess(1), eyedbuserdbaccess(1), eyedbsysaccess(1), 
+      eyedbuserlist(1), 
+      eyedbdblist(1),
+      eyedb-options(1)
+    </para>
   </refsect1>
 
 </refentry>

@@ -1,5 +1,5 @@
 man1_MANS= \
-eyedb-common-options.1 \
+eyedb-options.1 \
 eyedbadmin.1 \
 eyedbcollimpladmin.1 \
 eyedbcollimplgetdef.1 \
@@ -83,7 +83,6 @@ man5_MANS= \
 eyedb-config.5
 
 man7_MANS= \
-eyedb-options.7 \
 eyedb.7
 
 man8_MANS= \
