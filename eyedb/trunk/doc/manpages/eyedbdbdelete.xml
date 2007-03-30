@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
-  "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
-  <!ENTITY eyedbdbdelete "<command>eyedbdbdelete</command>">
+"http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+<!ENTITY eyedbdbdelete "<command>eyedbdbdelete</command>">
 ]>
 
 <refentry id="eyedbdbdelete">
@@ -17,21 +17,21 @@
 
   <refnamediv>
     <refname>&eyedbdbdelete;</refname>
-    <refpurpose>command purpose</refpurpose>
+    <refpurpose>Deletes an EyeDB database.</refpurpose>
   </refnamediv>
 
   <refsynopsisdiv>
     <cmdsynopsis>
-      <code><![CDATA[usage: eyedbdbdelete <dbname>]]></code>
-      eyedbdbdelete
-<arg choice="plain"><replaceable>dbname</replaceable></arg>
+      &eyedbdbdelete;
+      <arg choice="opt"><replaceable>common-options</replaceable></arg> 
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
     </cmdsynopsis>
   </refsynopsisdiv>
 
   <refsect1>
     <title>Description</title>
 
-    <para>&eyedbdbdelete; ...</para>
+    <para>&eyedbdbdelete; is used to delete an EyeDB database.</para>
   </refsect1>
 
   <refsect1>
@@ -42,7 +42,7 @@
       <varlistentry>
 	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
 	<listitem>
-	  <para>option_description</para>
+	  <para>Specifies the name of the database to be deleted.</para>
 	</listitem>
       </varlistentry>
 
@@ -50,29 +50,12 @@
 
   </refsect1>
 
-<refsect1>
-  <title>Environment</title>
-  See eyedb-options(7)
-</refsect1>
+  <refsect1>
+    <title>See also</title>
 
-<refsect1>
-  <title>Exit status</title>
-</refsect1>
-
-<refsect1>
-  <title>Examples</title>
-</refsect1>
-
-<refsect1>
-  <title>See also</title>
-</refsect1>
-
-<refsect1>
-  <title>Bugs</title>
-</refsect1>
-
-<refsect1>
-  <title>Authors</title>
-</refsect1>
+    <para>
+      eyedb-options(1), eyedbdbcreate(1), eyedbadmin(1)
+    </para>
+  </refsect1>
 
 </refentry>

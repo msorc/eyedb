@@ -17,30 +17,22 @@
 
   <refnamediv>
     <refname>&eyedbdbcreate;</refname>
-    <refpurpose>command purpose</refpurpose>
+    <refpurpose>Creates a new EyeDB database.</refpurpose>
   </refnamediv>
 
   <refsynopsisdiv>
     <cmdsynopsis>
-      <code><![CDATA[usage: eyedbdbcreate <dbname> [--dbfile=<dbfile>] [--datafiles={<datafile>[:name[:<sizeMb>[:sizeslot[:phy|log]]]]}] [--filedir=<filedir>] [--object-count=<objcnt>]]]></code>
-      eyedbdbcreate
-<arg choice="plain"><replaceable>dbname</replaceable></arg>
-<arg choice="optional">--dbfile=<replaceable>dbfile</replaceable></arg>
-<arg choice="optional">--datafiles={<replaceable>datafile</replaceable></arg>
-<arg choice="optional">:name</arg>
-<arg choice="optional">:<replaceable>sizeMb</replaceable></arg>
-<arg choice="optional">:sizeslot</arg>
-<arg choice="optional">:phy|log</arg>
-<arg choice="optional">}</arg>
-<arg choice="optional">--filedir=<replaceable>filedir</replaceable></arg>
-<arg choice="optional">--object-count=<replaceable>objcnt</replaceable></arg>
+      &eyedbdbcreate;
+      <arg choice="opt"><replaceable>common-options</replaceable></arg> 
+      <arg choice="opt"><replaceable>options</replaceable></arg> 
+      <arg choice="plain"><replaceable>dbname</replaceable></arg>
     </cmdsynopsis>
   </refsynopsisdiv>
 
   <refsect1>
     <title>Description</title>
 
-    <para>&eyedbdbcreate; ...</para>
+    <para>&eyedbdbcreate; is used to create a new EyeDB database.</para>
   </refsect1>
 
   <refsect1>
@@ -49,72 +41,47 @@
     <variablelist>
 
       <varlistentry>
-	<term><arg choice="plain"><replaceable>dbname</replaceable></arg></term>
+	<term>
+	  <arg choice="plain"><replaceable>dbname</replaceable></arg>
+	</term>
 	<listitem>
-	  <para>option_description</para>
+	  <para>Specifies the name of database to be created.</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term><arg choice="optional">--dbfile=<replaceable>dbfile</replaceable></arg></term>
+	<term>
+	  <option>--dbfile=<replaceable>dbfile</replaceable></option>
+	</term>
 	<listitem>
-	  <para>option_description</para>
+	  <para>Specifies the data base file.</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term><arg choice="optional">--datafiles={<replaceable>datafile</replaceable></arg></term>
+	<term>
+	  <option>--filedir=<replaceable>filedir</replaceable></option>
+	</term>
 	<listitem>
-	  <para>option_description</para>
+	  <para>Specifies the file directory.</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term><arg choice="optional">:name</arg></term>
+	<term>
+	  <option>--object-count=<replaceable>objcnt</replaceable></option>
+	</term>
 	<listitem>
-	  <para>option_description</para>
+	  <para>Specifies the database object count.</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term><arg choice="optional">:<replaceable>sizeMb</replaceable></arg></term>
+	<term>
+	  <option>--datafiles=<replaceable>datafile</replaceable><arg choice="opt">:<replaceable>name</replaceable></arg><arg choice="opt">:<replaceable>sizeMb</replaceable></arg><arg choice="opt">:sizeslot</arg><group choice="opt"><arg choice="plain">phy</arg><arg choice="plain">log</arg></group></option>
+	</term>
 	<listitem>
-	  <para>option_description</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term><arg choice="optional">:sizeslot</arg></term>
-	<listitem>
-	  <para>option_description</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term><arg choice="optional">:phy|log</arg></term>
-	<listitem>
-	  <para>option_description</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term><arg choice="optional">}</arg></term>
-	<listitem>
-	  <para>option_description</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term><arg choice="optional">--filedir=<replaceable>filedir</replaceable></arg></term>
-	<listitem>
-	  <para>option_description</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term><arg choice="optional">--object-count=<replaceable>objcnt</replaceable></arg></term>
-	<listitem>
-	  <para>option_description</para>
+	  <para>Specifies data files for the database.</para>
 	</listitem>
       </varlistentry>
 
@@ -122,29 +89,12 @@
 
   </refsect1>
 
-<refsect1>
-  <title>Environment</title>
-  See eyedb-options(7)
-</refsect1>
+  <refsect1>
+    <title>See also</title>
 
-<refsect1>
-  <title>Exit status</title>
-</refsect1>
-
-<refsect1>
-  <title>Examples</title>
-</refsect1>
-
-<refsect1>
-  <title>See also</title>
-</refsect1>
-
-<refsect1>
-  <title>Bugs</title>
-</refsect1>
-
-<refsect1>
-  <title>Authors</title>
-</refsect1>
+    <para>
+      eyedb-options(1), eyedbdelete(1), eyedbadmin(1)
+    </para>
+  </refsect1>
 
 </refentry>
