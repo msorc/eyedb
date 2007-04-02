@@ -24,18 +24,18 @@ eyedb-datafile          5        2         ??
 eyedb-dataspace         5        2         ??   
 
 ADMINISTRATION:
-eyedbadmin              1        1         FD   Almost OK
+eyedbadmin              1        1         FD   OK for databases sub-commands
 
 DATABASES:
-eyedbdbcreate           1        1         FD   To be checked
-eyedbdbdelete           1        1         FD   Almost OK
-eyedbdblist             1        1         FD   
-eyedbdbcopy             1        1         FD   
-eyedbdbmove             1        1         FD   
-eyedbdbrename           1        1         FD   
-eyedbdbexport           1        1         FD   
-eyedbdbimport           1        1         FD   
-eyedbdbmcreate          1        1         FD   
+eyedbdbcreate           1        1         FD   OK (to be checked for datafiles)
+eyedbdbdelete           1        1         FD   OK
+eyedbdblist             1        1         FD   OK
+eyedbdbcopy             1        1         FD   OK
+eyedbdbmove             1        1         FD   OK
+eyedbdbrename           1        1         FD   OK
+eyedbdbexport           1        1         FD   OK
+eyedbdbimport           1        1         FD   OK
+eyedbdbmcreate          1        1         FD   OK
 
 DATAFILES:
 eyedbdatcreate          1        2         ??   

@@ -38,17 +38,17 @@
     <variablelist>
       <varlistentry>
 	<term><command>dbmcreate</command></term>
-	<listitem><para>See <command>eyedbdbmcreate(1)</command></para></listitem>
+	<listitem><para>creates a new EyeDb system database</para></listitem>
       </varlistentry>
 
       <varlistentry>
 	<term><command>dbcreate</command></term>
-	<listitem><para>See <command>eyedbdbcreate(1)</command></para></listitem>
+	<listitem><para>creates a new EyeDb database</para></listitem>
       </varlistentry>
 
       <varlistentry>
 	<term><command>dbdelete</command></term>
-	<listitem><para>See <command>eyedbdbdelete(1)</command></para></listitem>
+	<listitem><para>deletes an EyeDB database</para></listitem>
       </varlistentry>
 
       <varlistentry>
@@ -203,6 +203,420 @@
 
     </variablelist>
     </para>
+
+  </refsect1>
+
+  <refsect1>
+    <title>&eyedbadmin; sub-commands</title>
+
+    <refsect2>
+      <title><command>Create system database</command></title>
+
+      <para><command>eyedbadmin dbmcreate</command> is used to create the EyeDB system database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin dbmcreate</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+
+	  <varlistentry>
+	    <term>
+	      <option>--strict-unix=</option><group><arg><replaceable>user</replaceable></arg><arg>@</arg></group>
+	    </term>
+	    <listitem>
+	      <para>??.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <option>--datafiles=<replaceable>datafile</replaceable><arg choice="opt">:<replaceable>name</replaceable></arg><arg choice="opt">:<replaceable>sizeMb</replaceable></arg><arg choice="opt">:sizeslot</arg><group choice="opt"><arg choice="plain">phy</arg><arg choice="plain">log</arg></group></option>
+	    </term>
+	    <listitem>
+	      <para>Specifies data files for the system database.</para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </para>
+      
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>Create</command></title>
+
+      <para><command>eyedbadmin create</command> is used to create a new EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin create</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+
+	  <varlistentry>
+	    <term>
+	      <option>--dbfile=<replaceable>dbfile</replaceable></option>
+	    </term>
+	    <listitem>
+	      <para>Specifies the data base file.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <option>--filedir=<replaceable>filedir</replaceable></option>
+	    </term>
+	    <listitem>
+	      <para>Specifies the file directory.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <option>--object-count=<replaceable>objcnt</replaceable></option>
+	    </term>
+	    <listitem>
+	      <para>Specifies the database object count.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <option>--datafiles=<replaceable>datafile</replaceable><arg choice="opt">:<replaceable>name</replaceable></arg><arg choice="opt">:<replaceable>sizeMb</replaceable></arg><arg choice="opt">:sizeslot</arg><group choice="opt"><arg choice="plain">phy</arg><arg choice="plain">log</arg></group></option>
+	    </term>
+	    <listitem>
+	      <para>Specifies data files for the database.</para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </para>
+      
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>Delete</command></title>
+
+      <para><command>eyedbadmin delete</command> is used to delete an EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin delete</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+      </cmdsynopsis>
+
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>List</command></title>
+
+      <para><command>eyedbadmin list</command> is used to list EyeDB databases.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin list</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<arg choice="plain" rep="repeat"><replaceable>databasename</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+	  <varlistentry>
+	    <term>
+	      <option>--dbname</option>
+	    </term>
+	    <listitem>
+	      <para>Lists the name of the listed databases.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <option>--dbid</option>
+	    </term>
+	    <listitem>
+	      <para>Lists the ids of the listed databases.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <option>--dbfile</option>
+	    </term>
+	    <listitem>
+	      <para>Lists the database file of the listed databases.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <option>--object-count</option>
+	    </term>
+	    <listitem>
+	      <para>Lists the objects count of the listed databases.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <option>--datafiles</option>
+	    </term>
+	    <listitem>
+	      <para>Lists the data files of the listed databases.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <option>--dbaccess</option>
+	    </term>
+	    <listitem>
+	      <para>Lists the access rights of the listed databases.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <option>--userdbaccess</option>
+	    </term>
+	    <listitem>
+	      <para>Lists the user access rights to the listed databases.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <option>--all</option>
+	    </term>
+	    <listitem>
+	      <para>Lists all the elements above for the listed databases.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <option>--stats</option>
+	    </term>
+	    <listitem>
+	      <para>Lists statistics for the listed databases.</para>
+	    </listitem>
+	  </varlistentry>
+
+	</variablelist>
+      </para>
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>Rename</command></title>
+
+      <para><command>eyedbadmin rename</command> is used to rename an EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin rename</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+	<arg choice="plain"><replaceable>new_databasename</replaceable></arg>
+      </cmdsynopsis>
+
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>Move</command></title>
+
+      <para><command>eyedbadmin move</command> is used to move physically an EyeDB database. To change its name without moving physically the database, use <command>eyedbadmin rename</command></para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin move</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+	  <varlistentry>
+	    <term>
+	      <option>--dbfile=<replaceable>dbfile</replaceable></option>
+	    </term>
+	    <listitem>
+	      <para>Specifies the data base file.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <option>--filedir=<replaceable>filedir</replaceable></option>
+	    </term>
+	    <listitem>
+	      <para>Specifies the file directory.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <option>--datafiles=<replaceable>datafile</replaceable><arg choice="opt">:<replaceable>name</replaceable></arg><arg choice="opt">:<replaceable>sizeMb</replaceable></arg><arg choice="opt">:sizeslot</arg><group choice="opt"><arg choice="plain">phy</arg><arg choice="plain">log</arg></group></option>
+	    </term>
+	    <listitem>
+	      <para>Specifies data files for the database.</para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </para>
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>Copy</command></title>
+
+      <para><command>eyedbadmin copy</command> is used to create a copy of an EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin copy</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+	<arg choice="plain"><replaceable>new_databasename</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+	  <varlistentry>
+	    <term>
+	      <option>--dbfile=<replaceable>dbfile</replaceable></option>
+	    </term>
+	    <listitem>
+	      <para>Specifies the data base file.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <option>--filedir=<replaceable>filedir</replaceable></option>
+	    </term>
+	    <listitem>
+	      <para>Specifies the file directory.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <option>--datafiles=<replaceable>datafile</replaceable><arg choice="opt">:<replaceable>name</replaceable></arg><arg choice="opt">:<replaceable>sizeMb</replaceable></arg><arg choice="opt">:sizeslot</arg><group choice="opt"><arg choice="plain">phy</arg><arg choice="plain">log</arg></group></option>
+	    </term>
+	    <listitem>
+	      <para>Specifies data files for the new database.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <option>--new-dbid</option>
+	    </term>
+	    <listitem>
+	      <para>??.</para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </para>
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>Export</command></title>
+
+      <para><command>eyedbadmin export</command> is used to export an EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin export</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+	<group choice="plain"><replaceable>file</replaceable><arg choice="plain">-</arg></group>
+      </cmdsynopsis>
+
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>Import</command></title>
+
+      <para><command>eyedbadmin import</command> is used to import an EyeDB database previously exported with <command>eyedbadmin export</command>.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin import</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<group choice="plain"><replaceable>file</replaceable><arg choice="plain">-</arg></group>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+	  <varlistentry>
+	    <term>
+	      <option>-d <replaceable>databasename</replaceable></option>
+	    </term>
+	    <listitem>
+	      <para>Specifies the database name.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <option>--filedir=<replaceable>filedir</replaceable></option>
+	    </term>
+	    <listitem>
+	      <para>Specifies the file directory.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <option>--mthdir=<replaceable>mthdir</replaceable></option>
+	    </term>
+	    <listitem>
+	      <para>??.</para>
+	    </listitem>
+	  </varlistentry>
+
+	</variablelist>
+      </para>
+    </refsect2>
+
+
+    <!-- ============================== -->
+    <refsect2>
+      <title><command>Sub-command</command></title>
+
+      <para><command>eyedbadmin sub-command</command> is used to ... EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin sub-command</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+	</variablelist>
+      </para>
+    </refsect2>
 
   </refsect1>
 
