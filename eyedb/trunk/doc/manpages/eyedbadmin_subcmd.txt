@@ -1,6 +1,7 @@
 dbmcreate eyedbdbmcreate
 dbcreate eyedbdbcreate
 dbdelete eyedbdbdelete
+dblist eyedbdblist
 dbrename eyedbdbrename
 dbmove eyedbdbmove
 dbcopy eyedbdbcopy
@@ -30,4 +31,3 @@ dbaccess eyedbdbaccess
 userdbaccess eyedbuserdbaccess
 sysaccess eyedbsysaccess
 userlist eyedbuserlist
-dblist eyedbdblist

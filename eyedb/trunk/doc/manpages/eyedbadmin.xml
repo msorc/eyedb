@@ -52,18 +52,23 @@
       </varlistentry>
 
       <varlistentry>
+	<term><command>dblist</command></term>
+	<listitem><para>list EyeDB databases</para></listitem>
+      </varlistentry>
+
+      <varlistentry>
 	<term><command>dbrename</command></term>
-	<listitem><para>See <command>eyedbdbrename(1)</command></para></listitem>
+	<listitem><para>rename an EyeDB database</para></listitem>
       </varlistentry>
 
       <varlistentry>
 	<term><command>dbmove</command></term>
-	<listitem><para>See <command>eyedbdbmove(1)</command></para></listitem>
+	<listitem><para>move an EyeDB database</para></listitem>
       </varlistentry>
 
       <varlistentry>
 	<term><command>dbcopy</command></term>
-	<listitem><para>See <command>eyedbdbcopy(1)</command></para></listitem>
+	<listitem><para>copy an EyeDB database</para></listitem>
       </varlistentry>
 
       <varlistentry>
@@ -196,11 +201,6 @@
 	<listitem><para>See <command>eyedbuserlist(1)</command></para></listitem>
       </varlistentry>
 
-      <varlistentry>
-	<term><command>dblist</command></term>
-	<listitem><para>See <command>eyedbdblist(1)</command></para></listitem>
-      </varlistentry>
-
     </variablelist>
     </para>
 
@@ -210,7 +210,7 @@
     <title>&eyedbadmin; sub-commands</title>
 
     <refsect2>
-      <title><command>Create system database</command></title>
+      <title><command>dbmcreate</command></title>
 
       <para><command>eyedbadmin dbmcreate</command> is used to create the EyeDB system database.</para>
 
@@ -248,12 +248,12 @@
 
 
     <refsect2>
-      <title><command>Create</command></title>
+      <title><command>dbcreate</command></title>
 
-      <para><command>eyedbadmin create</command> is used to create a new EyeDB database.</para>
+      <para><command>eyedbadmin dbcreate</command> is used to create a new EyeDB database.</para>
 
       <cmdsynopsis>
-	<command>eyedbadmin create</command>
+	<command>eyedbadmin dbcreate</command>
 	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
 	<arg choice="opt"><replaceable>options</replaceable></arg> 
 	<arg choice="plain"><replaceable>databasename</replaceable></arg>
@@ -305,12 +305,12 @@
 
 
     <refsect2>
-      <title><command>Delete</command></title>
+      <title><command>dbdelete</command></title>
 
-      <para><command>eyedbadmin delete</command> is used to delete an EyeDB database.</para>
+      <para><command>eyedbadmin dbdelete</command> is used to delete an EyeDB database.</para>
 
       <cmdsynopsis>
-	<command>eyedbadmin delete</command>
+	<command>eyedbadmin dbdelete</command>
 	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
 	<arg choice="plain"><replaceable>databasename</replaceable></arg>
       </cmdsynopsis>
@@ -319,12 +319,12 @@
 
 
     <refsect2>
-      <title><command>List</command></title>
+      <title><command>dblist</command></title>
 
-      <para><command>eyedbadmin list</command> is used to list EyeDB databases.</para>
+      <para><command>eyedbadmin dblist</command> is used to list EyeDB databases.</para>
 
       <cmdsynopsis>
-	<command>eyedbadmin list</command>
+	<command>eyedbadmin dblist</command>
 	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
 	<arg choice="opt"><replaceable>options</replaceable></arg> 
 	<arg choice="plain" rep="repeat"><replaceable>databasename</replaceable></arg>
@@ -420,12 +420,12 @@
 
 
     <refsect2>
-      <title><command>Rename</command></title>
+      <title><command>dbrename</command></title>
 
-      <para><command>eyedbadmin rename</command> is used to rename an EyeDB database.</para>
+      <para><command>eyedbadmin dbrename</command> is used to rename an EyeDB database.</para>
 
       <cmdsynopsis>
-	<command>eyedbadmin rename</command>
+	<command>eyedbadmin dbrename</command>
 	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
 	<arg choice="plain"><replaceable>databasename</replaceable></arg>
 	<arg choice="plain"><replaceable>new_databasename</replaceable></arg>
@@ -435,12 +435,12 @@
 
 
     <refsect2>
-      <title><command>Move</command></title>
+      <title><command>dbmove</command></title>
 
-      <para><command>eyedbadmin move</command> is used to move physically an EyeDB database. To change its name without moving physically the database, use <command>eyedbadmin rename</command></para>
+      <para><command>eyedbadmin dbmove</command> is used to move physically an EyeDB database. To change its name without moving physically the database, use <command>eyedbadmin rename</command></para>
 
       <cmdsynopsis>
-	<command>eyedbadmin move</command>
+	<command>eyedbadmin dbmove</command>
 	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
 	<arg choice="opt"><replaceable>options</replaceable></arg> 
 	<arg choice="plain"><replaceable>databasename</replaceable></arg>
@@ -481,12 +481,12 @@
 
 
     <refsect2>
-      <title><command>Copy</command></title>
+      <title><command>dbcopy</command></title>
 
-      <para><command>eyedbadmin copy</command> is used to create a copy of an EyeDB database.</para>
+      <para><command>eyedbadmin dbcopy</command> is used to create a copy of an EyeDB database.</para>
 
       <cmdsynopsis>
-	<command>eyedbadmin copy</command>
+	<command>eyedbadmin dbcopy</command>
 	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
 	<arg choice="opt"><replaceable>options</replaceable></arg> 
 	<arg choice="plain"><replaceable>databasename</replaceable></arg>
@@ -537,12 +537,12 @@
 
 
     <refsect2>
-      <title><command>Export</command></title>
+      <title><command>dbexport</command></title>
 
-      <para><command>eyedbadmin export</command> is used to export an EyeDB database.</para>
+      <para><command>eyedbadmin dbexport</command> is used to export an EyeDB database.</para>
 
       <cmdsynopsis>
-	<command>eyedbadmin export</command>
+	<command>eyedbadmin dbexport</command>
 	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
 	<arg choice="plain"><replaceable>databasename</replaceable></arg>
 	<group choice="plain"><replaceable>file</replaceable><arg choice="plain">-</arg></group>
@@ -552,12 +552,12 @@
 
 
     <refsect2>
-      <title><command>Import</command></title>
+      <title><command>dbimport</command></title>
 
-      <para><command>eyedbadmin import</command> is used to import an EyeDB database previously exported with <command>eyedbadmin export</command>.</para>
+      <para><command>eyedbadmin dbimport</command> is used to import an EyeDB database previously exported with <command>eyedbadmin export</command>.</para>
 
       <cmdsynopsis>
-	<command>eyedbadmin import</command>
+	<command>eyedbadmin dbimport</command>
 	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
 	<arg choice="opt"><replaceable>options</replaceable></arg> 
 	<group choice="plain"><replaceable>file</replaceable><arg choice="plain">-</arg></group>
@@ -598,14 +598,472 @@
     </refsect2>
 
 
-    <!-- ============================== -->
     <refsect2>
-      <title><command>Sub-command</command></title>
+      <title><command>datcreate</command></title>
 
-      <para><command>eyedbadmin sub-command</command> is used to ... EyeDB database.</para>
+      <para><command>eyedbadmin datcreate</command> is used to ... EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin datcreate</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+	</variablelist>
+      </para>
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>datdelete</command></title>
+
+      <para><command>eyedbadmin datdelete</command> is used to ... EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin datdelete</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+	</variablelist>
+      </para>
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>datmove</command></title>
+
+      <para><command>eyedbadmin datmove</command> is used to ... EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin datmove</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+	</variablelist>
+      </para>
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>datresize</command></title>
+
+      <para><command>eyedbadmin datresize</command> is used to ... EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin datresize</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+	</variablelist>
+      </para>
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>datdefragment</command></title>
+
+      <para><command>eyedbadmin datdefragment</command> is used to ... EyeDB database.</para>
 
       <cmdsynopsis>
 	<command>eyedbadmin sub-command</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+	</variablelist>
+      </para>
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>datlist</command></title>
+
+      <para><command>eyedbadmin datlist</command> is used to ... EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin datlist</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+	</variablelist>
+      </para>
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>datrename</command></title>
+
+      <para><command>eyedbadmin datrename</command> is used to ... EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin datrename</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+	</variablelist>
+      </para>
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>dspcreate</command></title>
+
+      <para><command>eyedbadmin dspcreate</command> is used to ... EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin dspcreate</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+	</variablelist>
+      </para>
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>dspupdate</command></title>
+
+      <para><command>eyedbadmin dspupdate</command> is used to ... EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin dspupdate</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+	</variablelist>
+      </para>
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>dspdelete</command></title>
+
+      <para><command>eyedbadmin dspdelete</command> is used to ... EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin dspdelete</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+	</variablelist>
+      </para>
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>dsprename</command></title>
+
+      <para><command>eyedbadmin dsprename</command> is used to ... EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin dsplist</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+	</variablelist>
+      </para>
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>dsplist</command></title>
+
+      <para><command>eyedbadmin dsplist</command> is used to ... EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin dsplist</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+	</variablelist>
+      </para>
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>dspsetdefault</command></title>
+
+      <para><command>eyedbadmin dspsetdefault</command> is used to ... EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin dspsetdefault</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+	</variablelist>
+      </para>
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>dspgetdefault</command></title>
+
+      <para><command>eyedbadmin dspgetdefault</command> is used to ... EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin dspgetdefault</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+	</variablelist>
+      </para>
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>dspsetcurdat</command></title>
+
+      <para><command>eyedbadmin dspsetcurdat</command> is used to ... EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin dspsetcurdat</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+	</variablelist>
+      </para>
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>dspgetcurdat</command></title>
+
+      <para><command>eyedbadmin dspgetcurdat</command> is used to ... EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin dspgetcurdat</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+	</variablelist>
+      </para>
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>useradd</command></title>
+
+      <para><command>eyedbadmin useradd</command> is used to ... EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin useradd</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+	</variablelist>
+      </para>
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>userdelete</command></title>
+
+      <para><command>eyedbadmin userdelete</command> is used to ... EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin userdelete</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+	</variablelist>
+      </para>
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>userpasswd</command></title>
+
+      <para><command>eyedbadmin userpasswd</command> is used to ... EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin userpasswd</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+	</variablelist>
+      </para>
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>passwd</command></title>
+
+      <para><command>eyedbadmin passwd</command> is used to ... EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin passwd</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+	</variablelist>
+      </para>
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>dbaccess</command></title>
+
+      <para><command>eyedbadmin dbaccess</command> is used to ... EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin dbaccess</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+	</variablelist>
+      </para>
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>userdbaccess</command></title>
+
+      <para><command>eyedbadmin userdbaccess</command> is used to ... EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin userdbaccess</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+	</variablelist>
+      </para>
+    </refsect2>
+
+
+    <refsect2>
+      <title><command>sysaccess</command></title>
+
+      <para><command>eyedbadmin sysaccess</command> is used to ... EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin sysaccess</command>
+	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
+	<arg choice="opt"><replaceable>options</replaceable></arg> 
+	<arg choice="plain"><replaceable>databasename</replaceable></arg>
+      </cmdsynopsis>
+
+      <para>
+	Options:
+	<variablelist>
+	</variablelist>
+      </para>
+    </refsect2>
+
+    <refsect2>
+      <title><command>userlist</command></title>
+
+      <para><command>eyedbadmin userlist</command> is used to ... EyeDB database.</para>
+
+      <cmdsynopsis>
+	<command>eyedbadmin userlist</command>
 	<arg choice="opt"><replaceable>common-options</replaceable></arg> 
 	<arg choice="opt"><replaceable>options</replaceable></arg> 
 	<arg choice="plain"><replaceable>databasename</replaceable></arg>
@@ -624,17 +1082,6 @@
     <title>SEE ALSO</title>
 
     <para>
-      eyedbdbmcreate(1), eyedbdbcreate(1), eyedbdbdelete(1), eyedbdbrename(1), 
-      eyedbdbmove(1), eyedbdbcopy(1), eyedbdbexport(1), eyedbdbimport(1), 
-      eyedbdatcreate(1), eyedbdatdelete(1), eyedbdatmove(1), eyedbdatresize(1), 
-      eyedbdatdefragment(1), eyedbdatlist(1), eyedbdatrename(1), 
-      eyedbdspcreate(1), eyedbdspupdate(1), eyedbdspdelete(1), eyedbdsprename(1), 
-      eyedbdsplist(1), eyedbdspsetdefault(1), eyedbdspgetdefault(1), 
-      eyedbdspsetcurdat(1), eyedbdspgetcurdat(1), 
-      eyedbuseradd(1), eyedbuserdelete(1), eyedbuserpasswd(1), eyedbpasswd(1), 
-      eyedbdbaccess(1), eyedbuserdbaccess(1), eyedbsysaccess(1), 
-      eyedbuserlist(1), 
-      eyedbdblist(1),
       eyedb-options(1)
     </para>
   </refsect1>

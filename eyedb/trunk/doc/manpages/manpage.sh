@@ -66,7 +66,7 @@ print "";
 /usage:/ {
 print "  <refsynopsisdiv>";
 print "    <cmdsynopsis>";
-printf( "      <code><![CDATA[%s]]></code>\n", $0);
+printf( "      <![CDATA[%s]]>\n", $0);
 printf( "      %s\n", cmd);
 
 line = "";

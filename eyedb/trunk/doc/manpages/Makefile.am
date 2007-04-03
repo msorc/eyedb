@@ -20,15 +20,6 @@ eyedbdatmove.1 \
 eyedbdatrename.1 \
 eyedbdatresize.1 \
 eyedbdbaccess.1 \
-eyedbdbcopy.1 \
-eyedbdbcreate.1 \
-eyedbdbdelete.1 \
-eyedbdbexport.1 \
-eyedbdbimport.1 \
-eyedbdblist.1 \
-eyedbdbmcreate.1 \
-eyedbdbmove.1 \
-eyedbdbrename.1 \
 eyedbdspcreate.1 \
 eyedbdspdelete.1 \
 eyedbdspgetcurdat.1 \
