@@ -6,5 +6,5 @@ INCLUDES=-I$(top_srcdir)/src -I$(top_srcdir)/src/eyedb -I$(top_srcdir)/include -
 
 EYEDBCLLIBS=$(top_builddir)/src/eyedb/libeyedb.la $(top_builddir)/src/lib/libeyedbrpcfe.la $(top_builddir)/src/eyedbsm/libeyedbsm.la $(top_builddir)/src/lib/libeyedbutils.la
 
-eyedbadmin2_SOURCES=eyedbadmin.cc
+eyedbadmin2_SOURCES=eyedbadmin.cc Topic.cc DBTopic.cc DTFTopic.cc DSPTopic.cc 
 eyedbadmin2_LDADD= $(EYEDBCLLIBS)

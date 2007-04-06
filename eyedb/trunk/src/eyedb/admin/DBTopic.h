@@ -21,26 +21,26 @@
    Author: Eric Viara <viara@sysra.com>
 */
 
-#include "eyedbconfig.h"
-
-#include <eyedb/eyedb.h>
-/*
-#include "eyedb/DBM_Database.h"
-
-#include <sys/types.h>
-#include <signal.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <eyedblib/butils.h>
-#include "GetOpt.h"
-*/
+#ifndef _EYEDB_ADMIN_DBTOPIC_H
+#define _EYEDB_ADMIN_DBTOPIC_H
 
 #include "Topic.h"
 
-int main(int argc, char *argv[])
-{
-  eyedb::init();
+class DBTopic : public Topic {
 
-  return TopicSet::getInstance()->perform(argc, argv);
-}
+public:
+  DBTopic();
+};
+
+CMDCLASS(DBDBMCreateCmd, "dbmcreate");
+CMDCLASS(DBCreateCmd, "create");
+CMDCLASS(DBDeleteCmd, "delete");
+CMDCLASS(DBListCmd, "list");
+CMDCLASS(DBMoveCmd, "move");
+CMDCLASS(DBCopyCmd, "copy");
+CMDCLASS(DBRenameCmd, "rename");
+CMDCLASS(DBAccessCmd, "access");
+CMDCLASS(DBExportCmd, "export");
+CMDCLASS(DBImportCmd, "import");
+
+#endif

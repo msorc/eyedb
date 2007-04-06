@@ -1,3 +1,4 @@
+
 /* 
    EyeDB Object Database Management System
    Copyright (C) 1994-1999,2004-2006 SYSRA
@@ -24,23 +25,27 @@
 #include "eyedbconfig.h"
 
 #include <eyedb/eyedb.h>
-/*
 #include "eyedb/DBM_Database.h"
-
 #include <sys/types.h>
 #include <signal.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <eyedblib/butils.h>
+
 #include "GetOpt.h"
-*/
 
-#include "Topic.h"
+#include "DTFTopic.h"
 
-int main(int argc, char *argv[])
+DTFTopic::DTFTopic() : Topic("datafile")
 {
-  eyedb::init();
+  addAlias("dtf");
 
-  return TopicSet::getInstance()->perform(argc, argv);
+  addCommand(new DTFCreateCmd(this));
+  addCommand(new DTFDeleteCmd(this));
+  addCommand(new DTFMoveCmd(this));
+  addCommand(new DTFResizeCmd(this));
+  addCommand(new DTFDefragmentCmd(this));
+  addCommand(new DTFListCmd(this));
+  addCommand(new DTFRenameCmd(this));
 }

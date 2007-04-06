@@ -21,26 +21,23 @@
    Author: Eric Viara <viara@sysra.com>
 */
 
-#include "eyedbconfig.h"
-
-#include <eyedb/eyedb.h>
-/*
-#include "eyedb/DBM_Database.h"
-
-#include <sys/types.h>
-#include <signal.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <eyedblib/butils.h>
-#include "GetOpt.h"
-*/
+#ifndef _EYEDB_ADMIN_DTFTOPIC_H
+#define _EYEDB_ADMIN_DTFTOPIC_H
 
 #include "Topic.h"
 
-int main(int argc, char *argv[])
-{
-  eyedb::init();
+class DTFTopic : public Topic {
 
-  return TopicSet::getInstance()->perform(argc, argv);
-}
+public:
+  DTFTopic();
+};
+
+CMDCLASS(DTFCreateCmd, "create");
+CMDCLASS(DTFDeleteCmd, "delete");
+CMDCLASS(DTFMoveCmd, "move");
+CMDCLASS(DTFResizeCmd, "resize");
+CMDCLASS(DTFDefragmentCmd, "defragment");
+CMDCLASS(DTFListCmd, "list");
+CMDCLASS(DTFRenameCmd, "rename");
+
+#endif

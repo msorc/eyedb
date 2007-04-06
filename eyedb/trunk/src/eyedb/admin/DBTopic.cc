@@ -1,3 +1,4 @@
+
 /* 
    EyeDB Object Database Management System
    Copyright (C) 1994-1999,2004-2006 SYSRA
@@ -24,23 +25,35 @@
 #include "eyedbconfig.h"
 
 #include <eyedb/eyedb.h>
-/*
 #include "eyedb/DBM_Database.h"
-
 #include <sys/types.h>
 #include <signal.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <eyedblib/butils.h>
+
 #include "GetOpt.h"
-*/
 
-#include "Topic.h"
+#include "DBTopic.h"
 
-int main(int argc, char *argv[])
+DBTopic::DBTopic() : Topic("database")
 {
-  eyedb::init();
+  addAlias("db");
 
-  return TopicSet::getInstance()->perform(argc, argv);
+  addCommand(new DBDBMCreateCmd(this));
+
+  addCommand(new DBCreateCmd(this));
+  addCommand(new DBDeleteCmd(this));
+  addCommand(new DBListCmd(this));
+
+  addCommand(new DBMoveCmd(this));
+  addCommand(new DBCopyCmd(this));
+  addCommand(new DBRenameCmd(this));
+
+  addCommand(new DBAccessCmd(this));
+
+  addCommand(new DBExportCmd(this));
+  addCommand(new DBImportCmd(this));
 }
+
