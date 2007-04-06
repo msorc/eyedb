@@ -37,29 +37,39 @@ TopicSet::TopicSet()
   addTopic(new DSPTopic());
 }
 
-int TopicSet::perform(int argc, char *argv[])
+int TopicSet::perform(const std::string &prog, const std::vector<std::string> &argv)
 {
-  std::string prog_name = argv[0];
-
-  if (argc == 1) {
-    return usage(prog_name);
+  if (argv.size() == 0) {
+    return usage(prog);
   }
 
-  std::string topic_name = argv[1];
+  std::string topic_name = argv[0];
 
-  if (argc == 2) {
-    Topic *topic = getTopic(topic_name);
+  Topic *topic = 0;
+  if (argv.size() >= 1) {
+    topic = getTopic(topic_name);
     if (!topic) {
-      return usage(prog_name);
+      return usage(prog);
     }
-
-    return topic->usage(prog_name, topic_name);
   }
+
+  if (argv.size() == 1) {
+    return topic->usage(prog, topic_name);
+  }
+  
+  std::string cmd_name = argv[1];
+
+  Command *cmd = topic->getCommand(cmd_name);
+  if (!cmd) {
+    return topic->usage(prog, topic_name);
+  }
+
+  return cmd->perform(prog, argv);
 }
 
-int TopicSet::usage(const std::string &prog_name)
+int TopicSet::usage(const std::string &prog)
 {
-  std::cerr << "usage: " << prog_name << " <topic> <command> <options>\n\n";
+  std::cerr << "usage: " << prog << " <topic> <command> <options>\n\n";
   std::cerr << "where <topic> is one of the following:\n";
 
   std::vector<Topic *>::iterator begin = topic_v.begin();
@@ -117,9 +127,24 @@ bool Topic::isTopic(const std::string &name) const
   return false;
 }
 
-int Topic::usage(const std::string &prog_name, const std::string &tname)
+Command *Topic::getCommand(const std::string &name)
 {
-  std::cerr << "usage: " << prog_name << " " << tname << " <command> <options>\n\n";
+  std::vector<Command *>::iterator begin = cmd_v.begin();
+  std::vector<Command *>::iterator end = cmd_v.end();
+
+  while (begin != end) {
+    Command *cmd = *begin;
+    if (cmd->getName() == name)
+      return cmd;
+    ++begin;
+  }
+
+  return 0;
+}
+
+int Topic::usage(const std::string &prog, const std::string &tname)
+{
+  std::cerr << "usage: " << prog << " " << tname << " <command> <options>\n\n";
   std::cerr << "where <command> is one of the following:\n";
 
   std::vector<Command *>::iterator begin = cmd_v.begin();

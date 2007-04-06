@@ -57,3 +57,34 @@ DBTopic::DBTopic() : Topic("database")
   addCommand(new DBImportCmd(this));
 }
 
+void DBCreateCmd::init()
+{
+  std::vector<Option> opts;
+
+  opts.push_back(Option("dbfile", OptionStringType(), Option::MandatoryValue, OptionDesc("Database file", "<dbfile>")));
+  opts.push_back(Option("filedir", OptionStringType(), Option::MandatoryValue, OptionDesc("Database file directory", "<filedir>")));
+  opts.push_back(Option("max-object-count", OptionStringType(), Option::MandatoryValue, OptionDesc("Maximum database object count", "<object-count>")));
+  getopt = new GetOpt(PROG_NAME, opts);
+}
+
+int DBCreateCmd::usage()
+{
+  getopt->usage("", "");
+  std::cerr << " <dbname>\n";
+  return 1;
+}
+
+int DBCreateCmd::help()
+{
+  getopt->help();
+  return 1;
+}
+
+int DBCreateCmd::perform(const std::string &prog, const std::vector<std::string> &argv)
+{
+  if (argv.size() <= 2) {
+    return usage();
+  }
+
+  return 0;
+}

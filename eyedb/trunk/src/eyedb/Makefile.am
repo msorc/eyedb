@@ -1,4 +1,4 @@
-SUBDIRS=admin
+SUBDIRS=. admin
 
 lib_LTLIBRARIES= libeyedb.la
 

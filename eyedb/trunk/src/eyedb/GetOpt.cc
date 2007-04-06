@@ -114,6 +114,16 @@ GetOpt::GetOpt(const std::string &prog, const Option opts[],
     add(opts[n]);
 }
 
+GetOpt::GetOpt(const std::string &prog, const std::vector<Option> &opts,
+	       unsigned int flags,
+	       std::ostream &err_os) : prog(prog), flags(flags), err_os(err_os)
+{
+  unsigned int opt_cnt = opts.size();
+
+  for (unsigned int n = 0; n < opt_cnt; n++)
+    add(opts[n]);
+}
+
 void GetOpt::usage(const std::string &append, const std::string &prefix,
 		   std::ostream &os) const
 {

@@ -356,6 +356,7 @@ do { \
     GetOpt::Map &map = getopt.getMap();
 
     if (map.find(help_eyedb_options_opt) != map.end()) {
+      cerr << "Common Options:\n";
       getopt.help(cerr, "  ");
       exit(0);
     }
@@ -564,10 +565,9 @@ do { \
     unsigned int size = options.size();
     for (unsigned int n = 0; n < size; n += 2)
       getopt.helpLine(options[n], options[n+1], os);
-    os << "\nCommon Options:\n";
-    print_common_help(os, server);
-  }
 
+    print_use_help(os);
+  }
 
   void print_common_usage(ostream &os, bool server)
   {
@@ -575,6 +575,11 @@ do { \
     char *argv[] = {""};
     string listen;
     make_options(argc, argv, &os, 0, server ? &listen : 0);
+  }
+
+  void print_use_help(ostream &os)
+  {
+    os << "\nUse --help-eyedb-options for a list of common options.\n";
   }
 
   void print_common_help(ostream &os, bool server)
@@ -597,12 +602,11 @@ do { \
     pthread_mutex_init(&mp, NULL);
     pthread_mutex_lock(&mp);
 
-    if (!pthread_mutex_trylock(&mp))
-      {
-	fprintf(stderr, "eyedb fatal error: this program has not been linked "
-		"with the thread library: flag -mt or -lpthread\n");
-	exit(1);
-      }
+    if (!pthread_mutex_trylock(&mp)) {
+      fprintf(stderr, "eyedb fatal error: this program has not been linked "
+	      "with the thread library: flag -mt or -lpthread\n");
+      exit(1);
+    }
   }
 
   static FILE *fd_stream;
