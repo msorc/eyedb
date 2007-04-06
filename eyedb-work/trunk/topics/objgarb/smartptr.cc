@@ -55,8 +55,6 @@ static void breakit()
 {
 }
 
-#define AVOID
-
 #define USE_SMARTPTR
 
 #ifdef USE_SMARTPTR
@@ -64,16 +62,10 @@ static void breakit()
 static DPtr perform1(Database *db)
 {
   DPtr d = new D(db);
-#ifndef AVOID
-  d->release(); // could be avoid in case of information is given from the API
-#endif
 
   CPtr lc = d->getLc();
 
   CPtr lc2 = new C(db);
-#ifndef AVOID
-  lc2->release();  // could be avoid in case of information is given from the API
-#endif
 
   CPtr lc3 = lc2;
   lc3 = lc2;
@@ -459,7 +451,7 @@ main(int argc, char *argv[])
 
   try {
     eyedb::Connection conn(true);
-    schemaDatabase db(&conn, argv[1], eyedb::Database::DBRW);
+    schemaDatabase db(&conn, argv[1], eyedb::Database::DBRWLocal);
 
 #ifdef USE_SMARTPTR
     db.transactionBegin();
