@@ -28,6 +28,10 @@
 #include "DSPTopic.h"
 #include "DTFTopic.h"
 
+const Option HELP_OPT("help", OptionStringType(), Option::Help, OptionDesc("Displays the current help"));
+
+const Option HELP_COMMON_OPT("help-eyedb-options", OptionStringType(), 0, OptionDesc("Displays the EyeDB common options"));
+
 TopicSet *TopicSet::instance;
 
 TopicSet::TopicSet()
@@ -37,7 +41,7 @@ TopicSet::TopicSet()
   addTopic(new DSPTopic());
 }
 
-int TopicSet::perform(const std::string &prog, std::vector<std::string> &argv)
+int TopicSet::perform(eyedb::Connection &conn, const std::string &prog, std::vector<std::string> &argv)
 {
   if (argv.size() == 0) {
     return usage(prog);
@@ -67,7 +71,7 @@ int TopicSet::perform(const std::string &prog, std::vector<std::string> &argv)
   // get rid of the two first arguments
   argv.erase(argv.begin());
   argv.erase(argv.begin());
-  return cmd->perform(prog, argv);
+  return cmd->perform(conn, prog, argv);
 }
 
 int TopicSet::usage(const std::string &prog)
@@ -108,7 +112,7 @@ void Topic::display(std::ostream &os)
   std::vector<std::string>::iterator end = alias_v.end();
 
   while (begin != end) {
-    os << '|' << (*begin);
+    os << " | " << (*begin);
     ++begin;
   }
 }
@@ -160,4 +164,9 @@ int Topic::usage(const std::string &prog, const std::string &tname)
   }
 
   return 1;
+}
+
+std::string Command::getExtName() const
+{
+  return PROG_NAME + " " + topic->getName() + " " + getName();
 }

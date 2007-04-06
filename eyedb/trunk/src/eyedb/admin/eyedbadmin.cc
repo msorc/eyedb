@@ -26,9 +26,11 @@
 
 #include "Topic.h"
 
+using namespace eyedb;
+
 int main(int c_argc, char *c_argv[])
 {
-  eyedb::init();
+  eyedb::init(c_argc, c_argv);
 
   std::string prog = c_argv[0];
 
@@ -36,5 +38,15 @@ int main(int c_argc, char *c_argv[])
   for (int n = 1; n < c_argc; n++)
     argv.push_back(c_argv[n]);
 
-  return TopicSet::getInstance()->perform(prog, argv);
+  Exception::setMode(Exception::ExceptionMode);
+
+  try {
+    Connection conn(true);
+    return TopicSet::getInstance()->perform(conn, prog, argv);
+  }
+
+  catch(Exception &e) {
+    std::cerr << e << std::endl;
+    return 1;
+  }
 }

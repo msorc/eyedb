@@ -25,8 +25,7 @@
 #define _EYEDB_ADMIN_TOPIC_H
 
 #include "Command.h"
-
-const std::string PROG_NAME = "eyedbadmin";
+#include "../GetOpt.h"
 
 class Topic {
 
@@ -81,7 +80,9 @@ public:
     return instance;
   }
 
-  int perform(const std::string &prog, std::vector<std::string> &argv);
+  int perform(eyedb::Connection &conn, const std::string &prog, std::vector<std::string> &argv);
 };
+
+extern const Option HELP_OPT, HELP_COMMON_OPT;
 
 #endif

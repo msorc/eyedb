@@ -28,7 +28,12 @@
 #include <vector>
 #include <iostream>
 
+#include "eyedbconfig.h"
+#include <eyedb/eyedb.h>
+
 class Topic;
+
+const std::string PROG_NAME = "eyedbadmin";
 
 class Command {
 
@@ -45,7 +50,8 @@ public:
 
   virtual int usage() = 0;
   virtual int help() = 0;
-  virtual int perform(const std::string &prog, std::vector<std::string> &argv) = 0;
+  virtual int perform(eyedb::Connection &conn, const std::string &prog, std::vector<std::string> &argv) = 0;
+  std::string getExtName() const;
 };
 
 #define CMDCLASS(CLS, NAME) \
@@ -57,7 +63,7 @@ public: \
 \
   virtual int usage() { std::cout << "usage: " << NAME << '\n'; } \
   virtual int help() { std::cout << "help: " << NAME << '\n'; } \
-  virtual int perform(const std::string &prog, std::vector<std::string> &argv) { } \
+  virtual int perform(eyedb::Connection &conn, const std::string &prog, std::vector<std::string> &argv) { } \
 }
 
 #define CMDCLASS_GETOPT(CLS, NAME) \
@@ -66,13 +72,14 @@ class CLS : public Command { \
 \
   GetOpt *getopt; \
   void init(); \
+  void stdhelp() {usage(); std::cerr << '\n'; getopt->help();} \
 \
 public: \
   CLS(Topic *topic) : Command(topic, NAME), getopt(0) { init(); } \
 \
   virtual int usage(); \
   virtual int help(); \
-  virtual int perform(const std::string &prog, std::vector<std::string> &argv); \
+  virtual int perform(eyedb::Connection &conn, const std::string &prog, std::vector<std::string> &argv); \
 \
   virtual ~CLS() {delete getopt;} \
 }
