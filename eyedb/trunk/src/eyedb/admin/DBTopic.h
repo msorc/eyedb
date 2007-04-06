@@ -34,9 +34,9 @@ public:
 };
 
 CMDCLASS_GETOPT(DBCreateCmd, "create");
+CMDCLASS_GETOPT(DBDeleteCmd, "delete");
 
 CMDCLASS(DBDBMCreateCmd, "dbmcreate");
-CMDCLASS(DBDeleteCmd, "delete");
 CMDCLASS(DBListCmd, "list");
 CMDCLASS(DBMoveCmd, "move");
 CMDCLASS(DBCopyCmd, "copy");

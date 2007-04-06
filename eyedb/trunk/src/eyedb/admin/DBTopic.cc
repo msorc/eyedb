@@ -25,6 +25,7 @@
 #include "eyedbconfig.h"
 
 #include <eyedb/eyedb.h>
+#include <eyedb/opts.h>
 #include "eyedb/DBM_Database.h"
 #include <sys/types.h>
 #include <signal.h>
@@ -36,6 +37,8 @@
 #include "GetOpt.h"
 
 #include "DBTopic.h"
+
+using namespace eyedb;
 
 DBTopic::DBTopic() : Topic("database")
 {
@@ -64,9 +67,10 @@ void DBCreateCmd::init()
   opts.push_back(Option("dbfile", OptionStringType(), /*Option::Mandatory|*/Option::MandatoryValue, OptionDesc("Database file", "<dbfile>")));
   opts.push_back(Option("filedir", OptionStringType(), Option::MandatoryValue, OptionDesc("Database file directory", "<filedir>")));
   opts.push_back(Option("max-object-count", OptionStringType(), Option::MandatoryValue, OptionDesc("Maximum database object count", "<object-count>")));
-  opts.push_back(Option("help", OptionStringType(), Option::Help, OptionDesc("Displays the current help")));
+  opts.push_back(HELP_OPT);
+  opts.push_back(HELP_COMMON_OPT);
 
-  getopt = new GetOpt(PROG_NAME, opts);
+  getopt = new GetOpt(getExtName(), opts);
 }
 
 int DBCreateCmd::usage()
@@ -76,14 +80,14 @@ int DBCreateCmd::usage()
   return 1;
 }
 
-int DBCreateCmd::help() {
-  usage();
-  std::cerr << '\n'; getopt->help();
+int DBCreateCmd::help()
+{
+  stdhelp();
   getopt->displayOpt("<dbname>", "Database to create");
   return 1;
 }
 
-int DBCreateCmd::perform(const std::string &prog, std::vector<std::string> &argv)
+int DBCreateCmd::perform(eyedb::Connection &conn, const std::string &prog, std::vector<std::string> &argv)
 {
   bool r = getopt->parse(prog, argv);
 
@@ -102,6 +106,73 @@ int DBCreateCmd::perform(const std::string &prog, std::vector<std::string> &argv
   }
 
   printf("performing...\n");
+
+  return 0;
+}
+
+void DBDeleteCmd::init()
+{
+  std::vector<Option> opts;
+
+  opts.push_back(HELP_OPT);
+  opts.push_back(HELP_COMMON_OPT);
+
+  getopt = new GetOpt(getExtName(), opts);
+}
+
+int DBDeleteCmd::usage()
+{
+  getopt->usage("");
+  std::cerr << " {<dbname>}\n";
+  return 1;
+}
+
+int DBDeleteCmd::help()
+{
+  stdhelp();
+  getopt->displayOpt("{<dbname>}", "Database(s) to delete");
+  return 1;
+}
+
+int DBDeleteCmd::perform(eyedb::Connection &conn, const std::string &prog, std::vector<std::string> &argv)
+{
+  bool r = getopt->parse(prog, argv);
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end()) {
+    return help();
+  }
+
+  if (!r) {
+    return usage();
+  }
+
+  if (argv.size() < 1) { // dbname is missing
+    return usage();
+  }
+
+  bool error = false;
+
+  for (unsigned int n = 0; n < argv.size(); n++) {
+    try {
+      eyedb::Database db(&conn, argv[n].c_str());
+      const char *dbfile;
+      db.getDatabasefile(dbfile);
+    }
+    catch(Exception &e) {
+      std::cerr << e << std::endl;
+      error = true;
+    }
+  }
+
+  if (error)
+    return 1;
+
+  for (unsigned int n = 0; n < argv.size(); n++) {
+    eyedb::Database db(argv[n].c_str());
+    db.remove(&conn);
+  }
 
   return 0;
 }

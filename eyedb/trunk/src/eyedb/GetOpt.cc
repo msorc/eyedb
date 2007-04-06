@@ -489,13 +489,15 @@ static void display(const std::string &action, const std::vector<std::string> &a
 bool GetOpt::parse(const std::string &prog, std::vector<std::string> &argv)
 {
   unsigned int argv_cnt = argv.size();
-  char ** c_argv = new char*[argv_cnt + 1];
+  char ** c_argv = new char*[argv_cnt + 2];
 
   c_argv[0] = strdup(prog.c_str());
 
   for (unsigned int n = 0; n < argv_cnt; n++) {
     c_argv[n+1] = strdup(argv[n].c_str());
   }  
+
+  c_argv[argv_cnt + 1] = 0;
 
   //display("before: " , argv);
   int argc = argv_cnt + 1;
