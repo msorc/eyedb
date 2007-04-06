@@ -37,7 +37,7 @@ TopicSet::TopicSet()
   addTopic(new DSPTopic());
 }
 
-int TopicSet::perform(const std::string &prog, const std::vector<std::string> &argv)
+int TopicSet::perform(const std::string &prog, std::vector<std::string> &argv)
 {
   if (argv.size() == 0) {
     return usage(prog);
@@ -64,6 +64,9 @@ int TopicSet::perform(const std::string &prog, const std::vector<std::string> &a
     return topic->usage(prog, topic_name);
   }
 
+  // get rid of the two first arguments
+  argv.erase(argv.begin());
+  argv.erase(argv.begin());
   return cmd->perform(prog, argv);
 }
 

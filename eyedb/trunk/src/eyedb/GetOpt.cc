@@ -108,7 +108,8 @@ void Option::init(char _opt,
 
 GetOpt::GetOpt(const std::string &prog, const Option opts[],
 	       unsigned int opt_cnt, unsigned int flags,
-	       std::ostream &err_os) : prog(prog), flags(flags), err_os(err_os)
+	       std::ostream &err_os) : prog(prog), flags(flags),
+				       err_os(err_os), _maxlen(0)
 {
   for (unsigned int n = 0; n < opt_cnt; n++)
     add(opts[n]);
@@ -116,7 +117,8 @@ GetOpt::GetOpt(const std::string &prog, const Option opts[],
 
 GetOpt::GetOpt(const std::string &prog, const std::vector<Option> &opts,
 	       unsigned int flags,
-	       std::ostream &err_os) : prog(prog), flags(flags), err_os(err_os)
+	       std::ostream &err_os) : prog(prog), flags(flags),
+				       err_os(err_os), _maxlen(0)
 {
   unsigned int opt_cnt = opts.size();
 
@@ -188,9 +190,11 @@ void GetOpt::displayHelpOpt(const Option &opt, ostream &os) const
 
 unsigned int GetOpt::getMaxLen() const
 {
+  if (_maxlen)
+    return _maxlen;
+
   std::vector<Option>::const_iterator begin = opt_v.begin();
   std::vector<Option>::const_iterator end = opt_v.end();
-  unsigned int len = 0;
 
   while (begin != end) {
     const Option &opt = *begin;
@@ -199,17 +203,17 @@ unsigned int GetOpt::getMaxLen() const
 
     displayHelpOpt(opt, ostr);
 
-    if (ostr.str().length() > len)
-      len = ostr.str().length();
+    if (ostr.str().length() > _maxlen)
+      const_cast<GetOpt*>(this)->_maxlen = ostr.str().length();
 
     ++begin;
   }
 
-  return len;
+  return _maxlen;
 }
 
 void GetOpt::helpLine(const std::string &option, const std::string &detail,
-		      std::ostream &os, const std::string indent) const
+		      std::ostream &os, const std::string &indent) const
 {
   os << indent;
 
@@ -225,7 +229,23 @@ void GetOpt::helpLine(const std::string &option, const std::string &detail,
   os << ' ' << detail << '\n';
 }
 
-void GetOpt::help(std::ostream &os, const std::string indent) const
+void GetOpt::displayOpt(const std::string &opt, const std::string &detail, std::ostream &os, const std::string &indent) const
+{
+  unsigned int maxlen = getMaxLen();
+
+  os << indent;
+  ostringstream ostr;
+  ostr << opt;
+
+  os << ostr.str();
+
+  for (unsigned int n = ostr.str().length(); n < maxlen; n++)
+    os << ' ';
+  
+  os << ' ' << detail << endl;
+}
+
+void GetOpt::help(std::ostream &os, const std::string &indent) const
 {
   std::vector<Option>::const_iterator begin = opt_v.begin();
   std::vector<Option>::const_iterator end = opt_v.end();
@@ -456,6 +476,47 @@ bool GetOpt::parseLongOpt(const std::string &arg, const std::string &opt,
     return true;
 
   return false;
+}
+
+static void display(const std::string &action, const std::vector<std::string> &argv)
+{
+  std::cout << action << ":\n";
+  for (unsigned int n = 0; n < argv.size(); n++) {
+    std::cout << "#" << n << ": " << argv[n] << '\n';
+  }
+}
+
+bool GetOpt::parse(const std::string &prog, std::vector<std::string> &argv)
+{
+  unsigned int argv_cnt = argv.size();
+  char ** c_argv = new char*[argv_cnt + 1];
+
+  c_argv[0] = strdup(prog.c_str());
+
+  for (unsigned int n = 0; n < argv_cnt; n++) {
+    c_argv[n+1] = strdup(argv[n].c_str());
+  }  
+
+  //display("before: " , argv);
+  int argc = argv_cnt + 1;
+  int oargc = argc;
+  bool r = parse(argc, c_argv);
+
+  if (oargc != argc) {
+    argv.clear();
+    for (unsigned int n = 1; n < argc; n++) {
+      argv.push_back(c_argv[n]);
+    }
+  }
+
+  //display("after: " , argv);
+
+  for (unsigned int n = 0; n < argv_cnt + 1; n++) {
+    free(c_argv[n]);
+  }
+
+  delete [] c_argv;
+  return r;
 }
 
 bool GetOpt::parse(int &argc, char *argv[])

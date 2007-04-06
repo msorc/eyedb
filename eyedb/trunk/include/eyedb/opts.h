@@ -49,6 +49,8 @@ namespace eyedb {
 
   void print_common_usage(std::ostream &os, bool server = false);
 
+  void print_use_help(std::ostream &os);
+
   /**
      @}
   */

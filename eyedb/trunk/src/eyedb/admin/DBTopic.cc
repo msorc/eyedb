@@ -61,30 +61,47 @@ void DBCreateCmd::init()
 {
   std::vector<Option> opts;
 
-  opts.push_back(Option("dbfile", OptionStringType(), Option::MandatoryValue, OptionDesc("Database file", "<dbfile>")));
+  opts.push_back(Option("dbfile", OptionStringType(), /*Option::Mandatory|*/Option::MandatoryValue, OptionDesc("Database file", "<dbfile>")));
   opts.push_back(Option("filedir", OptionStringType(), Option::MandatoryValue, OptionDesc("Database file directory", "<filedir>")));
   opts.push_back(Option("max-object-count", OptionStringType(), Option::MandatoryValue, OptionDesc("Maximum database object count", "<object-count>")));
+  opts.push_back(Option("help", OptionStringType(), Option::Help, OptionDesc("Displays the current help")));
+
   getopt = new GetOpt(PROG_NAME, opts);
 }
 
 int DBCreateCmd::usage()
 {
-  getopt->usage("", "");
+  getopt->usage("");
   std::cerr << " <dbname>\n";
   return 1;
 }
 
-int DBCreateCmd::help()
-{
-  getopt->help();
+int DBCreateCmd::help() {
+  usage();
+  std::cerr << '\n'; getopt->help();
+  getopt->displayOpt("<dbname>", "Database to create");
   return 1;
 }
 
-int DBCreateCmd::perform(const std::string &prog, const std::vector<std::string> &argv)
+int DBCreateCmd::perform(const std::string &prog, std::vector<std::string> &argv)
 {
-  if (argv.size() <= 2) {
+  bool r = getopt->parse(prog, argv);
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end()) {
+    return help();
+  }
+
+  if (!r) {
     return usage();
   }
+
+  if (argv.size() != 1) { // dbname is missing
+    return usage();
+  }
+
+  printf("performing...\n");
 
   return 0;
 }

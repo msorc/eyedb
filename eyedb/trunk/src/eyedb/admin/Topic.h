@@ -55,6 +55,8 @@ public:
   Command *getCommand(const std::string &name);
 
   int usage(const std::string &prog_name, const std::string &name);
+
+  virtual ~Topic() { }
 };
 
 class TopicSet {
@@ -79,7 +81,7 @@ public:
     return instance;
   }
 
-  int perform(const std::string &prog, const std::vector<std::string> &argv);
+  int perform(const std::string &prog, std::vector<std::string> &argv);
 };
 
 #endif

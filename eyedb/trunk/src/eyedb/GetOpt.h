@@ -257,7 +257,7 @@ public:
 
   GetOpt(const std::string &prog,
 	 unsigned int flags = PurgeArgv, std::ostream &err_os = std::cerr) :
-    prog(prog), flags(flags), err_os(err_os) {}
+    prog(prog), flags(flags), err_os(err_os), _maxlen(0) { }
 
   GetOpt(const std::string &prog,
 	 const std::vector<Option> &opts,
@@ -272,16 +272,17 @@ public:
   void add(const Option &opt);
 
   bool parse(int &argc, char *argv[]);
+  bool parse(const std::string &prog, std::vector<std::string> &argv);
   
-  void usage(const std::string& append = "\n",
+  void usage(const std::string &append = "\n",
 	     const std::string &prefix = "usage: ",
 	     std::ostream &os = std::cerr) const;
-  void help(std::ostream &os = std::cerr, const std::string indent = "  ")
-    const;
+  void help(std::ostream &os = std::cerr, const std::string &indent = "  ") const;
 
   void helpLine(const std::string &option, const std::string &detail,
-		std::ostream &os = std::cerr, const std::string indent = "  ")
-    const;
+		std::ostream &os = std::cerr, const std::string &indent = "  ") const;
+
+  void displayOpt(const std::string &opt, const std::string &detail, std::ostream &os = std::cerr, const std::string &indent = "  ") const;
 
   static bool parseLongOpt(const std::string &arg, const std::string &opt,
 			   std::string *value = 0);
@@ -304,6 +305,7 @@ private:
   std::ostream &err_os;
   unsigned int getMaxLen() const;
   void displayHelpOpt(const Option &opt, std::ostream &os) const;
+  unsigned int _maxlen;
 };
 
 #endif
