@@ -1927,6 +1927,7 @@ lastnx_action_realize(int argc, char *argv[], mAction action)
       {
 	char s[128];
 	fgets(s, sizeof s, stdin);
+	s[strlen(s)-1] = 0;
 	if (!strcasecmp(s, "y") || !strcasecmp(s, "yes"))
 	  {
 	    sm_h->__lastidxbusy() = h2x_u32(idxbusy);

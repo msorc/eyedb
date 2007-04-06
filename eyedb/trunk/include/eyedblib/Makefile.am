@@ -6,6 +6,7 @@ filelib.h \
 iassert.h \
 log.h \
 machtypes.h \
+math.h \
 m_malloc.h \
 m_mem.h \
 performer.h \

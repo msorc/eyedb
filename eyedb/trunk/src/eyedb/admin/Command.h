@@ -45,7 +45,7 @@ public:
 
   virtual int usage() = 0;
   virtual int help() = 0;
-  virtual int perform(const std::string &prog, const std::vector<std::string> &argv) = 0;
+  virtual int perform(const std::string &prog, std::vector<std::string> &argv) = 0;
 };
 
 #define CMDCLASS(CLS, NAME) \
@@ -57,7 +57,7 @@ public: \
 \
   virtual int usage() { std::cout << "usage: " << NAME << '\n'; } \
   virtual int help() { std::cout << "help: " << NAME << '\n'; } \
-  virtual int perform(const std::string &prog, const std::vector<std::string> &argv) { } \
+  virtual int perform(const std::string &prog, std::vector<std::string> &argv) { } \
 }
 
 #define CMDCLASS_GETOPT(CLS, NAME) \
@@ -68,11 +68,13 @@ class CLS : public Command { \
   void init(); \
 \
 public: \
-  CLS(Topic *topic) : Command(topic, NAME) { init(); } \
+  CLS(Topic *topic) : Command(topic, NAME), getopt(0) { init(); } \
 \
   virtual int usage(); \
   virtual int help(); \
-  virtual int perform(const std::string &prog, const std::vector<std::string> &argv); \
+  virtual int perform(const std::string &prog, std::vector<std::string> &argv); \
+\
+  virtual ~CLS() {delete getopt;} \
 }
 
 #endif
