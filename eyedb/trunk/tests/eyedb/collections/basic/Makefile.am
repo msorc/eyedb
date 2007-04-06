@@ -6,7 +6,8 @@ check_PROGRAMS=colltest
 
 # for each binary listed in noinst_bin_PROGRAMS, add:
 # <<binary_name>>_SOURCES= with the list of all the sources of this binary
-colltest_SOURCES=colltest.cc schema.cc
+colltest_SOURCES=colltest.cc 
+nodist_colltest_SOURCES=schema.cc
 
 # add here the files that are not listed in SOURCES
 EXTRA_DIST= schema.odl

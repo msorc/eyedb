@@ -117,13 +117,15 @@ Union.cc					\
 UnionClass.cc					\
 Value.cc					\
 ValueCache.cc					\
-odl.tab.cc					\
-oql.tab.cc					\
 DBM.cc						\
 syscls.cc					\
 oqlctb.cc					\
 utils.cc					\
 version.cc
+
+nodist_libeyedb_la_SOURCES=			\
+odl.tab.cc					\
+oql.tab.cc					
 
 BUILT_SOURCES=lex.oql.c lex.odl.c
 
@@ -215,7 +217,6 @@ sysclsmthfe_la_LDFLAGS=-module -release $(EYEDB_VERSION)
 sysclsmthfe_la_DEPENDENCIES= $(top_srcdir)/VERSION
 
 bin_PROGRAMS=					\
-eyedbd						\
 eyedboql					\
 eyedbodl					\
 eyedbloca					\
@@ -225,9 +226,12 @@ eyedbconsadmin					\
 eyedbcollimpladmin				\
 eyedbcrypt					\
 eyedbgetenv					\
-eyedbctl					\
-eyedbrc						\
 eyedbadmin
+
+sbin_PROGRAMS=					\
+eyedbd						\
+eyedbctl					\
+eyedbrc						
 
 EYEDBSVLIBS=libeyedb.la $(top_builddir)/src/lib/libeyedbrpcbe.la $(top_builddir)/src/lib/libeyedbrpcfe.la $(top_builddir)/src/eyedbsm/libeyedbsm.la $(top_builddir)/src/lib/libeyedbutils.la
 
