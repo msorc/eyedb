@@ -8,3 +8,10 @@ EYEDBCLLIBS=$(top_builddir)/src/eyedb/libeyedb.la $(top_builddir)/src/lib/libeye
 
 eyedbadmin2_SOURCES=eyedbadmin.cc Topic.cc DBTopic.cc DTFTopic.cc DSPTopic.cc 
 eyedbadmin2_LDADD= $(EYEDBCLLIBS)
+
+noinst_HEADERS= \
+Command.h \
+DBTopic.h \
+DSPTopic.h \
+DTFTopic.h \
+Topic.h 

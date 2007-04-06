@@ -38,7 +38,7 @@ libeyedbsm_la_LDFLAGS= -release $(EYEDB_VERSION)
 
 SMLIBS=$(top_builddir)/src/lib/libeyedbrpcfe.la libeyedbsm.la $(top_builddir)/src/lib/libeyedbutils.la
 
-bin_PROGRAMS=					\
+sbin_PROGRAMS=					\
 eyedbsmd					\
 eyedbsmtool
 
