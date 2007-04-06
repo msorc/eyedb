@@ -150,9 +150,7 @@ usage(const char *prog)
 
   fflush(pipe);
 
-  cerr << "\nCommon Options:\n";
-  print_common_help(cerr);
-  cerr << "\n";
+  print_use_help(cerr);
 
   if (pipe != stderr)
     pclose(pipe);
@@ -601,7 +599,8 @@ collimpl_stats_realize(int argc, char *argv[])
 	if (stats2.size())
 	  fprintf(stdout, stats2.c_str());
       }
-      delete _idximpl;
+      if (_idximpl)
+	_idximpl->release();
     }
   }
 

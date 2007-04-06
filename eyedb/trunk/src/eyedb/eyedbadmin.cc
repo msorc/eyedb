@@ -376,9 +376,7 @@ usage(const char *prog)
 
   fflush(pipe);
 
-  cerr << "\nCommon Options:\n";
-  print_common_help(cerr);
-  cerr << "\n";
+  print_use_help(cerr);
 
   /*
     if (!mode)
@@ -2091,6 +2089,16 @@ get_mode(int argc, char *argv[], int &start)
 	return usage(prog);
 
       const char *cmd = argv[1];
+
+      if (!strcmp(cmd, "--help")) {
+	usage(prog);
+	return 1;
+      }
+
+      if (!strcmp(cmd, "--help-eyedb-options")) {
+	print_common_help(std::cerr);
+	return 1;
+      }
 
       if (!strcmp(cmd, "dbmcreate"))
 	mode = mDbmCreate;

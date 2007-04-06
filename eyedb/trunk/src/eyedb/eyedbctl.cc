@@ -60,7 +60,6 @@ static void help(const char *prog)
   cerr << "  stop [-f]      Stop the server. Set -f to force stop\n";
   cerr << "  status         Display status on the running server\n";
   cerr << "  --creating-dbm Bootstrap option for DBM database creation\n";
-  cerr << "\nCommon Options:\n";
   print_common_help(cerr, true);
 }
 

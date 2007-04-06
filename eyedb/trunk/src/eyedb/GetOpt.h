@@ -260,6 +260,11 @@ public:
     prog(prog), flags(flags), err_os(err_os) {}
 
   GetOpt(const std::string &prog,
+	 const std::vector<Option> &opts,
+	 unsigned int flags = PurgeArgv,
+	 std::ostream &err_os = std::cerr);
+
+  GetOpt(const std::string &prog,
 	 const Option opts[], unsigned int opt_cnt,
 	 unsigned int flags = PurgeArgv,
 	 std::ostream &err_os = std::cerr);

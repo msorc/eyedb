@@ -25,6 +25,7 @@
 #define _EYEDB_ADMIN_DBTOPIC_H
 
 #include "Topic.h"
+#include "eyedb/GetOpt.h"
 
 class DBTopic : public Topic {
 
@@ -32,8 +33,9 @@ public:
   DBTopic();
 };
 
+CMDCLASS_GETOPT(DBCreateCmd, "create");
+
 CMDCLASS(DBDBMCreateCmd, "dbmcreate");
-CMDCLASS(DBCreateCmd, "create");
 CMDCLASS(DBDeleteCmd, "delete");
 CMDCLASS(DBListCmd, "list");
 CMDCLASS(DBMoveCmd, "move");

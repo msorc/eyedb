@@ -26,6 +26,8 @@
 
 #include "Command.h"
 
+const std::string PROG_NAME = "eyedbadmin";
+
 class Topic {
 
   std::string name;
@@ -50,7 +52,7 @@ public:
 
   bool isTopic(const std::string &name) const;
 
-  Command *getCommand(std::string name);
+  Command *getCommand(const std::string &name);
 
   int usage(const std::string &prog_name, const std::string &name);
 };
@@ -77,7 +79,7 @@ public:
     return instance;
   }
 
-  int perform(int argc, char *argv[]);
+  int perform(const std::string &prog, const std::vector<std::string> &argv);
 };
 
 #endif

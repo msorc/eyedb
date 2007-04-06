@@ -69,11 +69,9 @@ usage()
   fprintf(stderr, "   -wid            : window identifier to use with the 'show' command\n");
 #endif
 
+  print_use_help(cerr);
   fflush(stderr);
 
-  cerr << "\nCommon Options:\n";
-  print_common_help(cerr);
-  cerr << "\n";
   return 1;
 }
 

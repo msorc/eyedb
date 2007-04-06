@@ -111,9 +111,7 @@ usage(const char *prog)
 
   fflush(pipe);
 
-  cerr << "\nCommon Options:\n";
-  print_common_help(cerr);
-  cerr << "\n";
+  print_use_help(cerr);
 
   if (pipe != stderr)
     pclose(pipe);

@@ -22,25 +22,19 @@
 */
 
 #include "eyedbconfig.h"
-
 #include <eyedb/eyedb.h>
-/*
-#include "eyedb/DBM_Database.h"
-
-#include <sys/types.h>
-#include <signal.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <eyedblib/butils.h>
-#include "GetOpt.h"
-*/
 
 #include "Topic.h"
 
-int main(int argc, char *argv[])
+int main(int c_argc, char *c_argv[])
 {
   eyedb::init();
 
-  return TopicSet::getInstance()->perform(argc, argv);
+  std::string prog = c_argv[0];
+
+  std::vector<std::string> argv;
+  for (int n = 1; n < c_argc; n++)
+    argv.push_back(c_argv[n]);
+
+  return TopicSet::getInstance()->perform(prog, argv);
 }

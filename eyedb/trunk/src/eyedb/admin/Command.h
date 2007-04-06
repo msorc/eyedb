@@ -43,12 +43,11 @@ public:
   const std::string &getName() const {return name;}
   bool isCommand(std::string name) const;
 
-  virtual void usage() = 0;
-  virtual void help() = 0;
-  virtual int perform() = 0;
+  virtual int usage() = 0;
+  virtual int help() = 0;
+  virtual int perform(const std::string &prog, const std::vector<std::string> &argv) = 0;
 };
 
-// to be moved to Command.h
 #define CMDCLASS(CLS, NAME) \
 \
 class CLS : public Command { \
@@ -56,9 +55,24 @@ class CLS : public Command { \
 public: \
   CLS(Topic *topic) : Command(topic, NAME) { } \
 \
-  virtual void usage() { std::cout << "usage: " << NAME << '\n'; } \
-  virtual void help() { std::cout << "help: " << NAME << '\n'; } \
-  virtual int perform() { std::cout << "perform: " << NAME << '\n'; return 0;} \
+  virtual int usage() { std::cout << "usage: " << NAME << '\n'; } \
+  virtual int help() { std::cout << "help: " << NAME << '\n'; } \
+  virtual int perform(const std::string &prog, const std::vector<std::string> &argv) { } \
+}
+
+#define CMDCLASS_GETOPT(CLS, NAME) \
+\
+class CLS : public Command { \
+\
+  GetOpt *getopt; \
+  void init(); \
+\
+public: \
+  CLS(Topic *topic) : Command(topic, NAME) { init(); } \
+\
+  virtual int usage(); \
+  virtual int help(); \
+  virtual int perform(const std::string &prog, const std::vector<std::string> &argv); \
 }
 
 #endif

@@ -222,10 +222,9 @@ help()
   fprintf(stderr, "--no-cpp                      Does not use any preprocessor\n");
   //fprintf(stderr, "\nThe following options can be added when the -d <dbname>|--database=<dbname> is used:,\n");
 
+  print_use_help(cerr);
+
   fflush(stderr);
-  cerr << "\nCommon Options:\n";
-  print_common_help(cerr);
-  cerr << "\n";
 }
 
 static char *package = NULL;

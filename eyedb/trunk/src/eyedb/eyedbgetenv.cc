@@ -37,10 +37,8 @@ Bool _server = False;
 static int
 usage(const char *prog)
 {
-  fprintf(stderr, "usage: %s [--server] [--config|--csh|--sh [--export]] [--expand-user] [<variables>]\n", prog);
-  std::cerr << "\nCommon Options:\n";
-  print_common_help(std::cerr, _server ? true : false);
-  std::cerr << "\n";
+  fprintf(stderr, "usage: %s [--server] [--config|--csh|--sh] [--export] [--expand-user] [<variables>]\n", prog);
+  print_use_help(std::cerr);
   return 1;
 }
 
