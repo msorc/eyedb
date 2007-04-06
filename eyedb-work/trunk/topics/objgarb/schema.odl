@@ -4,6 +4,8 @@ class A {
   B *b2;
   C *c1;
   C *c2;
+  int store;
+  int getClass;
 };
 
 class B {

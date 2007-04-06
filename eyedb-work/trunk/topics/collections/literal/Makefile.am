@@ -4,12 +4,14 @@
 # Binaries
 # Example:
 # TOPIC_BINARY_FILES = test1
-TOPIC_BINARY_FILES = 
+TOPIC_BINARY_FILES = colltest colltestlit
 
 # For each binary listed in $(TOPIC_BINARY_FILES) add the following line:
 # <<BINARY_FILE>>_SOURCES=<<list of all C++ source files>>
 # Example:
 # test1_SOURCES = test1.cc
+colltestlit_SOURCES = colltestlit.cc
+colltest_SOURCES = colltest.cc
 
 # Java files (excluding the .java files generated from odl)
 # Example:
@@ -19,7 +21,7 @@ TOPIC_JAVA_FILES =
 # ODL file (only one file allowed)
 # Example:
 # TOPIC_ODL_FILE = person.odl
-TOPIC_ODL_FILE = 
+TOPIC_ODL_FILE = schema.odl
 
 # Script files
 # Example:
