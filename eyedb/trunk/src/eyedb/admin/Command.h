@@ -21,26 +21,44 @@
    Author: Eric Viara <viara@sysra.com>
 */
 
-#include "eyedbconfig.h"
+#ifndef _EYEDB_ADMIN_COMMAND_H
+#define _EYEDB_ADMIN_COMMAND_H
 
-#include <eyedb/eyedb.h>
-/*
-#include "eyedb/DBM_Database.h"
+#include <string>
+#include <vector>
+#include <iostream>
 
-#include <sys/types.h>
-#include <signal.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <eyedblib/butils.h>
-#include "GetOpt.h"
-*/
+class Topic;
 
-#include "Topic.h"
+class Command {
 
-int main(int argc, char *argv[])
-{
-  eyedb::init();
+protected:
+  std::string name;
+  Topic *topic;
 
-  return TopicSet::getInstance()->perform(argc, argv);
+  Command(Topic *topic, const std::string &name) : topic(topic), name(name) { }
+
+public:
+
+  const std::string &getName() const {return name;}
+  bool isCommand(std::string name) const;
+
+  virtual void usage() = 0;
+  virtual void help() = 0;
+  virtual int perform() = 0;
+};
+
+// to be moved to Command.h
+#define CMDCLASS(CLS, NAME) \
+\
+class CLS : public Command { \
+\
+public: \
+  CLS(Topic *topic) : Command(topic, NAME) { } \
+\
+  virtual void usage() { std::cout << "usage: " << NAME << '\n'; } \
+  virtual void help() { std::cout << "help: " << NAME << '\n'; } \
+  virtual int perform() { std::cout << "perform: " << NAME << '\n'; return 0;} \
 }
+
+#endif

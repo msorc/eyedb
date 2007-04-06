@@ -21,26 +21,25 @@
    Author: Eric Viara <viara@sysra.com>
 */
 
-#include "eyedbconfig.h"
-
-#include <eyedb/eyedb.h>
-/*
-#include "eyedb/DBM_Database.h"
-
-#include <sys/types.h>
-#include <signal.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <eyedblib/butils.h>
-#include "GetOpt.h"
-*/
+#ifndef _EYEDB_ADMIN_DSPTOPIC_H
+#define _EYEDB_ADMIN_DSPTOPIC_H
 
 #include "Topic.h"
 
-int main(int argc, char *argv[])
-{
-  eyedb::init();
+class DSPTopic : public Topic {
 
-  return TopicSet::getInstance()->perform(argc, argv);
-}
+public:
+  DSPTopic();
+};
+
+CMDCLASS(DSPCreateCmd, "create");
+CMDCLASS(DSPUpdateCmd, "update");
+CMDCLASS(DSPDeleteCmd, "delete");
+CMDCLASS(DSPRenameCmd, "rename");
+CMDCLASS(DSPListCmd, "list");
+CMDCLASS(DSPSetDefaultCmd, "setdefault");
+CMDCLASS(DSPGetDefaultCmd, "getdefault");
+CMDCLASS(DSPSetCurDatCmd, "setcurdat");
+CMDCLASS(DSPGetCurDatCmd, "getcurdat");
+
+#endif

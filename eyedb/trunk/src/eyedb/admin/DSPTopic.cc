@@ -1,3 +1,5 @@
+
+
 /* 
    EyeDB Object Database Management System
    Copyright (C) 1994-1999,2004-2006 SYSRA
@@ -24,23 +26,29 @@
 #include "eyedbconfig.h"
 
 #include <eyedb/eyedb.h>
-/*
 #include "eyedb/DBM_Database.h"
-
 #include <sys/types.h>
 #include <signal.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <eyedblib/butils.h>
+
 #include "GetOpt.h"
-*/
 
-#include "Topic.h"
+#include "DSPTopic.h"
 
-int main(int argc, char *argv[])
+DSPTopic::DSPTopic() : Topic("dataspace")
 {
-  eyedb::init();
+  addAlias("dsp");
 
-  return TopicSet::getInstance()->perform(argc, argv);
+  addCommand(new DSPCreateCmd(this));
+  addCommand(new DSPUpdateCmd(this));
+  addCommand(new DSPDeleteCmd(this));
+  addCommand(new DSPRenameCmd(this));
+  addCommand(new DSPListCmd(this));
+  addCommand(new DSPSetDefaultCmd(this));
+  addCommand(new DSPGetDefaultCmd(this));
+  addCommand(new DSPSetCurDatCmd(this));
+  addCommand(new DSPGetCurDatCmd(this));
 }
