@@ -52,9 +52,10 @@ int TopicSet::perform(eyedb::Connection &conn, const std::string &prog, std::vec
   Topic *topic = 0;
   if (argv.size() >= 1) {
     topic = getTopic(topic_name);
-    if (!topic) {
-      return usage(prog);
-    }
+  }
+
+  if (!topic) {
+    return usage(prog);
   }
 
   if (argv.size() == 1) {
@@ -103,6 +104,8 @@ Topic *TopicSet::getTopic(const std::string &name)
       return topic;
     ++begin;
   }
+
+  return 0;
 }
 
 void Topic::display(std::ostream &os)

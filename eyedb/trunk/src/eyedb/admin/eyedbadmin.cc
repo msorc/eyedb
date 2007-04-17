@@ -28,6 +28,8 @@
 
 using namespace eyedb;
 
+const std::string PROG_NAME = "eyedbadmin";
+
 int main(int c_argc, char *c_argv[])
 {
   eyedb::init(c_argc, c_argv);
