@@ -33,7 +33,7 @@
 
 class Topic;
 
-const std::string PROG_NAME = "eyedbadmin";
+extern const std::string PROG_NAME;
 
 class Command {
 
