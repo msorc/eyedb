@@ -5,6 +5,8 @@
 %define release %mkrel 1 
 %define group   Databases
 
+%define _requires_exceptions devel(libcrypt(64bit))\\|devel(libdl(64bit))\\|devel(libgcc_s(64bit))\\|devel(libm(64bit))\\|devel(libnsl(64bit))\\|devel(libstdc++(64bit))  
+
 %define _unpackaged_files_terminate_build	0
 %define _missing_doc_files_terminate_build	0
 
@@ -86,12 +88,11 @@ rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install
 
 %clean 
-rm -rf $RPM_BUILD_ROOT 
-rm -rf $RPM_BUILD_DIR/jmax-%{version}
+#rm -rf $RPM_BUILD_ROOT 
 
 %post
 # create eyedb user
-# ...
+/usr/sbin/useradd -M -r eyedb
 # create DBM
 /usr/share/eyedb/tools/eyedb-postinstall.sh
 

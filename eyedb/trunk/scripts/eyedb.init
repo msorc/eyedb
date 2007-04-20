@@ -1,0 +1,104 @@
+#!/bin/sh
+#
+### BEGIN INIT INFO
+# Provides: eyedb
+# [[Required-Start]]: $network
+# [[Required-Stop]]: $network
+# [[Default-Start]]: 3 4 5
+# [[Short-Description]]: EyeDB database server
+# Description: Starts and stops the EyeDB daemon that handles database
+#              Really, nothing.
+### END INIT INFO
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+DAEMON_NAME=eyedb
+DAEMON_PROCESS=some_daemon
+DAEMON_BINARY=some_daemon
+LOCK_FILE=/var/lock/subsys/$DAEMON_NAME
+RETVAL=0
+
+# default option, they can be overriden in /etc/sysconfig/$DAEMON_NAME
+# of course, you can place what you want.
+OPTIONS=
+PORT=1234
+# this file should be commented, with proper pointer to the doc, and
+# you should use
+# more than one line of option, if possible.
+[ -f /etc/sysconfig/$DAEMON_NAME ] && . /etc/sysconfig/$DAEMON_NAME
+
+# here, you can do what you want with the option
+
+start() {
+    # if you cannot start the daemon since something is missing ( like
+    a
+path that cannot be set by default
+    # , place the test here
+    # if [ -z "$SOME_VAR" ]; then
+    #     echo "You need to set $SOME_VAR in
+    /etc/sysconfig/$DAEMON_NAME"
+    #     RETVAL=1
+    #     return
+    # fi
+
+    if [ ! -f $LOCK_FILE ]; then
+        echo "Starting $DAEMON_NAME"
+        # use --user to run the daemon under the specified uid
+        daemon $DAEMON_BINARY $OPTIONS -p $PORT
+        RETVAL=$?
+        echo
+        [ $RETVAL -eq 0 ] && touch $LOCK_FILE
+    fi
+}
+
+stop() {
+    echo "Shutting down $DAEMON_NAME"
+    killproc $DAEMON_PROCESS
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && rm -f $LOCK_FILE
+}
+
+reload() {
+    echo "Reloading $DAEMON_NAME configuration"
+    killproc $DAEMON_PROCESS SIGHUP
+    RETVAL=$?
+    echo
+}
+
+status() {
+    status $DAEMON_PROCESS
+    RETVAL=$?
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    status)
+        status
+        ;;
+    reload)
+        reload
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    condrestart)
+        if [ -f $LOCK_FILE ]; then
+            stop
+            start
+        fi
+        ;;
+    *)
+        echo "Usage: $0
+    {start|stop|restart|reload|condrestart|status}"
+        RETVAL=1
+esac
+
+exit $RETVAL
