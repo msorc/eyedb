@@ -2,73 +2,58 @@
 #
 ### BEGIN INIT INFO
 # Provides: eyedb
-# [[Required-Start]]: $network
-# [[Required-Stop]]: $network
-# [[Default-Start]]: 3 4 5
-# [[Short-Description]]: EyeDB database server
-# Description: Starts and stops the EyeDB daemon that handles database
-#              Really, nothing.
+# Required-Start: $network
+# Required-Stop: $network
+# Default-Start: 3 4 5
+# Short-Description: EyeDB database server
+# Description: Starts and stops the EyeDB daemon that handles 
+#              databases.
 ### END INIT INFO
 
 # Source function library.
 . /etc/rc.d/init.d/functions
 
-DAEMON_NAME=eyedb
-DAEMON_PROCESS=some_daemon
-DAEMON_BINARY=some_daemon
-LOCK_FILE=/var/lock/subsys/$DAEMON_NAME
+NAME=eyedb
+LOCK_FILE=/var/lock/subsys/$NAME
 RETVAL=0
 
-# default option, they can be overriden in /etc/sysconfig/$DAEMON_NAME
-# of course, you can place what you want.
-OPTIONS=
-PORT=1234
-# this file should be commented, with proper pointer to the doc, and
-# you should use
-# more than one line of option, if possible.
-[ -f /etc/sysconfig/$DAEMON_NAME ] && . /etc/sysconfig/$DAEMON_NAME
-
-# here, you can do what you want with the option
+# Read options file
+[ -f /etc/sysconfig/$NAME ] && . /etc/sysconfig/$NAME
 
 start() {
-    # if you cannot start the daemon since something is missing ( like
-    a
-path that cannot be set by default
-    # , place the test here
-    # if [ -z "$SOME_VAR" ]; then
-    #     echo "You need to set $SOME_VAR in
-    /etc/sysconfig/$DAEMON_NAME"
-    #     RETVAL=1
-    #     return
-    # fi
-
     if [ ! -f $LOCK_FILE ]; then
-        echo "Starting $DAEMON_NAME"
-        # use --user to run the daemon under the specified uid
-        daemon $DAEMON_BINARY $OPTIONS -p $PORT
+	EYEDB_START="Starting %s:"
+	echo "$EYEDB_START" $NAME
+
+	# Start EyeDB daemon under user eyedb
+	# FIXME: add options from /etc/sysconfig/eyedb (need first to check which options can be set from the command line)
+	su -l eyedb -s /bin/bash -c "/usr/sbin/eyedbctl start"
         RETVAL=$?
-        echo
-        [ $RETVAL -eq 0 ] && touch $LOCK_FILE
+        if [ $RETVAL -eq 0 ] ; then
+	    touch $LOCK_FILE
+	    # Get the pids
+	    pid_eyedbd=`pidof -s /usr/sbin/eyedbd`
+	    pid_eyedbsmd=`pidof -s /usr/sbin/eyedbsmd`
+	    echo "$pid_eyedbd" > /var/run/eyedbd.pid
+	    echo "$pid_eyedbsmd" > /var/run/eyedbsmd.pid
+	fi
+	[ $RETVAL -eq 0 ] && success "%s startup" $NAME || failure "%s startup" $NAME
+	echo
     fi
 }
 
 stop() {
-    echo "Shutting down $DAEMON_NAME"
-    killproc $DAEMON_PROCESS
+    EYEDB_STOP="Stopping %s:"
+    echo "$EYEDB_STOP" $NAME
+    su -l eyedb -s /bin/bash -c "/usr/sbin/eyedbctl stop"
     RETVAL=$?
-    echo
     [ $RETVAL -eq 0 ] && rm -f $LOCK_FILE
-}
-
-reload() {
-    echo "Reloading $DAEMON_NAME configuration"
-    killproc $DAEMON_PROCESS SIGHUP
-    RETVAL=$?
+    [ $RETVAL -eq 0 ] && success "%s shutdown" $NAME || failure "%s shutdown" $NAME
     echo
 }
 
 status() {
-    status $DAEMON_PROCESS
+    /usr/sbin/eyedbctl status
     RETVAL=$?
 }
 
@@ -82,22 +67,12 @@ case "$1" in
     status)
         status
         ;;
-    reload)
-        reload
-        ;;
     restart)
         stop
         start
         ;;
-    condrestart)
-        if [ -f $LOCK_FILE ]; then
-            stop
-            start
-        fi
-        ;;
     *)
-        echo "Usage: $0
-    {start|stop|restart|reload|condrestart|status}"
+        echo "Usage: $0 {start|stop|restart|status}"
         RETVAL=1
 esac
 
