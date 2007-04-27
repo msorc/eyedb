@@ -1,4 +1,4 @@
-noinst_htmldir=$(datadir)/doc/$(PACKAGE)-$(VERSION)/api/java
+noinst_htmldir=$(datadir)/doc/$(PACKAGE)/api/java
 noinst_html_DATA= index.html
 
 JAVADOC=@JAVADOC@
