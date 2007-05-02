@@ -87,7 +87,11 @@ PROGNAME=`basename $0`
 decrypt_options $*
 
 set -e
-trap clean_exit 0
+# 0 means EXIT, i.e. execute clean_exit when exiting from the shell
+# which means eyedbctl stop is executed twice
+#trap clean_exit 0
+# execute clean_exit if a command has a non-zero exit status 
+trap clean_exit ERR
 
 create_directories
 
