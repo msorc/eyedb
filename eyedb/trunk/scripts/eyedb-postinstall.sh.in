@@ -65,15 +65,15 @@ start_server()
 create_dbm()
 {
     echo ==== Creating EYEDBDBM database
-    $bindir/eyedbdbmcreate --strict-unix=@
+    $bindir/eyedbadmin dbmcreate --strict-unix=@
     echo ==== Setting EYEDBDBM database permissions
-    $bindir/eyedbdbaccess EYEDBDBM r --user=@
+    $bindir/eyedbadmin dbaccess EYEDBDBM r --user=@
 }
 
 stop_server()
 {
     echo ==== Stopping EyeDB server
-    $bindir/eyedbctl stop
+    $sbindir/eyedbctl stop
 }
 
 clean_exit()
