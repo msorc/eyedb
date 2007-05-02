@@ -684,7 +684,7 @@ namespace eyedb {
   void
   ClientConfig::setDefaults()
   {
-    std::string pipedir = eyedblib::CompileBuiltin::getEyedbpipedir();
+    std::string pipedir = eyedblib::CompileBuiltin::getPipedir();
 
     // Port
     setValue( "port", (pipedir + "/eyedbd").c_str());
@@ -721,7 +721,7 @@ namespace eyedb {
     setValue( "sopath", (libdir + "/eyedb").c_str());
 
     // Default EYEDBDBM Databases
-    setValue( "default_dbm", database.c_str());
+    setValue( "default_dbm", (databasedir + "/dbmdb.dbs").c_str());
 
     // Granted EYEDBDBM Databases
     //setValue( "granted_dbm", (localstatedir + "/lib/eyedb/db/dbmdb.dbs").c_str());

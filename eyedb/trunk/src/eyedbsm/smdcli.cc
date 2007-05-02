@@ -225,7 +225,7 @@ smdcli_init(smdcli_conn_t *conn, const char *dbfile)
 }
 
 #define SMD_PORT_ENV "EYEDBSV_SMDPORT"
-#define SMD_PORT "/lib/eyedb/pipes/eyedbsmd"
+#define SMD_PORT "/eyedbsmd"
 
 static std::string smd_port;
 
@@ -238,7 +238,7 @@ const char *smd_get_port()
   if (s)
     return s;
 
-  std::string path = eyedblib::CompileBuiltin::getLocalstatedir();
+  std::string path = eyedblib::CompileBuiltin::getPipedir();
   path += SMD_PORT;
     
   return path.c_str();

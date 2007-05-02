@@ -25,9 +25,12 @@ namespace eyedblib {
     static const char* getOs();
     static const char* getCompiler();
     static const char* getBindir();
+    static const char* getSbindir();
     static const char* getDatadir();
     static const char* getLibdir();
-    static const char* getLocalstatedir();
+    static const char* getDatabasedir();
+    static const char* getPipedir();
+    static const char* getTmpdir();
     static const char* getSysconfdir();
   };
 }

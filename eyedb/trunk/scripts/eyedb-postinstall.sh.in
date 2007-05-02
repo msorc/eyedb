@@ -7,7 +7,10 @@
 prefix=@prefix@
 exec_prefix=@exec_prefix@
 bindir=@bindir@
-localstatedir=@localstatedir@
+sbindir=@sbindir@
+eyedb_databasedir=@eyedb_databasedir@
+eyedb_pipedir=@eyedb_pipedir@
+eyedb_tmpdir=@eyedb_tmpdir@
 
 PROGNAME=
 
@@ -47,14 +50,16 @@ ECHO()
 }
 
 create_directories() {
-    mkdir -p $localstatedir/eyedb/db $localstatedir)/eyedb/pipes $localstatedir/eyedb/tmp
-#???    chmod a+w $localstatedir/eyedb/tmp
+    mkdir -p $eyedb_databasedir
+    mkdir -p $eyedb_pipedir
+    mkdir -p $eyedb_tmpdir
+    chmod a+w $eyedb_tmpdir
 }
 
 start_server()
 {
     echo ==== Starting EyeDB server
-    $bindir/eyedbctl start --creating-dbm --nod
+    $sbindir/eyedbctl start --creating-dbm --nod
 }
 
 create_dbm()
@@ -74,7 +79,7 @@ stop_server()
 clean_exit()
 {
     SAVED_STATUS=$?
-    $bindir/eyedbctl stop
+    $sbindir/eyedbctl stop
     exit $SAVED_STATUS
 }
 

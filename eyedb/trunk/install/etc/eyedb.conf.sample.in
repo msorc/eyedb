@@ -3,7 +3,7 @@
 # This file is a template that you can use to override the default values.
 
 # Unix socket filename for Unix socket connection
-#port = @localstatedir@/eyedb/pipes/eyedbd;
+#port = @eyedb_pipedir@/eyedbd;
 
 # TCP port number for TCP socket connection
 #tcp_port = 6240;
