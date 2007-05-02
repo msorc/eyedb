@@ -84,17 +84,31 @@ EyeDB documentation
 %make 
 
 %install
-rm -rf $RPM_BUILD_ROOT
-make DESTDIR=$RPM_BUILD_ROOT install
+[ "%{buildroot}" != "/" ] && rm -rf %{buildroot} 
+make DESTDIR=%{buildroot} install
+# Install directories
+install -d -m 700 %{buildroot}/var/lib/eyedb/db
+install -d -m 700 %{buildroot}/var/lib/eyedb/pipes
+install -d -m 700 %{buildroot}/var/lib/eyedb/tmp
+# Install the init script
+install -d %{buildroot}%{_initrddir}
+install -m0755 scripts/eyedb.init %{buildroot}%{_initrddir}/eyedb
+# Install the sysconfiguration file
+# FIXME
+#install -d %{buildroot}%{_sysconfdir}/sysconfig
+#install -m0644 eyedb.sysconfig %{buildroot}%{_sysconfdir}/sysconfig/eyedb
+
+%pre server
+# create eyedb user
+%_pre_useradd eyedb /var/lib/eyedb /bin/bash
+# create DBM
+#/usr/share/eyedb/tools/eyedb-postinstall.sh
+
+%postun server
+%_postun_userdel eyedb
 
 %clean 
-#rm -rf $RPM_BUILD_ROOT 
-
-%post
-# create eyedb user
-/usr/sbin/useradd -M -r eyedb
-# create DBM
-/usr/share/eyedb/tools/eyedb-postinstall.sh
+#rm -rf %{buildroot}
 
 %files common
 %defattr(-,root,root)
@@ -106,9 +120,9 @@ make DESTDIR=$RPM_BUILD_ROOT install
 %{_libdir}/libeyedbutils.so
 %{_libdir}/libeyedbrpcfe-%{version}.so
 %{_libdir}/libeyedbrpcfe.so
-%{_docdir}/%{name}-%{version}/AUTHORS
-%{_docdir}/%{name}-%{version}/COPYING
-%{_docdir}/%{name}-%{version}/README
+%{_docdir}/%{name}/AUTHORS
+%{_docdir}/%{name}/COPYING
+%{_docdir}/%{name}/README
 
 %files client
 %defattr(-,root,root)
@@ -141,7 +155,10 @@ make DESTDIR=$RPM_BUILD_ROOT install
 %{_datadir}/%{name}/eyedbd.conf.sample
 %{_datadir}/%{name}/Access.sample
 %{_datadir}/%{name}/tools/eyedb-postinstall.sh
-#%{_sysconfdir}/rc.d/init.d/eyedb
+%{_initrddir}/eyedb
+%attr(700,eyedb,eyedb) %dir %_var/lib/eyedb/db
+%attr(700,eyedb,eyedb) %dir %_var/lib/eyedb/pipes
+%attr(700,eyedb,eyedb) %dir %_var/lib/eyedb/tmp
 # man pages
 
 %files devel
@@ -155,11 +172,11 @@ make DESTDIR=$RPM_BUILD_ROOT install
 
 %files doc
 %defattr(-,root,root)
-%{_docdir}/%{name}-%{version}/index.html
-%{_docdir}/%{name}-%{version}/eyedbdoc.css
-%{_docdir}/%{name}-%{version}/examples
-%{_docdir}/%{name}-%{version}/images
-%{_docdir}/%{name}-%{version}/manual
+%{_docdir}/%{name}/index.html
+%{_docdir}/%{name}/eyedbdoc.css
+%{_docdir}/%{name}/examples
+%{_docdir}/%{name}/images
+%{_docdir}/%{name}/manual
 # man pages
 # to be completed
 

@@ -715,7 +715,6 @@ do { \
     checkLinkedWithMt();
 
     //stream_init();
-    Config::init();
     Architecture::init();
     Class::init();
     Basic::init();

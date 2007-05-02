@@ -15,6 +15,10 @@ xdr.cc
 libeyedbutils_la_LIBADD=compile_builtin.lo
 libeyedbutils_la_LDFLAGS= -release $(EYEDB_VERSION)
 
+eyedb_databasedir=@eyedb_databasedir@
+eyedb_pipedir=@eyedb_pipedir@
+eyedb_tmpdir=@eyedb_tmpdir@
+
 compile_builtin.lo: $(srcdir)/compile_builtin.cc
 	$(LTCXXCOMPILE) \
 		-DARCH=\"$(host)\" \
@@ -24,7 +28,9 @@ compile_builtin.lo: $(srcdir)/compile_builtin.cc
 		-DBINDIR=\"$(bindir)\" \
 		-DDATADIR=\"$(datadir)\" \
 		-DLIBDIR=\"$(libdir)\" \
-		-DLOCALSTATEDIR=\"$(localstatedir)\" \
+		-DEYEDB_DATABASEDIR=\"$(eyedb_databasedir)\" \
+		-DEYEDB_PIPEDIR=\"$(eyedb_pipedir)\" \
+		-DEYEDB_TMPDIR=\"$(eyedb_tmpdir)\" \
 		-DSYSCONFDIR=\"$(sysconfdir)\" \
 		-c -o $@ $<
 

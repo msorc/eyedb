@@ -450,21 +450,6 @@ namespace eyedb {
 
 
   /*
-   * Config init static method
-   * Is there mainly so that error() functions work... but probably it is no longer needed
-   */
-  void
-  Config::init()
-  {
-    /*
-    if (initialized) 
-      return;
-
-    initialized = true;
-    */
-  }
-
-  /*
    * Config and Config::Item constructors, destructor and operator=
    */
 
@@ -699,10 +684,10 @@ namespace eyedb {
   void
   ClientConfig::setDefaults()
   {
-    std::string localstatedir = eyedblib::CompileBuiltin::getLocalstatedir();
+    std::string pipedir = eyedblib::CompileBuiltin::getEyedbpipedir();
 
     // Port
-    setValue( "port", (localstatedir + "/lib/eyedb/pipes/eyedbd").c_str());
+    setValue( "port", (pipedir + "/eyedbd").c_str());
 
     // TCP Port
     setValue( "tcp_port", tcp_port.c_str());
@@ -714,7 +699,6 @@ namespace eyedb {
     setValue( "user", "@");
 
     // EYEDBDBM Database
-    //setValue( "dbm", (localstatedir + "/lib/eyedb/db/dbmdb.dbs").c_str());
     setValue( "dbm", "default");
   }
 
@@ -722,26 +706,22 @@ namespace eyedb {
   ServerConfig::setDefaults()
   {
     std::string libdir = eyedblib::CompileBuiltin::getLibdir();
-    std::string localstatedir = eyedblib::CompileBuiltin::getLocalstatedir();
+    std::string databasedir = eyedblib::CompileBuiltin::getDatabasedir();
+    std::string pipedir = eyedblib::CompileBuiltin::getPipedir();
+    std::string tmpdir = eyedblib::CompileBuiltin::getTmpdir();
     std::string sysconfdir = eyedblib::CompileBuiltin::getSysconfdir();
 
-    // Executables directory
-    //setValue( "bindir", eyedblib::CompileBuiltin::getBindir());
-
     // Bases directory
-    setValue( "datadir", (localstatedir + "/lib/eyedb/db").c_str());
-
-    // pipes:
-    // setValue( "pipedir", (localstatedir + "/lib/eyedb/pipes").c_str());
+    setValue( "datadir", databasedir.c_str());
 
     // tmpdir
-    setValue( "tmpdir", (localstatedir + "/lib/eyedb/tmp").c_str());
+    setValue( "tmpdir", tmpdir.c_str());
 
     // sopath
     setValue( "sopath", (libdir + "/eyedb").c_str());
 
     // Default EYEDBDBM Databases
-    setValue( "default_dbm", (localstatedir + "/lib/eyedb/db/dbmdb.dbs").c_str());
+    setValue( "default_dbm", database.c_str());
 
     // Granted EYEDBDBM Databases
     //setValue( "granted_dbm", (localstatedir + "/lib/eyedb/db/dbmdb.dbs").c_str());
@@ -752,12 +732,12 @@ namespace eyedb {
     // Server Parameters
     setValue( "maximum_memory_size", "0");
     setValue( "access_file", (sysconfdir + "/eyedb/Access").c_str());
-    setValue( "smdport", (localstatedir + "/lib/eyedb/pipes/eyedbsmd").c_str());
+    setValue( "smdport", (pipedir + "/eyedbsmd").c_str());
     setValue( "default_file_group", "");
     setValue( "default_file_mask", "0600");
 
     // Server Parameters
-    setValue( "listen", ("localhost:" + tcp_port + "," + localstatedir + "/lib/eyedb/pipes/eyedbd").c_str());
+    setValue( "listen", ("localhost:" + tcp_port + "," + pipedir + "/eyedbd").c_str());
 
     // OQL path
     setValue( "oqlpath", (libdir + "/eyedb/oql").c_str());

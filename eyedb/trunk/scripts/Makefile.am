@@ -5,4 +5,5 @@ eyedbtools_SCRIPTS=\
 eyedb-postinstall.sh
 
 dist_noinst_SCRIPTS= \
-eyedb-lex 
+eyedb-lex \
+eyedb.init

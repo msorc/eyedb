@@ -1,4 +1,4 @@
 SUBDIRS=applet appli
 
-eyedbexamplesdir=$(datadir)/doc/$(PACKAGE)-$(VERSION)/examples/JavaBinding/generic
+eyedbexamplesdir=$(datadir)/doc/$(PACKAGE)/examples/JavaBinding/generic
 eyedbexamples_DATA=Makefile.eyedb-examples

@@ -1,4 +1,4 @@
-eyedbexamplesdir=$(datadir)/doc/$(PACKAGE)-$(VERSION)/examples/JavaBinding/schema-oriented/store
+eyedbexamplesdir=$(datadir)/doc/$(PACKAGE)/examples/JavaBinding/schema-oriented/store
 dist_eyedbexamples_DATA= PersonTest.java
 eyedbexamples_DATA=  Makefile.eyedb-examples
 

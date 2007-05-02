@@ -7,6 +7,7 @@
 prefix=@prefix@
 exec_prefix=@exec_prefix@
 bindir=@bindir@
+localstatedir=@localstatedir@
 
 PROGNAME=
 
@@ -45,6 +46,11 @@ ECHO()
     echo "$PROGNAME: $*"
 }
 
+create_directories() {
+    mkdir -p $localstatedir/eyedb/db $localstatedir)/eyedb/pipes $localstatedir/eyedb/tmp
+#???    chmod a+w $localstatedir/eyedb/tmp
+}
+
 start_server()
 {
     echo ==== Starting EyeDB server
@@ -77,6 +83,8 @@ decrypt_options $*
 
 set -e
 trap clean_exit 0
+
+create_directories
 
 start_server
 

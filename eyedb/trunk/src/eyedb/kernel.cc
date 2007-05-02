@@ -6714,8 +6714,6 @@ do { \
   void
   config_init()
   {
-    Config::init();
-
     const char *s;
 #ifdef PASSWD_FILE
     const char *passwdfile;
