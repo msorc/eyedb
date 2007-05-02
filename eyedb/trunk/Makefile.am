@@ -5,7 +5,7 @@ DOC_SRC_DIR=
 endif
 SUBDIRS=src include scripts install pkg-config examples tests $(DOC_SRC_DIR) 
 
-docdir=$(datadir)/doc/$(PACKAGE)-$(VERSION)
+docdir=$(datadir)/doc/$(PACKAGE)
 doc_DATA=AUTHORS COPYING README
 
 EXTRA_DIST= AUTHORS COPYING ChangeLog README VERSION autogen.sh

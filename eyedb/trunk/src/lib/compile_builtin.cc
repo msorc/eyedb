@@ -55,9 +55,19 @@ namespace eyedblib {
     return LIBDIR;
   }
 
-  const char* CompileBuiltin::getLocalstatedir()
+  const char* CompileBuiltin::getDatabasedir()
   {
-    return LOCALSTATEDIR;
+    return EYEDB_DATABASEDIR;
+  }
+
+  const char* CompileBuiltin::getPipedir()
+  {
+    return EYEDB_PIPEDIR;
+  }
+
+  const char* CompileBuiltin::getTmpdir()
+  {
+    return EYEDB_TMPDIR;
   }
 
   const char* CompileBuiltin::getSysconfdir()
