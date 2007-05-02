@@ -26,6 +26,7 @@ compile_builtin.lo: $(srcdir)/compile_builtin.cc
 		-DOS=\"$(host_os)\" \
 		-DCXX=\"$(CXX)\" \
 		-DBINDIR=\"$(bindir)\" \
+		-DSBINDIR=\"$(sbindir)\" \
 		-DDATADIR=\"$(datadir)\" \
 		-DLIBDIR=\"$(libdir)\" \
 		-DEYEDB_DATABASEDIR=\"$(eyedb_databasedir)\" \

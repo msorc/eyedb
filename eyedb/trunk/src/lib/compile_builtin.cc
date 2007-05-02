@@ -45,6 +45,11 @@ namespace eyedblib {
     return BINDIR;
   }
 
+  const char* CompileBuiltin::getSbindir()
+  {
+    return SBINDIR;
+  }
+
   const char* CompileBuiltin::getDatadir()
   {
     return DATADIR;

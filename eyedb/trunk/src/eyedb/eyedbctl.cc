@@ -91,7 +91,7 @@ ld_libpath_manage()
   putenv(strdup(env));
 }
 
-static const char *bindir;
+static const char *sbindir;
 #define PIPE_SYNC
 
 extern char **environ;
@@ -110,7 +110,7 @@ execute(const char *prog, const char *arg, Bool pipes)
 #endif
 
   if ((pid = fork()) == 0) {
-    std::string cmd = std::string(bindir) + "/" + prog;
+    std::string cmd = std::string(sbindir) + "/" + prog;
     char *argv[3];
 
     argv[0] = (char *)prog;
@@ -168,7 +168,7 @@ startServer(int argc, char *argv[], const char *smdport)
 
   if ((pid = fork()) == 0) {
     ld_libpath_manage();
-    std::string cmd = std::string(bindir) + "/eyedbd";
+    std::string cmd = std::string(sbindir) + "/eyedbd";
     std::string s = std::string("eyedbd");
 
     argv[0] = (char *)s.c_str();
@@ -329,7 +329,7 @@ main(int argc, char *argv[])
       unlink_ports(smdport, listen);
     }
 
-    bindir = eyedblib::CompileBuiltin::getBindir();
+    sbindir = eyedblib::CompileBuiltin::getSbindir();
 
     int ac;
     char **av;

@@ -5,7 +5,9 @@ EDIT = sed \
         -e 's,@exec_prefix\@,$(exec_prefix),g' \
         -e 's,@datadir\@,$(pkgdatadir),g' \
         -e 's,@libdir\@,$(libdir),g' \
-        -e 's,@localstatedir\@,$(localstatedir),g' \
+        -e 's,@eyedb_databasedir\@,$(eyedb_databasedir),g' \
+        -e 's,@eyedb_pipedir\@,$(eyedb_pipedir),g' \
+        -e 's,@eyedb_tmpdir\@,$(eyedb_tmpdir),g' \
         -e 's,@prefix\@,$(prefix),g' \
         -e 's,@sysconfdir\@,$(sysconfdir),g'
 

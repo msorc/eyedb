@@ -3,16 +3,16 @@
 # This file is a template that you can use to override the default values.
 
 # Bases directory
-#datadir = @localstatedir@/eyedb/db;
+#datadir = @eyedb_databasedir@;
 
 # Temporary files directory
-#tmpdir = @localstatedir@/eyedb/tmp;
+#tmpdir = @eyedb_tmpdir@;
 
 # Path to .so files
 #sopath = @libdir@/eyedb;
 
 # Default EYEDBDBM database
-#default_dbm = @localstatedir@/eyedb/db/dbmdb.dbs;
+#default_dbm = @eyedb_databasedir@/dbmdb.dbs;
 
 # Granted EYEDBDBM database
 #granted_dbm = %default_dbm%;
@@ -30,10 +30,10 @@
 #access_file = @sysconfdir@/eyedb/Access;
 
 # Smd connection port
-#smdport = @localstatedir@/eyedb/pipes/eyedbsmd;
+#smdport = @eyedb_pipedir@/eyedbsmd;
 
 # Server listen ports and sockets list
-#listen = localhost:6240,@localstatedir@/eyedb/pipes/eyedbd;
+#listen = localhost:6240,@eyedb_pipedir@/eyedbd;
 
 # OQL files path
 #oqlpath = @libdir@/eyedb/oql

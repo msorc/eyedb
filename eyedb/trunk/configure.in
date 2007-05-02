@@ -529,7 +529,6 @@ install/etc/Makefile
 pkg-config/Makefile
 pkg/rpm/eyedb.spec
 scripts/Makefile
-scripts/eyedb-postinstall.sh
 scripts/eyedbjrun
 src/Makefile
 src/bindings/Makefile
