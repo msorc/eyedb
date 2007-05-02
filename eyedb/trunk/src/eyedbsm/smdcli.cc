@@ -55,22 +55,19 @@ smdcli_open(const char *port)
   struct sockaddr *sock_addr;
   int sock_fd;
 
-  // FD
-  fprintf( stderr, "port=%s\n", port);
-
   sock_un_name.sun_family = AF_UNIX;
   strcpy(sock_un_name.sun_path, port);
   sock_addr = (struct sockaddr *)&sock_un_name;
   if ((sock_fd = socket(AF_UNIX, SOCK_STREAM, 0))  < 0)
     {
-      fprintf(stderr, "smd client: cannot create socket\n");
+      //fprintf(stderr, "smd client: cannot create socket\n");
       return 0;
     }
 
   if (connect(sock_fd, sock_addr, sizeof(sock_un_name)) < 0)
     {
-      fprintf(stderr, "smd client: cannot connect to smd daemon\n");
-      perror("connect");
+      //fprintf(stderr, "smd client: cannot connect to smd daemon\n");
+      //perror("connect");
       return 0;
     }
 
