@@ -2651,7 +2651,7 @@ do { \
    if (!ISNULL) \
     { \
       eyedbsm::Boolean found; \
-      if (status = idx_item->search(e, &found)) \
+      if (status = idx_item->searchAny(e, &found)) \
 	{ \
           free(F1); free(F2); \
  	  return Exception::make(IDB_INDEX_ERROR, fmt_error, \
@@ -2677,7 +2677,7 @@ do { \
    if (!ISNULL) \
     { \
       eyedbsm::Boolean found; \
-      if (status = idx_comp->search(data, &found)) \
+      if (status = idx_comp->searchAny(data, &found)) \
 	{ \
           free(F1); free(F2); \
 	  return Exception::make(IDB_INDEX_ERROR, fmt_error, \

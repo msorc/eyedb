@@ -1478,14 +1478,14 @@ namespace eyedb {
   Bool
   Index::compareHints(Index *idx)
   {
-    int cnt1 = getImplHintsCount();
-    int cnt2 = idx->getImplHintsCount();
+    unsigned int cnt1 = getImplHintsCount();
+    unsigned int cnt2 = idx->getImplHintsCount();
     int cnt = cnt1 < cnt2 ? cnt1 : cnt2;
 
 #ifdef REIMPL_TRACE
     printf("compareHints: cnt %d vs %d\n", cnt1, cnt2);
 #endif
-    for (int i = 0; i < cnt; i++) {
+    for (unsigned int i = 0; i < cnt; i++) {
 #ifdef REIMPL_TRACE
       printf("hints[%d] %d %d\n", i, getImplHints(i), idx->getImplHints(i));
 #endif
@@ -1711,21 +1711,24 @@ namespace eyedb {
       fprintf(fd, "key_count = %d;", getKeyCount());
     }
 
-    int cnt = getImplHintsCount();
-
+    unsigned int cnt = getImplHintsCount();
+    
 #ifdef IDB_SKIP_HASH_XCOEF
-    if (cnt > eyedbsm::HIdx::XCoef_Hints) cnt = eyedbsm::HIdx::XCoef_Hints;
+    if (cnt > eyedbsm::HIdx::XCoef_Hints)
+      cnt = eyedbsm::HIdx::XCoef_Hints;
 #endif
 
-    for (int i = 0; i < cnt; i++) {
+    for (unsigned int i = 0; i < cnt; i++) {
       if (is_string) {
 	if (i == eyedbsm::HIdx::IniObjCnt_Hints)
 	  continue;
       }
       else if ((i) == eyedbsm::HIdx::IniSize_Hints &&
-	       getImplHints(eyedbsm::HIdx::IniObjCnt_Hints)) continue;
+	       getImplHints(eyedbsm::HIdx::IniObjCnt_Hints))
+	continue;
       int val = getImplHints(i);
-      if (val) {
+      // if (val)
+      if (IndexImpl::isHashHintImplemented(i)) {
 	PREF(fd, hints);
 	fprintf(fd, "%s = %d;", IndexImpl::hashHintToStr(i), val);
       }
@@ -1761,7 +1764,7 @@ namespace eyedb {
   {
     int impl_hints[eyedbsm::HIdxImplHintsCount];
     memset(impl_hints, 0, sizeof(int) * eyedbsm::HIdxImplHintsCount);
-    int impl_hints_cnt = getImplHintsCount();
+    unsigned int impl_hints_cnt = getImplHintsCount();
     for (int i = 0; i < impl_hints_cnt; i++)
       impl_hints[i] = getImplHints(i);
     Bool isnull;
@@ -1812,9 +1815,9 @@ namespace eyedb {
     if (s) return s;
 
     if (!remote) {
-      int cnt = getImplHintsCount();
+      unsigned int cnt = getImplHintsCount();
       int *impl_hints = (cnt ? new int [cnt] : 0);
-      for (int i = 0; i < cnt; i++)
+      for (unsigned int i = 0; i < cnt; i++)
 	impl_hints[i] = getImplHints(i);
       idximpl =
 	new IndexImpl(IndexImpl::Hash, dataspace, getKeyCount(),
@@ -2074,7 +2077,7 @@ namespace eyedb {
     if (s) return s;
 
     if (!remote) {
-      int cnt = getImplHintsCount();
+      unsigned int cnt = getImplHintsCount();
       int *impl_hints = (cnt ? new int [cnt] : 0);
 
       idximpl = new IndexImpl(IndexImpl::BTree, dataspace, getDegree(),
@@ -2206,7 +2209,7 @@ namespace eyedb {
   AttributeComponent *
   CollAttrImpl::xclone(Database *db, const Class *cls)
   {
-    int impl_hints_cnt = getImplHintsCount();
+    unsigned int impl_hints_cnt = getImplHintsCount();
     int impl_hints[eyedbsm::HIdxImplHintsCount];
     memset(impl_hints, 0, sizeof(int) * eyedbsm::HIdxImplHintsCount);
     for (int i = 0; i < impl_hints_cnt; i++)
@@ -2289,8 +2292,8 @@ namespace eyedb {
 	fprintf(fd, "degree = %d;", getKeyCountOrDegree());
     }
 
-    int cnt = getImplHintsCount();
-    for (int i = 0; i < cnt; i++) {
+    unsigned int cnt = getImplHintsCount();
+    for (unsigned int i = 0; i < cnt; i++) {
       if ((i) == eyedbsm::HIdx::IniSize_Hints &&
 	  getImplHints(eyedbsm::HIdx::IniObjCnt_Hints))
 	continue;
@@ -2351,7 +2354,7 @@ namespace eyedb {
       Status s = makeDataspace(db, dataspace);
       if (s) return s;
 
-      int impl_hints_cnt = getImplHintsCount();
+      unsigned int impl_hints_cnt = getImplHintsCount();
       int impl_hints[eyedbsm::HIdxImplHintsCount];
       memset(impl_hints, 0, sizeof(int) * eyedbsm::HIdxImplHintsCount);
       for (int i = 0; i < impl_hints_cnt; i++)
