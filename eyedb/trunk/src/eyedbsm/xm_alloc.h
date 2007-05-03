@@ -1,4 +1,3 @@
-
 /* 
    EyeDB Object Database Management System
    Copyright (C) 1994-1999,2004-2006 SYSRA
@@ -19,7 +18,7 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
+  Author: Eric Viara <viara@sysra.com>
 */
 
 
@@ -28,33 +27,33 @@
 
 namespace eyedbsm {
 
-typedef struct XMMap XMMap;
+  typedef struct XMMap XMMap;
 
-struct XMHandle {
-  XMMap *map;
-  struct Mutex *mp;
-  int fd;
-  void *x;
-};
+  struct XMHandle {
+    XMMap *map;
+    struct Mutex *mp;
+    int fd;
+    void *x;
+  };
 
-typedef unsigned int XMOffset;
+  typedef unsigned int XMOffset;
 
-extern XMHandle *XMCreate(char *, unsigned int, void *);
-extern XMHandle *XMOpen(char *, void *x);
-extern void XMInit(XMHandle *);
-extern void XMClose(XMHandle *);
+  extern XMHandle *XMCreate(char *, unsigned int, void *);
+  extern XMHandle *XMOpen(char *, void *x);
+  extern void XMInit(XMHandle *);
+  extern void XMClose(XMHandle *);
 
-extern void  *XMAlloc(XMHandle *, unsigned int);
-extern void  *XMAllocZero(XMHandle *, unsigned int);
-extern void  *XMRealloc(XMHandle *, void *, unsigned int);
-extern int   XMFree(XMHandle *, void *);
+  extern void  *XMAlloc(XMHandle *, unsigned int);
+  extern void  *XMAllocZero(XMHandle *, unsigned int);
+  extern void  *XMRealloc(XMHandle *, void *, unsigned int);
+  extern int   XMFree(XMHandle *, void *);
 
-extern int   XMGetSize(XMHandle *, void *);
-extern void  XMShowMemory(XMHandle *);
-extern int   XMCheckMemory(XMHandle *);
-extern void  XMGetInfo(XMHandle *, int *, int *, int *, int *);
-extern void  XMLock(XMHandle *);
-extern void  XMUnlock(XMHandle *);
+  extern int   XMGetSize(XMHandle *, void *);
+  extern void  XMShowMemory(XMHandle *);
+  extern int   XMCheckMemory(XMHandle *);
+  extern void  XMGetInfo(XMHandle *, int *, int *, int *, int *);
+  extern void  XMLock(XMHandle *);
+  extern void  XMUnlock(XMHandle *);
 
 #define XM_ADDR_(MAP, OFFSET) \
         ((OFFSET) ? ((char *)(MAP) + (OFFSET)) : (char *)0)

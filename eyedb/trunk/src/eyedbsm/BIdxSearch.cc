@@ -69,8 +69,9 @@ namespace eyedbsm {
   }
 
   static Status
-  bTreeSearchAny(void const * key, Oid oid, BIdx::InCore * x, unsigned * ip)
+  bTreeSearchAny(void const * key, Oid oid, BIdx::InCore * x, unsigned * ip, unsigned int *found_cnt, Boolean found_any)
   {
+    *found_cnt = 0;
     for (;;) {
       if (backend_interrupt)
 	return statusMake(BACKEND_INTERRUPTED, "");
@@ -80,24 +81,70 @@ namespace eyedbsm {
 	return s;
       for (i = 0; i < x->node->n && x->cmp(i, key, OP1_SWAP) < 0; i++)
 	;
-      if ((i < x->node->n && x->cmp(i, key, OP1_SWAP) == 0) || x->node->leaf) {
+      if ((i < x->node->n && x->cmp(i, key, OP1_SWAP) == 0)) {
 	*ip = i;
+	(*found_cnt)++;
+	if (found_any)
+	  return Success;
+      }
+      if (x->node->leaf) {
 	return Success;
       }
       oid = x->node->c[i];
     }
+
+    return eyedbsm::Success;
   }
 
   Status
-  BIdx::search(void const * key, Boolean * found, void * data)
+  BIdx::search(void const * key, unsigned int *found_cnt)
   {
+    return searchPerform(key, found_cnt, eyedbsm::False, 0);
+  }
+
+  Status
+  BIdx::searchAny(void const * key, Boolean * found, void * data)
+  {
+    unsigned int found_cnt;
+    Status s = searchPerform(key, &found_cnt, eyedbsm::True, data);
+    if (s)
+      return s;
+    *found = (found_cnt != 0) ? eyedbsm::True : eyedbsm::False;
+    return eyedbsm::Success;
+  }
+
+  Status
+  BIdx::searchPerform(void const * key, unsigned int * found_cnt, Boolean found_any, void * data)
+  {
+#if 1
+    BIdxCursor curs(this, key, key, False, False);
+
+    *found_cnt = 0;
+    for (;;) {
+      eyedbsm::Boolean found;
+      eyedbsm::Status s = curs.next(&found, data);
+      if (s)
+	return s;
+
+      if (!found)
+	break;
+
+      (*found_cnt)++;
+
+      if (found_any)
+	return eyedbsm::Success;
+      }
+
+    return eyedbsm::Success;
+#else
     BTree tree;
     if (stat = readBTree(tree))
       return fatal();
     BIdx::InCore x(this);
     unsigned i;
     Status s;
-    if (!(s = bTreeSearchAny(key, tree.root, &x, &i))) {
+#if 0
+    if (!(s = bTreeSearchAny(key, tree.root, &x, &i, found_cnt, found_any))) {
       if (i < x.node->n && cmp(key, x.k(i), OP2_SWAP) == 0) {
 	*found = True;
 	if (data)
@@ -106,7 +153,15 @@ namespace eyedbsm {
       else
 	*found = False;
     }
+#else
+    if (!(s = bTreeSearchAny(key, tree.root, &x, &i, found_cnt, found_any))) {
+      if (*found_cnt && data) {
+	  memcpy(data, x.d(i), dataSize);
+      }
+    }
+#endif
     return s;
+#endif
   }
 
   static Status

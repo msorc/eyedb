@@ -4464,7 +4464,7 @@ namespace eyedb {
 	    return rpcStatusMake_se(se_status);
 	  }
 
-	  se_status = idx2->search(&ind, &found, temp1);
+	  se_status = idx2->searchAny(&ind, &found, temp1);
 	  if (se_status) {
 	    UPDATE_COUNT();
 	    free(temp1);
@@ -4734,7 +4734,7 @@ namespace eyedb {
     /*
       1) get coll from the cache:
       if is not put it (coll = new CollectionBE(db, colloid) -> bequeue)
-      2) coll->getIdx1()->search(ind) -> found?
+      2) coll->getIdx1()->searchAny(ind) -> found?
     */
     Database *db = (Database *)dbh->db;
     CollectionBE *collbe;
@@ -4773,7 +4773,7 @@ namespace eyedb {
 
     eyedbsm::Status se_status;
 
-    if (!(se_status = idx2->search(&ind, &sefound, idr))) {
+    if (!(se_status = idx2->searchAny(&ind, &sefound, idr))) {
       if (sefound) {
 	*found = 1;
       }
@@ -4793,7 +4793,7 @@ namespace eyedb {
   {
     /*
       1) get coll from the cache (see above)
-      2) coll->getIdx2()->search(oid) -> found?
+      2) coll->getIdx2()->searchAny(oid) -> found?
     */
 
     Database *db = (Database *)dbh->db;
@@ -4810,7 +4810,7 @@ namespace eyedb {
     collbe->getIdx(&idx1, 0);
     eyedbsm::Boolean sefound;
 
-    // 30/08/05 : code suppressed because HIdx::search() performs the swap
+    // 30/08/05 : code suppressed because HIdx::searchAny() performs the swap
     // seems that other code does not perform swap before
     // 09/09/05: reconnected
 
@@ -4831,7 +4831,7 @@ namespace eyedb {
 #endif
 
     eyedbsm::Status se_status;
-    if (!(se_status = idx1->search(val, &sefound, ind))) {
+    if (!(se_status = idx1->searchAny(val, &sefound, ind))) {
       if (sefound)
 	*found = 1;
     }

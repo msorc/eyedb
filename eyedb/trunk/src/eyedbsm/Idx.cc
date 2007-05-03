@@ -18,7 +18,7 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
+  Author: Eric Viara <viara@sysra.com>
 */
 
 #include <eyedbconfig.h>
@@ -42,112 +42,112 @@
 
 namespace eyedbsm {
 
-Idx::Idx(Boolean _opened,
-	       Boolean (*_precmp)(void const * p, void const * q,
-				    KeyType const * type, int & r))
-{
-  opened = _opened;
-  precmp = _precmp;
-}
-
-Status
-Idx::make(DbHandle *dbh, const Oid &oid, Idx *&idx)
-{
-  unsigned int idxtype;
-  idx = 0;
-  Status s = objectRead(dbh, 0, sizeof(unsigned int), &idxtype,
-			DefaultLock, 0, 0, &oid);
-  if (s) return s;
-
-  idxtype = x2h_u32(idxtype);
-
-  if (idxtype == HashType) {
-    idx = new HIdx(dbh, &oid);
-    return Success;
+  Idx::Idx(Boolean _opened,
+	   Boolean (*_precmp)(void const * p, void const * q,
+			      KeyType const * type, int & r))
+  {
+    opened = _opened;
+    precmp = _precmp;
   }
 
-  if (idxtype == BTreeType) {
-    idx = new BIdx(dbh, oid);
-    return Success;
-  }
+  Status
+  Idx::make(DbHandle *dbh, const Oid &oid, Idx *&idx)
+  {
+    unsigned int idxtype;
+    idx = 0;
+    Status s = objectRead(dbh, 0, sizeof(unsigned int), &idxtype,
+			  DefaultLock, 0, 0, &oid);
+    if (s) return s;
 
-  return statusMake(ERROR, "object %s is not a valid index [%x]",
-		       getOidString(&oid), idxtype);
-}
+    idxtype = x2h_u32(idxtype);
 
-Status
-Idx::checkOpened() const
-{
-  if (!opened)
-    return statusMake(ERROR, "index %s is not opened",
-			 getOidString(&oid()));
-  return Success;
-}
-
-Idx::Key::Key(int sz)
-{
-  size = sz;
-  key = (size ? m_malloc(size) : 0);
-}
-
-void Idx::Key::setKey(void *k, int sz, const KeyType &keyType)
-{
-#if 1
-  Boolean no_x2h;
-  if (sz < 0) {no_x2h = True; sz = -sz;}
-  else no_x2h = False;
-#endif
-  if (sz > size) {
-    free(key);
-    size = sz;
-    key = m_malloc(sz);
-    assert(key);
-  }
-
-#if 1
-  if (no_x2h)
-    memcpy(key, k, sz);
-  else
-#endif
-    x2h(key, k, keyType, sz);
-}
-
-Idx::Key::~Key()
-{
-  free(key);
-}
-
-unsigned int
-Idx::computeCount()
-{
-  IdxCursor *curs;
-
-  if (asHIdx())
-    curs = new HIdxCursor(asHIdx(), 0, 0, False, False);
-  else
-    curs = new BIdxCursor(asBIdx(), 0, 0, False, False);
-
-  unsigned int count = 0;
-
-  for (;;)
-    {
-      Boolean found;
-      Oid oid;
-      curs->next(&found, &oid, 0);
-
-      if (!found)
-	break;
-
-      count++;
+    if (idxtype == HashType) {
+      idx = new HIdx(dbh, &oid);
+      return Success;
     }
 
-  delete curs;
-  return count;
-}
+    if (idxtype == BTreeType) {
+      idx = new BIdx(dbh, oid);
+      return Success;
+    }
 
-using namespace std;
+    return statusMake(ERROR, "object %s is not a valid index [%x]",
+		      getOidString(&oid), idxtype);
+  }
 
-static ofstream DEVNULL("/dev/null");
+  Status
+  Idx::checkOpened() const
+  {
+    if (!opened)
+      return statusMake(ERROR, "index %s is not opened",
+			getOidString(&oid()));
+    return Success;
+  }
+
+  Idx::Key::Key(int sz)
+  {
+    size = sz;
+    key = (size ? m_malloc(size) : 0);
+  }
+
+  void Idx::Key::setKey(void *k, int sz, const KeyType &keyType)
+  {
+#if 1
+    Boolean no_x2h;
+    if (sz < 0) {no_x2h = True; sz = -sz;}
+    else no_x2h = False;
+#endif
+    if (sz > size) {
+      free(key);
+      size = sz;
+      key = m_malloc(sz);
+      assert(key);
+    }
+
+#if 1
+    if (no_x2h)
+      memcpy(key, k, sz);
+    else
+#endif
+      x2h(key, k, keyType, sz);
+  }
+
+  Idx::Key::~Key()
+  {
+    free(key);
+  }
+
+  unsigned int
+  Idx::computeCount()
+  {
+    IdxCursor *curs;
+
+    if (asHIdx())
+      curs = new HIdxCursor(asHIdx(), 0, 0, False, False);
+    else
+      curs = new BIdxCursor(asBIdx(), 0, 0, False, False);
+
+    unsigned int count = 0;
+
+    for (;;)
+      {
+	Boolean found;
+	Oid oid;
+	curs->next(&found, &oid, 0);
+
+	if (!found)
+	  break;
+
+	count++;
+      }
+
+    delete curs;
+    return count;
+  }
+
+  using namespace std;
+
+  static ofstream DEVNULL("/dev/null");
 
 #define mkcmp(type, x2h) \
 inline static int \
@@ -167,202 +167,202 @@ cmp(type const * p, type const * q, unsigned i, unsigned char bswap) \
 	return 0; \
 }
 
-mkcmp(unsigned char, x2h_nop)
-mkcmp(signed char, x2h_nop)
-mkcmp(eyedblib::int16, x2h_16)
-mkcmp(eyedblib::uint16, x2h_u16)
-mkcmp(eyedblib::int32, x2h_32)
-mkcmp(eyedblib::uint32, x2h_u32)
-mkcmp(eyedblib::int64, x2h_64)
-mkcmp(eyedblib::uint64, x2h_u64)
-mkcmp(eyedblib::float32, x2h_f32)
-mkcmp(eyedblib::float64, x2h_f64)
-//mkcmp(Oid)
+  mkcmp(unsigned char, x2h_nop)
+    mkcmp(signed char, x2h_nop)
+    mkcmp(eyedblib::int16, x2h_16)
+    mkcmp(eyedblib::uint16, x2h_u16)
+    mkcmp(eyedblib::int32, x2h_32)
+    mkcmp(eyedblib::uint32, x2h_u32)
+    mkcmp(eyedblib::int64, x2h_64)
+    mkcmp(eyedblib::uint64, x2h_u64)
+    mkcmp(eyedblib::float32, x2h_f32)
+    mkcmp(eyedblib::float64, x2h_f64)
+    //mkcmp(Oid)
 #undef mkcmp
 
 
-static inline void const *
-fpos_(void const * p, int offset)
-{
-  return (char const *)p + offset;
-}
-
-static inline void *
-fpos_(void * p, int offset)
-{
-  return (char *)p + offset;
-}
-
-//
-// Improvment?
-// is this switch really necessary !?
-// in fact, yes! Because comparison is not bit per bit comparison but a
-// typed comparison: 'x < y' has not the same implementation for float or int
-//
-
-static Boolean offset_cmp = getenv("EYEDBNOIDXOFF") ? True : False;
-
-int
-Idx::compare(void const * p, void const * q, KeyType const * type,
-		unsigned char bswap) const
-{
-  // EV: added 13/12/01
-  if (!offset_cmp && precmp) {
-    int r;
-    if (precmp(p, q, type, r))
-      return r;
+    static inline void const *
+  fpos_(void const * p, int offset)
+  {
+    return (char const *)p + offset;
   }
-  // end added
 
-  p = fpos_(p, type->offset);
-  q = fpos_(q, type->offset);
+  static inline void *
+  fpos_(void * p, int offset)
+  {
+    return (char *)p + offset;
+  }
 
-  switch (type->type)
-    {
-    case tChar:
-      return memcmp(p, q, type->count);
+  //
+  // Improvment?
+  // is this switch really necessary !?
+  // in fact, yes! Because comparison is not bit per bit comparison but a
+  // typed comparison: 'x < y' has not the same implementation for float or int
+  //
 
-    case tInt32:
-      return cmp((eyedblib::int32 const *)p, (eyedblib::int32 const *)q, type->count, bswap);
+  static Boolean offset_cmp = getenv("EYEDBNOIDXOFF") ? True : False;
 
-    case tInt64:
-      return cmp((eyedblib::int64 const *)p, (eyedblib::int64 const *)q, type->count, bswap);
-
-    case tInt16:
-      return cmp((eyedblib::int16 const *)p, (eyedblib::int16 const *)q, type->count, bswap);
-
-    case tFloat32:
-      return cmp((eyedblib::float32 const *)p, (eyedblib::float32 const *)q, type->count, bswap);
-
-    case tFloat64:
-      return cmp((eyedblib::float64 const *)p, (eyedblib::float64 const *)q, type->count, bswap);
-
-    case tSignedChar:
-      return cmp((signed char const *)p, (signed char const *)q, type->count, bswap);
-
-    case tUnsignedChar:
-      return cmp((unsigned char const *)p, (unsigned char const *)q, type->count, bswap);
-
-    case tUnsignedInt16:
-      return cmp((eyedblib::uint16 const *)p, (eyedblib::uint16 const *)q, type->count, bswap);
-
-    case tUnsignedInt32:
-      return cmp((eyedblib::uint32 const *)p, (eyedblib::uint32 const *)q, type->count, bswap);
-
-    case tUnsignedInt64:
-      return cmp((eyedblib::uint64 const *)p, (eyedblib::uint64 const *)q, type->count, bswap);
-
-    case tOid:
-      if (!bswap)
-	return memcmp(p, q, type->count * sizeof(Oid));
-      else {
-	assert(type->count == 1);
-	Oid poid, qoid;
-	eyedblib_mcp(&poid, p, sizeof(poid));
-	eyedblib_mcp(&qoid, q, sizeof(qoid));
-	if (bswap & OP1_SWAP) x2h_oid(&poid, &poid);
-	if (bswap & OP2_SWAP) x2h_oid(&qoid, &qoid);
-	return memcmp(&poid, &qoid, sizeof(Oid));
-      }
-
-    case tString:
-      return strcmp((char const *)p, (char const *)q);
-
-    default:
-      assert(0);
+  int
+  Idx::compare(void const * p, void const * q, KeyType const * type,
+	       unsigned char bswap) const
+  {
+    // EV: added 13/12/01
+    if (!offset_cmp && precmp) {
+      int r;
+      if (precmp(p, q, type, r))
+	return r;
     }
-  return 0;
-}
+    // end added
 
-void
-Idx::h2x(void *xkey, const void *hkey, const KeyType &type)
-{
-  if (type.offset)
-    memcpy((char *)xkey, (char *)hkey, type.offset);
+    p = fpos_(p, type->offset);
+    q = fpos_(q, type->offset);
 
-  xkey = fpos_(xkey, type.offset);
-  hkey = fpos_(hkey, type.offset);
-  //printf("h2x(%s[%d])\n", typeString(type.type), type.count);
-
-  switch (type.type)
-    {
-    case tInt32:
-    case tFloat32:
-    case tUnsignedInt32:
-      h2x_32_cpy(xkey, hkey);
-      break;
-
-    case tInt64:
-    case tFloat64:
-    case tUnsignedInt64:
-      h2x_64_cpy(xkey, hkey);
-      break;
-
-    case tInt16:
-    case tUnsignedInt16:
-      h2x_16_cpy(xkey, hkey);
-      break;
-
-    case tOid:
+    switch (type->type)
       {
-	Oid hoid;
-	memcpy(&hoid, hkey, sizeof(hoid));
-	h2x_oid((Oid *)xkey, &hoid); // 2nd arg need to be aligned !
+      case tChar:
+	return memcmp(p, q, type->count);
+
+      case tInt32:
+	return cmp((eyedblib::int32 const *)p, (eyedblib::int32 const *)q, type->count, bswap);
+
+      case tInt64:
+	return cmp((eyedblib::int64 const *)p, (eyedblib::int64 const *)q, type->count, bswap);
+
+      case tInt16:
+	return cmp((eyedblib::int16 const *)p, (eyedblib::int16 const *)q, type->count, bswap);
+
+      case tFloat32:
+	return cmp((eyedblib::float32 const *)p, (eyedblib::float32 const *)q, type->count, bswap);
+
+      case tFloat64:
+	return cmp((eyedblib::float64 const *)p, (eyedblib::float64 const *)q, type->count, bswap);
+
+      case tSignedChar:
+	return cmp((signed char const *)p, (signed char const *)q, type->count, bswap);
+
+      case tUnsignedChar:
+	return cmp((unsigned char const *)p, (unsigned char const *)q, type->count, bswap);
+
+      case tUnsignedInt16:
+	return cmp((eyedblib::uint16 const *)p, (eyedblib::uint16 const *)q, type->count, bswap);
+
+      case tUnsignedInt32:
+	return cmp((eyedblib::uint32 const *)p, (eyedblib::uint32 const *)q, type->count, bswap);
+
+      case tUnsignedInt64:
+	return cmp((eyedblib::uint64 const *)p, (eyedblib::uint64 const *)q, type->count, bswap);
+
+      case tOid:
+	if (!bswap)
+	  return memcmp(p, q, type->count * sizeof(Oid));
+	else {
+	  assert(type->count == 1);
+	  Oid poid, qoid;
+	  eyedblib_mcp(&poid, p, sizeof(poid));
+	  eyedblib_mcp(&qoid, q, sizeof(qoid));
+	  if (bswap & OP1_SWAP) x2h_oid(&poid, &poid);
+	  if (bswap & OP2_SWAP) x2h_oid(&qoid, &qoid);
+	  return memcmp(&poid, &qoid, sizeof(Oid));
+	}
+
+      case tString:
+	return strncmp((char const *)p, (char const *)q, type->count);
+
+      default:
+	assert(0);
       }
-      break;
+    return 0;
+  }
 
-    default:
-      printf("ERROR TYPE = %d\n", type.type);
-      assert(0);
-    }
-}
+  void
+  Idx::h2x(void *xkey, const void *hkey, const KeyType &type)
+  {
+    if (type.offset)
+      memcpy((char *)xkey, (char *)hkey, type.offset);
 
-void
-Idx::x2h(void *hkey, const void *xkey, const KeyType &type,
-	    unsigned int size)
-{
-  if (type.offset)
-    memcpy((char *)hkey, (char *)xkey, type.offset);
+    xkey = fpos_(xkey, type.offset);
+    hkey = fpos_(hkey, type.offset);
+    //printf("h2x(%s[%d])\n", typeString(type.type), type.count);
 
-  hkey = fpos_(hkey, type.offset);
-  xkey = fpos_(xkey, type.offset);
-  //printf("x2h(%s[%d])+%d\n", typeString(type.type), type.count, type.offset);
+    switch (type.type)
+      {
+      case tInt32:
+      case tFloat32:
+      case tUnsignedInt32:
+	h2x_32_cpy(xkey, hkey);
+	break;
 
-  Oid hoid;
-  switch (type.type)
-    {
-    case tInt32:
-    case tFloat32:
-    case tUnsignedInt32:
-      x2h_32_cpy(hkey, xkey);
-      break;
+      case tInt64:
+      case tFloat64:
+      case tUnsignedInt64:
+	h2x_64_cpy(xkey, hkey);
+	break;
 
-    case tInt64:
-    case tFloat64:
-    case tUnsignedInt64:
-      x2h_64_cpy(hkey, xkey);
-      break;
+      case tInt16:
+      case tUnsignedInt16:
+	h2x_16_cpy(xkey, hkey);
+	break;
 
-    case tInt16:
-    case tUnsignedInt16:
-      x2h_16_cpy(hkey, xkey);
-      break;
+      case tOid:
+	{
+	  Oid hoid;
+	  memcpy(&hoid, hkey, sizeof(hoid));
+	  h2x_oid((Oid *)xkey, &hoid); // 2nd arg need to be aligned !
+	}
+	break;
 
-    case tOid:
-      x2h_oid(&hoid, (const Oid *)xkey); // 1st arg need to be aligned !
-      memcpy(hkey, &hoid, sizeof(hoid));
-      break;
+      default:
+	printf("ERROR TYPE = %d\n", type.type);
+	assert(0);
+      }
+  }
 
-    default:
-      memcpy(hkey, xkey, size - type.offset);
-      break;
-    }
-}
+  void
+  Idx::x2h(void *hkey, const void *xkey, const KeyType &type,
+	   unsigned int size)
+  {
+    if (type.offset)
+      memcpy((char *)hkey, (char *)xkey, type.offset);
 
-const char *
-Idx::typeString(Type type)
-{
-  switch (type) {
+    hkey = fpos_(hkey, type.offset);
+    xkey = fpos_(xkey, type.offset);
+    //printf("x2h(%s[%d])+%d\n", typeString(type.type), type.count, type.offset);
+
+    Oid hoid;
+    switch (type.type)
+      {
+      case tInt32:
+      case tFloat32:
+      case tUnsignedInt32:
+	x2h_32_cpy(hkey, xkey);
+	break;
+
+      case tInt64:
+      case tFloat64:
+      case tUnsignedInt64:
+	x2h_64_cpy(hkey, xkey);
+	break;
+
+      case tInt16:
+      case tUnsignedInt16:
+	x2h_16_cpy(hkey, xkey);
+	break;
+
+      case tOid:
+	x2h_oid(&hoid, (const Oid *)xkey); // 1st arg need to be aligned !
+	memcpy(hkey, &hoid, sizeof(hoid));
+	break;
+
+      default:
+	memcpy(hkey, xkey, size - type.offset);
+	break;
+      }
+  }
+
+  const char *
+  Idx::typeString(Type type)
+  {
+    switch (type) {
     case tChar:
       return "tChar";
 
@@ -407,12 +407,12 @@ Idx::typeString(Type type)
       abort();
       return 0;
     }
-}
+  }
 
-size_t
-Idx::typeSize(Type type)
-{
-  switch (type) {
+  size_t
+  Idx::typeSize(Type type)
+  {
+    switch (type) {
     case tChar:
       return sizeof(char);
 
@@ -452,9 +452,9 @@ Idx::typeSize(Type type)
     case tString:
       return sizeof(char);
       /*
-      fprintf(stderr, "%s line %d: not yet supported string type in index\n", __FILE__, __LINE__);
-      abort();
-      return 0;
+	fprintf(stderr, "%s line %d: not yet supported string type in index\n", __FILE__, __LINE__);
+	abort();
+	return 0;
       */
 
     default:
@@ -462,6 +462,5 @@ Idx::typeSize(Type type)
       abort();
       return 0;
     }
-}
-
+  }
 }

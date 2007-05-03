@@ -37,12 +37,15 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <assert.h>
+#include <eyedblib/rpc_lib.h>
 #include <eyedblib/performer.h>
 #include <eyedblib/strutils.h>
 #include <eyedbsm/xdr.h>
 #include <eyedblib/log.h>
 #include <eyedblib/m_mem.h>
 #include "lib/m_mem_p.h"
+
+#include <map>
 
 namespace eyedbsm {
   class MapHeader;
@@ -79,6 +82,9 @@ namespace eyedbsm {
 
   extern Boolean backend_interrupt;
 
+#define data_group_sz(I, THIS) \
+ sizeof(unsigned int) + (I) * (THIS)->hidx.datasz
+
 static void
 dump_keytype(const char *msg, const Idx::KeyType &keytype,
 	     const HIdx::_Idx &hidx)
@@ -88,6 +94,11 @@ dump_keytype(const char *msg, const Idx::KeyType &keytype,
 	 Idx::typeString(keytype.type), keytype.count, keytype.offset);
   printf("    hidx.keytype=%s hidx.keysz=%d hidx.offset=%d\n",
 	 Idx::typeString((Idx::Type)hidx.keytype), hidx.keysz, hidx.offset);
+}
+
+static void cmp_offset(unsigned long off, const char *str)
+{
+  printf("SAME OFFSET %s: %d\n", str, off);
 }
 
 #define mcp(D, S, N) \
@@ -269,6 +280,16 @@ get_keyTypeCount(const HIdx::_Idx &hidx)
 
 //#define FORCE_COPY
 
+static Boolean _isUExtend(const HIdx::_Idx &hidx)
+{
+  return (hidx.impl_hints[HIdx::XCoef_Hints] > 1) ? True : False;
+}
+
+static Boolean _isDataGroupedByKey(const HIdx::_Idx &hidx)
+{
+  return (hidx.impl_hints[HIdx::DataGroupedByKey_Hints] != 0) ? True : False;
+}
+
 void
 HIdx::init(DbHandle *_dbh, unsigned int _keytype,
 	      unsigned int keysz, unsigned int offset,
@@ -376,7 +397,8 @@ HIdx::init(DbHandle *_dbh, unsigned int _keytype,
 	    ("Have Created Hash Index: treeoid=%s\n",
 	     getOidString(&treeoid)));
   delete [] hats;
-  uextend = (hidx.impl_hints[XCoef_Hints] > 1) ? True : False;
+  uextend = _isUExtend(hidx);
+  data_grouped_by_key = _isDataGroupedByKey(hidx);
 }
 
 HIdx::HIdx(DbHandle *_dbh, KeyType _keytype,
@@ -453,7 +475,8 @@ HIdx::HIdx(DbHandle *_dbh, const Oid *_oid,
   mask = hidx.key_count - 1;
   pow2 = isPower2(hidx.key_count);
   bsize = hidx.impl_hints[IniSize_Hints];
-  uextend = (hidx.impl_hints[XCoef_Hints] > 1) ? True : False;
+  uextend = _isUExtend(hidx);
+  data_grouped_by_key = _isDataGroupedByKey(hidx);
 }
 
 #ifdef NEW_HASH_KEY
@@ -682,7 +705,8 @@ HIdx::get_key(int &n, const void *key, unsigned int *size) const
   if (STRTYPE(this)) {
     int len = strlen((char *)key);
     s = get_string_hash_key(key, len, x);
-    if (s) return s;
+    if (s)
+      return s;
     
     if (size) {
       if (hidx.keysz == VarSize)
@@ -696,7 +720,8 @@ HIdx::get_key(int &n, const void *key, unsigned int *size) const
   }
 
   s = get_rawdata_hash_key(key, hidx.keysz - keytype.offset, x);
-  if (s) return s;
+  if (s)
+    return s;
   if (size)
     *size = hidx.datasz + hidx.keysz;
   
@@ -718,7 +743,8 @@ HIdx::suppressObjectFromFreeList(Hat &hat, int hat_k, Header &h,
     h2x_oid(&xoid, &h.free_next);
     s = objectWrite(dbh, OFFSET(Header, free_next), sizeof(Oid),
 		       &xoid, &h.free_prev);
-    if (s) return s;
+    if (s)
+      return s;
   }
   
   if (h.free_next.getNX()) {
@@ -726,13 +752,15 @@ HIdx::suppressObjectFromFreeList(Hat &hat, int hat_k, Header &h,
     h2x_oid(&xoid, &h.free_prev);
     s = objectWrite(dbh, OFFSET(Header, free_prev), sizeof(Oid),
 		       &xoid, &h.free_next);
-    if (s) return s;
+    if (s)
+      return s;
   }
   
   if (hat.free_first.getNX() == koid.getNX()) {
     hat.free_first = h.free_next;
     s = writeHat(hat_k, hat);
-    if (s) return s;
+    if (s)
+      return s;
   }
 
   mset(&h.free_prev, 0, sizeof(h.free_prev));
@@ -755,7 +783,8 @@ HIdx::suppressObjectFromList(Hat &hat, int hat_k, Header &h,
     h2x_oid(&xoid, &h.next);
     s = objectWrite(dbh, OFFSET(Header, next), sizeof(Oid),
 		       &xoid, &h.prev);
-    if (s) return s;
+    if (s)
+      return s;
   }
   
   if (h.next.getNX()) {
@@ -763,7 +792,8 @@ HIdx::suppressObjectFromList(Hat &hat, int hat_k, Header &h,
     h2x_oid(&xoid, &h.prev);
     s = objectWrite(dbh, OFFSET(Header, prev), sizeof(Oid),
 		       &xoid, &h.next);
-    if (s) return s;
+    if (s)
+      return s;
   }
   
   Boolean write_hat = False;
@@ -779,7 +809,8 @@ HIdx::suppressObjectFromList(Hat &hat, int hat_k, Header &h,
 
   if (write_hat) {
     s = writeHat(hat_k, hat);
-    if (s) return s;
+    if (s)
+      return s;
   }
 
   return objectDelete(dbh, &koid);
@@ -861,25 +892,29 @@ HIdx::replaceObjectInList(Hat &hat, int hat_k, Header &h,
   if (h.prev.getNX()) {
     s = objectWrite(dbh, OFFSET(Header, next), sizeof(Oid),
 		       &xoid, &h.prev);
-    if (s) return s;
+    if (s)
+      return s;
   }
   
   if (h.next.getNX()) {
     s = objectWrite(dbh, OFFSET(Header, prev), sizeof(Oid),
 		       &xoid, &h.next);
-    if (s) return s;
+    if (s)
+      return s;
   }
   
   if (h.free_prev.getNX()) {
     s = objectWrite(dbh, OFFSET(Header, free_next), sizeof(Oid),
 		       &xoid, &h.free_prev);
-    if (s) return s;
+    if (s)
+      return s;
   }
   
   if (h.free_next.getNX()) {
     s = objectWrite(dbh, OFFSET(Header, free_prev), sizeof(Oid),
 		       &xoid, &h.free_next);
-    if (s) return s;
+    if (s)
+      return s;
   }
   
   Boolean write_hat = False;
@@ -900,7 +935,8 @@ HIdx::replaceObjectInList(Hat &hat, int hat_k, Header &h,
 
   if (write_hat) {
     s = writeHat(hat_k, hat);
-    if (s) return s;
+    if (s)
+      return s;
   }
 
   return Success;
@@ -913,11 +949,18 @@ Status
 HIdx::insert_realize(Hat &hat, int hat_k, const void *key,
 		     unsigned int size, const void *xdata,
 		     const Oid &koid,
-		     Header &h, int offset, Overhead &o)
+		     Header &h, int offset, Overhead &o, unsigned int datasz)
 {
   int osize = o.size, onext = o.free_next;
   int ovsize = size + sizeof(Overhead);
   Status s;
+
+  assert(o.free);
+
+  /*
+  printf("insert_realize offset %d o.free %d o.free_next %d o.free_prev %d\n",
+	 offset, o.free, o.free_next, o.free_prev);
+  */
 
 #ifdef TRACK_MAP
   printf("insert_realize(%d vs. %d", osize, size);
@@ -941,25 +984,62 @@ HIdx::insert_realize(Hat &hat, int hat_k, const void *key,
     memcpy(data + sizeof(Overhead), key, strlen((char *)key)+1);
   else if (hidx.keytype == tUnsignedChar || hidx.keytype == tChar ||
 	   hidx.keytype == tSignedChar)
-    memcpy(data + sizeof(Overhead), key, size - hidx.datasz);
+    memcpy(data + sizeof(Overhead), key, size - datasz);
   else {
     char xkey[Idx_max_type_size];
-    assert(size - hidx.datasz <= Idx_max_type_size);
+    assert(size - datasz <= Idx_max_type_size);
     h2x(xkey, key, keytype);
-    memcpy(data + sizeof(Overhead), xkey, size - hidx.datasz);
+    memcpy(data + sizeof(Overhead), xkey, size - datasz);
   }
 
+  if (o.free_next != NullOffset) {
+    Overhead no;
+    s = readOverhead(o.free_next, koid, no);
+    if (s)
+      return s;
+    assert(no.free);
+    no.free_prev = o.free_prev;
+    s = writeOverhead(o.free_next, koid, no);
+    if (s)
+      return s;
+  }
+
+  if (o.free_prev != NullOffset) {
+    Overhead no;
+    s = readOverhead(o.free_prev, koid, no);
+    if (s)
+      return s;
+    assert(no.free);
+    no.free_next = o.free_next;
+    s = writeOverhead(o.free_prev, koid, no);
+    if (s)
+      return s;
+  }
+  else {
+    assert(h.free_first == offset);
+    h.free_first = o.free_next;
+  }
+
+#if 0
   if (h.free_first == offset) {
+    printf("h.free_first == offset %d\n", offset);
     if (o.free_next != NullOffset) {
       Overhead no;
       s = readOverhead(o.free_next, koid, no);
-      if (s) return s;
+      if (s)
+	return s;
+      // EV : 3/05/07
+      assert(no.free);
       no.free_prev = NullOffset;
       s = writeOverhead(o.free_next, koid, no);
-      if (s) return s;
+      if (s)
+	return s;
     }
     h.free_first = o.free_next;
+    printf("setting free_first to %d\n", h.free_first);
   }
+#endif
+
 
 #ifndef BUG_DATA_STORE
   if (osize > size + sizeof(Overhead))
@@ -972,13 +1052,21 @@ HIdx::insert_realize(Hat &hat, int hat_k, const void *key,
   Overhead to;
   h2x_overhead(&to, &o);
   mcp(data, &to, sizeof(to));
-  memcpy(data + ovsize - hidx.datasz, xdata, hidx.datasz);
+  //  memcpy(data + ovsize - hidx.datasz, xdata, hidx.datasz);
+  memcpy(data + ovsize - datasz, xdata, datasz);
   //printf("writing OBJECT %s of size %d offset = %d total = %d\n", getOidString(&koid), ovsize, offset, offset+ovsize);
   s = objectWrite(dbh, offset, ovsize, data, &koid);
   free(data);
-  if (s) return s;  
+  if (s)
+    return s;  
 
   h.free_whole -= osize;
+
+#if 0
+  assert(!writeHeader(koid, h));
+#endif
+
+  assert(h.free_whole >= 0 && h.free_whole < (~0UL/2));
   if (osize == size) {
 #ifdef TRACK_MAP
     printf("exact size %d\n", size);
@@ -987,13 +1075,14 @@ HIdx::insert_realize(Hat &hat, int hat_k, const void *key,
   else if (osize > size + sizeof(Overhead)) {
     /* generation d'une nouvelle cellule */
 #ifdef TRACK_MAP
-    printf("split cell %d %d\n", size, osize);
+    printf("split cell %d %d %d %d\n", size+sizeof(Overhead), osize, offset, h.free_first);
 #endif
     int noffset = offset + size + sizeof(Overhead);
     s = insertCell(noffset, osize - size - sizeof(Overhead), h, koid);
-    if (s) return s;
+    if (s)
+      return s;
   }
-  #ifdef TRACK_MAP
+#ifdef TRACK_MAP
   else {
     printf("special case: we are loosing some place %s ?\n", getOidString(&koid));
   }
@@ -1009,10 +1098,11 @@ HIdx::insert_realize(Hat &hat, int hat_k, const void *key,
 
   // changed this test the 29/06/02 to allow to get rid of unuseful objects
 #ifdef OPT_FREELIST
-  if (!h.free_cnt || (STRTYPE(this) && h.free_whole <= sizeof(Overhead)+8)) {
+  if (!h.free_cnt || (STRTYPE(this) && h.free_whole <= sizeof(Overhead)+8))
 #else
-  if (!h.free_cnt) {
+  if (!h.free_cnt)
 #endif
+    {
 #ifdef TRACK_MAP
     printf("making chain for new object\n");
 #endif
@@ -1027,7 +1117,8 @@ HIdx::insert_realize(Hat &hat, int hat_k, const void *key,
       }
 #endif
       s = suppressObjectFromFreeList(hat, hat_k, h, koid);
-      if (s) return s;
+      if (s)
+	return s;
     }
   }
 
@@ -1046,7 +1137,8 @@ HIdx::count_manage(DbHandle *_dbh, int inc)
   Status s = objectRead(_dbh, sizeof(unsigned int),
 			      sizeof(unsigned int), &count,
 			      DefaultLock, 0, 0, &treeoid);
-  if (s) return s;
+  if (s)
+    return s;
   count = x2h_u32(count);
   unsigned int o_count = hidx.object_count;
 
@@ -1068,7 +1160,8 @@ HIdx::readHat(int k, Hat &hat) const
 
   s = objectRead(dbh, gkey(k) * sizeof(Hat), sizeof(Hat), &hat,
 		    DefaultLock, 0, 0, &treeoid);
-  if (s) return s;
+  if (s)
+    return s;
   x2h_hat(&hat);
   return Success;
 }
@@ -1079,7 +1172,8 @@ HIdx::readHeader(const Oid &koid, Header &h) const
   Status s;
   s = objectRead(dbh, 0, sizeof(Header), &h, DefaultLock,
 		    0, 0, &koid);
-  if (s) return s;
+  if (s)
+    return s;
   x2h_header(&h);
   return Success;
 }
@@ -1087,6 +1181,15 @@ HIdx::readHeader(const Oid &koid, Header &h) const
 Status
 HIdx::writeHeader(const Oid &koid, const Header &h) const
 {
+#if 1
+  if (h.free_first != NullOffset) {
+    Overhead o = {0};
+    Status s = readOverhead(h.free_first, koid, o);
+    if (s)
+      statusPrint(s, "...");
+    assert(o.free);
+  }
+#endif
   Header th;
   h2x_header(&th, &h);
   return objectWrite(dbh, 0, sizeof(Header), &th, &koid);
@@ -1098,10 +1201,90 @@ HIdx::readOverhead(int offset, const Oid &koid, Overhead &o) const
   Status s;
   s = objectRead(dbh, offset, sizeof(Overhead), &o, DefaultLock,
 		    0, 0, &koid);
-  if (s) return s;
+  if (s)
+    return s;
   x2h_overhead(&o);
   return Success;
 }
+
+void HIdx::printOverhead(const HIdx::Overhead *o, int offset) const
+{
+  printf("Overhead at %d\n", offset);
+  printf("  o.free %d\n", o->free);
+  printf("  o.size %d\n", o->size);
+  printf("  o.free_prev %d\n", o->free_prev);
+  printf("  o.free_next %d\n", o->free_next);
+}
+
+void HIdx::checkOverhead(int offset, const Oid *koid) const
+{
+  HIdx::Overhead o;
+  readOverhead(offset, *koid, o);
+  printOverhead(&o, offset);
+}
+
+void HIdx::printHeader(const HIdx::Header *h) const
+{
+  printf("Header\n");
+  printf("  h.size %u\n", h->size);
+  printf("  h.free_cnt %d\n", h->free_cnt);
+  printf("  h.alloc_cnt %d\n", h->alloc_cnt);
+  printf("  h.free_whole %d\n", h->free_whole);
+  printf("  h.free_first %d\n", h->free_first);
+  printf("  h.free_prev %s\n", getOidString(&h->free_prev));
+  printf("  h.free_next %s\n", getOidString(&h->free_next));
+  printf("  h.prev %s\n", getOidString(&h->prev));
+  printf("  h.next %s\n", getOidString(&h->next));
+}
+
+void HIdx::checkHeader(const Oid *koid) const
+{
+  HIdx::Header h;
+  readHeader(*koid, h);
+  printHeader(&h);
+}
+
+void HIdx::checkChain(const Oid *koid) const
+{
+  Header h;
+  readHeader(*koid, h);
+  int offset = h.free_first;
+  int prev = NullOffset;
+  //printHeader(&h);
+
+  for (unsigned int n = 0; offset != NullOffset && n < 100; n++) {
+    Overhead o;
+    assert(!readOverhead(offset, *koid, o));
+    assert(o.free);
+    assert(o.free_prev == prev);
+    prev = offset;
+    //printOverhead(&o, offset);
+    offset = o.free_next;
+    if (n > 90)
+      printf("chain loop\n");
+  }
+}
+
+void HIdx::checkChain(const Hat *hat, const std::string &msg) const
+{
+  Oid koid = hat->free_first;
+
+  //printf("\nChecking chain %s {\n", msg.c_str());
+
+  int cnt = 0;
+  while (koid.getNX()) {
+    Header h;
+    assert(!readHeader(koid, h));
+    //printf("h.free_first %d\n", h.free_first);
+    checkChain(&koid);
+    koid = h.free_next;
+    cnt++;
+  }
+  //printf("} %d found\n", cnt);
+}
+
+static bool dont_check = false;
+//static bool dont_check = true;
 
 Status
 HIdx::writeOverhead(int offset, const Oid &koid,
@@ -1109,6 +1292,57 @@ HIdx::writeOverhead(int offset, const Oid &koid,
 {
   Overhead to;
   h2x_overhead(&to, &o);
+
+#if 0
+  if (!dont_check) {
+    std::map<unsigned int, bool> map;
+    map[offset] = true;
+
+    unsigned off = o.free_prev;
+    bool loop = false;
+    for (int n = 0; !loop && n < 10; n++) {
+      if (off == NullOffset)
+	break;
+
+      if (loop) {
+	printf("offset %u at #%d\n", off, n);
+      }
+
+      if (map.find(off) != map.end()) {
+	printf("loop in writeOverhead prev %u at #%d [prev %d]\n", off, n, o.free_prev);
+	loop = true;
+      }
+      map[off] = true;
+      Overhead no;
+      readOverhead(off, koid, no);
+      off = no.free_prev;
+    }
+    if (loop)
+      printf("*** prev EOL\n");
+
+    off = o.free_next;
+    loop = false;
+    for (int n = 0; !loop && n < 10; n++) {
+      if (off == NullOffset)
+	break;
+
+      if (loop) {
+	printf("offset %u at #%d\n", off, n);
+      }
+
+      if (map.find(off) != map.end()) {
+	printf("loop in writeOverhead next %u at #%d [next %d]\n", off, n, o.free_next);
+	loop = true;
+      }
+      map[off] = true;
+      Overhead no;
+      readOverhead(off, koid, no);
+      off = no.free_next;
+    }
+    if (loop)
+      printf("*** next EOL\n");
+  }
+#endif
   return objectWrite(dbh, offset, sizeof(Overhead), &to, &koid);
 }
 
@@ -1121,7 +1355,8 @@ HIdx::readHats(Hat *&hats) const
 
   s = objectRead(dbh, 0, len * sizeof(Hat), hats,
 		    DefaultLock, 0, 0, &treeoid);
-  if (s) return s;
+  if (s)
+    return s;
   for (int i = KEY_OFF; i < len; i++)
     x2h_hat(&hats[i]);
   return Success;
@@ -1152,7 +1387,8 @@ HIdx::writeHat(int k, const Hat &hat) const
   h2x_hat(&that, &hat);
   s = objectWrite(dbh, gkey(k) * sizeof(Hat), sizeof(Hat), &that,
 		     &treeoid);
-  if (s) return s;
+  if (s)
+    return s;
   return Success;
 }
 
@@ -1169,7 +1405,8 @@ HIdx::dumpMemoryMap(const Hat &hat, const char *msg, FILE *fd)
     Status s;
     Header h;
     s = readHeader(koid, h);
-    if (s) return s;
+    if (s)
+      return s;
     fprintf(fd, "\tObject %s -> Free Whole: %d, Free Count: %d\n",
 	    getOidString(&koid), h.free_whole, h.free_cnt);
     assert(!memcmp(&h.free_prev, &prev, sizeof(prev)));
@@ -1189,10 +1426,12 @@ HIdx::dumpMemoryMap(const Hat &hat, const char *msg, FILE *fd)
     Status s;
     Header h;
     s = readHeader(koid, h);
-    if (s) return s;
+    if (s)
+      return s;
     unsigned int sz = 0;
     s = objectSizeGet(dbh, &sz, DefaultLock, &koid);
-    if (s) return s;
+    if (s)
+      return s;
     int cur = sizeof(Header);
     fprintf(fd, "\tObject %s {\n\t  First Free: %d\n\t  Free Whole: %d\n\t  "
 	    "Free Count: %d\n\t  Alloc Count: %d\n\t  Size: %d\n\t  "
@@ -1207,7 +1446,8 @@ HIdx::dumpMemoryMap(const Hat &hat, const char *msg, FILE *fd)
     while (cur + sizeof(Overhead) <= sz) {
       Overhead to;
       s = readOverhead(cur, koid, to);
-      if (s) return s;
+      if (s)
+	return s;
       fprintf(fd, "\t  #%d size %d %s", cur,
 	      to.size, (to.free ? "free" : "busy"));
 
@@ -1233,7 +1473,8 @@ HIdx::dumpMemoryMap(const Hat &hat, const char *msg, FILE *fd)
     while (free_cur != NullOffset) {
       Overhead to;
       s = readOverhead(free_cur, koid, to);
-      if (s) return s;
+      if (s)
+	return s;
       if (!to.free || to.free_prev != free_prev) {
 	fprintf(fd, "#%d free, free_prev %d %d\n", free_cur, to.free_prev,
 		free_prev);
@@ -1261,7 +1502,7 @@ HIdx::makeObject(Hat &hat, int hat_k, Oid &koid, int &offset,
 		    Header &h, Overhead &o, unsigned int objsize)
 {
 #ifdef TRACK_MAP
-  printf("making object %s\n", !hat.first.nx ? "FIRST" : "not FIRST");
+  printf("making object\n");
 #endif
   unsigned int bsz = bsize; // changed the 30/01/02
   objsize += sizeof(Overhead); // added the 30/01/02
@@ -1281,6 +1522,7 @@ HIdx::makeObject(Hat &hat, int hat_k, Oid &koid, int &offset,
   h.free_cnt = 1;
   h.alloc_cnt = 0;
   h.free_whole = utsize - sizeof(Overhead);
+  assert(h.free_whole >= 0 && h.free_whole < (~0UL/2));
   h.free_first = sizeof(Header);
   h.prev = hat.last;
   mset(&h.next, 0, sizeof(h.next));
@@ -1310,7 +1552,8 @@ HIdx::makeObject(Hat &hat, int hat_k, Oid &koid, int &offset,
 #endif
   free(d);
 
-  if (s) return s;
+  if (s)
+    return s;
 
   if (!hat.first.getNX())
     hat.first = koid;
@@ -1319,7 +1562,8 @@ HIdx::makeObject(Hat &hat, int hat_k, Oid &koid, int &offset,
     h2x_oid(&xoid, &koid);
     s = objectWrite(dbh, OFFSET(Header, next), sizeof(Oid), &xoid,
 		       &hat.last);
-    if (s) return s;
+    if (s)
+      return s;
   }
 
   hat.last = koid;
@@ -1346,7 +1590,8 @@ HIdx::insertObjectInFreeList(Hat &hat, int hat_k, Header &h,
     h2x_oid(&xoid, &koid);
     s = objectWrite(dbh, OFFSET(Header, free_prev),
 		       sizeof(Oid), &xoid, &hat.free_first);
-    if (s) return s;
+    if (s)
+      return s;
   }
 
   h.free_next = hat.free_first;
@@ -1370,11 +1615,10 @@ HIdx::extendObject(unsigned int size, Hat &hat, int hat_k, Oid &koid,
   unsigned int size_n = hidx.impl_hints[XCoef_Hints] * h.size;
   unsigned int size_inc = size_n - h.size;
 
-  /*
   printf("extendObject %s [%d > %d && %d > %d] ?\n", getOidString(&koid),
 	 size_n, hidx.impl_hints[SzMax_Hints],
 	 size_inc + h.free_whole, size);
-  */
+
   if (size_n > (unsigned int)hidx.impl_hints[SzMax_Hints] &&
       (!size || size_inc + h.free_whole >= size)) {
     extended = False;
@@ -1387,7 +1631,8 @@ HIdx::extendObject(unsigned int size, Hat &hat, int hat_k, Oid &koid,
   int lastoffset = NullOffset;
   while (offset != NullOffset) {
     s = readOverhead(offset, koid, o);
-    if (s) return s;
+    if (s)
+      return s;
     lastoffset = offset;
     offset = o.free_next;
   }
@@ -1401,18 +1646,22 @@ HIdx::extendObject(unsigned int size, Hat &hat, int hat_k, Oid &koid,
     o.size += size_inc;
     offset = lastoffset;
     s = writeOverhead(offset, koid, o);
-    if (s) return s;
+    if (s)
+      return s;
     extended = True;
     h.free_whole += size_inc;
     int osize = h.size;
     h.size = size_n;
     s = writeHeader(koid, h);
-    if (s) return s;
+    if (s)
+      return s;
     if (isPhysicalOid(dbh, &koid)) {
       s = modifyObjectSize(osize, size_n, koid, nkoid);
-      if (s) return s;
+      if (s)
+	return s;
       s = replaceObjectInList(hat, hat_k, h, koid, nkoid);
-      if (s) return s;
+      if (s)
+	return s;
       koid = nkoid;
       return Success;
     }
@@ -1427,18 +1676,21 @@ HIdx::extendObject(unsigned int size, Hat &hat, int hat_k, Oid &koid,
 #endif
     if (isPhysicalOid(dbh, &koid)) {
       s = modifyObjectSize(h.size, size_n, koid, nkoid);
-      if (s) return s;
+      if (s)
+	return s;
       s = replaceObjectInList(hat, hat_k, h, koid, nkoid);
       koid = nkoid;
     }
     else
       s = objectSizeModify(dbh, size_n, True, &koid);
-    if (s) return s;
+    if (s)
+      return s;
     offset = h.size;
     if (lastoffset != NullOffset) {
       o.free_next = offset;
       s = writeOverhead(lastoffset, koid, o);
-      if (s) return s;
+      if (s)
+	return s;
     }
     else
       h.free_first = offset;
@@ -1454,10 +1706,12 @@ HIdx::extendObject(unsigned int size, Hat &hat, int hat_k, Oid &koid,
     if (!inFreeList(h, hat, koid)) {
       //      printf("not in free list ?\n");
       s = insertObjectInFreeList(hat, hat_k, h, koid);
-      if (s) return s;
+      if (s)
+	return s;
     }
     s = writeHeader(koid, h);
-    if (s) return s;
+    if (s)
+      return s;
     return writeOverhead(offset, koid, o);
   }
   //printf("not extended\n");
@@ -1470,12 +1724,15 @@ HIdx::getObjectToExtend(unsigned int size, Hat &hat, int hat_k,
 			   Oid &koid, Header &h, int &offset, Overhead &o,
 			   Boolean &found)
 {
+  ------ CODE NOT USED ----
   found = False;
   Status s;
   koid = hat.first;
+
   while (koid.getNX()) {
     s = readHeader(koid, h);
-    if (s) return s;
+    if (s)
+      return s;
     /*
     printf("KOID %s h.prev %s h.next %s\n", getOidString(&koid),
 	   getOidString(&h.prev),
@@ -1490,7 +1747,8 @@ HIdx::getObjectToExtend(unsigned int size, Hat &hat, int hat_k,
       int lastoffset = NullOffset;
       while (offset != NullOffset) {
 	s = readOverhead(offset, koid, o);
-	if (s) return s;
+	if (s)
+	  return s;
 	lastoffset = offset;
 	offset = o.free_next;
       }
@@ -1504,18 +1762,22 @@ HIdx::getObjectToExtend(unsigned int size, Hat &hat, int hat_k,
 	o.size += size_inc;
 	offset = lastoffset;
 	s = writeOverhead(offset, koid, o);
-	if (s) return s;
+	if (s)
+	  return s;
 	found = True;
 	h.free_whole += size_inc;
 	int osize = h.size;
 	h.size = size_n;
 	s = writeHeader(koid, h);
-	if (s) return s;
+	if (s)
+	  return s;
 	if (isPhysicalOid(dbh, &koid)) {
 	  s = modifyObjectSize(osize, size_n, koid, nkoid);
-	  if (s) return s;
+	  if (s)
+	    return s;
 	  s = replaceObjectInList(hat, hat_k, h, koid, nkoid);
-	  if (s) return s;
+	  if (s)
+	    return s;
 	  koid = nkoid;
 	  return Success;
 	}
@@ -1529,18 +1791,22 @@ HIdx::getObjectToExtend(unsigned int size, Hat &hat, int hat_k,
 #endif
 	if (isPhysicalOid(dbh, &koid)) {
 	  s = modifyObjectSize(h.size, size_n, koid, nkoid);
-	  if (s) return s;
+	  if (s)
+	    return s;
 	  s = replaceObjectInList(hat, hat_k, h, koid, nkoid);
 	  koid = nkoid;
 	}
 	else
 	  s = objectSizeModify(dbh, size_n, True, &koid);
-	if (s) return s;
+	if (s)
+	  return s;
 	offset = h.size;
 	if (lastoffset != NullOffset) {
+  ------ CODE NOT USED ----
 	  o.free_next = offset;
 	  s = writeOverhead(lastoffset, koid, o);
-	  if (s) return s;
+	  if (s)
+	    return s;
 	}
 	else
 	  h.free_first = offset;
@@ -1555,10 +1821,12 @@ HIdx::getObjectToExtend(unsigned int size, Hat &hat, int hat_k,
 	h.size = size_n;
 	if (!inFreeList(h, hat, koid)) {
 	  s = insertObjectInFreeList(hat, hat_k, h, koid);
-	  if (s) return s;
+	  if (s)
+	    return s;
 	}
 	s = writeHeader(koid, h);
-	if (s) return s;
+	if (s)
+	  return s;
 	return writeOverhead(offset, koid, o);
       }
     }
@@ -1590,13 +1858,15 @@ HIdx::getCell(unsigned int size, Hat &hat, int hat_k,
 
   while (koid.getNX()) {
     s = readHeader(koid, h);
-    if (s) return s;
+    if (s)
+      return s;
 
     Boolean extended;
     if (uextend) {
       if (h.free_whole < size) {
 	s = extendObject(size, hat, hat_k, koid, h, offset, o, extended);
-	if (s) return s;
+	if (s)
+	  return s;
       }
     }
 
@@ -1612,19 +1882,30 @@ HIdx::getCell(unsigned int size, Hat &hat, int hat_k,
 #endif
     if (h.free_whole >= size) { // optimisation added 29/01/02
       offset = h.free_first;
-      while (offset != NullOffset) {
+      for (unsigned int n = 0; offset != NullOffset; n++) {
+	if (n && offset == h.free_first || n > 100) {
+	  //printf("free_whole %u %d looping #%d\n", h.free_whole, size, n);
+	  break;
+	}
 	s = readOverhead(offset, koid, o);
-	if (s) return s;
-	if (o.free && o.size >= size)
+	if (s)
+	  return s;
+	if (o.free && o.size >= size) {
+	  //printf("object found free_next %d size %d\n", o.free_next, o.size);
 	  return Success;
+	}
 
 	if (uextend) {
 	  s = extendObject(size, hat, hat_k, koid, h, offset, o, extended);
-	  if (s) return s;
-	  if (extended && o.free && o.size >= size)
+	  if (s)
+	    return s;
+	  if (extended && o.free && o.size >= size) {
+	    //printf("object extended and found\n");
 	    return Success;
+	  }
 	}
 
+	//COMPARE_OFFSET(offset, o.free_next, "looping");
 	offset = o.free_next;
       }
     }
@@ -1680,8 +1961,16 @@ lowstring(const char *key)
 
 void stop_imm1() { }
 
+static int WRITE_HEADER;
+
 Status
 HIdx::insert(const void *key, const void *xdata)
+{ 
+  return insert_perform(key, xdata, 0);
+}
+
+Status
+HIdx::insert_perform(const void *key, const void *xdata, unsigned int datasz)
 { 
   Status s;
 
@@ -1700,25 +1989,118 @@ HIdx::insert(const void *key, const void *xdata)
   unsigned int size;
   unsigned int (*gkey)(int) = get_gkey(version);
   s = get_key(x, key, &size);
-  if (s) return s;
+  if (s)
+    return s;
 
   IdxLock lockx(dbh, treeoid);
   s = lockx.lock();
-  if (s) return s;
+  if (s)
+    return s;
 
+  /*
   Hat hat;
   s = readHat(x, hat);
-  if (s) return s;
+  if (s)
+    return s;
+  */
 
 #ifdef TRACK_MAP
   printf("\nINSERT at #%d\n", x);
 #endif
+  unsigned char *rdata = 0;
+  bool direct;
+  if (datasz) {
+    direct = true;
+    size += datasz - hidx.datasz;
+  }
+  else {
+    direct = false;
+    datasz = hidx.datasz;
+  }
+
+  if (data_grouped_by_key && !direct) {
+#ifdef CHECK_CHAIN
+    Hat hat2;
+    s = readHat(x, hat2);
+    if (s)
+      return s;
+    
+    checkChain(&hat2, "before remove");
+#endif
+    Boolean found = False;
+    unsigned int datacnt = 0;
+    s = remove_perform(key, 0, &found, &rdata, &datacnt, 0);
+    if (s)
+      return s;
+
+#ifdef TRACE_DGK
+    printf("remove_perform(found=%d)\n", found);
+#endif
+    if (!found) {
+      rdata = new unsigned char[data_group_sz(1, this)];
+    }
+
+    size += data_group_sz(datacnt, this);
+#ifdef TRACE_DGK
+    printf("insert(datacnt = %d)\n", datacnt);
+#endif
+    memcpy(rdata + data_group_sz(datacnt, this), xdata, hidx.datasz);
+    ++datacnt;
+    h2x_32_cpy(rdata, &datacnt);
+    xdata = (const void *)rdata;
+    datasz = data_group_sz(datacnt, this);
+    
+    /*
+      1. one must search for key
+      2. if (found) {
+      get the entry (ddata and dsize) : datacnt data(s)
+      copy the entry : new unsigned char[dsize + datasz], memcpy(ndata, ddata, dsize)
+      recompute the size : size += datasz
+      remove the full entry by calling removeDataGroup
+      [add W: ++datacnt data(s)+datai by calling insertDataGroup()]:
+      memcpy(ndata + dsize, data, datasz)
+      ++ndata.datacnt
+      xdata = ndata
+      => all in only one index scan
+      }
+      else {
+      create the entry : ndata = new unsigned char[size + sizeof(datacnt)]
+      recompute the size : size += sizeof(datacnt)
+      ndata.datacnt = 1;
+      memcpy(ndata + sizeof(datacnt), data, datasz)
+      xdata = ndata
+      }
+      // at the end of the method: delete [] ndata
+    */
+  }
+
+  Hat hat;
+  s = readHat(x, hat);
+  if (s)
+    return s;
+
+#ifdef CHECK_CHAIN
+  checkChain(&hat, "before getcell");
+#endif
+
   Overhead o;
   Header h;
   Oid koid;
   int offset = 0;
   s = getCell(size, hat, x, koid, h, offset, o);
-  if (s) return s;
+  if (s) {
+    delete [] rdata;
+    return s;
+  }
+
+#ifdef CHECK_CHAIN
+  Hat hat2;
+  s = readHat(x, hat2);
+  if (s)
+    return s;
+
+  checkChain(&hat2, "after getcell");
+#endif
 
 #ifdef TRACK_MAP
   printf("GETTING CELL offset=%d, koid=%s\n", offset,
@@ -1728,9 +2110,18 @@ HIdx::insert(const void *key, const void *xdata)
 #ifdef TRACK_MAP_2
   (void)dumpMemoryMap(hat, "before inserting ");
 #endif
-  s = insert_realize(hat, x, key, size, xdata, koid, h, offset, o);
+  s = insert_realize(hat, x, key, size, xdata, koid, h, offset, o, datasz);
 #ifdef TRACK_MAP_2
   (void)dumpMemoryMap(hat, "after inserting ");
+#endif
+  delete [] rdata;
+
+#ifdef CHECK_CHAIN
+  s = readHat(x, hat2);
+  if (s)
+    return s;
+    
+  checkChain(&hat2, "after insert_realize");
 #endif
   return s;
 }
@@ -1741,7 +2132,8 @@ HIdx::suppressCell(int offset, Header &h, const Oid &koid) const
   Status s;
   Overhead o;
   s = readOverhead(offset, koid, o);
-  if (s) return s;
+  if (s)
+    return s;
 #ifdef TRACK_MAP
   printf("suppressing cell at #%d size %d free_first is %d free_prev %d "
 	 "free_next %d\n", offset, o.size, h.free_first, o.free_prev,
@@ -1750,20 +2142,24 @@ HIdx::suppressCell(int offset, Header &h, const Oid &koid) const
   Overhead po, no;
   if (o.free_prev != NullOffset) {
     s = readOverhead(o.free_prev, koid, po);
-    if (s) return s;
+    if (s)
+      return s;
     po.free_next = o.free_next;
     s = writeOverhead(o.free_prev, koid, po);
-    if (s) return s;
+    if (s)
+      return s;
   }
   else
     h.free_first = o.free_next;
 
   if (o.free_next != NullOffset) {
     s = readOverhead(o.free_next, koid, no);
-    if (s) return s;
+    if (s)
+      return s;
     no.free_prev = o.free_prev;
     s = writeOverhead(o.free_next, koid, no);
-    if (s) return s;
+    if (s)
+      return s;
   }
 
 #ifdef TRACK_MAP
@@ -1771,6 +2167,7 @@ HIdx::suppressCell(int offset, Header &h, const Oid &koid) const
 #endif
   h.free_cnt--;
   h.free_whole -= o.size;
+  assert(h.free_whole >= 0 && h.free_whole < (~0UL/2));
   o.free_next = NullOffset;
   o.free_prev = NullOffset;
   o.free = 0;
@@ -1791,19 +2188,26 @@ HIdx::insertCell(int offset, unsigned int size, Header &h,
   o.free_next = h.free_first;
   o.free_prev = NullOffset;
 
-  if (h.free_first >= 0) {
+  if (h.free_first != NullOffset) {
     Overhead po;
     Status s = readOverhead(h.free_first, koid, po);
-    if (s) return s;
+    if (s)
+      return s;
 #ifdef TRACK_MAP
-    printf("making prev link for #%d -> #%d\n", h.free_first, offset);
+    printf("making prev link for #%d -> #%d next #%d\n", h.free_first, offset, po.free_next);
 #endif
+    assert(po.free);
     po.free_prev = offset;
+    bool old_dont_check = dont_check;
+    dont_check = true;
     s = writeOverhead(h.free_first, koid, po);
-    if (s) return s;
+    dont_check = old_dont_check;
+    if (s)
+      return s;
 #ifdef TRACK_MAP
     s = readOverhead(h.free_first, koid, po);
-    if (s) return s;
+    if (s)
+      return s;
     printf("PO.offset = %d\n", po.free_prev);
 #endif
   }
@@ -1888,6 +2292,7 @@ HIdx::remove_realize(Hat *hat, int hat_k,
     }
   else if (no.free) {
       suppressCell(nextcell-start, h, *koid);
+      // 24/04/07: BUG ?
       insertCell(curcell-start,
 		 o->size + no.size + sizeof(Overhead),
 		 h, *koid);
@@ -1897,6 +2302,7 @@ HIdx::remove_realize(Hat *hat, int hat_k,
 #endif
     }
   else if (po.free) {
+    // WARNING: 24/04/07 these 2 lines have been swapped !
       suppressCell(prevcell-start, h, *koid);
       insertCell(prevcell-start,
 		 o->size + po.size + sizeof(Overhead),
@@ -1914,25 +2320,31 @@ HIdx::remove_realize(Hat *hat, int hat_k,
 #endif
     }
   
+  // EV: 3/05/07: WHY ??
   h.alloc_cnt--;
 
   Status s;
   Boolean rmobj = False;
   if (!h.alloc_cnt) {
     s = suppressObjectFromFreeList(*hat, hat_k, h, *koid);
-    if (s) return s;
+    if (s)
+      return s;
     s = suppressObjectFromList(*hat, hat_k, h, *koid);
-    if (s) return s;
+    if (s)
+      return s;
     rmobj = True;
   }
   else if (!inFreeList(h, *hat, *koid)) {
     s = insertObjectInFreeList(*hat, hat_k, h, *koid);
-    if (s) return s;
+    if (s)
+      return s;
   }
 
+  //printf("writing header %d: po.free %d, no.free %d %d %d %d\n", !rmobj, po.free, no.free, h.alloc_cnt, h.free_first, h.free_cnt);
   if (!rmobj) {
     s = writeHeader(*koid, h);
-    if (s) return s;
+    if (s)
+      return s;
   }
 
 #ifdef TRACK_MAP
@@ -1949,6 +2361,47 @@ HIdx::remove_realize(Hat *hat, int hat_k,
 
 Status
 HIdx::remove(const void *key, const void *xdata, Boolean *found)
+{
+  unsigned char *rdata = 0;
+
+  if (data_grouped_by_key) {
+    Boolean xfound = False;
+    unsigned int datacnt = 0;
+    int found_idx = -1;
+    Status s = remove_perform(key, xdata, &xfound, &rdata, &datacnt, &found_idx);
+    if (s)
+      return s;
+
+    if (found)
+      *found = xfound;
+
+    if (!xfound)
+      return Success;
+
+#ifdef TRACE_DGK
+    printf("found_idx %d\n", found_idx);
+#endif
+    assert(found_idx >= 0);
+    if (--datacnt) {
+      memmove(rdata + data_group_sz(found_idx, this),
+	      rdata + data_group_sz(found_idx + 1, this),
+	      (datacnt - found_idx) * hidx.datasz);
+      h2x_32_cpy(rdata, &datacnt);
+#ifdef TRACE_DGK
+      printf("insert_perforn(%d)\n", data_group_sz(datacnt, this));
+#endif
+      s = insert_perform(key, rdata, data_group_sz(datacnt, this));
+    }
+    delete [] rdata;
+    return s;
+  }
+  else {
+    return remove_perform(key, xdata, found, 0, 0, 0);
+  }
+}
+
+Status
+HIdx::remove_perform(const void *key, const void *xdata, Boolean *found, unsigned char **prdata, unsigned int *pdatacnt, int *found_idx)
 {
   Status s;
   
@@ -1989,18 +2442,21 @@ HIdx::remove(const void *key, const void *xdata, Boolean *found)
   int x;
   unsigned int (*gkey)(int) = get_gkey(version);
   s = get_key(x, key);
-  if (s) return s;
+  if (s)
+    return s;
 
 #ifdef TRACK_MAP
   printf("\nREMOVE at #%d\n", x);
 #endif
   IdxLock lockx(dbh, treeoid);
   s = lockx.lock();
-  if (s) return s;
+  if (s)
+    return s;
 
   Hat hat;
   s = readHat(x, hat);
-  if (s) return s;
+  if (s)
+    return s;
 
 #ifdef IDX_DBG
   if (STRTYPE(this)) {
@@ -2014,7 +2470,8 @@ HIdx::remove(const void *key, const void *xdata, Boolean *found)
       if (s)
 	statusPrint(s, "HIdx::remove() treeoid %s", getOidString(&treeoid));
 
-      if (s) return s;
+      if (s)
+	return s;
 
       char *start = (char *)m_malloc(size);
       s = objectRead(dbh, 0, size, start, DefaultLock, 0, 0, &koid);
@@ -2032,12 +2489,45 @@ HIdx::remove(const void *key, const void *xdata, Boolean *found)
 	  curcell += sizeof(Overhead);
 	  
 	  if (!o.free && !cmp(key, curcell, OP2_SWAP)) {
-#ifdef BUG_DATA_STORE2
-	    int r = memcmp(xdata, curcell + get_off(curcell, this),
-			   hidx.datasz);
-#else
-	    int r = memcmp(xdata, curcell + o.size - hidx.datasz, hidx.datasz);
+	    int r = 1;
+	    if (prdata) {
+	      assert(data_grouped_by_key);
+	      assert(pdatacnt);
+	      x2h_32_cpy(pdatacnt, curcell + get_off(curcell, this));
+#ifdef TRACE_DGK
+	      printf("DATACNT %d\n", *pdatacnt);
 #endif
+	      unsigned int size;
+	      if (xdata) {
+		assert(found_idx);
+		*found_idx = -1;
+		for (unsigned int n = 0; n < *pdatacnt; n++) {
+		  r = memcmp(xdata, curcell + get_off(curcell, this) + data_group_sz(n, this),
+			     hidx.datasz);
+		  if (!r) {
+		    *found_idx = n;
+		    break;
+		  }
+		}
+		size = data_group_sz(*pdatacnt, this);
+	      }
+	      else {
+		size = data_group_sz((*pdatacnt)+1, this);
+		r = 0;
+	      }
+
+	      unsigned int cpsize = data_group_sz(*pdatacnt, this);
+	      *prdata = new unsigned char[size];
+	      memcpy(*prdata, curcell + get_off(curcell, this), cpsize);
+	    }
+	    else {
+#ifdef BUG_DATA_STORE2
+	      r = memcmp(xdata, curcell + get_off(curcell, this),
+			     hidx.datasz);
+#else
+	      r = memcmp(xdata, curcell + o.size - hidx.datasz, hidx.datasz);
+#endif
+	    }
 	    if (!r) {
 #ifdef TRACK_MAP
 	      Header h;
@@ -2047,7 +2537,6 @@ HIdx::remove(const void *key, const void *xdata, Boolean *found)
 #endif
 	      s = remove_realize(&hat, x, curcell - sizeof(Overhead),
 				 prevcell, start, &o, &koid);
-
 #ifdef TRACK_MAP
 	      memcpy(&h, start, sizeof(h));
 	      x2h_header(&h);
@@ -2125,6 +2614,9 @@ implHintsStr(int hints)
   if (hints == HIdx::SzMax_Hints)
     return "Maximal Hash Object Size";
 
+  if (hints == HIdx::DataGroupedByKey_Hints)
+    return "Data Grouped by Key";
+
   return "<unimplemented>";
 }
 
@@ -2173,7 +2665,8 @@ HIdx::getObjects(Oid *&oids, unsigned int &cnt) const
   for (int i = 0; i < hidx.key_count; i++) {
     HIdx::Hat hat;
     Status s = readHat(i, hat);
-    if (s) return s;
+    if (s)
+      return s;
 
     Oid koid = hat.first;
     while (koid.getNX()) {
@@ -2181,7 +2674,8 @@ HIdx::getObjects(Oid *&oids, unsigned int &cnt) const
       HIdx::Header h;
       s = objectRead(dbh, 0, sizeof(HIdx::Header), &h,
 			DefaultLock, 0, 0, &koid);
-      if (s) return s;
+      if (s)
+	return s;
       x2h_header(&h);
       koid = h.next;
     }
@@ -2196,7 +2690,22 @@ HIdx::cmp(const void *key, const void *d, unsigned char bswap) const
   return compare(key, d, &keytype, bswap);
 }
 
-Status HIdx::search(const void *key, Boolean *found, void *xdata)
+Status HIdx::searchAny(const void *key, Boolean *found, void *xdata)
+{
+  unsigned int found_cnt;
+  Status s = search_realize(key, &found_cnt, True, xdata);
+  if (s)
+    return s;
+    *found = (found_cnt != 0) ? eyedbsm::True : eyedbsm::False;
+  return Success;
+}
+
+Status HIdx::search(const void *key, unsigned int *found_cnt)
+{
+  return search_realize(key, found_cnt, False, 0);
+}
+
+Status HIdx::search_realize(const void *key, unsigned int *found_cnt, Boolean found_any, void *xdata)
 {
   Status s;
   
@@ -2208,23 +2717,34 @@ Status HIdx::search(const void *key, Boolean *found, void *xdata)
 
   int x;
 
-  *found = False;
+  *found_cnt = 0;
 
   unsigned int (*gkey)(int) = get_gkey(version);
   s = get_key(x, key);
-  if (s) return s;
+  if (s)
+    return s;
 
   Hat hat;
   s = readHat(x, hat);
-  if (s) return s;
+  if (s)
+    return s;
 
+  // EV: 23/04/07 it seems that this method search key, and can find it several time:
+  // but the returned xdata will contained the last data and the count
+  // will not be returned (only found == true)
+  // => we changed this method by (at least) changing Boolean found to unsigned int found_cnt
+  // or we add a break in case of *found == true as shown below:
+  // idea:
+  // 1. add the break, and rename the methode searchAny
+  // 2. add a methode ::search(const void *key, unsigned int *found_cnt)
   Oid koid = hat.first;
   while (koid.getNX() > 0) {
     if (backend_interrupt)
       return statusMake(BACKEND_INTERRUPTED, "");
     unsigned int size;
     Status s = objectSizeGet(dbh, &size, DefaultLock, &koid);
-    if (s) return s;
+    if (s)
+      return s;
     char *data = (char *)m_malloc(size);
     s = objectRead(dbh, 0, size, data, DefaultLock, 0, 0, &koid);
       
@@ -2241,15 +2761,38 @@ Status HIdx::search(const void *key, Boolean *found, void *xdata)
       d += sizeof(Overhead);
 
       if (!o.free && !cmp(key, d, OP2_SWAP)) {
-	*found = True;
+	unsigned int offset;
+	if (data_grouped_by_key) {
+	  unsigned int datacnt;
+	  x2h_32_cpy(&datacnt, d + get_off(d, this));
+	  *found_cnt += datacnt;
+	  offset = sizeof(datacnt);
+#if 1
+	  for (unsigned int n = 0; n < datacnt; n++) {
+	    if (hidx.datasz == sizeof(Oid)) { // perharps an Oid
+	      Oid oo;
+	      memcpy(&oo, d + get_off(d, this) + data_group_sz(n, this), hidx.datasz);
+	      printf("Data oid[%d]: %s\n", n, getOidString(&oo));
+	    }
+	  }
+#endif
+	}
+	else {
+	  offset = 0;
+	  (*found_cnt)++;
+	}
+
 	if (xdata) {
+	  // NOTE: in case of data_grouped_by_key, only one data is copied
 #ifdef BUG_DATA_STORE2
-	  memcpy(xdata, d + get_off(d, this), hidx.datasz);
+	  memcpy(xdata, d + get_off(d, this) + offset, hidx.datasz);
 #else
 	  memcpy(xdata, d + o.size - hidx.datasz, hidx.datasz);
 #endif
 	}
-	break;
+
+	if (found_any)
+	  break;
       }
 	  
       d += o.size;
@@ -2261,6 +2804,11 @@ Status HIdx::search(const void *key, Boolean *found, void *xdata)
     //koid = h.free_next;
     koid = h.next;
     free(data);
+
+    // break added in case of *found == true
+    if (*found_cnt && found_any) {
+      break;
+    }
   }
 
   return Success;
@@ -2269,7 +2817,8 @@ Status HIdx::search(const void *key, Boolean *found, void *xdata)
 Status HIdx::destroy()
 {
   Status s = destroy_r();
-  if (s) return s;
+  if (s)
+    return s;
   return objectDelete(dbh, &treeoid);
 }
 
@@ -2278,17 +2827,20 @@ Status HIdx::destroy_r()
   for (int n = 0; n < hidx.key_count; n++) {
     Hat hat;
     Status s = readHat(n, hat);
-    if (s) return s;
+    if (s)
+      return s;
 
     Oid koid = hat.first;
 
     while (koid.getNX()) {
       Header h;
       Status s = readHeader(koid, h);
-      if (s) return s;
+      if (s)
+	return s;
 
       s = objectDelete(dbh, &koid);
-      if (s) return s;
+      if (s)
+	return s;
 
       koid = h.next;
     }
@@ -2304,7 +2856,8 @@ HIdx::headPrint(FILE *fd, int n, Oid *koid, int &count) const
   Status s = objectRead(dbh, 0, sizeof(Header), &h, DefaultLock, 0,
 			      0, koid);
 
-  if (s) return s;
+  if (s)
+    return s;
   x2h_header(&h);
 
   count = h.alloc_cnt;
@@ -2325,24 +2878,27 @@ HIdx::headPrint(FILE *fd, int n, Oid *koid, int &count) const
 }
 
 Status
-HIdx::getHashObjectBusySize(const Oid *koid, unsigned int &osize, unsigned int size) const
+HIdx::getHashObjectBusySize(const Oid *koid, unsigned int &osize, unsigned int &count, unsigned int size) const
 {
-  if (!STRTYPE(this)) {
+  if (!STRTYPE(this) && !data_grouped_by_key) {
     Header h;
     Status s = objectRead(dbh, 0, sizeof(Header), &h, DefaultLock, 0,
 				0, koid);
     
-    if (s) return s;
+    if (s)
+      return s;
     x2h_header(&h);
   
-    osize = h.alloc_cnt * (sizeof(Overhead) + hidx.keysz) + sizeof(Header);
+    osize = h.alloc_cnt * (sizeof(Overhead) + hidx.keysz + hidx.datasz) + sizeof(Header);
+    count = h.alloc_cnt;
     return Success;
   }
 
   Status s;
   if (!size) {
     s = objectSizeGet(dbh, &size, DefaultLock, koid);
-    if (s) return s;
+    if (s)
+      return s;
   }
 
   osize = sizeof(Header);
@@ -2358,13 +2914,25 @@ HIdx::getHashObjectBusySize(const Oid *koid, unsigned int &osize, unsigned int s
 
   if (s) {if (!nocopy) free(data); return s;}
 
+  count = 0;
   int cur = sizeof(Header);
   while (cur + sizeof(Overhead) <= size) {
     Overhead to;
     s = readOverhead(cur, *koid, to);
     if (s) {if (!nocopy) free(data); return s;}
     cur += sizeof(Overhead);
-    osize += sizeof(Overhead) + strlen(data+cur)+1;
+    if (!to.free) {
+      //      osize += sizeof(Overhead) + strlen(data+cur)+1 + hidx.datasz;
+      osize += sizeof(Overhead) + to.size;
+      if (data_grouped_by_key) {
+	unsigned int datacnt;
+	x2h_32_cpy(&datacnt, data + cur + get_off(data + cur, this));
+	count += datacnt;
+      }
+      else
+	count++;
+    }
+    //    printf("SIZES '%s' %d %d %d free=%d\n", data+cur, to.size + sizeof(Overhead), sizeof(Overhead) + strlen(data+cur)+1, hidx.datasz, to.free);
     cur += to.size;
   }
 
@@ -2374,17 +2942,19 @@ HIdx::getHashObjectBusySize(const Oid *koid, unsigned int &osize, unsigned int s
 }
 
 Status
-HIdx::getEntryCount(Oid *koid, int &count) const
+HIdx::getEntryCount(Oid *koid, unsigned int &count) const
 {
   if (koid->getNX() == 0) {
     count = 0;
     return Success;
   }
+
   Header h;
   Status s = objectRead(dbh, 0, sizeof(Header), &h, DefaultLock, 0,
 			      0, koid);
 
-  if (s) return s;
+  if (s)
+    return s;
   x2h_header(&h);
 
   count = h.alloc_cnt;
@@ -2401,13 +2971,16 @@ HIdx::dumpMemoryMap(FILE *fd)
   for (int n = 0; n < hidx.key_count; n++) {
     Hat hat;
     Status s = readHat(n, hat);
-    if (s) return s;
+    if (s)
+      return s;
     Oid koid = hat.first;
     if (!koid.getNX()) continue;
-    if (s) return s;
+    if (s)
+      return s;
     s = dumpMemoryMap(hat, (std::string("Entry #") + str_convert((long)n) + " ").c_str(),
 		      fd);
-    if (s) return s;
+    if (s)
+      return s;
   }
 
   return Success;
@@ -2432,7 +3005,8 @@ Status HIdx::printStat(FILE *fd) const
   for (int n = 0; n < hidx.key_count; n++) {
     Hat hat;
     Status s = readHat(n, hat);
-    if (s) return s;
+    if (s)
+      return s;
 
 #ifdef ALL_STATS
     fprintf(fd, "cell[%d] = {\n", n);
@@ -2446,7 +3020,7 @@ Status HIdx::printStat(FILE *fd) const
     int cell_count = 0;
 
     while (toid.getNX() > 0) {
-      int count;
+      unsigned int count;
       if (backend_interrupt) {
 	/*
 	fprintf(fd, "Interrupted!\n");
@@ -2712,6 +3286,10 @@ HIdxCursor::init(DbHandle *dbh)
   nocopy = isWholeMapped(dbh);
 #endif
   data_tofree = False;
+
+  datacnt = 0;
+  idata = 0;
+  jumpsize = 0;
 }
 
 HIdxCursor::HIdxCursor(const HIdx *_idx,
@@ -2807,7 +3385,8 @@ HIdxCursor::read(Boolean &eox)
 
       HIdx::Hat hat;
       s = idx->readHat(k_cur, hat);
-      if (s) return s;
+      if (s)
+	return s;
       koid = hat.first;
 
       if (equal) {
@@ -2825,7 +3404,8 @@ HIdxCursor::read(Boolean &eox)
 
     s = objectRead(idx->dbh, 0, sizeof(HIdx::Header), &h,
 		   DefaultLock, 0, &size, &koid);
-    if (s) return s;
+    if (s)
+      return s;
     x2h_header(&h);
     
     if (h.alloc_cnt)
@@ -2940,6 +3520,37 @@ HIdxCursor::cmp(const void *key) const
   return 1;
 }
 
+void HIdxCursor::append_next(void *data, Idx::Key *key, unsigned int n)
+{
+  int off = get_off(cur, idx);
+
+  Link *l;
+  if (slave) {
+    l = new Link(idx->hidx.datasz);
+    data = l->data;
+    key = &l->key;
+  }
+  else
+    l = 0;
+
+  if (data) {
+    if (idx->isDataGroupedByKey()) {
+      memcpy(data, cur + off + data_group_sz(n, idx), idx->hidx.datasz);
+    }
+    else {
+      memcpy(data, cur + off, idx->hidx.datasz);
+    }
+  }
+	
+  if (key)
+    key->setKey(cur, (idx->hidx.keysz != HIdx::VarSize ?
+		      idx->hidx.keysz : strlen(cur) + 1),
+		idx->keytype);
+  
+  if (slave)
+    list->insert(l);
+}
+
 Status
 HIdxCursor::next(Boolean *found, void *data, Idx::Key *key)
 {
@@ -3016,12 +3627,30 @@ HIdxCursor::next(Boolean *found, void *data, Idx::Key *key)
   if (!sdata) {
     Boolean eox;
     Status s = read(eox);
-    if (s) return s;
+    if (s)
+      return s;
     
     if (eox) {
       *found = False;
       return Success;
     }
+  }
+
+  if (++idata < datacnt) {
+#ifdef TRACE_DGK
+    printf("...CURSOR DATACNT %d idata=%d\n", datacnt, idata);
+#endif
+    *found = True;
+    append_next(data, key, idata);
+    return Success;
+  }
+  else if (datacnt) {
+#ifdef TRACE_DGK
+    printf("...CURSOR jumping\n");
+#endif
+    cur += jumpsize;
+    datacnt = 0;
+    jumpsize = 0;
   }
 
   for (;;) {
@@ -3055,7 +3684,18 @@ HIdxCursor::next(Boolean *found, void *data, Idx::Key *key)
 	  continue;
 	}
 
+	if (idx->isDataGroupedByKey()) {
+	  x2h_32_cpy(&datacnt, cur + get_off(cur, idx));
+	  idata = 0;
+#ifdef TRACE_DGK
+	  printf("CURSOR DATACNT %d idata=%d\n", datacnt, idata);
+#endif
+	  jumpsize = o.size;
+	}
+
 	*found = True;
+	append_next(data, key, 0);
+#if 0
 	int off = get_off(cur, idx);
 
 	Link *l;
@@ -3082,8 +3722,9 @@ HIdxCursor::next(Boolean *found, void *data, Idx::Key *key)
 	
 	if (slave)
 	  list->insert(l);
-
-	cur += o.size;
+#endif
+	if (!idx->isDataGroupedByKey())
+	  cur += o.size;
 	return Success;
       }
 	  
@@ -3099,7 +3740,8 @@ HIdxCursor::next(Boolean *found, void *data, Idx::Key *key)
     Boolean eox;
     Status s = read(eox);
 	  
-    if (s) return s;
+    if (s)
+      return s;
 
     if (eox) {
       *found = False;
@@ -3157,19 +3799,21 @@ HIdx::getStats(std::string &stats) const
   for (n = 0; n < hidx.key_count; n++) {
     Hat hat;
     Status s = readHat(n, hat);
-    if (s) return s;
+    if (s)
+      return s;
 
     Oid toid;
     toid = hat.first;
     unsigned int cell_count = 0;
     unsigned int nobjs = 0;
     while (toid.getNX() > 0) {
-      int count;
+      unsigned int count;
       if (backend_interrupt)
 	return statusMake(BACKEND_INTERRUPTED, "");
 
       s = getEntryCount(&toid, count);
-      if (s) return s;
+      if (s)
+	return s;
 
       cell_count += count;
       nobjs++;
@@ -3222,25 +3866,34 @@ HIdx::getStats(HIdx::Stats &stats) const
   for (int n = 0; n < hidx.key_count; n++, entry++) {
     Hat hat;
     Status s = readHat(n, hat);
-    if (s) return s;
+    if (s)
+      return s;
 
     Oid koid;
     koid = hat.first;
     while (koid.getNX() > 0) {
-      int count;
+      unsigned int count;
       if (backend_interrupt)
 	return statusMake(BACKEND_INTERRUPTED, "");
       
       unsigned int size, busysize;
       s = objectSizeGet(dbh, &size, DefaultLock, &koid);
-      if (s) return s;
+      if (s)
+	return s;
 
-      s = getHashObjectBusySize(&koid, busysize, size);
-      if (s) return s;
+      s = getHashObjectBusySize(&koid, busysize, count, size);
+      if (s)
+	return s;
 
-      s = getEntryCount(&koid, count);
-      if (s) return s;
+      unsigned int ncount;
+      s = getEntryCount(&koid, ncount);
+      if (s)
+	return s;
       
+      if (ncount != count) {
+	printf("COUNTS differ %d %d\n", count, ncount);
+      }
+
       entry->object_count += count;
       entry->hash_object_busy_size += busysize;
       entry->hash_object_count++;
@@ -3408,9 +4061,11 @@ HIdx::reimplementToBTree(Oid &newoid, int degree, short dspid)
   bidx.open();
 
   Status s = copyRealize(&bidx);
-  if (s) return s;
+  if (s)
+    return s;
   s = destroy();
-  if (s) return s;
+  if (s)
+    return s;
 
   newoid = bidx.oid();
   return Success;
@@ -3425,15 +4080,18 @@ HIdx::reimplementToHash(Oid &newoid, int key_count, int mag_order,
 {
   IdxLock lockx(dbh, treeoid);
   Status s = lockx.lock();
-  if (s) return s;
+  if (s)
+    return s;
 
   HIdx *idx_n = 0;
   s = copy(idx_n, key_count, mag_order, dspid, impl_hints,
 	   impl_hints_cnt, _hash_key, _hash_data, ktype);
-  if (s) return s;
+  if (s)
+    return s;
 
   s = destroy();
-  if (s) return s;
+  if (s)
+    return s;
   newoid = idx_n->oid();
   delete idx_n;
   return Success;
@@ -3448,7 +4106,8 @@ HIdx::simulate(Stats &stats, int key_count, int mag_order,
   HIdx *idx_n;
   Status s = copy(idx_n, key_count, mag_order, hidx.dspid, impl_hints,
 		     impl_hints_cnt, _hash_key, _hash_data, 0);
-  if (s) return s;
+  if (s)
+    return s;
 
   s = idx_n->getStats(stats);
   idx_n->destroy();

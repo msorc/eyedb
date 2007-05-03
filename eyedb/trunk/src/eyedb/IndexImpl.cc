@@ -107,8 +107,7 @@ namespace eyedb {
     return hints;
   }
 
-  const char *
-  IndexImpl::hashHintToStr(int hints, Bool cap)
+  const char *IndexImpl::hashHintToStr(unsigned int hints, Bool cap)
   {
     if (hints == eyedbsm::HIdx::IniSize_Hints)
       return cap ? "Initial Size" : "initial_size";
@@ -122,7 +121,15 @@ namespace eyedb {
     if (hints == eyedbsm::HIdx::SzMax_Hints)
       return cap ? "Maximal Hash Object Size" : "size_max";
 
+    if (hints == eyedbsm::HIdx::DataGroupedByKey_Hints)
+      return cap ? "Data Grouped by Key" : "data_grouped_by_key";
+
     return "<unimplemented>";
+  }
+
+  bool IndexImpl::isHashHintImplemented(unsigned int hints)
+  {
+    return hints <= eyedbsm::HIdx::DataGroupedByKey_Hints;
   }
 
 #define MAKE(H) \
@@ -290,8 +297,9 @@ namespace eyedb {
 	       else MAKE(IniObjCnt_Hints)
 		      else MAKE(XCoef_Hints)
 			     else MAKE(SzMax_Hints)
-				    else if (!strcasecmp(k, "key_function"))
-				      key_function = v;
+				    else MAKE(DataGroupedByKey_Hints)
+					   else if (!strcasecmp(k, "key_function"))
+					     key_function = v;
 	else if (*k || (v && *v)) {
 	  if (errmsg.size()) errmsg += "\n";
 	  errmsg += std::string("unknown hint: ") + k;
@@ -304,6 +312,7 @@ namespace eyedb {
 	  "initial_object_count = <intval>; "
 	  "extend_coef = <intval>; "
 	  "size_max = <intval>; "
+	  "data_grouped_by_key = <intval>; "
 	  "key_function = <class>::<method>; "
 	  "dataspace = <name>';";
 	return Exception::make(IDB_ERROR, errmsg.c_str());
