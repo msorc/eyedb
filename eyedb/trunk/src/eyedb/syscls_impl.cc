@@ -1285,7 +1285,7 @@ namespace eyedb {
 
 #define NEW_INDEX_MOVE
 
-  static const char index_force_reimplement[] = "eyedb:force:reimplement";
+  static const char index_move[] = "eyedb:move";
   extern char index_backend[];
 
   Status
@@ -1296,10 +1296,10 @@ namespace eyedb {
 
 #ifdef NEW_INDEX_MOVE
     void *ud;
-    if (!getUserData(index_force_reimplement))
+    if (!getUserData(index_move))
       ud = setUserData(index_backend, AnyUserData); // prevent from reimplementing index
     s = store();
-    if (!getUserData(index_force_reimplement))
+    if (!getUserData(index_move))
       setUserData(index_backend, ud);
 #else
     s = store();
@@ -1320,7 +1320,7 @@ namespace eyedb {
     s = db->reloadObject(oid, (Object *&)idx);
     if (s) return s;
 #ifdef NEW_INDEX_MOVE
-    if (!getUserData(index_force_reimplement))
+    if (!getUserData(index_move))
       assert(idx->getIdxOid() == getIdxOid());
 #endif
     idxoid = idx->getIdxOid();
@@ -1351,9 +1351,9 @@ namespace eyedb {
   {
 #ifdef NEW_INDEX_MOVE
     Index *mthis = const_cast<Index *>(this);
-    void *ud = mthis->setUserData(index_force_reimplement, AnyUserData);
+    void *ud = mthis->setUserData(index_move, AnyUserData);
     Status s = mthis->setDefaultDataspace(dataspace);
-    mthis->setUserData(index_force_reimplement, ud);
+    mthis->setUserData(index_move, ud);
     return s;
 #else
     const Oid &idxoid = getIdxOid();
@@ -1584,6 +1584,7 @@ namespace eyedb {
     Bool backend_updating = IDBBOOL(getUserData(index_backend));
     Bool creating = IDBBOOL(!backend_updating && !getOid().isValid());
     Bool updating = False;
+    bool index_moving = (getUserData(index_move) != 0);
 
     /*
       printf("HashIndex::realize(%s, %s, key_count%d, hash_method=%p, backend_updating=%d)\n",
@@ -1636,8 +1637,15 @@ namespace eyedb {
 
     if (s) return s;
 
+    printf("creating %d\n", creating);
+    printf("updating %d\n", updating);
+    printf("backend_updating %d\n", backend_updating);
+    printf("index_moving %d\n", index_moving);
+
     if (creating || updating)
-      return StatusMake(indexCreate(db->getDbHandle(), oid.getOid()));
+      return StatusMake(indexCreate(db->getDbHandle(),
+				    index_moving,
+				    oid.getOid()));
 
     return Success;
   }
@@ -1914,6 +1922,7 @@ namespace eyedb {
     Bool backend_updating = IDBBOOL(getUserData(index_backend));
     Bool creating = IDBBOOL(!backend_updating && !getOid().isValid());
     Bool updating = False;
+    bool index_moving = (getUserData(index_move) != 0);
 
     /*
       printf("realizing btreeindex %s %s creating=%d\n",
@@ -1953,7 +1962,9 @@ namespace eyedb {
     s = AttributeComponent::realize(rcm);
     if (s) return s;
     if (creating || updating)
-      return StatusMake(indexCreate(db->getDbHandle(), oid.getOid()));
+      return StatusMake(indexCreate(db->getDbHandle(),
+				    index_moving,
+				    oid.getOid()));
 
     return Success;
   }

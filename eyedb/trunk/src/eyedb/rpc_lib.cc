@@ -1029,10 +1029,12 @@ namespace eyedb {
   rpc_RpcDescription *
   makeINDEX_CREATE(void)
   {
-    rpc_RpcDescription *rd = rpc_newRpcDescription(IDB_INDEX_CREATE, 3);
+    rpc_RpcDescription *rd = rpc_newRpcDescription(IDB_INDEX_CREATE, 4);
     int n = 0;
 
     rd->args[n].type = rpc_Int32Type; /* dbh */
+    rd->args[n++].send_rcv = rpc_Send;
+    rd->args[n].type = rpc_Int32Type; /* index_moving */
     rd->args[n++].send_rcv = rpc_Send;
     rd->args[n].type = OidType; /* objoid */
     rd->args[n++].send_rcv = rpc_Send;

@@ -151,6 +151,13 @@ namespace eyedbsm {
 
     /**
        Not yet documented
+       @param dspid
+       @return
+    */
+    Status move(short dspid, eyedbsm::Oid &newoid);
+
+    /**
+       Not yet documented
        @param newoid
        @param key_count
        @param mag_order

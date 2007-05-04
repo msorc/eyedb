@@ -372,7 +372,7 @@ namespace eyedb {
 			   Size);
 
   extern RPCStatus
-  indexCreate(DbHandle *, const eyedbsm::Oid *);
+  indexCreate(DbHandle *, bool index_move, const eyedbsm::Oid *);
 
   extern RPCStatus
   indexRemove(DbHandle *, const eyedbsm::Oid *, int);

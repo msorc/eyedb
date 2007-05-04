@@ -430,6 +430,11 @@ namespace eyedbsm {
     return s;
   }
 
+  Status BIdx::move(short dspid, eyedbsm::Oid &newoid)
+  {
+    return reimplementToBTree(newoid, degree, dspid);
+  }
+
   Status
   BIdx::reimplementToHash(Oid &newoid, int key_count, int mag_order,
 			  short _dspid,
