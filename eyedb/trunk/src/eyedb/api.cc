@@ -1581,21 +1581,22 @@ attributeIndexRemove(DbHandle *dbh, const eyedbsm::Oid *cloid, int num,
 }
 
 RPCStatus
-indexCreate(DbHandle * dbh, const eyedbsm::Oid * objoid)
+indexCreate(DbHandle * dbh, bool index_move, const eyedbsm::Oid * objoid)
 {
   if (DBH_IS_LOCAL(dbh))
-    return IDB_indexCreate((DbHandle *)dbh->u.dbh, objoid);
+    return IDB_indexCreate((DbHandle *)dbh->u.dbh, index_move, objoid);
   else
     {
       ClientArg ua[IDB_MAXARGS], *pua = ua;
       int r, offset;
       pua++->a_int = RDBHID_GET(dbh);
+      pua++->a_int = index_move;
       pua++->a_oid = *objoid;
 
       RPC_RPCMAKE(dbh->ch->ch, INDEX_CREATE_RPC, ua);
 
 
-      status_copy(status_r, ua[2].a_status);
+      status_copy(status_r, ua[3].a_status);
       STATUS_RETURN(status_r);
     }
 }

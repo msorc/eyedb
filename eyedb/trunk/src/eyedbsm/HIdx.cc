@@ -4211,6 +4211,157 @@ HIdx::reimplementToBTree(Oid &newoid, int degree, short dspid)
   return Success;
 }
 
+Status HIdx::move(short dspid, eyedbsm::Oid &newoid,
+		  hash_key_t hash_key, void *hash_data)
+{
+  // for now
+  /*
+  return reimplementToHash(newoid, hidx.key_count, hidx.mag_order, dspid, hidx.impl_hints, HIdxImplHintsCount, hash_key, hash_data);
+  */
+  // construction d'un index comme dans copy
+  // parcours de tous les objets comme dans collapse, puis writeCListHeader sur le nouvel index, sans destruction (le destroy se fait ensuite) => en fait, il faut dupliquer collapse, c'est trop different
+  // note: le collapse est-il obligatoire ? ou bien c'est une option a ajouter dans le mvidx et a passer a Index::move puis a Index::realize (via les UserData) ?
+  // dans un 1er temps, on peut le faire obligatoire
+  HIdx *idx_n = new HIdx(dbh,
+			 getKeyType(),
+			 hidx.datasz,
+			 dspid,
+			 hidx.mag_order,
+			 hidx.key_count,
+			 hidx.impl_hints,
+			 HIdxImplHintsCount);
+
+  if (idx_n->status())
+    return idx_n->status();
+
+  idx_n->open(hash_key, hash_data);
+
+  IdxLock lockx_n(dbh, idx_n->treeoid);
+  Status s = lockx_n.lock();
+  if (s)
+    return s;
+
+  IdxLock lockx(dbh, treeoid);
+  s = lockx.lock();
+  if (s)
+    return s;
+
+  for (unsigned int chd_k = 0; chd_k < hidx.key_count; chd_k++) {
+    HIdx::CListHeader chd;
+    s = readCListHeader(chd_k, chd);
+    if (s)
+      return s;
+    HIdx::CListHeader chd_n;
+    s = idx_n->readCListHeader(chd_k, chd_n);
+    if (s)
+      return s;
+
+    unsigned int clistobj_cnt = 0;
+    Oid koid = chd.clobj_first;
+    if (koid.getNX()) {
+      printf("Key #%d {\n", chd_k);
+      unsigned int total_busy_size = 0;
+      unsigned int total_free_size = 0;
+      unsigned int clist_data_size = 0;
+      unsigned int clist_data_alloc_size = 0;
+      unsigned char *clist_data = 0;
+      adapt(clist_data, clist_data_size, clist_data_alloc_size, sizeof(CListObjHeader));
+      clist_data_size = sizeof(CListObjHeader);
+
+      while (koid.getNX()) {
+	unsigned int busy_size = 0;
+	unsigned int free_size = 0;
+	unsigned int cell_cnt = 0;
+	unsigned int sz = 0;
+	s = objectSizeGet(dbh, &sz, DefaultLock, &koid);
+	if (s)
+	  return s;
+	unsigned char *clistobj_data = new unsigned char[sz];
+	CListObjHeader h;
+	s = objectRead(dbh, 0, 0, clistobj_data, DefaultLock, 0, 0, &koid);
+	if (s)
+	  return s;
+	unsigned char *d, *edata = clistobj_data + sz;
+	for (d = clistobj_data + sizeof(CListObjHeader); d < edata; ) {
+	  CellHeader o;
+	  mcp(&o, d, sizeof(CellHeader));
+	  x2h_overhead(&o);
+	  if (!o.free) {
+	    total_busy_size += o.size;
+	    busy_size += o.size;
+	    unsigned int cpsize = o.size + sizeof(CellHeader);
+	    adapt(clist_data, clist_data_size, clist_data_alloc_size, cpsize);
+	    memcpy(clist_data + clist_data_size, d, cpsize);
+	    clist_data_size += cpsize;
+	  }
+	  else {
+	    total_free_size += o.size;
+	    free_size += o.size;
+	  }
+
+	  d += sizeof(CellHeader);
+	  d += o.size;
+	  cell_cnt++;
+	}
+
+	printf("  KOID %s [%d b] {\n", getOidString(&koid), sz);
+	printf("    cell_cnt: %d\n", cell_cnt);
+	printf("    busy_size: %u b\n", busy_size);
+	printf("    free_size: %u b\n", free_size);
+	printf("  }\n");
+
+	memcpy(&h, clistobj_data, sizeof(h));
+	x2h_header(&h);
+	koid = h.clobj_next;
+	delete [] clistobj_data;
+	clistobj_cnt++;
+      }
+      
+      CListObjHeader h;
+      memset(&h, 0, sizeof(h));
+      h.free_cnt = 0;
+      h.alloc_cnt = 1;
+      h.free_whole = 0;
+      h.cell_free_first = NullOffset;
+      CListObjHeader xh;
+      h2x_header(&xh, &h);
+      memcpy(clist_data, &xh, sizeof(xh));
+      
+      memset(&chd_n, 0, sizeof(chd_n));
+      s = objectCreate(dbh, clist_data, clist_data_size, hidx.dspid,
+		       &chd_n.clobj_first);
+      if (s)
+	return s;
+      
+      chd_n.clobj_last = chd_n.clobj_last;
+      
+      s = idx_n->writeCListHeader(chd_k, chd_n);
+      if (s)
+	return s;
+      printf("  collapse oids: %s\n", getOidString(&chd.clobj_first));
+
+      // must delete all koid
+      delete [] clist_data;
+      printf("  clistobj_cnt: %u\n", clistobj_cnt);
+      printf("  total_busy_size: %u b\n", total_busy_size);
+      printf("  total_free_size: %u b\n", total_free_size);
+      printf("  clist_data_size: %u\n", clist_data_size);
+      printf("  clist_data_alloc_size: %u\n", clist_data_alloc_size);
+      printf("}\n");
+    }
+  }
+
+  s = destroy();
+  if (s)
+    return s;
+
+  newoid = idx_n->oid();
+
+  delete idx_n;
+
+  return Success;
+}
+
 Status
 HIdx::reimplementToHash(Oid &newoid, int key_count, int mag_order,
 			   short dspid, const int *impl_hints,
@@ -4222,6 +4373,13 @@ HIdx::reimplementToHash(Oid &newoid, int key_count, int mag_order,
   Status s = lockx.lock();
   if (s)
     return s;
+
+  printf("reimplementToHash:\n");
+  printf("OLD: kc: %d dspid: %d hints: %d %d %d %d %d %d\n", hidx.key_count, hidx.dspid, hidx.impl_hints[0],hidx.impl_hints[1],hidx.impl_hints[2],hidx.impl_hints[3],hidx.impl_hints[4],hidx.impl_hints[5],hidx.impl_hints[6]);
+  printf("NEW: kc: %d dspid: %d hints: %d %d %d %d %d %d\n", key_count, dspid, impl_hints[0],impl_hints[1],impl_hints[2],impl_hints[3],impl_hints[4],impl_hints[5],impl_hints[6]);
+
+  // si tous les parametres sont identiques sauf le dspid, alors il suffit de
+  // reorganiser l'index, et il ne faut pas le reimplementer !
 
   HIdx *idx_n = 0;
   s = copy(idx_n, key_count, mag_order, dspid, impl_hints,

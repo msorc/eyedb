@@ -240,7 +240,7 @@ namespace eyedb {
 			   Data, Size, void *);
 
   extern RPCStatus
-  IDB_indexCreate(DbHandle *, const eyedbsm::Oid *);
+  IDB_indexCreate(DbHandle *, bool index_move, const eyedbsm::Oid *);
 
   extern RPCStatus
   IDB_indexRemove(DbHandle *, const eyedbsm::Oid *, int);

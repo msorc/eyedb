@@ -1065,11 +1065,11 @@ namespace eyedb {
     rpcDB_DbHandleClientInfo *dcinfo = rpcDB_clientDbhGet(clientid, ua[0].a_int);
 
     if (dcinfo)
-      status = IDB_indexCreate((DbHandle *)dcinfo->dbh, &ua[1].a_oid);
+      status = IDB_indexCreate((DbHandle *)dcinfo->dbh, ua[1].a_int, &ua[2].a_oid);
     else
       status = RPCInvalidDbId;
 
-    RPC_STATUS_MAKE(status, ua, 2);
+    RPC_STATUS_MAKE(status, ua, 3);
   }
 
   void

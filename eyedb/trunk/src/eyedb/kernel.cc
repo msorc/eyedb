@@ -3373,7 +3373,7 @@ namespace eyedb {
   extern char index_backend[];
 
   RPCStatus
-  IDB_indexCreate(DbHandle * dbh, const eyedbsm::Oid * objoid)
+  IDB_indexCreate(DbHandle * dbh, bool index_move, const eyedbsm::Oid * objoid)
   {
     Database *db = (Database *)dbh->db;
     AttrIdxContext idx_ctx;
@@ -3416,7 +3416,19 @@ namespace eyedb {
 
     Bool swap = False;
 
-    if (idx->asHashIndex()) {
+    if (index_move) {
+      printf("MOVING...\n");
+      if (idx->asBTreeIndex()) {
+	s = seidx->asBIdx()->move(idx->getDspid(), *newoid.getOid());
+      }
+      else if (idx->asHashIndex()) {
+	HashIndex *hidx = idx->asHashIndex();
+	BEMethod_C *mth = hidx->getHashMethod();
+	s = seidx->asHIdx()->move(idx->getDspid(), *newoid.getOid(), (mth ? hash_key : 0), mth);
+      }
+    }
+    else if (idx->asHashIndex()) {
+      printf("REIMPLEMENTING...\n");
       if (seidx->asBIdx())
 	swap = True;
       HashIndex *hidx = idx->asHashIndex();
@@ -3426,10 +3438,10 @@ namespace eyedb {
       memset(impl_hints, 0, sizeof(int) * eyedbsm::HIdxImplHintsCount);
       for (int i = 0; i < cnt; i++)
 	impl_hints[i] = hidx->getImplHints(i);
-#ifdef REIMPL_TRACE
+      //#ifdef REIMPL_TRACE
       printf("Server: reimplementing HASH INDEX %s new keycount = %d\n",
 	     Oid(seidx->oid()).toString(), hidx->getKeyCount());
-#endif
+      //#endif
       BEMethod_C *mth = hidx->getHashMethod();
       s = seidx->reimplementToHash(*newoid.getOid(), hidx->getKeyCount(), 0,
 				   hidx->getDspid(),
