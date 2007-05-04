@@ -2695,6 +2695,7 @@ static void adapt(unsigned char *&clist_data, unsigned int &clist_data_size,
   }
 }
 
+#if 0
 Status
 HIdx::collapse()
 {
@@ -2818,6 +2819,164 @@ HIdx::collapse()
       printf("  clist_data_size: %u\n", clist_data_size);
       printf("  clist_data_alloc_size: %u\n", clist_data_alloc_size);
       printf("}\n");
+    }
+  }
+
+  return Success;
+}
+#endif
+
+Status
+HIdx::collapse()
+{
+  return collapse_realize(hidx.dspid, 0);
+}
+
+#define COLLAPSE_TRACE
+
+Status
+HIdx::collapse_realize(short dspid, HIdx *idx_n)
+{
+  IdxLock lockx(dbh, treeoid);
+  Status s = lockx.lock();
+  if (s)
+    return s;
+
+  for (unsigned int chd_k = 0; chd_k < hidx.key_count; chd_k++) {
+    HIdx::CListHeader chd;
+    s = readCListHeader(chd_k, chd);
+    if (s)
+      return s;
+
+    unsigned int clistobj_cnt = 0;
+    Oid koid = chd.clobj_first;
+    std::vector<Oid> oid_v;
+    if (koid.getNX()) {
+#ifdef COLLAPSE_TRACE
+      printf("Key #%d {\n", chd_k);
+#endif
+      unsigned int total_busy_size = 0;
+      unsigned int total_free_size = 0;
+      unsigned int clist_data_size = 0;
+      unsigned int clist_data_alloc_size = 0;
+      unsigned char *clist_data = 0;
+      adapt(clist_data, clist_data_size, clist_data_alloc_size, sizeof(CListObjHeader));
+      clist_data_size = sizeof(CListObjHeader);
+
+      while (koid.getNX()) {
+	oid_v.push_back(koid);
+	unsigned int busy_size = 0;
+	unsigned int free_size = 0;
+	unsigned int cell_cnt = 0;
+	unsigned int sz = 0;
+	s = objectSizeGet(dbh, &sz, DefaultLock, &koid);
+	if (s)
+	  return s;
+	unsigned char *clistobj_data = new unsigned char[sz];
+	CListObjHeader h;
+	s = objectRead(dbh, 0, 0, clistobj_data, DefaultLock, 0, 0, &koid);
+	if (s)
+	  return s;
+	unsigned char *d, *edata = clistobj_data + sz;
+	for (d = clistobj_data + sizeof(CListObjHeader); d < edata; ) {
+	  CellHeader o;
+	  mcp(&o, d, sizeof(CellHeader));
+	  x2h_overhead(&o);
+	  if (!o.free) {
+	    total_busy_size += o.size;
+	    busy_size += o.size;
+	    unsigned int cpsize = o.size + sizeof(CellHeader);
+	    adapt(clist_data, clist_data_size, clist_data_alloc_size, cpsize);
+	    memcpy(clist_data + clist_data_size, d, cpsize);
+	    clist_data_size += cpsize;
+	  }
+	  else {
+	    total_free_size += o.size;
+	    free_size += o.size;
+	  }
+
+	  d += sizeof(CellHeader);
+	  d += o.size;
+	  cell_cnt++;
+	}
+
+#ifdef COLLAPSE_TRACE
+	printf("  KOID %s [%d b] {\n", getOidString(&koid), sz);
+	printf("    cell_cnt: %d\n", cell_cnt);
+	printf("    busy_size: %u b\n", busy_size);
+	printf("    free_size: %u b\n", free_size);
+	printf("  }\n");
+#endif
+	memcpy(&h, clistobj_data, sizeof(h));
+	x2h_header(&h);
+	koid = h.clobj_next;
+	delete [] clistobj_data;
+	clistobj_cnt++;
+      }
+      
+      if (idx_n || (clistobj_cnt > 1 && total_free_size != 0)) {
+	CListObjHeader h;
+	memset(&h, 0, sizeof(h));
+	h.free_cnt = 0;
+	h.alloc_cnt = 1;
+	h.free_whole = 0;
+	h.cell_free_first = NullOffset;
+	CListObjHeader xh;
+	h2x_header(&xh, &h);
+	memcpy(clist_data, &xh, sizeof(xh));
+	
+	memset(&chd, 0, sizeof(chd));
+	s = objectCreate(dbh, clist_data, clist_data_size, dspid,
+			 &chd.clobj_first);
+	if (s)
+	  return s;
+	
+	chd.clobj_last = chd.clobj_last;
+	
+	if (idx_n) {
+	  s = idx_n->writeCListHeader(chd_k, chd);
+	}
+	else {
+	  s = writeCListHeader(chd_k, chd);
+	}
+
+	if (s)
+	  return s;
+
+#ifdef COLLAPSE_TRACE
+	printf("  collapse oids: %s\n", getOidString(&chd.clobj_first));
+#endif
+	if (!idx_n) {
+	  std::vector<Oid>::iterator begin = oid_v.begin();
+	  std::vector<Oid>::iterator end = oid_v.end();
+	  unsigned int del_obj_cnt = 0;
+	  while (begin != end) {
+	    s = objectDelete(dbh, &(*begin));
+	    if (s)
+	      return s;
+	    ++begin;
+	    del_obj_cnt++;
+	  }
+#ifdef COLLAPSE_TRACE
+	  printf("  deleted obj: %d\n", del_obj_cnt);
+#endif
+	}
+      }
+#ifdef COLLAPSE_TRACE
+      else
+	printf("  NO COLLAPSE\n");
+#endif
+
+      // must delete all koid
+      delete [] clist_data;
+#ifdef COLLAPSE_TRACE
+      printf("  clistobj_cnt: %u\n", clistobj_cnt);
+      printf("  total_busy_size: %u b\n", total_busy_size);
+      printf("  total_free_size: %u b\n", total_free_size);
+      printf("  clist_data_size: %u\n", clist_data_size);
+      printf("  clist_data_alloc_size: %u\n", clist_data_alloc_size);
+      printf("}\n");
+#endif
     }
   }
 
@@ -4241,6 +4400,11 @@ Status HIdx::move(short dspid, eyedbsm::Oid &newoid,
   if (s)
     return s;
 
+  s = collapse_realize(dspid, idx_n);
+  if (s)
+    return s;
+
+#if 0
   IdxLock lockx(dbh, treeoid);
   s = lockx.lock();
   if (s)
@@ -4304,12 +4468,13 @@ Status HIdx::move(short dspid, eyedbsm::Oid &newoid,
 	  cell_cnt++;
 	}
 
+#ifdef COLLAPSE_TRACE
 	printf("  KOID %s [%d b] {\n", getOidString(&koid), sz);
 	printf("    cell_cnt: %d\n", cell_cnt);
 	printf("    busy_size: %u b\n", busy_size);
 	printf("    free_size: %u b\n", free_size);
 	printf("  }\n");
-
+#endif
 	memcpy(&h, clistobj_data, sizeof(h));
 	x2h_header(&h);
 	koid = h.clobj_next;
@@ -4328,7 +4493,7 @@ Status HIdx::move(short dspid, eyedbsm::Oid &newoid,
       memcpy(clist_data, &xh, sizeof(xh));
       
       memset(&chd_n, 0, sizeof(chd_n));
-      s = objectCreate(dbh, clist_data, clist_data_size, hidx.dspid,
+      s = objectCreate(dbh, clist_data, clist_data_size, dspid,
 		       &chd_n.clobj_first);
       if (s)
 	return s;
@@ -4350,6 +4515,7 @@ Status HIdx::move(short dspid, eyedbsm::Oid &newoid,
       printf("}\n");
     }
   }
+#endif
 
   s = destroy();
   if (s)

@@ -328,8 +328,9 @@ ESM_dspDelete(DbHandle const *dbh, const char *dataspace)
   */
 
   DbHeader _dbh(DBSADDR(dbh));
-  for (int i = 0; i < ndat; i++) 
-    setDataspace(&_dbh, dsp.__datid(i), DefaultDspid);
+  for (int i = 0; i < ndat; i++) {
+    setDataspace(&_dbh, x2h_16(dsp.__datid(i)), DefaultDspid);
+  }
 
   dsp.__ndat() = 0;
   *dsp.name() = 0;

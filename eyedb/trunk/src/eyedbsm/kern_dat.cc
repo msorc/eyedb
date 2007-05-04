@@ -450,6 +450,8 @@ namespace eyedbsm {
     unlink(dfd->file());
     unlink(dmpfileGet(dfd->file()));
 
+    *h->dat(datid).file() = 0;
+
     s = pop_dir(pwd);
     if (s) return s;
 

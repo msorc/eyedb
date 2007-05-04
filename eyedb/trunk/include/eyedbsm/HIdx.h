@@ -191,6 +191,8 @@ namespace eyedbsm {
 	      const int *impl_hints,
 	      unsigned int impl_hints_cnt);
     KeyType keytype;
+    Status collapse_realize(short dspid, HIdx *idx_n);
+
   public:
 
     enum Hints {
