@@ -352,7 +352,18 @@ AM_CONDITIONAL(COND_DOC, test x"$COND_DOC" = xyes)
 # Doxygen for C++ API documentation
 AC_PATH_PROG(DOXYGEN, doxygen)
 if test x"$DOXYGEN" != x ; then
-COND_DOXYGEN="yes"
+   AC_MSG_CHECKING(for doxygen version)
+   DOXYGEN_VERSION=`$DOXYGEN --version`
+   AC_MSG_RESULT($DOXYGEN_VERSION)
+   DOXYGEN_MAJOR_VERSION=[`echo "$DOXYGEN_VERSION" | sed -e 's/.[1-9]*.[1-9]*$//'`]
+   DOXYGEN_MINOR_VERSION=[`echo "$DOXYGEN_VERSION" | sed -e 's/^[1-9]*.//' -e 's/.[1-9]*$//'`]
+   DOXYGEN_REQUIRED_MAJOR_VERSION=1
+   DOXYGEN_REQUIRED_MINOR_VERSION=4
+   if test "$DOXYGEN_MAJOR_VERSION" -le "$DOXYGEN_REQUIRED_MAJOR_VERSION" -a "$DOXYGEN_MINOR_VERSION" -lt "$DOXYGEN_REQUIRED_MINOR_VERSION" ; then
+      AC_MSG_WARN(doxygen version should be at least $DOXYGEN_REQUIRED_MAJOR_VERSION.$DOXYGEN_REQUIRED_MINOR_VERSION.x)
+   else
+      COND_DOXYGEN="yes"
+   fi
 fi
 AM_CONDITIONAL(COND_DOXYGEN, test x"$COND_DOXYGEN" = xyes)
 
