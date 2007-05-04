@@ -65,7 +65,7 @@ namespace eyedbsm {
       unsigned int offset;
     };
 
-    typedef eyedbsm::Status (*hash_key_t)(const void *, unsigned int, void *, int &);
+    typedef eyedbsm::Status (*hash_key_t)(const void *, unsigned int, void *, unsigned int &);
   
     class Key {
 
@@ -108,11 +108,13 @@ namespace eyedbsm {
     */
     eyedbsm::Boolean isOpened() const {return opened;}
 
-    virtual eyedbsm::Status insert(const void *, const void *) = 0;
+    virtual eyedbsm::Status insert(const void *key, const void *data) = 0;
 
-    virtual eyedbsm::Status remove(const void *, const void *, eyedbsm::Boolean * = 0) = 0;
+    virtual eyedbsm::Status remove(const void *key, const void *data, eyedbsm::Boolean *found = 0) = 0;
 
-    virtual eyedbsm::Status search(const void *, eyedbsm::Boolean *, void * = 0) = 0;
+    virtual eyedbsm::Status search(const void *key, unsigned int *found_cnt) = 0;
+
+    virtual eyedbsm::Status searchAny(const void *key, eyedbsm::Boolean *found, void * xdata = 0) = 0;
 
     /**
        Not yet documented

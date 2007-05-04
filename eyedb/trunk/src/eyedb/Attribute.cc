@@ -1921,7 +1921,7 @@ Attribute::getIdx(Database *db, int ind, int& maxind, Size &sz,
 #define NEW_ARGARR
 // FE
 eyedbsm::Status
-hash_key(const void *key, unsigned int len, void *hash_data, int &x)
+hash_key(const void *key, unsigned int len, void *hash_data, unsigned int &x)
 {
   BEMethod_C *mth = (BEMethod_C *)hash_data;
 #ifdef NEW_ARGARR

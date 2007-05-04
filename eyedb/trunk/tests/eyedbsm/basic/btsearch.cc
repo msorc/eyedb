@@ -29,12 +29,13 @@ static int
 usage()
 {
   o_usage(eyedbsm::False);
-  fprintf(stderr, "[-remove] <key>\n");
+  fprintf(stderr, "[-remove] <keynum>|<key>\n");
   return 1;
 }
 
 static unsigned int count;
 static int from;
+static char *key_data;
 static eyedbsm::Boolean rmv = eyedbsm::False;
 
 static void
@@ -55,10 +56,18 @@ read_btree(void *x)
   }
 
   int len;
-  char *data = o_make_data(kt[0], 0, from, len, eyedbsm::False);
+  char *data;
+
+  if (key_data) {
+    data = key_data;
+    len = strlen(data);
+  }
+  else {
+    data = o_make_data(kt[0], 0, from, len, eyedbsm::False);
+  }
+
   char *key = new char[len];
   memcpy(key, data, len);
-  data = o_make_data(kt[0], 0, from, len, eyedbsm::False);
 
   printf("searching ");
   o_trace_data(kt[0], key, eyedbsm::False);
@@ -66,7 +75,7 @@ read_btree(void *x)
 
   eyedbsm::Boolean found;
   eyedbsm::Oid data_oid;
-  s = bidx.search(key, &found, &data_oid);
+  s = bidx.searchAny(key, &found, &data_oid);
   if (s) {
     eyedbsm::statusPrint(s, "searching hash index");
     return;
@@ -76,6 +85,15 @@ read_btree(void *x)
     printf("found -> %s\n", eyedbsm::getOidString(&data_oid));
   else
     printf("not found\n");
+
+  unsigned int found_cnt = 0;
+  s = bidx.search(key, &found_cnt);
+  if (s) {
+    eyedbsm::statusPrint(s, "searching hash index");
+    return;
+  }
+
+  printf("found -> %u\n", found_cnt);
 
   delete [] key;
 }
@@ -102,7 +120,10 @@ main(int argc, char *argv[])
   else if (argc != 1)
     return usage();
 
-  from = atoi(argv[start]);
+  if (eyedblib::is_number(argv[start]))
+    from = atoi(argv[start]);
+  else
+    key_data = argv[start];
 
   o_bench(read_btree, 0);
 

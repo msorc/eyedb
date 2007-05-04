@@ -46,6 +46,7 @@
 #include "lib/m_mem_p.h"
 
 #include <map>
+#include <vector>
 
 namespace eyedbsm {
   class MapHeader;
@@ -119,12 +120,12 @@ do { \
 
 static void x2h_idx(HIdx::_Idx *idx);
 static void h2x_idx(HIdx::_Idx *idx, const HIdx::_Idx *);
-static void x2h_hat(HIdx::Hat *);
-static void h2x_hat(HIdx::Hat *, const HIdx::Hat *);
-static void x2h_header(HIdx::Header *);
-static void h2x_header(HIdx::Header *, const HIdx::Header *);
-static void x2h_overhead(HIdx::Overhead *);
-static void h2x_overhead(HIdx::Overhead *, const HIdx::Overhead *);
+static void x2h_chd(HIdx::CListHeader *);
+static void h2x_chd(HIdx::CListHeader *, const HIdx::CListHeader *);
+static void x2h_header(HIdx::CListObjHeader *);
+static void h2x_header(HIdx::CListObjHeader *, const HIdx::CListObjHeader *);
+static void x2h_overhead(HIdx::CellHeader *);
+static void h2x_overhead(HIdx::CellHeader *, const HIdx::CellHeader *);
 
 #define KEY_OFF (3)
 
@@ -161,9 +162,9 @@ get_inisize_small_def(const HIdx::_Idx &hidx)
 
   if (hidx.keysz != HIdx::VarSize) {
     assert(hidx.impl_hints[HIdx::IniObjCnt_Hints]);
-    return (sizeof(HIdx::Overhead) + hidx.keysz + hidx.datasz) * 
+    return (sizeof(HIdx::CellHeader) + hidx.keysz + hidx.datasz) * 
       hidx.impl_hints[HIdx::IniObjCnt_Hints];
-    // - sizeof(HIdx::Overhead); necessary ?
+    // - sizeof(HIdx::CellHeader); necessary ?
   }
 
   return IniSizeSmall_Default;
@@ -177,9 +178,9 @@ get_inisize_def(const HIdx::_Idx &hidx)
 
   if (hidx.keysz != HIdx::VarSize) {
     assert(hidx.impl_hints[HIdx::IniObjCnt_Hints]);
-    return (sizeof(HIdx::Overhead) + hidx.keysz + hidx.datasz) * 
+    return (sizeof(HIdx::CellHeader) + hidx.keysz + hidx.datasz) * 
       hidx.impl_hints[HIdx::IniObjCnt_Hints];
-    // - sizeof(HIdx::Overhead); necessary ?
+    // - sizeof(HIdx::CellHeader); necessary ?
   }
 
   return IniSize_Default;
@@ -361,19 +362,19 @@ HIdx::init(DbHandle *_dbh, unsigned int _keytype,
 	   hidx.key_count,
 	   hidx.keysz,
 	   hidx.datasz,
-	   sizeof(Hat)*hidx.key_count+len*sizeof(Oid),
+	   sizeof(CListHeader)*hidx.key_count+len*sizeof(Oid),
 	   hidx.key_count,
-	   sizeof(Hat),
+	   sizeof(CListHeader),
 	   len*sizeof(Oid)));
 
-  Hat *hats;
-  hats = new Hat[len];
+  CListHeader *chds;
+  chds = new CListHeader[len];
 
-  memset(hats, 0, sizeof(Hat) * len);
+  memset(chds, 0, sizeof(CListHeader) * len);
   _Idx xidx;
   h2x_idx(&xidx, &hidx);
-  mcp(hats, &xidx, sizeof(xidx));
-  assert(sizeof(xidx) <= KEY_OFF * sizeof(Hat));
+  mcp(chds, &xidx, sizeof(xidx));
+  assert(sizeof(xidx) <= KEY_OFF * sizeof(CListHeader));
 
   bsize = hidx.impl_hints[IniSize_Hints];
   /*
@@ -384,19 +385,19 @@ HIdx::init(DbHandle *_dbh, unsigned int _keytype,
   printf("creating index %d\n",  sizeof(Oid) * len);
 #endif
 
-  Hat *thats = new Hat[len];
-  memcpy(thats, hats, sizeof(Hat) * KEY_OFF);
+  CListHeader *tchds = new CListHeader[len];
+  memcpy(tchds, chds, sizeof(CListHeader) * KEY_OFF);
   for (int i = KEY_OFF; i < len; i++)
-    h2x_hat(&thats[i], &hats[i]);
-  stat = objectCreate(dbh, thats, sizeof(Hat) * len, hidx.dspid,
+    h2x_chd(&tchds[i], &chds[i]);
+  stat = objectCreate(dbh, tchds, sizeof(CListHeader) * len, hidx.dspid,
 			 &treeoid);
-  delete [] thats;
+  delete [] tchds;
 
   if (!stat)
     IDB_LOG(IDB_LOG_IDX_CREATE,
 	    ("Have Created Hash Index: treeoid=%s\n",
 	     getOidString(&treeoid)));
-  delete [] hats;
+  delete [] chds;
   uextend = _isUExtend(hidx);
   data_grouped_by_key = _isDataGroupedByKey(hidx);
 }
@@ -485,7 +486,7 @@ HIdx::HIdx(DbHandle *_dbh, const Oid *_oid,
 
 #define MK_DEF_HASH_KEY(T, F) \
 Status \
-HIdx::F(const void *key, unsigned int len, void *xhidx, int &x) \
+HIdx::F(const void *key, unsigned int len, void *xhidx, unsigned int &x) \
 { \
   T t; \
   mcp(&t, (unsigned char *)key, sizeof(T)); \
@@ -495,7 +496,7 @@ HIdx::F(const void *key, unsigned int len, void *xhidx, int &x) \
 
 Status
 HIdx::get_def_oiddata_hash_key(const void *key, unsigned int len,
-				  void *xhidx, int &x)
+				  void *xhidx, unsigned int &x)
 {
   Oid oid;
   mcp(&oid, (unsigned char *)(key), sizeof(oid));
@@ -609,7 +610,7 @@ Boolean trace_it;
 #define NEW_HASH_KEY2
 
 Status
-HIdx::get_def_string_hash_key(const void *key, unsigned int len, void *, int &x)
+HIdx::get_def_string_hash_key(const void *key, unsigned int len, void *, unsigned int &x)
 {
 #ifdef NEW_HASH_KEY2
   unsigned char *k = (unsigned char *)key;
@@ -629,7 +630,7 @@ HIdx::get_def_string_hash_key(const void *key, unsigned int len, void *, int &x)
 }
 
 Status
-HIdx::get_def_nstring_hash_key(const void *key, unsigned int len, void *, int &x)
+HIdx::get_def_nstring_hash_key(const void *key, unsigned int len, void *, unsigned int &x)
 {
   unsigned char *k = (unsigned char *)key;
   if (len > 12)
@@ -654,7 +655,7 @@ HIdx::get_def_nstring_hash_key(const void *key, unsigned int len, void *, int &x
 }
 
 Status
-HIdx::get_string_hash_key(const void *key, unsigned int len, int &x) const
+HIdx::get_string_hash_key(const void *key, unsigned int len, unsigned int &x) const
 {
 #ifdef NEW_HASH_KEY
   assert(hash_key);
@@ -667,7 +668,7 @@ HIdx::get_string_hash_key(const void *key, unsigned int len, int &x) const
 }
 
 Status
-HIdx::get_def_rawdata_hash_key(const void *key, unsigned int len, void *, int &x)
+HIdx::get_def_rawdata_hash_key(const void *key, unsigned int len, void *, unsigned int &x)
 {
   x = 0;
   unsigned char *k = (unsigned char *)key;
@@ -678,7 +679,7 @@ HIdx::get_def_rawdata_hash_key(const void *key, unsigned int len, void *, int &x
 }
 
 Status
-HIdx::get_rawdata_hash_key(const void *key, unsigned int len, int &x) const
+HIdx::get_rawdata_hash_key(const void *key, unsigned int len, unsigned int &x) const
 {
 #ifdef NEW_HASH_KEY
   assert(hash_key);
@@ -696,11 +697,11 @@ fpos_(void const * p, int offset)
 }
 
 inline Status
-HIdx::get_key(int &n, const void *key, unsigned int *size) const
+HIdx::get_key(unsigned int &n, const void *key, unsigned int *size) const
 {
   key = fpos_(key, keytype.offset);
   Status s;
-  int x;
+  unsigned int x;
 
   if (STRTYPE(this)) {
     int len = strlen((char *)key);
@@ -730,7 +731,7 @@ HIdx::get_key(int &n, const void *key, unsigned int *size) const
 }
 
 Status
-HIdx::suppressObjectFromFreeList(Hat &hat, int hat_k, Header &h,
+HIdx::suppressObjectFromFreeList(CListHeader &chd, unsigned int chd_k, CListObjHeader &h,
 				    const Oid &koid)
 {
 #ifdef TRACK_MAP
@@ -738,39 +739,39 @@ HIdx::suppressObjectFromFreeList(Hat &hat, int hat_k, Header &h,
 #endif  
   Status s;
 
-  if (h.free_prev.getNX()) {
+  if (h.clobj_free_prev.getNX()) {
     Oid xoid;
-    h2x_oid(&xoid, &h.free_next);
-    s = objectWrite(dbh, OFFSET(Header, free_next), sizeof(Oid),
-		       &xoid, &h.free_prev);
+    h2x_oid(&xoid, &h.clobj_free_next);
+    s = objectWrite(dbh, OFFSET(CListObjHeader, clobj_free_next), sizeof(Oid),
+		       &xoid, &h.clobj_free_prev);
     if (s)
       return s;
   }
   
-  if (h.free_next.getNX()) {
+  if (h.clobj_free_next.getNX()) {
     Oid xoid;
-    h2x_oid(&xoid, &h.free_prev);
-    s = objectWrite(dbh, OFFSET(Header, free_prev), sizeof(Oid),
-		       &xoid, &h.free_next);
+    h2x_oid(&xoid, &h.clobj_free_prev);
+    s = objectWrite(dbh, OFFSET(CListObjHeader, clobj_free_prev), sizeof(Oid),
+		       &xoid, &h.clobj_free_next);
     if (s)
       return s;
   }
   
-  if (hat.free_first.getNX() == koid.getNX()) {
-    hat.free_first = h.free_next;
-    s = writeHat(hat_k, hat);
+  if (chd.clobj_free_first.getNX() == koid.getNX()) {
+    chd.clobj_free_first = h.clobj_free_next;
+    s = writeCListHeader(chd_k, chd);
     if (s)
       return s;
   }
 
-  mset(&h.free_prev, 0, sizeof(h.free_prev));
-  mset(&h.free_next, 0, sizeof(h.free_next));
+  mset(&h.clobj_free_prev, 0, sizeof(h.clobj_free_prev));
+  mset(&h.clobj_free_next, 0, sizeof(h.clobj_free_next));
 
   return Success;
 }
 
 Status
-HIdx::suppressObjectFromList(Hat &hat, int hat_k, Header &h,
+HIdx::suppressObjectFromList(CListHeader &chd, unsigned int chd_k, CListObjHeader &h,
 				const Oid &koid)
 {
 #ifdef TRACK_MAP
@@ -778,37 +779,37 @@ HIdx::suppressObjectFromList(Hat &hat, int hat_k, Header &h,
 #endif  
   Status s;
 
-  if (h.prev.getNX()) {
+  if (h.clobj_prev.getNX()) {
     Oid xoid;
-    h2x_oid(&xoid, &h.next);
-    s = objectWrite(dbh, OFFSET(Header, next), sizeof(Oid),
-		       &xoid, &h.prev);
+    h2x_oid(&xoid, &h.clobj_next);
+    s = objectWrite(dbh, OFFSET(CListObjHeader, clobj_next), sizeof(Oid),
+		       &xoid, &h.clobj_prev);
     if (s)
       return s;
   }
   
-  if (h.next.getNX()) {
+  if (h.clobj_next.getNX()) {
     Oid xoid;
-    h2x_oid(&xoid, &h.prev);
-    s = objectWrite(dbh, OFFSET(Header, prev), sizeof(Oid),
-		       &xoid, &h.next);
+    h2x_oid(&xoid, &h.clobj_prev);
+    s = objectWrite(dbh, OFFSET(CListObjHeader, clobj_prev), sizeof(Oid),
+		       &xoid, &h.clobj_next);
     if (s)
       return s;
   }
   
-  Boolean write_hat = False;
-  if (hat.first.getNX() == koid.getNX()) {
-    hat.first = h.next;
-    write_hat = True;
+  Boolean write_chd = False;
+  if (chd.clobj_first.getNX() == koid.getNX()) {
+    chd.clobj_first = h.clobj_next;
+    write_chd = True;
   }
 
-  if (hat.last.getNX() == koid.getNX()) {
-    hat.last = h.prev;
-    write_hat = True;
+  if (chd.clobj_last.getNX() == koid.getNX()) {
+    chd.clobj_last = h.clobj_prev;
+    write_chd = True;
   }
 
-  if (write_hat) {
-    s = writeHat(hat_k, hat);
+  if (write_chd) {
+    s = writeCListHeader(chd_k, chd);
     if (s)
       return s;
   }
@@ -869,72 +870,72 @@ HIdx::modifyObjectSize(int osize, int nsize, const Oid &koid,
 }
 
 Status
-HIdx::replaceObjectInList(Hat &hat, int hat_k, Header &h,
+HIdx::replaceObjectInList(CListHeader &chd, unsigned int chd_k, CListObjHeader &h,
 			     const Oid &koid, const Oid &nkoid)
 {
 #ifdef TRACK_MAP
   printf("replaceObjectFromList(%s, %s)\n", getOidString(&koid),
 	 getOidString(&nkoid));
-  printf("HAT first=%s last=%s\n", getOidString(&hat.first), getOidString(&hat.last));
-  printf("HAT2 free_first=%s\n",
-	 getOidString(&hat.free_first));
+  printf("CHD first=%s last=%s\n", getOidString(&chd.first), getOidString(&chd.last));
+  printf("CHD2 free_first=%s\n",
+	 getOidString(&chd.free_first));
   printf("HEADER prev=%s, next=%s, free_prev=%s, free_next=%s\n",
-	 getOidString(&h.prev),
-	 getOidString(&h.next),
-	 getOidString(&h.free_prev),
-	 getOidString(&h.free_next));
+	 getOidString(&h.clobj_prev),
+	 getOidString(&h.clobj_next),
+	 getOidString(&h.clobj_free_prev),
+	 getOidString(&h.clobj_free_next));
 #endif  
   Status s;
 
   Oid xoid;
   h2x_oid(&xoid, &nkoid);
 
-  if (h.prev.getNX()) {
-    s = objectWrite(dbh, OFFSET(Header, next), sizeof(Oid),
-		       &xoid, &h.prev);
+  if (h.clobj_prev.getNX()) {
+    s = objectWrite(dbh, OFFSET(CListObjHeader, clobj_next), sizeof(Oid),
+		       &xoid, &h.clobj_prev);
     if (s)
       return s;
   }
   
-  if (h.next.getNX()) {
-    s = objectWrite(dbh, OFFSET(Header, prev), sizeof(Oid),
-		       &xoid, &h.next);
+  if (h.clobj_next.getNX()) {
+    s = objectWrite(dbh, OFFSET(CListObjHeader, clobj_prev), sizeof(Oid),
+		       &xoid, &h.clobj_next);
     if (s)
       return s;
   }
   
-  if (h.free_prev.getNX()) {
-    s = objectWrite(dbh, OFFSET(Header, free_next), sizeof(Oid),
-		       &xoid, &h.free_prev);
+  if (h.clobj_free_prev.getNX()) {
+    s = objectWrite(dbh, OFFSET(CListObjHeader, clobj_free_next), sizeof(Oid),
+		       &xoid, &h.clobj_free_prev);
     if (s)
       return s;
   }
   
-  if (h.free_next.getNX()) {
-    s = objectWrite(dbh, OFFSET(Header, free_prev), sizeof(Oid),
-		       &xoid, &h.free_next);
+  if (h.clobj_free_next.getNX()) {
+    s = objectWrite(dbh, OFFSET(CListObjHeader, clobj_free_prev), sizeof(Oid),
+		       &xoid, &h.clobj_free_next);
     if (s)
       return s;
   }
   
-  Boolean write_hat = False;
-  if (hat.first.getNX() == koid.getNX()) {
-    hat.first = xoid;
-    write_hat = True;
+  Boolean write_chd = False;
+  if (chd.clobj_first.getNX() == koid.getNX()) {
+    chd.clobj_first = xoid;
+    write_chd = True;
   }
 
-  if (hat.last.getNX() == koid.getNX()) {
-    hat.last = xoid;
-    write_hat = True;
+  if (chd.clobj_last.getNX() == koid.getNX()) {
+    chd.clobj_last = xoid;
+    write_chd = True;
   }
 
-  if (hat.free_first.getNX() == koid.getNX()) {
-    hat.free_first = xoid;
-    write_hat = True;
+  if (chd.clobj_free_first.getNX() == koid.getNX()) {
+    chd.clobj_free_first = xoid;
+    write_chd = True;
   }
 
-  if (write_hat) {
-    s = writeHat(hat_k, hat);
+  if (write_chd) {
+    s = writeCListHeader(chd_k, chd);
     if (s)
       return s;
   }
@@ -946,20 +947,20 @@ HIdx::replaceObjectInList(Hat &hat, int hat_k, Header &h,
 #define BUG_DATA_STORE2
 
 Status
-HIdx::insert_realize(Hat &hat, int hat_k, const void *key,
+HIdx::insert_realize(CListHeader &chd, unsigned int chd_k, const void *key,
 		     unsigned int size, const void *xdata,
 		     const Oid &koid,
-		     Header &h, int offset, Overhead &o, unsigned int datasz)
+		     CListObjHeader &h, int offset, CellHeader &o, unsigned int datasz)
 {
-  int osize = o.size, onext = o.free_next;
-  int ovsize = size + sizeof(Overhead);
+  int osize = o.size, onext = o.cell_free_next;
+  int ovsize = size + sizeof(CellHeader);
   Status s;
 
   assert(o.free);
 
   /*
-  printf("insert_realize offset %d o.free %d o.free_next %d o.free_prev %d\n",
-	 offset, o.free, o.free_next, o.free_prev);
+  printf("insert_realize offset %d o.free %d o.cell_free_next %d o.cell_free_prev %d\n",
+	 offset, o.free, o.cell_free_next, o.cell_free_prev);
   */
 
 #ifdef TRACK_MAP
@@ -973,7 +974,7 @@ HIdx::insert_realize(Hat &hat, int hat_k, const void *key,
 #endif
 
 #ifdef BUG_DATA_STORE
-  if (osize > size + sizeof(Overhead))
+  if (osize > size + sizeof(CellHeader))
     o.size = size;
   else
     ovsize += osize - size;
@@ -981,75 +982,75 @@ HIdx::insert_realize(Hat &hat, int hat_k, const void *key,
 
   char *data = (char *)m_malloc(ovsize);
   if (STRTYPE(this))
-    memcpy(data + sizeof(Overhead), key, strlen((char *)key)+1);
+    memcpy(data + sizeof(CellHeader), key, strlen((char *)key)+1);
   else if (hidx.keytype == tUnsignedChar || hidx.keytype == tChar ||
 	   hidx.keytype == tSignedChar)
-    memcpy(data + sizeof(Overhead), key, size - datasz);
+    memcpy(data + sizeof(CellHeader), key, size - datasz);
   else {
     char xkey[Idx_max_type_size];
     assert(size - datasz <= Idx_max_type_size);
     h2x(xkey, key, keytype);
-    memcpy(data + sizeof(Overhead), xkey, size - datasz);
+    memcpy(data + sizeof(CellHeader), xkey, size - datasz);
   }
 
-  if (o.free_next != NullOffset) {
-    Overhead no;
-    s = readOverhead(o.free_next, koid, no);
+  if (o.cell_free_next != NullOffset) {
+    CellHeader no;
+    s = readCellHeader(o.cell_free_next, koid, no);
     if (s)
       return s;
     assert(no.free);
-    no.free_prev = o.free_prev;
-    s = writeOverhead(o.free_next, koid, no);
+    no.cell_free_prev = o.cell_free_prev;
+    s = writeCellHeader(o.cell_free_next, koid, no);
     if (s)
       return s;
   }
 
-  if (o.free_prev != NullOffset) {
-    Overhead no;
-    s = readOverhead(o.free_prev, koid, no);
+  if (o.cell_free_prev != NullOffset) {
+    CellHeader no;
+    s = readCellHeader(o.cell_free_prev, koid, no);
     if (s)
       return s;
     assert(no.free);
-    no.free_next = o.free_next;
-    s = writeOverhead(o.free_prev, koid, no);
+    no.cell_free_next = o.cell_free_next;
+    s = writeCellHeader(o.cell_free_prev, koid, no);
     if (s)
       return s;
   }
   else {
-    assert(h.free_first == offset);
-    h.free_first = o.free_next;
+    assert(h.cell_free_first == offset);
+    h.cell_free_first = o.cell_free_next;
   }
 
 #if 0
-  if (h.free_first == offset) {
-    printf("h.free_first == offset %d\n", offset);
-    if (o.free_next != NullOffset) {
-      Overhead no;
-      s = readOverhead(o.free_next, koid, no);
+  if (h.cell_free_first == offset) {
+    printf("h.cell_free_first == offset %d\n", offset);
+    if (o.cell_free_next != NullOffset) {
+      CellHeader no;
+      s = readCellHeader(o.cell_free_next, koid, no);
       if (s)
 	return s;
       // EV : 3/05/07
       assert(no.free);
-      no.free_prev = NullOffset;
-      s = writeOverhead(o.free_next, koid, no);
+      no.cell_free_prev = NullOffset;
+      s = writeCellHeader(o.cell_free_next, koid, no);
       if (s)
 	return s;
     }
-    h.free_first = o.free_next;
-    printf("setting free_first to %d\n", h.free_first);
+    h.cell_free_first = o.cell_free_next;
+    printf("setting free_first to %d\n", h.cell_free_first);
   }
 #endif
 
 
 #ifndef BUG_DATA_STORE
-  if (osize > size + sizeof(Overhead))
+  if (osize > size + sizeof(CellHeader))
     o.size = size;
 #endif
 
   o.free = 0;
-  o.free_next = NullOffset;
-  o.free_prev = NullOffset;
-  Overhead to;
+  o.cell_free_next = NullOffset;
+  o.cell_free_prev = NullOffset;
+  CellHeader to;
   h2x_overhead(&to, &o);
   mcp(data, &to, sizeof(to));
   //  memcpy(data + ovsize - hidx.datasz, xdata, hidx.datasz);
@@ -1063,22 +1064,21 @@ HIdx::insert_realize(Hat &hat, int hat_k, const void *key,
   h.free_whole -= osize;
 
 #if 0
-  assert(!writeHeader(koid, h));
+  assert(!writeCListObjHeader(koid, h));
 #endif
 
-  assert(h.free_whole >= 0 && h.free_whole < (~0UL/2));
   if (osize == size) {
 #ifdef TRACK_MAP
     printf("exact size %d\n", size);
 #endif
   }
-  else if (osize > size + sizeof(Overhead)) {
+  else if (osize > size + sizeof(CellHeader)) {
     /* generation d'une nouvelle cellule */
 #ifdef TRACK_MAP
-    printf("split cell %d %d %d %d\n", size+sizeof(Overhead), osize, offset, h.free_first);
+    printf("split cell %d %d %d %d\n", size+sizeof(CellHeader), osize, offset, h.cell_free_first);
 #endif
-    int noffset = offset + size + sizeof(Overhead);
-    s = insertCell(noffset, osize - size - sizeof(Overhead), h, koid);
+    int noffset = offset + size + sizeof(CellHeader);
+    s = insertCell(noffset, osize - size - sizeof(CellHeader), h, koid);
     if (s)
       return s;
   }
@@ -1098,7 +1098,7 @@ HIdx::insert_realize(Hat &hat, int hat_k, const void *key,
 
   // changed this test the 29/06/02 to allow to get rid of unuseful objects
 #ifdef OPT_FREELIST
-  if (!h.free_cnt || (STRTYPE(this) && h.free_whole <= sizeof(Overhead)+8))
+  if (!h.free_cnt || (STRTYPE(this) && h.free_whole <= sizeof(CellHeader)+8))
 #else
   if (!h.free_cnt)
 #endif
@@ -1116,13 +1116,13 @@ HIdx::insert_realize(Hat &hat, int hat_k, const void *key,
 	printf("get rid of this fucking object %d %s\n", h.free_whole, getOidString(&koid));
       }
 #endif
-      s = suppressObjectFromFreeList(hat, hat_k, h, koid);
+      s = suppressObjectFromFreeList(chd, chd_k, h, koid);
       if (s)
 	return s;
     }
   }
 
-  s = writeHeader(koid, h);
+  s = writeCListObjHeader(koid, h);
 
   if (!s)
     s = count_manage(dbh, 1);
@@ -1153,24 +1153,24 @@ HIdx::count_manage(DbHandle *_dbh, int inc)
 }
 
 Status
-HIdx::readHat(int k, Hat &hat) const
+HIdx::readCListHeader(unsigned int k, CListHeader &chd) const
 {
   Status s;
   unsigned int (*gkey)(int) = get_gkey(version);
 
-  s = objectRead(dbh, gkey(k) * sizeof(Hat), sizeof(Hat), &hat,
+  s = objectRead(dbh, gkey(k) * sizeof(CListHeader), sizeof(CListHeader), &chd,
 		    DefaultLock, 0, 0, &treeoid);
   if (s)
     return s;
-  x2h_hat(&hat);
+  x2h_chd(&chd);
   return Success;
 }
 
 Status
-HIdx::readHeader(const Oid &koid, Header &h) const
+HIdx::readCListObjHeader(const Oid &koid, CListObjHeader &h) const
 {
   Status s;
-  s = objectRead(dbh, 0, sizeof(Header), &h, DefaultLock,
+  s = objectRead(dbh, 0, sizeof(CListObjHeader), &h, DefaultLock,
 		    0, 0, &koid);
   if (s)
     return s;
@@ -1179,27 +1179,27 @@ HIdx::readHeader(const Oid &koid, Header &h) const
 }
 
 Status
-HIdx::writeHeader(const Oid &koid, const Header &h) const
+HIdx::writeCListObjHeader(const Oid &koid, const CListObjHeader &h) const
 {
 #if 1
-  if (h.free_first != NullOffset) {
-    Overhead o = {0};
-    Status s = readOverhead(h.free_first, koid, o);
+  if (h.cell_free_first != NullOffset) {
+    CellHeader o = {0};
+    Status s = readCellHeader(h.cell_free_first, koid, o);
     if (s)
       statusPrint(s, "...");
     assert(o.free);
   }
 #endif
-  Header th;
+  CListObjHeader th;
   h2x_header(&th, &h);
-  return objectWrite(dbh, 0, sizeof(Header), &th, &koid);
+  return objectWrite(dbh, 0, sizeof(CListObjHeader), &th, &koid);
 }
 
 Status
-HIdx::readOverhead(int offset, const Oid &koid, Overhead &o) const
+HIdx::readCellHeader(int offset, const Oid &koid, CellHeader &o) const
 {
   Status s;
-  s = objectRead(dbh, offset, sizeof(Overhead), &o, DefaultLock,
+  s = objectRead(dbh, offset, sizeof(CellHeader), &o, DefaultLock,
 		    0, 0, &koid);
   if (s)
     return s;
@@ -1207,77 +1207,77 @@ HIdx::readOverhead(int offset, const Oid &koid, Overhead &o) const
   return Success;
 }
 
-void HIdx::printOverhead(const HIdx::Overhead *o, int offset) const
+void HIdx::printCellHeader(const HIdx::CellHeader *o, int offset) const
 {
-  printf("Overhead at %d\n", offset);
+  printf("CellHeader at %d\n", offset);
   printf("  o.free %d\n", o->free);
   printf("  o.size %d\n", o->size);
-  printf("  o.free_prev %d\n", o->free_prev);
-  printf("  o.free_next %d\n", o->free_next);
+  printf("  o.cell_free_prev %d\n", o->cell_free_prev);
+  printf("  o.cell_free_next %d\n", o->cell_free_next);
 }
 
-void HIdx::checkOverhead(int offset, const Oid *koid) const
+void HIdx::checkCellHeader(int offset, const Oid *koid) const
 {
-  HIdx::Overhead o;
-  readOverhead(offset, *koid, o);
-  printOverhead(&o, offset);
+  HIdx::CellHeader o;
+  readCellHeader(offset, *koid, o);
+  printCellHeader(&o, offset);
 }
 
-void HIdx::printHeader(const HIdx::Header *h) const
+void HIdx::printCListObjHeader(const HIdx::CListObjHeader *h) const
 {
-  printf("Header\n");
+  printf("CListObjHeader\n");
   printf("  h.size %u\n", h->size);
   printf("  h.free_cnt %d\n", h->free_cnt);
   printf("  h.alloc_cnt %d\n", h->alloc_cnt);
   printf("  h.free_whole %d\n", h->free_whole);
-  printf("  h.free_first %d\n", h->free_first);
-  printf("  h.free_prev %s\n", getOidString(&h->free_prev));
-  printf("  h.free_next %s\n", getOidString(&h->free_next));
-  printf("  h.prev %s\n", getOidString(&h->prev));
-  printf("  h.next %s\n", getOidString(&h->next));
+  printf("  h.cell_free_first %d\n", h->cell_free_first);
+  printf("  h.clobj_free_prev %s\n", getOidString(&h->clobj_free_prev));
+  printf("  h.clobj_free_next %s\n", getOidString(&h->clobj_free_next));
+  printf("  h.clobj_prev %s\n", getOidString(&h->clobj_prev));
+  printf("  h.clobj_next %s\n", getOidString(&h->clobj_next));
 }
 
-void HIdx::checkHeader(const Oid *koid) const
+void HIdx::checkCListObjHeader(const Oid *koid) const
 {
-  HIdx::Header h;
-  readHeader(*koid, h);
-  printHeader(&h);
+  HIdx::CListObjHeader h;
+  readCListObjHeader(*koid, h);
+  printCListObjHeader(&h);
 }
 
 void HIdx::checkChain(const Oid *koid) const
 {
-  Header h;
-  readHeader(*koid, h);
-  int offset = h.free_first;
+  CListObjHeader h;
+  readCListObjHeader(*koid, h);
+  int offset = h.cell_free_first;
   int prev = NullOffset;
-  //printHeader(&h);
+  //printCListObjHeader(&h);
 
   for (unsigned int n = 0; offset != NullOffset && n < 100; n++) {
-    Overhead o;
-    assert(!readOverhead(offset, *koid, o));
+    CellHeader o;
+    assert(!readCellHeader(offset, *koid, o));
     assert(o.free);
-    assert(o.free_prev == prev);
+    assert(o.cell_free_prev == prev);
     prev = offset;
-    //printOverhead(&o, offset);
-    offset = o.free_next;
+    //printCellHeader(&o, offset);
+    offset = o.cell_free_next;
     if (n > 90)
       printf("chain loop\n");
   }
 }
 
-void HIdx::checkChain(const Hat *hat, const std::string &msg) const
+void HIdx::checkChain(const CListHeader *chd, const std::string &msg) const
 {
-  Oid koid = hat->free_first;
+ Oid koid = chd->clobj_free_first;
 
   //printf("\nChecking chain %s {\n", msg.c_str());
 
   int cnt = 0;
   while (koid.getNX()) {
-    Header h;
-    assert(!readHeader(koid, h));
-    //printf("h.free_first %d\n", h.free_first);
+    CListObjHeader h;
+    assert(!readCListObjHeader(koid, h));
+    //printf("h.cell_free_first %d\n", h.cell_free_first);
     checkChain(&koid);
-    koid = h.free_next;
+    koid = h.clobj_free_next;
     cnt++;
   }
   //printf("} %d found\n", cnt);
@@ -1287,10 +1287,10 @@ static bool dont_check = false;
 //static bool dont_check = true;
 
 Status
-HIdx::writeOverhead(int offset, const Oid &koid,
-		       const Overhead &o) const
+HIdx::writeCellHeader(int offset, const Oid &koid,
+		       const CellHeader &o) const
 {
-  Overhead to;
+  CellHeader to;
   h2x_overhead(&to, &o);
 
 #if 0
@@ -1298,7 +1298,7 @@ HIdx::writeOverhead(int offset, const Oid &koid,
     std::map<unsigned int, bool> map;
     map[offset] = true;
 
-    unsigned off = o.free_prev;
+    unsigned off = o.cell_free_prev;
     bool loop = false;
     for (int n = 0; !loop && n < 10; n++) {
       if (off == NullOffset)
@@ -1309,18 +1309,18 @@ HIdx::writeOverhead(int offset, const Oid &koid,
       }
 
       if (map.find(off) != map.end()) {
-	printf("loop in writeOverhead prev %u at #%d [prev %d]\n", off, n, o.free_prev);
+	printf("loop in writeCellHeader prev %u at #%d [prev %d]\n", off, n, o.cell_free_prev);
 	loop = true;
       }
       map[off] = true;
-      Overhead no;
-      readOverhead(off, koid, no);
-      off = no.free_prev;
+      CellHeader no;
+      readCellHeader(off, koid, no);
+      off = no.cell_free_prev;
     }
     if (loop)
       printf("*** prev EOL\n");
 
-    off = o.free_next;
+    off = o.cell_free_next;
     loop = false;
     for (int n = 0; !loop && n < 10; n++) {
       if (off == NullOffset)
@@ -1331,61 +1331,61 @@ HIdx::writeOverhead(int offset, const Oid &koid,
       }
 
       if (map.find(off) != map.end()) {
-	printf("loop in writeOverhead next %u at #%d [next %d]\n", off, n, o.free_next);
+	printf("loop in writeCellHeader next %u at #%d [next %d]\n", off, n, o.cell_free_next);
 	loop = true;
       }
       map[off] = true;
-      Overhead no;
-      readOverhead(off, koid, no);
-      off = no.free_next;
+      CellHeader no;
+      readCellHeader(off, koid, no);
+      off = no.cell_free_next;
     }
     if (loop)
       printf("*** next EOL\n");
   }
 #endif
-  return objectWrite(dbh, offset, sizeof(Overhead), &to, &koid);
+  return objectWrite(dbh, offset, sizeof(CellHeader), &to, &koid);
 }
 
 Status
-HIdx::readHats(Hat *&hats) const
+HIdx::readCListHeaders(CListHeader *&chds) const
 {
   Status s;
   int len = get_gkey(version)(hidx.key_count);
-  hats = new Hat[len];
+  chds = new CListHeader[len];
 
-  s = objectRead(dbh, 0, len * sizeof(Hat), hats,
+  s = objectRead(dbh, 0, len * sizeof(CListHeader), chds,
 		    DefaultLock, 0, 0, &treeoid);
   if (s)
     return s;
   for (int i = KEY_OFF; i < len; i++)
-    x2h_hat(&hats[i]);
+    x2h_chd(&chds[i]);
   return Success;
 }
 
 Status
-HIdx::writeHats(const Hat *hats) const
+HIdx::writeCListHeaders(const CListHeader *chds) const
 {
   int len = get_gkey(version)(hidx.key_count);
-  Hat *nhats = new Hat[len];
-  memcpy(nhats, hats, sizeof(Hat) * KEY_OFF);
+  CListHeader *nchds = new CListHeader[len];
+  memcpy(nchds, chds, sizeof(CListHeader) * KEY_OFF);
   for (int i = KEY_OFF; i < len; i++)
-    h2x_hat(&nhats[i], &hats[i]);
+    h2x_chd(&nchds[i], &chds[i]);
 
-  Status s = objectWrite(dbh, 0, len * sizeof(Hat), nhats,
+  Status s = objectWrite(dbh, 0, len * sizeof(CListHeader), nchds,
 			       &treeoid);
-  delete [] nhats;
+  delete [] nchds;
   return s;
 }
 
 Status
-HIdx::writeHat(int k, const Hat &hat) const
+HIdx::writeCListHeader(unsigned int k, const CListHeader &chd) const
 {
   Status s;
   unsigned int (*gkey)(int) = get_gkey(version);
 
-  Hat that;
-  h2x_hat(&that, &hat);
-  s = objectWrite(dbh, gkey(k) * sizeof(Hat), sizeof(Hat), &that,
+  CListHeader tchd;
+  h2x_chd(&tchd, &chd);
+  s = objectWrite(dbh, gkey(k) * sizeof(CListHeader), sizeof(CListHeader), &tchd,
 		     &treeoid);
   if (s)
     return s;
@@ -1393,103 +1393,103 @@ HIdx::writeHat(int k, const Hat &hat) const
 }
 
 Status
-HIdx::dumpMemoryMap(const Hat &hat, const char *msg, FILE *fd)
+HIdx::dumpMemoryMap(const CListHeader &chd, const char *msg, FILE *fd)
 {
   fprintf(fd, "%sFREE MEMORY MAP {\n", msg);
   Oid prev;
-  Oid koid = hat.free_first;
+  Oid koid = chd.clobj_free_first;
   memset(&prev, 0, sizeof(prev));
 
   int cnt = 0;
   while (koid.getNX()) {
     Status s;
-    Header h;
-    s = readHeader(koid, h);
+    CListObjHeader h;
+    s = readCListObjHeader(koid, h);
     if (s)
       return s;
     fprintf(fd, "\tObject %s -> Free Whole: %d, Free Count: %d\n",
 	    getOidString(&koid), h.free_whole, h.free_cnt);
-    assert(!memcmp(&h.free_prev, &prev, sizeof(prev)));
+    assert(!memcmp(&h.clobj_free_prev, &prev, sizeof(prev)));
     prev = koid;
-    koid = h.free_next;
+    koid = h.clobj_free_next;
     cnt++;
   }
   fprintf(fd, "} -> %d cells in FREE MAP\n\n", cnt);
 
   cnt = 0;
   memset(&prev, 0, sizeof(prev));
-  koid = hat.first;
+  koid = chd.clobj_first;
 
   fprintf(fd, "%sMEMORY MAP {\n", msg);
-  fprintf(fd, "\tFirst Free %s\n", getOidString(&hat.free_first));
+  fprintf(fd, "\tFirst Free %s\n", getOidString(&chd.clobj_free_first));
   while (koid.getNX()) {
     Status s;
-    Header h;
-    s = readHeader(koid, h);
+    CListObjHeader h;
+    s = readCListObjHeader(koid, h);
     if (s)
       return s;
     unsigned int sz = 0;
     s = objectSizeGet(dbh, &sz, DefaultLock, &koid);
     if (s)
       return s;
-    int cur = sizeof(Header);
+    int cur = sizeof(CListObjHeader);
     fprintf(fd, "\tObject %s {\n\t  First Free: %d\n\t  Free Whole: %d\n\t  "
 	    "Free Count: %d\n\t  Alloc Count: %d\n\t  Size: %d\n\t  "
 	    "Free Prev: %s\n\t  Free Next: %s\n",
-	    getOidString(&koid), h.free_first,
+	    getOidString(&koid), h.cell_free_first,
 	    h.free_whole, h.free_cnt, h.alloc_cnt, sz,
-	    getOidString(&h.free_prev), getOidString(&h.free_next));
-    assert(!memcmp(&h.prev, &prev, sizeof(prev)));
+	    getOidString(&h.clobj_free_prev), getOidString(&h.clobj_free_next));
+    assert(!memcmp(&h.clobj_prev, &prev, sizeof(prev)));
 
     int busy_cnt = 0;
     int free_cnt = 0;
-    while (cur + sizeof(Overhead) <= sz) {
-      Overhead to;
-      s = readOverhead(cur, koid, to);
+    while (cur + sizeof(CellHeader) <= sz) {
+      CellHeader to;
+      s = readCellHeader(cur, koid, to);
       if (s)
 	return s;
       fprintf(fd, "\t  #%d size %d %s", cur,
 	      to.size, (to.free ? "free" : "busy"));
 
-      if (to.free_prev != NullOffset)
-	fprintf(fd, " free_prev %d", to.free_prev);
+      if (to.cell_free_prev != NullOffset)
+	fprintf(fd, " free_prev %d", to.cell_free_prev);
 
-      if (to.free_next != NullOffset)
-	fprintf(fd, " free_next %d", to.free_next);
+      if (to.cell_free_next != NullOffset)
+	fprintf(fd, " free_next %d", to.cell_free_next);
 
       fprintf(fd, "\n");
       if (to.free) free_cnt++;
       else busy_cnt++;
-      cur += to.size + sizeof(Overhead);
+      cur += to.size + sizeof(CellHeader);
     }
 
     fprintf(fd, "\t}\n");
     // now checking
     assert(free_cnt == h.free_cnt);
     assert(busy_cnt == h.alloc_cnt);
-    int free_cur = h.free_first;
+    int free_cur = h.cell_free_first;
     int free_prev = NullOffset;
     int free_size = 0;
     while (free_cur != NullOffset) {
-      Overhead to;
-      s = readOverhead(free_cur, koid, to);
+      CellHeader to;
+      s = readCellHeader(free_cur, koid, to);
       if (s)
 	return s;
-      if (!to.free || to.free_prev != free_prev) {
-	fprintf(fd, "#%d free, free_prev %d %d\n", free_cur, to.free_prev,
+      if (!to.free || to.cell_free_prev != free_prev) {
+	fprintf(fd, "#%d free, free_prev %d %d\n", free_cur, to.cell_free_prev,
 		free_prev);
 	assert(0);
       }
       assert(to.free);
-      assert(to.free_prev == free_prev);
+      assert(to.cell_free_prev == free_prev);
       free_size += to.size;
       free_prev = free_cur;
-      free_cur = to.free_next;
+      free_cur = to.cell_free_next;
     }
 
     assert(free_size == h.free_whole);
     prev = koid;
-    koid = h.next;
+    koid = h.clobj_next;
     cnt++;
   }
   fprintf(fd, "} -> %d cells in MAP\n", cnt);
@@ -1498,50 +1498,49 @@ HIdx::dumpMemoryMap(const Hat &hat, const char *msg, FILE *fd)
 }
 
 Status
-HIdx::makeObject(Hat &hat, int hat_k, Oid &koid, int &offset,
-		    Header &h, Overhead &o, unsigned int objsize)
+HIdx::makeObject(CListHeader &chd, unsigned int chd_k, Oid &koid, int &offset,
+		    CListObjHeader &h, CellHeader &o, unsigned int objsize)
 {
 #ifdef TRACK_MAP
   printf("making object\n");
 #endif
   unsigned int bsz = bsize; // changed the 30/01/02
-  objsize += sizeof(Overhead); // added the 30/01/02
+  objsize += sizeof(CellHeader); // added the 30/01/02
   int utsize = (bsz > objsize ? bsz : objsize);
-  //int size = sizeof(Header) + sizeof(Overhead) + utsize;
-  unsigned int size = sizeof(Header) + utsize;
+  //int size = sizeof(CListObjHeader) + sizeof(CellHeader) + utsize;
+  unsigned int size = sizeof(CListObjHeader) + utsize;
 
 #ifdef OPTIM_LARGE_OBJECTS
-  int alloc_size = sizeof(Header) + sizeof(Overhead);
+  int alloc_size = sizeof(CListObjHeader) + sizeof(CellHeader);
   char *d = (char *)m_malloc(alloc_size);
 #else
   char *d = (char *)m_malloc(size);
 #endif
 
-  offset = sizeof(Header);
+  offset = sizeof(CListObjHeader);
   h.size = size;
   h.free_cnt = 1;
   h.alloc_cnt = 0;
-  h.free_whole = utsize - sizeof(Overhead);
-  assert(h.free_whole >= 0 && h.free_whole < (~0UL/2));
-  h.free_first = sizeof(Header);
-  h.prev = hat.last;
-  mset(&h.next, 0, sizeof(h.next));
-  mset(&h.free_prev, 0, sizeof(h.free_prev));
+  h.free_whole = utsize - sizeof(CellHeader);
+  h.cell_free_first = sizeof(CListObjHeader);
+  h.clobj_prev = chd.clobj_last;
+  mset(&h.clobj_next, 0, sizeof(h.clobj_next));
+  mset(&h.clobj_free_prev, 0, sizeof(h.clobj_free_prev));
 
   // changed the 20/05/02
-  //mset(&h.free_next, 0, sizeof(h.free_next));
-  h.free_next = hat.free_first;
+  //mset(&h.clobj_free_next, 0, sizeof(h.clobj_free_next));
+  h.clobj_free_next = chd.clobj_free_first;
 
   o.free = 1;
-  o.size = utsize - sizeof(Overhead); //  + sizeof(Overhead); // 26/12/01: added '+ sizeof(Overhead)'
-  o.free_next = NullOffset;
-  o.free_prev = NullOffset;
-  Header xh;
+  o.size = utsize - sizeof(CellHeader); //  + sizeof(CellHeader); // 26/12/01: added '+ sizeof(CellHeader)'
+  o.cell_free_next = NullOffset;
+  o.cell_free_prev = NullOffset;
+  CListObjHeader xh;
   h2x_header(&xh, &h);
-  mcp(d, &xh, sizeof(Header));
-  Overhead xo;
+  mcp(d, &xh, sizeof(CListObjHeader));
+  CellHeader xo;
   h2x_overhead(&xo, &o);
-  mcp(d + sizeof(Header), &xo, sizeof(Overhead));
+  mcp(d + sizeof(CListObjHeader), &xo, sizeof(CellHeader));
   
 #ifdef OPTIM_LARGE_OBJECTS
   Status s = objectCreate(dbh, ObjectNone, size, hidx.dspid, &koid);
@@ -1555,61 +1554,61 @@ HIdx::makeObject(Hat &hat, int hat_k, Oid &koid, int &offset,
   if (s)
     return s;
 
-  if (!hat.first.getNX())
-    hat.first = koid;
+  if (!chd.clobj_first.getNX())
+    chd.clobj_first = koid;
   else {
     Oid xoid;
     h2x_oid(&xoid, &koid);
-    s = objectWrite(dbh, OFFSET(Header, next), sizeof(Oid), &xoid,
-		       &hat.last);
+    s = objectWrite(dbh, OFFSET(CListObjHeader, clobj_next), sizeof(Oid), &xoid,
+		       &chd.clobj_last);
     if (s)
       return s;
   }
 
-  hat.last = koid;
+  chd.clobj_last = koid;
   // changed the 20/05/02
-  return insertObjectInFreeList(hat, hat_k, h, koid);
+  return insertObjectInFreeList(chd, chd_k, h, koid);
 }
 
 inline bool
-HIdx::inFreeList(const Header &h, const Hat &hat, const Oid &koid)
+HIdx::inFreeList(const CListObjHeader &h, const CListHeader &chd, const Oid &koid)
 {
-  return h.free_prev.getNX() || h.free_next.getNX() || hat.free_first.getNX() == koid.getNX();
+  return h.clobj_free_prev.getNX() || h.clobj_free_next.getNX() || chd.clobj_free_first.getNX() == koid.getNX();
 }
 
 Status
-HIdx::insertObjectInFreeList(Hat &hat, int hat_k, Header &h,
+HIdx::insertObjectInFreeList(CListHeader &chd, unsigned int chd_k, CListObjHeader &h,
 				const Oid &koid)
 {
 #ifdef TRACK_MAP
   printf("hidx: insertion of a new cell!\n");
 #endif
   Status s;
-  if (hat.free_first.getNX()) {
+  if (chd.clobj_free_first.getNX()) {
     Oid xoid;
     h2x_oid(&xoid, &koid);
-    s = objectWrite(dbh, OFFSET(Header, free_prev),
-		       sizeof(Oid), &xoid, &hat.free_first);
+    s = objectWrite(dbh, OFFSET(CListObjHeader, clobj_free_prev),
+		       sizeof(Oid), &xoid, &chd.clobj_free_first);
     if (s)
       return s;
   }
 
-  h.free_next = hat.free_first;
-  hat.free_first = koid;
+  h.clobj_free_next = chd.clobj_free_first;
+  chd.clobj_free_first = koid;
 
-  return writeHat(hat_k, hat);
+  return writeCListHeader(chd_k, chd);
 }
 
 Boolean
-HIdx::candidateForExtension(const Header &h)
+HIdx::candidateForExtension(const CListObjHeader &h)
 {
   unsigned int size_n = hidx.impl_hints[XCoef_Hints] * h.size;
   return (size_n <= (unsigned int)hidx.impl_hints[SzMax_Hints] ? True : False);
 }
 
 Status
-HIdx::extendObject(unsigned int size, Hat &hat, int hat_k, Oid &koid,
-		      Header &h, int &offset, Overhead &o,
+HIdx::extendObject(unsigned int size, CListHeader &chd, unsigned int chd_k, Oid &koid,
+		      CListObjHeader &h, int &offset, CellHeader &o,
 		      Boolean &extended)
 {
   unsigned int size_n = hidx.impl_hints[XCoef_Hints] * h.size;
@@ -1626,15 +1625,15 @@ HIdx::extendObject(unsigned int size, Hat &hat, int hat_k, Oid &koid,
   }
     
   Status s;
-  memset(&o, 0, sizeof(Overhead));
-  offset = h.free_first;
+  memset(&o, 0, sizeof(CellHeader));
+  offset = h.cell_free_first;
   int lastoffset = NullOffset;
   while (offset != NullOffset) {
-    s = readOverhead(offset, koid, o);
+    s = readCellHeader(offset, koid, o);
     if (s)
       return s;
     lastoffset = offset;
-    offset = o.free_next;
+    offset = o.cell_free_next;
   }
 
   Oid nkoid;
@@ -1645,21 +1644,21 @@ HIdx::extendObject(unsigned int size, Hat &hat, int hat_k, Oid &koid,
 #endif
     o.size += size_inc;
     offset = lastoffset;
-    s = writeOverhead(offset, koid, o);
+    s = writeCellHeader(offset, koid, o);
     if (s)
       return s;
     extended = True;
     h.free_whole += size_inc;
     int osize = h.size;
     h.size = size_n;
-    s = writeHeader(koid, h);
+    s = writeCListObjHeader(koid, h);
     if (s)
       return s;
     if (isPhysicalOid(dbh, &koid)) {
       s = modifyObjectSize(osize, size_n, koid, nkoid);
       if (s)
 	return s;
-      s = replaceObjectInList(hat, hat_k, h, koid, nkoid);
+      s = replaceObjectInList(chd, chd_k, h, koid, nkoid);
       if (s)
 	return s;
       koid = nkoid;
@@ -1678,7 +1677,7 @@ HIdx::extendObject(unsigned int size, Hat &hat, int hat_k, Oid &koid,
       s = modifyObjectSize(h.size, size_n, koid, nkoid);
       if (s)
 	return s;
-      s = replaceObjectInList(hat, hat_k, h, koid, nkoid);
+      s = replaceObjectInList(chd, chd_k, h, koid, nkoid);
       koid = nkoid;
     }
     else
@@ -1687,32 +1686,32 @@ HIdx::extendObject(unsigned int size, Hat &hat, int hat_k, Oid &koid,
       return s;
     offset = h.size;
     if (lastoffset != NullOffset) {
-      o.free_next = offset;
-      s = writeOverhead(lastoffset, koid, o);
+      o.cell_free_next = offset;
+      s = writeCellHeader(lastoffset, koid, o);
       if (s)
 	return s;
     }
     else
-      h.free_first = offset;
+      h.cell_free_first = offset;
 
-    o.size = size_inc - sizeof(Overhead);
+    o.size = size_inc - sizeof(CellHeader);
     o.free = 1;
-    o.free_prev = lastoffset;
-    o.free_next = NullOffset;
+    o.cell_free_prev = lastoffset;
+    o.cell_free_next = NullOffset;
     extended = True;
     h.free_cnt++;
-    h.free_whole += size_inc - sizeof(Overhead);
+    h.free_whole += size_inc - sizeof(CellHeader);
     h.size = size_n;
-    if (!inFreeList(h, hat, koid)) {
+    if (!inFreeList(h, chd, koid)) {
       //      printf("not in free list ?\n");
-      s = insertObjectInFreeList(hat, hat_k, h, koid);
+      s = insertObjectInFreeList(chd, chd_k, h, koid);
       if (s)
 	return s;
     }
-    s = writeHeader(koid, h);
+    s = writeCListObjHeader(koid, h);
     if (s)
       return s;
-    return writeOverhead(offset, koid, o);
+    return writeCellHeader(offset, koid, o);
   }
   //printf("not extended\n");
   return Success;
@@ -1720,37 +1719,37 @@ HIdx::extendObject(unsigned int size, Hat &hat, int hat_k, Oid &koid,
 
 #ifndef NO_EXTEND
 Status
-HIdx::getObjectToExtend(unsigned int size, Hat &hat, int hat_k,
-			   Oid &koid, Header &h, int &offset, Overhead &o,
+HIdx::getObjectToExtend(unsigned int size, CListHeader &chd, unsigned int chd_k,
+			   Oid &koid, CListObjHeader &h, int &offset, CellHeader &o,
 			   Boolean &found)
 {
   ------ CODE NOT USED ----
   found = False;
   Status s;
-  koid = hat.first;
+  koid = chd.first;
 
   while (koid.getNX()) {
-    s = readHeader(koid, h);
+    s = readCListObjHeader(koid, h);
     if (s)
       return s;
     /*
-    printf("KOID %s h.prev %s h.next %s\n", getOidString(&koid),
-	   getOidString(&h.prev),
-	   getOidString(&h.next));
+    printf("KOID %s h.clobj_prev %s h.clobj_next %s\n", getOidString(&koid),
+	   getOidString(&h.clobj_prev),
+	   getOidString(&h.clobj_next));
     */
     unsigned int size_n = hidx.impl_hints[XCoef_Hints] * h.size;
     unsigned int size_inc = size_n - h.size;
     if (size_n <= hidx.impl_hints[SzMax_Hints] &&
 	size_inc + h.free_whole >= size) {
-      memset(&o, 0, sizeof(Overhead));
-      offset = h.free_first;
+      memset(&o, 0, sizeof(CellHeader));
+      offset = h.cell_free_first;
       int lastoffset = NullOffset;
       while (offset != NullOffset) {
-	s = readOverhead(offset, koid, o);
+	s = readCellHeader(offset, koid, o);
 	if (s)
 	  return s;
 	lastoffset = offset;
-	offset = o.free_next;
+	offset = o.cell_free_next;
       }
 
       Oid nkoid;
@@ -1761,21 +1760,21 @@ HIdx::getObjectToExtend(unsigned int size, Hat &hat, int hat_k,
 #endif
 	o.size += size_inc;
 	offset = lastoffset;
-	s = writeOverhead(offset, koid, o);
+	s = writeCellHeader(offset, koid, o);
 	if (s)
 	  return s;
 	found = True;
 	h.free_whole += size_inc;
 	int osize = h.size;
 	h.size = size_n;
-	s = writeHeader(koid, h);
+	s = writeCListObjHeader(koid, h);
 	if (s)
 	  return s;
 	if (isPhysicalOid(dbh, &koid)) {
 	  s = modifyObjectSize(osize, size_n, koid, nkoid);
 	  if (s)
 	    return s;
-	  s = replaceObjectInList(hat, hat_k, h, koid, nkoid);
+	  s = replaceObjectInList(chd, chd_k, h, koid, nkoid);
 	  if (s)
 	    return s;
 	  koid = nkoid;
@@ -1793,7 +1792,7 @@ HIdx::getObjectToExtend(unsigned int size, Hat &hat, int hat_k,
 	  s = modifyObjectSize(h.size, size_n, koid, nkoid);
 	  if (s)
 	    return s;
-	  s = replaceObjectInList(hat, hat_k, h, koid, nkoid);
+	  s = replaceObjectInList(chd, chd_k, h, koid, nkoid);
 	  koid = nkoid;
 	}
 	else
@@ -1803,34 +1802,34 @@ HIdx::getObjectToExtend(unsigned int size, Hat &hat, int hat_k,
 	offset = h.size;
 	if (lastoffset != NullOffset) {
   ------ CODE NOT USED ----
-	  o.free_next = offset;
-	  s = writeOverhead(lastoffset, koid, o);
+	  o.cell_free_next = offset;
+	  s = writeCellHeader(lastoffset, koid, o);
 	  if (s)
 	    return s;
 	}
 	else
-	  h.free_first = offset;
+	  h.cell_free_first = offset;
 
-	o.size = size_inc - sizeof(Overhead);
+	o.size = size_inc - sizeof(CellHeader);
 	o.free = 1;
-	o.free_prev = lastoffset;
-	o.free_next = NullOffset;
+	o.cell_free_prev = lastoffset;
+	o.cell_free_next = NullOffset;
 	found = True;
 	h.free_cnt++;
-	h.free_whole += size_inc - sizeof(Overhead);
+	h.free_whole += size_inc - sizeof(CellHeader);
 	h.size = size_n;
-	if (!inFreeList(h, hat, koid)) {
-	  s = insertObjectInFreeList(hat, hat_k, h, koid);
+	if (!inFreeList(h, chd, koid)) {
+	  s = insertObjectInFreeList(chd, chd_k, h, koid);
 	  if (s)
 	    return s;
 	}
-	s = writeHeader(koid, h);
+	s = writeCListObjHeader(koid, h);
 	if (s)
 	  return s;
-	return writeOverhead(offset, koid, o);
+	return writeCellHeader(offset, koid, o);
       }
     }
-    koid = h.next;
+    koid = h.clobj_next;
   }
 
 #ifdef TRACK_MAP
@@ -1843,11 +1842,11 @@ HIdx::getObjectToExtend(unsigned int size, Hat &hat, int hat_k,
 int hidx_gccnt;
 
 Status
-HIdx::getCell(unsigned int size, Hat &hat, int hat_k,
-		 Oid &koid, Header &h, int &offset, Overhead &o)
+HIdx::getCell(unsigned int size, CListHeader &chd, unsigned int chd_k,
+		 Oid &koid, CListObjHeader &h, int &offset, CellHeader &o)
 {
   Status s;
-  koid = hat.free_first;
+  koid = chd.clobj_free_first;
   hidx_gccnt = 0;
 #ifdef TRUSS1_GC
   unsigned int total_whole = 0, min_whole = ~0, max_whole = 0;
@@ -1857,14 +1856,14 @@ HIdx::getCell(unsigned int size, Hat &hat, int hat_k,
 #endif
 
   while (koid.getNX()) {
-    s = readHeader(koid, h);
+    s = readCListObjHeader(koid, h);
     if (s)
       return s;
 
     Boolean extended;
     if (uextend) {
       if (h.free_whole < size) {
-	s = extendObject(size, hat, hat_k, koid, h, offset, o, extended);
+	s = extendObject(size, chd, chd_k, koid, h, offset, o, extended);
 	if (s)
 	  return s;
       }
@@ -1881,22 +1880,22 @@ HIdx::getCell(unsigned int size, Hat &hat, int hat_k,
     printf("getcell free_whole %d #%d\n", h.free_whole, hidx_gccnt);
 #endif
     if (h.free_whole >= size) { // optimisation added 29/01/02
-      offset = h.free_first;
+      offset = h.cell_free_first;
       for (unsigned int n = 0; offset != NullOffset; n++) {
-	if (n && offset == h.free_first || n > 100) {
+	if (n && offset == h.cell_free_first || n > 100) {
 	  //printf("free_whole %u %d looping #%d\n", h.free_whole, size, n);
 	  break;
 	}
-	s = readOverhead(offset, koid, o);
+	s = readCellHeader(offset, koid, o);
 	if (s)
 	  return s;
 	if (o.free && o.size >= size) {
-	  //printf("object found free_next %d size %d\n", o.free_next, o.size);
+	  //printf("object found free_next %d size %d\n", o.cell_free_next, o.size);
 	  return Success;
 	}
 
 	if (uextend) {
-	  s = extendObject(size, hat, hat_k, koid, h, offset, o, extended);
+	  s = extendObject(size, chd, chd_k, koid, h, offset, o, extended);
 	  if (s)
 	    return s;
 	  if (extended && o.free && o.size >= size) {
@@ -1905,11 +1904,11 @@ HIdx::getCell(unsigned int size, Hat &hat, int hat_k,
 	  }
 	}
 
-	//COMPARE_OFFSET(offset, o.free_next, "looping");
-	offset = o.free_next;
+	//COMPARE_OFFSET(offset, o.cell_free_next, "looping");
+	offset = o.cell_free_next;
       }
     }
-    koid = h.free_next;
+    koid = h.clobj_free_next;
 #ifdef TRUSS1_GC
     if (hidx_gccnt == 10000) {
       printf("hidx getcell size=%d, avg_whole=%f, min_whole=%d, "
@@ -1932,12 +1931,12 @@ HIdx::getCell(unsigned int size, Hat &hat, int hat_k,
 
 #ifndef NO_EXTEND
   Boolean found;
-  s = getObjectToExtend(size, hat, hat_k, koid, h, offset, o, found);
+  s = getObjectToExtend(size, chd, chd_k, koid, h, offset, o, found);
   if (s || found) return s;
 #endif
 
   // not found
-  return makeObject(hat, hat_k, koid, offset, h, o, size);
+  return makeObject(chd, chd_k, koid, offset, h, o, size);
 }
 
 #ifdef CI_STORE
@@ -1985,7 +1984,7 @@ HIdx::insert_perform(const void *key, const void *xdata, unsigned int datasz)
   // return Success;
 #endif
 
-  int x;
+  unsigned int x;
   unsigned int size;
   unsigned int (*gkey)(int) = get_gkey(version);
   s = get_key(x, key, &size);
@@ -1998,8 +1997,8 @@ HIdx::insert_perform(const void *key, const void *xdata, unsigned int datasz)
     return s;
 
   /*
-  Hat hat;
-  s = readHat(x, hat);
+  CListHeader chd;
+  s = readCListHeader(x, chd);
   if (s)
     return s;
   */
@@ -2020,12 +2019,12 @@ HIdx::insert_perform(const void *key, const void *xdata, unsigned int datasz)
 
   if (data_grouped_by_key && !direct) {
 #ifdef CHECK_CHAIN
-    Hat hat2;
-    s = readHat(x, hat2);
+    CListHeader chd2;
+    s = readCListHeader(x, chd2);
     if (s)
       return s;
     
-    checkChain(&hat2, "before remove");
+    checkChain(&chd2, "before remove");
 #endif
     Boolean found = False;
     unsigned int datacnt = 0;
@@ -2074,32 +2073,32 @@ HIdx::insert_perform(const void *key, const void *xdata, unsigned int datasz)
     */
   }
 
-  Hat hat;
-  s = readHat(x, hat);
+  CListHeader chd;
+  s = readCListHeader(x, chd);
   if (s)
     return s;
 
 #ifdef CHECK_CHAIN
-  checkChain(&hat, "before getcell");
+  checkChain(&chd, "before getcell");
 #endif
 
-  Overhead o;
-  Header h;
+  CellHeader o;
+  CListObjHeader h;
   Oid koid;
   int offset = 0;
-  s = getCell(size, hat, x, koid, h, offset, o);
+  s = getCell(size, chd, x, koid, h, offset, o);
   if (s) {
     delete [] rdata;
     return s;
   }
 
 #ifdef CHECK_CHAIN
-  Hat hat2;
-  s = readHat(x, hat2);
+  CListHeader chd2;
+  s = readCListHeader(x, chd2);
   if (s)
     return s;
 
-  checkChain(&hat2, "after getcell");
+  checkChain(&chd2, "after getcell");
 #endif
 
 #ifdef TRACK_MAP
@@ -2108,151 +2107,150 @@ HIdx::insert_perform(const void *key, const void *xdata, unsigned int datasz)
 #endif
 
 #ifdef TRACK_MAP_2
-  (void)dumpMemoryMap(hat, "before inserting ");
+  (void)dumpMemoryMap(chd, "before inserting ");
 #endif
-  s = insert_realize(hat, x, key, size, xdata, koid, h, offset, o, datasz);
+  s = insert_realize(chd, x, key, size, xdata, koid, h, offset, o, datasz);
 #ifdef TRACK_MAP_2
-  (void)dumpMemoryMap(hat, "after inserting ");
+  (void)dumpMemoryMap(chd, "after inserting ");
 #endif
   delete [] rdata;
 
 #ifdef CHECK_CHAIN
-  s = readHat(x, hat2);
+  s = readCListHeader(x, chd2);
   if (s)
     return s;
     
-  checkChain(&hat2, "after insert_realize");
+  checkChain(&chd2, "after insert_realize");
 #endif
   return s;
 }
 
 Status
-HIdx::suppressCell(int offset, Header &h, const Oid &koid) const
+HIdx::suppressCell(int offset, CListObjHeader &h, const Oid &koid) const
 {
   Status s;
-  Overhead o;
-  s = readOverhead(offset, koid, o);
+  CellHeader o;
+  s = readCellHeader(offset, koid, o);
   if (s)
     return s;
 #ifdef TRACK_MAP
   printf("suppressing cell at #%d size %d free_first is %d free_prev %d "
-	 "free_next %d\n", offset, o.size, h.free_first, o.free_prev,
-	 o.free_next);
+	 "free_next %d\n", offset, o.size, h.cell_free_first, o.cell_free_prev,
+	 o.cell_free_next);
 #endif
-  Overhead po, no;
-  if (o.free_prev != NullOffset) {
-    s = readOverhead(o.free_prev, koid, po);
+  CellHeader po, no;
+  if (o.cell_free_prev != NullOffset) {
+    s = readCellHeader(o.cell_free_prev, koid, po);
     if (s)
       return s;
-    po.free_next = o.free_next;
-    s = writeOverhead(o.free_prev, koid, po);
+    po.cell_free_next = o.cell_free_next;
+    s = writeCellHeader(o.cell_free_prev, koid, po);
     if (s)
       return s;
   }
   else
-    h.free_first = o.free_next;
+    h.cell_free_first = o.cell_free_next;
 
-  if (o.free_next != NullOffset) {
-    s = readOverhead(o.free_next, koid, no);
+  if (o.cell_free_next != NullOffset) {
+    s = readCellHeader(o.cell_free_next, koid, no);
     if (s)
       return s;
-    no.free_prev = o.free_prev;
-    s = writeOverhead(o.free_next, koid, no);
+    no.cell_free_prev = o.cell_free_prev;
+    s = writeCellHeader(o.cell_free_next, koid, no);
     if (s)
       return s;
   }
 
 #ifdef TRACK_MAP
-  printf("now free_first %d\n", h.free_first);
+  printf("now free_first %d\n", h.cell_free_first);
 #endif
   h.free_cnt--;
   h.free_whole -= o.size;
-  assert(h.free_whole >= 0 && h.free_whole < (~0UL/2));
-  o.free_next = NullOffset;
-  o.free_prev = NullOffset;
+  o.cell_free_next = NullOffset;
+  o.cell_free_prev = NullOffset;
   o.free = 0;
-  return writeOverhead(offset, koid, o);
+  return writeCellHeader(offset, koid, o);
 }
 
 Status
-HIdx::insertCell(int offset, unsigned int size, Header &h,
+HIdx::insertCell(int offset, unsigned int size, CListObjHeader &h,
 		    const Oid &koid) const
 {
 #ifdef TRACK_MAP
   printf("inserting cell at #%d size %d [free_first %d]\n", offset, size,
-	 h.free_first);
+	 h.cell_free_first);
 #endif
-  Overhead o;
+  CellHeader o;
   o.size = size;
   o.free = 1;
-  o.free_next = h.free_first;
-  o.free_prev = NullOffset;
+  o.cell_free_next = h.cell_free_first;
+  o.cell_free_prev = NullOffset;
 
-  if (h.free_first != NullOffset) {
-    Overhead po;
-    Status s = readOverhead(h.free_first, koid, po);
+  if (h.cell_free_first != NullOffset) {
+    CellHeader po;
+    Status s = readCellHeader(h.cell_free_first, koid, po);
     if (s)
       return s;
 #ifdef TRACK_MAP
-    printf("making prev link for #%d -> #%d next #%d\n", h.free_first, offset, po.free_next);
+    printf("making prev link for #%d -> #%d next #%d\n", h.cell_free_first, offset, po.cell_free_next);
 #endif
     assert(po.free);
-    po.free_prev = offset;
+    po.cell_free_prev = offset;
     bool old_dont_check = dont_check;
     dont_check = true;
-    s = writeOverhead(h.free_first, koid, po);
+    s = writeCellHeader(h.cell_free_first, koid, po);
     dont_check = old_dont_check;
     if (s)
       return s;
 #ifdef TRACK_MAP
-    s = readOverhead(h.free_first, koid, po);
+    s = readCellHeader(h.cell_free_first, koid, po);
     if (s)
       return s;
-    printf("PO.offset = %d\n", po.free_prev);
+    printf("PO.offset = %d\n", po.cell_free_prev);
 #endif
   }
 
-  h.free_first = offset;
+  h.cell_free_first = offset;
   h.free_cnt++;
   h.free_whole += o.size;
-  return writeOverhead(offset, koid, o);
+  return writeCellHeader(offset, koid, o);
 }
 
 //#define SIMPLE_REMOVE
 #ifdef SIMPLE_REMOVE
   h.free_whole += o->size;
-  Overhead co;
+  CellHeader co;
   co.free = 1;
   co.size = o->size;
-  co.next = h.free_first;
+  co.next = h.cell_free_first;
   int offset = (eyedblib::int32)(curcell - start);
-  h.free_first = offset;
+  h.cell_free_first = offset;
   h.free_cnt++;
   h.alloc_cnt--;
 #endif
 
 Status
-HIdx::remove_realize(Hat *hat, int hat_k,
+HIdx::remove_realize(CListHeader *chd, unsigned int chd_k,
 			const char *curcell, const char *prevcell,
-			const char *start, const Overhead *o,
+			const char *start, const CellHeader *o,
 			const Oid *koid)
 {
-  Header h;
+  CListObjHeader h;
 
-  mcp(&h, start, sizeof(Header));
+  mcp(&h, start, sizeof(CListObjHeader));
   x2h_header(&h);
 
-  Overhead no, po;
-  const char *nextcell = curcell + sizeof(Overhead) + o->size;
+  CellHeader no, po;
+  const char *nextcell = curcell + sizeof(CellHeader) + o->size;
   if ((eyedblib::int32)(nextcell - start) < h.size) {
-    mcp(&no, nextcell, sizeof(Overhead));
+    mcp(&no, nextcell, sizeof(CellHeader));
     x2h_overhead(&no);
   }
   else
     no.free = 0;
 
   if (prevcell) {
-    mcp(&po, prevcell, sizeof(Overhead));
+    mcp(&po, prevcell, sizeof(CellHeader));
     x2h_overhead(&po);
   }
   else
@@ -2260,17 +2258,17 @@ HIdx::remove_realize(Hat *hat, int hat_k,
 
 #ifdef TRACK_MAP
   printf("co = #%d, no = #%d, po = #%d\n", curcell-start,
-	 (curcell-start) + sizeof(Overhead) + o->size,
+	 (curcell-start) + sizeof(CellHeader) + o->size,
 	 (prevcell ? prevcell-start : 0));
-  printf("fo = #%d", h.free_first);
+  printf("fo = #%d", h.cell_free_first);
 #endif
-  Overhead fo;
-  if (h.free_first >= 0) {
-    mcp(&fo, h.free_first + start, sizeof(Overhead));
+  CellHeader fo;
+  if (h.cell_free_first >= 0) {
+    mcp(&fo, h.cell_free_first + start, sizeof(CellHeader));
     x2h_overhead(&fo);
 #ifdef TRACK_MAP
     printf(", fo.free = %d, fo.size = %d, fo.next = %d",
-	   fo.free, fo.size, fo.free_next);
+	   fo.free, fo.size, fo.cell_free_next);
 #endif
   }
 
@@ -2282,10 +2280,10 @@ HIdx::remove_realize(Hat *hat, int hat_k,
       suppressCell(prevcell-start, h, *koid);
       suppressCell(nextcell-start, h, *koid);
       insertCell(prevcell-start,
-		 o->size + po.size + no.size + 2 * sizeof(Overhead),
+		 o->size + po.size + no.size + 2 * sizeof(CellHeader),
 		 h, *koid);
 
-      //h.free_whole += o->size + 2 * sizeof(Overhead);
+      //h.free_whole += o->size + 2 * sizeof(CellHeader);
 #ifdef TRACK_MAP
       printf("case no.free && po.free\n");
 #endif
@@ -2294,9 +2292,9 @@ HIdx::remove_realize(Hat *hat, int hat_k,
       suppressCell(nextcell-start, h, *koid);
       // 24/04/07: BUG ?
       insertCell(curcell-start,
-		 o->size + no.size + sizeof(Overhead),
+		 o->size + no.size + sizeof(CellHeader),
 		 h, *koid);
-      //h.free_whole += o->size + sizeof(Overhead);
+      //h.free_whole += o->size + sizeof(CellHeader);
 #ifdef TRACK_MAP
       printf("case no.free\n");
 #endif
@@ -2305,9 +2303,9 @@ HIdx::remove_realize(Hat *hat, int hat_k,
     // WARNING: 24/04/07 these 2 lines have been swapped !
       suppressCell(prevcell-start, h, *koid);
       insertCell(prevcell-start,
-		 o->size + po.size + sizeof(Overhead),
+		 o->size + po.size + sizeof(CellHeader),
 		 h, *koid);
-      //h.free_whole += o->size + sizeof(Overhead);
+      //h.free_whole += o->size + sizeof(CellHeader);
 #ifdef TRACK_MAP
       printf("case po.free\n");
 #endif
@@ -2326,29 +2324,29 @@ HIdx::remove_realize(Hat *hat, int hat_k,
   Status s;
   Boolean rmobj = False;
   if (!h.alloc_cnt) {
-    s = suppressObjectFromFreeList(*hat, hat_k, h, *koid);
+    s = suppressObjectFromFreeList(*chd, chd_k, h, *koid);
     if (s)
       return s;
-    s = suppressObjectFromList(*hat, hat_k, h, *koid);
+    s = suppressObjectFromList(*chd, chd_k, h, *koid);
     if (s)
       return s;
     rmobj = True;
   }
-  else if (!inFreeList(h, *hat, *koid)) {
-    s = insertObjectInFreeList(*hat, hat_k, h, *koid);
+  else if (!inFreeList(h, *chd, *koid)) {
+    s = insertObjectInFreeList(*chd, chd_k, h, *koid);
     if (s)
       return s;
   }
 
-  //printf("writing header %d: po.free %d, no.free %d %d %d %d\n", !rmobj, po.free, no.free, h.alloc_cnt, h.free_first, h.free_cnt);
+  //printf("writing header %d: po.free %d, no.free %d %d %d %d\n", !rmobj, po.free, no.free, h.alloc_cnt, h.cell_free_first, h.free_cnt);
   if (!rmobj) {
-    s = writeHeader(*koid, h);
+    s = writeCListObjHeader(*koid, h);
     if (s)
       return s;
   }
 
 #ifdef TRACK_MAP
-  Header xh;
+  CListObjHeader xh;
   h2x_header(&xh, &h);
   memcpy((void *)start, &xh, sizeof(xh));
 #endif
@@ -2439,7 +2437,7 @@ HIdx::remove_perform(const void *key, const void *xdata, Boolean *found, unsigne
   if (found)
     *found = False;
 
-  int x;
+  unsigned int x;
   unsigned int (*gkey)(int) = get_gkey(version);
   s = get_key(x, key);
   if (s)
@@ -2453,8 +2451,8 @@ HIdx::remove_perform(const void *key, const void *xdata, Boolean *found, unsigne
   if (s)
     return s;
 
-  Hat hat;
-  s = readHat(x, hat);
+  CListHeader chd;
+  s = readCListHeader(x, chd);
   if (s)
     return s;
 
@@ -2463,7 +2461,7 @@ HIdx::remove_perform(const void *key, const void *xdata, Boolean *found, unsigne
       printf("hidx: removing '%s' '%s'\n", key, getOidString((const Oid *)xdata));
     }
 #endif
-  Oid koid = hat.first;
+  Oid koid = chd.clobj_first;
   while (koid.getNX() > 0) {
     unsigned int size;
       s = objectSizeGet(dbh, &size, DefaultLock, &koid);
@@ -2482,11 +2480,11 @@ HIdx::remove_perform(const void *key, const void *xdata, Boolean *found, unsigne
 	}
       
       char *curcell, *end = start + size, *prevcell = 0;
-      for (curcell = start + sizeof(Header); curcell < end; ) {
-	  Overhead o;
-	  mcp(&o, curcell, sizeof(Overhead));
+      for (curcell = start + sizeof(CListObjHeader); curcell < end; ) {
+	  CellHeader o;
+	  mcp(&o, curcell, sizeof(CellHeader));
 	  x2h_overhead(&o);
-	  curcell += sizeof(Overhead);
+	  curcell += sizeof(CellHeader);
 	  
 	  if (!o.free && !cmp(key, curcell, OP2_SWAP)) {
 	    int r = 1;
@@ -2530,17 +2528,17 @@ HIdx::remove_perform(const void *key, const void *xdata, Boolean *found, unsigne
 	    }
 	    if (!r) {
 #ifdef TRACK_MAP
-	      Header h;
+	      CListObjHeader h;
 	      memcpy(&h, start, sizeof(h));
 	      x2h_header(&h);
-	      dumpMemoryMap(hat, "before remove_realize ");
+	      dumpMemoryMap(chd, "before remove_realize ");
 #endif
-	      s = remove_realize(&hat, x, curcell - sizeof(Overhead),
+	      s = remove_realize(&chd, x, curcell - sizeof(CellHeader),
 				 prevcell, start, &o, &koid);
 #ifdef TRACK_MAP
 	      memcpy(&h, start, sizeof(h));
 	      x2h_header(&h);
-	      dumpMemoryMap(hat, "after remove_realize ");
+	      dumpMemoryMap(chd, "after remove_realize ");
 #endif
 
 	      if (!s && found)
@@ -2550,15 +2548,15 @@ HIdx::remove_perform(const void *key, const void *xdata, Boolean *found, unsigne
 	    }
 	  }
 	  
-	  prevcell = curcell - sizeof(Overhead);
+	  prevcell = curcell - sizeof(CellHeader);
 	  curcell += o.size;
 	}
 
-      Header h;
-      mcp(&h, start, sizeof(Header));
+      CListObjHeader h;
+      mcp(&h, start, sizeof(CListObjHeader));
       x2h_header(&h);
-      //koid = h.free_next;
-      koid = h.next;
+      //koid = h.clobj_free_next;
+      koid = h.clobj_next;
       free(start);
     }
 
@@ -2663,21 +2661,163 @@ HIdx::getObjects(Oid *&oids, unsigned int &cnt) const
   unsigned int (*gkey)(int) = get_gkey(version);
 
   for (int i = 0; i < hidx.key_count; i++) {
-    HIdx::Hat hat;
-    Status s = readHat(i, hat);
+    HIdx::CListHeader chd;
+    Status s = readCListHeader(i, chd);
     if (s)
       return s;
 
-    Oid koid = hat.first;
+    Oid koid = chd.clobj_first;
     while (koid.getNX()) {
       add(oids, cnt, alloc_cnt, koid);
-      HIdx::Header h;
-      s = objectRead(dbh, 0, sizeof(HIdx::Header), &h,
+      HIdx::CListObjHeader h;
+      s = objectRead(dbh, 0, sizeof(HIdx::CListObjHeader), &h,
 			DefaultLock, 0, 0, &koid);
       if (s)
 	return s;
       x2h_header(&h);
-      koid = h.next;
+      koid = h.clobj_next;
+    }
+  }
+
+  return Success;
+}
+
+static void adapt(unsigned char *&clist_data, unsigned int &clist_data_size,
+		  unsigned int &clist_data_alloc_size,
+		  unsigned int size)
+{
+  if (clist_data_size + size > clist_data_alloc_size) {
+    clist_data_alloc_size = clist_data_size + size + 2048;
+    unsigned char *n_clist_data = new unsigned char[clist_data_alloc_size];
+    memcpy(n_clist_data, clist_data, clist_data_size);
+    delete [] clist_data;
+    clist_data = n_clist_data;
+  }
+}
+
+Status
+HIdx::collapse()
+{
+  IdxLock lockx(dbh, treeoid);
+  Status s = lockx.lock();
+  if (s)
+    return s;
+
+  for (unsigned int chd_k = 0; chd_k < hidx.key_count; chd_k++) {
+    HIdx::CListHeader chd;
+    s = readCListHeader(chd_k, chd);
+    if (s)
+      return s;
+
+    unsigned int clistobj_cnt = 0;
+    Oid koid = chd.clobj_first;
+    std::vector<Oid> oid_v;
+    if (koid.getNX()) {
+      printf("Key #%d {\n", chd_k);
+      unsigned int total_busy_size = 0;
+      unsigned int total_free_size = 0;
+      unsigned int clist_data_size = 0;
+      unsigned int clist_data_alloc_size = 0;
+      unsigned char *clist_data = 0;
+      adapt(clist_data, clist_data_size, clist_data_alloc_size, sizeof(CListObjHeader));
+      clist_data_size = sizeof(CListObjHeader);
+
+      while (koid.getNX()) {
+	oid_v.push_back(koid);
+	unsigned int busy_size = 0;
+	unsigned int free_size = 0;
+	unsigned int cell_cnt = 0;
+	unsigned int sz = 0;
+	s = objectSizeGet(dbh, &sz, DefaultLock, &koid);
+	if (s)
+	  return s;
+	unsigned char *clistobj_data = new unsigned char[sz];
+	CListObjHeader h;
+	s = objectRead(dbh, 0, 0, clistobj_data, DefaultLock, 0, 0, &koid);
+	if (s)
+	  return s;
+	unsigned char *d, *edata = clistobj_data + sz;
+	for (d = clistobj_data + sizeof(CListObjHeader); d < edata; ) {
+	  CellHeader o;
+	  mcp(&o, d, sizeof(CellHeader));
+	  x2h_overhead(&o);
+	  if (!o.free) {
+	    total_busy_size += o.size;
+	    busy_size += o.size;
+	    unsigned int cpsize = o.size + sizeof(CellHeader);
+	    adapt(clist_data, clist_data_size, clist_data_alloc_size, cpsize);
+	    memcpy(clist_data + clist_data_size, d, cpsize);
+	    clist_data_size += cpsize;
+	  }
+	  else {
+	    total_free_size += o.size;
+	    free_size += o.size;
+	  }
+
+	  d += sizeof(CellHeader);
+	  d += o.size;
+	  cell_cnt++;
+	}
+
+	printf("  KOID %s [%d b] {\n", getOidString(&koid), sz);
+	printf("    cell_cnt: %d\n", cell_cnt);
+	printf("    busy_size: %u b\n", busy_size);
+	printf("    free_size: %u b\n", free_size);
+	printf("  }\n");
+
+	memcpy(&h, clistobj_data, sizeof(h));
+	x2h_header(&h);
+	koid = h.clobj_next;
+	delete [] clistobj_data;
+	clistobj_cnt++;
+      }
+      
+      if (clistobj_cnt > 1 && total_free_size != 0) {
+	CListObjHeader h;
+	memset(&h, 0, sizeof(h));
+	h.free_cnt = 0;
+	h.alloc_cnt = 1;
+	h.free_whole = 0;
+	h.cell_free_first = NullOffset;
+	CListObjHeader xh;
+	h2x_header(&xh, &h);
+	memcpy(clist_data, &xh, sizeof(xh));
+	
+	memset(&chd, 0, sizeof(chd));
+	s = objectCreate(dbh, clist_data, clist_data_size, hidx.dspid,
+			 &chd.clobj_first);
+	if (s)
+	  return s;
+	
+	chd.clobj_last = chd.clobj_last;
+	
+	s = writeCListHeader(chd_k, chd);
+	if (s)
+	  return s;
+	printf("  collapse oids: %s\n", getOidString(&chd.clobj_first));
+	std::vector<Oid>::iterator begin = oid_v.begin();
+	std::vector<Oid>::iterator end = oid_v.end();
+	unsigned int del_obj_cnt = 0;
+	while (begin != end) {
+	  s = objectDelete(dbh, &(*begin));
+	  if (s)
+	    return s;
+	  ++begin;
+	  del_obj_cnt++;
+	}
+	printf("  deleted obj: %d\n", del_obj_cnt);
+      }
+      else
+	printf("  NO COLLAPSE\n");
+
+      // must delete all koid
+      delete [] clist_data;
+      printf("  clistobj_cnt: %u\n", clistobj_cnt);
+      printf("  total_busy_size: %u b\n", total_busy_size);
+      printf("  total_free_size: %u b\n", total_free_size);
+      printf("  clist_data_size: %u\n", clist_data_size);
+      printf("  clist_data_alloc_size: %u\n", clist_data_alloc_size);
+      printf("}\n");
     }
   }
 
@@ -2715,7 +2855,7 @@ Status HIdx::search_realize(const void *key, unsigned int *found_cnt, Boolean fo
   if (s = checkOpened())
     return s;
 
-  int x;
+  unsigned int x;
 
   *found_cnt = 0;
 
@@ -2724,12 +2864,12 @@ Status HIdx::search_realize(const void *key, unsigned int *found_cnt, Boolean fo
   if (s)
     return s;
 
-  Hat hat;
-  s = readHat(x, hat);
+  CListHeader chd;
+  s = readCListHeader(x, chd);
   if (s)
     return s;
 
-  // EV: 23/04/07 it seems that this method search key, and can find it several time:
+  // EV: 23/04/07 it seems tchd this method search key, and can find it several time:
   // but the returned xdata will contained the last data and the count
   // will not be returned (only found == true)
   // => we changed this method by (at least) changing Boolean found to unsigned int found_cnt
@@ -2737,7 +2877,7 @@ Status HIdx::search_realize(const void *key, unsigned int *found_cnt, Boolean fo
   // idea:
   // 1. add the break, and rename the methode searchAny
   // 2. add a methode ::search(const void *key, unsigned int *found_cnt)
-  Oid koid = hat.first;
+  Oid koid = chd.clobj_first;
   while (koid.getNX() > 0) {
     if (backend_interrupt)
       return statusMake(BACKEND_INTERRUPTED, "");
@@ -2754,11 +2894,11 @@ Status HIdx::search_realize(const void *key, unsigned int *found_cnt, Boolean fo
     }
       
     char *d, *edata = data + size;
-    for (d = data + sizeof(Header); d < edata; ) {
-      Overhead o;
-      mcp(&o, d, sizeof(Overhead));
+    for (d = data + sizeof(CListObjHeader); d < edata; ) {
+      CellHeader o;
+      mcp(&o, d, sizeof(CellHeader));
       x2h_overhead(&o);
-      d += sizeof(Overhead);
+      d += sizeof(CellHeader);
 
       if (!o.free && !cmp(key, d, OP2_SWAP)) {
 	unsigned int offset;
@@ -2767,7 +2907,7 @@ Status HIdx::search_realize(const void *key, unsigned int *found_cnt, Boolean fo
 	  x2h_32_cpy(&datacnt, d + get_off(d, this));
 	  *found_cnt += datacnt;
 	  offset = sizeof(datacnt);
-#if 1
+#if 0
 	  for (unsigned int n = 0; n < datacnt; n++) {
 	    if (hidx.datasz == sizeof(Oid)) { // perharps an Oid
 	      Oid oo;
@@ -2798,11 +2938,11 @@ Status HIdx::search_realize(const void *key, unsigned int *found_cnt, Boolean fo
       d += o.size;
     }
       
-    Header h;
-    mcp(&h, data, sizeof(Header));
+    CListObjHeader h;
+    mcp(&h, data, sizeof(CListObjHeader));
     x2h_header(&h);
-    //koid = h.free_next;
-    koid = h.next;
+    //koid = h.clobj_free_next;
+    koid = h.clobj_next;
     free(data);
 
     // break added in case of *found == true
@@ -2825,16 +2965,16 @@ Status HIdx::destroy()
 Status HIdx::destroy_r()
 {
   for (int n = 0; n < hidx.key_count; n++) {
-    Hat hat;
-    Status s = readHat(n, hat);
+    CListHeader chd;
+    Status s = readCListHeader(n, chd);
     if (s)
       return s;
 
-    Oid koid = hat.first;
+    Oid koid = chd.clobj_first;
 
     while (koid.getNX()) {
-      Header h;
-      Status s = readHeader(koid, h);
+      CListObjHeader h;
+      Status s = readCListObjHeader(koid, h);
       if (s)
 	return s;
 
@@ -2842,7 +2982,7 @@ Status HIdx::destroy_r()
       if (s)
 	return s;
 
-      koid = h.next;
+      koid = h.clobj_next;
     }
   }
 
@@ -2852,8 +2992,8 @@ Status HIdx::destroy_r()
 Status
 HIdx::headPrint(FILE *fd, int n, Oid *koid, int &count) const
 {
-  Header h;
-  Status s = objectRead(dbh, 0, sizeof(Header), &h, DefaultLock, 0,
+  CListObjHeader h;
+  Status s = objectRead(dbh, 0, sizeof(CListObjHeader), &h, DefaultLock, 0,
 			      0, koid);
 
   if (s)
@@ -2866,13 +3006,13 @@ HIdx::headPrint(FILE *fd, int n, Oid *koid, int &count) const
   fprintf(fd, "\t\tnfree      = %d;\n", h.free_cnt);
   fprintf(fd, "\t\tnalloc     = %d;\n", h.alloc_cnt);
   fprintf(fd, "\t\tfree_whole = %d;\n", h.free_whole);
-  fprintf(fd, "\t\tfirstfree  = %d;\n", h.free_first);
-  fprintf(fd, "\t\tprev       = %s;\n", getOidString(&h.prev));
-  fprintf(fd, "\t\tnext       = %s;\n", getOidString(&h.next));
-  fprintf(fd, "\t\tfree_prev  = %s;\n", getOidString(&h.free_prev));
-  fprintf(fd, "\t\tfree_next  = %s;\n", getOidString(&h.free_next));
+  fprintf(fd, "\t\tfirstfree  = %d;\n", h.cell_free_first);
+  fprintf(fd, "\t\tprev       = %s;\n", getOidString(&h.clobj_prev));
+  fprintf(fd, "\t\tnext       = %s;\n", getOidString(&h.clobj_next));
+  fprintf(fd, "\t\tfree_prev  = %s;\n", getOidString(&h.clobj_free_prev));
+  fprintf(fd, "\t\tfree_next  = %s;\n", getOidString(&h.clobj_free_next));
   fprintf(fd, "\t};\n");
-  *koid = h.next;
+  *koid = h.clobj_next;
 
   return Success;
 }
@@ -2881,15 +3021,15 @@ Status
 HIdx::getHashObjectBusySize(const Oid *koid, unsigned int &osize, unsigned int &count, unsigned int size) const
 {
   if (!STRTYPE(this) && !data_grouped_by_key) {
-    Header h;
-    Status s = objectRead(dbh, 0, sizeof(Header), &h, DefaultLock, 0,
+    CListObjHeader h;
+    Status s = objectRead(dbh, 0, sizeof(CListObjHeader), &h, DefaultLock, 0,
 				0, koid);
     
     if (s)
       return s;
     x2h_header(&h);
   
-    osize = h.alloc_cnt * (sizeof(Overhead) + hidx.keysz + hidx.datasz) + sizeof(Header);
+    osize = h.alloc_cnt * (sizeof(CellHeader) + hidx.keysz + hidx.datasz) + sizeof(CListObjHeader);
     count = h.alloc_cnt;
     return Success;
   }
@@ -2901,7 +3041,7 @@ HIdx::getHashObjectBusySize(const Oid *koid, unsigned int &osize, unsigned int &
       return s;
   }
 
-  osize = sizeof(Header);
+  osize = sizeof(CListObjHeader);
 
   char *data;
   if (nocopy) {
@@ -2915,15 +3055,15 @@ HIdx::getHashObjectBusySize(const Oid *koid, unsigned int &osize, unsigned int &
   if (s) {if (!nocopy) free(data); return s;}
 
   count = 0;
-  int cur = sizeof(Header);
-  while (cur + sizeof(Overhead) <= size) {
-    Overhead to;
-    s = readOverhead(cur, *koid, to);
+  int cur = sizeof(CListObjHeader);
+  while (cur + sizeof(CellHeader) <= size) {
+    CellHeader to;
+    s = readCellHeader(cur, *koid, to);
     if (s) {if (!nocopy) free(data); return s;}
-    cur += sizeof(Overhead);
+    cur += sizeof(CellHeader);
     if (!to.free) {
-      //      osize += sizeof(Overhead) + strlen(data+cur)+1 + hidx.datasz;
-      osize += sizeof(Overhead) + to.size;
+      //      osize += sizeof(CellHeader) + strlen(data+cur)+1 + hidx.datasz;
+      osize += sizeof(CellHeader) + to.size;
       if (data_grouped_by_key) {
 	unsigned int datacnt;
 	x2h_32_cpy(&datacnt, data + cur + get_off(data + cur, this));
@@ -2932,7 +3072,7 @@ HIdx::getHashObjectBusySize(const Oid *koid, unsigned int &osize, unsigned int &
       else
 	count++;
     }
-    //    printf("SIZES '%s' %d %d %d free=%d\n", data+cur, to.size + sizeof(Overhead), sizeof(Overhead) + strlen(data+cur)+1, hidx.datasz, to.free);
+    //    printf("SIZES '%s' %d %d %d free=%d\n", data+cur, to.size + sizeof(CellHeader), sizeof(CellHeader) + strlen(data+cur)+1, hidx.datasz, to.free);
     cur += to.size;
   }
 
@@ -2949,8 +3089,8 @@ HIdx::getEntryCount(Oid *koid, unsigned int &count) const
     return Success;
   }
 
-  Header h;
-  Status s = objectRead(dbh, 0, sizeof(Header), &h, DefaultLock, 0,
+  CListObjHeader h;
+  Status s = objectRead(dbh, 0, sizeof(CListObjHeader), &h, DefaultLock, 0,
 			      0, koid);
 
   if (s)
@@ -2958,7 +3098,7 @@ HIdx::getEntryCount(Oid *koid, unsigned int &count) const
   x2h_header(&h);
 
   count = h.alloc_cnt;
-  *koid = h.next;
+  *koid = h.clobj_next;
 
   return Success;
 }
@@ -2969,15 +3109,15 @@ Status
 HIdx::dumpMemoryMap(FILE *fd)
 {
   for (int n = 0; n < hidx.key_count; n++) {
-    Hat hat;
-    Status s = readHat(n, hat);
+    CListHeader chd;
+    Status s = readCListHeader(n, chd);
     if (s)
       return s;
-    Oid koid = hat.first;
+    Oid koid = chd.clobj_first;
     if (!koid.getNX()) continue;
     if (s)
       return s;
-    s = dumpMemoryMap(hat, (std::string("Entry #") + str_convert((long)n) + " ").c_str(),
+    s = dumpMemoryMap(chd, (std::string("Entry #") + str_convert((long)n) + " ").c_str(),
 		      fd);
     if (s)
       return s;
@@ -3003,20 +3143,20 @@ Status HIdx::printStat(FILE *fd) const
   total = 0;
 
   for (int n = 0; n < hidx.key_count; n++) {
-    Hat hat;
-    Status s = readHat(n, hat);
+    CListHeader chd;
+    Status s = readCListHeader(n, chd);
     if (s)
       return s;
 
 #ifdef ALL_STATS
     fprintf(fd, "cell[%d] = {\n", n);
-    fprintf(fd, "\tfirst      = %s;\n", getOidString(&hat.first));
-    fprintf(fd, "\tlast       = %s;\n", getOidString(&hat.last));
-    fprintf(fd, "\tfree_first = %s;\n", getOidString(&hat.free_first));
+    fprintf(fd, "\tfirst      = %s;\n", getOidString(&chd.clobj_first));
+    fprintf(fd, "\tlast       = %s;\n", getOidString(&chd.clobj_last));
+    fprintf(fd, "\tfree_first = %s;\n", getOidString(&chd.clobj_free_first));
 #endif
 
     Oid toid;
-    toid = hat.first;
+    toid = chd.clobj_first;
     int cell_count = 0;
 
     while (toid.getNX() > 0) {
@@ -3365,7 +3505,7 @@ HIdxCursor::read(Boolean &eox)
   Status s;
   int n;
 
-  HIdx::Header h;
+  HIdx::CListObjHeader h;
 
   unsigned int (*gkey)(int) = get_gkey(idx->version);
   //  printf("enter HIdxCursor::read()\n");
@@ -3383,11 +3523,11 @@ HIdxCursor::read(Boolean &eox)
 	return Success;
       }
 
-      HIdx::Hat hat;
-      s = idx->readHat(k_cur, hat);
+      HIdx::CListHeader chd;
+      s = idx->readCListHeader(k_cur, chd);
       if (s)
 	return s;
-      koid = hat.first;
+      koid = chd.clobj_first;
 
       if (equal) {
 	if (koid.getNX() == 0) {
@@ -3402,7 +3542,7 @@ HIdxCursor::read(Boolean &eox)
 	continue;
     }	  
 
-    s = objectRead(idx->dbh, 0, sizeof(HIdx::Header), &h,
+    s = objectRead(idx->dbh, 0, sizeof(HIdx::CListObjHeader), &h,
 		   DefaultLock, 0, &size, &koid);
     if (s)
       return s;
@@ -3411,7 +3551,7 @@ HIdxCursor::read(Boolean &eox)
     if (h.alloc_cnt)
       break;
 
-    koid = h.next;
+    koid = h.clobj_next;
     
     if (equal && koid.getNX() == 0) {
       eox = True;
@@ -3431,7 +3571,7 @@ HIdxCursor::read(Boolean &eox)
 			     &koid);
     if (!s) {
       edata = sdata + size;
-      cur = sdata + sizeof(HIdx::Header);
+      cur = sdata + sizeof(HIdx::CListObjHeader);
       data_tofree = False;
     }
     else {
@@ -3444,12 +3584,12 @@ HIdxCursor::read(Boolean &eox)
     sdata = (char *)m_malloc(size);
     data_tofree = True;
     edata = sdata + size;
-    cur = sdata + sizeof(HIdx::Header);
+    cur = sdata + sizeof(HIdx::CListObjHeader);
     
     s =  objectRead(idx->dbh, 0, size, sdata, DefaultLock, 0, 0, &koid);
   }
 
-  koid = h.next;
+  koid = h.clobj_next;
 
   return s;
 }
@@ -3656,13 +3796,13 @@ HIdxCursor::next(Boolean *found, void *data, Idx::Key *key)
   for (;;) {
     // changed the 8/12/99
     // for (; cur < edata; )
-    for (; cur+sizeof(HIdx::Overhead) <= edata; ) {
+    for (; cur+sizeof(HIdx::CellHeader) <= edata; ) {
       if (backend_interrupt)
 	return statusMake(BACKEND_INTERRUPTED, "");
-      HIdx::Overhead o;
-      mcp(&o, cur, sizeof(HIdx::Overhead));
+      HIdx::CellHeader o;
+      mcp(&o, cur, sizeof(HIdx::CellHeader));
       x2h_overhead(&o);
-      cur += sizeof(HIdx::Overhead);
+      cur += sizeof(HIdx::CellHeader);
 	  
       if (!o.free && !cmp(cur)) {
 	if (idx->precmp) {
@@ -3797,13 +3937,13 @@ HIdx::getStats(std::string &stats) const
   unsigned int free = 0, busy = 0;
 
   for (n = 0; n < hidx.key_count; n++) {
-    Hat hat;
-    Status s = readHat(n, hat);
+    CListHeader chd;
+    Status s = readCListHeader(n, chd);
     if (s)
       return s;
 
     Oid toid;
-    toid = hat.first;
+    toid = chd.clobj_first;
     unsigned int cell_count = 0;
     unsigned int nobjs = 0;
     while (toid.getNX() > 0) {
@@ -3856,7 +3996,7 @@ HIdx::getStats(HIdx::Stats &stats) const
   unsigned int (*gkey)(int) = get_gkey(version);
   // the tree object:
   stats.total_hash_object_count = 1;
-  stats.total_hash_object_size = sizeof(Hat) * gkey(hidx.key_count);
+  stats.total_hash_object_size = sizeof(CListHeader) * gkey(hidx.key_count);
 
   stats.entries = new Stats::Entry[hidx.key_count];
   memset(stats.entries, 0, sizeof(Stats::Entry) * hidx.key_count);
@@ -3864,13 +4004,13 @@ HIdx::getStats(HIdx::Stats &stats) const
 
   Stats::Entry *entry = stats.entries;
   for (int n = 0; n < hidx.key_count; n++, entry++) {
-    Hat hat;
-    Status s = readHat(n, hat);
+    CListHeader chd;
+    Status s = readCListHeader(n, chd);
     if (s)
       return s;
 
     Oid koid;
-    koid = hat.first;
+    koid = chd.clobj_first;
     while (koid.getNX() > 0) {
       unsigned int count;
       if (backend_interrupt)
@@ -4152,61 +4292,61 @@ static void h2x_idx(HIdx::_Idx *xidx, const HIdx::_Idx *hidx)
 #endif
 }
 
-static void x2h_hat(HIdx::Hat *hat)
+static void x2h_chd(HIdx::CListHeader *chd)
 {
 #ifdef HIDX_XDR
-  x2h_oid(&hat->first, &hat->first);
-  x2h_oid(&hat->last, &hat->last);
-  x2h_oid(&hat->free_first, &hat->free_first);
+  x2h_oid(&chd->clobj_first, &chd->clobj_first);
+  x2h_oid(&chd->clobj_last, &chd->clobj_last);
+  x2h_oid(&chd->clobj_free_first, &chd->clobj_free_first);
 #endif
 }
 
-static void h2x_hat(HIdx::Hat *xhat, const HIdx::Hat *hhat)
+static void h2x_chd(HIdx::CListHeader *xchd, const HIdx::CListHeader *hchd)
 {
 #ifdef HIDX_XDR
-  h2x_oid(&xhat->first, &hhat->first);
-  h2x_oid(&xhat->last, &hhat->last);
-  h2x_oid(&xhat->free_first, &hhat->free_first);
+  h2x_oid(&xchd->clobj_first, &hchd->clobj_first);
+  h2x_oid(&xchd->clobj_last, &hchd->clobj_last);
+  h2x_oid(&xchd->clobj_free_first, &hchd->clobj_free_first);
 #else
-  if (xhat != hhat)
-    memcpy(xhat, hhat, sizeof(*xhat));
+  if (xchd != hchd)
+    memcpy(xchd, hchd, sizeof(*xchd));
 #endif
 }
 
-static void x2h_header(HIdx::Header *h)
+static void x2h_header(HIdx::CListObjHeader *h)
 {
 #ifdef HIDX_XDR
   h->size = x2h_32(h->size);
   h->free_cnt = x2h_u16(h->free_cnt);
   h->alloc_cnt = x2h_u16(h->alloc_cnt);
   h->free_whole = x2h_u32(h->free_whole);
-  h->free_first = x2h_u32(h->free_first);
-  x2h_oid(&h->free_prev, &h->free_prev);
-  x2h_oid(&h->free_next, &h->free_next);
-  x2h_oid(&h->prev, &h->prev);
-  x2h_oid(&h->next, &h->next);
+  h->cell_free_first = x2h_u32(h->cell_free_first);
+  x2h_oid(&h->clobj_free_prev, &h->clobj_free_prev);
+  x2h_oid(&h->clobj_free_next, &h->clobj_free_next);
+  x2h_oid(&h->clobj_prev, &h->clobj_prev);
+  x2h_oid(&h->clobj_next, &h->clobj_next);
 #endif
 }
 
-static void h2x_header(HIdx::Header *xh, const HIdx::Header *hh)
+static void h2x_header(HIdx::CListObjHeader *xh, const HIdx::CListObjHeader *hh)
 {
 #ifdef HIDX_XDR
   xh->size = h2x_32(hh->size);
   xh->free_cnt = h2x_u16(hh->free_cnt);
   xh->alloc_cnt = h2x_u16(hh->alloc_cnt);
   xh->free_whole = h2x_u32(hh->free_whole);
-  xh->free_first = h2x_32(hh->free_first);
-  h2x_oid(&xh->free_prev, &hh->free_prev);
-  h2x_oid(&xh->free_next, &hh->free_next);
-  h2x_oid(&xh->prev, &hh->prev);
-  h2x_oid(&xh->next, &hh->next);
+  xh->cell_free_first = h2x_32(hh->cell_free_first);
+  h2x_oid(&xh->clobj_free_prev, &hh->clobj_free_prev);
+  h2x_oid(&xh->clobj_free_next, &hh->clobj_free_next);
+  h2x_oid(&xh->clobj_prev, &hh->clobj_prev);
+  h2x_oid(&xh->clobj_next, &hh->clobj_next);
 #else
   if (xh != hh)
     memcpy(xh, hh, sizeof(*xh));
 #endif
 }
 
-static void x2h_overhead(HIdx::Overhead *o)
+static void x2h_overhead(HIdx::CellHeader *o)
 {
 #ifdef HIDX_XDR_OVERHEAD
   unsigned int x;
@@ -4214,18 +4354,18 @@ static void x2h_overhead(HIdx::Overhead *o)
   x = x2h_u32(x);
   o->free = x >> 31;
   o->size = x & 0xefffffff;
-  o->free_next = x2h_32(o->free_next);
-  o->free_prev = x2h_32(o->free_prev);
+  o->cell_free_next = x2h_32(o->cell_free_next);
+  o->cell_free_prev = x2h_32(o->cell_free_prev);
 #endif
 }
 
-static void h2x_overhead(HIdx::Overhead *xo, const HIdx::Overhead *ho)
+static void h2x_overhead(HIdx::CellHeader *xo, const HIdx::CellHeader *ho)
 {
 #ifdef HIDX_XDR_OVERHEAD
   unsigned int x = h2x_u32((ho->free << 31) | ho->size);
   mcp(xo, &x, sizeof(x));
-  xo->free_next = h2x_32(ho->free_next);
-  xo->free_prev = h2x_32(ho->free_prev);
+  xo->cell_free_next = h2x_32(ho->cell_free_next);
+  xo->cell_free_prev = h2x_32(ho->cell_free_prev);
 #else
   if (xo != ho)
     memcpy(xo, ho, sizeof(*xo));

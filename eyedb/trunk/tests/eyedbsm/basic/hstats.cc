@@ -30,7 +30,7 @@ static int
 usage()
 {
   o_usage(eyedbsm::False);
-  fprintf(stderr, "-struct|-string [-full]\n");
+  fprintf(stderr, "-struct|-string|-collapse [-full]\n");
   return 1;
 }
 
@@ -38,6 +38,7 @@ static unsigned int count;
 static eyedbsm::Boolean structStats = eyedbsm::False;
 static eyedbsm::Boolean stringStats = eyedbsm::False;
 static eyedbsm::Boolean fullStats = eyedbsm::False;
+static eyedbsm::Boolean collapseIndex = eyedbsm::False;
 
 static void
 stats_hash(void *x)
@@ -48,6 +49,14 @@ stats_hash(void *x)
   if (s) {
     eyedbsm::statusPrint(s, "reading hash index");
     return;
+  }
+
+  if (collapseIndex) {
+    s = hidx.collapse();
+    if (s) {
+      eyedbsm::statusPrint(s, "collapse");
+      return;
+    }
   }
 
   if (stringStats) {
@@ -86,11 +95,13 @@ main(int argc, char *argv[])
       stringStats = eyedbsm::True;
     else if (!strcmp(s, "-struct"))
       structStats = eyedbsm::True;
+    else if (!strcmp(s, "-collapse"))
+      collapseIndex = eyedbsm::True;
     else
       return usage();
   }
 
-  if (!stringStats && !structStats)
+  if (!stringStats && !structStats && !collapseIndex)
     return usage();
 
   if (o_trsbegin())

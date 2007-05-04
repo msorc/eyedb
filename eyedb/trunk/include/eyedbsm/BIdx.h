@@ -87,6 +87,7 @@ namespace eyedbsm {
     eyedbsm::Status readNode(Node *, const eyedbsm::Oid &) const;
     eyedbsm::Status writeNode(const Node *, const eyedbsm::Oid &) const;
     eyedbsm::Status createNode(const Node *, eyedbsm::Oid *) const;
+    eyedbsm::Status searchPerform(const void *key, unsigned int *found_cnt, Boolean found_any, void * data);
     Node *tmpnode;
 
   public:
@@ -308,11 +309,20 @@ namespace eyedbsm {
     /**
        Not yet documented
        @param key
+       @param found_cnt
+       @param xdata
+       @return
+    */
+    Status search(const void *key, unsigned int *found_cnt);
+
+    /**
+       Not yet documented
+       @param key
        @param found
        @param data
        @return
     */
-    eyedbsm::Status search(void const * key, eyedbsm::Boolean * found, void * data = 0);
+    eyedbsm::Status searchAny(void const * key, eyedbsm::Boolean * found, void * data = 0);
 
     /**
        Not yet documented

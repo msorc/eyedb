@@ -53,9 +53,9 @@ namespace eyedbsm {
     friend class HIdxCursor;
 
   public: /* conceptually private */
-    class Overhead;
-    class Header;
-    class Hat;
+    class CellHeader;
+    class CListObjHeader;
+    class CListHeader;
 
   public:
     enum HIdxKeyType {
@@ -85,6 +85,7 @@ namespace eyedbsm {
     unsigned int mask;
     Boolean pow2;
     Boolean uextend;
+    Boolean data_grouped_by_key;
     Oid treeoid;
     Status stat;
     DbHandle *dbh;
@@ -94,81 +95,92 @@ namespace eyedbsm {
     int version;
     Boolean nocopy;
 
-    Status dumpMemoryMap(const Hat &, const char *msg = "", FILE *fd = stdout);
+    Status dumpMemoryMap(const CListHeader &, const char *msg = "", FILE *fd = stdout);
 
-    Status readOverhead(int off, const Oid &, Overhead &) const;
-    Status writeOverhead(int off, const Oid &, const Overhead &) const;
-    Status readHeader(const Oid &, Header &) const;
-    Status writeHeader(const Oid &, const Header &) const;
-    Status readHat(int k, Hat &hat) const;
-    Status writeHat(int k, const Hat &hat) const;
-    Status readHats(Hat *&hats) const;
-    Status writeHats(const Hat *hats) const;
+    Status readCellHeader(int off, const Oid &, CellHeader &) const;
+    Status writeCellHeader(int off, const Oid &, const CellHeader &) const;
+    Status readCListObjHeader(const Oid &, CListObjHeader &) const;
+    Status writeCListObjHeader(const Oid &, const CListObjHeader &) const;
+    Status readCListHeader(unsigned int k, CListHeader &chd) const;
+    Status writeCListHeader(unsigned int k, const CListHeader &chd) const;
+    Status readCListHeaders(CListHeader *&chds) const;
+    Status writeCListHeaders(const CListHeader *chds) const;
 
-    Status insertCell(int offset, unsigned int size, Header &h,
+    Status insertCell(int offset, unsigned int size, CListObjHeader &h,
 		      const Oid &koid) const;
-    Status suppressCell(int offset, Header &h, const Oid &koid) const;
-    Status get_key(int &, const void *, unsigned int * = 0) const;
+    Status suppressCell(int offset, CListObjHeader &h, const Oid &koid) const;
+    Status get_key(unsigned int &, const void *, unsigned int * = 0) const;
     int cmp(const void *, const void *, unsigned char) const;
     Status count_manage(DbHandle *dbh, int inc);
-    Status getCell(unsigned int size, Hat &hat, int hat_k,
-		   Oid &koid, Header &h, int &offset, Overhead &o);
-    Status insert_realize(Hat &hat, int hat_k, const void *key,
+    Status getCell(unsigned int size, CListHeader &chd, unsigned int chd_k,
+		   Oid &koid, CListObjHeader &h, int &offset, CellHeader &o);
+    Status insert_realize(CListHeader &chd, unsigned int chd_k, const void *key,
 			  unsigned int size, const void *xdata,
-			  const Oid &koid, Header &h, int offset,
-			  Overhead &o);
-    Status remove_realize(Hat *hat, int hat_key,
+			  const Oid &koid, CListObjHeader &h, int offset,
+			  CellHeader &o, unsigned int datasz);
+    Status insert_perform(const void *key, const void *xdata, unsigned int datasz);
+    Status remove_perform(const void *key, const void *xdata, Boolean *found,
+			  unsigned char **prdata, unsigned int *pdatacnt, int *found_idx);
+    Status remove_realize(CListHeader *chd, unsigned int chd_key,
 			  const char *, const char *, const char *,
-			  const Overhead *, const Oid *);
-    Status getObjectToExtend(unsigned int size, Hat &hat, int hat_k,
-			     Oid &koid, Header &h, int &offset,
-			     Overhead &o, Boolean &found);
-    Status extendObject(Hat &hat, int hat_k, const Oid &koid,
-			Header &h, Boolean &extended);
-    Status extendObject(unsigned int size, Hat &hat, int hat_k, Oid &koid,
-			Header &h, int &offset, Overhead &o,
+			  const CellHeader *, const Oid *);
+    Status search_realize(const void *key, unsigned int *found_cnt, Boolean found_any, void * data);
+    Status getObjectToExtend(unsigned int size, CListHeader &chd, unsigned int chd_k,
+			     Oid &koid, CListObjHeader &h, int &offset,
+			     CellHeader &o, Boolean &found);
+    Status extendObject(CListHeader &chd, unsigned int chd_k, const Oid &koid,
+			CListObjHeader &h, Boolean &extended);
+    Status extendObject(unsigned int size, CListHeader &chd, unsigned int chd_k, Oid &koid,
+			CListObjHeader &h, int &offset, CellHeader &o,
 			Boolean &extended);
-    Boolean candidateForExtension(const Header &);
-    Status makeObject(Hat &hat, int hat_k, Oid &koid, int &offset,
-		      Header &h, Overhead &o, unsigned int objsize);
-    static bool inFreeList(const Header &h, const Hat &hat, const Oid &koid);
-    Status insertObjectInFreeList(Hat &hat, int hat_k, Header &h,
+    Boolean candidateForExtension(const CListObjHeader &);
+    Status makeObject(CListHeader &chd, unsigned int chd_k, Oid &koid, int &offset,
+		      CListObjHeader &h, CellHeader &o, unsigned int objsize);
+    static bool inFreeList(const CListObjHeader &h, const CListHeader &chd, const Oid &koid);
+    Status insertObjectInFreeList(CListHeader &chd, unsigned int chd_k, CListObjHeader &h,
 				  const Oid &koid);
-    Status suppressObjectFromFreeList(Hat &hat, int hat_k, Header &h,
+    Status suppressObjectFromFreeList(CListHeader &chd, unsigned int chd_k, CListObjHeader &h,
 				      const Oid &koid);
-    Status suppressObjectFromList(Hat &hat, int hat_k, Header &h,
+    Status suppressObjectFromList(CListHeader &chd, unsigned int chd_k, CListObjHeader &h,
 				  const Oid &koid);
-    Status replaceObjectInList(Hat &hat, int hat_k, Header &h,
+    Status replaceObjectInList(CListHeader &chd, unsigned int chd_k, CListObjHeader &h,
 			       const Oid &koid, const Oid &nkoid);
     Status modifyObjectSize(int osize, int nsize, const Oid &koid, 
 			    Oid &nkoid);
     Status headPrint(FILE *, int, Oid *, int&) const;
-    Status getEntryCount(Oid *, int& ) const;
+    Status getEntryCount(Oid *, unsigned int& ) const;
     Status getHashObjectBusySize(const Oid *koid, unsigned int &busysize,
-				 unsigned int size = 0) const;
+				 unsigned int &count, unsigned int size = 0) const;
     static Status get_def_string_hash_key(const void *key, unsigned int len,
-					  void *, int &);
+					  void *, unsigned int &);
     static Status get_def_nstring_hash_key(const void *key, unsigned int len,
-					   void *, int &);
+					   void *, unsigned int &);
     static Status get_def_rawdata_hash_key(const void *key, unsigned int len,
-					   void *, int &);
+					   void *, unsigned int &);
     static Status get_def_int16data_hash_key(const void *key,
-					     unsigned int len, void *, int &);
+					     unsigned int len, void *, unsigned int &);
     static Status get_def_int32data_hash_key(const void *key,
-					     unsigned int len, void *, int &);
+					     unsigned int len, void *, unsigned int &);
     static Status get_def_int64data_hash_key(const void *key,
-					     unsigned int len, void *, int &);
+					     unsigned int len, void *, unsigned int &);
     static Status get_def_oiddata_hash_key(const void *key, unsigned int len,
-					   void *, int &);
+					   void *, unsigned int &);
     static Status get_def_float32data_hash_key(const void *key,
 					       unsigned int len,
-					       void *, int &);
+					       void *, unsigned int &);
     static Status get_def_float64data_hash_key(const void *key,
 					       unsigned int len,
-					       void *, int &);
+					       void *, unsigned int &);
 
-    Status get_string_hash_key(const void *key, unsigned int len, int &) const;
-    Status get_rawdata_hash_key(const void *key, unsigned int len, int &) const;
+    Status get_string_hash_key(const void *key, unsigned int len, unsigned int &) const;
+    Status get_rawdata_hash_key(const void *key, unsigned int len, unsigned int &) const;
+    void printCellHeader(const HIdx::CellHeader *o, int offset) const;
+    void checkCellHeader(int offset, const Oid *koid) const;
+    void printCListObjHeader(const HIdx::CListObjHeader *h) const;
+    void checkCListObjHeader(const Oid *koid) const;
+    void checkChain(const Oid *koid) const;
+    void checkChain(const CListHeader *chd, const std::string &msg) const;
+
     void set_hash_key();
     Status destroy_r();
     Status copyRealize(Idx *) const;
@@ -185,7 +197,8 @@ namespace eyedbsm {
       IniSize_Hints,
       IniObjCnt_Hints,
       XCoef_Hints,
-      SzMax_Hints
+      SzMax_Hints,
+      DataGroupedByKey_Hints
     };
 
     static const unsigned int MaxKeys;
@@ -300,11 +313,20 @@ namespace eyedbsm {
     /**
        Not yet documented
        @param key
+       @param found_cnt
+       @param xdata
+       @return
+    */
+    Status search(const void *key, unsigned int *found_cnt);
+
+    /**
+       Not yet documented
+       @param key
        @param found
        @param xdata
        @return
     */
-    Status search(const void *key, Boolean *found, void *xdata = 0);
+    Status searchAny(const void *key, Boolean *found, void *xdata = 0);
 
     /**
        Not yet documented
@@ -336,6 +358,12 @@ namespace eyedbsm {
        Not yet documented
        @return
     */
+    Boolean isDataGroupedByKey() const {return data_grouped_by_key;}
+
+    /**
+       Not yet documented
+       @return
+    */
     Status status() const {return stat;}
 
     /**
@@ -343,6 +371,12 @@ namespace eyedbsm {
        @return
     */
     unsigned int getKeyCount() const {return hidx.key_count;}
+
+    /**
+       Not yet documented
+       @return
+    */
+    Status collapse();
 
     /**
        Not yet documented
@@ -460,26 +494,26 @@ namespace eyedbsm {
 		    void *hash_data = 0) const;
 
   public: /* conceptually private */
-    struct Overhead {
+    struct CellHeader {
     public:
       eyedblib::uint32 free:1, size:31;
-      eyedblib::int32 free_prev, free_next;
+      eyedblib::int32 cell_free_prev, cell_free_next;
     };
 
-    struct Header {
+    struct CListObjHeader {
     public:
       unsigned int size;
       eyedblib::uint16 free_cnt, alloc_cnt;
       eyedblib::uint32 free_whole;
-      eyedblib::int32 free_first;
-      Oid free_prev, free_next;
-      Oid prev, next;
+      eyedblib::int32 cell_free_first;
+      Oid clobj_free_prev, clobj_free_next;
+      Oid clobj_prev, clobj_next;
     };
   
-    struct Hat {
+    struct CListHeader {
     public:
-      Oid first, last;
-      Oid free_first;
+      Oid clobj_first, clobj_last;
+      Oid clobj_free_first;
     };
   };
 
@@ -493,11 +527,13 @@ namespace eyedbsm {
     Boolean sexcl, eexcl;
     static const char defaultSKey[];
     char *sdata, *edata, *cur;
+    unsigned int datacnt, idata;
+    unsigned int jumpsize;
     Boolean nocopy;
     Boolean data_tofree;
     Status read(Boolean& end);
     Boolean equal;
-    int k_cur, k_end;
+    unsigned int k_cur, k_end;
     int cmp_realize(const void *, const void *, Boolean, unsigned char) const;
     int cmp(const void *) const;
     Oid koid;
@@ -505,6 +541,7 @@ namespace eyedbsm {
     Boolean state;
     Boolean (*user_cmp)(const void *key, void *cmp_arg);
     void *cmp_arg;
+    void append_next(void *data, Idx::Key *key, unsigned int n);
 
     void init(DbHandle *);
 

@@ -18,7 +18,8 @@ ocreate \
 odelete \
 oread \
 oreadall \
-owrite
+owrite \
+woid
 
 EXTRA_DIST=olib.cc olib.h dbcreate.sh
 
@@ -86,6 +87,9 @@ oreadall_LDADD= olib.o $(EYEDBSMLIBS)
 
 owrite_SOURCES= owrite.cc
 owrite_LDADD= olib.o $(EYEDBSMLIBS)
+
+woid_SOURCES= woid.cc
+woid_LDADD= olib.o $(EYEDBSMLIBS)
 
 noinst_SCRIPTS= dbcreate1.sh
 
