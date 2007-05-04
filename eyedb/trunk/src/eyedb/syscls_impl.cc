@@ -1637,11 +1637,6 @@ namespace eyedb {
 
     if (s) return s;
 
-    printf("creating %d\n", creating);
-    printf("updating %d\n", updating);
-    printf("backend_updating %d\n", backend_updating);
-    printf("index_moving %d\n", index_moving);
-
     if (creating || updating)
       return StatusMake(indexCreate(db->getDbHandle(),
 				    index_moving,

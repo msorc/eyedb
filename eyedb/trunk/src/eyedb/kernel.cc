@@ -3417,7 +3417,7 @@ namespace eyedb {
     Bool swap = False;
 
     if (index_move) {
-      printf("MOVING...\n");
+      printf("Index moving...\n");
       if (idx->asBTreeIndex()) {
 	s = seidx->asBIdx()->move(idx->getDspid(), *newoid.getOid());
       }
@@ -3428,7 +3428,7 @@ namespace eyedb {
       }
     }
     else if (idx->asHashIndex()) {
-      printf("REIMPLEMENTING...\n");
+      printf("Index reimplementing...\n");
       if (seidx->asBIdx())
 	swap = True;
       HashIndex *hidx = idx->asHashIndex();
@@ -3438,10 +3438,10 @@ namespace eyedb {
       memset(impl_hints, 0, sizeof(int) * eyedbsm::HIdxImplHintsCount);
       for (int i = 0; i < cnt; i++)
 	impl_hints[i] = hidx->getImplHints(i);
-      //#ifdef REIMPL_TRACE
+#ifdef REIMPL_TRACE
       printf("Server: reimplementing HASH INDEX %s new keycount = %d\n",
 	     Oid(seidx->oid()).toString(), hidx->getKeyCount());
-      //#endif
+#endif
       BEMethod_C *mth = hidx->getHashMethod();
       s = seidx->reimplementToHash(*newoid.getOid(), hidx->getKeyCount(), 0,
 				   hidx->getDspid(),
