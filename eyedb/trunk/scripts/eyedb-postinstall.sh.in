@@ -60,14 +60,17 @@ start_server()
 {
     echo ==== Starting EyeDB server
     $sbindir/eyedbctl start --creating-dbm --nod
+    if [ $? -ne 0 ] ; then clean_exit; fi
 }
 
 create_dbm()
 {
     echo ==== Creating EYEDBDBM database
     $bindir/eyedbadmin dbmcreate --strict-unix=@
+    if [ $? -ne 0 ] ; then clean_exit; fi
     echo ==== Setting EYEDBDBM database permissions
     $bindir/eyedbadmin dbaccess EYEDBDBM r --user=@
+    if [ $? -ne 0 ] ; then clean_exit; fi
 }
 
 stop_server()
@@ -85,13 +88,6 @@ clean_exit()
 
 PROGNAME=`basename $0`
 decrypt_options $*
-
-set -e
-# 0 means EXIT, i.e. execute clean_exit when exiting from the shell
-# which means eyedbctl stop is executed twice
-#trap clean_exit 0
-# execute clean_exit if a command has a non-zero exit status 
-trap clean_exit ERR
 
 create_directories
 
