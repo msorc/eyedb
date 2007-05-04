@@ -196,32 +196,31 @@ namespace eyedbsm {
     if (datid_src == datid_dest)
       return Success;
 
-    Boolean found;
+    Boolean found = False;
     Oid oid;
 
     if (s = ESM_firstOidGet_omp(dbh, &oid, &found))
       return s;
 
-    while (found)
-      {
-	/*
-	  if (s = ESM_objectLock(dbh, &oid, LOCKX, 0, 0))
+    while (found) {
+      /*
+	if (s = ESM_objectLock(dbh, &oid, LOCKX, 0, 0))
+	return s;
+      */
+
+      OidLoc oidloc = oidLocGet(dbh, &oid);
+      if (oidloc.datid == datid_src) {
+	if (s = ESM_objectMoveDatDsp(dbh, &oid, datid_dest, -1, True,
+				     OPDefault))
 	  return s;
-	*/
-
-	OidLoc oidloc = oidLocGet(dbh, &oid);
-	if (oidloc.datid == datid_src) {
-	  if (s = ESM_objectMoveDatDsp(dbh, &oid, datid_dest, -1, True,
-				       OPDefault))
-	    return s;
-	}
-
-	Oid newoid;
-	if (s = ESM_nextOidGet_omp(dbh, &oid, &newoid, &found))
-	  return s;
-
-	oid = newoid;
       }
+      
+      Oid newoid;
+      if (s = ESM_nextOidGet_omp(dbh, &oid, &newoid, &found))
+	return s;
+      
+      oid = newoid;
+    }
 
     return Success;
   }
@@ -523,7 +522,8 @@ namespace eyedbsm {
 
     /* check if datfile is registered */
     s = get_datid(dbh, datfile, datid);
-    if (s) return s;
+    if (s)
+      return s;
 
     DatType dtype = getDatType(&_dbh, datid);
     if (dtype == PhysicalOidType)
@@ -535,8 +535,11 @@ namespace eyedbsm {
     const MapHeader *mp = dfd->mp();
 
     const char *tmp_datfile = get_tmp_datfile(dfd->file());
-    if (s = ESM_datCreate(dbh, tmp_datfile, "", x2h_u32(dfd->__maxsize()),
-			  (MapType)x2h_u16(mp->mtype()), x2h_u32(mp->sizeslot()),
+
+    if (s = ESM_datCreate(dbh, tmp_datfile, "",
+			  x2h_u32(dfd->__maxsize()),
+			  (MapType)x2h_u16(mp->mtype()),
+			  x2h_u32(mp->sizeslot()),
 			  dtype, file_mask, file_group))
       return s;
 
@@ -559,24 +562,49 @@ namespace eyedbsm {
 
     char *datfile_keep = strdup(dfd->file());
     char *datname_keep = strdup(dfd->name());
-    if (s = ESM_datDelete(dbh_n, datfile, True))
-      {
-	free(datfile_keep);
-	free(datname_keep);
-	return s;
-      }
 
-    if (s = ESM_datMove(dbh_n, tmp_datfile, datfile_keep, True))
-      {
-	free(datfile_keep);
-	free(datname_keep);
-	return s;
-      }
+    if (s = ESM_datDelete(dbh_n, datfile, True)) {
+      free(datfile_keep);
+      free(datname_keep);
+      return s;
+    }
 
-    //DBSADDR(dbh_n)->dat[datid] = DBSADDR(dbh_n)->dat[tmp_datid];
+    if (s = ESM_datMove(dbh_n, tmp_datfile, datfile_keep, True)) {
+      free(datfile_keep);
+      free(datname_keep);
+      return s;
+    }
+
     DbHeader _dbh_n(DBSADDR(dbh_n));
 
-    _dbh_n.dat(datid) = _dbh_n.dat(tmp_datid);
+    // WRONG: must use separate fields
+    //_dbh_n.dat(datid) = _dbh_n.dat(tmp_datid);
+    _dbh_n.dat(datid).__lastslot() = _dbh_n.dat(tmp_datid).__lastslot();
+    _dbh_n.dat(datid).__maxsize() = _dbh_n.dat(tmp_datid).__maxsize();
+
+    MapHeader *dmp = _dbh_n.dat(datid).mp();
+    MapHeader *smp = _dbh_n.dat(tmp_datid).mp();
+
+#if 1
+    memcpy(dmp->_addr(), smp->_addr(), MapHeader_SIZE);
+#else
+    dmp->mtype() = smp->mtype();
+    dmp->sizeslot() = smp->sizeslot();
+    dmp->pow2() = smp->pow2();
+    dmp->nslots() = smp->nslots();
+    dmp->nbobjs() = smp->nbobjs();
+    dmp->mstat_mtype() = smp->mstat_mtype();
+
+    dmp->u_bmh_slot_cur() = smp->u_bmh_slot_cur();
+    dmp->u_bmh_slot_lastbusy() = smp->u_bmh_slot_lastbusy();
+    dmp->u_bmh_retry() = smp->u_bmh_retry();
+    
+    dmp->mstat_u_bmstat_obj_count() = smp->mstat_u_bmstat_obj_count();
+    dmp->mstat_u_bmstat_busy_slots() = smp->mstat_u_bmstat_busy_slots();
+    dmp->mstat_u_bmstat_busy_size() = smp->mstat_u_bmstat_busy_size();
+    dmp->mstat_u_bmstat_hole_size() = smp->mstat_u_bmstat_hole_size();
+#endif
+
     strcpy(_dbh_n.dat(datid).file(), datfile_keep);
     strcpy(_dbh_n.dat(datid).name(), datname_keep);
     *_dbh_n.dat(tmp_datid).file() = 0;
