@@ -648,9 +648,11 @@ namespace eyedb {
     file_mask = 0;
     const char *file_mask_str = ServerConfig::getSValue("default_file_mask");
     if (file_mask_str && strcmp(file_mask_str, "0")) {
-      sscanf(file_mask_str, "%o", &file_mask);
-      if (!file_mask) {
+      unsigned int fmask = 0;
+      sscanf(file_mask_str, "%o", &fmask);
+      if (!fmask) {
 	return rpcStatusMake(IDB_ERROR, "invalid file mode: %s", file_mask_str);
+	file_mask = fmask;
       }
     }
 
