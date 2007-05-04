@@ -30,6 +30,7 @@
 #include <unistd.h>
 #include <eyedblib/performer.h>
 #include <eyedbsm/eyedbsm.h>
+#include <eyedblib/butils.h>
 
 extern int o_release(void);
 extern int o_usage(eyedbsm::Boolean complete);
@@ -56,6 +57,7 @@ extern int o_trsbegin();
 extern int o_trsend();
 extern void o_bench(void (*f)(void *), void *arg);
 extern void o_write_oids(const eyedbsm::Oid *oids, unsigned int count);
+extern int o_fileopen(o_FileType type);
 
 extern char *o_make_data_0(int &len, int count, int n);
 extern char *o_make_data_1(int &len, int count, int n);

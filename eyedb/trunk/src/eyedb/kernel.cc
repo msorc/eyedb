@@ -3363,7 +3363,7 @@ namespace eyedb {
   }
 
   extern eyedbsm::Status
-  hash_key(const void *key, unsigned int len, void *hash_data, int &x);
+  hash_key(const void *key, unsigned int len, void *hash_data, unsigned int &x);
   //extern eyedbsm::HIdx::hash_key_t hash_key;
 
   //#define REIMPL_TRACE
@@ -3387,9 +3387,10 @@ namespace eyedb {
     Index *idx = attr_comp->asIndex();
 
 #ifdef REIMPL_TRACE
-    printf("INDEX_CREATE(%s, %s, oid=%s, idxoid=%s)\n",
+    printf("INDEX_CREATE(%s, %s, oid=%s, idxoid=%s, dspid=%d)\n",
 	   attr_comp->getAttrpath(), cls->getName(), Oid(objoid).toString(),
-	   idx->getIdxOid().toString());
+	   idx->getIdxOid().toString(),
+	   idx->getDspid());
 #endif
 
     if (!idx->getIdxOid().isValid()) {
@@ -3638,9 +3639,6 @@ namespace eyedb {
 
     return RPCSuccess;
   }
-
-  extern eyedbsm::Status
-  hash_key(const void *key, unsigned int len, void *hash_data, int &x);
 
   RPCStatus
   IDB_indexSimulStats(DbHandle * dbh, const eyedbsm::Oid * idxoid,

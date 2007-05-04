@@ -36,6 +36,7 @@ usage()
 }
 
 static unsigned int Count;
+static char *key_data;
 
 static void
 insert_btree(void *x)
@@ -60,7 +61,14 @@ insert_btree(void *x)
     oid.setNX(oid.getNX() + n);
     oid.setUnique(oid.getUnique() + n);
     int len;
-    char * key = o_make_data(kt[0], Count, n, len, eyedbsm::False);
+    char *key;
+    if (key_data) {
+      key = key_data;
+      len = strlen(key);
+    }
+    else
+      key = o_make_data(kt[0], Count, n, len, eyedbsm::False);
+
     if (o_verbose) {
       printf("inserting key\n\t");
       o_trace_data(kt[0], key, eyedbsm::False);
@@ -87,10 +95,15 @@ main(int argc, char *argv[])
   for (int i = 0; i < argc; i++) {
     if (!Count) {
       Count = atoi(argv[i]);
-      if (!Count) return usage();
+      if (!Count)
+	return usage();
+    }
+    else if (!key_data) {
+      key_data = argv[i];
     }
     else
       return usage();
+
   }
 
   o_bench(insert_btree, 0);

@@ -94,7 +94,7 @@ o_usage(eyedbsm::Boolean complete)
 	  "       [-trans_lock R_S_W_S|R_S_W_SX|R_S_W_X|R_SX_W_SX|R_SX_W_X|R_X_W_X|\n"
 	  "        R_N_W_S||R_N_W_SX|R_N_W_X|R_N_W_N|DB_X]\n"
 	  "       [-read_lock N|S|X|SX] [-abort|-commit|-forget]\n"
-	  "       [-verbose] [-location] [-register] [-threads <cnt>\n"
+	  "       [-verbose] [-location] [-register] [-threads <cnt>]\n"
 	  "       [-ntimes <cnt>] [-wait_start] [-wait_op] <n> [-wait_trans]\n"
 	  "       [-wait_timeout <timeout>]\n"
 	  "       %s <dbfile>%s%s%s",
@@ -119,8 +119,7 @@ o_dbopen()
   return 0;
 }
 
-static int
-o_fileopen(o_FileType type)
+int o_fileopen(o_FileType type)
 {
   if (type == o_Skip) return 0;
   int rcount, i;
@@ -209,7 +208,7 @@ o_trace_params()
     printf("eyedbsm::ReadSWriteSX\n");
   else if (o_params.lockmode == eyedbsm::ReadNWriteN)
     printf("eyedbsm::ReadNWriteN\n");
-  else if (o_params.lockmode == eyedbsm::DatabaseX)
+  else if (o_params.lockmode == eyedbsm::DatabaseRW)
     printf("eyedbsm::DatabaseX\n");
 
   printf(o_FMT " %s\n", "Recovmode",
@@ -357,7 +356,7 @@ o_init(int &argc, char *argv[], o_FileType type, int (*usage)(),
 	  o_params.lockmode = eyedbsm::ReadNWriteN;
 
 	else if (!strcmp(s, "DB_X"))
-	  o_params.lockmode = eyedbsm::DatabaseX;
+	  o_params.lockmode = eyedbsm::DatabaseRW;
 	else
 	  return usage();
       }
@@ -1049,7 +1048,7 @@ static int
 o_index_usage()
 {
   o_usage(eyedbsm::False);
-  fprintf(stderr, "[-magorder <magorder>] [-keycount <keycount>] [-keytype <keytype>] [-inisize_hints <inisize>] [-iniobjcnt_hints <iniobjcnt>] [-xcoef_hints <xcoef>] [-szmax_hints <szmax>] [-degree <degree>] [-reimplement_H|-reimplement_B|-simulate] [-fullstats]\n");
+  fprintf(stderr, "[-magorder <magorder>] [-keycount <keycount>] [-keytype <keytype>] [-inisize_hints <inisize>] [-iniobjcnt_hints <iniobjcnt>] [-xcoef_hints <xcoef>] [-szmax_hints <szmax>] [-data_grouped_by_key <on|off>] [-degree <degree>] [-reimplement_H|-reimplement_B|-simulate] [-fullstats]\n");
   return 1;
 }
 
@@ -1154,6 +1153,19 @@ o_index_manage(int argc, char *argv[], o_FileType &ftype,
 	if (!eyedblib::is_number(s))
 	  return o_index_usage();
 	o_impl_hints[eyedbsm::HIdx::SzMax_Hints] = atoi(s);
+      }
+      else if (!strcmp(s, "-data_grouped_by_key")) {
+	if (i == argc - 1)
+	  return o_index_usage();
+	s = argv[++i];
+	if (!strcasecmp(s, "on")) {
+	  o_impl_hints[eyedbsm::HIdx::DataGroupedByKey_Hints] = 1;
+	}
+	else if (!strcasecmp(s, "off")) {
+	  o_impl_hints[eyedbsm::HIdx::DataGroupedByKey_Hints] = 0;
+	}
+	else
+	  return o_index_usage();
       }
       else
 	return o_index_usage();

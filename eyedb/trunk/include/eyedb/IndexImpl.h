@@ -185,7 +185,14 @@ namespace eyedb {
        @param cap
        @return
     */
-    static const char *hashHintToStr(int hints, Bool cap = False);
+    static const char *hashHintToStr(unsigned int hints, Bool cap = False);
+
+    /**
+       Not yet documented
+       @param hints
+       @return
+    */
+    static bool isHashHintImplemented(unsigned int hints);
 
   private:
     Type type;
