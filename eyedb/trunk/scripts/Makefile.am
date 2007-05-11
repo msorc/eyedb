@@ -24,3 +24,5 @@ eyedb-postinstall.sh
 dist_noinst_SCRIPTS= \
 eyedb-lex \
 eyedb.init
+
+EXTRA_DIST=eyedb-postinstall.sh.in

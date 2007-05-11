@@ -50,9 +50,9 @@ ECHO()
 }
 
 create_directories() {
-    mkdir -p $eyedb_databasedir
-    mkdir -p $eyedb_pipedir
-    mkdir -p $eyedb_tmpdir
+    [ ! -d $eyedb_databasedir ] && mkdir -p $eyedb_databasedir
+    [ ! -d $eyedb_pipedir ] && mkdir -p $eyedb_pipedir
+    [ ! -d $eyedb_tmpdir ] && mkdir -p $eyedb_tmpdir
     chmod a+w $eyedb_tmpdir
 }
 
@@ -60,17 +60,14 @@ start_server()
 {
     echo ==== Starting EyeDB server
     $sbindir/eyedbctl start --creating-dbm --nod
-    if [ $? -ne 0 ] ; then clean_exit; fi
 }
 
 create_dbm()
 {
     echo ==== Creating EYEDBDBM database
     $bindir/eyedbadmin dbmcreate --strict-unix=@
-    if [ $? -ne 0 ] ; then clean_exit; fi
     echo ==== Setting EYEDBDBM database permissions
     $bindir/eyedbadmin dbaccess EYEDBDBM r --user=@
-    if [ $? -ne 0 ] ; then clean_exit; fi
 }
 
 stop_server()
@@ -82,12 +79,18 @@ stop_server()
 clean_exit()
 {
     SAVED_STATUS=$?
-    $sbindir/eyedbctl stop
+    # Check if EyeDB is running, and stop it if running
+    if $sbindir/eyedbctl status > /dev/null 2>&1 ; then
+	$sbindir/eyedbctl stop
+    fi
     exit $SAVED_STATUS
 }
 
 PROGNAME=`basename $0`
 decrypt_options $*
+
+set -e
+trap clean_exit 0
 
 create_directories
 
