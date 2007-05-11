@@ -76,7 +76,7 @@ class DBM_Database : public Database {
  public:
   static void init();
   static void _release();
-  static void __release();
+  static void _dble_underscore_release();
   static Status updateSchema(Database *);
 
   static DBM_Database *getDBM_Database(const char *);

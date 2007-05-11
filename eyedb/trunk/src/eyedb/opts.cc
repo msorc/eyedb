@@ -779,7 +779,7 @@ do { \
     Config::_release();
     Architecture::_release();
 
-    DBM_Database::__release();
+    DBM_Database::_dble_underscore_release();
     Database::_release();
     Class::_release();
     Basic::_release();

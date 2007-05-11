@@ -80,7 +80,7 @@ DBM_Database::setDBM_Database(const char *dbmfile, Database *db)
   return dbm;
 }
 
-void DBM_Database::__release()
+void DBM_Database::_dble_underscore_release()
 {
   _release();
   //  dbmRelease();

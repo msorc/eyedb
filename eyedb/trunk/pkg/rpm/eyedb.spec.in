@@ -69,7 +69,7 @@ BuildRequires: make
 BuildRequires: libxslt-proc
 BuildRequires: docbook-style-xsl
 BuildRequires: tetex-latex
-BuildRequires: latex2html
+#BuildRequires: latex2html
 %description doc
 EyeDB documentation
 
