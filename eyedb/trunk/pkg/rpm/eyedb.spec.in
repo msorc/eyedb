@@ -101,8 +101,13 @@ install -m0755 scripts/eyedb.init %{buildroot}%{_initrddir}/eyedb
 %pre server
 # create eyedb user
 %_pre_useradd eyedb /var/lib/eyedb /bin/bash
-# create DBM
-#/usr/share/eyedb/tools/eyedb-postinstall.sh
+
+%post server
+su -l eyedb -s /bin/bash -c /usr/share/eyedb/tools/eyedb-postinstall.sh
+%_post_service %{name}
+
+%preun server
+%_preun_service %{name}
 
 %postun server
 %_postun_userdel eyedb
@@ -174,12 +179,11 @@ install -m0755 scripts/eyedb.init %{buildroot}%{_initrddir}/eyedb
 %defattr(-,root,root)
 %{_docdir}/%{name}/index.html
 %{_docdir}/%{name}/eyedbdoc.css
-%{_docdir}/%{name}/examples
-%{_docdir}/%{name}/images
-%{_docdir}/%{name}/manual
+%dir %{_docdir}/%{name}/examples
+%dir %{_docdir}/%{name}/images
+%dir %{_docdir}/%{name}/manual
 # man pages
 # to be completed
-
 # in which package should the APIs docs go?
 #%{_docdir}/%{name}-%{version}/api
 
