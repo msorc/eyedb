@@ -4,9 +4,9 @@ eyedbadmin TODO list, 18/05/07
 EV(1):
   X eyedbadmin database delete [--help] {<dbname>}
 EV(2):
-  eyedbadmin database create [--help] [--dbfile=<dbfile>] [--filedir=<filedir>] [--max-object-count=<object-count>] <dbname>
+  X eyedbadmin database create [--help] [--dbfile=<dbfile>] [--filedir=<filedir>] [--max-object-count=<object-count>] <dbname>
 EV(3):
-  eyedbadmin database list <options>
+  X eyedbadmin database list <options>
 EV(4):
   eyedbadmin database rename <options>
 EV(5):
