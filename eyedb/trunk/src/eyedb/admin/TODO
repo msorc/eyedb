@@ -1,7 +1,93 @@
 
-class (eyedbloca *inst*)
-collection (eyedbloca *coll* + eyedbcollimpl)
-attribute (eyedbloca *attr*)
-index (eyedbidxadmin + eyedbloca *idx*)
-?object? (eyedbloca *obj*)
-constraint (eyedbconsadmin)
+eyedbadmin TODO list, 18/05/07
+
+EV(1):
+  X eyedbadmin database delete [--help] {<dbname>}
+EV(2):
+  eyedbadmin database create [--help] [--dbfile=<dbfile>] [--filedir=<filedir>] [--max-object-count=<object-count>] <dbname>
+EV(3):
+  eyedbadmin database list <options>
+EV(4):
+  eyedbadmin database rename <options>
+EV(5):
+  eyedbadmin datafile create <options>
+EV(6):
+  eyedbadmin datafile delete <options>
+EV(7):
+  eyedbadmin datafile list <options>
+
+  eyedbadmin database move <options>
+  eyedbadmin database copy <options>
+  eyedbadmin database defaccess <options>
+
+  eyedbadmin database export <options>
+  eyedbadmin database import <options>
+
+  eyedbadmin datafile move <options>
+  eyedbadmin datafile resize <options>
+  eyedbadmin datafile defragment <options>
+
+  eyedbadmin datafile rename <options>
+
+FD(2): from eyedbadmin dataspace * [tests depends on datafile create,delete,list]  [DSPTopic module]
+  eyedbadmin dataspace create <options>
+  eyedbadmin dataspace update <options>
+  eyedbadmin dataspace delete <options>
+  eyedbadmin dataspace rename <options>
+  eyedbadmin dataspace list <options>
+  eyedbadmin dataspace setdef <options>
+  eyedbadmin dataspace getdef <options>
+  eyedbadmin dataspace setcurdat <options>
+  eyedbadmin dataspace getcurdat <options>
+
+FD(1): from eyedbadmin user * [USRTopic module]
+  eyedbadmin user add <options>
+  eyedbadmin user delete <options>
+  eyedbadmin user list <options>
+  eyedbadmin user sysaccess <options>
+  eyedbadmin user dbaccess <options>
+  eyedbadmin user passwd <options>
+
+FD(3): from eyedbidxadmin [IDXTopic module]
+  eyedbadmin index create <options>
+  eyedbadmin index delete <options>
+  eyedbadmin index update <options>
+  eyedbadmin index list <options>
+  eyedbadmin index stats <options>
+  eyedbadmin index simulate <options>
+
+plus tard:
+  from eyedbloca
+  eyedbadmin class getinstdefdsp <options>
+  eyedbadmin class setinstdefdsp <options>
+  eyedbadmin class moveinst <options>
+  eyedbadmin class getinstloca <options>
+
+  from eyedbloca
+  eyedbadmin collection getdefdsp <options>
+  eyedbadmin collection setdefdsp <options>
+  eyedbadmin collection getelemloca <options>
+  eyedbadmin collection moveelems <options>
+
+  from eyedbcollimpladmin
+  eyedbadmin collection setdefimpl <options>
+  eyedbadmin collection getdefimpl <options>
+  eyedbadmin collection listimpl <options>
+  eyedbadmin collection updateimpl <options>
+  eyedbadmin collection simulimpl <options>
+  eyedbadmin collection implstats <options>
+
+  from eyedbloca
+  eyedbadmin attribute getloca <options>
+  eyedbadmin attribute getdefdsp <options>
+  eyedbadmin attribute setdefdsp <options>
+  eyedbadmin attribute move <options>
+
+  from eyedbloca
+  eyedbadmin object getloca <options>
+  eyedbadmin object move <options>
+
+  from eyedbconsadmin
+  eyedbadmin constraint create <options>
+  eyedbadmin constraint delete <options>
+  eyedbadmin constraint list <options>
