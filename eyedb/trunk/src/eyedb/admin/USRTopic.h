@@ -33,11 +33,11 @@ public:
   USRTopic();
 };
 
-CMDCLASS(USRAddCmd, "add");
-CMDCLASS(USRDeleteCmd, "delete");
-CMDCLASS(USRListCmd, "list");
-CMDCLASS(USRSysAccessCmd, "sysaccess");
-CMDCLASS(USRDBAccessCmd, "dbaccess");
-CMDCLASS(USRPasswdCmd, "passwd");
+CMDCLASS_GETOPT(USRAddCmd, "add");
+CMDCLASS_GETOPT(USRDeleteCmd, "delete");
+CMDCLASS_GETOPT(USRListCmd, "list");
+CMDCLASS_GETOPT(USRSysAccessCmd, "sysaccess");
+CMDCLASS_GETOPT(USRDBAccessCmd, "dbaccess");
+CMDCLASS_GETOPT(USRPasswdCmd, "passwd");
 
 #endif
