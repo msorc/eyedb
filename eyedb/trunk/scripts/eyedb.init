@@ -22,8 +22,8 @@ RETVAL=0
 
 start() {
     if [ ! -f $LOCK_FILE ]; then
-	EYEDB_START="Starting %s:"
-	echo "$EYEDB_START" $NAME
+	EYEDB_START=$"Starting %s:"
+	echo -n "$EYEDB_START" $NAME
 
 	# Start EyeDB daemon under user eyedb
 	# FIXME: add options from /etc/sysconfig/eyedb (need first to check which options can be set from the command line)
@@ -37,18 +37,18 @@ start() {
 	    echo "$pid_eyedbd" > /var/run/eyedbd.pid
 	    echo "$pid_eyedbsmd" > /var/run/eyedbsmd.pid
 	fi
-	[ $RETVAL -eq 0 ] && success "%s startup" $NAME || failure "%s startup" $NAME
+	[ $RETVAL -eq 0 ] && success "$EYEDB_START" $NAME || failure "$EYEDB_START" $NAME
 	echo
     fi
 }
 
 stop() {
-    EYEDB_STOP="Stopping %s:"
+    EYEDB_STOP=$"Stopping %s:"
     echo "$EYEDB_STOP" $NAME
     su -l eyedb -s /bin/bash -c "/usr/sbin/eyedbctl stop"
     RETVAL=$?
     [ $RETVAL -eq 0 ] && rm -f $LOCK_FILE
-    [ $RETVAL -eq 0 ] && success "%s shutdown" $NAME || failure "%s shutdown" $NAME
+    [ $RETVAL -eq 0 ] && success "$EYEDB_STOP" $NAME || failure "$EYEDB_STOP" $NAME
     echo
 }
 
