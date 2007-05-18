@@ -34,8 +34,6 @@ int main(int c_argc, char *c_argv[])
 {
   eyedb::init(c_argc, c_argv);
 
-  std::string prog = c_argv[0];
-
   std::vector<std::string> argv;
   for (int n = 1; n < c_argc; n++)
     argv.push_back(c_argv[n]);
@@ -44,7 +42,7 @@ int main(int c_argc, char *c_argv[])
 
   try {
     Connection conn(true);
-    return TopicSet::getInstance()->perform(conn, prog, argv);
+    return TopicSet::getInstance()->perform(conn, argv);
   }
 
   catch(Exception &e) {

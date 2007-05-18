@@ -1,0 +1,7 @@
+
+class (eyedbloca *inst*)
+collection (eyedbloca *coll* + eyedbcollimpl)
+attribute (eyedbloca *attr*)
+index (eyedbidxadmin + eyedbloca *idx*)
+?object? (eyedbloca *obj*)
+constraint (eyedbconsadmin)

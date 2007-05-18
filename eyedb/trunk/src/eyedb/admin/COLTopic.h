@@ -38,4 +38,11 @@ CMDCLASS(COLSetDefDSPCmd, "setdefdsp");
 CMDCLASS(COLGetElemLocaCmd, "getelemloca");
 CMDCLASS(COLMoveElemsCmd, "moveelems");
 
+CMDCLASS(COLSetDefImplCmd, "setdefimpl");
+CMDCLASS(COLGetDefImplCmd, "getdefimpl");
+CMDCLASS(COLListImplCmd, "listimpl");
+CMDCLASS(COLUpdateImplCmd, "updateimpl");
+CMDCLASS(COLSimulImplCmd, "simulimpl");
+CMDCLASS(COLImplStatsCmd, "implstats");
+
 #endif

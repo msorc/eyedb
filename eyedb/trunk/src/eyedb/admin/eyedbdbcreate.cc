@@ -21,30 +21,38 @@
    Author: Eric Viara <viara@sysra.com>
 */
 
-#ifndef _EYEDB_ADMIN_DBTOPIC_H
-#define _EYEDB_ADMIN_DBTOPIC_H
+#include "eyedbconfig.h"
+#include <eyedb/eyedb.h>
 
 #include "Topic.h"
-#include "eyedb/GetOpt.h"
 
-class DBSTopic : public Topic {
+using namespace eyedb;
 
-public:
-  DBSTopic();
-};
+const std::string PROG_NAME = "eyedbdbcreate";
 
-CMDCLASS_GETOPT(DBSCreateCmd, "create");
-CMDCLASS_GETOPT(DBSDeleteCmd, "delete");
+int main(int c_argc, char *c_argv[])
+{
+  eyedb::init(c_argc, c_argv);
 
-// will be put un eyedbdbminit with options
-//CMDCLASS(DBSDBMCreateCmd, "dbmcreate");
+  std::vector<std::string> argv;
 
-CMDCLASS(DBSListCmd, "list");
-CMDCLASS(DBSMoveCmd, "move");
-CMDCLASS(DBSCopyCmd, "copy");
-CMDCLASS(DBSRenameCmd, "rename");
-CMDCLASS(DBSDefAccessCmd, "defaccess");
-CMDCLASS(DBSExportCmd, "export");
-CMDCLASS(DBSImportCmd, "import");
+  Command::setShortcutMode(true);
 
-#endif
+  argv.push_back("database");
+  argv.push_back("create");
+
+  for (int n = 1; n < c_argc; n++)
+    argv.push_back(c_argv[n]);
+
+  Exception::setMode(Exception::ExceptionMode);
+
+  try {
+    Connection conn(true);
+    return TopicSet::getInstance()->perform(conn, argv);
+  }
+
+  catch(Exception &e) {
+    std::cerr << e << std::endl;
+    return 1;
+  }
+}

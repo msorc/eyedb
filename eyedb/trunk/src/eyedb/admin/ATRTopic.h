@@ -33,9 +33,9 @@ public:
   ATRTopic();
 };
 
-CMDCLASS(ATRGetLocaCmd, "getloca");
 CMDCLASS(ATRGetDefDSPCmd, "getdefdsp");
 CMDCLASS(ATRSetDefDSPCmd, "setdefdsp");
+CMDCLASS(ATRGetLocaCmd, "getloca");
 CMDCLASS(ATRMoveCmd, "move");
 
 #endif

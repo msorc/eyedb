@@ -37,8 +37,8 @@ CMDCLASS(DSPUpdateCmd, "update");
 CMDCLASS(DSPDeleteCmd, "delete");
 CMDCLASS(DSPRenameCmd, "rename");
 CMDCLASS(DSPListCmd, "list");
-CMDCLASS(DSPSetDefaultCmd, "setdefault");
-CMDCLASS(DSPGetDefaultCmd, "getdefault");
+CMDCLASS(DSPSetDefCmd, "setdef");
+CMDCLASS(DSPGetDefCmd, "getdef");
 CMDCLASS(DSPSetCurDatCmd, "setcurdat");
 CMDCLASS(DSPGetCurDatCmd, "getcurdat");
 
