@@ -24,9 +24,16 @@
 
 #include "eyedbconfig.h"
 
-#include "DBTopic.h"
+#include "DBSTopic.h"
 #include "DSPTopic.h"
 #include "DTFTopic.h"
+#include "USRTopic.h"
+#include "IDXTopic.h"
+#include "CLSTopic.h"
+#include "COLTopic.h"
+#include "ATRTopic.h"
+#include "OBJTopic.h"
+#include "CNSTopic.h"
 
 const Option HELP_OPT("help", OptionStringType(), Option::Help, OptionDesc("Displays the current help"));
 
@@ -36,9 +43,16 @@ TopicSet *TopicSet::instance;
 
 TopicSet::TopicSet()
 {
-  addTopic(new DBTopic());
+  addTopic(new DBSTopic());
   addTopic(new DTFTopic());
   addTopic(new DSPTopic());
+  addTopic(new USRTopic());
+  addTopic(new IDXTopic());
+  addTopic(new CLSTopic());
+  addTopic(new COLTopic());
+  addTopic(new ATRTopic());
+  addTopic(new OBJTopic());
+  addTopic(new CNSTopic());
 }
 
 int TopicSet::perform(eyedb::Connection &conn, const std::string &prog, std::vector<std::string> &argv)
