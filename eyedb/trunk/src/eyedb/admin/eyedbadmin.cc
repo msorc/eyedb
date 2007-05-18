@@ -41,7 +41,7 @@ int main(int c_argc, char *c_argv[])
   Exception::setMode(Exception::ExceptionMode);
 
   try {
-    Connection conn(true);
+    Connection conn;
     return TopicSet::getInstance()->perform(conn, argv);
   }
 
