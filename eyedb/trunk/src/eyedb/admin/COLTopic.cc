@@ -45,4 +45,10 @@ COLTopic::COLTopic() : Topic("collection")
   addCommand(new COLSetDefDSPCmd(this));
   addCommand(new COLGetElemLocaCmd(this));
   addCommand(new COLMoveElemsCmd(this));
+  addCommand(new COLSetDefImplCmd(this));
+  addCommand(new COLGetDefImplCmd(this));
+  addCommand(new COLListImplCmd(this));
+  addCommand(new COLUpdateImplCmd(this));
+  addCommand(new COLSimulImplCmd(this));
+  addCommand(new COLImplStatsCmd(this));
 }

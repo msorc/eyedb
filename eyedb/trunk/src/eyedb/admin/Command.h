@@ -42,6 +42,7 @@ protected:
   Topic *topic;
 
   Command(Topic *topic, const std::string &name) : topic(topic), name(name) { }
+  static bool shortcut;
 
 public:
 
@@ -50,8 +51,11 @@ public:
 
   virtual int usage() = 0;
   virtual int help() = 0;
-  virtual int perform(eyedb::Connection &conn, const std::string &prog, std::vector<std::string> &argv) = 0;
+  virtual int perform(eyedb::Connection &conn, std::vector<std::string> &argv) = 0;
   std::string getExtName() const;
+
+  static bool setShortcutMode(bool _shortcut) {shortcut = _shortcut;}
+  static bool isShortcutMode() {return shortcut;}
 };
 
 #define CMDCLASS(CLS, NAME) \
@@ -61,9 +65,9 @@ class CLS : public Command { \
 public: \
   CLS(Topic *topic) : Command(topic, NAME) { } \
 \
-  virtual int usage() { std::cout << "usage: " << NAME << '\n'; } \
+  virtual int usage() { std::cout << PROG_NAME << " " << topic->getName() << " " << NAME << " <options>\n"; } \
   virtual int help() { std::cout << "help: " << NAME << '\n'; } \
-  virtual int perform(eyedb::Connection &conn, const std::string &prog, std::vector<std::string> &argv) { } \
+  virtual int perform(eyedb::Connection &conn, std::vector<std::string> &argv) { } \
 }
 
 #define CMDCLASS_GETOPT(CLS, NAME) \
@@ -79,7 +83,7 @@ public: \
 \
   virtual int usage(); \
   virtual int help(); \
-  virtual int perform(eyedb::Connection &conn, const std::string &prog, std::vector<std::string> &argv); \
+  virtual int perform(eyedb::Connection &conn, std::vector<std::string> &argv); \
 \
   virtual ~CLS() {delete getopt;} \
 }

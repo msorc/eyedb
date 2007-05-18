@@ -53,7 +53,10 @@ public:
 
   Command *getCommand(const std::string &name);
 
-  int usage(const std::string &prog_name, const std::string &name);
+  std::vector<Command *> getCommands() {return cmd_v;}
+
+  int usage(const std::string &name);
+  int help();
 
   virtual ~Topic() { }
 };
@@ -63,7 +66,9 @@ class TopicSet {
   std::vector<Topic *> topic_v;
   static TopicSet *instance;
 
-  int usage(const std::string &prog_name);
+  int usage();
+
+  int help();
 
   std::vector<Topic *> getTopics() {return topic_v;}
   Topic *getTopic(const std::string &name);
@@ -80,7 +85,7 @@ public:
     return instance;
   }
 
-  int perform(eyedb::Connection &conn, const std::string &prog, std::vector<std::string> &argv);
+  int perform(eyedb::Connection &conn, std::vector<std::string> &argv);
 };
 
 extern const Option HELP_OPT, HELP_COMMON_OPT;

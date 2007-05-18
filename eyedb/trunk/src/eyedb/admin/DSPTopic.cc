@@ -47,8 +47,8 @@ DSPTopic::DSPTopic() : Topic("dataspace")
   addCommand(new DSPDeleteCmd(this));
   addCommand(new DSPRenameCmd(this));
   addCommand(new DSPListCmd(this));
-  addCommand(new DSPSetDefaultCmd(this));
-  addCommand(new DSPGetDefaultCmd(this));
+  addCommand(new DSPSetDefCmd(this));
+  addCommand(new DSPGetDefCmd(this));
   addCommand(new DSPSetCurDatCmd(this));
   addCommand(new DSPGetCurDatCmd(this));
 }

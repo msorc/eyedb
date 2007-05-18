@@ -40,6 +40,7 @@ const Option HELP_OPT("help", OptionStringType(), Option::Help, OptionDesc("Disp
 const Option HELP_COMMON_OPT("help-eyedb-options", OptionStringType(), 0, OptionDesc("Displays the EyeDB common options"));
 
 TopicSet *TopicSet::instance;
+bool Command::shortcut = false;
 
 TopicSet::TopicSet()
 {
@@ -55,10 +56,14 @@ TopicSet::TopicSet()
   addTopic(new CNSTopic());
 }
 
-int TopicSet::perform(eyedb::Connection &conn, const std::string &prog, std::vector<std::string> &argv)
+int TopicSet::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
   if (argv.size() == 0) {
-    return usage(prog);
+    return usage();
+  }
+
+  if (argv.size() == 1 && argv[0] == "--help") {
+    return help();
   }
 
   std::string topic_name = argv[0];
@@ -69,29 +74,38 @@ int TopicSet::perform(eyedb::Connection &conn, const std::string &prog, std::vec
   }
 
   if (!topic) {
-    return usage(prog);
+    return usage();
   }
 
   if (argv.size() == 1) {
-    return topic->usage(prog, topic_name);
+    return topic->usage(topic_name);
   }
   
   std::string cmd_name = argv[1];
 
+  if (cmd_name == "--help") {
+    return topic->help();
+  }
+
   Command *cmd = topic->getCommand(cmd_name);
   if (!cmd) {
-    return topic->usage(prog, topic_name);
+    return topic->usage(topic_name);
   }
 
   // get rid of the two first arguments
   argv.erase(argv.begin());
   argv.erase(argv.begin());
-  return cmd->perform(conn, prog, argv);
+  return cmd->perform(conn, argv);
 }
 
-int TopicSet::usage(const std::string &prog)
+int TopicSet::usage()
 {
-  std::cerr << "usage: " << prog << " <topic> <command> <options>\n\n";
+  std::cerr << PROG_NAME << " usage:\n";
+  std::cerr << "  " << PROG_NAME << " --help\n";
+  std::cerr << "  " << PROG_NAME << " --help-eyedb-options\n";
+  std::cerr << "  " << PROG_NAME << " <topic> --help\n";
+  std::cerr << "  " << PROG_NAME << " <topic> <command> --help\n";
+  std::cerr << "  " << PROG_NAME << " <topic> <command> <options>\n\n";
   std::cerr << "where <topic> is one of the following:\n";
 
   std::vector<Topic *>::iterator begin = topic_v.begin();
@@ -99,8 +113,38 @@ int TopicSet::usage(const std::string &prog)
 
   while (begin != end) {
     Topic *topic = *begin;
+    std::cerr << "  ";
     topic->display(std::cerr);
     std::cerr << '\n';
+    ++begin;
+  }
+
+  return 1;
+}
+
+int TopicSet::help()
+{
+  std::vector<Topic *>::iterator begin = topic_v.begin();
+  std::vector<Topic *>::iterator end = topic_v.end();
+
+  std::cerr << PROG_NAME << " help:\n\n";
+
+  for (int n = 0; begin != end; n++) {
+    Topic *topic = *begin;
+    std::vector<Command *> cmd_v = topic->getCommands();
+    std::vector<Command *>::iterator b = cmd_v.begin();
+    std::vector<Command *>::iterator e = cmd_v.end();
+    if (n) {
+      std::cerr << '\n';
+    }
+
+    //std::cerr << "  " << PROG_NAME << " " << topic->getName() << " --help\n";
+    while (b != e) {
+      Command *cmd = *b;
+      std::cerr << "  ";
+      cmd->usage();
+      ++b;
+    }
     ++begin;
   }
 
@@ -166,9 +210,11 @@ Command *Topic::getCommand(const std::string &name)
   return 0;
 }
 
-int Topic::usage(const std::string &prog, const std::string &tname)
+int Topic::usage(const std::string &tname)
 {
-  std::cerr << "usage: " << prog << " " << tname << " <command> <options>\n\n";
+  std::cerr << PROG_NAME << " " << name << " usage:\n\n";
+  std::cerr << "  " << PROG_NAME << " " << tname << " --help\n";
+  std::cerr << "  " << PROG_NAME << " " << tname << " <command> <options>\n\n";
   std::cerr << "where <command> is one of the following:\n";
 
   std::vector<Command *>::iterator begin = cmd_v.begin();
@@ -176,7 +222,24 @@ int Topic::usage(const std::string &prog, const std::string &tname)
 
   while (begin != end) {
     Command *cmd = *begin;
-    std::cerr << cmd->getName() << '\n';
+    std::cerr << "  " << cmd->getName() << '\n';
+    ++begin;
+  }
+
+  return 1;
+}
+
+int Topic::help()
+{
+  std::vector<Command *>::iterator begin = cmd_v.begin();
+  std::vector<Command *>::iterator end = cmd_v.end();
+
+  std::cerr << PROG_NAME << " " << name << " help:\n\n";
+
+  while (begin != end) {
+    Command *cmd = *begin;
+    std::cerr << "  ";
+    cmd->usage();
     ++begin;
   }
 
@@ -185,5 +248,7 @@ int Topic::usage(const std::string &prog, const std::string &tname)
 
 std::string Command::getExtName() const
 {
+  if (isShortcutMode())
+    return PROG_NAME;
   return PROG_NAME + " " + topic->getName() + " " + getName();
 }

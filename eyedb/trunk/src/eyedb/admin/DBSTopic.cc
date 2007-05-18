@@ -44,7 +44,7 @@ DBSTopic::DBSTopic() : Topic("database")
 {
   addAlias("db");
 
-  addCommand(new DBSDBMCreateCmd(this));
+  //  addCommand(new DBSDBMCreateCmd(this));
 
   addCommand(new DBSCreateCmd(this));
   addCommand(new DBSDeleteCmd(this));
@@ -54,7 +54,7 @@ DBSTopic::DBSTopic() : Topic("database")
   addCommand(new DBSCopyCmd(this));
   addCommand(new DBSRenameCmd(this));
 
-  addCommand(new DBSAccessCmd(this));
+  addCommand(new DBSDefAccessCmd(this));
 
   addCommand(new DBSExportCmd(this));
   addCommand(new DBSImportCmd(this));
@@ -64,18 +64,18 @@ void DBSCreateCmd::init()
 {
   std::vector<Option> opts;
 
+  opts.push_back(HELP_OPT);
   opts.push_back(Option("dbfile", OptionStringType(), /*Option::Mandatory|*/Option::MandatoryValue, OptionDesc("Database file", "<dbfile>")));
   opts.push_back(Option("filedir", OptionStringType(), Option::MandatoryValue, OptionDesc("Database file directory", "<filedir>")));
   opts.push_back(Option("max-object-count", OptionStringType(), Option::MandatoryValue, OptionDesc("Maximum database object count", "<object-count>")));
-  opts.push_back(HELP_OPT);
-  opts.push_back(HELP_COMMON_OPT);
+  //opts.push_back(HELP_COMMON_OPT);
 
   getopt = new GetOpt(getExtName(), opts);
 }
 
 int DBSCreateCmd::usage()
 {
-  getopt->usage("");
+  getopt->usage("", "");
   std::cerr << " <dbname>\n";
   return 1;
 }
@@ -87,9 +87,9 @@ int DBSCreateCmd::help()
   return 1;
 }
 
-int DBSCreateCmd::perform(eyedb::Connection &conn, const std::string &prog, std::vector<std::string> &argv)
+int DBSCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  bool r = getopt->parse(prog, argv);
+  bool r = getopt->parse(PROG_NAME, argv);
 
   GetOpt::Map &map = getopt->getMap();
 
@@ -115,14 +115,14 @@ void DBSDeleteCmd::init()
   std::vector<Option> opts;
 
   opts.push_back(HELP_OPT);
-  opts.push_back(HELP_COMMON_OPT);
+  //opts.push_back(HELP_COMMON_OPT);
 
   getopt = new GetOpt(getExtName(), opts);
 }
 
 int DBSDeleteCmd::usage()
 {
-  getopt->usage("");
+  getopt->usage("", "");
   std::cerr << " {<dbname>}\n";
   return 1;
 }
@@ -134,9 +134,9 @@ int DBSDeleteCmd::help()
   return 1;
 }
 
-int DBSDeleteCmd::perform(eyedb::Connection &conn, const std::string &prog, std::vector<std::string> &argv)
+int DBSDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  bool r = getopt->parse(prog, argv);
+  bool r = getopt->parse(PROG_NAME, argv);
 
   GetOpt::Map &map = getopt->getMap();
 
