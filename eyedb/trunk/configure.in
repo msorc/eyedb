@@ -590,7 +590,13 @@ echo
 echo "  EyeDB will be compiled with the following options:"
 echo 
 echo "  *** EyeDB Core ***" 
-echo "  Prefix where EyeDB will be installed: ${prefix:-none}"
+echo "  EyeDB will be installed in: ${prefix:-none}"
+V=${eyedb_databasedir}; while echo $V | grep '\$' > /dev/null 2>&1; do V=$(eval echo $V) ; done
+echo "  EyeDB databases will be in: $V"
+V=${eyedb_pipedir}; while echo $V | grep '\$' > /dev/null 2>&1; do V=$(eval echo $V) ; done
+echo "  EyeDB pipes will be in: $V"
+V=${eyedb_tmpdir}; while echo $V | grep '\$' > /dev/null 2>&1; do V=$(eval echo $V) ; done
+echo "  EyeDB temporary files will be in: $V"
 echo "  C++ compiler: ${CXX:-none}"
 echo "  C++ compiler flags: ${CXXFLAGS:-none}"
 echo "  Compile with debug: ${enable_debug:-no}"
