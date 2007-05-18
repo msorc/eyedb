@@ -39,7 +39,7 @@ CMDCLASS_GETOPT(DBSDeleteCmd, "delete");
 // will be put un eyedbdbminit with options
 //CMDCLASS(DBSDBMCreateCmd, "dbmcreate");
 
-CMDCLASS(DBSListCmd, "list");
+CMDCLASS_GETOPT(DBSListCmd, "list");
 CMDCLASS(DBSMoveCmd, "move");
 CMDCLASS(DBSCopyCmd, "copy");
 CMDCLASS(DBSRenameCmd, "rename");
