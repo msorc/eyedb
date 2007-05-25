@@ -524,7 +524,8 @@ namespace eyedbsm {
     for (s = start + ns/BITS_PER_BYTE,
 	   nb = (ns/BITS_PER_BYTE)*BITS_PER_BYTE; s < end; s++)
       {
-	if (nb > lastbusy)
+	// EV patch 26/04/07
+	if (nb >= lastbusy)
 	  return INVALID_NS;
 
 	char v = *s;

@@ -605,6 +605,54 @@ const char *getOP(const char *s, unsigned int &offset)
 }
 
 /// ---- end of factorization
+
+static unsigned getListOptions(const GetOpt::Map &map)
+{
+  unsigned int options = 0;
+
+  if (map.find(DBNAME_OPT) != map.end()) {
+    options |= DBNAME_FLG;
+  }
+
+  if (map.find(DBID_OPT) != map.end()) {
+    options |= DBID_FLG;
+  }
+
+  if (map.find(DBFILE_OPT) != map.end()) {
+    options |= DBFILE_FLG;
+  }
+
+  if (map.find(MAXOBJCNT_OPT) != map.end()) {
+    options |= MAXOBJCNT_FLG;
+  }
+
+  if (map.find(DATAFILES_OPT) != map.end()) {
+    options |= DATAFILES_FLG;
+  }
+
+  if (map.find(DEFACCESS_OPT) != map.end()) {
+    options |= DEFACCESS_FLG;
+  }
+
+  if (map.find(USERACCESS_OPT) != map.end()) {
+    options |= USERACCESS_FLG;
+  }
+
+  if (map.find(STATS_OPT) != map.end()) {
+    options |= STATS_FLG;
+  }
+
+  if (map.find(ALL_OPT) != map.end()) {
+    options |= ALL_FLG;
+  }
+
+  if (!options) {
+    options = ALL_FLG;
+  }
+
+  return options;
+}
+
 int DBSListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
   bool r = getopt->parse(PROG_NAME, argv);
@@ -619,42 +667,12 @@ int DBSListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
     return usage();
   }
 
-  unsigned int options = 0;
-  if (map.find(DBNAME_OPT) != map.end()) {
-    options |= DBNAME_FLG;
-  }
-  if (map.find(DBID_OPT) != map.end()) {
-    options |= DBID_FLG;
-  }
-  if (map.find(DBFILE_OPT) != map.end()) {
-    options |= DBFILE_FLG;
-  }
-  if (map.find(MAXOBJCNT_OPT) != map.end()) {
-    options |= MAXOBJCNT_FLG;
-  }
-  if (map.find(DATAFILES_OPT) != map.end()) {
-    options |= DATAFILES_FLG;
-  }
-  if (map.find(DEFACCESS_OPT) != map.end()) {
-    options |= DEFACCESS_FLG;
-  }
-  if (map.find(USERACCESS_OPT) != map.end()) {
-    options |= USERACCESS_FLG;
-  }
-  if (map.find(STATS_OPT) != map.end()) {
-    options |= STATS_FLG;
-  }
-  if (map.find(ALL_OPT) != map.end()) {
-    options |= ALL_FLG;
-  }
-
-  if (!options) {
-    options = ALL_FLG;
-  }
-
+  // not correct: in case of no argument, must list all databases
   if (argv.size() < 1) {
     return usage();
   }
+
+  unsigned int options = getListOptions(map);;
 
   conn.open();
 
