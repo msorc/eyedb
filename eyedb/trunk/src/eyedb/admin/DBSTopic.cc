@@ -790,3 +790,4 @@ int DBSDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   return 0;
 }
+
