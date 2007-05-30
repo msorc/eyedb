@@ -8,7 +8,7 @@ EV(2):
 EV(3):
   X eyedbadmin database list <options>
 EV(4):
-  eyedbadmin database rename <options>
+  X eyedbadmin database rename <options>
 EV(5):
   eyedbadmin datafile create <options>
 EV(6):

@@ -666,9 +666,8 @@ int DBSListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
     return usage();
   }
 
-  // not correct: in case of no argument, must list all databases
-  if (argv.size() < 1) {
-    return usage();
+  if (argv.size() == 0) {
+    argv.push_back("~");
   }
 
   unsigned int options = getListOptions(map);;
@@ -722,12 +721,72 @@ int DBSListCmd::help()
   return 1;
 }
 
+void DBSRenameCmd::init()
+{
+  std::vector<Option> opts;
+
+  opts.push_back(HELP_OPT);
+
+  getopt = new GetOpt(getExtName(), opts);
+}
+
+int DBSRenameCmd::usage()
+{
+  getopt->usage("", "");
+
+  std::cerr << " <dbname> <new_dbname>\n";
+
+  return 1;
+}
+
+int DBSRenameCmd::help()
+{
+  stdhelp();
+
+  getopt->displayOpt("<dbname>    ", "Database to rename");
+  getopt->displayOpt("<new_dbname>", "New database name");
+
+  return 1;
+}
+
+int DBSRenameCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+{
+  bool r = getopt->parse(PROG_NAME, argv);
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end()) {
+    return help();
+  }
+
+  if (!r) {
+    return usage();
+  }
+
+  if (argv.size() != 2) {
+    return usage();
+  }
+
+  conn.open();
+
+  std::string dbname = argv[0];
+  std::string new_dbname = argv[1];
+
+  if (dbname == new_dbname)
+    return 0;
+
+  Database *db = new Database(dbname.c_str());
+  //  db->rename(&conn, new_dbname.c_str(), (const char *)0, (const char *)0);
+  db->rename(&conn, new_dbname.c_str());
+
+  return 0;
+}
+
 void DBSDeleteCmd::init()
 {
   std::vector<Option> opts;
 
   opts.push_back(HELP_OPT);
-  //  opts.push_back(HELP_COMMON_OPT);
 
   getopt = new GetOpt(getExtName(), opts);
 }

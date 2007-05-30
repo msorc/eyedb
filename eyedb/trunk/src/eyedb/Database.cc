@@ -1004,6 +1004,8 @@ if ((mode) !=  NoDBAccessMode && \
     if (!dbmdb_str)
       return invalidDbmdb(IDB_DATABASE_RENAME_ERROR);
 
+    check_auth(user, passwd, "renaming database");
+
     RPCStatus rpc_status;
 
     rpc_status = dbRename(ConnectionPeer::getConnH(_conn), dbmdb_str,
@@ -1059,7 +1061,7 @@ if ((mode) !=  NoDBAccessMode && \
     if (!conn)
       return Exception::make(IDB_DATABASE_RENAME_ERROR, "connection is not set");
 
-    check_auth(user, passwd, "renaming database");
+    //check_auth(user, passwd, "renaming database");
 
     return rename(conn, newdbname, user, passwd);
   }

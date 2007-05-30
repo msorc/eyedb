@@ -42,7 +42,7 @@ CMDCLASS_GETOPT(DBSDeleteCmd, "delete");
 CMDCLASS_GETOPT(DBSListCmd, "list");
 CMDCLASS(DBSMoveCmd, "move");
 CMDCLASS(DBSCopyCmd, "copy");
-CMDCLASS(DBSRenameCmd, "rename");
+CMDCLASS_GETOPT(DBSRenameCmd, "rename");
 CMDCLASS(DBSDefAccessCmd, "defaccess");
 CMDCLASS(DBSExportCmd, "export");
 CMDCLASS(DBSImportCmd, "import");
