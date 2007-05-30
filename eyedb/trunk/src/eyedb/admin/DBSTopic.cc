@@ -59,25 +59,7 @@ DBSTopic::DBSTopic() : Topic("database")
   addCommand(new DBSImportCmd(this));
 }
 
-static const std::string DBFILE_OPT = "dbfile";
-static const std::string FILEDIR_OPT = "filedir";
-static const std::string MAXOBJCNT_OPT = "max-object-count";
-static const std::string DBNAME_OPT = "dbname";
-static const std::string DBID_OPT = "dbid";
-static const std::string DATAFILES_OPT = "datafiles";
-static const std::string DEFACCESS_OPT = "defaccess";
-static const std::string USERACCESS_OPT = "useraccess";
-static const std::string ALL_OPT = "all";
-static const std::string STATS_OPT = "stats";
 
-static const char DBS_EXT[] = ".dbs";
-static const char DAT_EXT[] = ".dat";
-
-static const int ONE_K = 1024;
-static const int DEFAULT_DATSIZE = 2048;
-static const int DEFAULT_DATSZSLOT = 16;
-static const char DEFAULT_DATNAME[] = "DEFAULT";
-static const unsigned int DEFAULT_DATOBJCNT = 10000000;
 
 void DBSCreateCmd::init()
 {
@@ -159,18 +141,18 @@ int DBSCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
     d->nbobjs = atoi(map[MAXOBJCNT_OPT].value.c_str());
   }
   else
-    d->nbobjs = DEFAULT_DATOBJCNT;
+    d->nbobjs = DEFAULT_MAXOBJCNT;
 
   d->ndat = 1;
   eyedbsm::Datafile *dat = &d->dat[0];
 
   std::string datfile = dbname + DAT_EXT;
   strcpy(dat->file, datfile.c_str());
-  strcpy(dat->name, DEFAULT_DATNAME);
-  d->dat[0].maxsize = DEFAULT_DATSIZE * ONE_K;
+  strcpy(dat->name, DEFAULT_DTFNAME);
+  d->dat[0].maxsize = DEFAULT_DTFSIZE * ONE_K;
 
   dat->mtype = eyedbsm::BitmapType;
-  dat->sizeslot = DEFAULT_DATSZSLOT;
+  dat->sizeslot = DEFAULT_DTFSZSLOT;
   dat->dtype = eyedbsm::LogicalOidType;
 
   dat->dspid = 0;

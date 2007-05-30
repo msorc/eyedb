@@ -32,12 +32,12 @@ public:
   DTFTopic();
 };
 
-CMDCLASS(DTFCreateCmd, "create");
-CMDCLASS(DTFDeleteCmd, "delete");
+CMDCLASS_GETOPT(DTFCreateCmd, "create");
+CMDCLASS_GETOPT(DTFDeleteCmd, "delete");
 CMDCLASS(DTFMoveCmd, "move");
 CMDCLASS(DTFResizeCmd, "resize");
 CMDCLASS(DTFDefragmentCmd, "defragment");
-CMDCLASS(DTFListCmd, "list");
+CMDCLASS_GETOPT(DTFListCmd, "list");
 CMDCLASS(DTFRenameCmd, "rename");
 
 #endif
