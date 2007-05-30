@@ -39,12 +39,12 @@ static const std::string USERACCESS_OPT = "useraccess";
 static const std::string ALL_OPT = "all";
 static const std::string STATS_OPT = "stats";
 
-static const char DBS_EXT[] = ".dbs";
-static const char DAT_EXT[] = ".dat";
+static const std::string DBS_EXT = ".dbs";
+static const std::string DTF_EXT = ".dat";
 
-static const int ONE_K = 1024;
-static const int DEFAULT_DTFSIZE = 2048;
-static const int DEFAULT_DTFSZSLOT = 16;
+static const unsigned int ONE_K = 1024;
+static const unsigned int DEFAULT_DTFSIZE = 2048;
+static const unsigned int DEFAULT_DTFSZSLOT = 16;
 static const char DEFAULT_DTFNAME[] = "DEFAULT";
 static const unsigned int DEFAULT_MAXOBJCNT = 10000000;
 

@@ -146,7 +146,7 @@ int DBSCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   d->ndat = 1;
   eyedbsm::Datafile *dat = &d->dat[0];
 
-  std::string datfile = dbname + DAT_EXT;
+  std::string datfile = dbname + DTF_EXT;
   strcpy(dat->file, datfile.c_str());
   strcpy(dat->name, DEFAULT_DTFNAME);
   d->dat[0].maxsize = DEFAULT_DTFSIZE * ONE_K;
