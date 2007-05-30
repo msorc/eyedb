@@ -546,6 +546,8 @@ src/bindings/Makefile
 src/bindings/python/Makefile
 src/eyedb/Makefile
 src/eyedb/admin/Makefile
+src/commands/Makefile
+src/commands/server/Makefile
 src/eyedbsm/Makefile
 src/java/Makefile
 src/java/src/Makefile
