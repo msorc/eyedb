@@ -24,6 +24,7 @@
 #ifndef _EYEDB_ADMIN_TOPIC_H
 #define _EYEDB_ADMIN_TOPIC_H
 
+#include "Const.h"
 #include "Command.h"
 #include "../GetOpt.h"
 
