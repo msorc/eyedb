@@ -24,7 +24,6 @@
 #include "eyedbconfig.h"
 #include <eyedb/eyedb.h>
 #include "eyedb/DBM_Database.h"
-//#include <eyedb/opts.h>
 
 using namespace eyedb;
 
@@ -44,63 +43,72 @@ static const unsigned int DEFAULT_DATOBJCNT = 10000000;
 //    echo ==== Setting EYEDBDBM database permissions
 //    $bindir/eyedbadmin dbaccess EYEDBDBM r --user=@
 
-#if 0
-// from old eyedbadmin
-static int
-dbmcreate_realize(char *username, char *passwd, char *dbfile, char *datafiles[], int datafiles_cnt)
-{
-  if (dbfile)
-    return usage(prog);
-
-  DbCreateDescription dbdesc;
-
-  DBM_Database *dbm = new DBM_Database(dbmdb);
-
-  if (dbcreate_prologue(dbm, DBM_Database::getDbName(), dbfile,
-			datafiles, datafiles_cnt, (const char *)0, &dbdesc))
-    return 1;
-
-  Status status = dbm->create(conn, passwdauth, username, passwd, &dbdesc);
-
-  CHECK(status);
-  return 0;
-}
-#endif
-
 static int
 help()
 {
-  std::cerr << "Create the EyeDB EYEDBDBM system database.";
-  std::cerr << "This command must be run once after installing EyeDB";
+  std::cerr << "Usage: " + PROG_NAME + "[--help]" << std::endl;
+  std::cerr << "Create the EyeDB EYEDBDBM system database." << std::endl;
+  std::cerr << std::endl;
+  std::cerr << "This command must be run once after installing EyeDB" << std::endl;
+  std::cerr << std::endl;
+  std::cerr << "  --help    display this help and exit" << std::endl;
+  std::cerr << std::endl;
+
   return 1;
 }
 
-static int
-initdbm_perform( eyedb::Connection &conn, std::vector<std::string> &argv)
+static const char datext[] = ".dat";
+
+static std::string
+getDatafile(const char *dbfile)
 {
-#if 0
-  bool r = getopt->parse(PROG_NAME, argv);
+  const char *start = strrchr(dbfile, '/');
+  const char *end   = strrchr(dbfile, '.'); 
+ 
+  if (!start) 
+    start = dbfile;
+  else 
+    start++; 
+  
+  if (!end) 
+    end = &dbfile[strlen(dbfile)-1]; 
+  else 
+    end--; 
+ 
+  int len = end-start+1;
+  char *s = new char[len+strlen(datext)+1];
+  strncpy(s, &dbfile[start - dbfile], len);
+  s[len] = 0; 
+  strcat(s, datext);
+  std::string datafile = s;
+  delete [] s;
+  return datafile;
+}
 
-  GetOpt::Map &map = getopt->getMap();
+static int
+initdbm()
+{
+  Connection *conn = new Connection();
+  conn->open();
 
-  if (map.find("help") != map.end()) {
-    return help();
-  }
-#endif
-
-  conn.open();
+  std::string user = Connection::makeUser("@");
+  char *username = strdup(user.c_str());
+  char *passwd = (char *)strict_unix_user;
+  char *passwdauth = "";
 
   DBM_Database *dbm = new DBM_Database( Database::getDefaultDBMDB());
 
+  const char *dbname = DBM_Database::getDbName();
+  const char *dbfile = strdup(Database::getDefaultServerDBMDB());
+
   DbCreateDescription dbdesc;
 
-  strcpy( dbdesc.dbfile, Database::getDefaultServerDBMDB());
+  strcpy( dbdesc.dbfile, dbfile);
   dbdesc.sedbdesc.dbid = 0;
   dbdesc.sedbdesc.nbobjs = DEFAULT_DATOBJCNT;
   dbdesc.sedbdesc.ndat = 1;
 
-  // FIXME
-  std::string datfile = std::string("dbmdb") + DAT_EXT;
+  std::string datfile = getDatafile(dbfile);
   strcpy( dbdesc.sedbdesc.dat[0].file, datfile.c_str());
   strcpy( dbdesc.sedbdesc.dat[0].name, DEFAULT_DATNAME);
   dbdesc.sedbdesc.dat[0].maxsize = DEFAULT_DATSIZE * ONE_K;
@@ -109,8 +117,13 @@ initdbm_perform( eyedb::Connection &conn, std::vector<std::string> &argv)
   dbdesc.sedbdesc.dat[0].dtype = eyedbsm::LogicalOidType;
   dbdesc.sedbdesc.dat[0].dspid = 0;
 
-  // FIXME
-  //  dbm->create(&conn, passwdauth, username, passwd, &dbdesc);
+  Status status = dbm->create(conn, passwdauth, username, passwd, &dbdesc);
+
+  if (status) {
+    std::cerr << PROG_NAME << ":";
+    status->print();
+    return 1;
+  }
 
   return 0;
 }
@@ -120,21 +133,12 @@ main(int c_argc, char *c_argv[])
 {
   eyedb::init(c_argc, c_argv);
 
-  std::vector<std::string> argv;
-  for (int n = 1; n < c_argc; n++)
-    argv.push_back(c_argv[n]);
+  if (c_argc == 2 && !strcmp(c_argv[1], "--help"))
+    return help();
+  else if (c_argc != 1)
+    return help();
 
-  Exception::setMode(Exception::ExceptionMode);
+  //  Exception::setMode(Exception::ExceptionMode);
 
-  try {
-    Connection conn;
-
-    return initdbm_perform(conn, argv);
-  }
-  catch(Exception &e) {
-    std::cerr << e << std::endl;
-    return 1;
-  }
-
-  return 0;
+  return initdbm();
 }
