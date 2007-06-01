@@ -86,11 +86,20 @@ getDatafile(const char *dbfile)
 }
 
 static int
-initdbm()
+check_status( Status status)
 {
-  Connection *conn = new Connection();
-  conn->open();
+  if (status) {
+    std::cerr << PROG_NAME << ":";
+    status->print();
+    return 1;
+  }
 
+  return 0;
+}
+
+static int
+initdbm( Connection *conn)
+{
   std::string user = Connection::makeUser("@");
   char *username = strdup(user.c_str());
   char *passwd = (char *)strict_unix_user;
@@ -119,13 +128,23 @@ initdbm()
 
   Status status = dbm->create(conn, passwdauth, username, passwd, &dbdesc);
 
-  if (status) {
-    std::cerr << PROG_NAME << ":";
-    status->print();
-    return 1;
-  }
+  return check_status( status);
+}
 
-  return 0;
+static int
+dbmaccess( Connection *conn)
+{
+  char userauth[64];
+  char passwdauth[64];
+
+  strcpy( userauth, Connection::getDefaultUser());
+  strcpy( passwdauth, Connection::getDefaultPasswd());
+
+  Database *db = new Database( "EYEDBDBM", Database::getDefaultDBMDB());
+
+  Status status = db->setDefaultDBAccess(conn, ReadDBAccessMode, userauth, passwdauth);
+
+  return check_status(status);
 }
 
 int
@@ -140,5 +159,14 @@ main(int c_argc, char *c_argv[])
 
   //  Exception::setMode(Exception::ExceptionMode);
 
-  return initdbm();
+  Connection *conn = new Connection();
+  conn->open();
+
+  if (!initdbm( conn))
+    return 1;
+
+  if (!dbmaccess( conn))
+    return 1;
+
+  return 0;
 }
