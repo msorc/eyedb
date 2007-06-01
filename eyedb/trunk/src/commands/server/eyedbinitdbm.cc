@@ -162,10 +162,10 @@ main(int c_argc, char *c_argv[])
   Connection *conn = new Connection();
   conn->open();
 
-  if (!initdbm( conn))
+  if (initdbm( conn))
     return 1;
 
-  if (!dbmaccess( conn))
+  if (dbmaccess( conn))
     return 1;
 
   return 0;
