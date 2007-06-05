@@ -16,6 +16,7 @@ eyedbadmin2_LDADD= $(EYEDBCLLIBS)
 
 noinst_HEADERS= \
 Command.h \
+Const.h \
 DBSTopic.h \
 DSPTopic.h \
 DTFTopic.h \

@@ -114,6 +114,9 @@ int DTFCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   std::string dbname = argv[0];
 
   Database *db = new Database(dbname.c_str());
+  db->open(&conn);
+
+  db->transactionBeginExclusive();
 
   const char *filedir;
   if (map.find(FILEDIR_OPT) != map.end()) {
@@ -128,7 +131,7 @@ int DTFCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
     filename = map[FILENAME_OPT].value.c_str();
   }
   else {
-    filename = 0;
+    filename = "";
   }
 
   const char *name;
@@ -136,7 +139,7 @@ int DTFCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
     name = map[NAME_OPT].value.c_str();
   }
   else {
-    name = 0;
+    name = "";
   }
 
   unsigned int size;
@@ -164,6 +167,8 @@ int DTFCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   }
 
   db->createDatafile(filedir, filename, name, size, slotsize, dtfType);
+
+  db->transactionCommit();
 
   return 0;
 }
