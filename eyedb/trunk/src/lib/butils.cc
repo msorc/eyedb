@@ -52,7 +52,7 @@ namespace eyedblib {
     static char *buffer[NBUFS];
 
     MutexLocker _(mt);
-    int which, n;
+    int n;
     int argstr_cnt = 0;
     int argint_cnt = 0;
     int arg_cnt = 0;
@@ -167,18 +167,17 @@ namespace eyedblib {
 	  (void)va_arg(ap, int);
       }
 
-    which = buffer_which;
-    if (which >= NBUFS)
-      which = 0;
+    if (buffer_which >= NBUFS)
+      buffer_which = 0;
 
-    if (len+1 >= buffer_len[which])
+    if (len+1 >= buffer_len[buffer_which])
       {
-	free(buffer[which]);
-	buffer_len[which] = len + 128;
-	buffer[which] = (char *)malloc(buffer_len[which]);
+	free(buffer[buffer_which]);
+	buffer_len[buffer_which] = len + 128 + 1024; // test
+	buffer[buffer_which] = (char *)malloc(buffer_len[buffer_which]);
       }
 
-    return buffer[which++];
+    return buffer[buffer_which++];
   }
 
   void display_time(const char *fmt, ...)

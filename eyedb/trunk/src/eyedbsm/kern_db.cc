@@ -797,6 +797,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 #if 1
     sparsify = 0; // 27/08/03 : no more need for sparsification
 #endif
+
     errno = 0;
 
 #ifdef MVCP_TRACE

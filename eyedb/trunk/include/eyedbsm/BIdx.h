@@ -397,7 +397,15 @@ namespace eyedbsm {
        @param key
        @return
     */
-    eyedbsm::Status next(eyedbsm::Boolean * found, void * data = 0, Idx::Key * key = 0);
+    Status next(eyedbsm::Boolean * found, void * data = 0, Idx::Key * key = 0);
+
+    /**
+       Not yet documented
+       @param found_cnt
+       @param key
+       @return
+    */
+    Status next(unsigned int *found_cnt, Idx::Key *key = 0);
 
     ~BIdxCursor();
   };

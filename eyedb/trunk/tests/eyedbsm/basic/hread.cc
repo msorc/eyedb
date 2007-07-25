@@ -79,6 +79,11 @@ read_hash(void *x)
     eyedbsm::Boolean found;
     eyedbsm::Oid oid;
     s = c.next(&found, &oid, &key);
+    if (s) {
+      eyedbsm::statusPrint(s, "getting next");
+      break;
+    }
+
     if (!found)
       break;
 
@@ -90,6 +95,34 @@ read_hash(void *x)
   }
 
   printf("%d found\n", count);
+
+#if 1
+  eyedbsm::HIdxCursor c1(&hidx);
+  count = 0;
+  for (;;) {
+    eyedbsm::Idx::Key key;
+    unsigned int found_cnt;
+    s = c1.next(&found_cnt, &key);
+    if (s) {
+      eyedbsm::statusPrint(s, "getting next");
+      break;
+    }
+
+    if (!found_cnt)
+      break;
+
+    count += found_cnt;
+
+    if (o_verbose) {
+      printf("keydata [%d]\n\t", found_cnt);
+      o_trace_data(kt, (char *)key.getKey(), eyedbsm::False);
+      printf("\n");
+    }
+  }
+
+  printf("%d found\n", count);
+#endif
+
   o_count = count;
   if (getenv("DUMPMAP"))
     hidx.dumpMemoryMap();

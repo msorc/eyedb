@@ -73,6 +73,8 @@ namespace eyedbsm {
 //#define TRACE_HIDX
 //#define ESM_HIDX_REGISTER
 
+#define VARSZ_DATACNT
+
 #define NEW_HASH_KEY
 #define NEW_HASH_KEY_VERSION 206004
 
@@ -84,7 +86,7 @@ namespace eyedbsm {
   extern Boolean backend_interrupt;
 
 #define data_group_sz(I, THIS) \
- sizeof(unsigned int) + (I) * (THIS)->hidx.datasz
+ (THIS)->data_grouped_sizeof + (I) * (THIS)->hidx.datasz
 
 static void
 dump_keytype(const char *msg, const Idx::KeyType &keytype,
@@ -291,6 +293,11 @@ static Boolean _isDataGroupedByKey(const HIdx::_Idx &hidx)
   return (hidx.impl_hints[HIdx::DataGroupedByKey_Hints] != 0) ? True : False;
 }
 
+static unsigned int _dataGroupedByKeySize(const HIdx::_Idx &hidx)
+{
+  return (unsigned int)hidx.impl_hints[HIdx::DataGroupedByKey_Hints];
+}
+
 void
 HIdx::init(DbHandle *_dbh, unsigned int _keytype,
 	      unsigned int keysz, unsigned int offset,
@@ -400,6 +407,7 @@ HIdx::init(DbHandle *_dbh, unsigned int _keytype,
   delete [] chds;
   uextend = _isUExtend(hidx);
   data_grouped_by_key = _isDataGroupedByKey(hidx);
+  data_grouped_sizeof = _dataGroupedByKeySize(hidx);
 }
 
 HIdx::HIdx(DbHandle *_dbh, KeyType _keytype,
@@ -478,6 +486,7 @@ HIdx::HIdx(DbHandle *_dbh, const Oid *_oid,
   bsize = hidx.impl_hints[IniSize_Hints];
   uextend = _isUExtend(hidx);
   data_grouped_by_key = _isDataGroupedByKey(hidx);
+  data_grouped_sizeof = _dataGroupedByKeySize(hidx);
 }
 
 #ifdef NEW_HASH_KEY
@@ -2045,7 +2054,13 @@ HIdx::insert_perform(const void *key, const void *xdata, unsigned int datasz)
 #endif
     memcpy(rdata + data_group_sz(datacnt, this), xdata, hidx.datasz);
     ++datacnt;
+#ifdef VARSZ_DATACNT
+    s = h2x_datacnt_cpy(rdata, &datacnt);
+    if (s)
+      return s;
+#else
     h2x_32_cpy(rdata, &datacnt);
+#endif
     xdata = (const void *)rdata;
     datasz = data_group_sz(datacnt, this);
     
@@ -2384,7 +2399,13 @@ HIdx::remove(const void *key, const void *xdata, Boolean *found)
       memmove(rdata + data_group_sz(found_idx, this),
 	      rdata + data_group_sz(found_idx + 1, this),
 	      (datacnt - found_idx) * hidx.datasz);
+#ifdef VARSZ_DATACNT
+      s = h2x_datacnt_cpy(rdata, &datacnt);
+      if (s)
+	return s;
+#else
       h2x_32_cpy(rdata, &datacnt);
+#endif
 #ifdef TRACE_DGK
       printf("insert_perforn(%d)\n", data_group_sz(datacnt, this));
 #endif
@@ -2491,7 +2512,13 @@ HIdx::remove_perform(const void *key, const void *xdata, Boolean *found, unsigne
 	    if (prdata) {
 	      assert(data_grouped_by_key);
 	      assert(pdatacnt);
+#ifdef VARSZ_DATACNT
+	      s = x2h_datacnt_cpy(pdatacnt, (unsigned char *)(curcell + get_off(curcell, this)));
+	      if (s)
+		return s;
+#else
 	      x2h_32_cpy(pdatacnt, curcell + get_off(curcell, this));
+#endif
 #ifdef TRACE_DGK
 	      printf("DATACNT %d\n", *pdatacnt);
 #endif
@@ -2695,137 +2722,6 @@ static void adapt(unsigned char *&clist_data, unsigned int &clist_data_size,
   }
 }
 
-#if 0
-Status
-HIdx::collapse()
-{
-  IdxLock lockx(dbh, treeoid);
-  Status s = lockx.lock();
-  if (s)
-    return s;
-
-  for (unsigned int chd_k = 0; chd_k < hidx.key_count; chd_k++) {
-    HIdx::CListHeader chd;
-    s = readCListHeader(chd_k, chd);
-    if (s)
-      return s;
-
-    unsigned int clistobj_cnt = 0;
-    Oid koid = chd.clobj_first;
-    std::vector<Oid> oid_v;
-    if (koid.getNX()) {
-      printf("Key #%d {\n", chd_k);
-      unsigned int total_busy_size = 0;
-      unsigned int total_free_size = 0;
-      unsigned int clist_data_size = 0;
-      unsigned int clist_data_alloc_size = 0;
-      unsigned char *clist_data = 0;
-      adapt(clist_data, clist_data_size, clist_data_alloc_size, sizeof(CListObjHeader));
-      clist_data_size = sizeof(CListObjHeader);
-
-      while (koid.getNX()) {
-	oid_v.push_back(koid);
-	unsigned int busy_size = 0;
-	unsigned int free_size = 0;
-	unsigned int cell_cnt = 0;
-	unsigned int sz = 0;
-	s = objectSizeGet(dbh, &sz, DefaultLock, &koid);
-	if (s)
-	  return s;
-	unsigned char *clistobj_data = new unsigned char[sz];
-	CListObjHeader h;
-	s = objectRead(dbh, 0, 0, clistobj_data, DefaultLock, 0, 0, &koid);
-	if (s)
-	  return s;
-	unsigned char *d, *edata = clistobj_data + sz;
-	for (d = clistobj_data + sizeof(CListObjHeader); d < edata; ) {
-	  CellHeader o;
-	  mcp(&o, d, sizeof(CellHeader));
-	  x2h_overhead(&o);
-	  if (!o.free) {
-	    total_busy_size += o.size;
-	    busy_size += o.size;
-	    unsigned int cpsize = o.size + sizeof(CellHeader);
-	    adapt(clist_data, clist_data_size, clist_data_alloc_size, cpsize);
-	    memcpy(clist_data + clist_data_size, d, cpsize);
-	    clist_data_size += cpsize;
-	  }
-	  else {
-	    total_free_size += o.size;
-	    free_size += o.size;
-	  }
-
-	  d += sizeof(CellHeader);
-	  d += o.size;
-	  cell_cnt++;
-	}
-
-	printf("  KOID %s [%d b] {\n", getOidString(&koid), sz);
-	printf("    cell_cnt: %d\n", cell_cnt);
-	printf("    busy_size: %u b\n", busy_size);
-	printf("    free_size: %u b\n", free_size);
-	printf("  }\n");
-
-	memcpy(&h, clistobj_data, sizeof(h));
-	x2h_header(&h);
-	koid = h.clobj_next;
-	delete [] clistobj_data;
-	clistobj_cnt++;
-      }
-      
-      if (clistobj_cnt > 1 && total_free_size != 0) {
-	CListObjHeader h;
-	memset(&h, 0, sizeof(h));
-	h.free_cnt = 0;
-	h.alloc_cnt = 1;
-	h.free_whole = 0;
-	h.cell_free_first = NullOffset;
-	CListObjHeader xh;
-	h2x_header(&xh, &h);
-	memcpy(clist_data, &xh, sizeof(xh));
-	
-	memset(&chd, 0, sizeof(chd));
-	s = objectCreate(dbh, clist_data, clist_data_size, hidx.dspid,
-			 &chd.clobj_first);
-	if (s)
-	  return s;
-	
-	chd.clobj_last = chd.clobj_last;
-	
-	s = writeCListHeader(chd_k, chd);
-	if (s)
-	  return s;
-	printf("  collapse oids: %s\n", getOidString(&chd.clobj_first));
-	std::vector<Oid>::iterator begin = oid_v.begin();
-	std::vector<Oid>::iterator end = oid_v.end();
-	unsigned int del_obj_cnt = 0;
-	while (begin != end) {
-	  s = objectDelete(dbh, &(*begin));
-	  if (s)
-	    return s;
-	  ++begin;
-	  del_obj_cnt++;
-	}
-	printf("  deleted obj: %d\n", del_obj_cnt);
-      }
-      else
-	printf("  NO COLLAPSE\n");
-
-      // must delete all koid
-      delete [] clist_data;
-      printf("  clistobj_cnt: %u\n", clistobj_cnt);
-      printf("  total_busy_size: %u b\n", total_busy_size);
-      printf("  total_free_size: %u b\n", total_free_size);
-      printf("  clist_data_size: %u\n", clist_data_size);
-      printf("  clist_data_alloc_size: %u\n", clist_data_alloc_size);
-      printf("}\n");
-    }
-  }
-
-  return Success;
-}
-#endif
-
 Status
 HIdx::collapse()
 {
@@ -3002,7 +2898,7 @@ Status HIdx::searchAny(const void *key, Boolean *found, void *xdata)
   Status s = search_realize(key, &found_cnt, True, xdata);
   if (s)
     return s;
-    *found = (found_cnt != 0) ? eyedbsm::True : eyedbsm::False;
+  *found = (found_cnt != 0) ? eyedbsm::True : eyedbsm::False;
   return Success;
 }
 
@@ -3070,9 +2966,15 @@ Status HIdx::search_realize(const void *key, unsigned int *found_cnt, Boolean fo
 	unsigned int offset;
 	if (data_grouped_by_key) {
 	  unsigned int datacnt;
+#ifdef VARSZ_DATACNT
+	  s = x2h_datacnt_cpy(&datacnt, (unsigned char *)(d + get_off(d, this)));
+	  if (s)
+	    return s;
+#else
 	  x2h_32_cpy(&datacnt, d + get_off(d, this));
+#endif
 	  *found_cnt += datacnt;
-	  offset = sizeof(datacnt);
+	  offset = data_grouped_sizeof;
 #if 0
 	  for (unsigned int n = 0; n < datacnt; n++) {
 	    if (hidx.datasz == sizeof(Oid)) { // perharps an Oid
@@ -3232,7 +3134,13 @@ HIdx::getHashObjectBusySize(const Oid *koid, unsigned int &osize, unsigned int &
       osize += sizeof(CellHeader) + to.size;
       if (data_grouped_by_key) {
 	unsigned int datacnt;
+#ifdef VARSZ_DATACNT
+	s = x2h_datacnt_cpy(&datacnt, (unsigned char *)(data + cur + get_off(data + cur, this)));
+	if (s)
+	  return s;
+#else
 	x2h_32_cpy(&datacnt, data + cur + get_off(data + cur, this));
+#endif
 	count += datacnt;
       }
       else
@@ -3858,9 +3766,30 @@ void HIdxCursor::append_next(void *data, Idx::Key *key, unsigned int n)
 }
 
 Status
+HIdxCursor::next(unsigned int *found_cnt, Idx::Key *key)
+{
+  if (!idx->isDataGroupedByKey()) {
+    *found_cnt = 0;
+    // for now
+    return statusMake(ERROR, "cannot use this type of cursor on non data_grouped_by_key hash index");
+  }
+
+  Boolean found;
+  return next(&found, found_cnt, 0, key);
+}
+
+Status
 HIdxCursor::next(Boolean *found, void *data, Idx::Key *key)
 {
+  return next(found, 0, data, key);
+}
+
+Status
+HIdxCursor::next(Boolean *found, unsigned int *found_cnt, void *data, Idx::Key *key)
+{
   if (!state) {
+    if (found_cnt)
+      *found_cnt = 0;
     *found = False;
     return Success;
   }
@@ -3893,6 +3822,8 @@ HIdxCursor::next(Boolean *found, void *data, Idx::Key *key)
 #ifdef NEW_WAIT
       if (perf_end_cnt == perf_cnt) {
 	thrpool->waitAll();
+	if (found_cnt)
+	  *found_cnt = 0;
 	*found = False;
 	return Success;
       }
@@ -3923,6 +3854,8 @@ HIdxCursor::next(Boolean *found, void *data, Idx::Key *key)
       }
       else if (cond) { // all performers have finished
 	thrpool->waitAll();
+	if (found_cnt)
+	  *found_cnt = 0;
 	*found = False;
 	return Success;
       }
@@ -3937,12 +3870,19 @@ HIdxCursor::next(Boolean *found, void *data, Idx::Key *key)
       return s;
     
     if (eox) {
+      if (found_cnt)
+	*found_cnt = 0;
       *found = False;
       return Success;
     }
   }
 
-  if (++idata < datacnt) {
+  if (found_cnt) {
+    cur += jumpsize;
+    datacnt = 0;
+    jumpsize = 0;
+  }
+  else if (++idata < datacnt) {
 #ifdef TRACE_DGK
     printf("...CURSOR DATACNT %d idata=%d\n", datacnt, idata);
 #endif
@@ -3980,6 +3920,9 @@ HIdxCursor::next(Boolean *found, void *data, Idx::Key *key)
 	      cur += o.size; // 23/12/01: was not test with this statement
 	      continue;
 	    }
+
+	    if (found_cnt)
+	      *found_cnt = 0;
 	    *found = False;
 	    return Success;
 	  }
@@ -3991,44 +3934,28 @@ HIdxCursor::next(Boolean *found, void *data, Idx::Key *key)
 	}
 
 	if (idx->isDataGroupedByKey()) {
+#ifdef VARSZ_DATACNT
+	  Status s = idx->x2h_datacnt_cpy(&datacnt, (unsigned char *)(cur + get_off(cur, idx)));
+	  if (s)
+	    return s;
+#else
 	  x2h_32_cpy(&datacnt, cur + get_off(cur, idx));
+#endif
 	  idata = 0;
 #ifdef TRACE_DGK
 	  printf("CURSOR DATACNT %d idata=%d\n", datacnt, idata);
 #endif
 	  jumpsize = o.size;
 	}
+	else
+	  datacnt = 1;
+
+	if (found_cnt)
+	  *found_cnt = datacnt;
 
 	*found = True;
 	append_next(data, key, 0);
-#if 0
-	int off = get_off(cur, idx);
 
-	Link *l;
-	if (slave) {
-	  l = new Link(idx->hidx.datasz);
-	  data = l->data;
-	  key = &l->key;
-	}
-	else
-	  l = 0;
-
-	if (data) {
-#ifdef BUG_DATA_STORE2
-	  memcpy(data, cur + off, idx->hidx.datasz);
-#else
-	  memcpy(data, cur + o.size - idx->hidx.datasz, idx->hidx.datasz);
-#endif
-	}
-	
-	if (key)
-	  key->setKey(cur, (idx->hidx.keysz != HIdx::VarSize ?
-			    idx->hidx.keysz : strlen(cur) + 1),
-		      idx->keytype);
-	
-	if (slave)
-	  list->insert(l);
-#endif
 	if (!idx->isDataGroupedByKey())
 	  cur += o.size;
 	return Success;
@@ -4038,6 +3965,8 @@ HIdxCursor::next(Boolean *found, void *data, Idx::Key *key)
     }
       
     if (equal && !koid.getNX()) {
+      if (found_cnt)
+	*found_cnt = 0;
       *found = False;
       state = False;
       return Success;
@@ -4050,6 +3979,8 @@ HIdxCursor::next(Boolean *found, void *data, Idx::Key *key)
       return s;
 
     if (eox) {
+      if (found_cnt)
+	*found_cnt = 0;
       *found = False;
       state = False;
       return Success;
@@ -4430,119 +4361,6 @@ Status HIdx::move(short dspid, eyedbsm::Oid &newoid,
   if (s)
     return s;
 
-#if 0
-  IdxLock lockx(dbh, treeoid);
-  s = lockx.lock();
-  if (s)
-    return s;
-
-  for (unsigned int chd_k = 0; chd_k < hidx.key_count; chd_k++) {
-    HIdx::CListHeader chd;
-    s = readCListHeader(chd_k, chd);
-    if (s)
-      return s;
-    HIdx::CListHeader chd_n;
-    s = idx_n->readCListHeader(chd_k, chd_n);
-    if (s)
-      return s;
-
-    unsigned int clistobj_cnt = 0;
-    Oid koid = chd.clobj_first;
-    if (koid.getNX()) {
-      printf("Key #%d {\n", chd_k);
-      unsigned int total_busy_size = 0;
-      unsigned int total_free_size = 0;
-      unsigned int clist_data_size = 0;
-      unsigned int clist_data_alloc_size = 0;
-      unsigned char *clist_data = 0;
-      adapt(clist_data, clist_data_size, clist_data_alloc_size, sizeof(CListObjHeader));
-      clist_data_size = sizeof(CListObjHeader);
-
-      while (koid.getNX()) {
-	unsigned int busy_size = 0;
-	unsigned int free_size = 0;
-	unsigned int cell_cnt = 0;
-	unsigned int sz = 0;
-	s = objectSizeGet(dbh, &sz, DefaultLock, &koid);
-	if (s)
-	  return s;
-	unsigned char *clistobj_data = new unsigned char[sz];
-	CListObjHeader h;
-	s = objectRead(dbh, 0, 0, clistobj_data, DefaultLock, 0, 0, &koid);
-	if (s)
-	  return s;
-	unsigned char *d, *edata = clistobj_data + sz;
-	for (d = clistobj_data + sizeof(CListObjHeader); d < edata; ) {
-	  CellHeader o;
-	  mcp(&o, d, sizeof(CellHeader));
-	  x2h_overhead(&o);
-	  if (!o.free) {
-	    total_busy_size += o.size;
-	    busy_size += o.size;
-	    unsigned int cpsize = o.size + sizeof(CellHeader);
-	    adapt(clist_data, clist_data_size, clist_data_alloc_size, cpsize);
-	    memcpy(clist_data + clist_data_size, d, cpsize);
-	    clist_data_size += cpsize;
-	  }
-	  else {
-	    total_free_size += o.size;
-	    free_size += o.size;
-	  }
-
-	  d += sizeof(CellHeader);
-	  d += o.size;
-	  cell_cnt++;
-	}
-
-#ifdef COLLAPSE_TRACE
-	printf("  KOID %s [%d b] {\n", getOidString(&koid), sz);
-	printf("    cell_cnt: %d\n", cell_cnt);
-	printf("    busy_size: %u b\n", busy_size);
-	printf("    free_size: %u b\n", free_size);
-	printf("  }\n");
-#endif
-	memcpy(&h, clistobj_data, sizeof(h));
-	x2h_header(&h);
-	koid = h.clobj_next;
-	delete [] clistobj_data;
-	clistobj_cnt++;
-      }
-      
-      CListObjHeader h;
-      memset(&h, 0, sizeof(h));
-      h.free_cnt = 0;
-      h.alloc_cnt = 1;
-      h.free_whole = 0;
-      h.cell_free_first = NullOffset;
-      CListObjHeader xh;
-      h2x_header(&xh, &h);
-      memcpy(clist_data, &xh, sizeof(xh));
-      
-      memset(&chd_n, 0, sizeof(chd_n));
-      s = objectCreate(dbh, clist_data, clist_data_size, dspid,
-		       &chd_n.clobj_first);
-      if (s)
-	return s;
-      
-      chd_n.clobj_last = chd_n.clobj_last;
-      
-      s = idx_n->writeCListHeader(chd_k, chd_n);
-      if (s)
-	return s;
-      printf("  collapse oids: %s\n", getOidString(&chd.clobj_first));
-
-      // must delete all koid
-      delete [] clist_data;
-      printf("  clistobj_cnt: %u\n", clistobj_cnt);
-      printf("  total_busy_size: %u b\n", total_busy_size);
-      printf("  total_free_size: %u b\n", total_free_size);
-      printf("  clist_data_size: %u\n", clist_data_size);
-      printf("  clist_data_alloc_size: %u\n", clist_data_alloc_size);
-      printf("}\n");
-    }
-  }
-#endif
-
   s = destroy();
   if (s)
     return s;
@@ -4722,4 +4540,74 @@ static void h2x_overhead(HIdx::CellHeader *xo, const HIdx::CellHeader *ho)
 #endif
 }
 
+static const char out_of_bounds_fmt[] =
+"out of bounds data grouped sizeof: maximum data count per key is %u";
+
+static const char unsupported_sizeof_fmt[] =
+"unsupported data grouped sizeof in hash index %u";
+
+static Status out_of_bounds(unsigned int data_grouped_sizeof)
+{
+  return statusMake(ERROR, out_of_bounds_fmt,
+		    (1 << (8 * data_grouped_sizeof)) - 1);
 }
+
+Status HIdx::h2x_datacnt_cpy(unsigned char *rdata, const unsigned int *pdatacnt) const
+{
+  if (data_grouped_sizeof == 4) {
+    h2x_32_cpy(rdata, pdatacnt);
+    return Success;
+  }
+
+  if (data_grouped_sizeof == 2) {
+    unsigned short sdatacnt = *pdatacnt;
+    if ((unsigned int)sdatacnt != *pdatacnt) {
+      return out_of_bounds(data_grouped_sizeof);
+    }
+    h2x_16_cpy(rdata, &sdatacnt);
+    return Success;
+  }
+
+  if (data_grouped_sizeof == 1) {
+    *rdata = *pdatacnt;
+    if ((unsigned int)*rdata != *pdatacnt) {
+      return out_of_bounds(data_grouped_sizeof);
+    }
+
+    return Success;
+  }
+
+  return statusMake(ERROR, unsupported_sizeof_fmt, data_grouped_sizeof);
+}
+
+Status HIdx::x2h_datacnt_cpy(unsigned int *pdatacnt, const unsigned char *pdata) const
+{
+  if (data_grouped_sizeof == 4) {
+    x2h_32_cpy(pdatacnt, pdata);
+    return Success;
+  }
+
+  if (data_grouped_sizeof == 2) {
+    unsigned short sdatacnt;
+    x2h_16_cpy(&sdatacnt, pdata);
+    *pdatacnt = sdatacnt;
+    if ((unsigned int)sdatacnt != *pdatacnt) {
+      return out_of_bounds(data_grouped_sizeof);
+    }
+    return Success;
+  }
+
+  if (data_grouped_sizeof == 1) {
+    *pdatacnt = *pdata;
+
+    if ((unsigned int)*pdata != *pdatacnt) {
+      return out_of_bounds(data_grouped_sizeof);
+    }
+
+    return Success;
+  }
+
+  return statusMake(ERROR, unsupported_sizeof_fmt, data_grouped_sizeof);
+}
+}
+

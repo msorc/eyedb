@@ -87,6 +87,14 @@ plus tard:
   eyedbadmin object getloca <options>
   eyedbadmin object move <options>
 
+  from eyedbloca
+  # index move: ajouter une option --collapse + une info dans le protocole
+  eyedbadmin index move <dbname> <index name> <dest dataspace>
+  eyedbadmin index setdefdsp <dbname> <idx name>
+  eyedbadmin index getdefdsp <dbname> <idx name>
+  eyedbadmin index --stats|--loca|--all getloca <dbname> <idx name>
+  # => eyedbgetidxloca
+
   from eyedbconsadmin
   eyedbadmin constraint create <options>
   eyedbadmin constraint delete <options>
