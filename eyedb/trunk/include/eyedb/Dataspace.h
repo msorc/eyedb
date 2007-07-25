@@ -59,6 +59,12 @@ namespace eyedb {
        Not yet documented
        @return
     */
+    bool isValid() const;
+
+    /**
+       Not yet documented
+       @return
+    */
     unsigned short getId() const {return id;}
 
     /**

@@ -183,7 +183,7 @@ namespace eyedbsm {
 
     void set_hash_key();
     Status destroy_r();
-    Status copyRealize(Idx *) const;
+    Status copy_realize(Idx *) const;
     void init(DbHandle *, unsigned int keytype, unsigned int keysz,
 	      unsigned int offset,
 	      unsigned int datasz, short dspid,

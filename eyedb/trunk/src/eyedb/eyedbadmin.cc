@@ -2884,8 +2884,12 @@ dsplist_realize(Database *db, char *argv[], int argc)
     const Dataspace **dataspaces;
     s = db->getDataspaces(dataspaces, cnt);
     CHECK(s);
-    for (int i = 0; i < cnt; i++)
-      cout << (i ? "\n" : "") << *dataspaces[i];
+    for (unsigned int i = 0, m = 0; i < cnt; i++) {
+      if (dataspaces[i]->isValid()) {
+	cout << (m ? "\n" : "") << *dataspaces[i];
+	m++;
+      }
+    }
     return 0;
   }
 

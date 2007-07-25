@@ -79,7 +79,7 @@ namespace eyedbsm {
 		unsigned int cnt = 1) const;
     eyedbsm::Status create(unsigned int degree, unsigned dataSize, KeyType const types[], unsigned ntypes, short dspid);
     eyedbsm::Status count_manage(int inc);
-    eyedbsm::Status copyRealize(Idx *idx) const;
+    eyedbsm::Status copy_realize(Idx *idx) const;
     eyedbsm::Status readBTree(BTree &) const;
     eyedbsm::Status writeBTree(const BTree &) const;
     eyedbsm::Status readKeyType(KeyType *&, unsigned int nkeys, const eyedbsm::Oid &) const;

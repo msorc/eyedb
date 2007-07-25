@@ -3417,7 +3417,7 @@ namespace eyedb {
     Bool swap = False;
 
     if (index_move) {
-      printf("Index moving...\n");
+      //printf("Index moving...\n");
       if (idx->asBTreeIndex()) {
 	s = seidx->asBIdx()->move(idx->getDspid(), *newoid.getOid());
       }
