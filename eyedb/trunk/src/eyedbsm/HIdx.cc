@@ -2832,7 +2832,7 @@ HIdx::collapse()
   return collapse_realize(hidx.dspid, 0);
 }
 
-#define COLLAPSE_TRACE
+//#define COLLAPSE_TRACE
 
 Status
 HIdx::collapse_realize(short dspid, HIdx *idx_n)
@@ -2855,6 +2855,7 @@ HIdx::collapse_realize(short dspid, HIdx *idx_n)
 #ifdef COLLAPSE_TRACE
       printf("Key #%d {\n", chd_k);
 #endif
+      unsigned int total_busy_cell_cnt = 0;
       unsigned int total_busy_size = 0;
       unsigned int total_free_size = 0;
       unsigned int clist_data_size = 0;
@@ -2867,7 +2868,7 @@ HIdx::collapse_realize(short dspid, HIdx *idx_n)
 	oid_v.push_back(koid);
 	unsigned int busy_size = 0;
 	unsigned int free_size = 0;
-	unsigned int cell_cnt = 0;
+	unsigned int busy_cell_cnt = 0;
 	unsigned int sz = 0;
 	s = objectSizeGet(dbh, &sz, DefaultLock, &koid);
 	if (s)
@@ -2889,6 +2890,8 @@ HIdx::collapse_realize(short dspid, HIdx *idx_n)
 	    adapt(clist_data, clist_data_size, clist_data_alloc_size, cpsize);
 	    memcpy(clist_data + clist_data_size, d, cpsize);
 	    clist_data_size += cpsize;
+	    busy_cell_cnt++;
+	    total_busy_cell_cnt++;
 	  }
 	  else {
 	    total_free_size += o.size;
@@ -2897,12 +2900,11 @@ HIdx::collapse_realize(short dspid, HIdx *idx_n)
 
 	  d += sizeof(CellHeader);
 	  d += o.size;
-	  cell_cnt++;
 	}
 
 #ifdef COLLAPSE_TRACE
 	printf("  KOID %s [%d b] {\n", getOidString(&koid), sz);
-	printf("    cell_cnt: %d\n", cell_cnt);
+	printf("    busy_cell_cnt: %d\n", busy_cell_cnt);
 	printf("    busy_size: %u b\n", busy_size);
 	printf("    free_size: %u b\n", free_size);
 	printf("  }\n");
@@ -2918,7 +2920,11 @@ HIdx::collapse_realize(short dspid, HIdx *idx_n)
 	CListObjHeader h;
 	memset(&h, 0, sizeof(h));
 	h.free_cnt = 0;
-	h.alloc_cnt = 1;
+	// JE PENSE QUE CELA EST FAUX: alloc_cnt indique le nombre de cells
+	// et pas le nombre de hashobject
+	// h.alloc_cnt = busy_cell_cnt; ???
+	//h.alloc_cnt = 1;
+	h.alloc_cnt = total_busy_cell_cnt;
 	h.free_whole = 0;
 	h.cell_free_first = NullOffset;
 	CListObjHeader xh;
@@ -2971,6 +2977,7 @@ HIdx::collapse_realize(short dspid, HIdx *idx_n)
       delete [] clist_data;
 #ifdef COLLAPSE_TRACE
       printf("  clistobj_cnt: %u\n", clistobj_cnt);
+      printf("  total_busy_cell_cnt: %u\n", total_busy_cell_cnt);
       printf("  total_busy_size: %u b\n", total_busy_size);
       printf("  total_free_size: %u b\n", total_free_size);
       printf("  clist_data_size: %u\n", clist_data_size);
@@ -4167,7 +4174,9 @@ HIdx::getStats(HIdx::Stats &stats) const
     Status s = readCListHeader(n, chd);
     if (s)
       return s;
-
+#if 1
+    checkChain(&chd, "getStats");
+#endif
     Oid koid;
     koid = chd.clobj_first;
     while (koid.getNX() > 0) {
@@ -4189,9 +4198,14 @@ HIdx::getStats(HIdx::Stats &stats) const
       if (s)
 	return s;
       
+      /*
       if (ncount != count) {
-	printf("COUNTS differ %d %d\n", count, ncount);
+	printf("HIdx: count differ %d %d\n", count, ncount);
       }
+      else {
+	printf("HIdx: count equal %d %d\n", count, ncount);
+      }
+      */
 
       entry->object_count += count;
       entry->hash_object_busy_size += busysize;
@@ -4319,11 +4333,11 @@ HIdx::copy(HIdx *&idx_n, int key_count, int mag_order, short dspid,
 
   idx_n->open(_hash_key, _hash_data);
   
-  return copyRealize(idx_n);
+  return copy_realize(idx_n);
 }
 
 Status
-HIdx::copyRealize(Idx *idx) const
+HIdx::copy_realize(Idx *idx) const
 {
   Status s = Success;
   HIdxCursor curs(this);
@@ -4359,7 +4373,7 @@ HIdx::reimplementToBTree(Oid &newoid, int degree, short dspid)
 
   bidx.open();
 
-  Status s = copyRealize(&bidx);
+  Status s = copy_realize(&bidx);
   if (s)
     return s;
   s = destroy();
@@ -4381,6 +4395,14 @@ Status HIdx::move(short dspid, eyedbsm::Oid &newoid,
   // parcours de tous les objets comme dans collapse, puis writeCListHeader sur le nouvel index, sans destruction (le destroy se fait ensuite) => en fait, il faut dupliquer collapse, c'est trop different
   // note: le collapse est-il obligatoire ? ou bien c'est une option a ajouter dans le mvidx et a passer a Index::move puis a Index::realize (via les UserData) ?
   // dans un 1er temps, on peut le faire obligatoire
+#if 1
+  if (getenv("MOVE_IS_COLLAPSE")) {
+    printf("move is collapse only\n");
+    newoid = oid();
+    return collapse();
+  }
+#endif
+
   HIdx *idx_n = new HIdx(dbh,
 			 getKeyType(),
 			 hidx.datasz,
@@ -4400,7 +4422,11 @@ Status HIdx::move(short dspid, eyedbsm::Oid &newoid,
   if (s)
     return s;
 
+#if 0
+  s = copy_realize(idx_n);
+#else
   s = collapse_realize(dspid, idx_n);
+#endif
   if (s)
     return s;
 

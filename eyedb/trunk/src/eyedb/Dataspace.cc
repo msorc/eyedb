@@ -29,6 +29,11 @@ namespace eyedb {
 
   const short Dataspace::DefaultDspid = eyedbsm::DefaultDspid;
 
+  bool Dataspace::isValid() const
+  {
+    return *getName();
+  }
+
   Status
   Dataspace::remove() const
   {
@@ -88,6 +93,9 @@ namespace eyedb {
 
   std::ostream& operator<<(std::ostream& os, const Dataspace &dsp)
   {
+    if (!*dsp.getName())
+      return os;
+
     os << "Dataspace #" << dsp.getId() << '\n';
     os << "Name " << dsp.getName() << '\n';
 

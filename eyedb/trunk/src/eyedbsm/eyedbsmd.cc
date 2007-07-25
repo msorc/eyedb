@@ -759,7 +759,7 @@ init()
 {
   signal(SIGHUP,  SIG_IGN);
   signal(SIGINT,  SIG_IGN);
-  signal(SIGTERM, signal_handler);
+  //  signal(SIGTERM, signal_handler);
   signal(SIGQUIT, signal_handler);
   signal(SIGSEGV, signal_handler);
   signal(SIGBUS,  signal_handler);

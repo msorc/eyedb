@@ -406,7 +406,7 @@ namespace eyedbsm {
   }
 
   Status
-  BIdx::copyRealize(Idx *idx) const
+  BIdx::copy_realize(Idx *idx) const
   {
     Status s = Success;
     BIdxCursor curs(const_cast<BIdx *>(this));
@@ -453,7 +453,7 @@ namespace eyedbsm {
     if (s) return s;
 
     hidx.open();
-    s = copyRealize(&hidx);
+    s = copy_realize(&hidx);
     if (s) return s;
     newoid = hidx.oid();
     return destroy();
@@ -477,7 +477,7 @@ namespace eyedbsm {
     Status s = bidx.status();
     if (s) return s;
 
-    s = copyRealize(&bidx);
+    s = copy_realize(&bidx);
     if (s) return s;
 
     newoid = bidx.oid();
