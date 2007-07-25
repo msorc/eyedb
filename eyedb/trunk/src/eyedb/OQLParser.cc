@@ -188,7 +188,7 @@ int OQLParser::parse_file(const char *file)
   fd = run_cpp(fd, 0, 0, file); // added the 16/11/99
 
   if (fd) {
-    while(parse(fd, echo_mode) && !oql_interrupt)
+    while(parse(fd, echo_mode) && !oql_interrupt && !getExitMode())
       ;
     fclose(fd);
     if (oql_interrupt)

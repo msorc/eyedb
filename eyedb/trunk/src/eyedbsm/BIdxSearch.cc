@@ -239,6 +239,14 @@ namespace eyedbsm {
   }		
 
   Status
+  BIdxCursor::next(unsigned int *found_cnt, Idx::Key *key)
+  {
+    *found_cnt = 0;
+    // for now !
+    return statusMake(ERROR, "cannot use this type of cursor on non data_grouped_by_key hash index");
+  }
+
+  Status
   BIdxCursor::next(Boolean * found, void * data, Idx::Key * key)
   {
     *found = False;

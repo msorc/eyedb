@@ -86,6 +86,7 @@ namespace eyedbsm {
     Boolean pow2;
     Boolean uextend;
     Boolean data_grouped_by_key;
+    unsigned int data_grouped_sizeof;
     Oid treeoid;
     Status stat;
     DbHandle *dbh;
@@ -192,6 +193,8 @@ namespace eyedbsm {
 	      unsigned int impl_hints_cnt);
     KeyType keytype;
     Status collapse_realize(short dspid, HIdx *idx_n);
+    Status h2x_datacnt_cpy(unsigned char *rdata, const unsigned int *pdatacnt) const;
+    Status x2h_datacnt_cpy(unsigned int *pdatacnt, const unsigned char *pdata) const;
 
   public:
 
@@ -577,6 +580,9 @@ namespace eyedbsm {
 	       void *cmp_arg,
 	       LinkList *);
 
+    Status next(Boolean *found, unsigned int *found_cnt, void *data,
+		Idx::Key *key);
+
   public:
     /**
        Not yet documented
@@ -606,6 +612,15 @@ namespace eyedbsm {
        @return
     */
     Status next(Boolean *found, void *data = 0, Idx::Key *key = 0);
+
+    /**
+       Not yet documented
+       @param found_cnt
+       @param key
+       @return
+    */
+    // note: can be only used on data_grouped_by_key index
+    Status next(unsigned int *found_cnt, Idx::Key *key = 0);
 
     ~HIdxCursor();
   };

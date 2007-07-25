@@ -245,7 +245,15 @@ namespace eyedbsm {
        @param key
        @return
     */
-    virtual eyedbsm::Status next(eyedbsm::Boolean *found, void *data = 0, Idx::Key *key = 0) = 0;
+    virtual Status next(eyedbsm::Boolean *found, void *data = 0, Idx::Key *key = 0) = 0;
+
+    /**
+       Not yet documented
+       @param found_cnt
+       @param key
+       @return
+    */
+    virtual Status next(unsigned int *found_cnt, Idx::Key *key = 0) = 0;
 
     virtual ~IdxCursor() {}
   };
