@@ -20,6 +20,7 @@
 
 /*
    Author: Eric Viara <viara@sysra.com>
+   Author: Francois Dechelle <francois@dechelle.net>
 */
 
 #include "eyedbconfig.h"
@@ -149,14 +150,14 @@ int USRAddCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
   bool r = getopt->parse(PROG_NAME, argv);
 
+  if (!r) {
+    return usage();
+  }
+
   GetOpt::Map &map = getopt->getMap();
 
   if (map.find("help") != map.end()) {
     return help();
-  }
-
-  if (!r) {
-    return usage();
   }
 
   UserType user_type;
@@ -224,6 +225,15 @@ int USRAddCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 
 void USRDeleteCmd::init()
 {
+  std::vector<Option> opts;
+
+  opts.push_back(HELP_OPT);
+  opts.push_back( Option(ADD_UNIX_OPT,
+			 OptionBoolType()));
+  opts.push_back( Option(ADD_STRICT_UNIX_OPT, 
+			 OptionBoolType()));
+
+  getopt = new GetOpt(getExtName(), opts);
 }
 
 int USRDeleteCmd::usage()

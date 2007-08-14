@@ -176,7 +176,14 @@ AC_PROG_LIBTOOL
 
 # Check for lex/flex and yacc/bison
 AM_PROG_LEX
+if test "$LEX" != "flex" ; then
+	AC_MSG_ERROR(you must have GNU flex installed to compile EyeDB)
+fi
 AC_PROG_YACC
+if test "$YACC" = "yacc" ; then
+	AC_MSG_ERROR(you must have GNU bison installed to compile EyeDB)
+fi
+
 
 # check for libraries
 # this library is necessary on Solaris
