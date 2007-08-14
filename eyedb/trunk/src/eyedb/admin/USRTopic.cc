@@ -228,30 +228,64 @@ void USRDeleteCmd::init()
   std::vector<Option> opts;
 
   opts.push_back(HELP_OPT);
-  opts.push_back( Option(ADD_UNIX_OPT,
-			 OptionBoolType()));
-  opts.push_back( Option(ADD_STRICT_UNIX_OPT, 
-			 OptionBoolType()));
 
   getopt = new GetOpt(getExtName(), opts);
 }
 
 int USRDeleteCmd::usage()
 {
-  std::cerr << " not yet implemented\n";
+  getopt->usage("", "");
+  std::cerr << " <user>\n";
   return 1;
 }
 
 int USRDeleteCmd::help()
 {
-  std::cerr << " not yet implemented\n";
   stdhelp();
+  getopt->displayOpt("<user>", "User name");
   return 1;
 }
 
 int USRDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  std::cerr << " not yet implemented\n";
+  bool r = getopt->parse(PROG_NAME, argv);
+
+  if (!r) {
+    return usage();
+  }
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end()) {
+    return help();
+  }
+
+  if (argv.size() < 1) {
+    return usage();
+  }
+
+  char *username = strdup(argv[0].c_str());
+
+  std::string user = Connection::makeUser(username);
+  username = strdup(user.c_str());
+
+  char userauth[32];
+  char passwdauth[10];
+
+  auth_realize( userauth, passwdauth);
+
+  DBM_Database *dbmdatabase = new DBM_Database();
+
+  conn.open();
+
+  Status s = dbmdatabase->deleteUser( &conn, username, userauth, passwdauth);
+
+  if (s) {
+    std::cerr << PROG_NAME;
+    s->print();
+    return 1;
+  }
+
   return 0;
 }
 
