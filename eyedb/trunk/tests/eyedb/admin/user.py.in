@@ -2,7 +2,7 @@
 import pexpect
 import sys
 
-child = pexpect.spawn('eyedbadmin2 user delete')
+child = pexpect.spawn('@bindir@/eyedbadmin2 user delete')
 index = child.expect(['eyedbadmin user delete \[--help\] <user>', pexpect.EOF])
 if index == 1:
     sys.exit(255)
