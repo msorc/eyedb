@@ -333,6 +333,13 @@ AM_CONDITIONAL(COND_JAVA, test x"$COND_JAVA" = xyes)
 AC_SUBST(JAVACFLAGS)
 
 # ========================================
+# Python/pexpect tests
+# ========================================
+AM_PATH_PYTHON
+AC_PYTHON_MODULE(pexpect,ac_python_pexpect="yes",ac_python_pexpect="no")
+AM_CONDITIONAL(COND_PYTHON_PEXPECT, test x"$PYTHON" != "x" -a "$ac_python_pexpect" != "no")
+
+# ========================================
 # SWIG
 # ========================================
 if test "$enable_swig" = "yes" ; then
@@ -572,6 +579,7 @@ src/www/html/Makefile
 src/www/icons/Makefile
 tests/Makefile
 tests/eyedb/Makefile
+tests/eyedb/admin/Makefile
 tests/eyedb/collections/Makefile
 tests/eyedb/collections/basic/Makefile
 tests/eyedb/collections/litcoll/Makefile
