@@ -554,9 +554,19 @@ int USRListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
     return help();
   }
 
+  char userauth[32];
+  char passwdauth[10];
+
+  auth_realize( userauth, passwdauth);
+
   DBM_Database *dbm = new DBM_Database();
 
   conn.open();
+
+  Status status = dbm->open(&conn, Database::DBSRead,
+			    userauth, passwdauth);
+
+  CHECK_STATUS(status);
 
   if (argv.size() < 1) {
     return list_all_users( dbm);
