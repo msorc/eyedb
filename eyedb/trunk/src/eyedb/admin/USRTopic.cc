@@ -522,7 +522,7 @@ list_selected_users(DBM_Database *dbm, std::vector<std::string> &argv)
     
     if (!user) {
       std::cerr << PROG_NAME;
-      std::cerr << "user " << username << " not found\n";
+      std::cerr << ": user " << username << " not found\n";
       error = 1;
     }
     else {
