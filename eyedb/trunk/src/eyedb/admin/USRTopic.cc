@@ -1,4 +1,3 @@
-
 /* 
    EyeDB Object Database Management System
    Copyright (C) 1994-1999,2004-2006 SYSRA
