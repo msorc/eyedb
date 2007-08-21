@@ -1,4 +1,5 @@
 noinst_PYTHON=\
+common.py \
 user.py
 
 #EDIT = sed \
@@ -10,6 +11,6 @@ user.py
 #	mv $*.py.tmp $*.py
 #	chmod +x $*.py
 
-TESTS_ENVIRONMENT= PATH=$PATH:$(bindir) $(PYTHON) 
+TESTS_ENVIRONMENT= PATH=$PATH:$(bindir) PYTHONPATH=$(srcdir):$PYTHONPATH $(PYTHON) 
 TESTS=\
 user.py
