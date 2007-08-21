@@ -8,6 +8,7 @@ EDIT = sed \
 	rm -f $*.py $*.py.tmp
 	$(EDIT) $(srcdir)/$*.py.in >$*.py.tmp
 	mv $*.py.tmp $*.py
+	chmod +x $*.py
 
 TESTS=\
 user.py
