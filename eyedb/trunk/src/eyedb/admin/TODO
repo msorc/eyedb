@@ -29,6 +29,14 @@ EV(7):
 
   eyedbadmin datafile rename <options>
 
+FD(1): from eyedbadmin user * [USRTopic module]
+  eyedbadmin user add <options> [DONE]
+  eyedbadmin user delete <options> [DONE]
+  eyedbadmin user list <options> [DONE]
+  eyedbadmin user sysaccess <options> [DONE]
+  eyedbadmin user dbaccess <options> [DONE]
+  eyedbadmin user passwd <options> [DONE]
+
 FD(2): from eyedbadmin dataspace * [tests depends on datafile create,delete,list]  [DSPTopic module]
   eyedbadmin dataspace create <options>
   eyedbadmin dataspace update <options>
@@ -39,14 +47,6 @@ FD(2): from eyedbadmin dataspace * [tests depends on datafile create,delete,list
   eyedbadmin dataspace getdef <options>
   eyedbadmin dataspace setcurdat <options>
   eyedbadmin dataspace getcurdat <options>
-
-FD(1): from eyedbadmin user * [USRTopic module]
-  eyedbadmin user add <options> [DONE]
-  eyedbadmin user delete <options> [DONE]
-  eyedbadmin user list <options> [DONE]
-  eyedbadmin user sysaccess <options> [DONE]
-  eyedbadmin user dbaccess <options>
-  eyedbadmin user passwd <options>
 
 FD(3): from eyedbidxadmin [IDXTopic module]
   eyedbadmin index create <options>
