@@ -623,7 +623,7 @@ int USRSysAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
     return usage();
   }
 
-  char *username = strdup(argv[0].c_str());
+  const char *username = argv[0].c_str();
   int sysmode = 0;
   char *p = strdup( argv[1].c_str());
   
@@ -678,24 +678,95 @@ int USRSysAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
 
 void USRDBAccessCmd::init()
 {
+  std::vector<Option> opts;
+
+  opts.push_back(HELP_OPT);
+
+  getopt = new GetOpt(getExtName(), opts);
 }
 
 int USRDBAccessCmd::usage()
 {
-  std::cerr << " not yet implemented\n";
+  getopt->usage("", "");
+  std::cerr << " <user> <dbname> r|rw|rx|rwx|admin|no\n";
   return 1;
 }
 
 int USRDBAccessCmd::help()
 {
-  std::cerr << " not yet implemented\n";
   stdhelp();
+  getopt->displayOpt("<user>", "User name");
+  getopt->displayOpt("<dbname>", "Data base name");
+  getopt->displayOpt("<mode>", "r|rw|rx|rwx|admin|no");
   return 1;
+}
+
+static int
+get_dbaccess(const char *accessmode, DBAccessMode &dbmode)
+{
+  if (!strcmp(accessmode, "r"))
+    dbmode = ReadDBAccessMode;
+  else if (!strcmp(accessmode, "rw"))
+    dbmode = ReadWriteDBAccessMode;
+  else if (!strcmp(accessmode, "rx"))
+    dbmode = ReadExecDBAccessMode;
+  else if (!strcmp(accessmode, "rwx"))
+    dbmode = ReadWriteExecDBAccessMode;
+  else if (!strcmp(accessmode, "admin"))
+    dbmode = AdminDBAccessMode;
+  else if (!strcmp(accessmode, "no"))
+    dbmode = NoDBAccessMode;
+  else
+    return 1;
+
+  return 0;
+}
+
+static int
+userdbaccessset_realize(const char *username, const char *dbname,
+			const char *accessmode)
+{
 }
 
 int USRDBAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  std::cerr << " not yet implemented\n";
+  bool r = getopt->parse(PROG_NAME, argv);
+
+  if (!r) {
+    return usage();
+  }
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end()) {
+    return help();
+  }
+
+  if (argv.size() < 3) {
+    return usage();
+  }
+
+  const char *username = argv[0].c_str();
+  const char *dbname = argv[1].c_str();
+
+  DBAccessMode dbmode;
+
+  if (get_dbaccess(argv[2].c_str(), dbmode))
+    return usage();
+
+  char userauth[32];
+  char passwdauth[10];
+
+  auth_realize( userauth, passwdauth);
+
+  Database *db = new Database(dbname, Database::getDefaultDBMDB());
+
+  conn.open();
+
+  Status s = db->setUserDBAccess(  &conn, username, dbmode, userauth, passwdauth);
+
+  CHECK_STATUS(s);
+
   return 0;
 }
 

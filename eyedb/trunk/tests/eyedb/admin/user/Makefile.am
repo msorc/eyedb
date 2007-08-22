@@ -12,4 +12,7 @@ user_sysaccess_usage.py \
 user_add_std.py \
 user_list_sysaccess_1.py \
 user_sysaccess_std.py \
-user_list_sysaccess_2.py 
+user_list_sysaccess_2.py \
+user_dbaccess_usage.py \
+user_dbaccess_std.py
+
