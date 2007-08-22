@@ -582,24 +582,92 @@ int USRListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 
 void USRSysAccessCmd::init()
 {
+  std::vector<Option> opts;
+
+  opts.push_back(HELP_OPT);
+
+  getopt = new GetOpt(getExtName(), opts);
 }
 
 int USRSysAccessCmd::usage()
 {
-  std::cerr << " not yet implemented\n";
+  getopt->usage("", "");
+  std::cerr << " <user> ['+' combination of] dbcreate|adduser|deleteuser|setuserpasswd|admin|superuser|no\n";
   return 1;
 }
 
 int USRSysAccessCmd::help()
 {
-  std::cerr << " not yet implemented\n";
   stdhelp();
+  getopt->displayOpt("<user>", "User name");
+  getopt->displayOpt("<mode>", "['+' combination of] dbcreate|adduser|deleteuser|setuserpasswd|admin|superuser|no");
+
   return 1;
 }
 
 int USRSysAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  std::cerr << " not yet implemented\n";
+  bool r = getopt->parse(PROG_NAME, argv);
+
+  if (!r) {
+    return usage();
+  }
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end()) {
+    return help();
+  }
+
+  if (argv.size() < 2) {
+    return usage();
+  }
+
+  char *username = strdup(argv[0].c_str());
+  int sysmode = 0;
+  char *p = strdup( argv[1].c_str());
+  
+  for (;;)
+    {
+      char *q = strchr(p, '+');
+      if (q)
+	*q = 0;
+
+      if (!strcmp(p, "dbcreate"))
+	sysmode |= DBCreateSysAccessMode;
+      else if (!strcmp(p, "adduser"))
+	sysmode |= AddUserSysAccessMode;
+      else if (!strcmp(p, "deleteuser"))
+	sysmode |= DeleteUserSysAccessMode;
+      else if (!strcmp(p, "setuserpasswd"))
+	sysmode |= SetUserPasswdSysAccessMode;
+      else if (!strcmp(p, "superuser"))
+	sysmode |= SuperUserSysAccessMode;
+      else if (!strcmp(p, "admin"))
+	sysmode |= AdminSysAccessMode;
+      else if (!strcmp(p, "no"))
+	sysmode = NoSysAccessMode;
+      else
+	return usage();
+
+      if (!q)
+	break;
+      p = q+1;
+    }
+
+  char userauth[32];
+  char passwdauth[10];
+
+  auth_realize( userauth, passwdauth);
+
+  DBM_Database *dbmdatabase = new DBM_Database();
+
+  conn.open();
+
+  Status s = dbmdatabase->setUserSysAccess(&conn, username, (SysAccessMode)sysmode, userauth, passwdauth);
+
+  CHECK_STATUS(s);
+
   return 0;
 }
 
