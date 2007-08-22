@@ -44,7 +44,7 @@ FD(1): from eyedbadmin user * [USRTopic module]
   eyedbadmin user add <options> [DONE]
   eyedbadmin user delete <options> [DONE]
   eyedbadmin user list <options> [DONE]
-  eyedbadmin user sysaccess <options>
+  eyedbadmin user sysaccess <options> [DONE]
   eyedbadmin user dbaccess <options>
   eyedbadmin user passwd <options>
 
