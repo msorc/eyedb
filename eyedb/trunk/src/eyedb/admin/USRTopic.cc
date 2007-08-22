@@ -776,24 +776,78 @@ int USRDBAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &a
 
 void USRPasswdCmd::init()
 {
+  std::vector<Option> opts;
+
+  opts.push_back(HELP_OPT);
+
+  getopt = new GetOpt(getExtName(), opts);
 }
 
 int USRPasswdCmd::usage()
 {
-  std::cerr << " not yet implemented\n";
+  getopt->usage("", "");
+  std::cerr << " <user> [<passwd>] [<new passwd>]\n";
   return 1;
 }
 
 int USRPasswdCmd::help()
 {
-  std::cerr << " not yet implemented\n";
   stdhelp();
+  getopt->displayOpt("<user>", "User name");
+  getopt->displayOpt("<passwd>", "User password");
+  getopt->displayOpt("<new passwd>", "New user password");
   return 1;
 }
 
+
 int USRPasswdCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  std::cerr << " not yet implemented\n";
+  bool r = getopt->parse(PROG_NAME, argv);
+
+  if (!r) {
+    return usage();
+  }
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end()) {
+    return help();
+  }
+
+  if (argv.size() < 1) {
+    return usage();
+  }
+
+  char *username = strdup(argv[0].c_str());
+  char *passwd = 0;
+  char *newpasswd = 0;
+
+  if (argv.size() >= 2) {
+    passwd = strdup(argv[1].c_str());
+
+    if (argv.size() >= 3)
+      newpasswd = strdup(argv[1].c_str());
+  }
+
+  if (!passwd)
+    passwd_realize("user old password", &passwd, 0);
+
+  if (!newpasswd)
+    passwd_realize("user new password", &newpasswd);
+
+  char userauth[32];
+  char passwdauth[10];
+
+  auth_realize( userauth, passwdauth);
+
+  DBM_Database *dbmdatabase = new DBM_Database();
+
+  conn.open();
+
+  Status s = dbmdatabase->setPasswd( &conn, username, passwd, newpasswd);
+
+  CHECK_STATUS(s);
+
   return 0;
 }
 
