@@ -12,5 +12,6 @@ dataspace_list_1.py \
 dataspace_list_2.py \
 dataspace_list_3.py \
 dataspace_create_1.py \
-dataspace_update_1.py
+dataspace_update_1.py \
+dataspace_delete_1.py
 
