@@ -152,16 +152,35 @@ int DSPUpdateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   if (map.find("help") != map.end())
     return help();
 
-  std::cerr << " not yet implemented\n";
-  return 1;
+  if (argv.size() < 3)
+    return usage();
 
-  //  DBM_Database *dbmdatabase = new DBM_Database();
+  const char *dbname = argv[0].c_str();
+  const char *dspname = argv[1].c_str();
 
-  //  conn.open();
+  conn.open();
 
-  //  Status s = dbmdatabase->addUser(&conn, username, passwd, user_type, userauth, passwdauth);
+  Database *db = new Database(dbname);
 
-  //  CHECK_STATUS(s);
+  Status s = db->open( &conn, Database::DBRW);
+  CHECK_STATUS(s);
+
+  s = db->transactionBeginExclusive();
+  CHECK_STATUS(s);
+
+  const Dataspace *dataspace = 0;
+  s = db->getDataspace(dspname, dataspace);
+  CHECK_STATUS(s);
+
+  int count = argv.size() - 2;
+  const Datafile **datafiles = new const Datafile *[count];
+  for (int i = 0; i < count; i++) {
+    s = db->getDatafile( argv[i+2].c_str(), datafiles[i]);
+    CHECK_STATUS(s);
+  }
+
+  s = dataspace->update(datafiles, count);
+  CHECK_STATUS(s);
 
   return 0;
 }
