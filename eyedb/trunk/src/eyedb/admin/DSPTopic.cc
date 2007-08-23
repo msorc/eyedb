@@ -78,33 +78,6 @@ int DSPCreateCmd::help()
   return 1;
 }
 
-#if 0
-  Database *db = new Database(dbname);
-  Status s = db->open(conn, (mode == mDspList ? Database::DBSRead :
-			     Database::DBRW));
-  CHECK(s);
-
-  if (mode != mDspList) {
-    s = db->transactionBeginExclusive();
-    CHECK(s);
-  }
-
-static int
-dspcreate_realize(Database *db, const char *dspname, char *datid[],
-		  unsigned int cnt)
-{
-  Status s;
-  const Datafile **datafiles = new const Datafile *[cnt];
-  for (int i = 0; i < cnt; i++) {
-    s = db->getDatafile(datid[i], datafiles[i]);
-    CHECK(s);
-  }
-
-  s = db->createDataspace(dspname, datafiles, cnt);
-  CHECK(s);
-  return 0;
-}
-#endif
 int DSPCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
   if (! getopt->parse(PROG_NAME, argv))
@@ -115,16 +88,31 @@ int DSPCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   if (map.find("help") != map.end())
     return help();
 
-  std::cerr << " not yet implemented\n";
-  return 1;
+  if (argv.size() < 3)
+    return usage();
 
-  //  DBM_Database *dbmdatabase = new DBM_Database();
+  const char *dbname = argv[0].c_str();
+  const char *dspname = argv[1].c_str();
 
-  //  conn.open();
+  conn.open();
 
-  //  Status s = dbmdatabase->addUser(&conn, username, passwd, user_type, userauth, passwdauth);
+  Database *db = new Database(dbname);
 
-  //  CHECK_STATUS(s);
+  Status s = db->open( &conn, Database::DBRW);
+  CHECK_STATUS(s);
+
+  s = db->transactionBeginExclusive();
+  CHECK_STATUS(s);
+
+  int count = argv.size() - 2;
+  const Datafile **datafiles = new const Datafile *[count];
+  for ( int i = 0; i < count; i++) {
+    s = db->getDatafile( argv[i+2].c_str(), datafiles[i]);
+    CHECK_STATUS(s);
+  }
+
+  s = db->createDataspace( dspname, datafiles, count);
+  CHECK_STATUS(s);
 
   return 0;
 }
@@ -324,11 +312,11 @@ int DSPListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
     }
   }
   else {
-    unsigned int cnt;
+    unsigned int count;
     const Dataspace **dataspaces;
-    s = db->getDataspaces(dataspaces, cnt);
+    s = db->getDataspaces(dataspaces, count);
     CHECK_STATUS(s);
-    for (unsigned int i = 0; i < cnt; i++) {
+    for (unsigned int i = 0; i < count; i++) {
       if (dataspaces[i]->isValid()) {
 	cout << *dataspaces[i];
       }

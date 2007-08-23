@@ -42,7 +42,7 @@ FD(2): from eyedbadmin dataspace * [tests depends on datafile create,delete,list
   eyedbadmin dataspace update <options>
   eyedbadmin dataspace delete <options>
   eyedbadmin dataspace rename <options>
-  eyedbadmin dataspace list <options>
+  eyedbadmin dataspace list <options> [DONE]
   eyedbadmin dataspace setdef <options>
   eyedbadmin dataspace getdef <options>
   eyedbadmin dataspace setcurdat <options>
