@@ -522,16 +522,33 @@ int DSPSetCurDatCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
   if (map.find("help") != map.end())
     return help();
 
-  std::cerr << " not yet implemented\n";
-  return 1;
+  if (argv.size() < 3)
+    return usage();
 
-  //  DBM_Database *dbmdatabase = new DBM_Database();
+  const char *dbname = argv[0].c_str();
+  const char *dspname = argv[1].c_str();
+  const char *datname = argv[2].c_str();
 
-  //  conn.open();
+  conn.open();
 
-  //  Status s = dbmdatabase->addUser(&conn, username, passwd, user_type, userauth, passwdauth);
+  Database *db = new Database(dbname);
 
-  //  CHECK_STATUS(s);
+  Status s = db->open( &conn, Database::DBRW);
+  CHECK_STATUS(s);
+
+  s = db->transactionBeginExclusive();
+  CHECK_STATUS(s);
+
+  const Dataspace *dataspace;
+  s = db->getDataspace(dspname, dataspace);
+  CHECK_STATUS(s);
+
+  const Datafile *datafile;
+  s = db->getDatafile(datname, datafile);
+  CHECK_STATUS(s);
+
+  s = const_cast<Dataspace *>(dataspace)->setCurrentDatafile(datafile);
+  CHECK_STATUS(s);
 
   return 0;
 }
@@ -569,16 +586,32 @@ int DSPGetCurDatCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
   if (map.find("help") != map.end())
     return help();
 
-  std::cerr << " not yet implemented\n";
-  return 1;
+  if (argv.size() < 2)
+    return usage();
 
-  //  DBM_Database *dbmdatabase = new DBM_Database();
+  const char *dbname = argv[0].c_str();
+  const char *dspname = argv[1].c_str();
 
-  //  conn.open();
 
-  //  Status s = dbmdatabase->addUser(&conn, username, passwd, user_type, userauth, passwdauth);
+  conn.open();
 
-  //  CHECK_STATUS(s);
+  Database *db = new Database(dbname);
+
+  Status s = db->open( &conn, Database::DBRW);
+  CHECK_STATUS(s);
+
+  s = db->transactionBeginExclusive();
+  CHECK_STATUS(s);
+
+  const Dataspace *dataspace;
+  s = db->getDataspace(dspname, dataspace);
+  CHECK_STATUS(s);
+
+  const Datafile *datafile;
+  s = dataspace->getCurrentDatafile(datafile);
+  CHECK_STATUS(s);
+
+  cout << *datafile;
 
   return 0;
 }
