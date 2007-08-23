@@ -44,8 +44,8 @@ Note: tests depends on datafile create,delete,list
   eyedbadmin dataspace delete <options> [DONE]
   eyedbadmin dataspace rename <options> [DONE]
   eyedbadmin dataspace list <options> [DONE]
-  eyedbadmin dataspace setdef <options>
-  eyedbadmin dataspace getdef <options>
+  eyedbadmin dataspace setdef <options> [DONE]
+  eyedbadmin dataspace getdef <options> [DONE]
   eyedbadmin dataspace setcurdat <options>
   eyedbadmin dataspace getcurdat <options>
 
