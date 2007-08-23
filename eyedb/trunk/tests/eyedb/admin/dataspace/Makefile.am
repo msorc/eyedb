@@ -17,5 +17,8 @@ dataspace_rename_1.py \
 dataspace_setdef_1.py \
 dataspace_getdef_1.py \
 dataspace_setdef_2.py \
+dataspace_getcurdat_1.py \
 dataspace_delete_1.py 
+
+#dataspace_setcurdat_1.py 
 

@@ -46,8 +46,8 @@ Note: tests depends on datafile create,delete,list
   eyedbadmin dataspace list <options> [DONE]
   eyedbadmin dataspace setdef <options> [DONE]
   eyedbadmin dataspace getdef <options> [DONE]
-  eyedbadmin dataspace setcurdat <options>
-  eyedbadmin dataspace getcurdat <options>
+  eyedbadmin dataspace setcurdat <options> [DONE]
+  eyedbadmin dataspace getcurdat <options> [DONE]
 
 FD(3): from eyedbidxadmin [IDXTopic module]
   eyedbadmin index create <options>
