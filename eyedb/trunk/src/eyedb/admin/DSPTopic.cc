@@ -255,13 +255,16 @@ void DSPRenameCmd::init()
 int DSPRenameCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " ?\n";
+  std::cerr << " <dbname> <dspname> <newdspname>\n";
   return 1;
 }
 
 int DSPRenameCmd::help()
 {
   stdhelp();
+  getopt->displayOpt("<dbname>", "Data base name");
+  getopt->displayOpt("<dspname>", "Data space name");
+  getopt->displayOpt("<newdspname>", "New data space name");
   return 1;
 }
 
@@ -275,16 +278,29 @@ int DSPRenameCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   if (map.find("help") != map.end())
     return help();
 
-  std::cerr << " not yet implemented\n";
-  return 1;
+  if (argv.size() < 3)
+    return usage();
 
-  //  DBM_Database *dbmdatabase = new DBM_Database();
+  const char *dbname = argv[0].c_str();
+  const char *dspname = argv[1].c_str();
+  const char *newdspname = argv[2].c_str();
 
-  //  conn.open();
+  conn.open();
 
-  //  Status s = dbmdatabase->addUser(&conn, username, passwd, user_type, userauth, passwdauth);
+  Database *db = new Database(dbname);
 
-  //  CHECK_STATUS(s);
+  Status s = db->open( &conn, Database::DBRW);
+  CHECK_STATUS(s);
+
+  s = db->transactionBeginExclusive();
+  CHECK_STATUS(s);
+
+  const Dataspace *dataspace = 0;
+  s = db->getDataspace(dspname, dataspace);
+  CHECK_STATUS(s);
+
+  s = dataspace->rename(newdspname);
+  CHECK_STATUS(s);
 
   return 0;
 }
