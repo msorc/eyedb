@@ -28,8 +28,7 @@
 #include "eyedb/GetOpt.h"
 
 class USRTopic : public Topic {
-
-public:
+ public:
   USRTopic();
 };
 

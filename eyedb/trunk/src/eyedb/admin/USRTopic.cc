@@ -23,14 +23,11 @@
 */
 
 #include "eyedbconfig.h"
-
 #include <eyedb/eyedb.h>
 #include <eyedb/opts.h>
 #include "eyedb/DBM_Database.h"
-
 #include "GetOpt.h"
 #include "USRTopic.h"
-
 #include <errno.h>
 
 using namespace eyedb;

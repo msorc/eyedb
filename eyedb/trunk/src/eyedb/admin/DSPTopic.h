@@ -27,19 +27,18 @@
 #include "Topic.h"
 
 class DSPTopic : public Topic {
-
-public:
+ public:
   DSPTopic();
 };
 
-CMDCLASS(DSPCreateCmd, "create");
-CMDCLASS(DSPUpdateCmd, "update");
-CMDCLASS(DSPDeleteCmd, "delete");
-CMDCLASS(DSPRenameCmd, "rename");
-CMDCLASS(DSPListCmd, "list");
-CMDCLASS(DSPSetDefCmd, "setdef");
-CMDCLASS(DSPGetDefCmd, "getdef");
-CMDCLASS(DSPSetCurDatCmd, "setcurdat");
-CMDCLASS(DSPGetCurDatCmd, "getcurdat");
+CMDCLASS_GETOPT(DSPCreateCmd, "create");
+CMDCLASS_GETOPT(DSPUpdateCmd, "update");
+CMDCLASS_GETOPT(DSPDeleteCmd, "delete");
+CMDCLASS_GETOPT(DSPRenameCmd, "rename");
+CMDCLASS_GETOPT(DSPListCmd, "list");
+CMDCLASS_GETOPT(DSPSetDefCmd, "setdef");
+CMDCLASS_GETOPT(DSPGetDefCmd, "getdef");
+CMDCLASS_GETOPT(DSPSetCurDatCmd, "setcurdat");
+CMDCLASS_GETOPT(DSPGetCurDatCmd, "getcurdat");
 
 #endif

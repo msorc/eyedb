@@ -1,5 +1,6 @@
 SUBDIRS=\
-user
+user \
+dataspace
 
 noinst_PYTHON=\
 common.py 
