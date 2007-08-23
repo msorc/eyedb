@@ -37,11 +37,12 @@ FD(1): from eyedbadmin user * [USRTopic module]
   eyedbadmin user dbaccess <options> [DONE]
   eyedbadmin user passwd <options> [DONE]
 
-FD(2): from eyedbadmin dataspace * [tests depends on datafile create,delete,list]  [DSPTopic module]
-  eyedbadmin dataspace create <options>
-  eyedbadmin dataspace update <options>
-  eyedbadmin dataspace delete <options>
-  eyedbadmin dataspace rename <options>
+FD(2): from eyedbadmin dataspace * [DSPTopic module]
+Note: tests depends on datafile create,delete,list
+  eyedbadmin dataspace create <options> [DONE]
+  eyedbadmin dataspace update <options> [DONE]
+  eyedbadmin dataspace delete <options> [DONE]
+  eyedbadmin dataspace rename <options> [DONE]
   eyedbadmin dataspace list <options> [DONE]
   eyedbadmin dataspace setdef <options>
   eyedbadmin dataspace getdef <options>
