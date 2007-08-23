@@ -78,6 +78,33 @@ int DSPCreateCmd::help()
   return 1;
 }
 
+#if 0
+  Database *db = new Database(dbname);
+  Status s = db->open(conn, (mode == mDspList ? Database::DBSRead :
+			     Database::DBRW));
+  CHECK(s);
+
+  if (mode != mDspList) {
+    s = db->transactionBeginExclusive();
+    CHECK(s);
+  }
+
+static int
+dspcreate_realize(Database *db, const char *dspname, char *datid[],
+		  unsigned int cnt)
+{
+  Status s;
+  const Datafile **datafiles = new const Datafile *[cnt];
+  for (int i = 0; i < cnt; i++) {
+    s = db->getDatafile(datid[i], datafiles[i]);
+    CHECK(s);
+  }
+
+  s = db->createDataspace(dspname, datafiles, cnt);
+  CHECK(s);
+  return 0;
+}
+#endif
 int DSPCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
   if (! getopt->parse(PROG_NAME, argv))
@@ -120,8 +147,10 @@ int DSPUpdateCmd::usage()
 int DSPUpdateCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<user>", "User name");
-  getopt->displayOpt("<passwd>", "Password for specified user");
+  getopt->displayOpt("<dbname>", "Data base name");
+  getopt->displayOpt("<dspname>", "Data space name");
+  getopt->displayOpt("<datid>", "Data file id");
+  getopt->displayOpt("<datname>", "Data file name");
   return 1;
 }
 
@@ -167,8 +196,8 @@ int DSPDeleteCmd::usage()
 int DSPDeleteCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<user>", "User name");
-  getopt->displayOpt("<passwd>", "Password for specified user");
+  getopt->displayOpt("<dbname>", "Data base name");
+  getopt->displayOpt("<dspname>", "Data space name");
   return 1;
 }
 
@@ -214,8 +243,6 @@ int DSPRenameCmd::usage()
 int DSPRenameCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<user>", "User name");
-  getopt->displayOpt("<passwd>", "Password for specified user");
   return 1;
 }
 
@@ -261,8 +288,8 @@ int DSPListCmd::usage()
 int DSPListCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<user>", "User name");
-  getopt->displayOpt("<passwd>", "Password for specified user");
+  getopt->displayOpt("<dbname>", "Data base name");
+  getopt->displayOpt("<dspname>", "Data space name");
   return 1;
 }
 
@@ -276,16 +303,37 @@ int DSPListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
   if (map.find("help") != map.end())
     return help();
 
-  std::cerr << " not yet implemented\n";
-  return 1;
+  if (argv.size() < 1)
+    return usage();
 
-  //  DBM_Database *dbmdatabase = new DBM_Database();
+  const char *dbname = argv[0].c_str();
 
-  //  conn.open();
+  conn.open();
 
-  //  Status s = dbmdatabase->addUser(&conn, username, passwd, user_type, userauth, passwdauth);
+  Database *db = new Database(dbname);
 
-  //  CHECK_STATUS(s);
+  Status s = db->open( &conn, Database::DBSRead);
+  CHECK_STATUS(s);
+
+  if ( argv.size() > 1) {
+    for (int i = 1; i < argv.size(); i++) {
+      const Dataspace *dataspace;
+      s = db->getDataspace( argv[i].c_str(), dataspace);
+      CHECK_STATUS(s);
+      cout << *dataspace;
+    }
+  }
+  else {
+    unsigned int cnt;
+    const Dataspace **dataspaces;
+    s = db->getDataspaces(dataspaces, cnt);
+    CHECK_STATUS(s);
+    for (unsigned int i = 0; i < cnt; i++) {
+      if (dataspaces[i]->isValid()) {
+	cout << *dataspaces[i];
+      }
+    }
+  }
 
   return 0;
 }
@@ -308,8 +356,8 @@ int DSPSetDefCmd::usage()
 int DSPSetDefCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<user>", "User name");
-  getopt->displayOpt("<passwd>", "Password for specified user");
+  getopt->displayOpt("<dbname>", "Data base name");
+  getopt->displayOpt("<dspname>", "Data space name");
   return 1;
 }
 
@@ -355,8 +403,7 @@ int DSPGetDefCmd::usage()
 int DSPGetDefCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<user>", "User name");
-  getopt->displayOpt("<passwd>", "Password for specified user");
+  getopt->displayOpt("<dbname>", "Data base name");
   return 1;
 }
 
@@ -402,8 +449,10 @@ int DSPSetCurDatCmd::usage()
 int DSPSetCurDatCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<user>", "User name");
-  getopt->displayOpt("<passwd>", "Password for specified user");
+  getopt->displayOpt("<dbname>", "Data base name");
+  getopt->displayOpt("<dspname>", "Data space name");
+  getopt->displayOpt("<datid>", "Data file id");
+  getopt->displayOpt("<datname>", "Data file name");
   return 1;
 }
 
@@ -449,8 +498,8 @@ int DSPGetCurDatCmd::usage()
 int DSPGetCurDatCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<user>", "User name");
-  getopt->displayOpt("<passwd>", "Password for specified user");
+  getopt->displayOpt("<dbname>", "Data base name");
+  getopt->displayOpt("<dspname>", "Data space name");
   return 1;
 }
 
