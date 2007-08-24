@@ -3,30 +3,24 @@ eyedbadmin TODO list, 18/05/07
 
 EV(1):
   X eyedbadmin database delete [--help] {<dbname>}
-EV(2):
   X eyedbadmin database create [--help] [--dbfile=<dbfile>] [--filedir=<filedir>] [--max-object-count=<object-count>] <dbname>
-EV(3):
   X eyedbadmin database list <options>
-EV(4):
   X eyedbadmin database rename <options>
-EV(5):
-  eyedbadmin datafile create <options>
-EV(6):
-  eyedbadmin datafile delete <options>
-EV(7):
-  eyedbadmin datafile list <options>
 
+EV|FD:
   eyedbadmin database move <options>
   eyedbadmin database copy <options>
   eyedbadmin database defaccess <options>
-
   eyedbadmin database export <options>
   eyedbadmin database import <options>
 
+EV|FD:
+  eyedbadmin datafile create <options>
+  eyedbadmin datafile delete <options>
+  eyedbadmin datafile list <options>
   eyedbadmin datafile move <options>
   eyedbadmin datafile resize <options>
   eyedbadmin datafile defragment <options>
-
   eyedbadmin datafile rename <options>
 
 FD(1): from eyedbadmin user * [USRTopic module]

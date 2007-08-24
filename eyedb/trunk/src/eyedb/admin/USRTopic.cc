@@ -137,15 +137,15 @@ void USRAddCmd::init()
 int USRAddCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " [<user> [<passwd>]]\n";
+  std::cerr << " [USER [PASSWORD]]\n";
   return 1;
 }
 
 int USRAddCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<user>", "User name");
-  getopt->displayOpt("<passwd>", "Password for specified user");
+  getopt->displayOpt("USER", "User name");
+  getopt->displayOpt("PASSWORD", "Password for specified user");
   return 1;
 }
 
@@ -217,7 +217,6 @@ int USRAddCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 }
 
 
-
 //
 // eyedbadmin user delete ...
 //
@@ -234,14 +233,14 @@ void USRDeleteCmd::init()
 int USRDeleteCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " <user>\n";
+  std::cerr << " USER\n";
   return 1;
 }
 
 int USRDeleteCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<user>", "User name");
+  getopt->displayOpt("USER", "User name");
   return 1;
 }
 
@@ -301,14 +300,14 @@ void USRListCmd::init()
 int USRListCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " <user>\n";
+  std::cerr << " [USER]...\n";
   return 1;
 }
 
 int USRListCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<user>", "User name");
+  getopt->displayOpt("USER", "User name");
   return 1;
 }
 
@@ -589,15 +588,15 @@ void USRSysAccessCmd::init()
 int USRSysAccessCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " <user> ['+' combination of] dbcreate|adduser|deleteuser|setuserpasswd|admin|superuser|no\n";
+  std::cerr << " USER ['+' combination of] dbcreate|adduser|deleteuser|setuserpasswd|admin|superuser|no\n";
   return 1;
 }
 
 int USRSysAccessCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<user>", "User name");
-  getopt->displayOpt("<mode>", "['+' combination of] dbcreate|adduser|deleteuser|setuserpasswd|admin|superuser|no");
+  getopt->displayOpt("USER", "User name");
+  getopt->displayOpt("MODE", "['+' combination of] dbcreate|adduser|deleteuser|setuserpasswd|admin|superuser|no");
 
   return 1;
 }
@@ -685,16 +684,16 @@ void USRDBAccessCmd::init()
 int USRDBAccessCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " <user> <dbname> r|rw|rx|rwx|admin|no\n";
+  std::cerr << " USER DBNAME MODE\n";
   return 1;
 }
 
 int USRDBAccessCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<user>", "User name");
-  getopt->displayOpt("<dbname>", "Data base name");
-  getopt->displayOpt("<mode>", "r|rw|rx|rwx|admin|no");
+  getopt->displayOpt("USER", "User name");
+  getopt->displayOpt("DBNAME", "Data base name");
+  getopt->displayOpt("MODE", "r|rw|rx|rwx|admin|no");
   return 1;
 }
 
@@ -783,16 +782,16 @@ void USRPasswdCmd::init()
 int USRPasswdCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " <user> [<passwd>] [<new passwd>]\n";
+  std::cerr << " USER [PASSWORD] [NEWPASSWORD]\n";
   return 1;
 }
 
 int USRPasswdCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<user>", "User name");
-  getopt->displayOpt("<passwd>", "User password");
-  getopt->displayOpt("<new passwd>", "New user password");
+  getopt->displayOpt("USER", "User name");
+  getopt->displayOpt("PASSWORD", "User password");
+  getopt->displayOpt("NEWPASSWORD", "New user password");
   return 1;
 }
 

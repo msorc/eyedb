@@ -48,3 +48,12 @@ IDXTopic::IDXTopic() : Topic("index")
   addCommand(new IDXStatsCmd(this));
   addCommand(new IDXSimulateCmd(this));
 }
+
+#if 0
+"create <dbname> [--check] {<attrpath> [hash|btree [<hints>|\"\" [propagate=on|propagate=off |\"\"]]]}\n"
+"update <dbname> [--check] {<attrpath> [hash|btree [<hints>|\"\"]] [propagate=on|propagate=off |\"\"]}\n"
+"simulate <dbname> [--full] [--fmt=<fmt>] {<attrpath> hash|btree [<hints>]}\n"
+"list <dbname> [--full] {[<attrpath>|<classname>|--all]}\n"
+"stats <dbname> [--full] [--fmt=<fmt>] {[<attrpath>|<classname>|--all]}\n"
+"delete <dbname> {<attrpath>}\n"
+#endif
