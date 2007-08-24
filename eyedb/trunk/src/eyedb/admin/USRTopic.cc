@@ -151,9 +151,7 @@ int USRAddCmd::help()
 
 int USRAddCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  bool r = getopt->parse(PROG_NAME, argv);
-
-  if (!r) {
+  if (!getopt->parse(PROG_NAME, argv)) {
     return usage();
   }
 
@@ -246,9 +244,7 @@ int USRDeleteCmd::help()
 
 int USRDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  bool r = getopt->parse(PROG_NAME, argv);
-
-  if (!r) {
+  if (!getopt->parse(PROG_NAME, argv)) {
     return usage();
   }
 
@@ -538,9 +534,7 @@ list_selected_users(DBM_Database *dbm, std::vector<std::string> &argv)
 
 int USRListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  bool r = getopt->parse(PROG_NAME, argv);
-
-  if (!r) {
+  if (!getopt->parse(PROG_NAME, argv)) {
     return usage();
   }
 
@@ -603,9 +597,7 @@ int USRSysAccessCmd::help()
 
 int USRSysAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  bool r = getopt->parse(PROG_NAME, argv);
-
-  if (!r) {
+  if (!getopt->parse(PROG_NAME, argv)) {
     return usage();
   }
 
@@ -726,9 +718,7 @@ userdbaccessset_realize(const char *username, const char *dbname,
 
 int USRDBAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  bool r = getopt->parse(PROG_NAME, argv);
-
-  if (!r) {
+  if (!getopt->parse(PROG_NAME, argv)) {
     return usage();
   }
 
@@ -798,9 +788,7 @@ int USRPasswdCmd::help()
 
 int USRPasswdCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  bool r = getopt->parse(PROG_NAME, argv);
-
-  if (!r) {
+  if (!getopt->parse(PROG_NAME, argv)) {
     return usage();
   }
 
