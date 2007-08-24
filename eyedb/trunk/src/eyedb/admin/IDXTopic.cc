@@ -1,4 +1,3 @@
-
 /* 
    EyeDB Object Database Management System
    Copyright (C) 1994-1999,2004-2006 SYSRA
@@ -20,6 +19,7 @@
 
 /*
    Author: Eric Viara <viara@sysra.com>
+   Author: Francois Dechelle <francois@dechelle.net>
 */
 
 #include "eyedbconfig.h"
@@ -49,11 +49,230 @@ IDXTopic::IDXTopic() : Topic("index")
   addCommand(new IDXSimulateCmd(this));
 }
 
-#if 0
-"create <dbname> [--check] {<attrpath> [hash|btree [<hints>|\"\" [propagate=on|propagate=off |\"\"]]]}\n"
-"update <dbname> [--check] {<attrpath> [hash|btree [<hints>|\"\"]] [propagate=on|propagate=off |\"\"]}\n"
-"simulate <dbname> [--full] [--fmt=<fmt>] {<attrpath> hash|btree [<hints>]}\n"
-"list <dbname> [--full] {[<attrpath>|<classname>|--all]}\n"
-"stats <dbname> [--full] [--fmt=<fmt>] {[<attrpath>|<classname>|--all]}\n"
-"delete <dbname> {<attrpath>}\n"
-#endif
+// 
+// IDXCreateCmd
+//
+void IDXCreateCmd::init()
+{
+  std::vector<Option> opts;
+  opts.push_back(HELP_OPT);
+  getopt = new GetOpt(getExtName(), opts);
+}
+
+int IDXCreateCmd::usage()
+{
+  getopt->usage("", "");
+  std::cerr << " DBNAME [--check] {ATTRPATH [hash|btree [<hints>|\"\" [propagate=on|propagate=off |\"\"]]]}\n";
+  return 1;
+}
+
+int IDXCreateCmd::help()
+{
+  stdhelp();
+  getopt->displayOpt("DBNAME", "Data base name");
+  getopt->displayOpt("ATTRPATH", "Attribute path");
+  return 1;
+}
+
+int IDXCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+{
+  if (! getopt->parse(PROG_NAME, argv))
+    return usage();
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end())
+    return help();
+
+  return 0;
+}
+
+//
+// IDXDeleteCmd
+//
+void IDXDeleteCmd::init()
+{
+  std::vector<Option> opts;
+  opts.push_back(HELP_OPT);
+  getopt = new GetOpt(getExtName(), opts);
+}
+
+int IDXDeleteCmd::usage()
+{
+  getopt->usage("", "");
+  std::cerr << " delete DBNAME ATTRPATH...\n";
+  return 1;
+}
+
+int IDXDeleteCmd::help()
+{
+  stdhelp();
+  getopt->displayOpt("DBNAME", "Data base name");
+  getopt->displayOpt("ATTRPATH", "Attribute path");
+  return 1;
+}
+
+int IDXDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+{
+  if (! getopt->parse(PROG_NAME, argv))
+    return usage();
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end())
+    return help();
+
+  return 0;
+}
+
+//
+// IDXUpdateCmd
+//
+void IDXUpdateCmd::init()
+{
+  std::vector<Option> opts;
+  opts.push_back(HELP_OPT);
+  getopt = new GetOpt(getExtName(), opts);
+}
+
+int IDXUpdateCmd::usage()
+{
+  getopt->usage("", "");
+  std::cerr << " update DBNAME [--check] {ATTRPATH [hash|btree [<hints>|\"\"]] [propagate=on|propagate=off |\"\"]}\n";
+  return 1;
+}
+
+int IDXUpdateCmd::help()
+{
+  stdhelp();
+  getopt->displayOpt("DBNAME", "Data base name");
+  getopt->displayOpt("ATTRPATH", "Attribute path");
+  return 1;
+}
+
+int IDXUpdateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+{
+  if (! getopt->parse(PROG_NAME, argv))
+    return usage();
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end())
+    return help();
+
+  return 0;
+}
+
+//
+// IDXListCmd
+//
+void IDXListCmd::init()
+{
+  std::vector<Option> opts;
+  opts.push_back(HELP_OPT);
+  getopt = new GetOpt(getExtName(), opts);
+}
+
+int IDXListCmd::usage()
+{
+  getopt->usage("", "");
+  std::cerr << " DBNAME [--full] {[ATTRPATH|<classname>|--all]}\n";
+  return 1;
+}
+
+int IDXListCmd::help()
+{
+  stdhelp();
+  getopt->displayOpt("DBNAME", "Data base name");
+  getopt->displayOpt("ATTRPATH", "Attribute path");
+  return 1;
+}
+
+int IDXListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+{
+  if (! getopt->parse(PROG_NAME, argv))
+    return usage();
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end())
+    return help();
+
+  return 0;
+}
+
+//
+// IDXStatsCmd
+//
+void IDXStatsCmd::init()
+{
+  std::vector<Option> opts;
+  opts.push_back(HELP_OPT);
+  getopt = new GetOpt(getExtName(), opts);
+}
+
+int IDXStatsCmd::usage()
+{
+  getopt->usage("", "");
+  std::cerr << " stats DBNAME [--full] [--fmt=<fmt>] {[ATTRPATH|<classname>|--all]}\n";
+  return 1;
+}
+
+int IDXStatsCmd::help()
+{
+  stdhelp();
+  getopt->displayOpt("DBNAME", "Data base name");
+  getopt->displayOpt("ATTRPATH", "Attribute path");
+  return 1;
+}
+
+int IDXStatsCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+{
+  if (! getopt->parse(PROG_NAME, argv))
+    return usage();
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end())
+    return help();
+
+  return 0;
+}
+
+//
+// IDXSimulateCmd
+//
+void IDXSimulateCmd::init()
+{
+  std::vector<Option> opts;
+  opts.push_back(HELP_OPT);
+  getopt = new GetOpt(getExtName(), opts);
+}
+
+int IDXSimulateCmd::usage()
+{
+  getopt->usage("", "");
+  std::cerr << " simulate DBNAME [--full] [--fmt=<fmt>] {ATTRPATH hash|btree [<hints>]}\n";
+  return 1;
+}
+
+int IDXSimulateCmd::help()
+{
+  stdhelp();
+  getopt->displayOpt("DBNAME", "Data base name");
+  getopt->displayOpt("ATTRPATH", "Attribute path");
+  return 1;
+}
+
+int IDXSimulateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+{
+  if (! getopt->parse(PROG_NAME, argv))
+    return usage();
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end())
+    return help();
+
+  return 0;
+}

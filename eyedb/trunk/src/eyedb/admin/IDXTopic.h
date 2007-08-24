@@ -33,11 +33,11 @@ public:
   IDXTopic();
 };
 
-CMDCLASS(IDXCreateCmd, "create");
-CMDCLASS(IDXDeleteCmd, "delete");
-CMDCLASS(IDXUpdateCmd, "update");
-CMDCLASS(IDXListCmd, "list");
-CMDCLASS(IDXStatsCmd, "stats");
-CMDCLASS(IDXSimulateCmd, "simulate");
+CMDCLASS_GETOPT(IDXCreateCmd, "create");
+CMDCLASS_GETOPT(IDXDeleteCmd, "delete");
+CMDCLASS_GETOPT(IDXUpdateCmd, "update");
+CMDCLASS_GETOPT(IDXListCmd, "list");
+CMDCLASS_GETOPT(IDXStatsCmd, "stats");
+CMDCLASS_GETOPT(IDXSimulateCmd, "simulate");
 
 #endif
