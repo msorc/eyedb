@@ -1,0 +1,6 @@
+class Person {
+  string firstName;
+  string lastName;
+  int age;
+};
+
