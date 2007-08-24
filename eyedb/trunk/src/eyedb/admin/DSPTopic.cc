@@ -19,6 +19,7 @@
 
 /*
    Author: Eric Viara <viara@sysra.com>
+   Author: Francois Dechelle <francois@dechelle.net>
 */
 
 #include "eyedbconfig.h"
@@ -255,7 +256,7 @@ void DSPRenameCmd::init()
 int DSPRenameCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " DBNAME DSPNAME <newdspname>\n";
+  std::cerr << " DBNAME DSPNAME NEWDSPNAME\n";
   return 1;
 }
 
@@ -264,7 +265,7 @@ int DSPRenameCmd::help()
   stdhelp();
   getopt->displayOpt("DBNAME", "Data base name");
   getopt->displayOpt("DSPNAME", "Data space name");
-  getopt->displayOpt("<newdspname>", "New data space name");
+  getopt->displayOpt("NEWDSPNAME", "New data space name");
   return 1;
 }
 
