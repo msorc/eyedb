@@ -49,6 +49,108 @@ IDXTopic::IDXTopic() : Topic("index")
   addCommand(new IDXSimulateCmd(this));
 }
 
+//
+// Helper functions
+//
+static void index_trace(Index *idx, bool full)
+{
+  if (!full) {
+    printf("%s index on %s\n", idx->asHashIndex() ? "hash" : "btree",
+	   idx->getAttrpath().c_str());
+    return;
+  }
+
+  printf("Index on %s:\n", idx->getAttrpath().c_str());
+  printf("  Propagation: %s\n", idx->getPropagate() ? "on" : "off");
+
+  const Dataspace *dataspace = 0;
+  idx->makeDataspace(db, dataspace);
+  if (dataspace)
+    printf("  Dataspace: %s #%d\n", dataspace->getName(), dataspace->getId());
+
+  if (idx->asHashIndex()) {
+    HashIndex *hidx = idx->asHashIndex();
+
+    printf("  Type: Hash\n");
+    printf("  Key count: %d\n", hidx->getKeyCount());
+    if (hidx->getHashMethod())
+      printf("  Hash method: %s::%s;",
+	     hidx->getHashMethod()->getClassOwner()->getName(),
+	     hidx->getHashMethod()->getEx()->getExname().c_str());
+    int cnt = idx->getImplHintsCount();
+    for (int n = 0; n < cnt; n++)
+      if (idx->getImplHints(n))
+	printf("  %s: %d\n", IndexImpl::hashHintToStr(n, True),
+	       idx->getImplHints(n));
+  } else {
+    BTreeIndex *bidx = idx->asBTreeIndex();
+    printf("  Type: BTree\n");
+    printf("  Degree: %d\n", bidx->getDegree());
+  }
+}
+
+static int
+get_index( Database *db, const Class *cls, LinkedList &idxlist)
+{
+  const LinkedList *clidxlist;
+  Status s = const_cast<Class *>(cls)->getAttrCompList(Class::Index_C, clidxlist);
+  CHECK(s);
+    
+  LinkedListCursor c(clidxlist);
+  void *o;
+  while (c.getNext(o)) {
+    idxlist.insertObject(o);
+  }
+  return 0;
+}
+
+static int
+get_index( Database *db, const char *info, LinkedList &idxlist)
+{
+  Status s;
+  Bool all = False;
+
+  if (info) {
+    Status s;
+    if (strchr(info, '.')) {
+      s = Attribute::checkAttrPath(db->getSchema(), cls, attr, info);
+      CHECK(s);
+      Index *idx;
+      s = Attribute::getIndex(db, info, idx);
+      CHECK(s);
+      if (idx) {
+	idxlist.insertObject(idx);
+	return 0;
+      }
+      print_prog();
+      fprintf(stderr, "index '%s' not found\n", info);
+      return 1;
+    }
+    else if (!strcmp(info, "--all"))
+      all = True;
+    else {
+      const Class *cls = db->getSchema()->getClass(info);
+      if (!cls) {
+	print_prog();
+	fprintf(stderr, "class '%s' not found\n", info);
+	return 1;
+      }
+      
+      return get_index(cls, idxlist);
+    }
+  }
+
+  LinkedListCursor c(db->getSchema()->getClassList());
+  const Class *cls;
+  while (c.getNext((void *&)cls)) {
+    if (!cls->isSystem() || all)
+      if (get_index(cls, idxlist))
+	return 1;
+  }
+  
+  return 0;
+}
+
 // 
 // IDXCreateCmd
 //
@@ -169,14 +271,19 @@ int IDXUpdateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 void IDXListCmd::init()
 {
   std::vector<Option> opts;
+
   opts.push_back(HELP_OPT);
+
+  const std::string FULL_OPT("full");
+  opts.push_back( Option(FULL_OPT, OptionBoolType()));
+
   getopt = new GetOpt(getExtName(), opts);
 }
 
 int IDXListCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " DBNAME [--full] {[ATTRPATH|<classname>|--all]}\n";
+  std::cerr << " DBNAME [ATTRPATH|CLASSNAME]...\n";
   return 1;
 }
 
@@ -185,6 +292,7 @@ int IDXListCmd::help()
   stdhelp();
   getopt->displayOpt("DBNAME", "Data base name");
   getopt->displayOpt("ATTRPATH", "Attribute path");
+  getopt->displayOpt("CLASSNAME", "Class name");
   return 1;
 }
 
@@ -197,6 +305,35 @@ int IDXListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 
   if (map.find("help") != map.end())
     return help();
+  if (argv.size() < 1)
+    return usage();
+
+  const char *dbname = argv[0].c_str();
+  bool full = map.find("full") != map.end();
+
+  conn.open();
+
+  Database *db = new Database(dbname);
+
+  Status s = db->open( &conn, Database::DBSRead);
+  CHECK_STATUS(s);
+
+  s = db->transactionBegin();
+  CHECK_STATUS(s);
+
+  LinkedList indexList;
+
+  if (argv.size() < 2)
+    get_all_index( db, indexList);
+  else {
+    for ( int i = 1; i < argv.size(); i++)
+      get_index( db, argv[i].c_str(), indexList);
+  }
+
+  LinkedListCursor c(indexList);
+  Index *index;
+  while (c.getNext((void *&)index))
+    index_trace(index, full);
 
   return 0;
 }
