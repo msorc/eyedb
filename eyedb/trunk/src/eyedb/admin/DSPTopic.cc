@@ -64,17 +64,17 @@ void DSPCreateCmd::init()
 int DSPCreateCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " <dbname> <dspname> {<datid>|<datname>}\n";
+  std::cerr << " DBNAME DSPNAME DATID|DATNAME...\n";
   return 1;
 }
 
 int DSPCreateCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<dbname>", "Data base name");
-  getopt->displayOpt("<dspname>", "Data space name");
-  getopt->displayOpt("<datid>", "Data file id");
-  getopt->displayOpt("<datname>", "Data file name");
+  getopt->displayOpt("DBNAME", "Data base name");
+  getopt->displayOpt("DSPNAME", "Data space name");
+  getopt->displayOpt("DATID", "Data file id");
+  getopt->displayOpt("DATNAME", "Data file name");
   return 1;
 }
 
@@ -128,17 +128,17 @@ void DSPUpdateCmd::init()
 int DSPUpdateCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " <dbname> <dspname> {<datid>|<datname>}\n";
+  std::cerr << " DBNAME DSPNAME DATID|DATNAME...\n";
   return 1;
 }
 
 int DSPUpdateCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<dbname>", "Data base name");
-  getopt->displayOpt("<dspname>", "Data space name");
-  getopt->displayOpt("<datid>", "Data file id");
-  getopt->displayOpt("<datname>", "Data file name");
+  getopt->displayOpt("DBNAME", "Data base name");
+  getopt->displayOpt("DSPNAME", "Data space name");
+  getopt->displayOpt("DATID", "Data file id");
+  getopt->displayOpt("DATNAME", "Data file name");
   return 1;
 }
 
@@ -196,15 +196,15 @@ void DSPDeleteCmd::init()
 int DSPDeleteCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " <dbname> <dspname>\n";
+  std::cerr << " DBNAME DSPNAME\n";
   return 1;
 }
 
 int DSPDeleteCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<dbname>", "Data base name");
-  getopt->displayOpt("<dspname>", "Data space name");
+  getopt->displayOpt("DBNAME", "Data base name");
+  getopt->displayOpt("DSPNAME", "Data space name");
   return 1;
 }
 
@@ -255,15 +255,15 @@ void DSPRenameCmd::init()
 int DSPRenameCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " <dbname> <dspname> <newdspname>\n";
+  std::cerr << " DBNAME DSPNAME <newdspname>\n";
   return 1;
 }
 
 int DSPRenameCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<dbname>", "Data base name");
-  getopt->displayOpt("<dspname>", "Data space name");
+  getopt->displayOpt("DBNAME", "Data base name");
+  getopt->displayOpt("DSPNAME", "Data space name");
   getopt->displayOpt("<newdspname>", "New data space name");
   return 1;
 }
@@ -316,15 +316,15 @@ void DSPListCmd::init()
 int DSPListCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " <dbname> [{<dspname>}]\n";
+  std::cerr << " DBNAME [DSPNAME]...\n";
   return 1;
 }
 
 int DSPListCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<dbname>", "Data base name");
-  getopt->displayOpt("<dspname>", "Data space name");
+  getopt->displayOpt("DBNAME", "Data base name");
+  getopt->displayOpt("DSPNAME", "Data space name");
   return 1;
 }
 
@@ -384,15 +384,15 @@ void DSPSetDefCmd::init()
 int DSPSetDefCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " <dbname> <dspname>\n";
+  std::cerr << " DBNAME DSPNAME\n";
   return 1;
 }
 
 int DSPSetDefCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<dbname>", "Data base name");
-  getopt->displayOpt("<dspname>", "Data space name");
+  getopt->displayOpt("DBNAME", "Data base name");
+  getopt->displayOpt("DSPNAME", "Data space name");
   return 1;
 }
 
@@ -443,14 +443,14 @@ void DSPGetDefCmd::init()
 int DSPGetDefCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " <dbname>\n";
+  std::cerr << " DBNAME\n";
   return 1;
 }
 
 int DSPGetDefCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<dbname>", "Data base name");
+  getopt->displayOpt("DBNAME", "Data base name");
   return 1;
 }
 
@@ -498,17 +498,17 @@ void DSPSetCurDatCmd::init()
 int DSPSetCurDatCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " <dbname> <dspname> <datid>|<datname>\n";
+  std::cerr << " DBNAME DSPNAME DATID|DATNAME\n";
   return 1;
 }
 
 int DSPSetCurDatCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<dbname>", "Data base name");
-  getopt->displayOpt("<dspname>", "Data space name");
-  getopt->displayOpt("<datid>", "Data file id");
-  getopt->displayOpt("<datname>", "Data file name");
+  getopt->displayOpt("DBNAME", "Data base name");
+  getopt->displayOpt("DSPNAME", "Data space name");
+  getopt->displayOpt("DATID", "Data file id");
+  getopt->displayOpt("DATNAME", "Data file name");
   return 1;
 }
 
@@ -564,15 +564,15 @@ void DSPGetCurDatCmd::init()
 int DSPGetCurDatCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " <dbname> <dspname>\n";
+  std::cerr << " DBNAME DSPNAME\n";
   return 1;
 }
 
 int DSPGetCurDatCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<dbname>", "Data base name");
-  getopt->displayOpt("<dspname>", "Data space name");
+  getopt->displayOpt("DBNAME", "Data base name");
+  getopt->displayOpt("DSPNAME", "Data space name");
   return 1;
 }
 
