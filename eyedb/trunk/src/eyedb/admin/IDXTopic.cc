@@ -23,8 +23,8 @@
 */
 
 #include "eyedbconfig.h"
-
 #include <eyedb/eyedb.h>
+#include <eyedblib/butils.h>
 #include "eyedb/DBM_Database.h"
 #include <sys/types.h>
 #include <signal.h>
@@ -32,10 +32,18 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <eyedblib/butils.h>
-
 #include "GetOpt.h"
-
 #include "IDXTopic.h"
+
+using namespace eyedb;
+using namespace std;
+
+#define CHECK_STATUS(s) 			\
+  if (s) {					\
+    std::cerr << PROG_NAME;			\
+    s->print();					\
+    return 1;					\
+  }
 
 IDXTopic::IDXTopic() : Topic("index")
 {
@@ -52,7 +60,7 @@ IDXTopic::IDXTopic() : Topic("index")
 //
 // Helper functions
 //
-static void index_trace(Index *idx, bool full)
+static void index_trace( Database *db, Index *idx, bool full)
 {
   if (!full) {
     printf("%s index on %s\n", idx->asHashIndex() ? "hash" : "btree",
@@ -90,61 +98,70 @@ static void index_trace(Index *idx, bool full)
 }
 
 static int
-get_index( Database *db, const Class *cls, LinkedList &idxlist)
+get_index( Database *db, const Class *cls, LinkedList &indexlist)
 {
-  const LinkedList *clidxlist;
-  Status s = const_cast<Class *>(cls)->getAttrCompList(Class::Index_C, clidxlist);
-  CHECK(s);
+  const LinkedList *classindexlist;
+
+  Status s = const_cast<Class *>(cls)->getAttrCompList(Class::Index_C, classindexlist);
+  CHECK_STATUS(s);
     
-  LinkedListCursor c(clidxlist);
+  LinkedListCursor c(classindexlist);
   void *o;
   while (c.getNext(o)) {
-    idxlist.insertObject(o);
+    indexlist.insertObject(o);
   }
+
   return 0;
 }
 
 static int
-get_index( Database *db, const char *info, LinkedList &idxlist)
+get_index( Database *db, const char *name, LinkedList &indexlist)
 {
   Status s;
-  Bool all = False;
+  const Class *cls;
+  const Attribute *attr;
 
-  if (info) {
-    Status s;
-    if (strchr(info, '.')) {
-      s = Attribute::checkAttrPath(db->getSchema(), cls, attr, info);
-      CHECK(s);
-      Index *idx;
-      s = Attribute::getIndex(db, info, idx);
-      CHECK(s);
-      if (idx) {
-	idxlist.insertObject(idx);
-	return 0;
-      }
-      print_prog();
-      fprintf(stderr, "index '%s' not found\n", info);
+  if (strchr(name, '.')) {
+    // name is an attribute name
+    s = Attribute::checkAttrPath(db->getSchema(), cls, attr, name);
+    CHECK_STATUS(s);
+
+    Index *index;
+    s = Attribute::getIndex(db, name, index);
+    CHECK_STATUS(s);
+
+    if (!index) {
+      std::cerr << PROG_NAME;
+      fprintf(stderr, ": index '%s' not found\n", name);
       return 1;
     }
-    else if (!strcmp(info, "--all"))
-      all = True;
-    else {
-      const Class *cls = db->getSchema()->getClass(info);
-      if (!cls) {
-	print_prog();
-	fprintf(stderr, "class '%s' not found\n", info);
-	return 1;
-      }
-      
-      return get_index(cls, idxlist);
-    }
-  }
 
+    indexlist.insertObject(index);
+
+    return 0;
+  } else {
+    // name is a class name
+    cls = db->getSchema()->getClass(name);
+    if (!cls) {
+      std::cerr << PROG_NAME;
+      fprintf(stderr, ": class '%s' not found\n", name);
+      return 1;
+    }
+      
+    return get_index(db, cls, indexlist);
+  }
+  
+  return 0;
+}
+
+static int
+get_all_index( Database *db, LinkedList &indexlist, bool all)
+{
   LinkedListCursor c(db->getSchema()->getClassList());
   const Class *cls;
   while (c.getNext((void *&)cls)) {
     if (!cls->isSystem() || all)
-      if (get_index(cls, idxlist))
+      if (get_index(db, cls, indexlist))
 	return 1;
   }
   
@@ -277,6 +294,9 @@ void IDXListCmd::init()
   const std::string FULL_OPT("full");
   opts.push_back( Option(FULL_OPT, OptionBoolType()));
 
+  const std::string ALL_OPT("all");
+  opts.push_back( Option(ALL_OPT, OptionBoolType()));
+
   getopt = new GetOpt(getExtName(), opts);
 }
 
@@ -305,11 +325,17 @@ int IDXListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 
   if (map.find("help") != map.end())
     return help();
+
   if (argv.size() < 1)
     return usage();
 
   const char *dbname = argv[0].c_str();
+
   bool full = map.find("full") != map.end();
+  bool all = map.find("all") != map.end();
+
+  if (all && argv.size() > 1)
+    return usage();
 
   conn.open();
 
@@ -324,16 +350,18 @@ int IDXListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
   LinkedList indexList;
 
   if (argv.size() < 2)
-    get_all_index( db, indexList);
+    if (get_all_index( db, indexList, all))
+      return 1;
   else {
     for ( int i = 1; i < argv.size(); i++)
-      get_index( db, argv[i].c_str(), indexList);
+      if (get_index( db, argv[i].c_str(), indexList))
+	return 1;
   }
 
   LinkedListCursor c(indexList);
   Index *index;
   while (c.getNext((void *&)index))
-    index_trace(index, full);
+    index_trace( db, index, full);
 
   return 0;
 }
