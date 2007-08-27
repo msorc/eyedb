@@ -444,13 +444,14 @@ int IDXListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 
   LinkedList indexList;
 
-  if (argv.size() < 2)
+  if (argv.size() < 2) {
     if (index_get_all( db, indexList, all))
       return 1;
-  else {
-    for ( int i = 1; i < argv.size(); i++)
+  } else {
+    for ( int i = 1; i < argv.size(); i++) {
       if (index_get( db, argv[i].c_str(), indexList))
 	return 1;
+    }
   }
 
   LinkedListCursor c(indexList);
