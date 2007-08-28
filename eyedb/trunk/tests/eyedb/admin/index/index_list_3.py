@@ -8,9 +8,11 @@ attribute_3 = 'Person.age'
 attribute_4 = 'Person.id'
 
 # list the index
-command="eyedbadmin2 index list %s %s" % (dbname,attribute_1)
+command="eyedbadmin2 index list %s" % (dbname,)
 child = pexpect.spawn(command)
 r = child.expect("hash index on %s" % (attribute_1,))
+r = child.expect("btree index on %s" % (attribute_3,))
+r = child.expect("hash index on %s" % (attribute_4,))
 r = child.expect(pexpect.EOF)
 child.close()
 sys.exit(child.exitstatus)

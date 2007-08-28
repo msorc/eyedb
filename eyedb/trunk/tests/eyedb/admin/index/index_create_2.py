@@ -2,7 +2,7 @@ import pexpect
 import sys
 
 dbname = 'index_test_db'
-attribute = 'Person.firstName'
+attribute = 'Person.lastName'
 
 # create the index
 command="eyedbadmin2 index create %s %s" % (dbname,attribute)
