@@ -2,10 +2,10 @@
 eyedbadmin TODO list, 18/05/07
 
 EV(1):
-  X eyedbadmin database delete [--help] {<dbname>}
-  X eyedbadmin database create [--help] [--dbfile=<dbfile>] [--filedir=<filedir>] [--max-object-count=<object-count>] <dbname>
-  X eyedbadmin database list <options>
-  X eyedbadmin database rename <options>
+  eyedbadmin database delete [DONE]
+  eyedbadmin database create [DONE]
+  eyedbadmin database list [DONE]
+  eyedbadmin database rename [DONE]
 
 EV|FD:
   eyedbadmin database move <options>
@@ -44,10 +44,10 @@ Note: tests depends on datafile create,delete,list
   eyedbadmin dataspace getcurdat <options> [DONE]
 
 FD(3): from eyedbidxadmin [IDXTopic module]
-  eyedbadmin index create <options>
-  eyedbadmin index delete <options>
+  eyedbadmin index create <options> [DONE]
+  eyedbadmin index delete <options> [DONE]
   eyedbadmin index update <options>
-  eyedbadmin index list <options>
+  eyedbadmin index list <options> [DONE]
   eyedbadmin index stats <options>
   eyedbadmin index simulate <options>
 

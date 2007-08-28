@@ -238,7 +238,7 @@ int IDXCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   if (map.find(TYPE_OPT) != map.end()) {
     type = map[TYPE_OPT].value.c_str();
 
-    if (strcmp(type, "hash") || strcmp(type, "btree"))
+    if (strcmp(type, "hash") && strcmp(type, "btree"))
       return help();
   }
 
@@ -263,8 +263,6 @@ int IDXCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   s = Attribute::checkAttrPath( db->getSchema(), cls, attribute, attributePath);
   CHECK_STATUS(s);
 
-  Index *index;
-
   if (!type) {
     if (attribute->isString() 
 	|| attribute->isIndirect() 
@@ -273,6 +271,10 @@ int IDXCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
     else
       type = "btree";
   }
+
+  Index *index;
+
+  printf("Creating %s index on %s\n", type, attributePath);
 
   if (!strcmp(type, "hash")) {
     HashIndex *hidx;
@@ -290,8 +292,6 @@ int IDXCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
     CHECK_STATUS(s);
     index = bidx;
   }
-
-  printf("Creating %sindex on %s\n", type, attributePath);
 
   s = index->store();
   CHECK_STATUS(s);
@@ -335,6 +335,45 @@ int IDXDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   if (map.find("help") != map.end())
     return help();
+
+  if (argv.size() < 2)
+    return usage();
+
+  const char *dbname = argv[0].c_str();
+  const char *attributePath = argv[1].c_str();
+
+  conn.open();
+
+  Database *db = new Database(dbname);
+
+  Status s = db->open( &conn, Database::DBRW);
+  CHECK_STATUS(s);
+
+  s = db->transactionBegin();
+  CHECK_STATUS(s);
+
+  const Class *cls;
+  const Attribute *attribute;
+
+  s = Attribute::checkAttrPath(db->getSchema(), cls, attribute, attributePath);
+  CHECK_STATUS(s);
+
+  Index *index;
+
+  s = Attribute::getIndex(db, attributePath, index);
+  CHECK_STATUS(s);
+    
+  if (!index) {
+    std::cerr << PROG_NAME;
+    fprintf(stderr, ": index '%s' not found\n", attributePath);
+    return 1;
+  }
+
+  printf("Deleting index %s\n", index->getAttrpath().c_str());
+  s = index->remove();
+  CHECK_STATUS(s);
+    
+  db->transactionCommit();
 
   return 0;
 }
