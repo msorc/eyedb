@@ -49,7 +49,7 @@ FD(3): from eyedbidxadmin [IDXTopic module]
   eyedbadmin index update <options>
   eyedbadmin index list <options> [DONE]
   eyedbadmin index stats <options> [DONE]
-  eyedbadmin index simulate <options>
+  eyedbadmin index simulate <options> [DONE]
 
 plus tard:
   from eyedbloca
