@@ -48,7 +48,7 @@ FD(3): from eyedbidxadmin [IDXTopic module]
   eyedbadmin index delete <options> [DONE]
   eyedbadmin index update <options>
   eyedbadmin index list <options> [DONE]
-  eyedbadmin index stats <options>
+  eyedbadmin index stats <options> [DONE]
   eyedbadmin index simulate <options>
 
 plus tard:

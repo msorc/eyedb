@@ -7,13 +7,13 @@ attribute_2 = 'Person.lastName'
 attribute_3 = 'Person.age'
 attribute_4 = 'Person.id'
 
-# list the index
-command="eyedbadmin2 index list %s" % (dbname,)
+# get the index statistics
+command="eyedbadmin2 index stats %s %s" % (dbname,attribute_1)
 child = pexpect.spawn(command)
 child.logfile = sys.stdout
-r = child.expect("hash index on %s" % (attribute_1,))
-r = child.expect("btree index on %s" % (attribute_3,))
-r = child.expect("hash index on %s" % (attribute_4,))
+r = child.expect("Index on %s" % (attribute_1,))
+r = child.expect("Propagation: on")
+r = child.expect("Type: Hash")
 r = child.expect(pexpect.EOF)
 child.close()
 sys.exit(child.exitstatus)

@@ -57,6 +57,9 @@ IDXTopic::IDXTopic() : Topic("index")
   addCommand(new IDXSimulateCmd(this));
 }
 
+static const std::string PROPAGATE_OPT("propagate");
+static const std::string TYPE_OPT("type");
+
 //
 // Helper functions
 //
@@ -171,13 +174,8 @@ index_get_all( Database *db, LinkedList &indexlist, bool all)
 // 
 // IDXCreateCmd
 //
-static const std::string PROPAGATE_OPT("propagate");
-static const std::string TYPE_OPT("type");
-
-void IDXCreateCmd::init()
+static void make_create_update_options( std::vector<Option> &opts)
 {
-  std::vector<Option> opts;
-
   opts.push_back(HELP_OPT);
 
   std::vector<std::string> propagate_choices;
@@ -194,6 +192,13 @@ void IDXCreateCmd::init()
 			 OptionStringType(),
 			 Option::MandatoryValue,
 			 OptionDesc( "Index type (supported types are: hash, btree)", "TYPE")));
+}
+
+void IDXCreateCmd::init()
+{
+  std::vector<Option> opts;
+
+  make_create_update_options( opts);
 
   getopt = new GetOpt(getExtName(), opts);
 }
@@ -234,11 +239,11 @@ int IDXCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   if (argv.size() > 2)
     hints = argv[2].c_str();
 
-  const char *type = 0;
+  const char *typeOption = 0;
   if (map.find(TYPE_OPT) != map.end()) {
-    type = map[TYPE_OPT].value.c_str();
+    typeOption = map[TYPE_OPT].value.c_str();
 
-    if (strcmp(type, "hash") && strcmp(type, "btree"))
+    if (strcmp(typeOption, "hash") && strcmp(typeOption, "btree"))
       return help();
   }
 
@@ -263,20 +268,20 @@ int IDXCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   s = Attribute::checkAttrPath( db->getSchema(), cls, attribute, attributePath);
   CHECK_STATUS(s);
 
-  if (!type) {
+  if (!typeOption) {
     if (attribute->isString() 
 	|| attribute->isIndirect() 
 	|| attribute->getClass()->asCollectionClass()) // what about enums
-      type = "hash";
+      typeOption = "hash";
     else
-      type = "btree";
+      typeOption = "btree";
   }
 
   Index *index;
 
-  printf("Creating %s index on %s\n", type, attributePath);
+  printf("Creating %s index on %s\n", typeOption, attributePath);
 
-  if (!strcmp(type, "hash")) {
+  if (!strcmp(typeOption, "hash")) {
     HashIndex *hidx;
     Status s = HashIndex::make(db, const_cast<Class *>(cls), attributePath,
 			       (propagate)? eyedb::True : eyedb::False, 
@@ -284,7 +289,7 @@ int IDXCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
     CHECK_STATUS(s);
     index = hidx;
   }
-  else if (!strcmp(type, "btree")) {
+  else if (!strcmp(typeOption, "btree")) {
     BTreeIndex *bidx;
     Status s = BTreeIndex::make(db, const_cast<Class *>(cls), attributePath, 
 			       (propagate)? eyedb::True : eyedb::False, 
@@ -349,7 +354,7 @@ int IDXDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   Status s = db->open( &conn, Database::DBRW);
   CHECK_STATUS(s);
 
-  s = db->transactionBegin();
+  s = db->transactionBeginExclusive();
   CHECK_STATUS(s);
 
   const Class *cls;
@@ -384,14 +389,16 @@ int IDXDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 void IDXUpdateCmd::init()
 {
   std::vector<Option> opts;
-  opts.push_back(HELP_OPT);
+
+  make_create_update_options( opts);
+
   getopt = new GetOpt(getExtName(), opts);
 }
 
 int IDXUpdateCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " update DBNAME [--check] {ATTRPATH [hash|btree [<hints>|\"\"]] [propagate=on|propagate=off |\"\"]}\n";
+  std::cerr << " DBNAME ATTRPATH [HINTS]\n";
   return 1;
 }
 
@@ -400,6 +407,7 @@ int IDXUpdateCmd::help()
   stdhelp();
   getopt->displayOpt("DBNAME", "Data base name");
   getopt->displayOpt("ATTRPATH", "Attribute path");
+  getopt->displayOpt("HINTS", "Index hints");
   return 1;
 }
 
@@ -412,6 +420,108 @@ int IDXUpdateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   if (map.find("help") != map.end())
     return help();
+
+  if (argv.size() < 2)
+    return usage();
+
+  const char *dbname = argv[0].c_str();
+  const char *attributePath = argv[1].c_str();
+
+  const char *hints = 0;
+  if (argv.size() > 2)
+    hints = argv[2].c_str();
+
+  const char *typeOption = 0;
+  if (map.find(TYPE_OPT) != map.end()) {
+    typeOption = map[TYPE_OPT].value.c_str();
+
+    if (strcmp(typeOption, "hash") && strcmp(typeOption, "btree"))
+      return help();
+  }
+
+  bool propagate = true;
+  if (map.find(PROPAGATE_OPT) != map.end()) {
+    propagate = !strcmp( map[PROPAGATE_OPT].value.c_str(), "on");
+  }
+
+  conn.open();
+
+  Database *db = new Database(dbname);
+
+  Status s = db->open( &conn, Database::DBRW);
+  CHECK_STATUS(s);
+
+  s = db->transactionBeginExclusive();
+  CHECK_STATUS(s);
+
+  LinkedList indexList;
+  if (index_get( db, attributePath, indexList))
+    return 1;
+
+  Index *index = (Index *)indexList.getObject(0);
+
+  IndexImpl::Type type;
+  if (typeOption && !strcmp(typeOption, "hash"))
+    type = IndexImpl::Hash;
+  else if (typeOption && !strcmp(typeOption, "btree"))
+    type = IndexImpl::BTree;
+  else
+    type = index->asBTreeIndex() ? IndexImpl::BTree : IndexImpl::Hash;
+
+#if 0
+  Bool propag;
+  Bool only_propag = False;
+  const char *stype = argv[n+1];
+
+  if (!strcmp(stype, "hash"))
+    type = IndexImpl::Hash;
+  else if (!strcmp(stype, "btree"))
+    type = IndexImpl::BTree;
+  else if (!*stype)
+    type = idx->asBTreeIndex() ? IndexImpl::BTree : IndexImpl::Hash;
+  else if (!get_propag(stype, propag)) {
+    only_propag = True;
+    stype = idx->asBTreeIndex() ? "btree" : "hash";
+  }
+  else
+    return usage(prog);
+  
+  IndexImpl *idximpl = 0;
+  Status s;
+  if (!only_propag) {
+    const char *hints = (argc > n+2 ? argv[n+2] : "");
+    s = IndexImpl::make(db, type, hints, idximpl, idx->getIsString());
+    CHECK(s);
+
+    if (argc > n+3) {
+      if (get_propag(argv[n+3], propag))
+	return 1;
+      else
+	propag = idx->getPropagate();
+    }
+  }
+
+  printf("Updating %sindex on %s\n", stype, argv[n]);
+  idx->setPropagate(propag);
+  if (only_propag) {
+    s = idx->store();
+    CHECK(s);
+  }
+  else if ((type == IndexImpl::Hash && idx->asBTreeIndex()) ||
+	   (type == IndexImpl::BTree && idx->asHashIndex())) {
+    Index *idxn;
+    s = idx->reimplement(*idximpl, idxn);
+    CHECK(s);
+  }
+  else {
+    s = idx->setImplementation(idximpl);
+    CHECK(s);
+    s = idx->store();
+    CHECK(s);
+  }
+#endif
+
+  db->transactionCommit();
 
   return 0;
 }
@@ -507,14 +617,25 @@ int IDXListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 void IDXStatsCmd::init()
 {
   std::vector<Option> opts;
+
   opts.push_back(HELP_OPT);
+
+  const std::string FULL_OPT("full");
+  opts.push_back( Option(FULL_OPT, OptionBoolType()));
+
+  const std::string FORMAT_OPT("format");
+  opts.push_back( Option(FORMAT_OPT, 
+			 OptionStringType(),
+			 Option::MandatoryValue,
+			 OptionDesc( "Statistics format", "FORMAT")));
+
   getopt = new GetOpt(getExtName(), opts);
 }
 
 int IDXStatsCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " stats DBNAME [--full] [--fmt=<fmt>] {[ATTRPATH|<classname>|--all]}\n";
+  std::cerr << " DBNAME [ATTRPATH|CLASSNAME]...\n";
   return 1;
 }
 
@@ -523,6 +644,21 @@ int IDXStatsCmd::help()
   stdhelp();
   getopt->displayOpt("DBNAME", "Data base name");
   getopt->displayOpt("ATTRPATH", "Attribute path");
+  getopt->displayOpt("CLASSNAME", "Class name");
+  std::cout << 
+"\n  The --format option indicates an output format for hash index stat entries.\n\
+    <format> is a printf-like string where:\n\
+      %n denotes the number of keys,\n\
+      %O denotes the count of object entries for this key,\n\
+      %o denotes the count of hash objects for this key,\n\
+      %s denotes the size of hash objects for this key,\n\
+      %b denotes the busy size of hash objects for this key,\n\
+      %f denotes the free size of hash objects for this key.\n\
+\n\
+  Examples:\n\
+      --format=\"%n %O\\n\"\n\
+      --format=\"%n -> %O, %o, %s\\n\"\n";
+
   return 1;
 }
 
@@ -535,6 +671,60 @@ int IDXStatsCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv
 
   if (map.find("help") != map.end())
     return help();
+
+  if (argv.size() < 1)
+    return usage();
+
+  const char *dbname = argv[0].c_str();
+
+  bool full = map.find("full") != map.end();
+
+  const char *format = 0;
+  if (map.find("format") != map.end())
+    format = map["format"].value.c_str();
+
+  conn.open();
+
+  Database *db = new Database(dbname);
+
+  Status s = db->open( &conn, Database::DBSRead);
+  CHECK_STATUS(s);
+
+  s = db->transactionBegin();
+  CHECK_STATUS(s);
+
+  LinkedList indexList;
+
+  if (argv.size() < 2) {
+    if (index_get_all( db, indexList, false))
+      return 1;
+  } else {
+    for ( int i = 1; i < argv.size(); i++) {
+      if (index_get( db, argv[i].c_str(), indexList))
+	return 1;
+    }
+  }
+
+  LinkedListCursor c(indexList);
+  Index *index;
+  while (c.getNext((void *&)index)) {
+    if (format && index->asHashIndex()) {
+      IndexStats *stats;
+      s = index->getStats(stats);
+      CHECK_STATUS(s);
+      fprintf(stdout, "\n");
+      s = stats->asHashIndexStats()->printEntries(format);
+      delete stats;
+      CHECK_STATUS(s);
+    } else {
+      std::string stats;
+      s = index->getStats(stats, False, (full)? eyedb::True : eyedb::False, "    ");
+      CHECK_STATUS(s);
+      index_trace(db, index, True);
+      fprintf(stdout, "  Statistics:\n");
+      fprintf(stdout, stats.c_str());
+    }
+  }
 
   return 0;
 }
