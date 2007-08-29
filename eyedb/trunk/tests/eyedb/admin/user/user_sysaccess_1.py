@@ -5,6 +5,7 @@ username='toto'
 
 command="eyedbadmin2 user sysaccess %s dbcreate" % (username,)
 child = pexpect.spawn(command)
+child.logfile = sys.stdout
 r = child.expect(pexpect.EOF)
 child.close()
 if child.exitstatus != 0:
@@ -12,6 +13,7 @@ if child.exitstatus != 0:
 
 command="eyedbadmin2 user sysaccess %s setuserpasswd" % (username,)
 child = pexpect.spawn(command)
+child.logfile = sys.stdout
 r = child.expect(pexpect.EOF)
 child.close()
 sys.exit(child.exitstatus)
