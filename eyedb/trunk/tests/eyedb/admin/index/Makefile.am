@@ -10,5 +10,6 @@ index_list_1.py \
 index_list_2.py \
 index_stats_1.py \
 index_stats_2.py \
+index_simulate_1.py \
 index_delete_1.py \
 index_list_3.py 
