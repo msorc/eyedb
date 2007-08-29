@@ -8,5 +8,7 @@ index_create_3.py \
 index_create_4.py \
 index_list_1.py \
 index_list_2.py \
+index_stats_1.py \
+index_stats_2.py \
 index_delete_1.py \
 index_list_3.py 

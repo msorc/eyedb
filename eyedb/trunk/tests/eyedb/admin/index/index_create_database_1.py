@@ -7,6 +7,7 @@ dbname = 'index_test_db'
 # test if database exists
 dblist = "eyedbadmin2 database list %s" % (dbname,)
 child = pexpect.spawn( dblist)
+child.logfile = sys.stdout
 dblistmsg = "Database '%s' not found" % (dbname,)
 r = child.expect([dblistmsg, pexpect.EOF])
 # if it exists, delete it

@@ -10,6 +10,7 @@ attribute_4 = 'Person.id'
 # list the index
 command="eyedbadmin2 index list %s" % (dbname,)
 child = pexpect.spawn(command)
+child.logfile = sys.stdout
 r = child.expect("hash index on %s" % (attribute_1,))
 r = child.expect("hash index on %s" % (attribute_2,))
 r = child.expect("btree index on %s" % (attribute_3,))
