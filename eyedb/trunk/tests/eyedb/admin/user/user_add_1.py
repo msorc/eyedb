@@ -5,6 +5,7 @@ username='toto'
 password='titi'
 command="eyedbadmin2 user add %s" % (username,)
 child = pexpect.spawn(command)
+child.logfile = sys.stdout
 r = child.expect("%s password: " % (username,))
 #print "expect 1 returned %d" % r
 child.sendline( password)
