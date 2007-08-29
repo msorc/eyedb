@@ -440,7 +440,7 @@ int IDXUpdateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   const char *dbname = argv[0].c_str();
   const char *attributePath = argv[1].c_str();
 
-  const char *hints = 0;
+  const char *hints = "";
   if (argv.size() > 2)
     hints = argv[2].c_str();
 
@@ -452,9 +452,9 @@ int IDXUpdateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
       return help();
   }
 
-  bool propagate = true;
+  const char *propagateOption = 0;
   if (map.find(PROPAGATE_OPT) != map.end()) {
-    propagate = !strcmp( map[PROPAGATE_OPT].value.c_str(), "on");
+    propagateOption = map[TYPE_OPT].value.c_str();
   }
 
   conn.open();
@@ -481,58 +481,47 @@ int IDXUpdateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   else
     type = index->asBTreeIndex() ? IndexImpl::BTree : IndexImpl::Hash;
 
-#if 0
-  Bool propag;
-  Bool only_propag = False;
-  const char *stype = argv[n+1];
+  bool onlyPropagate = false;
+  if (propagateOption 
+      && !strcmp(hints,"") 
+      && ((type == IndexImpl::Hash && index->asHashIndex()) ||
+	  (type == IndexImpl::BTree && index->asBTreeIndex())))
+    onlyPropagate = true;
 
-  if (!strcmp(stype, "hash"))
-    type = IndexImpl::Hash;
-  else if (!strcmp(stype, "btree"))
-    type = IndexImpl::BTree;
-  else if (!*stype)
-    type = idx->asBTreeIndex() ? IndexImpl::BTree : IndexImpl::Hash;
-  else if (!get_propag(stype, propag)) {
-    only_propag = True;
-    stype = idx->asBTreeIndex() ? "btree" : "hash";
-  }
+  bool propagate;
+  if (propagateOption)
+    propagate = !strcmp( propagateOption, "on");
   else
-    return usage(prog);
-  
-  IndexImpl *idximpl = 0;
-  Status s;
-  if (!only_propag) {
-    const char *hints = (argc > n+2 ? argv[n+2] : "");
-    s = IndexImpl::make(db, type, hints, idximpl, idx->getIsString());
-    CHECK(s);
+    propagate = index->getPropagate();
 
-    if (argc > n+3) {
-      if (get_propag(argv[n+3], propag))
-	return 1;
-      else
-	propag = idx->getPropagate();
+  printf("Updating %s index on %s\n", (type == IndexImpl::Hash) ? "hash" : "btree", attributePath);
+
+  index->setPropagate( (propagate)? eyedb::True : eyedb::False);
+
+  if (onlyPropagate) {
+    s = index->store();
+    CHECK_STATUS(s);
+  } else {
+    IndexImpl *impl = 0;
+
+    s = IndexImpl::make( db, type, hints, impl, index->getIsString());
+    CHECK_STATUS(s);
+
+    // The index type has changed
+    if ((type == IndexImpl::Hash && index->asBTreeIndex()) ||
+	(type == IndexImpl::BTree && index->asHashIndex())) {
+      Index *newIndex;
+      s = index->reimplement(*impl, newIndex);
+      CHECK_STATUS(s);
     }
-  }
+    else {
+      s = index->setImplementation(impl);
+      CHECK_STATUS(s);
 
-  printf("Updating %sindex on %s\n", stype, argv[n]);
-  idx->setPropagate(propag);
-  if (only_propag) {
-    s = idx->store();
-    CHECK(s);
-  }
-  else if ((type == IndexImpl::Hash && idx->asBTreeIndex()) ||
-	   (type == IndexImpl::BTree && idx->asHashIndex())) {
-    Index *idxn;
-    s = idx->reimplement(*idximpl, idxn);
-    CHECK(s);
-  }
-  else {
-    s = idx->setImplementation(idximpl);
-    CHECK(s);
-    s = idx->store();
-    CHECK(s);
-  }
-#endif
+      s = index->store();
+      CHECK_STATUS(s);
+    }
+  }    
 
   db->transactionCommit();
 
