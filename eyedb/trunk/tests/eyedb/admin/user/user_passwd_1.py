@@ -7,6 +7,7 @@ newpassword='tata'
 
 command="eyedbadmin2 user passwd %s " % (username,)
 child = pexpect.spawn(command)
+child.logfile = sys.stdout
 r = child.expect("user old password: ")
 child.sendline( password)
 r = child.expect("user new password: ")
