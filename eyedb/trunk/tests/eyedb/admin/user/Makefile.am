@@ -7,15 +7,12 @@ user_list_not_found.py \
 user_add_usage.py \
 user_add_1.py \
 user_list_2.py \
-
 user_sysaccess_usage.py \
-user_add_std.py \
-user_list_sysaccess_1.py \
-user_sysaccess_std.py \
-user_list_sysaccess_2.py \
+user_sysaccess_1.py \
+user_list_3.py \
 user_dbaccess_usage.py \
-user_dbaccess_std.py \
+user_dbaccess_1.py \
+user_passwd_1.py \
 user_delete_usage.py \
-user_delete_std.py \
-user_passwd_std.py
+user_delete_1.py 
 
