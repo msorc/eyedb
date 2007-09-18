@@ -30,7 +30,7 @@
 #access_file = @sysconfdir@/eyedb/Access;
 
 # Smd connection port
-#smdport = @eyedb_pipedir@/eyedbsmd;
+#smdport = @eyedb_pipedir@/smd;
 
 # Server listen ports and sockets list
 #listen = localhost:6240,@eyedb_pipedir@/eyedbd;

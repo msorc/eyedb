@@ -28,6 +28,8 @@
 #include <stdio.h>
 #include <eyedblib/machtypes.h>
 #include <eyedbsm/Idx.h>
+#include <vector>
+#include <map>
 
 namespace eyedblib {
   class ThreadPool;
@@ -96,6 +98,36 @@ namespace eyedbsm {
     int version;
     Boolean nocopy;
 
+    class HKey {
+      const void *key;
+      HIdx *hidx;
+      bool _garbage;
+
+    public:
+
+      HKey(HIdx *hidx, const void *key, bool copy = false);
+      HKey(const HKey &);
+      HKey& operator=(const HKey &);
+
+      int operator<(const HKey &okey) const {
+	return hidx->cmp(key, okey.key, 0) < 0 ? 1 : 0;
+      }
+
+      const void *getKey() const {return key;}
+
+      void garbage() {
+	if (_garbage)
+	  free((void *)key);
+      }
+
+      ~HKey() {
+	garbage();
+      }
+    };
+
+    std::map<HKey, std::vector<const void *> > cache_map;
+
+    static void *copy_key(const void *, unsigned int, Boolean, Boolean *state = 0);
     Status dumpMemoryMap(const CListHeader &, const char *msg = "", FILE *fd = stdout);
 
     Status readCellHeader(int off, const Oid &, CellHeader &) const;
@@ -119,9 +151,10 @@ namespace eyedbsm {
 			  unsigned int size, const void *xdata,
 			  const Oid &koid, CListObjHeader &h, int offset,
 			  CellHeader &o, unsigned int datasz);
+    Status insert_perform(const void *key, std::vector<const void *> &xdata_v, unsigned int datasz);
     Status insert_perform(const void *key, const void *xdata, unsigned int datasz);
     Status remove_perform(const void *key, const void *xdata, Boolean *found,
-			  unsigned char **prdata, unsigned int *pdatacnt, int *found_idx);
+			  unsigned char **prdata, unsigned int *pdatacnt, int *found_idx, unsigned int incr_alloc);
     Status remove_realize(CListHeader *chd, unsigned int chd_key,
 			  const char *, const char *, const char *,
 			  const CellHeader *, const Oid *);
@@ -309,6 +342,36 @@ namespace eyedbsm {
     /**
        Not yet documented
        @param key
+       @param xdata_v
+       @return
+    */
+    Status insert(const void *key, std::vector<const void *> &xdata_v);
+
+    /**
+       Not yet documented
+       @param key
+       @param xdata
+       @return
+    */
+    Status insert_cache(const void *key, const void *xdata);
+
+    /**
+       Not yet documented
+       @param key
+       @param xdata_v
+       @return
+    */
+    Status insert_cache(const void *key, std::vector<const void *> &xdata_v);
+
+    /**
+       Not yet documented
+       @return
+    */
+    Status flush_cache();
+
+    /**
+       Not yet documented
+       @param key
        @param xdata
        @param found
        @return
@@ -364,6 +427,12 @@ namespace eyedbsm {
        @return
     */
     Boolean isDataGroupedByKey() const {return data_grouped_by_key;}
+
+    /**
+       Not yet documented
+       @return
+    */
+    unsigned int getDataGroupedSizeof() const {return data_grouped_sizeof;}
 
     /**
        Not yet documented
@@ -551,7 +620,6 @@ namespace eyedbsm {
     int cmp_realize(const void *, const void *, Boolean, unsigned char) const;
     int cmp(const void *) const;
     Oid koid;
-    void *copy_key(const void *, unsigned int, Boolean);
     Boolean state;
     Boolean (*user_cmp)(const void *key, void *cmp_arg);
     void *cmp_arg;

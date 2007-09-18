@@ -1971,6 +1971,90 @@ void stop_imm1() { }
 
 static int WRITE_HEADER;
 
+HIdx::HKey::HKey(HIdx *hidx, const void *key, bool copy) : hidx(hidx), key(key)
+{
+  if (copy) {
+    Boolean isstr = hidx->hidx.keytype == Idx::tString ? True : False;
+    key = copy_key(key, hidx->hidx.keysz, isstr);
+    _garbage = true;
+  }
+  else {
+    _garbage = false;
+  }
+}
+
+HIdx::HKey::HKey(const HIdx::HKey &hkey)
+{
+  _garbage = false;
+  key = 0;
+  hidx = 0;
+  *this = hkey;
+}
+
+HIdx::HKey& HIdx::HKey::operator=(const HIdx::HKey &hkey)
+{
+  garbage();
+
+  _garbage = hkey._garbage;
+  hidx = hkey.hidx;
+
+  if (_garbage) {
+    Boolean isstr = hkey.hidx->hidx.keytype == Idx::tString ? True : False;
+    key = copy_key(hkey.key, hkey.hidx->hidx.keysz, isstr);
+  }
+  else {
+    key = hkey.key;
+  }
+
+  return *this;
+}
+
+Status HIdx::insert_cache(const void *key, const void *xdata)
+{
+  std::vector<const void *> xdata_v;
+  xdata_v.push_back(xdata);
+  return insert_cache(key, xdata);
+}
+
+Status HIdx::insert_cache(const void *key, std::vector<const void *> &xdata_v)
+{
+  unsigned int xdata_v_cnt = xdata_v.size();
+  HKey hkey(this, key, true);
+  for (unsigned int n = 0; n < xdata_v_cnt; n++) {
+    unsigned char *data = new unsigned char[hidx.datasz];
+    memcpy(data, xdata_v[n], hidx.datasz);
+    cache_map[hkey].push_back((const void *)data);
+  }
+  return Success;
+}
+
+Status HIdx::flush_cache()
+{
+  std::map<HKey, std::vector<const void *> >::iterator begin = cache_map.begin();
+  std::map<HKey, std::vector<const void *> >::iterator end = cache_map.end();
+
+  int nn = 0;
+  while (begin != end) {
+    std::vector<const void *> &v = (*begin).second;
+    Status s = insert((*begin).first.getKey(), v);
+    nn++;
+    if (s)
+      return s;
+
+    std::vector<const void *>::iterator b = v.begin();
+    std::vector<const void *>::iterator e = v.end();
+    while (b != e) {
+      delete [] (unsigned char *)(*b);
+      ++b;
+    }
+    //const_cast<HKey&>((*begin).first).garbage();
+    ++begin;
+  }
+
+  cache_map.clear();
+  return Success;
+}
+
 Status
 HIdx::insert(const void *key, const void *xdata)
 { 
@@ -1978,7 +2062,21 @@ HIdx::insert(const void *key, const void *xdata)
 }
 
 Status
+HIdx::insert(const void *key, std::vector<const void *> &xdata_v)
+{ 
+  return insert_perform(key, xdata_v, 0);
+}
+
+Status
 HIdx::insert_perform(const void *key, const void *xdata, unsigned int datasz)
+{
+  std::vector<const void *> xdata_v;
+  xdata_v.push_back(xdata);
+  return insert_perform(key, xdata_v, datasz);
+}
+
+Status
+HIdx::insert_perform(const void *key, std::vector<const void *> &xdata_v, unsigned int xdatasz)
 { 
   Status s;
 
@@ -1993,6 +2091,8 @@ HIdx::insert_perform(const void *key, const void *xdata, unsigned int datasz)
   // return Success;
 #endif
 
+  unsigned int datasz = xdatasz;
+
   unsigned int x;
   unsigned int size;
   unsigned int (*gkey)(int) = get_gkey(version);
@@ -2005,6 +2105,8 @@ HIdx::insert_perform(const void *key, const void *xdata, unsigned int datasz)
   if (s)
     return s;
 
+  int xdata_v_cnt = xdata_v.size();
+
   /*
   CListHeader chd;
   s = readCListHeader(x, chd);
@@ -2016,8 +2118,10 @@ HIdx::insert_perform(const void *key, const void *xdata, unsigned int datasz)
   printf("\nINSERT at #%d\n", x);
 #endif
   unsigned char *rdata = 0;
+  const void *xdata = 0;
   bool direct;
   if (datasz) {
+    assert(xdata_v_cnt == 1);
     direct = true;
     size += datasz - hidx.datasz;
   }
@@ -2037,7 +2141,7 @@ HIdx::insert_perform(const void *key, const void *xdata, unsigned int datasz)
 #endif
     Boolean found = False;
     unsigned int datacnt = 0;
-    s = remove_perform(key, 0, &found, &rdata, &datacnt, 0);
+    s = remove_perform(key, 0, &found, &rdata, &datacnt, 0, xdata_v_cnt);
     if (s)
       return s;
 
@@ -2045,15 +2149,19 @@ HIdx::insert_perform(const void *key, const void *xdata, unsigned int datasz)
     printf("remove_perform(found=%d)\n", found);
 #endif
     if (!found) {
-      rdata = new unsigned char[data_group_sz(1, this)];
+      rdata = new unsigned char[data_group_sz(xdata_v_cnt, this)];
     }
 
-    size += data_group_sz(datacnt, this);
+    //  size += data_group_sz(datacnt, this);
+    //  size += data_group_sz(datacnt, this) + (xdata_v_cnt - 1) * hidx.datasz;
+    size += data_group_sz(datacnt + xdata_v_cnt - 1, this);
 #ifdef TRACE_DGK
     printf("insert(datacnt = %d)\n", datacnt);
 #endif
-    memcpy(rdata + data_group_sz(datacnt, this), xdata, hidx.datasz);
-    ++datacnt;
+    for (unsigned int nn = 0; nn < xdata_v_cnt; nn++) {
+      memcpy(rdata + data_group_sz(datacnt + nn, this), xdata_v[nn], hidx.datasz);
+    }
+    datacnt += xdata_v_cnt;
 #ifdef VARSZ_DATACNT
     s = h2x_datacnt_cpy(rdata, &datacnt);
     if (s)
@@ -2086,6 +2194,19 @@ HIdx::insert_perform(const void *key, const void *xdata, unsigned int datasz)
       }
       // at the end of the method: delete [] ndata
     */
+  }
+  else {
+    if (xdata_v_cnt == 1) {
+      xdata = xdata_v[0];
+    }
+    else {
+      assert(!xdatasz);
+      rdata = new unsigned char[hidx.datasz * xdata_v_cnt];
+      for (unsigned int nn = 0; nn < xdata_v_cnt; nn++) {
+	memcpy(rdata + nn * hidx.datasz, xdata_v[nn], hidx.datasz);
+      }
+      xdata = (const void *)rdata;
+    }
   }
 
   CListHeader chd;
@@ -2381,7 +2502,7 @@ HIdx::remove(const void *key, const void *xdata, Boolean *found)
     Boolean xfound = False;
     unsigned int datacnt = 0;
     int found_idx = -1;
-    Status s = remove_perform(key, xdata, &xfound, &rdata, &datacnt, &found_idx);
+    Status s = remove_perform(key, xdata, &xfound, &rdata, &datacnt, &found_idx, 0);
     if (s)
       return s;
 
@@ -2415,12 +2536,12 @@ HIdx::remove(const void *key, const void *xdata, Boolean *found)
     return s;
   }
   else {
-    return remove_perform(key, xdata, found, 0, 0, 0);
+    return remove_perform(key, xdata, found, 0, 0, 0, 0);
   }
 }
 
 Status
-HIdx::remove_perform(const void *key, const void *xdata, Boolean *found, unsigned char **prdata, unsigned int *pdatacnt, int *found_idx)
+HIdx::remove_perform(const void *key, const void *xdata, Boolean *found, unsigned char **prdata, unsigned int *pdatacnt, int *found_idx, unsigned int incr_alloc)
 {
   Status s;
   
@@ -2534,10 +2655,11 @@ HIdx::remove_perform(const void *key, const void *xdata, Boolean *found, unsigne
 		    break;
 		  }
 		}
+		assert(!incr_alloc);
 		size = data_group_sz(*pdatacnt, this);
 	      }
 	      else {
-		size = data_group_sz((*pdatacnt)+1, this);
+		size = data_group_sz((*pdatacnt)+incr_alloc, this);
 		r = 0;
 	      }
 
@@ -2714,7 +2836,8 @@ static void adapt(unsigned char *&clist_data, unsigned int &clist_data_size,
 		  unsigned int size)
 {
   if (clist_data_size + size > clist_data_alloc_size) {
-    clist_data_alloc_size = clist_data_size + size + 2048;
+    //    clist_data_alloc_size = clist_data_size + size + 2048;
+    clist_data_alloc_size = (clist_data_size + size) * 2;
     unsigned char *n_clist_data = new unsigned char[clist_data_alloc_size];
     memcpy(n_clist_data, clist_data, clist_data_size);
     delete [] clist_data;
@@ -3523,8 +3646,8 @@ HIdxCursor::HIdxCursor(const HIdx *_idx,
   slave = True;
   equal = False;
   Boolean isstr = (STRTYPE(idx) ? True : False);
-  skey = copy_key(_skey, idx->hidx.keysz, isstr);
-  ekey = copy_key((_ekey == defaultSKey) ? _skey : _ekey, idx->hidx.keysz, isstr);
+  skey = HIdx::copy_key(_skey, idx->hidx.keysz, isstr, &state);
+  ekey = HIdx::copy_key((_ekey == defaultSKey) ? _skey : _ekey, idx->hidx.keysz, isstr, &state);
   //printf("k_cur %d -> %d : %d\n", k_cur, k_end, idx->hidx.key_count);
 }
 
@@ -3548,8 +3671,8 @@ HIdxCursor::HIdxCursor(const HIdx *_idx,
 
   Status s;
   Boolean isstr = (STRTYPE(idx) ? True : False);
-  skey = copy_key(_skey, idx->hidx.keysz, isstr);
-  ekey = copy_key((_ekey == defaultSKey) ? _skey : _ekey, idx->hidx.keysz, isstr);
+  skey = HIdx::copy_key(_skey, idx->hidx.keysz, isstr, &state);
+  ekey = HIdx::copy_key((_ekey == defaultSKey) ? _skey : _ekey, idx->hidx.keysz, isstr, &state);
 
   if (!state)
     return;
@@ -3668,9 +3791,11 @@ HIdxCursor::read(Boolean &eox)
   return s;
 }
 
-void *
-HIdxCursor::copy_key(const void *key, unsigned int keysz, Boolean isstr)
+void *HIdx::copy_key(const void *key, unsigned int keysz, Boolean isstr, Boolean *state)
 {
+  if (state)
+    *state = True;
+
   if (!key)
     return 0;
 
@@ -3683,8 +3808,10 @@ HIdxCursor::copy_key(const void *key, unsigned int keysz, Boolean isstr)
   if (isstr) {
     int len = strlen((char *)key)+1;
 
-    if (len > keysz) // was if (len >= keysz)
-      state = False;
+    if (len > keysz) { // was if (len >= keysz)
+      if (state)
+	*state = False;
+    }
     else {
       memcpy(k, key, len);
       memset(k+len, 0, keysz-len);

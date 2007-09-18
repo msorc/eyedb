@@ -110,12 +110,23 @@ o_usage(eyedbsm::Boolean complete)
 int
 o_dbopen()
 {
+  eyedbsm::Status s = eyedbsm::dbOpen(o_dbfile, eyedbsm::VOLRW|eyedbsm::LOCAL,
+				      (o_open_hints.maph ? &o_open_hints : 0), 0,
+				      0, &o_dbh);
+  if (s) {
+    fprintf(stderr, "%s: cannot open database %s\n", o_progname, o_dbfile);
+    //eyedbsm::statusPrint(s, "%s: opening database %s", o_progname, o_dbfile);
+    return 1;
+  }
+
+  /*
   if (eyedbsm::statusPrint(eyedbsm::dbOpen(o_dbfile, eyedbsm::VOLRW|eyedbsm::LOCAL,
 			       (o_open_hints.maph ? &o_open_hints : 0), 0,
 			       0, &o_dbh),
-		     "%s: opening data base \"%s\"", o_progname, o_dbfile))
+		     "%s: opening database \"%s\"", o_progname, o_dbfile))
     return 1;
 
+  */
   return 0;
 }
 
@@ -1048,7 +1059,7 @@ static int
 o_index_usage()
 {
   o_usage(eyedbsm::False);
-  fprintf(stderr, "[-magorder <magorder>] [-keycount <keycount>] [-keytype <keytype>] [-inisize_hints <inisize>] [-iniobjcnt_hints <iniobjcnt>] [-xcoef_hints <xcoef>] [-szmax_hints <szmax>] [-data_grouped_by_key <on|off>] [-degree <degree>] [-reimplement_H|-reimplement_B|-simulate] [-fullstats]\n");
+  fprintf(stderr, "[-magorder <magorder>] [-keycount <keycount>] [-keytype <keytype>] [-inisize_hints <inisize>] [-iniobjcnt_hints <iniobjcnt>] [-xcoef_hints <xcoef>] [-szmax_hints <szmax>] [-data_grouped_by_key 0|1|2|4] [-degree <degree>] [-reimplement_H|-reimplement_B|-simulate] [-fullstats]\n");
   return 1;
 }
 
@@ -1158,14 +1169,12 @@ o_index_manage(int argc, char *argv[], o_FileType &ftype,
 	if (i == argc - 1)
 	  return o_index_usage();
 	s = argv[++i];
-	if (!strcasecmp(s, "on")) {
-	  o_impl_hints[eyedbsm::HIdx::DataGroupedByKey_Hints] = 1;
-	}
-	else if (!strcasecmp(s, "off")) {
-	  o_impl_hints[eyedbsm::HIdx::DataGroupedByKey_Hints] = 0;
-	}
-	else
+	if (!eyedblib::is_number(s))
 	  return o_index_usage();
+	int grouped = atoi(s);
+	if (grouped != 0 && grouped != 1 && grouped != 2 && grouped != 4)
+	  return o_index_usage();
+	o_impl_hints[eyedbsm::HIdx::DataGroupedByKey_Hints] = grouped;
       }
       else
 	return o_index_usage();
