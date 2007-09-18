@@ -226,11 +226,11 @@ smdcli_init(smdcli_conn_t *conn, const char *dbfile)
 }
 
 #define SMD_PORT_ENV "EYEDBSV_SMDPORT"
-#define SMD_PORT "/eyedbsmd"
+#define SMD_PORT "/smd"
 
 static std::string smd_port;
 
-const char *smd_get_port()
+static const char *smd_get_port_p()
 {
   if (smd_port.length())
     return smd_port.c_str();
@@ -239,10 +239,25 @@ const char *smd_get_port()
   if (s)
     return s;
 
-  std::string path = eyedblib::CompileBuiltin::getPipedir();
+  static std::string path = eyedblib::CompileBuiltin::getPipedir();
   path += SMD_PORT;
     
   return path.c_str();
+}
+
+const char *smd_get_port()
+{
+  static struct sockaddr_un sock_un_name;
+  static unsigned sun_path_len = sizeof(sock_un_name.sun_path);
+
+  const char *port = smd_get_port_p();
+  if (strlen(port) <= sun_path_len)
+    return port;
+
+  static std::string stpath = port;
+  stpath[sun_path_len] = 0;
+
+  return stpath.c_str();
 }
 
 void smd_set_port(const char *port)
