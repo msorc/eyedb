@@ -1,4 +1,3 @@
-
 /* 
    EyeDB Object Database Management System
    Copyright (C) 1994-1999,2004-2006 SYSRA
@@ -20,6 +19,7 @@
 
 /*
    Author: Eric Viara <viara@sysra.com>
+   Author: Francois Dechelle <francois@dechelle.net>
 */
 
 #include "eyedbconfig.h"
@@ -32,12 +32,17 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <eyedblib/butils.h>
-
 #include "GetOpt.h"
-
 #include "DTFTopic.h"
 
 using namespace eyedb;
+
+#define CHECK_STATUS(s) 			\
+  if (s) {					\
+    std::cerr << PROG_NAME;			\
+    s->print();					\
+    return 1;					\
+  }
 
 DTFTopic::DTFTopic() : Topic("datafile")
 {
@@ -46,29 +51,50 @@ DTFTopic::DTFTopic() : Topic("datafile")
   addCommand(new DTFCreateCmd(this));
   addCommand(new DTFDeleteCmd(this));
   addCommand(new DTFMoveCmd(this));
+  addCommand(new DTFRenameCmd(this));
   addCommand(new DTFResizeCmd(this));
   addCommand(new DTFDefragmentCmd(this));
   addCommand(new DTFListCmd(this));
-  addCommand(new DTFRenameCmd(this));
 }
 
+//
+// DFTCreateCmd
+//
 void DTFCreateCmd::init()
 {
   std::vector<Option> opts;
 
   opts.push_back(HELP_OPT);
 
-  opts.push_back(Option(FILENAME_OPT, OptionStringType(), Option::MandatoryValue, OptionDesc("File name", "<filename>")));
+  opts.push_back(Option(FILENAME_OPT,
+			OptionStringType(),
+			Option::MandatoryValue,
+			OptionDesc("File name", "FILENAME")));
 
-  opts.push_back(Option(FILEDIR_OPT, OptionStringType(), Option::MandatoryValue, OptionDesc("File directory", "<filedir>")));
+  opts.push_back(Option(FILEDIR_OPT, 
+			OptionStringType(), 
+			Option::MandatoryValue, 
+			OptionDesc("File directory", "FILEDIR")));
 
-  opts.push_back(Option(NAME_OPT, OptionStringType(), Option::MandatoryValue, OptionDesc("Datafile name", "<name>")));
+  opts.push_back(Option(NAME_OPT, 
+			OptionStringType(), 
+			Option::MandatoryValue, 
+			OptionDesc("Datafile name", "NAME")));
 
-  opts.push_back(Option(SIZE_OPT, OptionStringType(), Option::MandatoryValue, OptionDesc("Datafile size (in mega-bytes)", "<size>")));
+  opts.push_back(Option(SIZE_OPT, 
+			OptionStringType(), 
+			Option::MandatoryValue, 
+			OptionDesc("Datafile size (in mega-bytes)", "SIZE")));
 
-  opts.push_back(Option(SLOTSIZE_OPT, OptionStringType(), Option::MandatoryValue, OptionDesc("Slot size (in bytes)", "<slotsize>")));
+  opts.push_back(Option(SLOTSIZE_OPT, 
+			OptionStringType(), 
+			Option::MandatoryValue, 
+			OptionDesc("Slot size (in bytes)", "SLOTSIZE")));
 
-  opts.push_back(Option(PHYSICAL_OPT, OptionBoolType(), 0, OptionDesc("Physical datafile type")));
+  opts.push_back(Option(PHYSICAL_OPT, 
+			OptionBoolType(), 
+			0, 
+			OptionDesc("Physical datafile type")));
 
   getopt = new GetOpt(getExtName(), opts);
 }
@@ -76,24 +102,21 @@ void DTFCreateCmd::init()
 int DTFCreateCmd::usage()
 {
   getopt->usage("", "");
-
-  std::cerr << "<dbname>\n";
-
+  std::cerr << "DBNAME\n";
   return 1;
 }
 
 int DTFCreateCmd::help()
 {
   stdhelp();
-
-  getopt->displayOpt("<dbname>", "Database");
-
+  getopt->displayOpt("DBNAME", "Database");
   return 1;
 }
 
 int DTFCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  bool r = getopt->parse(PROG_NAME, argv);
+  if (!getopt->parse(PROG_NAME, argv))
+    return usage();
 
   GetOpt::Map &map = getopt->getMap();
 
@@ -101,22 +124,11 @@ int DTFCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
     return help();
   }
 
-  if (!r) {
-    return usage();
-  }
-
   if (argv.size() != 1) {
     return usage();
   }
 
-  conn.open();
-
   std::string dbname = argv[0];
-
-  Database *db = new Database(dbname.c_str());
-  db->open(&conn);
-
-  db->transactionBeginExclusive();
 
   const char *filedir;
   if (map.find(FILEDIR_OPT) != map.end()) {
@@ -166,121 +178,278 @@ int DTFCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
     dtfType = eyedbsm::LogicalOidType;
   }
 
-  db->createDatafile(filedir, filename, name, size, slotsize, dtfType);
+  conn.open();
+
+  Database *db = new Database(dbname.c_str());
+
+  Status s = db->open(&conn);
+  CHECK_STATUS(s);
+
+  s = db->transactionBeginExclusive();
+  CHECK_STATUS(s);
+
+  s = db->createDatafile(filedir, filename, name, size, slotsize, dtfType);
+  CHECK_STATUS(s);
 
   db->transactionCommit();
 
   return 0;
 }
 
+//
+// DTFDeleteCmd
+//
+//eyedbadmin datdelete <dbname> <datid>|<datname>
 void DTFDeleteCmd::init()
 {
   std::vector<Option> opts;
-
   opts.push_back(HELP_OPT);
-
-  // [...]
-
   getopt = new GetOpt(getExtName(), opts);
 }
 
 int DTFDeleteCmd::usage()
 {
   getopt->usage("", "");
-
-  // std::cerr << "Extra arg\n";
-
+  std::cerr << " DBNAME DATID|DATNAME\n";
   return 1;
 }
 
 int DTFDeleteCmd::help()
 {
   stdhelp();
-
-  //getopt->displayOpt("Extra arg, "Description");
-
+  getopt->displayOpt("DBNAME", "Database");
+  getopt->displayOpt("DATID", "Datafile id");
+  getopt->displayOpt("DATNAME", "Datafile name");
   return 1;
 }
 
 int DTFDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  bool r = getopt->parse(PROG_NAME, argv);
+  if (! getopt->parse(PROG_NAME, argv))
+    return usage();
 
   GetOpt::Map &map = getopt->getMap();
 
-  if (map.find("help") != map.end()) {
+  if (map.find("help") != map.end())
     return help();
-  }
 
-  if (!r) {
+  if (argv.size() != 2)
     return usage();
-  }
 
-  /*
-  if (argv.size() != N) { // N : number of extra args (could be 0)
-    return usage();
-  }
-  */
+  std::string dbname = argv[0];
+  std::string datname = argv[1];
 
-  conn.open();
+  Database *db = new Database(dbname.c_str());
 
-  // [...]
+  Status s = db->open( &conn, Database::DBRW);
+  CHECK_STATUS(s);
+
+  s = db->transactionBeginExclusive();
+  CHECK_STATUS(s);
+
+  const Datafile *datafile;
+  s = db->getDatafile(datname.c_str(), datafile);
+  CHECK_STATUS(s);
+  
+  s = datafile->remove();
+  CHECK_STATUS(s);
+
+  db->transactionCommit();
 
   return 0;
 }
 
+//
+// DTFMoveCmd
+//
+//eyedbadmin datmove <dbname> <datid>|<datname> <new datafile>|--filedir=<filedir>
+void DTFMoveCmd::init()
+{
+  std::vector<Option> opts;
+  opts.push_back(HELP_OPT);
+  getopt = new GetOpt(getExtName(), opts);
+}
+
+int DTFMoveCmd::usage()
+{
+  getopt->usage("", "");
+  std::cerr << " USAGE\n";
+  return 1;
+}
+
+int DTFMoveCmd::help()
+{
+  stdhelp();
+  getopt->displayOpt("<user>", "User name");
+  getopt->displayOpt("<passwd>", "Password for specified user");
+  return 1;
+}
+
+int DTFMoveCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+{
+  if (! getopt->parse(PROG_NAME, argv))
+    return usage();
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end())
+    return help();
+
+  return 0;
+}
+
+//
+// DTFRenameCmd
+//
+// eyedbadmin datrename <dbname> <datid>|<datname> <new name>
+void DTFRenameCmd::init()
+{
+  std::vector<Option> opts;
+  opts.push_back(HELP_OPT);
+  getopt = new GetOpt(getExtName(), opts);
+}
+
+int DTFRenameCmd::usage()
+{
+  getopt->usage("", "");
+  std::cerr << " USAGE\n";
+  return 1;
+}
+
+int DTFRenameCmd::help()
+{
+  stdhelp();
+  getopt->displayOpt("<user>", "User name");
+  getopt->displayOpt("<passwd>", "Password for specified user");
+  return 1;
+}
+
+int DTFRenameCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+{
+  if (! getopt->parse(PROG_NAME, argv))
+    return usage();
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end())
+    return help();
+
+  return 0;
+}
+
+//
+// DTFResizeCmd
+//
+// eyedbadmin datresize <dbname> <datid>|<datname> <new sizeMb>
+void DTFResizeCmd::init()
+{
+  std::vector<Option> opts;
+  opts.push_back(HELP_OPT);
+  getopt = new GetOpt(getExtName(), opts);
+}
+
+int DTFResizeCmd::usage()
+{
+  getopt->usage("", "");
+  std::cerr << " USAGE\n";
+  return 1;
+}
+
+int DTFResizeCmd::help()
+{
+  stdhelp();
+  getopt->displayOpt("<user>", "User name");
+  getopt->displayOpt("<passwd>", "Password for specified user");
+  return 1;
+}
+
+int DTFResizeCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+{
+  if (! getopt->parse(PROG_NAME, argv))
+    return usage();
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end())
+    return help();
+
+  return 0;
+}
+
+//
+// DTFDefragmentCmd
+//
+// eyedbadmin datdefragment <dbname> <datid>|<datname>
+void DTFDefragmentCmd::init()
+{
+  std::vector<Option> opts;
+  opts.push_back(HELP_OPT);
+  getopt = new GetOpt(getExtName(), opts);
+}
+
+int DTFDefragmentCmd::usage()
+{
+  getopt->usage("", "");
+  std::cerr << " USAGE\n";
+  return 1;
+}
+
+int DTFDefragmentCmd::help()
+{
+  stdhelp();
+  getopt->displayOpt("<user>", "User name");
+  getopt->displayOpt("<passwd>", "Password for specified user");
+  return 1;
+}
+
+int DTFDefragmentCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+{
+  if (! getopt->parse(PROG_NAME, argv))
+    return usage();
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end())
+    return help();
+
+  return 0;
+}
+
+//
+// DTFListCmd
+//
+// eyedbadmin datlist <dbname> [--stats|--all] [{<datid>|<datname>}]
 void DTFListCmd::init()
 {
   std::vector<Option> opts;
-
   opts.push_back(HELP_OPT);
-
-  // [...]
-
   getopt = new GetOpt(getExtName(), opts);
 }
 
 int DTFListCmd::usage()
 {
   getopt->usage("", "");
-
-  // std::cerr << "Extra arg\n";
-
+  std::cerr << " USAGE\n";
   return 1;
 }
 
 int DTFListCmd::help()
 {
   stdhelp();
-
-  //getopt->displayOpt("Extra arg, "Description");
-
+  getopt->displayOpt("<user>", "User name");
+  getopt->displayOpt("<passwd>", "Password for specified user");
   return 1;
 }
 
 int DTFListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  bool r = getopt->parse(PROG_NAME, argv);
+  if (! getopt->parse(PROG_NAME, argv))
+    return usage();
 
   GetOpt::Map &map = getopt->getMap();
 
-  if (map.find("help") != map.end()) {
+  if (map.find("help") != map.end())
     return help();
-  }
-
-  if (!r) {
-    return usage();
-  }
-
-  /*
-  if (argv.size() != N) { // N : number of extra args (could be 0)
-    return usage();
-  }
-  */
-
-  conn.open();
-
-  // [...]
 
   return 0;
 }

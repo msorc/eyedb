@@ -34,10 +34,10 @@ public:
 
 CMDCLASS_GETOPT(DTFCreateCmd, "create");
 CMDCLASS_GETOPT(DTFDeleteCmd, "delete");
-CMDCLASS(DTFMoveCmd, "move");
-CMDCLASS(DTFResizeCmd, "resize");
-CMDCLASS(DTFDefragmentCmd, "defragment");
+CMDCLASS_GETOPT(DTFMoveCmd, "move");
+CMDCLASS_GETOPT(DTFRenameCmd, "rename");
+CMDCLASS_GETOPT(DTFResizeCmd, "resize");
+CMDCLASS_GETOPT(DTFDefragmentCmd, "defragment");
 CMDCLASS_GETOPT(DTFListCmd, "list");
-CMDCLASS(DTFRenameCmd, "rename");
 
 #endif

@@ -684,7 +684,7 @@ int USRDBAccessCmd::help()
 {
   stdhelp();
   getopt->displayOpt("USER", "User name");
-  getopt->displayOpt("DBNAME", "Data base name");
+  getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("MODE", "r|rw|rx|rwx|admin|no");
   return 1;
 }
