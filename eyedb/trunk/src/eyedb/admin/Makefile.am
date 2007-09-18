@@ -7,8 +7,35 @@ INCLUDES=-I$(top_srcdir)/src -I$(top_srcdir)/src/eyedb -I$(top_srcdir)/include -
 
 EYEDBCLLIBS=$(top_builddir)/src/eyedb/libeyedb.la $(top_builddir)/src/lib/libeyedbrpcfe.la $(top_builddir)/src/eyedbsm/libeyedbsm.la $(top_builddir)/src/lib/libeyedbutils.la
 
-eyedbadmin2_SOURCES=eyedbadmin.cc Topic.cc DBSTopic.cc DTFTopic.cc DSPTopic.cc USRTopic.cc IDXTopic.cc CLSTopic.cc COLTopic.cc ATRTopic.cc OBJTopic.cc CNSTopic.cc 
-eyedbdbcreate2_SOURCES=eyedbdbcreate.cc Topic.cc DBSTopic.cc DTFTopic.cc DSPTopic.cc USRTopic.cc IDXTopic.cc CLSTopic.cc COLTopic.cc ATRTopic.cc OBJTopic.cc CNSTopic.cc 
+eyedbadmin2_SOURCES=\
+eyedbadmin.cc \
+Topic.cc \
+DBSTopic.cc \
+DTFTopic.cc \
+DSPTopic.cc \
+USRTopic.cc \
+IDXTopic.cc \
+CLSTopic.cc \
+COLTopic.cc \
+ATRTopic.cc \
+OBJTopic.cc \
+CNSTopic.cc \
+DatafileStats.cc
+
+eyedbdbcreate2_SOURCES= \
+eyedbdbcreate.cc \
+Topic.cc \
+DBSTopic.cc \
+DTFTopic.cc \
+DSPTopic.cc \
+USRTopic.cc \
+IDXTopic.cc \
+CLSTopic.cc \
+COLTopic.cc \
+ATRTopic.cc \
+OBJTopic.cc \
+CNSTopic.cc \
+DatafileStats.cc
 
 eyedbdbcreate2_LDADD= $(EYEDBCLLIBS)
 
