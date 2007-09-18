@@ -116,8 +116,10 @@ namespace eyedbsm {
       const void *getKey() const {return key;}
 
       void garbage() {
-	if (_garbage)
-	  free((void *)key);
+	if (_garbage) {
+	  free((char *)key);
+	  key = 0;
+	}
       }
 
       ~HKey() {
@@ -367,7 +369,7 @@ namespace eyedbsm {
        Not yet documented
        @return
     */
-    Status flush_cache();
+    Status flush_cache(bool insert_data = true);
 
     /**
        Not yet documented

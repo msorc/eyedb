@@ -607,6 +607,7 @@ HIdx::open(hash_key_t _hash_key,
 
 HIdx::~HIdx()
 {
+  flush_cache(false);
 }
 
 Boolean trace_it;
@@ -1971,14 +1972,15 @@ void stop_imm1() { }
 
 static int WRITE_HEADER;
 
-HIdx::HKey::HKey(HIdx *hidx, const void *key, bool copy) : hidx(hidx), key(key)
+HIdx::HKey::HKey(HIdx *hidx, const void *_key, bool copy) : hidx(hidx)
 {
   if (copy) {
     Boolean isstr = hidx->hidx.keytype == Idx::tString ? True : False;
-    key = copy_key(key, hidx->hidx.keysz, isstr);
+    key = copy_key(_key, hidx->hidx.keysz, isstr);
     _garbage = true;
   }
   else {
+    key = _key;
     _garbage = false;
   }
 }
@@ -1993,6 +1995,9 @@ HIdx::HKey::HKey(const HIdx::HKey &hkey)
 
 HIdx::HKey& HIdx::HKey::operator=(const HIdx::HKey &hkey)
 {
+  if (this == &hkey)
+    return *this;
+
   garbage();
 
   _garbage = hkey._garbage;
@@ -2020,26 +2025,27 @@ Status HIdx::insert_cache(const void *key, std::vector<const void *> &xdata_v)
 {
   unsigned int xdata_v_cnt = xdata_v.size();
   HKey hkey(this, key, true);
+  std::vector<const void *> &v = cache_map[hkey];
   for (unsigned int n = 0; n < xdata_v_cnt; n++) {
     unsigned char *data = new unsigned char[hidx.datasz];
     memcpy(data, xdata_v[n], hidx.datasz);
-    cache_map[hkey].push_back((const void *)data);
+    v.push_back((const void *)data);
   }
   return Success;
 }
 
-Status HIdx::flush_cache()
+Status HIdx::flush_cache(bool insert_data)
 {
   std::map<HKey, std::vector<const void *> >::iterator begin = cache_map.begin();
   std::map<HKey, std::vector<const void *> >::iterator end = cache_map.end();
 
-  int nn = 0;
   while (begin != end) {
     std::vector<const void *> &v = (*begin).second;
-    Status s = insert((*begin).first.getKey(), v);
-    nn++;
-    if (s)
-      return s;
+    if (insert_data) {
+      Status s = insert((*begin).first.getKey(), v);
+      if (s)
+	return s;
+    }
 
     std::vector<const void *>::iterator b = v.begin();
     std::vector<const void *>::iterator e = v.end();
@@ -2047,7 +2053,7 @@ Status HIdx::flush_cache()
       delete [] (unsigned char *)(*b);
       ++b;
     }
-    //const_cast<HKey&>((*begin).first).garbage();
+    v.clear();
     ++begin;
   }
 
