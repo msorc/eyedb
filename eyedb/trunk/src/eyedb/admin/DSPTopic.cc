@@ -72,10 +72,10 @@ int DSPCreateCmd::usage()
 int DSPCreateCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("DBNAME", "Data base name");
-  getopt->displayOpt("DSPNAME", "Data space name");
-  getopt->displayOpt("DATID", "Data file id");
-  getopt->displayOpt("DATNAME", "Data file name");
+  getopt->displayOpt("DBNAME", "Database name");
+  getopt->displayOpt("DSPNAME", "Dataspace name");
+  getopt->displayOpt("DATID", "Datafile id");
+  getopt->displayOpt("DATNAME", "Datafile name");
   return 1;
 }
 
@@ -115,6 +115,8 @@ int DSPCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   s = db->createDataspace( dspname, datafiles, count);
   CHECK_STATUS(s);
 
+  db->transactionCommit();
+
   return 0;
 }
 
@@ -136,10 +138,10 @@ int DSPUpdateCmd::usage()
 int DSPUpdateCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("DBNAME", "Data base name");
-  getopt->displayOpt("DSPNAME", "Data space name");
-  getopt->displayOpt("DATID", "Data file id");
-  getopt->displayOpt("DATNAME", "Data file name");
+  getopt->displayOpt("DBNAME", "Database name");
+  getopt->displayOpt("DSPNAME", "Dataspace name");
+  getopt->displayOpt("DATID", "Datafile id");
+  getopt->displayOpt("DATNAME", "Datafile name");
   return 1;
 }
 
@@ -183,6 +185,8 @@ int DSPUpdateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   s = dataspace->update(datafiles, count);
   CHECK_STATUS(s);
 
+  db->transactionCommit();
+
   return 0;
 }
 
@@ -204,8 +208,8 @@ int DSPDeleteCmd::usage()
 int DSPDeleteCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("DBNAME", "Data base name");
-  getopt->displayOpt("DSPNAME", "Data space name");
+  getopt->displayOpt("DBNAME", "Database name");
+  getopt->displayOpt("DSPNAME", "Dataspace name");
   return 1;
 }
 
@@ -242,6 +246,8 @@ int DSPDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   s = dataspace->remove();
   CHECK_STATUS(s);
 
+  db->transactionCommit();
+
   return 0;
 }
 
@@ -263,9 +269,9 @@ int DSPRenameCmd::usage()
 int DSPRenameCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("DBNAME", "Data base name");
-  getopt->displayOpt("DSPNAME", "Data space name");
-  getopt->displayOpt("NEWDSPNAME", "New data space name");
+  getopt->displayOpt("DBNAME", "Database name");
+  getopt->displayOpt("DSPNAME", "Dataspace name");
+  getopt->displayOpt("NEWDSPNAME", "New dataspace name");
   return 1;
 }
 
@@ -303,6 +309,8 @@ int DSPRenameCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   s = dataspace->rename(newdspname);
   CHECK_STATUS(s);
 
+  db->transactionCommit();
+
   return 0;
 }
 
@@ -324,8 +332,8 @@ int DSPListCmd::usage()
 int DSPListCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("DBNAME", "Data base name");
-  getopt->displayOpt("DSPNAME", "Data space name");
+  getopt->displayOpt("DBNAME", "Database name");
+  getopt->displayOpt("DSPNAME", "Dataspace name");
   return 1;
 }
 
@@ -392,8 +400,8 @@ int DSPSetDefCmd::usage()
 int DSPSetDefCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("DBNAME", "Data base name");
-  getopt->displayOpt("DSPNAME", "Data space name");
+  getopt->displayOpt("DBNAME", "Database name");
+  getopt->displayOpt("DSPNAME", "Dataspace name");
   return 1;
 }
 
@@ -430,6 +438,8 @@ int DSPSetDefCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   s = db->setDefaultDataspace(dataspace);
   CHECK_STATUS(s);
 
+  db->transactionCommit();
+
   return 0;
 }
 
@@ -451,7 +461,7 @@ int DSPGetDefCmd::usage()
 int DSPGetDefCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("DBNAME", "Data base name");
+  getopt->displayOpt("DBNAME", "Database name");
   return 1;
 }
 
@@ -485,6 +495,8 @@ int DSPGetDefCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   CHECK_STATUS(s);
   cout << *dataspace;
 
+  db->transactionCommit();
+
   return 0;
 }
 
@@ -506,10 +518,10 @@ int DSPSetCurDatCmd::usage()
 int DSPSetCurDatCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("DBNAME", "Data base name");
-  getopt->displayOpt("DSPNAME", "Data space name");
-  getopt->displayOpt("DATID", "Data file id");
-  getopt->displayOpt("DATNAME", "Data file name");
+  getopt->displayOpt("DBNAME", "Database name");
+  getopt->displayOpt("DSPNAME", "Dataspace name");
+  getopt->displayOpt("DATID", "Datafile id");
+  getopt->displayOpt("DATNAME", "Datafile name");
   return 1;
 }
 
@@ -551,6 +563,8 @@ int DSPSetCurDatCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
   s = const_cast<Dataspace *>(dataspace)->setCurrentDatafile(datafile);
   CHECK_STATUS(s);
 
+  db->transactionCommit();
+
   return 0;
 }
 
@@ -572,8 +586,8 @@ int DSPGetCurDatCmd::usage()
 int DSPGetCurDatCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("DBNAME", "Data base name");
-  getopt->displayOpt("DSPNAME", "Data space name");
+  getopt->displayOpt("DBNAME", "Database name");
+  getopt->displayOpt("DSPNAME", "Dataspace name");
   return 1;
 }
 
@@ -613,6 +627,8 @@ int DSPGetCurDatCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
   CHECK_STATUS(s);
 
   cout << *datafile;
+
+  db->transactionCommit();
 
   return 0;
 }

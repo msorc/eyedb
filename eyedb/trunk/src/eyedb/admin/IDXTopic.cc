@@ -211,7 +211,7 @@ int IDXCreateCmd::usage()
 int IDXCreateCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("DBNAME", "Data base name");
+  getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("ATTRPATH", "Attribute path");
   getopt->displayOpt("HINTS", "Index hints");
   return 1;
@@ -324,7 +324,7 @@ int IDXDeleteCmd::usage()
 int IDXDeleteCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("DBNAME", "Data base name");
+  getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("ATTRPATH", "Attribute path");
   return 1;
 }
@@ -418,7 +418,7 @@ int IDXUpdateCmd::usage()
 int IDXUpdateCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("DBNAME", "Data base name");
+  getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("ATTRPATH", "Attribute path");
   getopt->displayOpt("HINTS", "Index hints");
   return 1;
@@ -554,7 +554,7 @@ int IDXListCmd::usage()
 int IDXListCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("DBNAME", "Data base name");
+  getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("ATTRPATH", "Attribute path");
   getopt->displayOpt("CLASSNAME", "Class name");
   return 1;
@@ -657,7 +657,7 @@ static void displayFormatOptionHelp()
 int IDXStatsCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("DBNAME", "Data base name");
+  getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("ATTRPATH", "Attribute path");
   getopt->displayOpt("CLASSNAME", "Class name");
 
@@ -766,7 +766,7 @@ int IDXSimulateCmd::usage()
 int IDXSimulateCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("DBNAME", "Data base name");
+  getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("ATTRPATH", "Attribute path");
   getopt->displayOpt("HINTS", "Index hints");
   return 1;

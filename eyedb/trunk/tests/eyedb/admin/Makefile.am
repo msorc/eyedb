@@ -1,7 +1,8 @@
 SUBDIRS=\
 user \
 dataspace \
-index
+index \
+datafile 
 
 noinst_PYTHON=\
 common.py 

@@ -8,6 +8,7 @@ TESTS_ENVIRONMENT= PATH=$PATH:$(bindir) PYTHONPATH=$(top_srcdir)/tests/eyedb/adm
 #eyedbadmin dsplist foo
 
 TESTS=\
+dataspace_create_database_1.py \
 dataspace_list_1.py \
 dataspace_list_2.py \
 dataspace_list_3.py \
