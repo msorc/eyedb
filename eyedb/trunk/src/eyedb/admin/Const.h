@@ -23,21 +23,21 @@
 
 #include <string>
 
+static const std::string ALL_OPT = "all";
+static const std::string DATAFILES_OPT = "datafiles";
+static const std::string DBFILE_OPT = "dbfile";
+static const std::string DBID_OPT = "dbid";
+static const std::string DBNAME_OPT = "dbname";
+static const std::string DEFACCESS_OPT = "defaccess";
 static const std::string FILEDIR_OPT = "filedir";
 static const std::string FILENAME_OPT = "filename";
+static const std::string MAXOBJCNT_OPT = "max-object-count";
 static const std::string NAME_OPT = "name";
+static const std::string PHYSICAL_OPT = "physical";
 static const std::string SIZE_OPT = "size";
 static const std::string SLOTSIZE_OPT = "slotsize";
-static const std::string PHYSICAL_OPT = "physical";
-static const std::string DBFILE_OPT = "dbfile";
-static const std::string MAXOBJCNT_OPT = "max-object-count";
-static const std::string DBNAME_OPT = "dbname";
-static const std::string DBID_OPT = "dbid";
-static const std::string DATAFILES_OPT = "datafiles";
-static const std::string DEFACCESS_OPT = "defaccess";
-static const std::string USERACCESS_OPT = "useraccess";
-static const std::string ALL_OPT = "all";
 static const std::string STATS_OPT = "stats";
+static const std::string USERACCESS_OPT = "useraccess";
 
 static const std::string DBS_EXT = ".dbs";
 static const std::string DTF_EXT = ".dat";

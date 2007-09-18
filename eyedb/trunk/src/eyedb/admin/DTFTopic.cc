@@ -34,6 +34,7 @@
 #include <eyedblib/butils.h>
 #include "GetOpt.h"
 #include "DTFTopic.h"
+#include "DatafileStats.h"
 
 using namespace eyedb;
 
@@ -102,7 +103,7 @@ void DTFCreateCmd::init()
 int DTFCreateCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << "DBNAME\n";
+  std::cerr << " DBNAME\n";
   return 1;
 }
 
@@ -182,7 +183,7 @@ int DTFCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   Database *db = new Database(dbname.c_str());
 
-  Status s = db->open(&conn);
+  Status s = db->open( &conn, Database::DBRW);
   CHECK_STATUS(s);
 
   s = db->transactionBeginExclusive();
@@ -199,7 +200,6 @@ int DTFCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 //
 // DTFDeleteCmd
 //
-//eyedbadmin datdelete <dbname> <datid>|<datname>
 void DTFDeleteCmd::init()
 {
   std::vector<Option> opts;
@@ -238,6 +238,8 @@ int DTFDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   std::string dbname = argv[0];
   std::string datname = argv[1];
+
+  conn.open();
 
   Database *db = new Database(dbname.c_str());
 
@@ -422,22 +424,35 @@ int DTFDefragmentCmd::perform(eyedb::Connection &conn, std::vector<std::string> 
 void DTFListCmd::init()
 {
   std::vector<Option> opts;
+
   opts.push_back(HELP_OPT);
+
+  opts.push_back( Option(ALL_OPT,
+			 OptionBoolType(),
+			 0,
+			 OptionDesc("List all")));
+
+  opts.push_back( Option(STATS_OPT, 
+			 OptionBoolType(),
+			 0,
+			 OptionDesc("List only statistics on datafiles")));
+
   getopt = new GetOpt(getExtName(), opts);
 }
 
 int DTFListCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " USAGE\n";
+  std::cerr << " DBNAME [DATID|DATNAME]...\n";
   return 1;
 }
 
 int DTFListCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<user>", "User name");
-  getopt->displayOpt("<passwd>", "Password for specified user");
+  getopt->displayOpt("DBNAME", "Database");
+  getopt->displayOpt("DATID", "Datafile id");
+  getopt->displayOpt("DATNAME", "Datafile name");
   return 1;
 }
 
@@ -450,6 +465,72 @@ int DTFListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 
   if (map.find("help") != map.end())
     return help();
+
+  if (argv.size() < 1)
+    return usage();
+
+  std::string dbname = argv[0];
+
+  // By default, we show files and not statistics
+  bool showFiles = true;
+  bool showStats = false;
+
+  // If --stats option, we show statistics and not files
+  if (map.find(STATS_OPT) != map.end()) {
+    showFiles = false;
+    showStats = true;
+  }
+
+  // If --all option, we show both files and statistics
+  // This test is after the test on --stats so that if you pass both 
+  // --all and --stats options you get files and statistics
+  if (map.find(ALL_OPT) != map.end()) {
+    showFiles = true;
+    showStats = true;
+  }
+
+  conn.open();
+
+  Database *db = new Database(dbname.c_str());
+
+  Status s = db->open( &conn, Database::DBSRead);
+  CHECK_STATUS(s);
+
+  s = db->transactionBegin();
+  CHECK_STATUS(s);
+
+  const Datafile **datafiles;
+  unsigned int count;
+
+  if (argv.size() == 1) {
+    s = db->getDatafiles(datafiles, count);
+    CHECK_STATUS(s);
+  } else {
+    count = argv.size() - 1;
+    datafiles = new const Datafile*[count];
+    for (int i = 0; i < count; i++) {
+      s = db->getDatafile( argv[i+1].c_str(), datafiles[i]);
+      CHECK_STATUS(s);
+    }
+  }
+
+  if (showFiles) {
+    for (int i = 0; i < count; i++)
+      if (datafiles[i]->isValid()) {
+	DatafileInfo info;
+	s = datafiles[i]->getInfo(info);
+	CHECK_STATUS(s);
+	std::cout << info << std::endl;
+      }
+  }
+
+  if (showStats) {
+    DatafileStats stats;
+    for (int i = 0, n = 0; i < count; i++)
+      if (stats.add(datafiles[i])) 
+	return 1;
+    stats.display();
+  }
 
   return 0;
 }
