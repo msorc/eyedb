@@ -54,4 +54,5 @@ COLTopic.h \
 ATRTopic.h \
 OBJTopic.h \
 CNSTopic.h \
-Topic.h 
+Topic.h \
+DatafileStats.h
