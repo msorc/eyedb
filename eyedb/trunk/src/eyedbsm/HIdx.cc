@@ -2018,7 +2018,7 @@ Status HIdx::insert_cache(const void *key, const void *xdata)
 {
   std::vector<const void *> xdata_v;
   xdata_v.push_back(xdata);
-  return insert_cache(key, xdata);
+  return insert_cache(key, xdata_v);
 }
 
 Status HIdx::insert_cache(const void *key, std::vector<const void *> &xdata_v)
@@ -2868,6 +2868,11 @@ HIdx::collapse_realize(short dspid, HIdx *idx_n)
   if (s)
     return s;
 
+  unsigned int clist_data_alloc_size = 0;
+  unsigned char *clist_data = 0;
+  unsigned int clistobj_data_alloc_size = 0;
+  unsigned char *clistobj_data = 0;
+
   for (unsigned int chd_k = 0; chd_k < hidx.key_count; chd_k++) {
     HIdx::CListHeader chd;
     s = readCListHeader(chd_k, chd);
@@ -2885,8 +2890,6 @@ HIdx::collapse_realize(short dspid, HIdx *idx_n)
       unsigned int total_busy_size = 0;
       unsigned int total_free_size = 0;
       unsigned int clist_data_size = 0;
-      unsigned int clist_data_alloc_size = 0;
-      unsigned char *clist_data = 0;
       adapt(clist_data, clist_data_size, clist_data_alloc_size, sizeof(CListObjHeader));
       clist_data_size = sizeof(CListObjHeader);
 
@@ -2899,7 +2902,12 @@ HIdx::collapse_realize(short dspid, HIdx *idx_n)
 	s = objectSizeGet(dbh, &sz, DefaultLock, &koid);
 	if (s)
 	  return s;
-	unsigned char *clistobj_data = new unsigned char[sz];
+
+	if (sz > clistobj_data_alloc_size) {
+	  clistobj_data_alloc_size = sz;
+	  clistobj_data = new unsigned char[clistobj_data_alloc_size];
+	}
+
 	CListObjHeader h;
 	s = objectRead(dbh, 0, 0, clistobj_data, DefaultLock, 0, 0, &koid);
 	if (s)
@@ -2938,7 +2946,6 @@ HIdx::collapse_realize(short dspid, HIdx *idx_n)
 	memcpy(&h, clistobj_data, sizeof(h));
 	x2h_header(&h);
 	koid = h.clobj_next;
-	delete [] clistobj_data;
 	clistobj_cnt++;
       }
       
@@ -3000,7 +3007,6 @@ HIdx::collapse_realize(short dspid, HIdx *idx_n)
 #endif
 
       // must delete all koid
-      delete [] clist_data;
 #ifdef COLLAPSE_TRACE
       printf("  clistobj_cnt: %u\n", clistobj_cnt);
       printf("  total_busy_cell_cnt: %u\n", total_busy_cell_cnt);
@@ -3013,6 +3019,8 @@ HIdx::collapse_realize(short dspid, HIdx *idx_n)
     }
   }
 
+  delete [] clistobj_data;
+  delete [] clist_data;
   return Success;
 }
 
