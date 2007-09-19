@@ -2207,7 +2207,7 @@ HIdx::insert_perform(const void *key, std::vector<const void *> &xdata_v, unsign
     }
     else {
       assert(!xdatasz);
-      // this is wrong !!
+      // 18/09/07: this is wrong !!
       rdata = new unsigned char[hidx.datasz * xdata_v_cnt];
       for (unsigned int nn = 0; nn < xdata_v_cnt; nn++) {
 	memcpy(rdata + nn * hidx.datasz, xdata_v[nn], hidx.datasz);
