@@ -159,6 +159,7 @@ namespace eyedbsm {
     }
   */
 
+  //#define AUTO_DEFRAG
   static Status
   ESM_objectCreate_server(DbHandle const *dbh, void const *const object,
 			  unsigned int size, short datid, short dspid, Oid *oid,
@@ -208,32 +209,61 @@ namespace eyedbsm {
     const MapHeader *mp;
 
     DbHeader _dbh(DBSADDR(dbh));
+
+#ifdef AUTO_DEFRAG
+    std::map<short, bool> defrag_map;
+#endif
+
     for (;;) {
       MapHeader t_mp = DAT2MP(dbh, datid);
       mp = &t_mp;
       oidloc.datid = datid;
 
-      se = mapAlloc(dbh, datid, rsize, &oidloc.ns);
+      NS needslots, max_free_slots;
+      se = mapAlloc(dbh, datid, rsize, &oidloc.ns, &needslots, &max_free_slots);
       if (se)
 	return se;
 
-      // should be disconnected
-#if 0
-      if (oidloc.ns >= 0)
+      if (oidloc.ns != INVALID_NS) {
+#ifdef AUTO_DEFRAG
+	if (defrag_map[datid]) {
+	  printf("Defragmentation succesful for %u slots needed\n", needslots);
+	}
+
+	defrag_map[datid] = false;
+#endif
 	break;
-#else
-      if (oidloc.ns != INVALID_NS)
-	break;
+      }
+
+#ifdef AUTO_DEFRAG
+      // 19/09/07 : try a defragmentation if and only if:
+      // - no defragmentation has been attempted
+      // - datid is a logical datafile
+      // 20/09/07: this does not work: should try another type of defragmentation (in place)
+      if (!defrag_map[datid]) {
+	//&& getDatType(dbh, datid) == LogicalOidType) {
+	defrag_map[datid] = true;
+	char datfile[32];
+	sprintf(datfile, "%d", datid);
+	printf("Try defragmentation (%u slots needed / %u contiguous free slots available)\n", needslots, max_free_slots);
+	se = ESM_datDefragment(dbh, datfile, 0, 0);
+	if (!se) {
+	  continue;
+	}
+	statusPrint(se, "DEFRAGMENT ERROR");
+      }
 #endif
 
-      if (dspid == DefaultDspid || !ESM_getNextDatafile(dbh, dspid, datid))
+      if (dspid == DefaultDspid || !ESM_getNextDatafile(dbh, dspid, datid)) {
 	return statusMake(NO_DATAFILESPACE_LEFT,
-			  PR "database '%s' %s ",
+			  PR "database '%s' %s (%u slots needed / %u contiguous free slots available) ",
 			  dbh->dbfile,
 			  (dspid != DefaultDspid ?
 			   std::string("dataspace ") +
 			   _dbh.dsp(dspid).name() :
-			   std::string("unspecified dataspace")).c_str());
+			   std::string("unspecified dataspace")).c_str(),
+			  needslots, max_free_slots);
+      }
     }
 
     /*

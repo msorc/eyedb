@@ -25,6 +25,13 @@
 
 #include "kern_p.h"
 
+#if 0
+#undef CHECK_X
+#define CHECK_X(dbh, msg) \
+ if (!ESM_isExclusive(dbh)) \
+     fprintf(stderr, "WARNING: exclusive database access is needed when " msg "\n")
+#endif
+
 namespace eyedbsm {
 
   static Status
@@ -576,7 +583,7 @@ namespace eyedbsm {
     }
 
     DbHeader _dbh_n(DBSADDR(dbh_n));
-
+    
     // WRONG: must use separate fields
     //_dbh_n.dat(datid) = _dbh_n.dat(tmp_datid);
     _dbh_n.dat(datid).__lastslot() = _dbh_n.dat(tmp_datid).__lastslot();
@@ -585,25 +592,7 @@ namespace eyedbsm {
     MapHeader *dmp = _dbh_n.dat(datid).mp();
     MapHeader *smp = _dbh_n.dat(tmp_datid).mp();
 
-#if 1
     memcpy(dmp->_addr(), smp->_addr(), MapHeader_SIZE);
-#else
-    dmp->mtype() = smp->mtype();
-    dmp->sizeslot() = smp->sizeslot();
-    dmp->pow2() = smp->pow2();
-    dmp->nslots() = smp->nslots();
-    dmp->nbobjs() = smp->nbobjs();
-    dmp->mstat_mtype() = smp->mstat_mtype();
-
-    dmp->u_bmh_slot_cur() = smp->u_bmh_slot_cur();
-    dmp->u_bmh_slot_lastbusy() = smp->u_bmh_slot_lastbusy();
-    dmp->u_bmh_retry() = smp->u_bmh_retry();
-    
-    dmp->mstat_u_bmstat_obj_count() = smp->mstat_u_bmstat_obj_count();
-    dmp->mstat_u_bmstat_busy_slots() = smp->mstat_u_bmstat_busy_slots();
-    dmp->mstat_u_bmstat_busy_size() = smp->mstat_u_bmstat_busy_size();
-    dmp->mstat_u_bmstat_hole_size() = smp->mstat_u_bmstat_hole_size();
-#endif
 
     strcpy(_dbh_n.dat(datid).file(), datfile_keep);
     strcpy(_dbh_n.dat(datid).name(), datname_keep);

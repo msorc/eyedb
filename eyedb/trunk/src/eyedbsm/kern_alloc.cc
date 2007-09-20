@@ -231,7 +231,7 @@ namespace eyedbsm {
 
   static Status
   mapAllocRealize(DbHandle const *dbh, MapHeader *xmp, short datid,
-		  unsigned int size, NS *pns)
+		  unsigned int size, NS *pns, NS *pneedslots, NS *pmax_free_slots)
   {
     x2h_prologue(xmp, mp);
     DbDescription *vd = dbh->vd;
@@ -240,6 +240,12 @@ namespace eyedbsm {
     Status se;
 
     *pns = INVALID_NS;
+
+    NS max_free_slots = 0;
+    if (pneedslots)
+      *pneedslots = needslots;
+    if (pmax_free_slots)
+      *pmax_free_slots = 0;
 
     switch(mp->mtype()) {
     case BitmapType:
@@ -266,6 +272,9 @@ namespace eyedbsm {
 	      if (!o)
 		ns = nb;
 	      o++;
+	      if (o > max_free_slots)
+		max_free_slots = o;
+
 	      if (o == needslots) {
 		int obj_count = mp->mstat_u_bmstat_obj_count()++;
 			
@@ -295,12 +304,13 @@ namespace eyedbsm {
 	  mp->u_bmh_retry() = True;
 	  mp->u_bmh_slot_cur() = 0;
 	  h2x_epilogue(xmp, mp);
-	  //printf("retrying...\n");
-	  return mapAllocRealize(dbh, xmp, datid, size, pns);
+	  return mapAllocRealize(dbh, xmp, datid, size, pns, pneedslots, pmax_free_slots);
 	}
 
 	h2x_epilogue(xmp, mp);
 	*pns = INVALID_NS;
+	if (pmax_free_slots)
+	  *pmax_free_slots = max_free_slots;
 	return Success;
       }
 
@@ -392,7 +402,8 @@ namespace eyedbsm {
   }
 
   Status
-  mapAlloc(DbHandle const *dbh, short datid, unsigned int size, NS *pns)
+  mapAlloc(DbHandle const *dbh, short datid, unsigned int size, NS *pns,
+	   NS *pneedslots, NS *pmax_free_slots)
   {
     MapHeader t_mp = DAT2MP(dbh, datid);
     MapHeader *mp = &t_mp;
@@ -404,7 +415,7 @@ namespace eyedbsm {
 
     if (NEED_LOCK(trctx))
       MUTEX_LOCK_VOID(mt, xid);
-    se = mapAllocRealize(dbh, mp, datid, size, pns);
+    se = mapAllocRealize(dbh, mp, datid, size, pns, pneedslots, pmax_free_slots);
     if (NEED_LOCK(trctx))
       MUTEX_UNLOCK(mt, xid);
 
