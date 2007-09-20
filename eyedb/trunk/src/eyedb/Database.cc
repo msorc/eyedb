@@ -2586,8 +2586,14 @@ if ((mode) !=  NoDBAccessMode && \
 			   unsigned int slotsize, DatType dtype)
   {
     std::string s;
-    if (filedir) s = std::string(filedir) + filename;
-    else s = filename;
+    if (filedir) {
+      s = std::string(filedir);
+      if (s[s.length()] != '/')
+	s += "/";
+      s += filename;
+    }
+    else 
+      s = filename;
 
     RPCStatus rpc_status =
       eyedb::createDatafile(dbh, s.c_str(), name, maxsize, slotsize, dtype);
