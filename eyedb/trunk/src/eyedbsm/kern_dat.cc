@@ -584,8 +584,8 @@ namespace eyedbsm {
 
     DbHeader _dbh_n(DBSADDR(dbh_n));
     
-    // WRONG: must use separate fields
-    //_dbh_n.dat(datid) = _dbh_n.dat(tmp_datid);
+    _dbh_n.dat(datid).mp()->u_bmh_slot_cur() = 0; // added 20/09/07
+
     _dbh_n.dat(datid).__lastslot() = _dbh_n.dat(tmp_datid).__lastslot();
     _dbh_n.dat(datid).__maxsize() = _dbh_n.dat(tmp_datid).__maxsize();
 
