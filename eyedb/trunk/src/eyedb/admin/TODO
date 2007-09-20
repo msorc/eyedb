@@ -1,7 +1,7 @@
 
 eyedbadmin TODO list, 18/05/07
 
-EV(1):
+EV:
   eyedbadmin database delete [DONE]
   eyedbadmin database create [DONE]
   eyedbadmin database list [DONE]
@@ -14,16 +14,16 @@ EV|FD:
   eyedbadmin database export <options>
   eyedbadmin database import <options>
 
-EV|FD:
-  eyedbadmin datafile create <options>
-  eyedbadmin datafile delete <options>
-  eyedbadmin datafile list <options>
-  eyedbadmin datafile move <options>
-  eyedbadmin datafile resize <options>
-  eyedbadmin datafile defragment <options>
-  eyedbadmin datafile rename <options>
+FD:
+  eyedbadmin datafile create <options> [DONE]
+  eyedbadmin datafile delete <options> [DONE]
+  eyedbadmin datafile list <options> [DONE]
+  eyedbadmin datafile move <options> [DONE]
+  eyedbadmin datafile resize <options> [DONE]
+  eyedbadmin datafile defragment <options> [DONE]
+  eyedbadmin datafile rename <options> [DONE]
 
-FD(1): from eyedbadmin user * [USRTopic module]
+FD: from eyedbadmin user * [USRTopic module]
   eyedbadmin user add <options> [DONE]
   eyedbadmin user delete <options> [DONE]
   eyedbadmin user list <options> [DONE]
@@ -31,7 +31,7 @@ FD(1): from eyedbadmin user * [USRTopic module]
   eyedbadmin user dbaccess <options> [DONE]
   eyedbadmin user passwd <options> [DONE]
 
-FD(2): from eyedbadmin dataspace * [DSPTopic module]
+FD: from eyedbadmin dataspace * [DSPTopic module]
 Note: tests depends on datafile create,delete,list
   eyedbadmin dataspace create <options> [DONE]
   eyedbadmin dataspace update <options> [DONE]
@@ -43,7 +43,7 @@ Note: tests depends on datafile create,delete,list
   eyedbadmin dataspace setcurdat <options> [DONE]
   eyedbadmin dataspace getcurdat <options> [DONE]
 
-FD(3): from eyedbidxadmin [IDXTopic module]
+FD: from eyedbidxadmin [IDXTopic module]
   eyedbadmin index create <options> [DONE]
   eyedbadmin index delete <options> [DONE]
   eyedbadmin index update <options>

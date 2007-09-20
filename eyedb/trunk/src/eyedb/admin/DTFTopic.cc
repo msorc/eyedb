@@ -231,7 +231,6 @@ int DTFDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 //
 // DTFMoveCmd
 //
-//eyedbadmin datmove <dbname> <datid>|<datname> <new datafile>|--filedir=<filedir>
 void DTFMoveCmd::init()
 {
   std::vector<Option> opts;
@@ -309,26 +308,29 @@ int DTFMoveCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 //
 // DTFRenameCmd
 //
-// eyedbadmin datrename <dbname> <datid>|<datname> <new name>
 void DTFRenameCmd::init()
 {
   std::vector<Option> opts;
+
   opts.push_back(HELP_OPT);
+
   getopt = new GetOpt(getExtName(), opts);
 }
 
 int DTFRenameCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " USAGE\n";
+  std::cerr << " DBNAME DATID|DATNAME NEW_NAME\n";
   return 1;
 }
 
 int DTFRenameCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<user>", "User name");
-  getopt->displayOpt("<passwd>", "Password for specified user");
+  getopt->displayOpt("DBNAME", "Database");
+  getopt->displayOpt("DATID", "Datafile id");
+  getopt->displayOpt("DATNAME", "Datafile name");
+  getopt->displayOpt("NEW_NAME", "New name");
   return 1;
 }
 
@@ -342,13 +344,38 @@ int DTFRenameCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   if (map.find("help") != map.end())
     return help();
 
+  if (argv.size() != 3)
+    return usage();
+
+  const char *dbname = argv[0].c_str();
+  const char *datname = argv[1].c_str();
+  const char *new_name = argv[2].c_str();
+
+  conn.open();
+
+  Database *db = new Database(dbname);
+
+  Status s = db->open( &conn, Database::DBRW);
+  CHECK_STATUS(s);
+
+  s = db->transactionBeginExclusive();
+  CHECK_STATUS(s);
+
+  const Datafile *datafile;
+  s = db->getDatafile(datname, datafile);
+  CHECK_STATUS(s);
+  
+  s = datafile->rename( new_name);
+  CHECK_STATUS(s);
+
+  db->transactionCommit();
+
   return 0;
 }
 
 //
 // DTFResizeCmd
 //
-// eyedbadmin datresize <dbname> <datid>|<datname> <new sizeMb>
 void DTFResizeCmd::init()
 {
   std::vector<Option> opts;
@@ -359,15 +386,17 @@ void DTFResizeCmd::init()
 int DTFResizeCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " USAGE\n";
+  std::cerr << " DBNAME DATID|DATNAME NEW_SIZE\n";
   return 1;
 }
 
 int DTFResizeCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<user>", "User name");
-  getopt->displayOpt("<passwd>", "Password for specified user");
+  getopt->displayOpt("DBNAME", "Database");
+  getopt->displayOpt("DATID", "Datafile id");
+  getopt->displayOpt("DATNAME", "Datafile name");
+  getopt->displayOpt("NEW_SIZE", "New size (in Mb)");
   return 1;
 }
 
@@ -381,13 +410,38 @@ int DTFResizeCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   if (map.find("help") != map.end())
     return help();
 
+  const char *dbname = argv[0].c_str();
+  const char *datname = argv[1].c_str();
+  const char *new_size = argv[2].c_str();
+
+  if ( !eyedblib::is_number(new_size))
+    return usage();
+
+  conn.open();
+
+  Database *db = new Database(dbname);
+
+  Status s = db->open( &conn, Database::DBRW);
+  CHECK_STATUS(s);
+
+  s = db->transactionBeginExclusive();
+  CHECK_STATUS(s);
+
+  const Datafile *datafile;
+  s = db->getDatafile(datname, datafile);
+  CHECK_STATUS(s);
+  
+  s = datafile->resize( atoi(new_size)*1024);
+  CHECK_STATUS(s);
+
+  db->transactionCommit();
+
   return 0;
 }
 
 //
 // DTFDefragmentCmd
 //
-// eyedbadmin datdefragment <dbname> <datid>|<datname>
 void DTFDefragmentCmd::init()
 {
   std::vector<Option> opts;
@@ -398,15 +452,16 @@ void DTFDefragmentCmd::init()
 int DTFDefragmentCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " USAGE\n";
+  std::cerr << " DBNAME DATID|DATNAME NEW_SIZE\n";
   return 1;
 }
 
 int DTFDefragmentCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<user>", "User name");
-  getopt->displayOpt("<passwd>", "Password for specified user");
+  getopt->displayOpt("DBNAME", "Database");
+  getopt->displayOpt("DATID", "Datafile id");
+  getopt->displayOpt("DATNAME", "Datafile name");
   return 1;
 }
 
@@ -420,13 +475,34 @@ int DTFDefragmentCmd::perform(eyedb::Connection &conn, std::vector<std::string> 
   if (map.find("help") != map.end())
     return help();
 
+  const char *dbname = argv[0].c_str();
+  const char *datname = argv[1].c_str();
+
+  conn.open();
+
+  Database *db = new Database(dbname);
+
+  Status s = db->open( &conn, Database::DBRW);
+  CHECK_STATUS(s);
+
+  s = db->transactionBeginExclusive();
+  CHECK_STATUS(s);
+
+  const Datafile *datafile;
+  s = db->getDatafile(datname, datafile);
+  CHECK_STATUS(s);
+  
+  s = datafile->defragment();
+  CHECK_STATUS(s);
+
+  db->transactionCommit();
+
   return 0;
 }
 
 //
 // DTFListCmd
 //
-// eyedbadmin datlist <dbname> [--stats|--all] [{<datid>|<datname>}]
 void DTFListCmd::init()
 {
   std::vector<Option> opts;
