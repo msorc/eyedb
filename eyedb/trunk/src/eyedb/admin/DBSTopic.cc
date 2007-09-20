@@ -649,7 +649,7 @@ int DBSRenameCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 }
 
 //
-// DBSRenameCmd
+// DBSDeleteCmd
 //
 void DBSDeleteCmd::init()
 {
@@ -718,4 +718,195 @@ int DBSDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   return 0;
 }
+
+//
+// DBSMoveCmd
+//
+void DBSMoveCmd::init()
+{
+  std::vector<Option> opts;
+  opts.push_back(HELP_OPT);
+  getopt = new GetOpt(getExtName(), opts);
+}
+
+int DBSMoveCmd::usage()
+{
+  getopt->usage("", "");
+  std::cerr << " USAGE\n";
+  return 1;
+}
+
+int DBSMoveCmd::help()
+{
+  stdhelp();
+  getopt->displayOpt("<user>", "User name");
+  getopt->displayOpt("<passwd>", "Password for specified user");
+  return 1;
+}
+
+int DBSMoveCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+{
+  if (! getopt->parse(PROG_NAME, argv))
+    return usage();
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end())
+    return help();
+
+  return 0;
+}
+
+//
+// DBSCopyCmd
+//
+void DBSCopyCmd::init()
+{
+  std::vector<Option> opts;
+  opts.push_back(HELP_OPT);
+  getopt = new GetOpt(getExtName(), opts);
+}
+
+int DBSCopyCmd::usage()
+{
+  getopt->usage("", "");
+  std::cerr << " USAGE\n";
+  return 1;
+}
+
+int DBSCopyCmd::help()
+{
+  stdhelp();
+  getopt->displayOpt("<user>", "User name");
+  getopt->displayOpt("<passwd>", "Password for specified user");
+  return 1;
+}
+
+int DBSCopyCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+{
+  if (! getopt->parse(PROG_NAME, argv))
+    return usage();
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end())
+    return help();
+
+  return 0;
+}
+
+//
+// DBSDefAccessCmd
+//
+void DBSDefAccessCmd::init()
+{
+  std::vector<Option> opts;
+  opts.push_back(HELP_OPT);
+  getopt = new GetOpt(getExtName(), opts);
+}
+
+int DBSDefAccessCmd::usage()
+{
+  getopt->usage("", "");
+  std::cerr << " USAGE\n";
+  return 1;
+}
+
+int DBSDefAccessCmd::help()
+{
+  stdhelp();
+  getopt->displayOpt("<user>", "User name");
+  getopt->displayOpt("<passwd>", "Password for specified user");
+  return 1;
+}
+
+int DBSDefAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+{
+  if (! getopt->parse(PROG_NAME, argv))
+    return usage();
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end())
+    return help();
+
+  return 0;
+}
+
+//
+// DBSExportCmd
+//
+void DBSExportCmd::init()
+{
+  std::vector<Option> opts;
+  opts.push_back(HELP_OPT);
+  getopt = new GetOpt(getExtName(), opts);
+}
+
+int DBSExportCmd::usage()
+{
+  getopt->usage("", "");
+  std::cerr << " USAGE\n";
+  return 1;
+}
+
+int DBSExportCmd::help()
+{
+  stdhelp();
+  getopt->displayOpt("<user>", "User name");
+  getopt->displayOpt("<passwd>", "Password for specified user");
+  return 1;
+}
+
+int DBSExportCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+{
+  if (! getopt->parse(PROG_NAME, argv))
+    return usage();
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end())
+    return help();
+
+  return 0;
+}
+
+//
+// DBSImportCmd
+//
+void DBSImportCmd::init()
+{
+  std::vector<Option> opts;
+  opts.push_back(HELP_OPT);
+  getopt = new GetOpt(getExtName(), opts);
+}
+
+int DBSImportCmd::usage()
+{
+  getopt->usage("", "");
+  std::cerr << " USAGE\n";
+  return 1;
+}
+
+int DBSImportCmd::help()
+{
+  stdhelp();
+  getopt->displayOpt("<user>", "User name");
+  getopt->displayOpt("<passwd>", "Password for specified user");
+  return 1;
+}
+
+int DBSImportCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+{
+  if (! getopt->parse(PROG_NAME, argv))
+    return usage();
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end())
+    return help();
+
+  return 0;
+}
+
 

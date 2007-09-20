@@ -37,11 +37,10 @@ CMDCLASS_GETOPT(DBSCreateCmd, "create");
 CMDCLASS_GETOPT(DBSDeleteCmd, "delete");
 CMDCLASS_GETOPT(DBSListCmd, "list");
 CMDCLASS_GETOPT(DBSRenameCmd, "rename");
-
-CMDCLASS(DBSMoveCmd, "move");
-CMDCLASS(DBSCopyCmd, "copy");
-CMDCLASS(DBSDefAccessCmd, "defaccess");
-CMDCLASS(DBSExportCmd, "export");
-CMDCLASS(DBSImportCmd, "import");
+CMDCLASS_GETOPT(DBSMoveCmd, "move");
+CMDCLASS_GETOPT(DBSCopyCmd, "copy");
+CMDCLASS_GETOPT(DBSDefAccessCmd, "defaccess");
+CMDCLASS_GETOPT(DBSExportCmd, "export");
+CMDCLASS_GETOPT(DBSImportCmd, "import");
 
 #endif
