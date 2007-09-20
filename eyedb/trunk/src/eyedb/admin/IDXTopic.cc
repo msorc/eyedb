@@ -18,8 +18,8 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
-   Author: Francois Dechelle <francois@dechelle.net>
+  Author: Eric Viara <viara@sysra.com>
+  Author: Francois Dechelle <francois@dechelle.net>
 */
 
 #include "eyedbconfig.h"
@@ -37,13 +37,6 @@
 
 using namespace eyedb;
 using namespace std;
-
-#define CHECK_STATUS(s) 			\
-  if (s) {					\
-    std::cerr << PROG_NAME;			\
-    s->print();					\
-    return 1;					\
-  }
 
 IDXTopic::IDXTopic() : Topic("index")
 {
@@ -108,9 +101,8 @@ indexGet( Database *db, const Class *cls, LinkedList &indexlist)
 {
   const LinkedList *classindexlist;
 
-  Status s = const_cast<Class *>(cls)->getAttrCompList(Class::Index_C, classindexlist);
-  CHECK_STATUS(s);
-    
+  const_cast<Class *>(cls)->getAttrCompList(Class::Index_C, classindexlist);
+      
   LinkedListCursor c(classindexlist);
   void *o;
   while (c.getNext(o)) {
@@ -129,13 +121,11 @@ indexGet( Database *db, const char *name, LinkedList &indexlist)
 
   if (strchr(name, '.')) {
     // name is an attribute name
-    s = Attribute::checkAttrPath(db->getSchema(), cls, attr, name);
-    CHECK_STATUS(s);
-
+    Attribute::checkAttrPath(db->getSchema(), cls, attr, name);
+    
     Index *index;
-    s = Attribute::getIndex(db, name, index);
-    CHECK_STATUS(s);
-
+    Attribute::getIndex(db, name, index);
+    
     if (!index) {
       std::cerr << PROG_NAME;
       fprintf(stderr, ": index '%s' not found\n", name);
@@ -254,18 +244,15 @@ int IDXCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   Database *db = new Database(dbname);
 
-  Status s = db->open( &conn, Database::DBRW);
-  CHECK_STATUS(s);
-
-  s = db->transactionBeginExclusive();
-  CHECK_STATUS(s);
-
+  db->open( &conn, Database::DBRW);
+  
+  db->transactionBeginExclusive();
+  
   const Class *cls;
   const Attribute *attribute;
 
-  s = Attribute::checkAttrPath( db->getSchema(), cls, attribute, attributePath);
-  CHECK_STATUS(s);
-
+  Attribute::checkAttrPath( db->getSchema(), cls, attribute, attributePath);
+  
   if (!typeOption) {
     if (attribute->isString() 
 	|| attribute->isIndirect() 
@@ -281,24 +268,21 @@ int IDXCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   if (!strcmp(typeOption, "hash")) {
     HashIndex *hidx;
-    Status s = HashIndex::make(db, const_cast<Class *>(cls), attributePath,
-			       (propagate)? eyedb::True : eyedb::False, 
-			       attribute->isString(), hints, hidx);
-    CHECK_STATUS(s);
+    HashIndex::make(db, const_cast<Class *>(cls), attributePath,
+		    (propagate)? eyedb::True : eyedb::False, 
+		    attribute->isString(), hints, hidx);
     index = hidx;
   }
   else if (!strcmp(typeOption, "btree")) {
     BTreeIndex *bidx;
-    Status s = BTreeIndex::make(db, const_cast<Class *>(cls), attributePath, 
-			       (propagate)? eyedb::True : eyedb::False, 
-				attribute->isString(), hints, bidx);
-    CHECK_STATUS(s);
+    BTreeIndex::make(db, const_cast<Class *>(cls), attributePath, 
+		     (propagate)? eyedb::True : eyedb::False, 
+		     attribute->isString(), hints, bidx);
     index = bidx;
   }
 
-  s = index->store();
-  CHECK_STATUS(s);
-
+  index->store();
+  
   db->transactionCommit();
 
   return 0;
@@ -349,23 +333,19 @@ int IDXDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   Database *db = new Database(dbname);
 
-  Status s = db->open( &conn, Database::DBRW);
-  CHECK_STATUS(s);
-
-  s = db->transactionBeginExclusive();
-  CHECK_STATUS(s);
-
+  db->open( &conn, Database::DBRW);
+  
+  db->transactionBeginExclusive();
+  
   const Class *cls;
   const Attribute *attribute;
 
-  s = Attribute::checkAttrPath(db->getSchema(), cls, attribute, attributePath);
-  CHECK_STATUS(s);
-
+  Attribute::checkAttrPath(db->getSchema(), cls, attribute, attributePath);
+  
   Index *index;
 
-  s = Attribute::getIndex(db, attributePath, index);
-  CHECK_STATUS(s);
-    
+  Attribute::getIndex(db, attributePath, index);
+      
   if (!index) {
     std::cerr << PROG_NAME;
     fprintf(stderr, ": index '%s' not found\n", attributePath);
@@ -373,9 +353,8 @@ int IDXDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   }
 
   printf("Deleting index %s\n", index->getAttrpath().c_str());
-  s = index->remove();
-  CHECK_STATUS(s);
-    
+  index->remove();
+      
   db->transactionCommit();
 
   return 0;
@@ -461,12 +440,10 @@ int IDXUpdateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   Database *db = new Database(dbname);
 
-  Status s = db->open( &conn, Database::DBRW);
-  CHECK_STATUS(s);
-
-  s = db->transactionBeginExclusive();
-  CHECK_STATUS(s);
-
+  db->open( &conn, Database::DBRW);
+  
+  db->transactionBeginExclusive();
+  
   LinkedList indexList;
   if (indexGet( db, attributePath, indexList))
     return 1;
@@ -499,27 +476,22 @@ int IDXUpdateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   index->setPropagate( (propagate)? eyedb::True : eyedb::False);
 
   if (onlyPropagate) {
-    s = index->store();
-    CHECK_STATUS(s);
+    index->store();
   } else {
     IndexImpl *impl = 0;
 
-    s = IndexImpl::make( db, type, hints, impl, index->getIsString());
-    CHECK_STATUS(s);
-
+    IndexImpl::make( db, type, hints, impl, index->getIsString());
+    
     // The index type has changed
     if ((type == IndexImpl::Hash && index->asBTreeIndex()) ||
 	(type == IndexImpl::BTree && index->asHashIndex())) {
       Index *newIndex;
-      s = index->reimplement(*impl, newIndex);
-      CHECK_STATUS(s);
+      index->reimplement(*impl, newIndex);
     }
     else {
-      s = index->setImplementation(impl);
-      CHECK_STATUS(s);
-
-      s = index->store();
-      CHECK_STATUS(s);
+      index->setImplementation(impl);
+      
+      index->store();
     }
   }    
 
@@ -585,12 +557,10 @@ int IDXListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 
   Database *db = new Database(dbname);
 
-  Status s = db->open( &conn, Database::DBSRead);
-  CHECK_STATUS(s);
-
-  s = db->transactionBegin();
-  CHECK_STATUS(s);
-
+  db->open( &conn, Database::DBSRead);
+  
+  db->transactionBegin();
+  
   LinkedList indexList;
 
   if (argv.size() < 2) {
@@ -640,7 +610,7 @@ int IDXStatsCmd::usage()
 static void displayFormatOptionHelp()
 {
   std::cout << 
-"\n  The --format option indicates an output format for hash index stat entries.\n\
+    "\n  The --format option indicates an output format for hash index stat entries.\n\
     <format> is a printf-like string where:\n\
       %n denotes the number of keys,\n\
       %O denotes the count of object entries for this key,\n\
@@ -691,12 +661,10 @@ int IDXStatsCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv
 
   Database *db = new Database(dbname);
 
-  Status s = db->open( &conn, Database::DBSRead);
-  CHECK_STATUS(s);
-
-  s = db->transactionBegin();
-  CHECK_STATUS(s);
-
+  db->open( &conn, Database::DBSRead);
+  
+  db->transactionBegin();
+  
   LinkedList indexList;
 
   if (argv.size() < 2) {
@@ -714,16 +682,13 @@ int IDXStatsCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv
   while (c.getNext((void *&)index)) {
     if (format && index->asHashIndex()) {
       IndexStats *stats;
-      s = index->getStats(stats);
-      CHECK_STATUS(s);
+      index->getStats(stats);
       fprintf(stdout, "\n");
-      s = stats->asHashIndexStats()->printEntries(format);
+      stats->asHashIndexStats()->printEntries(format);
       delete stats;
-      CHECK_STATUS(s);
     } else {
       std::string stats;
-      s = index->getStats(stats, False, (full)? eyedb::True : eyedb::False, "    ");
-      CHECK_STATUS(s);
+      index->getStats(stats, False, (full)? eyedb::True : eyedb::False, "    ");
       indexTrace(db, index, True);
       fprintf(stdout, "  Statistics:\n");
       fprintf(stdout, stats.c_str());
@@ -810,12 +775,10 @@ int IDXSimulateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &a
 
   Database *db = new Database(dbname);
 
-  Status s = db->open( &conn, Database::DBRW);
-  CHECK_STATUS(s);
-
-  s = db->transactionBeginExclusive();
-  CHECK_STATUS(s);
-
+  db->open( &conn, Database::DBRW);
+  
+  db->transactionBeginExclusive();
+  
   LinkedList indexList;
 
   if (indexGet( db, attributePath, indexList))
@@ -830,21 +793,17 @@ int IDXSimulateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &a
   Index *index = (Index *)indexList.getObject(0);
   IndexImpl *impl;
 
-  s = IndexImpl::make(db, type, hints, impl, index->getIsString());
-  CHECK_STATUS(s);
-
+  IndexImpl::make(db, type, hints, impl, index->getIsString());
+  
   if (format && impl->getType() == IndexImpl::Hash) {
     IndexStats *stats;
-    s = index->simulate(*impl, stats);
-    CHECK_STATUS(s);
-    s = stats->asHashIndexStats()->printEntries(format);
-    CHECK_STATUS(s);
+    index->simulate(*impl, stats);
+    stats->asHashIndexStats()->printEntries(format);
     delete stats;
   }
   else {
     std::string stats;
-    s = index->simulate(*impl, stats, True, (full)? eyedb::True : eyedb::False, "  ");
-    CHECK_STATUS(s);
+    index->simulate(*impl, stats, True, (full)? eyedb::True : eyedb::False, "  ");
     printf("Index on %s:\n", index->getAttrpath().c_str());
     fprintf(stdout, stats.c_str());
   }
