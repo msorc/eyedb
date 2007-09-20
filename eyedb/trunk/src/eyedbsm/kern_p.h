@@ -249,7 +249,8 @@ namespace eyedbsm {
   get_time();
 
   extern Status
-  mapAlloc(DbHandle const *dbh, short datid, unsigned int size, NS *pns);
+  mapAlloc(DbHandle const *dbh, short datid, unsigned int size, NS *pns,
+	   NS *pneedslots, NS *pmax_free_slots);
 
   extern void
   mapFree(DbDescription *vd, NS ns, short datid, unsigned int size);
