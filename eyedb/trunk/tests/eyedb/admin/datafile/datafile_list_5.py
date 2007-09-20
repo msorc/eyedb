@@ -20,7 +20,7 @@ child.expect( "Oid Type *Logical")
 child.expect( "Datafile #1")
 child.expect( "Name *%s" % (name,))
 child.expect( "File .*%s" % (datafile,))
-child.expect( "Maxsize")
+child.expect( "Maxsize *4294967296")
 child.expect( "Slotsize")
 child.expect( "Oid Type *Logical")
 

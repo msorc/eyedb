@@ -2,7 +2,7 @@ import pexpect
 import sys
 
 dbname = 'datafile_test_db'
-new_datafile='new_test.dat'
+datafile='new_test.dat'
 name='test'
 
 command="eyedbadmin2 datafile list %s" % (dbname,)
@@ -19,7 +19,7 @@ child.expect( "Oid Type *Logical")
 
 child.expect( "Datafile #1")
 child.expect( "Name *%s" % (name,))
-child.expect( "File .*%s" % (new_datafile,))
+child.expect( "File .*%s" % (datafile,))
 child.expect( "Maxsize")
 child.expect( "Slotsize")
 child.expect( "Oid Type *Logical")
