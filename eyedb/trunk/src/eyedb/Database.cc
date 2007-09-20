@@ -2588,7 +2588,7 @@ if ((mode) !=  NoDBAccessMode && \
     std::string s;
     if (filedir) {
       s = std::string(filedir);
-      if (s[s.length()] != '/')
+      if (s.length() > 0 && s[s.length()-1] != '/')
 	s += "/";
       s += filename;
     }

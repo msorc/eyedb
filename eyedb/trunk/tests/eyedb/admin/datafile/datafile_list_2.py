@@ -1,9 +1,6 @@
 import pexpect
 import sys
 
-import pexpect
-import sys
-
 dbname = 'datafile_test_db'
 datafile='test.dat'
 name='test'

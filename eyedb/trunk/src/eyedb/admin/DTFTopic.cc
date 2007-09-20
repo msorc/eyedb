@@ -235,22 +235,31 @@ int DTFDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 void DTFMoveCmd::init()
 {
   std::vector<Option> opts;
+
   opts.push_back(HELP_OPT);
+
+  opts.push_back(Option(FILEDIR_OPT, 
+			OptionStringType(), 
+			Option::MandatoryValue, 
+			OptionDesc("File directory", "FILEDIR")));
+
   getopt = new GetOpt(getExtName(), opts);
 }
 
 int DTFMoveCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " USAGE\n";
+  std::cerr << " DBNAME DATID|DATNAME NEW_DATAFILE\n";
   return 1;
 }
 
 int DTFMoveCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<user>", "User name");
-  getopt->displayOpt("<passwd>", "Password for specified user");
+  getopt->displayOpt("DBNAME", "Database");
+  getopt->displayOpt("DATID", "Datafile id");
+  getopt->displayOpt("DATNAME", "Datafile name");
+  getopt->displayOpt("NEW_DATAFILE", "New datafile");
   return 1;
 }
 
@@ -263,6 +272,36 @@ int DTFMoveCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 
   if (map.find("help") != map.end())
     return help();
+
+  if (argv.size() != 3)
+    return usage();
+
+  const char *dbname = argv[0].c_str();
+  const char *datname = argv[1].c_str();
+  const char *new_filename = argv[2].c_str();
+
+  const char *filedir = 0;
+  if (map.find(FILEDIR_OPT) != map.end())
+    filedir = map[FILEDIR_OPT].value.c_str();
+
+  conn.open();
+
+  Database *db = new Database(dbname);
+
+  Status s = db->open( &conn, Database::DBRW);
+  CHECK_STATUS(s);
+
+  s = db->transactionBeginExclusive();
+  CHECK_STATUS(s);
+
+  const Datafile *datafile;
+  s = db->getDatafile(datname, datafile);
+  CHECK_STATUS(s);
+  
+  s = datafile->move( filedir, new_filename);
+  CHECK_STATUS(s);
+
+  db->transactionCommit();
 
   return 0;
 }
