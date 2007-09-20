@@ -1,6 +1,9 @@
 import pexpect
 import sys
 
+import pexpect
+import sys
+
 dbname = 'datafile_test_db'
 
 command="eyedbadmin2 datafile list %s" % (dbname,)

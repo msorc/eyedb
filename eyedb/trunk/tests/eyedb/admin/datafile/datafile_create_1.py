@@ -1,18 +1,16 @@
 import pexpect
 import sys
 
-dbname='foo'
-dspname='bar'
-datname='bar.dat'
+dbname = 'datafile_test_db'
+datafile='test.dat'
+name='test'
 
 # create the data file
-child = pexpect.spawn("eyedbadmin datcreate %s %s" % (dbname,datname))
-r = child.expect(pexpect.EOF)
-child.close()
-# create the dataspace
-command="eyedbadmin2 dataspace create %s %s %s" % (dbname,dspname,datname)
+command="eyedbadmin2 datafile create --name=%s %s %s" % (name,dbname,datafile)
 child = pexpect.spawn(command)
-r = child.expect(pexpect.EOF)
+child.logfile = sys.stdout
+child.expect(pexpect.EOF)
+child.logfile = sys.stdout
 child.close()
 sys.exit(child.exitstatus)
 

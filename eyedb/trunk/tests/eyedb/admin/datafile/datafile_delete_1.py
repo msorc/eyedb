@@ -1,12 +1,13 @@
 import pexpect
 import sys
 
-dbname='foo'
-dspname='bur'
+dbname = 'datafile_test_db'
+datafile='test.dat'
 
-command="eyedbadmin2 dataspace delete %s %s" % (dbname,dspname)
+command="eyedbadmin2 datafile delete %s %s" % (dbname,datafile)
 child = pexpect.spawn(command)
-r = child.expect(pexpect.EOF)
+child.logfile = sys.stdout
+child.expect(pexpect.EOF)
 child.close()
 sys.exit(child.exitstatus)
 

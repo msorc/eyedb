@@ -67,11 +67,6 @@ void DTFCreateCmd::init()
 
   opts.push_back(HELP_OPT);
 
-  opts.push_back(Option(FILENAME_OPT,
-			OptionStringType(),
-			Option::MandatoryValue,
-			OptionDesc("File name", "FILENAME")));
-
   opts.push_back(Option(FILEDIR_OPT, 
 			OptionStringType(), 
 			Option::MandatoryValue, 
@@ -103,7 +98,7 @@ void DTFCreateCmd::init()
 int DTFCreateCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " DBNAME\n";
+  std::cerr << " DBNAME DATAFILE\n";
   return 1;
 }
 
@@ -111,6 +106,7 @@ int DTFCreateCmd::help()
 {
   stdhelp();
   getopt->displayOpt("DBNAME", "Database");
+  getopt->displayOpt("DATAFILE", "Datafile");
   return 1;
 }
 
@@ -121,67 +117,38 @@ int DTFCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   GetOpt::Map &map = getopt->getMap();
 
-  if (map.find("help") != map.end()) {
+  if (map.find("help") != map.end())
     return help();
-  }
 
-  if (argv.size() != 1) {
+  if (argv.size() != 2)
     return usage();
-  }
 
-  std::string dbname = argv[0];
+  const char *dbname = argv[0].c_str();
+  const char *filename = argv[1].c_str();
 
-  const char *filedir;
-  if (map.find(FILEDIR_OPT) != map.end()) {
+  const char *filedir = 0;
+  if (map.find(FILEDIR_OPT) != map.end())
     filedir = map[FILEDIR_OPT].value.c_str();
-  }
-  else {
-    filedir = 0;
-  }
 
-  const char *filename;
-  if (map.find(FILENAME_OPT) != map.end()) {
-    filename = map[FILENAME_OPT].value.c_str();
-  }
-  else {
-    filename = "";
-  }
-
-  const char *name;
-  if (map.find(NAME_OPT) != map.end()) {
+  const char *name = "";
+  if (map.find(NAME_OPT) != map.end())
     name = map[NAME_OPT].value.c_str();
-  }
-  else {
-    name = "";
-  }
 
-  unsigned int size;
-  if (map.find(SIZE_OPT) != map.end()) {
+  unsigned int size = DEFAULT_DTFSIZE * ONE_K;
+  if (map.find(SIZE_OPT) != map.end())
     size = atoi(map[SIZE_OPT].value.c_str());
-  }
-  else {
-    size = DEFAULT_DTFSIZE * ONE_K;
-  }
 
-  unsigned int slotsize;
-  if (map.find(SLOTSIZE_OPT) != map.end()) {
+  unsigned int slotsize = DEFAULT_DTFSZSLOT;
+  if (map.find(SLOTSIZE_OPT) != map.end())
     slotsize = atoi(map[SLOTSIZE_OPT].value.c_str());
-  }
-  else {
-    slotsize = DEFAULT_DTFSZSLOT;
-  }
 
-  eyedbsm::DatType dtfType;
-  if (map.find(PHYSICAL_OPT) != map.end()) {
+  eyedbsm::DatType dtfType = eyedbsm::LogicalOidType;
+  if (map.find(PHYSICAL_OPT) != map.end())
     dtfType = eyedbsm::PhysicalOidType;
-  }
-  else {
-    dtfType = eyedbsm::LogicalOidType;
-  }
 
   conn.open();
 
-  Database *db = new Database(dbname.c_str());
+  Database *db = new Database(dbname);
 
   Status s = db->open( &conn, Database::DBRW);
   CHECK_STATUS(s);
@@ -236,12 +203,12 @@ int DTFDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   if (argv.size() != 2)
     return usage();
 
-  std::string dbname = argv[0];
-  std::string datname = argv[1];
+  const char *dbname = argv[0].c_str();
+  const char *datname = argv[1].c_str();
 
   conn.open();
 
-  Database *db = new Database(dbname.c_str());
+  Database *db = new Database(dbname);
 
   Status s = db->open( &conn, Database::DBRW);
   CHECK_STATUS(s);
@@ -250,7 +217,7 @@ int DTFDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   CHECK_STATUS(s);
 
   const Datafile *datafile;
-  s = db->getDatafile(datname.c_str(), datafile);
+  s = db->getDatafile(datname, datafile);
   CHECK_STATUS(s);
   
   s = datafile->remove();
