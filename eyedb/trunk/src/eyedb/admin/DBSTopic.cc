@@ -19,10 +19,10 @@
 
 /*
    Author: Eric Viara <viara@sysra.com>
+   Author: Francois Dechelle <francois@dechelle.net>
 */
 
 #include "eyedbconfig.h"
-
 #include <eyedb/eyedb.h>
 #include <eyedb/opts.h>
 #include "eyedb/DBM_Database.h"
@@ -32,18 +32,15 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <eyedblib/butils.h>
-
 #include "GetOpt.h"
-
 #include "DBSTopic.h"
+#include "DatafileStats.h"
 
 using namespace eyedb;
 
 DBSTopic::DBSTopic() : Topic("database")
 {
   addAlias("db");
-
-  //  addCommand(new DBSDBMCreateCmd(this));
 
   addCommand(new DBSCreateCmd(this));
   addCommand(new DBSDeleteCmd(this));
@@ -60,7 +57,9 @@ DBSTopic::DBSTopic() : Topic("database")
 }
 
 
-
+//
+// DBSCreateCmd
+//
 void DBSCreateCmd::init()
 {
   std::vector<Option> opts;
@@ -162,6 +161,9 @@ int DBSCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   return 0;
 }
 
+//
+// DBSListCmd
+//
 void DBSListCmd::init()
 {
   std::vector<Option> opts;
@@ -179,8 +181,21 @@ void DBSListCmd::init()
   getopt = new GetOpt(getExtName(), opts);
 }
 
-///----- should be factorized in another module
+int DBSListCmd::usage()
+{
+  getopt->usage("", "");
+  std::cerr << " {[~]<dbname>}\n";
+  return 1;
+}
 
+int DBSListCmd::help()
+{
+  stdhelp();
+  getopt->displayOpt("{[~]<dbname>}", "Database(s) to list (~ means regular expression)");
+  return 1;
+}
+
+///----- should be factorized in another module
 enum {
   DBNAME_FLG = 0x1,
   DBID_FLG = 0x2,
@@ -194,128 +209,6 @@ enum {
 };
 
 static const char LIST_INDENT[] = "  ";
-
-namespace eyedb {
-  extern void display_datsize(std::ostream &, unsigned long long);
-}
-
-class DatlistStats {
-  unsigned int objcnt;
-  unsigned int slotcnt;
-  unsigned int busyslotcnt;
-  unsigned long long maxsize;
-  unsigned long long totalsize;
-  unsigned long long busyslotsize;
-  unsigned long long datafilesize;
-  unsigned long long datafileblksize;
-  unsigned long long dmpfilesize;
-  unsigned long long dmpfileblksize;
-  unsigned long long defragmentablesize;
-  unsigned int slotfragcnt;
-  double used;
-  unsigned int cnt;
-  DbInfoDescription *dbdesc;
-
-public:
-  DatlistStats(DbInfoDescription *_dbdesc = 0) {
-
-    objcnt = slotcnt = busyslotcnt = 0;
-    maxsize = totalsize = busyslotsize = datafilesize = datafileblksize =
-      dmpfilesize = dmpfileblksize = defragmentablesize = 0;
-    slotfragcnt = 0;
-    used = 0.;
-    cnt = 0;
-    dbdesc = _dbdesc;
-  }
-
-  int add(const Datafile *datafile) {
-    if (!datafile->isValid()) return 0;
-
-    DatafileInfo info;
-    datafile->getInfo(info);
-
-    const DatafileInfo::Info &in = info.getInfo();
-    maxsize += datafile->getMaxsize();
-    objcnt += in.objcnt;
-    slotcnt += in.slotcnt;
-    totalsize += in.totalsize;
-    busyslotcnt += in.busyslotcnt;
-    busyslotsize += in.busyslotsize;
-
-    datafilesize += in.datfilesize;
-    datafileblksize += in.datfileblksize;
-    dmpfilesize += in.dmpfilesize;
-    dmpfileblksize += in.dmpfileblksize;
-
-    defragmentablesize += in.defragmentablesize;
-    slotfragcnt += in.slotfragcnt;
-    used += in.used;
-    cnt++;
-
-    return 0;
-  }
-
-  void display() {
-    if (dbdesc) {
-      std::cout << "Statistics\n";
-      std::cout << "  Maximum Object Number " << dbdesc->sedbdesc.nbobjs << '\n';
-    }
-    else
-      std::cout << "Datafile Statistics\n";
-
-    std::cout << "  Object Number         " << objcnt << '\n';
-    std::cout << "  Maximum Slot Count    " << slotcnt << '\n';
-    std::cout << "  Busy Slot Count       " << busyslotcnt << '\n';
-    std::cout << "  Maximum Size          ";
-    display_datsize(std::cout, maxsize*1024);
-
-    if (!dbdesc) {
-      std::cout << "  Busy Size             ";
-      display_datsize(std::cout, totalsize);
-    }
-
-    std::cout << "  Busy Slot Size        ";
-    display_datsize(std::cout, busyslotsize);
-
-    if (dbdesc) {
-      std::cout << "  Disk Size Used        ";
-      display_datsize(std::cout,
-		      datafilesize +
-		      dmpfilesize + 
-		      dbdesc->sedbdesc.dbsfilesize + 
-		      dbdesc->sedbdesc.ompfilesize +
-		      dbdesc->sedbdesc.shmfilesize);
-      std::cout << "  Disk Block Size Used  ";
-      display_datsize(std::cout,
-		      datafileblksize +
-		      dmpfileblksize + 
-		      dbdesc->sedbdesc.dbsfileblksize + 
-		      dbdesc->sedbdesc.ompfileblksize +
-		      dbdesc->sedbdesc.shmfileblksize);
-    }
-    else {
-      std::cout << "  .dat File Size        ";
-      display_datsize(std::cout, datafilesize);
-      std::cout << "  .dat File Block Size  ";
-      display_datsize(std::cout, datafileblksize);
-      
-      std::cout << "  .dmp File Size        ";
-      display_datsize(std::cout, dmpfilesize);
-      std::cout << "  .dmp File Block Size  ";
-      display_datsize(std::cout, dmpfileblksize);
-      std::cout << "  Disk Size Used        ";
-      display_datsize(std::cout, datafilesize+dmpfilesize);
-      std::cout << "  Disk Block Size Used  ";
-      display_datsize(std::cout, datafileblksize+dmpfileblksize);
-      std::cout << "  Defragmentable Size   ";
-      display_datsize(std::cout, defragmentablesize);
-    }
-
-    char buf[16];
-    sprintf(buf, "%2.2f", used/cnt);
-    std::cout << "  Used                  " << buf << "%\n";
-  }
-};
 
 static DbInfoDescription *getDBInfo(Connection &conn, DBEntry *dbentry, Database *&db)
 {
@@ -533,7 +426,7 @@ static int printDBEntry(Connection &conn, DBEntry *dbentry, DBM_Database *dbm, u
     unsigned int cnt;
     db->open(&conn, Database::DBSRead);
     db->getDatafiles(datafiles, cnt);
-    DatlistStats dstats(dbdesc);
+    DatafileStats dstats(dbdesc);
     for (int i = 0, n = 0; i < cnt; i++)
       if (dstats.add(datafiles[i])) return 1;
     dstats.display();
@@ -691,20 +584,9 @@ int DBSListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
   return 0;
 }
 
-int DBSListCmd::usage()
-{
-  getopt->usage("", "");
-  std::cerr << " {[~]<dbname>}\n";
-  return 1;
-}
-
-int DBSListCmd::help()
-{
-  stdhelp();
-  getopt->displayOpt("{[~]<dbname>}", "Database(s) to list (~ means regular expression)");
-  return 1;
-}
-
+//
+// DBSRenameCmd
+//
 void DBSRenameCmd::init()
 {
   std::vector<Option> opts;
@@ -766,6 +648,9 @@ int DBSRenameCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   return 0;
 }
 
+//
+// DBSRenameCmd
+//
 void DBSDeleteCmd::init()
 {
   std::vector<Option> opts;

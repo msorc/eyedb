@@ -35,14 +35,11 @@ public:
 
 CMDCLASS_GETOPT(DBSCreateCmd, "create");
 CMDCLASS_GETOPT(DBSDeleteCmd, "delete");
-
-// will be put un eyedbdbminit with options
-//CMDCLASS(DBSDBMCreateCmd, "dbmcreate");
-
 CMDCLASS_GETOPT(DBSListCmd, "list");
+CMDCLASS_GETOPT(DBSRenameCmd, "rename");
+
 CMDCLASS(DBSMoveCmd, "move");
 CMDCLASS(DBSCopyCmd, "copy");
-CMDCLASS_GETOPT(DBSRenameCmd, "rename");
 CMDCLASS(DBSDefAccessCmd, "defaccess");
 CMDCLASS(DBSExportCmd, "export");
 CMDCLASS(DBSImportCmd, "import");

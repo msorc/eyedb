@@ -18,8 +18,8 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
-   Author: Francois Dechelle <francois@dechelle.net>
+  Author: Eric Viara <viara@sysra.com>
+  Author: Francois Dechelle <francois@dechelle.net>
 */
 
 #include "eyedbconfig.h"
@@ -31,13 +31,6 @@
 
 using namespace eyedb;
 using namespace std;
-
-#define CHECK_STATUS(s) 			\
-  if (s) {					\
-    std::cerr << PROG_NAME;			\
-    s->print();					\
-    return 1;					\
-  }
 
 DSPTopic::DSPTopic() : Topic("dataspace")
 {
@@ -99,22 +92,18 @@ int DSPCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   Database *db = new Database(dbname);
 
-  Status s = db->open( &conn, Database::DBRW);
-  CHECK_STATUS(s);
-
-  s = db->transactionBeginExclusive();
-  CHECK_STATUS(s);
-
+  db->open( &conn, Database::DBRW);
+  
+  db->transactionBeginExclusive();
+  
   int count = argv.size() - 2;
   const Datafile **datafiles = new const Datafile *[count];
   for ( int i = 0; i < count; i++) {
-    s = db->getDatafile( argv[i+2].c_str(), datafiles[i]);
-    CHECK_STATUS(s);
+    db->getDatafile( argv[i+2].c_str(), datafiles[i]);
   }
 
-  s = db->createDataspace( dspname, datafiles, count);
-  CHECK_STATUS(s);
-
+  db->createDataspace( dspname, datafiles, count);
+  
   db->transactionCommit();
 
   return 0;
@@ -165,26 +154,21 @@ int DSPUpdateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   Database *db = new Database(dbname);
 
-  Status s = db->open( &conn, Database::DBRW);
-  CHECK_STATUS(s);
-
-  s = db->transactionBeginExclusive();
-  CHECK_STATUS(s);
-
+  db->open( &conn, Database::DBRW);
+  
+  db->transactionBeginExclusive();
+  
   const Dataspace *dataspace = 0;
-  s = db->getDataspace(dspname, dataspace);
-  CHECK_STATUS(s);
-
+  db->getDataspace(dspname, dataspace);
+  
   int count = argv.size() - 2;
   const Datafile **datafiles = new const Datafile *[count];
   for (int i = 0; i < count; i++) {
-    s = db->getDatafile( argv[i+2].c_str(), datafiles[i]);
-    CHECK_STATUS(s);
+    db->getDatafile( argv[i+2].c_str(), datafiles[i]);
   }
 
-  s = dataspace->update(datafiles, count);
-  CHECK_STATUS(s);
-
+  dataspace->update(datafiles, count);
+  
   db->transactionCommit();
 
   return 0;
@@ -233,19 +217,15 @@ int DSPDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   Database *db = new Database(dbname);
 
-  Status s = db->open( &conn, Database::DBRW);
-  CHECK_STATUS(s);
-
-  s = db->transactionBeginExclusive();
-  CHECK_STATUS(s);
-
+  db->open( &conn, Database::DBRW);
+  
+  db->transactionBeginExclusive();
+  
   const Dataspace *dataspace = 0;
-  s = db->getDataspace(dspname, dataspace);
-  CHECK_STATUS(s);
-
-  s = dataspace->remove();
-  CHECK_STATUS(s);
-
+  db->getDataspace(dspname, dataspace);
+  
+  dataspace->remove();
+  
   db->transactionCommit();
 
   return 0;
@@ -296,19 +276,15 @@ int DSPRenameCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   Database *db = new Database(dbname);
 
-  Status s = db->open( &conn, Database::DBRW);
-  CHECK_STATUS(s);
-
-  s = db->transactionBeginExclusive();
-  CHECK_STATUS(s);
-
+  db->open( &conn, Database::DBRW);
+  
+  db->transactionBeginExclusive();
+  
   const Dataspace *dataspace = 0;
-  s = db->getDataspace(dspname, dataspace);
-  CHECK_STATUS(s);
-
-  s = dataspace->rename(newdspname);
-  CHECK_STATUS(s);
-
+  db->getDataspace(dspname, dataspace);
+  
+  dataspace->rename(newdspname);
+  
   db->transactionCommit();
 
   return 0;
@@ -356,22 +332,19 @@ int DSPListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 
   Database *db = new Database(dbname);
 
-  Status s = db->open( &conn, Database::DBSRead);
-  CHECK_STATUS(s);
-
+  db->open( &conn, Database::DBSRead);
+  
   if ( argv.size() > 1) {
     for (int i = 1; i < argv.size(); i++) {
       const Dataspace *dataspace;
-      s = db->getDataspace( argv[i].c_str(), dataspace);
-      CHECK_STATUS(s);
+      db->getDataspace( argv[i].c_str(), dataspace);
       cout << *dataspace;
     }
   }
   else {
     unsigned int count;
     const Dataspace **dataspaces;
-    s = db->getDataspaces(dataspaces, count);
-    CHECK_STATUS(s);
+    db->getDataspaces(dataspaces, count);
     for (unsigned int i = 0; i < count; i++) {
       if (dataspaces[i]->isValid()) {
 	cout << *dataspaces[i];
@@ -425,19 +398,15 @@ int DSPSetDefCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   Database *db = new Database(dbname);
 
-  Status s = db->open( &conn, Database::DBRW);
-  CHECK_STATUS(s);
-
-  s = db->transactionBeginExclusive();
-  CHECK_STATUS(s);
-
+  db->open( &conn, Database::DBRW);
+  
+  db->transactionBeginExclusive();
+  
   const Dataspace *dataspace = 0;
-  s = db->getDataspace(dspname, dataspace);
-  CHECK_STATUS(s);
-
-  s = db->setDefaultDataspace(dataspace);
-  CHECK_STATUS(s);
-
+  db->getDataspace(dspname, dataspace);
+  
+  db->setDefaultDataspace(dataspace);
+  
   db->transactionCommit();
 
   return 0;
@@ -484,15 +453,12 @@ int DSPGetDefCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   Database *db = new Database(dbname);
 
-  Status s = db->open( &conn, Database::DBRW);
-  CHECK_STATUS(s);
-
-  s = db->transactionBeginExclusive();
-  CHECK_STATUS(s);
-
+  db->open( &conn, Database::DBRW);
+  
+  db->transactionBeginExclusive();
+  
   const Dataspace *dataspace;
-  s = db->getDefaultDataspace(dataspace);
-  CHECK_STATUS(s);
+  db->getDefaultDataspace(dataspace);
   cout << *dataspace;
 
   db->transactionCommit();
@@ -546,23 +512,18 @@ int DSPSetCurDatCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
 
   Database *db = new Database(dbname);
 
-  Status s = db->open( &conn, Database::DBRW);
-  CHECK_STATUS(s);
-
-  s = db->transactionBeginExclusive();
-  CHECK_STATUS(s);
-
+  db->open( &conn, Database::DBRW);
+  
+  db->transactionBeginExclusive();
+  
   const Dataspace *dataspace;
-  s = db->getDataspace(dspname, dataspace);
-  CHECK_STATUS(s);
-
+  db->getDataspace(dspname, dataspace);
+  
   const Datafile *datafile;
-  s = db->getDatafile(datname, datafile);
-  CHECK_STATUS(s);
-
-  s = const_cast<Dataspace *>(dataspace)->setCurrentDatafile(datafile);
-  CHECK_STATUS(s);
-
+  db->getDatafile(datname, datafile);
+  
+  const_cast<Dataspace *>(dataspace)->setCurrentDatafile(datafile);
+  
   db->transactionCommit();
 
   return 0;
@@ -607,25 +568,20 @@ int DSPGetCurDatCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
   const char *dbname = argv[0].c_str();
   const char *dspname = argv[1].c_str();
 
-
   conn.open();
 
   Database *db = new Database(dbname);
 
-  Status s = db->open( &conn, Database::DBRW);
-  CHECK_STATUS(s);
-
-  s = db->transactionBeginExclusive();
-  CHECK_STATUS(s);
-
+  db->open( &conn, Database::DBRW);
+  
+  db->transactionBeginExclusive();
+  
   const Dataspace *dataspace;
-  s = db->getDataspace(dspname, dataspace);
-  CHECK_STATUS(s);
-
+  db->getDataspace(dspname, dataspace);
+  
   const Datafile *datafile;
-  s = dataspace->getCurrentDatafile(datafile);
-  CHECK_STATUS(s);
-
+  dataspace->getCurrentDatafile(datafile);
+  
   cout << *datafile;
 
   db->transactionCommit();

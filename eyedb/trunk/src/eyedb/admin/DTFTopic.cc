@@ -23,7 +23,6 @@
 */
 
 #include "eyedbconfig.h"
-
 #include <eyedb/eyedb.h>
 #include "eyedb/DBM_Database.h"
 #include <sys/types.h>
@@ -37,13 +36,6 @@
 #include "DatafileStats.h"
 
 using namespace eyedb;
-
-#define CHECK_STATUS(s) 			\
-  if (s) {					\
-    std::cerr << PROG_NAME;			\
-    s->print();					\
-    return 1;					\
-  }
 
 DTFTopic::DTFTopic() : Topic("datafile")
 {
@@ -150,14 +142,11 @@ int DTFCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   Database *db = new Database(dbname);
 
-  Status s = db->open( &conn, Database::DBRW);
-  CHECK_STATUS(s);
+  db->open( &conn, Database::DBRW);
 
-  s = db->transactionBeginExclusive();
-  CHECK_STATUS(s);
+  db->transactionBeginExclusive();
 
-  s = db->createDatafile(filedir, filename, name, size, slotsize, dtfType);
-  CHECK_STATUS(s);
+  db->createDatafile(filedir, filename, name, size, slotsize, dtfType);
 
   db->transactionCommit();
 
@@ -210,18 +199,14 @@ int DTFDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   Database *db = new Database(dbname);
 
-  Status s = db->open( &conn, Database::DBRW);
-  CHECK_STATUS(s);
+  db->open( &conn, Database::DBRW);
 
-  s = db->transactionBeginExclusive();
-  CHECK_STATUS(s);
+  db->transactionBeginExclusive();
 
   const Datafile *datafile;
-  s = db->getDatafile(datname, datafile);
-  CHECK_STATUS(s);
+  db->getDatafile(datname, datafile);
   
-  s = datafile->remove();
-  CHECK_STATUS(s);
+  datafile->remove();
 
   db->transactionCommit();
 
@@ -287,18 +272,14 @@ int DTFMoveCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 
   Database *db = new Database(dbname);
 
-  Status s = db->open( &conn, Database::DBRW);
-  CHECK_STATUS(s);
+  db->open( &conn, Database::DBRW);
 
-  s = db->transactionBeginExclusive();
-  CHECK_STATUS(s);
+  db->transactionBeginExclusive();
 
   const Datafile *datafile;
-  s = db->getDatafile(datname, datafile);
-  CHECK_STATUS(s);
+  db->getDatafile(datname, datafile);
   
-  s = datafile->move( filedir, new_filename);
-  CHECK_STATUS(s);
+  datafile->move( filedir, new_filename);
 
   db->transactionCommit();
 
@@ -355,18 +336,14 @@ int DTFRenameCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   Database *db = new Database(dbname);
 
-  Status s = db->open( &conn, Database::DBRW);
-  CHECK_STATUS(s);
+  db->open( &conn, Database::DBRW);
 
-  s = db->transactionBeginExclusive();
-  CHECK_STATUS(s);
+  db->transactionBeginExclusive();
 
   const Datafile *datafile;
-  s = db->getDatafile(datname, datafile);
-  CHECK_STATUS(s);
+  db->getDatafile(datname, datafile);
   
-  s = datafile->rename( new_name);
-  CHECK_STATUS(s);
+  datafile->rename( new_name);
 
   db->transactionCommit();
 
@@ -421,18 +398,14 @@ int DTFResizeCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   Database *db = new Database(dbname);
 
-  Status s = db->open( &conn, Database::DBRW);
-  CHECK_STATUS(s);
+  db->open( &conn, Database::DBRW);
 
-  s = db->transactionBeginExclusive();
-  CHECK_STATUS(s);
+  db->transactionBeginExclusive();
 
   const Datafile *datafile;
-  s = db->getDatafile(datname, datafile);
-  CHECK_STATUS(s);
+  db->getDatafile(datname, datafile);
   
-  s = datafile->resize( atoi(new_size)*1024);
-  CHECK_STATUS(s);
+  datafile->resize( atoi(new_size)*1024);
 
   db->transactionCommit();
 
@@ -482,18 +455,14 @@ int DTFDefragmentCmd::perform(eyedb::Connection &conn, std::vector<std::string> 
 
   Database *db = new Database(dbname);
 
-  Status s = db->open( &conn, Database::DBRW);
-  CHECK_STATUS(s);
+  db->open( &conn, Database::DBRW);
 
-  s = db->transactionBeginExclusive();
-  CHECK_STATUS(s);
+  db->transactionBeginExclusive();
 
   const Datafile *datafile;
-  s = db->getDatafile(datname, datafile);
-  CHECK_STATUS(s);
+  db->getDatafile(datname, datafile);
   
-  s = datafile->defragment();
-  CHECK_STATUS(s);
+  datafile->defragment();
 
   db->transactionCommit();
 
@@ -575,24 +544,20 @@ int DTFListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 
   Database *db = new Database(dbname.c_str());
 
-  Status s = db->open( &conn, Database::DBSRead);
-  CHECK_STATUS(s);
+  db->open( &conn, Database::DBSRead);
 
-  s = db->transactionBegin();
-  CHECK_STATUS(s);
+  db->transactionBegin();
 
   const Datafile **datafiles;
   unsigned int count;
 
   if (argv.size() == 1) {
-    s = db->getDatafiles(datafiles, count);
-    CHECK_STATUS(s);
+    db->getDatafiles(datafiles, count);
   } else {
     count = argv.size() - 1;
     datafiles = new const Datafile*[count];
     for (int i = 0; i < count; i++) {
-      s = db->getDatafile( argv[i+1].c_str(), datafiles[i]);
-      CHECK_STATUS(s);
+      db->getDatafile( argv[i+1].c_str(), datafiles[i]);
     }
   }
 
@@ -600,8 +565,7 @@ int DTFListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
     for (int i = 0; i < count; i++)
       if (datafiles[i]->isValid()) {
 	DatafileInfo info;
-	s = datafiles[i]->getInfo(info);
-	CHECK_STATUS(s);
+	datafiles[i]->getInfo(info);
 	std::cout << info << std::endl;
       }
   }
