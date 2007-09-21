@@ -1027,6 +1027,9 @@ if ((mode) !=  NoDBAccessMode && \
     if (!dbmdb_str)
       return invalidDbmdb(IDB_DATABASE_MOVE_ERROR);
 
+    // (FD) added 21/09/2007
+    check_auth(user, passwd, "moving database");
+
     RPCStatus rpc_status;
 
     rpc_status = dbMove(ConnectionPeer::getConnH(_conn), dbmdb_str,

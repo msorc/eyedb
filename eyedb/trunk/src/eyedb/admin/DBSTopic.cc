@@ -725,22 +725,33 @@ int DBSDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 void DBSMoveCmd::init()
 {
   std::vector<Option> opts;
+
   opts.push_back(HELP_OPT);
+
+  opts.push_back(Option(DBFILE_OPT, 
+			OptionStringType(), 
+			Option::MandatoryValue, 
+			OptionDesc("Database file", "DBFILE")));
+
+  opts.push_back(Option(FILEDIR_OPT, 
+			OptionStringType(), 
+			Option::MandatoryValue, 
+			OptionDesc("Database file directory", "FILEDIR")));
+
   getopt = new GetOpt(getExtName(), opts);
 }
 
 int DBSMoveCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " USAGE\n";
+  std::cerr << " DBNAME\n";
   return 1;
 }
 
 int DBSMoveCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<user>", "User name");
-  getopt->displayOpt("<passwd>", "Password for specified user");
+  getopt->displayOpt("DBNAME", "Database to move");
   return 1;
 }
 
@@ -754,12 +765,57 @@ int DBSMoveCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
   if (map.find("help") != map.end())
     return help();
 
+  if (argv.size() != 1)
+    return usage();
+
+  const char *dbname = argv[0].c_str();
+
+  std::string filedir;
+  if (map.find(FILEDIR_OPT) != map.end())
+    filedir = map[FILEDIR_OPT].value;
+  else
+    filedir = std::string( eyedb::ServerConfig::getSValue("datadir"));
+
+  std::string dbfile;
+  if (map.find(DBFILE_OPT) != map.end())
+    dbfile = map[DBFILE_OPT].value;
+
+  if (dbfile.length() == 0)
+    dbfile = filedir + "/" + dbname + DBS_EXT;
+
+  conn.open();
+
+  Database *db = new Database(dbname);
+
+  DbCreateDescription newDesc;
+  strcpy(newDesc.dbfile, dbfile.c_str());
+
+  DbCreateDescription oldDesc;
+  db->getInfo( &conn, 0, 0, &oldDesc);
+
+  newDesc.sedbdesc.ndat = oldDesc.sedbdesc.ndat;
+
+  for (int i = 0; i < oldDesc.sedbdesc.ndat; i++) {
+    const char *datafile = oldDesc.sedbdesc.dat[i].file;
+    char *p = (char *)strrchr(datafile, '/');
+    if (p)
+      strcpy( newDesc.sedbdesc.dat[i].file, strdup((filedir + (p+1)).c_str()));
+    else
+      strcpy( newDesc.sedbdesc.dat[i].file, strdup( datafile));
+
+    newDesc.sedbdesc.dat[i].maxsize = 0;
+    newDesc.sedbdesc.dat[i].sizeslot = 0;
+  }
+
+  db->move(&conn, &newDesc);
+
   return 0;
 }
 
 //
 // DBSCopyCmd
 //
+// usage: eyedbadmin dbcopy <dbname> <new dbname> [--dbfile=<dbfile>] [--datafiles={<datafile>[:name[:<sizeMb>[:sizeslot[:phy|log]]]]}] [--filedir=<filedir>] [--new-dbid]
 void DBSCopyCmd::init()
 {
   std::vector<Option> opts;
@@ -798,6 +854,7 @@ int DBSCopyCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 //
 // DBSDefAccessCmd
 //
+// eyedbadmin dbaccess <dbname> r|rw|rx|rwx|admin|no
 void DBSDefAccessCmd::init()
 {
   std::vector<Option> opts;
@@ -836,6 +893,7 @@ int DBSDefAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
 //
 // DBSExportCmd
 //
+// usage: eyedbadmin dbexport <dbname> <file>|-
 void DBSExportCmd::init()
 {
   std::vector<Option> opts;
@@ -874,6 +932,7 @@ int DBSExportCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 //
 // DBSImportCmd
 //
+// usage: eyedbadmin dbimport [-l] <file>|- [-d <dbname> [--filedir=<filedir>] [--mthdir==<mthdir>]]
 void DBSImportCmd::init()
 {
   std::vector<Option> opts;
