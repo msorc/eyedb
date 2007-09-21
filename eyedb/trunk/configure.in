@@ -580,6 +580,7 @@ src/www/icons/Makefile
 tests/Makefile
 tests/eyedb/Makefile
 tests/eyedb/admin/Makefile
+tests/eyedb/admin/database/Makefile
 tests/eyedb/admin/datafile/Makefile
 tests/eyedb/admin/dataspace/Makefile
 tests/eyedb/admin/index/Makefile
