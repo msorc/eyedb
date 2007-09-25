@@ -8,7 +8,7 @@ EV:
   eyedbadmin database rename [DONE]
 
 EV|FD:
-  eyedbadmin database move <options>
+  eyedbadmin database move [DONE]
   eyedbadmin database copy <options>
   eyedbadmin database defaccess <options>
   eyedbadmin database export <options>
