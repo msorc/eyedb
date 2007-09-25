@@ -735,7 +735,7 @@ void DBSMoveCmd::init()
 
   opts.push_back(Option(FILEDIR_OPT, 
 			OptionStringType(), 
-			Option::MandatoryValue, 
+			Option::Mandatory|Option::MandatoryValue, 
 			OptionDesc("Database file directory", "FILEDIR")));
 
   getopt = new GetOpt(getExtName(), opts);
@@ -770,11 +770,16 @@ int DBSMoveCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 
   const char *dbname = argv[0].c_str();
 
+#if 0
   std::string filedir;
   if (map.find(FILEDIR_OPT) != map.end())
     filedir = map[FILEDIR_OPT].value;
   else
     filedir = std::string( eyedb::ServerConfig::getSValue("datadir"));
+#else
+  // filedir is a mandatory option
+  std::string filedir = map[FILEDIR_OPT].value;
+#endif
 
   std::string dbfile;
   if (map.find(DBFILE_OPT) != map.end())
@@ -787,14 +792,15 @@ int DBSMoveCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 
   Database *db = new Database(dbname);
 
-  DbCreateDescription newDesc;
-  strcpy(newDesc.dbfile, dbfile.c_str());
-
   DbCreateDescription oldDesc;
   db->getInfo( &conn, 0, 0, &oldDesc);
 
+  DbCreateDescription newDesc;
+  strcpy(newDesc.dbfile, dbfile.c_str());
+
   newDesc.sedbdesc.ndat = oldDesc.sedbdesc.ndat;
 
+  // FIXME: what if old file name does not contain '/', as --filedir is given? 
   for (int i = 0; i < oldDesc.sedbdesc.ndat; i++) {
     const char *datafile = oldDesc.sedbdesc.dat[i].file;
     char *p = (char *)strrchr(datafile, '/');
@@ -815,26 +821,37 @@ int DBSMoveCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 //
 // DBSCopyCmd
 //
-// usage: eyedbadmin dbcopy <dbname> <new dbname> [--dbfile=<dbfile>] [--datafiles={<datafile>[:name[:<sizeMb>[:sizeslot[:phy|log]]]]}] [--filedir=<filedir>] [--new-dbid]
 void DBSCopyCmd::init()
 {
   std::vector<Option> opts;
+
   opts.push_back(HELP_OPT);
+
+  opts.push_back(Option(DBFILE_OPT, 
+			OptionStringType(), 
+			Option::MandatoryValue, 
+			OptionDesc("Database file", "DBFILE")));
+
+  opts.push_back(Option(FILEDIR_OPT, 
+			OptionStringType(), 
+			Option::MandatoryValue, 
+			OptionDesc("Database file directory", "FILEDIR")));
+
   getopt = new GetOpt(getExtName(), opts);
 }
 
 int DBSCopyCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " USAGE\n";
+  std::cerr << " DBNAME NEW_DBNAME\n";
   return 1;
 }
 
 int DBSCopyCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<user>", "User name");
-  getopt->displayOpt("<passwd>", "Password for specified user");
+  getopt->displayOpt("DBNAME", "Database to copy");
+  getopt->displayOpt("NEW_DBNAME", "New database name");
   return 1;
 }
 
@@ -848,33 +865,118 @@ int DBSCopyCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
   if (map.find("help") != map.end())
     return help();
 
+  if (argv.size() != 2)
+    return usage();
+
+  const char *dbname = argv[0].c_str();
+  const char *newDbname = argv[1].c_str();
+
+  if (dbname == newDbname) {
+    std::cerr << PROG_NAME << ": error: '" << dbname << "' and '" << newDbname << "' are the same database.\n";
+    return 1;
+  }
+
+  std::string filedir;
+  if (map.find(FILEDIR_OPT) != map.end())
+    filedir = map[FILEDIR_OPT].value;
+  else
+    filedir = std::string( eyedb::ServerConfig::getSValue("datadir"));
+
+  std::string dbfile;
+  if (map.find(DBFILE_OPT) != map.end()) {
+    dbfile = map[DBFILE_OPT].value;
+    if (dbfile[0] != '/')
+      dbfile = filedir + "/" + dbfile;
+  } else
+    dbfile = filedir + "/" + newDbname + DBS_EXT;
+
+  conn.open();
+
+  Database *db = new Database(dbname);
+
+  DbCreateDescription oldDesc;
+  db->getInfo( &conn, 0, 0, &oldDesc);
+
+  if (oldDesc.sedbdesc.ndat > 1 && map.find(FILEDIR_OPT) == map.end()) {
+    std::cerr << PROG_NAME << ": error: when copying a database with more than one datafile, option --filedir is mandatory\n";
+    return 1;
+  }
+
+  DbCreateDescription newDesc;
+
+  strcpy(newDesc.dbfile, dbfile.c_str());
+
+  newDesc.sedbdesc.ndat = oldDesc.sedbdesc.ndat;
+
+  if (oldDesc.sedbdesc.ndat == 1) {
+    std::string newDatafile = filedir + "/" + newDbname + ".dat";
+    strcpy( newDesc.sedbdesc.dat[0].file, newDatafile.c_str());
+    newDesc.sedbdesc.dat[0].maxsize = 0;
+    newDesc.sedbdesc.dat[0].sizeslot = 0;
+  } else {
+    for (int i = 0; i < oldDesc.sedbdesc.ndat; i++) {
+      const char *datafile = oldDesc.sedbdesc.dat[i].file;
+      char *p = (char *)strrchr(datafile, '/');
+      if (p)
+	strcpy( newDesc.sedbdesc.dat[i].file, strdup((filedir + (p+1)).c_str()));
+      else
+	strcpy( newDesc.sedbdesc.dat[i].file, strdup( datafile));
+
+      newDesc.sedbdesc.dat[i].maxsize = 0;
+      newDesc.sedbdesc.dat[i].sizeslot = 0;
+    }
+  }
+
+  db->copy( &conn, newDbname, False, &newDesc);
+
   return 0;
 }
 
 //
 // DBSDefAccessCmd
 //
-// eyedbadmin dbaccess <dbname> r|rw|rx|rwx|admin|no
 void DBSDefAccessCmd::init()
 {
   std::vector<Option> opts;
+
   opts.push_back(HELP_OPT);
+
   getopt = new GetOpt(getExtName(), opts);
 }
 
 int DBSDefAccessCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " USAGE\n";
+  std::cerr << " DBNAME MODE\n";
   return 1;
 }
 
 int DBSDefAccessCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<user>", "User name");
-  getopt->displayOpt("<passwd>", "Password for specified user");
+  getopt->displayOpt("DBNAME", "Database to copy");
+  getopt->displayOpt("MODE", "Access mode, is one of r, rw, rx, rwx, admin, no");
   return 1;
+}
+
+static int getDbAccessMode(const char *accessMode, DBAccessMode &dbMode)
+{
+  if (!strcmp(accessMode, "r"))
+    dbMode = ReadDBAccessMode;
+  else if (!strcmp(accessMode, "rw"))
+    dbMode = ReadWriteDBAccessMode;
+  else if (!strcmp(accessMode, "rx"))
+    dbMode = ReadExecDBAccessMode;
+  else if (!strcmp(accessMode, "rwx"))
+    dbMode = ReadWriteExecDBAccessMode;
+  else if (!strcmp(accessMode, "admin"))
+    dbMode = AdminDBAccessMode;
+  else if (!strcmp(accessMode, "no"))
+    dbMode = NoDBAccessMode;
+  else
+    return 1;
+
+  return 0;
 }
 
 int DBSDefAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
@@ -887,6 +989,22 @@ int DBSDefAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
   if (map.find("help") != map.end())
     return help();
 
+  if (argv.size() != 2)
+    return usage();
+
+  const char *dbname = argv[0].c_str();
+  const char * accessMode= argv[1].c_str();
+
+  int dbMode;
+  if (getDbAccessMode( accessMode, dbMode))
+    return help();
+
+  conn.open();
+
+  Database *db = new Database(dbname);
+
+  db->setDefaultDBAccess(conn, dbmode);
+
   return 0;
 }
 
@@ -897,22 +1015,24 @@ int DBSDefAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
 void DBSExportCmd::init()
 {
   std::vector<Option> opts;
+
   opts.push_back(HELP_OPT);
+
   getopt = new GetOpt(getExtName(), opts);
 }
 
 int DBSExportCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " USAGE\n";
+  std::cerr << " DBNAME FILE\n";
   return 1;
 }
 
 int DBSExportCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<user>", "User name");
-  getopt->displayOpt("<passwd>", "Password for specified user");
+  getopt->displayOpt("DBNAME", "Database to export");
+  getopt->displayOpt("FILE", "File for export (- for standard output)");
   return 1;
 }
 
@@ -926,6 +1046,19 @@ int DBSExportCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   if (map.find("help") != map.end())
     return help();
 
+  const char *dbname = argv[0].c_str();
+  const char *filename = argv[1].c_str();
+
+  conn.open();
+
+  Database *db = new Database(dbname);
+
+  db->open( &conn, Database::DBSRead);
+
+  db->transactionBeginExclusive();
+
+  db->transactionCommit();
+
   return 0;
 }
 
@@ -936,22 +1069,34 @@ int DBSExportCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 void DBSImportCmd::init()
 {
   std::vector<Option> opts;
+
   opts.push_back(HELP_OPT);
+
+  opts.push_back(Option(FILEDIR_OPT, 
+			OptionStringType(), 
+			Option::MandatoryValue, 
+			OptionDesc("Database file directory", "FILEDIR")));
+
+  opts.push_back(Option(MTHDIR_OPT, 
+			OptionStringType(), 
+			Option::MandatoryValue, 
+			OptionDesc("Method directory", "MTHDIR")));
+
   getopt = new GetOpt(getExtName(), opts);
 }
 
 int DBSImportCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " USAGE\n";
+  std::cerr << " DBNAME FILE\n";
   return 1;
 }
 
 int DBSImportCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<user>", "User name");
-  getopt->displayOpt("<passwd>", "Password for specified user");
+  getopt->displayOpt("DBNAME", "Database to export");
+  getopt->displayOpt("FILE", "File for import (- for standard output)");
   return 1;
 }
 
@@ -964,6 +1109,20 @@ int DBSImportCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   if (map.find("help") != map.end())
     return help();
+
+
+  const char *dbname = argv[0].c_str();
+  const char *filename = argv[1].c_str();
+
+  conn.open();
+
+  Database *db = new Database(dbname);
+
+  db->open( &conn, Database::DBSRead);
+
+  db->transactionBeginExclusive();
+
+  db->transactionCommit();
 
   return 0;
 }
