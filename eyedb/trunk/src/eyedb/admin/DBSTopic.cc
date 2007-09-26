@@ -35,6 +35,7 @@
 #include "GetOpt.h"
 #include "DBSTopic.h"
 #include "DatafileStats.h"
+#include "DatabaseExport.h"
 
 using namespace eyedb;
 
@@ -976,21 +977,6 @@ static int getDbAccessMode(const char *accessMode, DBAccessMode &dbMode)
   return 0;
 }
 
-static void auth_realize( char *userauth, char *passwdauth)
-{
-  const char *s;
-  if (!(s = Connection::getDefaultUser()))
-    *userauth = 0;
-  else
-    strcpy(userauth, s);
-
-  if (!(s = Connection::getDefaultPasswd()))
-    *passwdauth = 0;
-  else
-    strcpy(passwdauth, s);
-}
-
-
 int DBSDefAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
   if (! getopt->parse(PROG_NAME, argv))
@@ -1015,12 +1001,6 @@ int DBSDefAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
 
   Database *db = new Database(dbname);
 
-//   char userauth[32];
-//   char passwdauth[10];
-
-//   auth_realize( userauth, passwdauth);
-
-//   db->setDefaultDBAccess( &conn, dbMode, userauth, passwdauth);
   db->setDefaultDBAccess( &conn, dbMode);
 
   return 0;
@@ -1029,7 +1009,6 @@ int DBSDefAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
 //
 // DBSExportCmd
 //
-// usage: eyedbadmin dbexport <dbname> <file>|-
 void DBSExportCmd::init()
 {
   std::vector<Option> opts;
@@ -1069,15 +1048,7 @@ int DBSExportCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   conn.open();
 
-  Database *db = new Database(dbname);
-
-  db->open( &conn, Database::DBSRead);
-
-  db->transactionBeginExclusive();
-
-  db->transactionCommit();
-
-  return 0;
+  return databaseExport( conn, dbname, filename);
 }
 
 //
@@ -1113,7 +1084,7 @@ int DBSImportCmd::usage()
 int DBSImportCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("DBNAME", "Database to export");
+  getopt->displayOpt("DBNAME", "Database to import");
   getopt->displayOpt("FILE", "File for import (- for standard output)");
   return 1;
 }
