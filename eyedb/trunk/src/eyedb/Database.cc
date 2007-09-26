@@ -1049,6 +1049,9 @@ if ((mode) !=  NoDBAccessMode && \
     if (!strcmp(name, newdbname))
       return Exception::make(IDB_DATABASE_COPY_ERROR, "cannot copy databases, names are identical '%s'", name);
 
+    // (FD) added 26/09/2007
+    check_auth(user, passwd, "copying database");
+
     RPCStatus rpc_status;
 
     rpc_status = dbCopy(ConnectionPeer::getConnH(_conn), dbmdb_str,

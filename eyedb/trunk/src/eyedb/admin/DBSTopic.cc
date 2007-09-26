@@ -173,7 +173,7 @@ void DBSListCmd::init()
   opts.push_back(Option(DBID_OPT, OptionBoolType(), 0, OptionDesc("Lists database identifier")));
   opts.push_back(Option(MAXOBJCNT_OPT, OptionBoolType(), 0, OptionDesc("Lists database max object count")));
   opts.push_back(Option(DATAFILES_OPT, OptionBoolType(), 0, OptionDesc("Lists database datafiles")));
-  opts.push_back(Option(DEFACCESS_OPT, OptionBoolType(), 0, OptionDesc("Lists dedatabase default access")));
+  opts.push_back(Option(DEFACCESS_OPT, OptionBoolType(), 0, OptionDesc("Lists database default access")));
   opts.push_back(Option(USERACCESS_OPT, OptionBoolType(), 0, OptionDesc("Lists user database accesses")));
   opts.push_back(Option(STATS_OPT, OptionBoolType(), 0, OptionDesc("Lists database statistics")));
   opts.push_back(Option(ALL_OPT, OptionBoolType(), 0, OptionDesc("Lists all database info")));
@@ -871,10 +871,7 @@ int DBSCopyCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
   const char *dbname = argv[0].c_str();
   const char *newDbname = argv[1].c_str();
 
-  if (dbname == newDbname) {
-    std::cerr << PROG_NAME << ": error: '" << dbname << "' and '" << newDbname << "' are the same database.\n";
-    return 1;
-  }
+  // No need to check if dbname == newDbname, this is done in Database::copy
 
   std::string filedir;
   if (map.find(FILEDIR_OPT) != map.end())
@@ -979,6 +976,21 @@ static int getDbAccessMode(const char *accessMode, DBAccessMode &dbMode)
   return 0;
 }
 
+static void auth_realize( char *userauth, char *passwdauth)
+{
+  const char *s;
+  if (!(s = Connection::getDefaultUser()))
+    *userauth = 0;
+  else
+    strcpy(userauth, s);
+
+  if (!(s = Connection::getDefaultPasswd()))
+    *passwdauth = 0;
+  else
+    strcpy(passwdauth, s);
+}
+
+
 int DBSDefAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
   if (! getopt->parse(PROG_NAME, argv))
@@ -993,9 +1005,9 @@ int DBSDefAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
     return usage();
 
   const char *dbname = argv[0].c_str();
-  const char * accessMode= argv[1].c_str();
+  const char *accessMode= argv[1].c_str();
 
-  int dbMode;
+  DBAccessMode dbMode;
   if (getDbAccessMode( accessMode, dbMode))
     return help();
 
@@ -1003,7 +1015,13 @@ int DBSDefAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
 
   Database *db = new Database(dbname);
 
-  db->setDefaultDBAccess(conn, dbmode);
+//   char userauth[32];
+//   char passwdauth[10];
+
+//   auth_realize( userauth, passwdauth);
+
+//   db->setDefaultDBAccess( &conn, dbMode, userauth, passwdauth);
+  db->setDefaultDBAccess( &conn, dbMode);
 
   return 0;
 }
