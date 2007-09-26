@@ -9,5 +9,7 @@ database_rename_1.py \
 database_list_3.py \
 database_copy_1.py \
 database_list_4.py \
+database_defaccess_1.py \
+database_list_5.py \
 database_delete_1.py \
-database_list_5.py 
+database_list_6.py 
