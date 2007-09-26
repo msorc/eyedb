@@ -20,7 +20,8 @@ COLTopic.cc \
 ATRTopic.cc \
 OBJTopic.cc \
 CNSTopic.cc \
-DatafileStats.cc
+DatafileStats.cc \
+DatabaseExport.cc
 
 eyedbdbcreate2_SOURCES= \
 eyedbdbcreate.cc \
@@ -35,7 +36,8 @@ COLTopic.cc \
 ATRTopic.cc \
 OBJTopic.cc \
 CNSTopic.cc \
-DatafileStats.cc
+DatafileStats.cc \
+DatabaseExport.cc
 
 eyedbdbcreate2_LDADD= $(EYEDBCLLIBS)
 
@@ -55,4 +57,5 @@ ATRTopic.h \
 OBJTopic.h \
 CNSTopic.h \
 Topic.h \
-DatafileStats.h
+DatafileStats.h \
+DatabaseExport.h
