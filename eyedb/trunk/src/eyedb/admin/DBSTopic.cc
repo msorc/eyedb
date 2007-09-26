@@ -36,6 +36,7 @@
 #include "DBSTopic.h"
 #include "DatafileStats.h"
 #include "DatabaseExport.h"
+#include "DatabaseImport.h"
 
 using namespace eyedb;
 
@@ -1054,7 +1055,6 @@ int DBSExportCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 //
 // DBSImportCmd
 //
-// usage: eyedbadmin dbimport [-l] <file>|- [-d <dbname> [--filedir=<filedir>] [--mthdir==<mthdir>]]
 void DBSImportCmd::init()
 {
   std::vector<Option> opts;
@@ -1099,21 +1099,24 @@ int DBSImportCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   if (map.find("help") != map.end())
     return help();
 
-
   const char *dbname = argv[0].c_str();
   const char *filename = argv[1].c_str();
 
+  std::string filedir;
+  if (map.find(FILEDIR_OPT) != map.end())
+    filedir = map[FILEDIR_OPT].value;
+  else
+    filedir = std::string( eyedb::ServerConfig::getSValue("datadir"));
+
+  std::string mthdir;
+  if (map.find(MTHDIR_OPT) != map.end())
+    filedir = map[MTHDIR_OPT].value;
+  else
+    filedir = std::string( eyedb::ServerConfig::getSValue("datadir"));
+
   conn.open();
 
-  Database *db = new Database(dbname);
-
-  db->open( &conn, Database::DBSRead);
-
-  db->transactionBeginExclusive();
-
-  db->transactionCommit();
-
-  return 0;
+  return databaseImport( conn, dbname, filename);
 }
 
 
