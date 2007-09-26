@@ -22,20 +22,12 @@
    Author: Francois Dechelle <francois@dechelle.net>
 */
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <eyedb/eyedb.h>
-#include "DatabaseImport.h"
+#ifndef _EYEDB_ADMIN_DATABASEEXPORTIMPORT_H_
+#define _EYEDB_ADMIN_DATABASEEXPORTIMPORT_H_
 
-using namespace eyedb;
-using namespace std;
-
-extern const std::string PROG_NAME;
-
-int eyedb::databaseImport( Connection &conn, const char *dbname, const char *file)
-{
-  std::cerr << "Not yet implemented\n";
-  return 0;
+namespace eyedb {
+  extern int databaseExport( Connection &conn, const char *dbname, const char *file);
+  extern int databaseImport( Connection &conn, const char *dbname, const char *file, const char *filedir = 0, const char *mthdir = 0, bool listOnly = false);
 }
 
+#endif

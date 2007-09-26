@@ -31,6 +31,7 @@ static const std::string DBNAME_OPT = "dbname";
 static const std::string DEFACCESS_OPT = "defaccess";
 static const std::string FILEDIR_OPT = "filedir";
 static const std::string FILENAME_OPT = "filename";
+static const std::string LIST_OPT = "list";
 static const std::string MTHDIR_OPT = "mthdir";
 static const std::string MAXOBJCNT_OPT = "max-object-count";
 static const std::string NAME_OPT = "name";
