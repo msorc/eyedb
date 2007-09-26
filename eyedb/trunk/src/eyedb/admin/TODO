@@ -7,80 +7,80 @@ EV:
   eyedbadmin database list [DONE]
   eyedbadmin database rename [DONE]
 
-EV|FD:
+FD:
   eyedbadmin database move [DONE]
-  eyedbadmin database copy <options>
-  eyedbadmin database defaccess <options>
-  eyedbadmin database export <options>
-  eyedbadmin database import <options>
+  eyedbadmin database copy [DONE]
+  eyedbadmin database defaccess [DONE]
+  eyedbadmin database export [DONE, NOT TESTED]
+  eyedbadmin database import [DONE, NOT TESTED]
 
 FD:
-  eyedbadmin datafile create <options> [DONE]
-  eyedbadmin datafile delete <options> [DONE]
-  eyedbadmin datafile list <options> [DONE]
-  eyedbadmin datafile move <options> [DONE]
-  eyedbadmin datafile resize <options> [DONE]
-  eyedbadmin datafile defragment <options> [DONE]
-  eyedbadmin datafile rename <options> [DONE]
+  eyedbadmin datafile create [DONE]
+  eyedbadmin datafile delete [DONE]
+  eyedbadmin datafile list [DONE]
+  eyedbadmin datafile move [DONE]
+  eyedbadmin datafile resize [DONE]
+  eyedbadmin datafile defragment [DONE]
+  eyedbadmin datafile rename [DONE]
 
 FD: from eyedbadmin user * [USRTopic module]
-  eyedbadmin user add <options> [DONE]
-  eyedbadmin user delete <options> [DONE]
-  eyedbadmin user list <options> [DONE]
-  eyedbadmin user sysaccess <options> [DONE]
-  eyedbadmin user dbaccess <options> [DONE]
-  eyedbadmin user passwd <options> [DONE]
+  eyedbadmin user add [DONE]
+  eyedbadmin user delete [DONE]
+  eyedbadmin user list [DONE]
+  eyedbadmin user sysaccess [DONE]
+  eyedbadmin user dbaccess [DONE]
+  eyedbadmin user passwd [DONE]
 
 FD: from eyedbadmin dataspace * [DSPTopic module]
 Note: tests depends on datafile create,delete,list
-  eyedbadmin dataspace create <options> [DONE]
-  eyedbadmin dataspace update <options> [DONE]
-  eyedbadmin dataspace delete <options> [DONE]
-  eyedbadmin dataspace rename <options> [DONE]
-  eyedbadmin dataspace list <options> [DONE]
-  eyedbadmin dataspace setdef <options> [DONE]
-  eyedbadmin dataspace getdef <options> [DONE]
-  eyedbadmin dataspace setcurdat <options> [DONE]
-  eyedbadmin dataspace getcurdat <options> [DONE]
+  eyedbadmin dataspace create [DONE]
+  eyedbadmin dataspace update [DONE]
+  eyedbadmin dataspace delete [DONE]
+  eyedbadmin dataspace rename [DONE]
+  eyedbadmin dataspace list [DONE]
+  eyedbadmin dataspace setdef [DONE]
+  eyedbadmin dataspace getdef [DONE]
+  eyedbadmin dataspace setcurdat [DONE]
+  eyedbadmin dataspace getcurdat [DONE]
 
 FD: from eyedbidxadmin [IDXTopic module]
-  eyedbadmin index create <options> [DONE]
-  eyedbadmin index delete <options> [DONE]
-  eyedbadmin index update <options>
-  eyedbadmin index list <options> [DONE]
-  eyedbadmin index stats <options> [DONE]
-  eyedbadmin index simulate <options> [DONE]
+  eyedbadmin index create [DONE]
+  eyedbadmin index delete [DONE]
+  eyedbadmin index update
+  eyedbadmin index list [DONE]
+  eyedbadmin index stats [DONE]
+  eyedbadmin index simulate [DONE]
 
-plus tard:
+Later:
   from eyedbloca
-  eyedbadmin class getinstdefdsp <options>
-  eyedbadmin class setinstdefdsp <options>
-  eyedbadmin class moveinst <options>
-  eyedbadmin class getinstloca <options>
+  eyedbadmin class getinstdefdsp
+  eyedbadmin class setinstdefdsp
+  eyedbadmin class moveinst
+  eyedbadmin class getinstloca
 
   from eyedbloca
-  eyedbadmin collection getdefdsp <options>
-  eyedbadmin collection setdefdsp <options>
-  eyedbadmin collection getelemloca <options>
-  eyedbadmin collection moveelems <options>
+  eyedbadmin collection getdefdsp
+  eyedbadmin collection setdefdsp
+  eyedbadmin collection getelemloca
+  eyedbadmin collection moveelems
 
   from eyedbcollimpladmin
-  eyedbadmin collection setdefimpl <options>
-  eyedbadmin collection getdefimpl <options>
-  eyedbadmin collection listimpl <options>
-  eyedbadmin collection updateimpl <options>
-  eyedbadmin collection simulimpl <options>
-  eyedbadmin collection implstats <options>
+  eyedbadmin collection setdefimpl
+  eyedbadmin collection getdefimpl
+  eyedbadmin collection listimpl
+  eyedbadmin collection updateimpl
+  eyedbadmin collection simulimpl
+  eyedbadmin collection implstats
 
   from eyedbloca
-  eyedbadmin attribute getloca <options>
-  eyedbadmin attribute getdefdsp <options>
-  eyedbadmin attribute setdefdsp <options>
-  eyedbadmin attribute move <options>
+  eyedbadmin attribute getloca
+  eyedbadmin attribute getdefdsp
+  eyedbadmin attribute setdefdsp
+  eyedbadmin attribute move
 
   from eyedbloca
-  eyedbadmin object getloca <options>
-  eyedbadmin object move <options>
+  eyedbadmin object getloca
+  eyedbadmin object move
 
   from eyedbloca
   # index move: ajouter une option --collapse + une info dans le protocole
@@ -91,6 +91,6 @@ plus tard:
   # => eyedbgetidxloca
 
   from eyedbconsadmin
-  eyedbadmin constraint create <options>
-  eyedbadmin constraint delete <options>
-  eyedbadmin constraint list <options>
+  eyedbadmin constraint create
+  eyedbadmin constraint delete
+  eyedbadmin constraint list

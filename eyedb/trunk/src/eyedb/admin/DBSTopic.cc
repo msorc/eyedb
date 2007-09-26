@@ -35,8 +35,7 @@
 #include "GetOpt.h"
 #include "DBSTopic.h"
 #include "DatafileStats.h"
-#include "DatabaseExport.h"
-#include "DatabaseImport.h"
+#include "DatabaseExportImport.h"
 
 using namespace eyedb;
 
@@ -1071,6 +1070,11 @@ void DBSImportCmd::init()
 			Option::MandatoryValue, 
 			OptionDesc("Method directory", "MTHDIR")));
 
+  opts.push_back(Option(LIST_OPT, 
+			OptionBoolType(), 
+			0, 
+			OptionDesc("List only, do not import")));
+
   getopt = new GetOpt(getExtName(), opts);
 }
 
@@ -1102,21 +1106,19 @@ int DBSImportCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   const char *dbname = argv[0].c_str();
   const char *filename = argv[1].c_str();
 
-  std::string filedir;
+  const char *filedir = 0;
   if (map.find(FILEDIR_OPT) != map.end())
-    filedir = map[FILEDIR_OPT].value;
-  else
-    filedir = std::string( eyedb::ServerConfig::getSValue("datadir"));
+    filedir = map[FILEDIR_OPT].value.c_str();
 
-  std::string mthdir;
+  const char *mthdir = 0;
   if (map.find(MTHDIR_OPT) != map.end())
-    filedir = map[MTHDIR_OPT].value;
-  else
-    filedir = std::string( eyedb::ServerConfig::getSValue("datadir"));
+    mthdir = map[MTHDIR_OPT].value.c_str();
+
+  bool listOnly = (map.find(LIST_OPT) != map.end());
 
   conn.open();
 
-  return databaseImport( conn, dbname, filename);
+  return databaseImport( conn, dbname, filename, filedir, mthdir, listOnly);
 }
 
 
