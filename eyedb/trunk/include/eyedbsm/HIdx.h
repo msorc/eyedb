@@ -127,6 +127,8 @@ namespace eyedbsm {
       }
     };
 
+    friend class HKey;
+   
     std::map<HKey, std::vector<const void *> > cache_map;
 
     static void *copy_key(const void *, unsigned int, Boolean, Boolean *state = 0);
