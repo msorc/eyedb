@@ -335,9 +335,11 @@ AC_SUBST(JAVACFLAGS)
 # ========================================
 # Python/pexpect tests
 # ========================================
-AM_PATH_PYTHON
-AC_PYTHON_MODULE(pexpect,ac_python_pexpect="yes",ac_python_pexpect="no")
-AM_CONDITIONAL(COND_PYTHON_PEXPECT, test x"$PYTHON" != "x" -a "$ac_python_pexpect" != "no")
+AM_PATH_PYTHON(,ac_python_found="yes",ac_python_found="no")
+if test "$ac_python_found" = "yes" ; then
+   AC_PYTHON_MODULE(pexpect,ac_python_pexpect="yes",ac_python_pexpect="no")
+fi
+AM_CONDITIONAL(COND_PYTHON_PEXPECT, test "$ac_python_found" != "no" -a "$ac_python_pexpect" != "no")
 
 # ========================================
 # SWIG
