@@ -54,7 +54,7 @@ public:
   virtual int perform(eyedb::Connection &conn, std::vector<std::string> &argv) = 0;
   std::string getExtName() const;
 
-  static bool setShortcutMode(bool _shortcut) {shortcut = _shortcut;}
+  static void setShortcutMode(bool _shortcut) {shortcut = _shortcut;}
   static bool isShortcutMode() {return shortcut;}
 };
 
@@ -65,9 +65,9 @@ class CLS : public Command { \
 public: \
   CLS(Topic *topic) : Command(topic, NAME) { } \
 \
-  virtual int usage() { std::cout << PROG_NAME << " " << topic->getName() << " " << NAME << " <options>\n"; } \
-  virtual int help() { std::cout << "help: " << NAME << '\n'; } \
-  virtual int perform(eyedb::Connection &conn, std::vector<std::string> &argv) { } \
+  virtual int usage() { std::cout << PROG_NAME << " " << topic->getName() << " " << NAME << " <options>\n"; return 1; } \
+  virtual int help() { std::cout << "help: " << NAME << '\n'; return 1; } \
+  virtual int perform(eyedb::Connection &conn, std::vector<std::string> &argv) { return 1; } \
 }
 
 #define CMDCLASS_GETOPT(CLS, NAME) \
