@@ -33,13 +33,6 @@
 using namespace eyedb;
 using namespace std;
 
-#define CHECK_STATUS(s) 			\
-  if (s) {					\
-    std::cerr << PROG_NAME;			\
-    s->print();					\
-    return 1;					\
-  }
-
 USRTopic::USRTopic() : Topic("user")
 {
   addAlias("usr");
@@ -207,9 +200,7 @@ int USRAddCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 
   conn.open();
 
-  Status s = dbmdatabase->addUser(&conn, username, passwd, user_type, userauth, passwdauth);
-
-  CHECK_STATUS(s);
+  dbmdatabase->addUser(&conn, username, passwd, user_type, userauth, passwdauth);
 
   return 0;
 }
@@ -272,9 +263,7 @@ int USRDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   conn.open();
 
-  Status s = dbmdatabase->deleteUser( &conn, username, userauth, passwdauth);
-
-  CHECK_STATUS(s);
+  dbmdatabase->deleteUser( &conn, username, userauth, passwdauth);
 
   return 0;
 }
@@ -418,14 +407,13 @@ get_db_access(DBM_Database *dbm, const char *name, const char *fieldname,
 
   ObjectArray obj_arr;
   status = q.execute(obj_arr);
-  CHECK_STATUS(status);
 
   if (!status)
     for (int i = 0; i < obj_arr.getCount(); i++)
       dbaccess[cnt++] = (DBUserAccess *)obj_arr[i];
 
   dbm->transactionCommit();
-  CHECK_STATUS(status);
+
   return cnt;
 }
 
@@ -482,8 +470,7 @@ list_all_users(DBM_Database *dbm)
     OQL q(dbm, "select user_entry");
     ObjectArray obj_arr;
 
-    Status s = q.execute(obj_arr);
-    CHECK_STATUS(s);
+    q.execute(obj_arr);
     
     for (int i = 0; i < obj_arr.getCount(); i++) {
       if (i)
@@ -508,9 +495,7 @@ list_selected_users(DBM_Database *dbm, std::vector<std::string> &argv)
   for (int i = 0; i < argv.size(); i++) {
     UserEntry *user;
     const char *username = argv[i].c_str();
-    Status s = dbm->getUser( username, user);
-
-    CHECK_STATUS(s);
+    dbm->getUser( username, user);
     
     if (!user) {
       std::cerr << PROG_NAME;
@@ -553,10 +538,7 @@ int USRListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 
   conn.open();
 
-  Status status = dbm->open(&conn, Database::DBSRead,
-			    userauth, passwdauth);
-
-  CHECK_STATUS(status);
+  dbm->open(&conn, Database::DBSRead, userauth, passwdauth);
 
   if (argv.size() < 1) {
     return list_all_users( dbm);
@@ -652,9 +634,7 @@ int USRSysAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
 
   conn.open();
 
-  Status s = dbmdatabase->setUserSysAccess(&conn, username, (SysAccessMode)sysmode, userauth, passwdauth);
-
-  CHECK_STATUS(s);
+  dbmdatabase->setUserSysAccess(&conn, username, (SysAccessMode)sysmode, userauth, passwdauth);
 
   return 0;
 }
@@ -750,9 +730,7 @@ int USRDBAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &a
 
   conn.open();
 
-  Status s = db->setUserDBAccess(  &conn, username, dbmode, userauth, passwdauth);
-
-  CHECK_STATUS(s);
+  db->setUserDBAccess(  &conn, username, dbmode, userauth, passwdauth);
 
   return 0;
 }
@@ -829,9 +807,7 @@ int USRPasswdCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   conn.open();
 
-  Status s = dbmdatabase->setPasswd( &conn, username, passwd, newpasswd);
-
-  CHECK_STATUS(s);
+  dbmdatabase->setPasswd( &conn, username, passwd, newpasswd);
 
   return 0;
 }
