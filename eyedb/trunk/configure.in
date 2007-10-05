@@ -583,6 +583,7 @@ src/www/eyedb.conf
 src/www/html/Makefile
 src/www/icons/Makefile
 tests/Makefile
+tests/compilation/Makefile
 tests/eyedb/Makefile
 tests/eyedb/admin/Makefile
 tests/eyedb/admin/database/Makefile
