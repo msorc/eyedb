@@ -480,126 +480,127 @@ AC_SUBST(EYEDB_ARCH_LIBS)
 
 
 
-AC_OUTPUT(
-Makefile 
-doc/Makefile
-doc/images/Makefile
-doc/doxygen/Makefile
-doc/doxygen/eyedb-doxygen.cfg
-doc/javadoc/Makefile
-doc/manpages/Makefile
-doc/manual/Makefile
-doc/manual/figures/Makefile
-doc/manual/version.tex
-doc/manual/latex2html-init
-doc/release-notes/Makefile
-examples/C++Binding/Makefile
-examples/C++Binding/Makefile.eyedb-examples
-examples/C++Binding/generic/Makefile
-examples/C++Binding/generic/Makefile.eyedb-examples
-examples/C++Binding/generic/basic/Makefile
-examples/C++Binding/generic/basic/Makefile.eyedb-examples
-examples/C++Binding/generic/query/Makefile
-examples/C++Binding/generic/query/Makefile.eyedb-examples
-examples/C++Binding/generic/schema/Makefile
-examples/C++Binding/generic/schema/Makefile.eyedb-examples
-examples/C++Binding/generic/store/Makefile
-examples/C++Binding/generic/store/Makefile.eyedb-examples
-examples/C++Binding/schema-oriented/Makefile
-examples/C++Binding/schema-oriented/Makefile.eyedb-examples
-examples/C++Binding/schema-oriented/admin/Makefile
-examples/C++Binding/schema-oriented/admin/Makefile.eyedb-examples
-examples/C++Binding/schema-oriented/methods/Makefile
-examples/C++Binding/schema-oriented/methods/Makefile.eyedb-examples
-examples/C++Binding/schema-oriented/query/Makefile
-examples/C++Binding/schema-oriented/query/Makefile.eyedb-examples
-examples/C++Binding/schema-oriented/share/Makefile
-examples/C++Binding/schema-oriented/share/Makefile.eyedb-examples
-examples/C++Binding/schema-oriented/store/Makefile
-examples/C++Binding/schema-oriented/store/Makefile.eyedb-examples
-examples/GettingStarted/Makefile
-examples/GettingStarted/Makefile.eyedb-examples
-examples/JavaBinding/Makefile
-examples/JavaBinding/Makefile.eyedb-examples
-examples/JavaBinding/generic/Makefile
-examples/JavaBinding/generic/Makefile.eyedb-examples
-examples/JavaBinding/generic/applet/Makefile
-examples/JavaBinding/generic/applet/Makefile.eyedb-examples
-examples/JavaBinding/generic/appli/Makefile
-examples/JavaBinding/generic/appli/Makefile.eyedb-examples
-examples/JavaBinding/generic/appli/basic/Makefile
-examples/JavaBinding/generic/appli/basic/Makefile.eyedb-examples
-examples/JavaBinding/generic/appli/collections/Makefile
-examples/JavaBinding/generic/appli/collections/Makefile.eyedb-examples
-examples/JavaBinding/generic/appli/query/Makefile
-examples/JavaBinding/generic/appli/query/Makefile.eyedb-examples
-examples/JavaBinding/generic/appli/schema/Makefile
-examples/JavaBinding/generic/appli/schema/Makefile.eyedb-examples
-examples/JavaBinding/generic/appli/store/Makefile
-examples/JavaBinding/generic/appli/store/Makefile.eyedb-examples
-examples/JavaBinding/schema-oriented/Makefile
-examples/JavaBinding/schema-oriented/Makefile.eyedb-examples
-examples/JavaBinding/schema-oriented/share/Makefile
-examples/JavaBinding/schema-oriented/share/Makefile.eyedb-examples
-examples/JavaBinding/schema-oriented/share/person/Makefile
-examples/JavaBinding/schema-oriented/store/Makefile
-examples/JavaBinding/schema-oriented/store/Makefile.eyedb-examples
-examples/Makefile
-examples/Makefile.eyedb-examples
-examples/oql/Makefile
-include/Makefile
-include/eyedb/Makefile
-include/eyedb/version.h
-include/eyedb/internals/Makefile
-include/eyedblib/Makefile
-include/eyedblib/endian.h
-include/eyedbsm/Makefile
-install/Makefile
-install/etc/Makefile
-pkg-config/Makefile
-pkg/rpm/eyedb.spec
-scripts/Makefile
-scripts/eyedbjrun
-src/Makefile
-src/bindings/Makefile
-src/bindings/python/Makefile
-src/eyedb/Makefile
-src/eyedb/admin/Makefile
-src/commands/Makefile
-src/commands/server/Makefile
-src/eyedbsm/Makefile
-src/java/Makefile
-src/java/src/Makefile
-src/java/src/org/Makefile
-src/java/src/org/eyedb/Makefile
-src/java/src/org/eyedb/Version.java
-src/java/src/org/eyedb/dbm/Makefile
-src/java/src/org/eyedb/syscls/Makefile
-src/java/src/org/eyedb/utils/Makefile
-src/lib/Makefile
-src/oql/Makefile
-src/www/Makefile
-src/www/eyedb.conf
-src/www/html/Makefile
-src/www/icons/Makefile
-tests/Makefile
-tests/compilation/Makefile
-tests/eyedb/Makefile
-tests/eyedb/admin/Makefile
-tests/eyedb/admin/database/Makefile
-tests/eyedb/admin/datafile/Makefile
-tests/eyedb/admin/dataspace/Makefile
-tests/eyedb/admin/index/Makefile
-tests/eyedb/admin/user/Makefile
-tests/eyedb/collections/Makefile
-tests/eyedb/collections/basic/Makefile
-tests/eyedb/collections/litcoll/Makefile
-tests/eyedb/dataspace/Makefile
-tests/eyedb/dataspace/dspsch/Makefile
-tests/eyedb/export/Makefile
-tests/eyedbsm/Makefile
-tests/eyedbsm/basic/Makefile
+AC_CONFIG_FILES( dnl
+Makefile dnl
+doc/Makefile dnl
+doc/images/Makefile dnl
+doc/doxygen/Makefile dnl
+doc/doxygen/eyedb-doxygen.cfg dnl
+doc/javadoc/Makefile dnl
+doc/manpages/Makefile dnl
+doc/manual/Makefile dnl
+doc/manual/figures/Makefile dnl
+doc/manual/version.tex dnl
+doc/manual/latex2html-init dnl
+doc/release-notes/Makefile dnl
+examples/C++Binding/Makefile dnl
+examples/C++Binding/Makefile.eyedb-examples dnl
+examples/C++Binding/generic/Makefile dnl
+examples/C++Binding/generic/Makefile.eyedb-examples dnl
+examples/C++Binding/generic/basic/Makefile dnl
+examples/C++Binding/generic/basic/Makefile.eyedb-examples dnl
+examples/C++Binding/generic/query/Makefile dnl
+examples/C++Binding/generic/query/Makefile.eyedb-examples dnl
+examples/C++Binding/generic/schema/Makefile dnl
+examples/C++Binding/generic/schema/Makefile.eyedb-examples dnl
+examples/C++Binding/generic/store/Makefile dnl
+examples/C++Binding/generic/store/Makefile.eyedb-examples dnl
+examples/C++Binding/schema-oriented/Makefile dnl
+examples/C++Binding/schema-oriented/Makefile.eyedb-examples dnl
+examples/C++Binding/schema-oriented/admin/Makefile dnl
+examples/C++Binding/schema-oriented/admin/Makefile.eyedb-examples dnl
+examples/C++Binding/schema-oriented/methods/Makefile dnl
+examples/C++Binding/schema-oriented/methods/Makefile.eyedb-examples dnl
+examples/C++Binding/schema-oriented/query/Makefile dnl
+examples/C++Binding/schema-oriented/query/Makefile.eyedb-examples dnl
+examples/C++Binding/schema-oriented/share/Makefile dnl
+examples/C++Binding/schema-oriented/share/Makefile.eyedb-examples dnl
+examples/C++Binding/schema-oriented/store/Makefile dnl
+examples/C++Binding/schema-oriented/store/Makefile.eyedb-examples dnl
+examples/GettingStarted/Makefile dnl
+examples/GettingStarted/Makefile.eyedb-examples dnl
+examples/JavaBinding/Makefile dnl
+examples/JavaBinding/Makefile.eyedb-examples dnl
+examples/JavaBinding/generic/Makefile dnl
+examples/JavaBinding/generic/Makefile.eyedb-examples dnl
+examples/JavaBinding/generic/applet/Makefile dnl
+examples/JavaBinding/generic/applet/Makefile.eyedb-examples dnl
+examples/JavaBinding/generic/appli/Makefile dnl
+examples/JavaBinding/generic/appli/Makefile.eyedb-examples dnl
+examples/JavaBinding/generic/appli/basic/Makefile dnl
+examples/JavaBinding/generic/appli/basic/Makefile.eyedb-examples dnl
+examples/JavaBinding/generic/appli/collections/Makefile dnl
+examples/JavaBinding/generic/appli/collections/Makefile.eyedb-examples dnl
+examples/JavaBinding/generic/appli/query/Makefile dnl
+examples/JavaBinding/generic/appli/query/Makefile.eyedb-examples dnl
+examples/JavaBinding/generic/appli/schema/Makefile dnl
+examples/JavaBinding/generic/appli/schema/Makefile.eyedb-examples dnl
+examples/JavaBinding/generic/appli/store/Makefile dnl
+examples/JavaBinding/generic/appli/store/Makefile.eyedb-examples dnl
+examples/JavaBinding/schema-oriented/Makefile dnl
+examples/JavaBinding/schema-oriented/Makefile.eyedb-examples dnl
+examples/JavaBinding/schema-oriented/share/Makefile dnl
+examples/JavaBinding/schema-oriented/share/Makefile.eyedb-examples dnl
+examples/JavaBinding/schema-oriented/share/person/Makefile dnl
+examples/JavaBinding/schema-oriented/store/Makefile dnl
+examples/JavaBinding/schema-oriented/store/Makefile.eyedb-examples dnl
+examples/Makefile dnl
+examples/Makefile.eyedb-examples dnl
+examples/oql/Makefile dnl
+include/Makefile dnl
+include/eyedb/Makefile dnl
+include/eyedb/version.h dnl
+include/eyedb/internals/Makefile dnl
+include/eyedblib/Makefile dnl
+include/eyedblib/endian.h dnl
+include/eyedbsm/Makefile dnl
+install/Makefile dnl
+install/etc/Makefile dnl
+pkg-config/Makefile dnl
+pkg/rpm/eyedb.spec dnl
+scripts/Makefile dnl
+scripts/eyedbjrun dnl
+src/Makefile dnl
+src/bindings/Makefile dnl
+src/bindings/python/Makefile dnl
+src/eyedb/Makefile dnl
+src/eyedb/admin/Makefile dnl
+src/commands/Makefile dnl
+src/commands/server/Makefile dnl
+src/eyedbsm/Makefile dnl
+src/java/Makefile dnl
+src/java/src/Makefile dnl
+src/java/src/org/Makefile dnl
+src/java/src/org/eyedb/Makefile dnl
+src/java/src/org/eyedb/Version.java dnl
+src/java/src/org/eyedb/dbm/Makefile dnl
+src/java/src/org/eyedb/syscls/Makefile dnl
+src/java/src/org/eyedb/utils/Makefile dnl
+src/lib/Makefile dnl
+src/oql/Makefile dnl
+src/www/Makefile dnl
+src/www/eyedb.conf dnl
+src/www/html/Makefile dnl
+src/www/icons/Makefile dnl
+tests/Makefile dnl
+tests/compilation/Makefile dnl
+tests/eyedb/Makefile dnl
+tests/eyedb/admin/Makefile dnl
+tests/eyedb/admin/database/Makefile dnl
+tests/eyedb/admin/datafile/Makefile dnl
+tests/eyedb/admin/dataspace/Makefile dnl
+tests/eyedb/admin/index/Makefile dnl
+tests/eyedb/admin/user/Makefile dnl
+tests/eyedb/collections/Makefile dnl
+tests/eyedb/collections/basic/Makefile dnl
+tests/eyedb/collections/litcoll/Makefile dnl
+tests/eyedb/dataspace/Makefile dnl
+tests/eyedb/dataspace/dspsch/Makefile dnl
+tests/eyedb/export/Makefile dnl
+tests/eyedbsm/Makefile dnl
+tests/eyedbsm/basic/Makefile dnl
 )
+AC_OUTPUT
 
 # make symbolic links for ODL files
 for f in src/java/src/org/eyedb/dbm/DBM.odl src/java/src/org/eyedb/utils/utils.odl src/java/src/org/eyedb/syscls/syscls.odl 
