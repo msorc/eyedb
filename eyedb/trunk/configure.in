@@ -583,7 +583,6 @@ src/www/eyedb.conf dnl
 src/www/html/Makefile dnl
 src/www/icons/Makefile dnl
 tests/Makefile dnl
-tests/compilation/Makefile dnl
 tests/eyedb/Makefile dnl
 tests/eyedb/admin/Makefile dnl
 tests/eyedb/admin/database/Makefile dnl
