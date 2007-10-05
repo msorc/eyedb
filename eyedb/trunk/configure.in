@@ -174,14 +174,17 @@ AC_DEFINE_UNQUOTED([POINTER_INT_TYPE], $ac_pointer_int_type, [Define to the inte
 # check for libtool
 AC_PROG_LIBTOOL
 
-# Check for lex/flex and yacc/bison
+# Check for lex/flex
 AM_PROG_LEX
-if test "$LEX" != "flex" ; then
-	AC_MSG_ERROR(you must have GNU flex installed to compile EyeDB)
+AC_PATH_PROG(_XLEX,$LEX)
+if test x"$_XLEX" = x ; then
+	AC_MSG_ERROR(you must have GNU flex or lex installed to compile EyeDB)
 fi
+# Check for yacc/bison
 AC_PROG_YACC
-if test "$YACC" = "yacc" ; then
-	AC_MSG_ERROR(you must have GNU bison installed to compile EyeDB)
+AC_PATH_PROG(_XYACC,$YACC)
+if test x"$_XYACC" = x ; then
+	AC_MSG_ERROR(you must have GNU bison or yacc installed to compile EyeDB)
 fi
 
 
