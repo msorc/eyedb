@@ -36,7 +36,7 @@ xm_alloc.cc
 
 libeyedbsm_la_LDFLAGS= -release $(EYEDB_VERSION)
 
-SMLIBS=$(top_builddir)/src/lib/libeyedbrpcfe.la libeyedbsm.la $(top_builddir)/src/lib/libeyedbutils.la
+SMLIBS=libeyedbsm.la $(top_builddir)/src/lib/libeyedbutils.la $(top_builddir)/src/lib/libeyedbrpcfe.la 
 
 sbin_PROGRAMS=					\
 eyedbsmd					\
