@@ -182,13 +182,14 @@ main(int argc, char *argv[])
   Exception::setHandler(check_status);
 
   LinkedList *clist = new LinkedList;
-  char *dbname = 0, *dbmfile = 0;
+  const char *dbname = 0;
+  const char *dbmfile = 0;
   unsigned int mode = 0;
   Bool printmode = False, recmode = False, echo = False,
     interact = False, commit = False;
   const char *display = NULL;
 
-  dbmfile = (char *)Database::getDefaultDBMDB();
+  dbmfile = Database::getDefaultDBMDB();
 
   static const std::string database_opt = "database";
   static const std::string read_opt = "read";

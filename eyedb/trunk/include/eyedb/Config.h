@@ -101,7 +101,7 @@ namespace eyedb {
        @param name
     */
 
-    const char *getValue(const char *name);
+    const char *getValue(const char *name) const;
 
     /**
        Not yet documented.
@@ -116,7 +116,7 @@ namespace eyedb {
        @param item_cnt
     */
 
-    Item *getValues(int &item_cnt) const;
+    Item *getValues(unsigned int &item_cnt, bool expand_vars = false) const;
 
     /**
        Not yet documented.
@@ -129,6 +129,10 @@ namespace eyedb {
     */
 
     static void _release();
+
+    static bool isBuiltinVar(const char *name);
+
+    static bool isUserVar(const char *name);
 
     ~Config();
 

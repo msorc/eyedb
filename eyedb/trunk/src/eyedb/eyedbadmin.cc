@@ -491,7 +491,6 @@ dbcreate_prologue(Database *db, const char *dbname,
       dbfile = strdup((dirname + dbname + ".dbs").c_str());
     else {
       dbfile = strdup(Database::getDefaultServerDBMDB());
-      //dbfile = strdup(Database::getDefaultDBMDB());
     }
   }
   else if (dbfile[0] != '/')
@@ -1276,12 +1275,14 @@ dbexport_realize(const char *dbname, const char *file)
 {
   if (!*userauth) {
     const char *env = eyedb::ClientConfig::getCValue("user");
-    if (env) strcpy(userauth, env);
+    if (env)
+      strcpy(userauth, env);
   }
 
   if (!*passwdauth) {
     const char *env = eyedb::ClientConfig::getCValue("passwd");
-    if (env) strcpy(passwdauth, env);
+    if (env)
+      strcpy(passwdauth, env);
   }
 
   if (!eyedb::ServerConfig::getSValue("sopath")) {
@@ -1641,8 +1642,9 @@ dbimport_realize(int fd, const char *file, const char *dbname,
     }
   }
   else {
-    if (!_filedir)
+    if (!_filedir) {
       _filedir = eyedb::ServerConfig::getSValue("datadir");
+    }
 
     /*
       for (i = 0; i < info.ndat; i++)
@@ -1654,7 +1656,7 @@ dbimport_realize(int fd, const char *file, const char *dbname,
 
   char **mthdir = 0;
   if (info.nmths) {
-    std::string def_mthdir = std::string(eyedb::ServerConfig::getSValue("sopath"));
+    std::string def_mthdir = eyedb::ServerConfig::getSValue("sopath");
     mthdir = new char*[info.nmths];
     if (lseek_ok && !_mthdir) {
       for (i = 0; i < info.nmths; i++)

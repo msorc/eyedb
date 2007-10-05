@@ -568,9 +568,10 @@ namespace eyedb {
   IDB_checkAuthDbm(const char *&dbmdb)
   {
 #if 1
-    if (!strcmp(dbmdb, DBM_Database::defaultDBMDB))
-      dbmdb = Database::getDefaultServerDBMDB();
-
+    std::string dbmdb_s;
+    if (!strcmp(dbmdb, DBM_Database::defaultDBMDB)) {
+      dbmdb = strdup(Database::getDefaultServerDBMDB());
+    }
     const std::vector<string> &granted_dbm = Database::getGrantedDBMDB();
     int size = granted_dbm.size();
     for (int n = 0; n < size; n++) {
