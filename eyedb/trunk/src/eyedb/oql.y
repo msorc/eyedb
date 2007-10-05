@@ -133,7 +133,7 @@ extern void yyerror(const char *);
 %token<s> OBJ
 %token<s> SYMBOL
 %token<s> ODL_QUOTED_SEQ
-%token TRUE FALSE NULL_ATOM NIL
+%token TRUE_ FALSE_ NULL_ATOM NIL
 
 %token TERM QUESTMARK DBL_DOT
 
@@ -1603,11 +1603,11 @@ literal: INT
   $$ = new oqmlObject($1);
   free($1);
 }
-| FALSE
+| FALSE_
 {
   $$ = new oqmlFalse();
 }
-| TRUE
+| TRUE_
 {
   $$ = new oqmlTrue();
 }
@@ -1791,10 +1791,10 @@ struct HashKeyWords {
   }
 
   void initKeyWords() {
-    insert("false", FALSE);
+    insert("false", FALSE_);
     insert("mod", MOD);
     insert("not", NOT);
-    insert("true", TRUE);
+    insert("true", TRUE_);
     insert("new", NEW);
     insert("delete", DELETE);
 //    insert("at", AT);

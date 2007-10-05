@@ -23,6 +23,8 @@
 
 #include <eyedbconfig.h>
 
+#define BUILTIN_VARS
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -166,6 +168,7 @@ namespace eyedb {
       return;
     }
 
+    fprintf(stderr, "eyedb configuration: ");
     fprintf(stderr, fmt, x1, x2, x3);
     fprintf(stderr, "\n");
     exit(1);
@@ -501,8 +504,10 @@ namespace eyedb {
 
     LinkedListCursor c(config.list);
     Item *item;
-    while(c.getNext((void *&)item))
-      list.insertObjectFirst(new Item(*item));
+    while(c.getNext((void *&)item)) {
+      //list.insertObjectFirst(new Item(*item));
+      list.insertObjectLast(new Item(*item));
+    }
 
     var_map = config.var_map ? new VarMap(*config.var_map) : 0;
     return *this;
@@ -600,6 +605,9 @@ namespace eyedb {
     if (!var_map)
       return;
 
+    if (*name == '$')
+      return;
+
     if (var_map->find(name) != var_map->end())
       return;
 
@@ -623,29 +631,98 @@ namespace eyedb {
     checkIsIn(name);
 
     Item *item = new Item(name, value);
-    list.insertObjectFirst(item);
+    //list.insertObjectFirst(item);
+    list.insertObjectLast(item);
   }
 
-  const char *
-  Config::getValue(const char *name)
+  static char *copySTDString(const std::string &value)
   {
-    const char *s = getenv((std::string("EYEDB") + uppercase(name)).c_str());
-    if (s)
-      return s;
+    static const int VALUE_BUFFER_CNT = 128;
+    static unsigned int n = 0;
+    static char *buf[VALUE_BUFFER_CNT];
+
+    if (n == VALUE_BUFFER_CNT)
+      n = 0;
+
+    if (!buf[n] || strlen(buf[n]) < value.length()) {
+      delete [] buf[n];
+      buf[n] = new char[value.length()+1];
+    }
+
+    strcpy(buf[n], value.c_str());
+    return buf[n++];
+  }
+
+  bool Config::isBuiltinVar(const char *name)
+  {
+    return *name == '@';
+  }
+
+  bool Config::isUserVar(const char *name)
+  {
+    return *name == '$';
+  }
+
+  const char *Config::getValue(const char *name) const
+  {
+    if (!isBuiltinVar(name) && !isUserVar(name)) {
+      const char *s = getenv((std::string("EYEDB") + uppercase(name)).c_str());
+      if (s)
+	return s;
+    }
 
     LinkedListCursor c(list);
     Item *item;
 
     while (c.getNext((void *&)item))
       if (!strcasecmp(item->name, name)) {
-	return item->value;
+	if (!strchr(item->value, '%')) {
+	  return item->value;
+	}
+
+	std::string value;
+
+	char *s = item->value;
+	char *var;
+	bool state = false;
+
+	while (char c = *s++) {
+	  if (c == '%') {
+	    if (state) {
+	      char svar[128];
+	      unsigned int len = s - var - 1;
+	      if (len >= sizeof(svar)) {
+		error("%sconfiguration variable too long: '%s' "
+		      "(maximum size is %s)", line_str(), svar,
+		      str_convert((long)sizeof(svar)-1).c_str());
+	      }
+
+	      strncpy(svar, var, len);
+	      svar[len] = 0;
+	      const char *val = getValue(svar);
+	      if (!val)
+		error("%sunknown configuration variable '%s'", line_str(), svar);
+	      value += val;
+	    }
+	    else {
+	      var = s;
+	    }
+	    state = !state;
+	  }
+	  else if (!state) {
+	    char tok[4];
+	    sprintf(tok, "%c", c);
+	    value += tok;
+	  }
+	}
+
+	return copySTDString(value);
       }
 
     return (const char *)0;
   }
 
-  Config::Item *
-  Config::getValues(int &item_cnt) const
+  Config::Item *Config::getValues(unsigned int &item_cnt, bool expand_vars) const
   {
     item_cnt = list.getCount();
 
@@ -657,7 +734,7 @@ namespace eyedb {
     Item *item;
     LinkedListCursor c(list);
 
-    int n;
+    unsigned int n;
     for (n = 0; c.getNext((void *&)item); ) {
       int _not = 0;
       for (int i = 0; i < n; i++)
@@ -666,8 +743,13 @@ namespace eyedb {
 	  break;
 	}
 
-      if (!_not)
-	items[n++] = *item;
+      if (!_not) {
+	items[n] = *item;
+	if (expand_vars) {
+	  items[n].value = strdup(getValue(item->name));
+	}
+	n++;
+      }
     }
 
     item_cnt = n;
@@ -711,6 +793,50 @@ namespace eyedb {
     std::string tmpdir = eyedblib::CompileBuiltin::getTmpdir();
     std::string sysconfdir = eyedblib::CompileBuiltin::getSysconfdir();
 
+#ifdef BUILTIN_VARS
+    std::string bindir = eyedblib::CompileBuiltin::getBindir();
+    std::string sbindir = eyedblib::CompileBuiltin::getSbindir();
+    std::string datadir = eyedblib::CompileBuiltin::getDatadir();
+
+    setValue("@bindir", bindir.c_str());;
+    setValue("@sbindir", sbindir.c_str());;
+    setValue("@libdir", libdir.c_str());;
+    setValue("@datadir", datadir.c_str());;
+    setValue("@sysconfdir", sysconfdir.c_str());;
+    setValue("@pipedir", pipedir.c_str());;
+    setValue("@tmpdir", tmpdir.c_str());;
+
+    // Bases directory
+    setValue( "datadir", "%@datadir%");
+
+    // tmpdir
+    setValue( "tmpdir", "%@tmpdir%");
+
+    // sopath
+    setValue( "sopath", "%@libdir%/eyedb");
+
+    // Default EYEDBDBM Databases
+    setValue( "default_dbm", (databasedir + "/dbmdb.dbs").c_str());
+
+    // Granted EYEDBDBM Databases
+    //setValue( "granted_dbm", (localstatedir + "/lib/eyedb/db/dbmdb.dbs").c_str());
+    // EV : 22/01/06
+    // when variable expansion will be done in getValue(), granted_dbm will be:
+    //setValue( "granted_dbm", "%default_dbm%");
+
+    // Server Parameters
+    setValue( "maximum_memory_size", "0");
+    setValue( "access_file", "%@sysconfdir%/eyedb/Access");
+    setValue( "smdport", "%@pipedir%/eyedbsmd");
+    setValue( "default_file_group", "");
+    setValue( "default_file_mask", "0600");
+
+    // Server Parameters
+    setValue( "listen", ("localhost:" + tcp_port + ",%@pipedir%/eyedbd").c_str());
+
+    // OQL path
+    setValue( "oqlpath", "%@libdir%/eyedb/oql");
+#else
     // Bases directory
     setValue( "datadir", databasedir.c_str());
 
@@ -741,6 +867,7 @@ namespace eyedb {
 
     // OQL path
     setValue( "oqlpath", (libdir + "/eyedb/oql").c_str());
+#endif
   }
 
   void
@@ -749,21 +876,28 @@ namespace eyedb {
     const char* envFileName;
 
     if (configFilename.length() != 0) {
-      add( configFilename.c_str(), false);
-    } else if ((envFileName = getenv( envVariable))) {
-      add( envFileName, false);
-    } else {
-      struct passwd* pw = getpwuid( getuid());
+      add(configFilename.c_str(), false);
+    }
+    else if ((envFileName = getenv(envVariable))) {
+      add(envFileName, false);
+    }
+    else {
+      struct passwd* pw = getpwuid(getuid());
 
       if (pw) {
-	std::string homeConfigFile = std::string( pw->pw_dir) + "/.eyedb/" + defaultFilename;
-	if (add( homeConfigFile.c_str(), true))
+	std::string homeConfigFile = std::string(pw->pw_dir) + "/.eyedb/" + defaultFilename;
+	if (add(homeConfigFile.c_str(), true))
 	  return;
       }
 
+      const char *confdir = getenv("EYEDBCONFDIR");
+      if (confdir) {
+	add((std::string(confdir) + "/" + defaultFilename).c_str(), false);
+	return;
+      }
       std::string sysConfigFile = std::string(eyedblib::CompileBuiltin::getSysconfdir()) + "/eyedb/" + defaultFilename;
 
-      add( sysConfigFile.c_str(), true);
+      add(sysConfigFile.c_str(), true);
     }
   }
 
@@ -784,6 +918,15 @@ namespace eyedb {
   static struct C {
 
     C() {
+#ifdef BUILTIN_VARS
+      server_map["@bindir"] = true;
+      server_map["@sbindir"] = true;
+      server_map["@libdir"] = true;
+      server_map["@sysconfdir"] = true;
+      server_map["@datadir"] = true;
+      server_map["@pipedir"] = true;
+      server_map["@tmpdir"] = true;
+#endif
       client_map["port"] = true;
       client_map["tcp_port"] = true;
       client_map["host"] = true;

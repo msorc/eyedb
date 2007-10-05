@@ -37,7 +37,7 @@ Bool _server = False;
 static int
 usage(const char *prog)
 {
-  fprintf(stderr, "usage: %s [--server] [--config|--csh|--sh] [--export] [--expand-user] [<variables>]\n", prog);
+  fprintf(stderr, "usage: %s [--server] [--config|--csh|--sh] [--export] [--expand-user] [--expand-vars] [<variables>]\n", prog);
   print_use_help(std::cerr);
   return 1;
 }
@@ -80,9 +80,9 @@ main(int argc, char *argv[])
       return usage(argv[0]);
 
     LinkedList list;
-    Bool shell, C_shell, _export, conf, expand_user;
+    Bool shell, C_shell, _export, conf, expand_user, expand_vars;
 
-    shell = C_shell =  _export = _server = False, conf = False, expand_user = False;
+    shell = C_shell =  _export = _server = False, conf = False, expand_user = expand_vars = False;
 
     std::string value;
 
@@ -107,6 +107,8 @@ main(int argc, char *argv[])
 	conf = True;
       else if (!strcmp(s, "--expand-user"))
 	expand_user = True;
+      else if (!strcmp(s, "--expand-vars"))
+	expand_vars = True;
       else if (*s == '-')
 	return usage(argv[0]);
       else
@@ -122,7 +124,7 @@ main(int argc, char *argv[])
     if (shell + C_shell + conf > 1)
       return usage(argv[0]);
 
-    int item_cnt;
+    unsigned int item_cnt;
     Config::Item *items;
 
     Config *cfg;
@@ -132,7 +134,7 @@ main(int argc, char *argv[])
       cfg = ClientConfig::getInstance();
 
     if (!list.getCount())
-      items = cfg->getValues(item_cnt);
+      items = cfg->getValues(item_cnt, expand_vars ? true : false);
     else  {
       item_cnt = list.getCount();
       items = new Config::Item[list.getCount()];
@@ -159,11 +161,13 @@ main(int argc, char *argv[])
       fprintf(stdout, "#\n\n");
 
       for (int n = 0; n < item_cnt; n++) {
-	std::string var = std::string("EYEDB") + capstring(items[n].name);
-	fprintf(stdout, "%s=%s", var.c_str(), items[n].value);
-	if (_export)
-	  fprintf(stdout, "; export %s", var.c_str());
-	fprintf(stdout, "\n");
+	if (!Config::isBuiltinVar(items[n].name) && !Config::isUserVar(items[n].name)) {
+	  std::string var = std::string("EYEDB") + capstring(items[n].name);
+	  fprintf(stdout, "%s=%s", var.c_str(), items[n].value);
+	  if (_export)
+	    fprintf(stdout, "; export %s", var.c_str());
+	  fprintf(stdout, "\n");
+	}
       }
 
       delete [] items;
@@ -176,12 +180,14 @@ main(int argc, char *argv[])
       fprintf(stdout, "#\n\n");
 
       for (int n = 0; n < item_cnt; n++) {
-	std::string var = std::string("EYEDB") + capstring(items[n].name);
-	if (_export)
-	  fprintf(stdout, "setenv %s %s\n", var.c_str(),
-		  items[n].value);
-	else
-	  fprintf(stdout, "set %s=%s\n", var.c_str(), items[n].value);
+	if (!Config::isBuiltinVar(items[n].name) && !Config::isUserVar(items[n].name)) {
+	  std::string var = std::string("EYEDB") + capstring(items[n].name);
+	  if (_export)
+	    fprintf(stdout, "setenv %s %s\n", var.c_str(),
+		    items[n].value);
+	  else
+	    fprintf(stdout, "set %s=%s\n", var.c_str(), items[n].value);
+	}
       }
 
       delete [] items;

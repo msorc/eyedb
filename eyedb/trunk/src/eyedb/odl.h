@@ -30,7 +30,9 @@
 #include <string.h>
 #include <eyedb/eyedb.h>
 
-extern int odlparse();
+extern "C" {
+  extern int odlparse();
+}
 
 namespace eyedb {
 

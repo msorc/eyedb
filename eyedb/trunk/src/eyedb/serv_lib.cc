@@ -41,136 +41,136 @@ namespace eyedb {
 namespace eyedb {
 
   rpc_ServerFunction
-  *DBMCREATE_RPC,
-    *DBMUPDATE_RPC,
+  *DBMCREATE_SERV_RPC,
+    *DBMUPDATE_SERV_RPC,
 
-    *DBCREATE_RPC,
-    *DBDELETE_RPC,
+    *DBCREATE_SERV_RPC,
+    *DBDELETE_SERV_RPC,
 
-    *DBINFO_RPC,
-    *DBMOVE_RPC,
-    *DBCOPY_RPC,
-    *DBRENAME_RPC,
+    *DBINFO_SERV_RPC,
+    *DBMOVE_SERV_RPC,
+    *DBCOPY_SERV_RPC,
+    *DBRENAME_SERV_RPC,
 
-    *USER_ADD_RPC,
-    *USER_DELETE_RPC,
-    *USER_PASSWD_SET_RPC,
-    *PASSWD_SET_RPC,
+    *USER_ADD_SERV_RPC,
+    *USER_DELETE_SERV_RPC,
+    *USER_PASSWD_SET_SERV_RPC,
+    *PASSWD_SET_SERV_RPC,
 
-    *DEFAULT_DBACCESS_SET_RPC,
-    *USER_DBACCESS_SET_RPC,
-    *USER_SYSACCESS_SET_RPC,
+    *DEFAULT_DBACCESS_SET_SERV_RPC,
+    *USER_DBACCESS_SET_SERV_RPC,
+    *USER_SYSACCESS_SET_SERV_RPC,
 
-    *BACKEND_INTERRUPT_RPC,
+    *BACKEND_INTERRUPT_SERV_RPC,
 
-    *TRANSACTION_BEGIN_RPC,
-    *TRANSACTION_ABORT_RPC,
-    *TRANSACTION_COMMIT_RPC,
+    *TRANSACTION_BEGIN_SERV_RPC,
+    *TRANSACTION_ABORT_SERV_RPC,
+    *TRANSACTION_COMMIT_SERV_RPC,
 
-    *TRANSACTION_PARAMS_SET_RPC,
-    *TRANSACTION_PARAMS_GET_RPC,
+    *TRANSACTION_PARAMS_SET_SERV_RPC,
+    *TRANSACTION_PARAMS_GET_SERV_RPC,
 
-    *DBOPEN_RPC,
-    *DBOPENLOCAL_RPC,
-    *DBCLOSE_RPC,
+    *DBOPEN_SERV_RPC,
+    *DBOPENLOCAL_SERV_RPC,
+    *DBCLOSE_SERV_RPC,
 
-    *OBJECT_CREATE_RPC,
-    *OBJECT_READ_RPC,
-    *OBJECT_WRITE_RPC,
-    *OBJECT_DELETE_RPC,
-    *OBJECT_HEADER_READ_RPC,
-    *OBJECT_SIZE_MODIFY_RPC,
-    *OBJECT_PROTECTION_SET_RPC,
-    *OBJECT_PROTECTION_GET_RPC,
-    *OBJECT_CHECK_RPC,
+    *OBJECT_CREATE_SERV_RPC,
+    *OBJECT_READ_SERV_RPC,
+    *OBJECT_WRITE_SERV_RPC,
+    *OBJECT_DELETE_SERV_RPC,
+    *OBJECT_HEADER_READ_SERV_RPC,
+    *OBJECT_SIZE_MODIFY_SERV_RPC,
+    *OBJECT_PROTECTION_SET_SERV_RPC,
+    *OBJECT_PROTECTION_GET_SERV_RPC,
+    *OBJECT_CHECK_SERV_RPC,
 
-    *OID_MAKE_RPC,
+    *OID_MAKE_SERV_RPC,
 
-    *DATA_CREATE_RPC,
-    *DATA_READ_RPC,
-    *DATA_WRITE_RPC,
-    *DATA_DELETE_RPC,
-    *DATA_SIZE_GET_RPC,
-    *DATA_SIZE_MODIFY_RPC,
+    *DATA_CREATE_SERV_RPC,
+    *DATA_READ_SERV_RPC,
+    *DATA_WRITE_SERV_RPC,
+    *DATA_DELETE_SERV_RPC,
+    *DATA_SIZE_GET_SERV_RPC,
+    *DATA_SIZE_MODIFY_SERV_RPC,
 
-    *VDDATA_CREATE_RPC,
-    *VDDATA_READ_RPC,
-    *VDDATA_DELETE_RPC,
+    *VDDATA_CREATE_SERV_RPC,
+    *VDDATA_WRITE_SERV_RPC,
+    *VDDATA_DELETE_SERV_RPC,
 
-    *SCHEMA_COMPLETE_RPC,
+    *SCHEMA_COMPLETE_SERV_RPC,
 
-    *ATTRIBUTE_INDEX_CREATE_RPC,
-    *ATTRIBUTE_INDEX_REMOVE_RPC,
+    *ATTRIBUTE_INDEX_CREATE_SERV_RPC,
+    *ATTRIBUTE_INDEX_REMOVE_SERV_RPC,
 
-    *INDEX_CREATE_RPC,
-    *INDEX_REMOVE_RPC,
+    *INDEX_CREATE_SERV_RPC,
+    *INDEX_REMOVE_SERV_RPC,
 
-    *CONSTRAINT_CREATE_RPC,
-    *CONSTRAINT_DELETE_RPC,
+    *CONSTRAINT_CREATE_SERV_RPC,
+    *CONSTRAINT_DELETE_SERV_RPC,
 
-    *COLLECTION_GET_BY_IND_RPC,
-    *COLLECTION_GET_BY_VALUE_RPC,
+    *COLLECTION_GET_BY_IND_SERV_RPC,
+    *COLLECTION_GET_BY_VALUE_SERV_RPC,
 
-    *SET_OBJECT_LOCK_RPC,
-    *GET_OBJECT_LOCK_RPC,
+    *SET_OBJECT_LOCK_SERV_RPC,
+    *GET_OBJECT_LOCK_SERV_RPC,
 
-    //*QUERY_LANG_CREATE_RPC,
-    //*QUERY_DATABASE_CREATE_RPC,
-    //*QUERY_CLASS_CREATE_RPC,
-    *QUERY_COLLECTION_CREATE_RPC,
-    *QUERY_ATTRIBUTE_CREATE_RPC,
-    *QUERY_DELETE_RPC,
-    *QUERY_SCAN_NEXT_RPC,
+    //*QUERY_LANG_CREATE_SERV_RPC,
+    //*QUERY_DATABASE_CREATE_SERV_RPC,
+    //*QUERY_CLASS_CREATE_SERV_RPC,
+    *QUERY_COLLECTION_CREATE_SERV_RPC,
+    *QUERY_ATTRIBUTE_CREATE_SERV_RPC,
+    *QUERY_DELETE_SERV_RPC,
+    *QUERY_SCAN_NEXT_SERV_RPC,
 
-    *EXECUTABLE_CHECK_RPC,
-    *EXECUTABLE_EXECUTE_RPC,
-    *EXECUTABLE_SET_EXTREF_PATH_RPC,
-    *EXECUTABLE_GET_EXTREF_PATH_RPC,
+    *EXECUTABLE_CHECK_SERV_RPC,
+    *EXECUTABLE_EXECUTE_SERV_RPC,
+    *EXECUTABLE_SET_EXTREF_PATH_SERV_RPC,
+    *EXECUTABLE_GET_EXTREF_PATH_SERV_RPC,
 
-    *OQL_CREATE_RPC,
-    *OQL_DELETE_RPC,
-    *OQL_GETRESULT_RPC,
+    *OQL_CREATE_SERV_RPC,
+    *OQL_DELETE_SERV_RPC,
+    *OQL_GETRESULT_SERV_RPC,
 
-    *SET_CONN_INFO_RPC,
-    *CHECK_AUTH_RPC,
+    *SET_CONN_INFO_SERV_RPC,
+    *CHECK_AUTH_SERV_RPC,
 
-    *SET_LOG_MASK_RPC,
+    *SET_LOG_MASK_SERV_RPC,
 
-    *INDEX_GET_COUNT_RPC,
-    *INDEX_GET_STATS_RPC,
-    *INDEX_SIMUL_STATS_RPC,
-    *COLLECTION_GET_IMPLSTATS_RPC,
-    *COLLECTION_SIMUL_IMPLSTATS_RPC,
-    *INDEX_GET_IMPL_RPC,
-    *COLLECTION_GET_IMPL_RPC,
+    *INDEX_GET_COUNT_SERV_RPC,
+    *INDEX_GET_STATS_SERV_RPC,
+    *INDEX_SIMUL_STATS_SERV_RPC,
+    *COLLECTION_GET_IMPLSTATS_SERV_RPC,
+    *COLLECTION_SIMUL_IMPLSTATS_SERV_RPC,
+    *INDEX_GET_IMPL_SERV_RPC,
+    *COLLECTION_GET_IMPL_SERV_RPC,
 
-    *GET_DEFAULT_DATASPACE_RPC,
-    *SET_DEFAULT_DATASPACE_RPC,
-    *DATASPACE_SET_CURRENT_DATAFILE_RPC,
-    *DATASPACE_GET_CURRENT_DATAFILE_RPC,
-    *GET_DEFAULT_INDEX_DATASPACE_RPC,
-    *SET_DEFAULT_INDEX_DATASPACE_RPC,
-    *GET_INDEX_LOCATIONS_RPC,
-    *MOVE_INDEX_RPC,
-    *GET_INSTANCE_CLASS_LOCATIONS_RPC,
-    *MOVE_INSTANCE_CLASS_RPC,
-    *GET_OBJECTS_LOCATIONS_RPC,
-    *MOVE_OBJECTS_RPC,
-    *GET_ATTRIBUTE_LOCATIONS_RPC,
-    *MOVE_ATTRIBUTE_RPC,
+    *GET_DEFAULT_DATASPACE_SERV_RPC,
+    *SET_DEFAULT_DATASPACE_SERV_RPC,
+    *DATASPACE_SET_CURRENT_DATAFILE_SERV_RPC,
+    *DATASPACE_GET_CURRENT_DATAFILE_SERV_RPC,
+    *GET_DEFAULT_INDEX_DATASPACE_SERV_RPC,
+    *SET_DEFAULT_INDEX_DATASPACE_SERV_RPC,
+    *GET_INDEX_LOCATIONS_SERV_RPC,
+    *MOVE_INDEX_SERV_RPC,
+    *GET_INSTANCE_CLASS_LOCATIONS_SERV_RPC,
+    *MOVE_INSTANCE_CLASS_SERV_RPC,
+    *GET_OBJECTS_LOCATIONS_SERV_RPC,
+    *MOVE_OBJECTS_SERV_RPC,
+    *GET_ATTRIBUTE_LOCATIONS_SERV_RPC,
+    *MOVE_ATTRIBUTE_SERV_RPC,
 
-    *CREATE_DATAFILE_RPC,
-    *DELETE_DATAFILE_RPC,
-    *MOVE_DATAFILE_RPC,
-    *DEFRAGMENT_DATAFILE_RPC,
-    *RESIZE_DATAFILE_RPC,
-    *GET_DATAFILEI_NFO_RPC,
-    *RENAME_DATAFILE_RPC,
-    *CREATE_DATASPACE_RPC,
-    *UPDATE_DATASPACE_RPC,
-    *DELETE_DATASPACE_RPC,
-    *RENAME_DATASPACE_RPC,
-    *GET_SERVER_OUTOFBAND_DATA_RPC;
+    *CREATE_DATAFILE_SERV_RPC,
+    *DELETE_DATAFILE_SERV_RPC,
+    *MOVE_DATAFILE_SERV_RPC,
+    *DEFRAGMENT_DATAFILE_SERV_RPC,
+    *RESIZE_DATAFILE_SERV_RPC,
+    *GET_DATAFILEI_NFO_SERV_RPC,
+    *RENAME_DATAFILE_SERV_RPC,
+    *CREATE_DATASPACE_SERV_RPC,
+    *UPDATE_DATASPACE_SERV_RPC,
+    *DELETE_DATASPACE_SERV_RPC,
+    *RENAME_DATASPACE_SERV_RPC,
+    *GET_SERVER_OUTOFBAND_DATA_SERV_RPC;
 
   static rpc_Server *server;
 
@@ -256,361 +256,361 @@ namespace eyedb {
 
     /* make functions */
 
-    DBCREATE_RPC =
+    DBCREATE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeDBCREATE(), DBCREATE_realize);
 
-    DBDELETE_RPC =
+    DBDELETE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeDBDELETE(), DBDELETE_realize);
 
-    DBINFO_RPC =
+    DBINFO_SERV_RPC =
       rpc_makeUserServerFunction(server, makeDBINFO(), DBINFO_realize);
 
-    DBMOVE_RPC =
+    DBMOVE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeDBMOVE(), DBMOVE_realize);
 
-    DBCOPY_RPC =
+    DBCOPY_SERV_RPC =
       rpc_makeUserServerFunction(server, makeDBCOPY(), DBCOPY_realize);
 
-    DBRENAME_RPC =
+    DBRENAME_SERV_RPC =
       rpc_makeUserServerFunction(server, makeDBRENAME(), DBRENAME_realize);
 
-    DBMCREATE_RPC =
+    DBMCREATE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeDBMCREATE(), DBMCREATE_realize);
 
-    DBMUPDATE_RPC =
+    DBMUPDATE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeDBMUPDATE(), DBMUPDATE_realize);
 
-    USER_ADD_RPC =
+    USER_ADD_SERV_RPC =
       rpc_makeUserServerFunction(server, makeUSER_ADD(), USER_ADD_realize);
 
-    USER_DELETE_RPC =
+    USER_DELETE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeUSER_DELETE(), USER_DELETE_realize);
 
-    USER_PASSWD_SET_RPC =
+    USER_PASSWD_SET_SERV_RPC =
       rpc_makeUserServerFunction(server, makeUSER_PASSWD_SET(), USER_PASSWD_SET_realize);
 
-    PASSWD_SET_RPC =
+    PASSWD_SET_SERV_RPC =
       rpc_makeUserServerFunction(server, makePASSWD_SET(), PASSWD_SET_realize);
 
-    DEFAULT_DBACCESS_SET_RPC =
+    DEFAULT_DBACCESS_SET_SERV_RPC =
       rpc_makeUserServerFunction(server, makeDEFAULT_DBACCESS_SET(), DEFAULT_DBACCESS_SET_realize);
 
-    USER_DBACCESS_SET_RPC =
+    USER_DBACCESS_SET_SERV_RPC =
       rpc_makeUserServerFunction(server, makeUSER_DBACCESS_SET(), USER_DBACCESS_SET_realize);
 
-    USER_SYSACCESS_SET_RPC =
+    USER_SYSACCESS_SET_SERV_RPC =
       rpc_makeUserServerFunction(server, makeUSER_SYSACCESS_SET(), USER_SYSACCESS_SET_realize);
 
-    BACKEND_INTERRUPT_RPC =
+    BACKEND_INTERRUPT_SERV_RPC =
       rpc_makeUserServerFunction(server, makeBACKEND_INTERRUPT(), BACKEND_INTERRUPT_realize);
 
-    TRANSACTION_BEGIN_RPC =
+    TRANSACTION_BEGIN_SERV_RPC =
       rpc_makeUserServerFunction(server, makeTRANSACTION_BEGIN(),
 				 TRANSACTION_BEGIN_realize);
 
-    TRANSACTION_COMMIT_RPC =
+    TRANSACTION_COMMIT_SERV_RPC =
       rpc_makeUserServerFunction(server, makeTRANSACTION_COMMIT(),
 				 TRANSACTION_COMMIT_realize);
 
-    TRANSACTION_ABORT_RPC =
+    TRANSACTION_ABORT_SERV_RPC =
       rpc_makeUserServerFunction(server, makeTRANSACTION_ABORT(),
 				 TRANSACTION_ABORT_realize);
 
-    TRANSACTION_PARAMS_SET_RPC =
+    TRANSACTION_PARAMS_SET_SERV_RPC =
       rpc_makeUserServerFunction(server, makeTRANSACTION_PARAMS_SET(),
 				 TRANSACTION_PARAMS_SET_realize);
 
-    TRANSACTION_PARAMS_GET_RPC =
+    TRANSACTION_PARAMS_GET_SERV_RPC =
       rpc_makeUserServerFunction(server, makeTRANSACTION_PARAMS_GET(),
 				 TRANSACTION_PARAMS_GET_realize);
 
-    DBOPEN_RPC =
+    DBOPEN_SERV_RPC =
       rpc_makeUserServerFunction(server, makeDBOPEN(), DBOPEN_realize);
 
-    DBOPENLOCAL_RPC =
+    DBOPENLOCAL_SERV_RPC =
       rpc_makeUserServerFunction(server, makeDBOPENLOCAL(), DBOPENLOCAL_realize);
 
-    DBCLOSE_RPC =
+    DBCLOSE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeDBCLOSE(), DBCLOSE_realize);
 
-    OBJECT_CREATE_RPC =
+    OBJECT_CREATE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeOBJECT_CREATE(),
 				 OBJECT_CREATE_realize);
 
-    OBJECT_WRITE_RPC =
+    OBJECT_WRITE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeOBJECT_WRITE(),
 				 OBJECT_WRITE_realize);
 
-    OBJECT_READ_RPC =
+    OBJECT_READ_SERV_RPC =
       rpc_makeUserServerFunction(server, makeOBJECT_READ(),
 				 OBJECT_READ_realize);
 
-    OBJECT_DELETE_RPC =
+    OBJECT_DELETE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeOBJECT_DELETE(),
 				 OBJECT_DELETE_realize);
 
-    OBJECT_HEADER_READ_RPC =
+    OBJECT_HEADER_READ_SERV_RPC =
       rpc_makeUserServerFunction(server, makeOBJECT_HEADER_READ(),
 				 OBJECT_HEADER_READ_realize);
 
-    OBJECT_SIZE_MODIFY_RPC =
+    OBJECT_SIZE_MODIFY_SERV_RPC =
       rpc_makeUserServerFunction(server, makeOBJECT_SIZE_MODIFY(),
 				 OBJECT_SIZE_MODIFY_realize);
 
-    OBJECT_CHECK_RPC =
+    OBJECT_CHECK_SERV_RPC =
       rpc_makeUserServerFunction(server, makeOBJECT_CHECK(),
 				 OBJECT_CHECK_realize);
 
-    OBJECT_PROTECTION_SET_RPC =
+    OBJECT_PROTECTION_SET_SERV_RPC =
       rpc_makeUserServerFunction(server, makeOBJECT_PROTECTION_SET(),
 				 OBJECT_PROTECTION_SET_realize);
 
-    OBJECT_PROTECTION_GET_RPC =
+    OBJECT_PROTECTION_GET_SERV_RPC =
       rpc_makeUserServerFunction(server, makeOBJECT_PROTECTION_GET(),
 				 OBJECT_PROTECTION_GET_realize);
 
-    OID_MAKE_RPC =
+    OID_MAKE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeOID_MAKE(),
 				 OID_MAKE_realize);
 
-    DATA_CREATE_RPC =
+    DATA_CREATE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeDATA_CREATE(),
 				 DATA_CREATE_realize);
 
-    DATA_WRITE_RPC =
+    DATA_WRITE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeDATA_WRITE(),
 				 DATA_WRITE_realize);
 
-    DATA_READ_RPC =
+    DATA_READ_SERV_RPC =
       rpc_makeUserServerFunction(server, makeDATA_READ(),
 				 DATA_READ_realize);
 
-    DATA_DELETE_RPC =
+    DATA_DELETE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeDATA_DELETE(),
 				 DATA_DELETE_realize);
 
-    DATA_SIZE_GET_RPC =
+    DATA_SIZE_GET_SERV_RPC =
       rpc_makeUserServerFunction(server, makeDATA_SIZE_GET(),
 				 DATA_SIZE_GET_realize);
 
-    DATA_SIZE_MODIFY_RPC =
+    DATA_SIZE_MODIFY_SERV_RPC =
       rpc_makeUserServerFunction(server, makeDATA_SIZE_MODIFY(),
 				 DATA_SIZE_MODIFY_realize);
 
-    VDDATA_CREATE_RPC =
+    VDDATA_CREATE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeVDDATA_CREATE(),
 				 VDDATA_CREATE_realize);
 
-    VDDATA_WRITE_RPC =
+    VDDATA_WRITE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeVDDATA_WRITE(),
 				 VDDATA_WRITE_realize);
 
-    VDDATA_DELETE_RPC =
+    VDDATA_DELETE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeVDDATA_DELETE(),
 				 VDDATA_DELETE_realize);
 
-    SCHEMA_COMPLETE_RPC =
+    SCHEMA_COMPLETE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeSCHEMA_COMPLETE(),
 				 SCHEMA_COMPLETE_realize);
 
-    ATTRIBUTE_INDEX_CREATE_RPC =
+    ATTRIBUTE_INDEX_CREATE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeATTRIBUTE_INDEX_CREATE(),
 				 ATTRIBUTE_INDEX_CREATE_realize);
 
-    ATTRIBUTE_INDEX_REMOVE_RPC =
+    ATTRIBUTE_INDEX_REMOVE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeATTRIBUTE_INDEX_REMOVE(),
 				 ATTRIBUTE_INDEX_REMOVE_realize);
 
-    INDEX_CREATE_RPC =
+    INDEX_CREATE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeINDEX_CREATE(), INDEX_CREATE_realize);
 
-    INDEX_REMOVE_RPC =
+    INDEX_REMOVE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeINDEX_REMOVE(), INDEX_REMOVE_realize);
 
-    CONSTRAINT_CREATE_RPC =
+    CONSTRAINT_CREATE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeCONSTRAINT_CREATE(), CONSTRAINT_CREATE_realize);
 
-    CONSTRAINT_DELETE_RPC =
+    CONSTRAINT_DELETE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeCONSTRAINT_DELETE(), CONSTRAINT_DELETE_realize);
 
-    COLLECTION_GET_BY_IND_RPC =
+    COLLECTION_GET_BY_IND_SERV_RPC =
       rpc_makeUserServerFunction(server, makeCOLLECTION_GET_BY_IND(),
 				 COLLECTION_GET_BY_IND_realize);
 
-    COLLECTION_GET_BY_VALUE_RPC =
+    COLLECTION_GET_BY_VALUE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeCOLLECTION_GET_BY_VALUE(),
 				 COLLECTION_GET_BY_VALUE_realize);
 
-    SET_OBJECT_LOCK_RPC =
+    SET_OBJECT_LOCK_SERV_RPC =
       rpc_makeUserServerFunction(server, makeSET_OBJECT_LOCK(), SET_OBJECT_LOCK_realize);
 
-    GET_OBJECT_LOCK_RPC =
+    GET_OBJECT_LOCK_SERV_RPC =
       rpc_makeUserServerFunction(server, makeGET_OBJECT_LOCK(), GET_OBJECT_LOCK_realize);
 
     /*
-    QUERY_LANG_CREATE_RPC =
+    QUERY_LANG_CREATE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeQUERY_LANG_CREATE(),
 				 QUERY_LANG_CREATE_realize);
 
-    QUERY_DATABASE_CREATE_RPC =
+    QUERY_DATABASE_CREATE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeQUERY_DATABASE_CREATE(),
 				 QUERY_DATABASE_CREATE_realize);
 
-    QUERY_CLASS_CREATE_RPC =
+    QUERY_CLASS_CREATE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeQUERY_CLASS_CREATE(),
 				 QUERY_CLASS_CREATE_realize);
     */
 
-    QUERY_COLLECTION_CREATE_RPC =
+    QUERY_COLLECTION_CREATE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeQUERY_COLLECTION_CREATE(),
 				 QUERY_COLLECTION_CREATE_realize);
 
-    QUERY_ATTRIBUTE_CREATE_RPC =
+    QUERY_ATTRIBUTE_CREATE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeQUERY_ATTRIBUTE_CREATE(),
 				 QUERY_ATTRIBUTE_CREATE_realize);
 
-    QUERY_DELETE_RPC =
+    QUERY_DELETE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeQUERY_DELETE(),
 				 QUERY_DELETE_realize);
 
-    QUERY_SCAN_NEXT_RPC =
+    QUERY_SCAN_NEXT_SERV_RPC =
       rpc_makeUserServerFunction(server, makeQUERY_SCAN_NEXT(),
 				 QUERY_SCAN_NEXT_realize);
 
-    EXECUTABLE_CHECK_RPC = 
+    EXECUTABLE_CHECK_SERV_RPC = 
       rpc_makeUserServerFunction(server, makeEXECUTABLE_CHECK(),
 				 EXECUTABLE_CHECK_realize);
 
-    EXECUTABLE_EXECUTE_RPC = 
+    EXECUTABLE_EXECUTE_SERV_RPC = 
       rpc_makeUserServerFunction(server, makeEXECUTABLE_EXECUTE(),
 				 EXECUTABLE_EXECUTE_realize);
 
-    EXECUTABLE_SET_EXTREF_PATH_RPC =
+    EXECUTABLE_SET_EXTREF_PATH_SERV_RPC =
       rpc_makeUserServerFunction(server,
 				 makeEXECUTABLE_SET_EXTREF_PATH(),
 				 EXECUTABLE_SET_EXTREF_PATH_realize);
 
-    EXECUTABLE_GET_EXTREF_PATH_RPC =
+    EXECUTABLE_GET_EXTREF_PATH_SERV_RPC =
       rpc_makeUserServerFunction(server,
 				 makeEXECUTABLE_GET_EXTREF_PATH(),
 				 EXECUTABLE_GET_EXTREF_PATH_realize);
 
-    OQL_CREATE_RPC =
+    OQL_CREATE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeOQL_CREATE(), OQL_CREATE_realize);
 
-    OQL_DELETE_RPC =
+    OQL_DELETE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeOQL_DELETE(), OQL_DELETE_realize);
 
-    OQL_GETRESULT_RPC =
+    OQL_GETRESULT_SERV_RPC =
       rpc_makeUserServerFunction(server, makeOQL_GETRESULT(), OQL_GETRESULT_realize);
 
-    SET_CONN_INFO_RPC =
+    SET_CONN_INFO_SERV_RPC =
       rpc_makeUserServerFunction(server, makeSET_CONN_INFO(),
 				 SET_CONN_INFO_realize);
 
-    CHECK_AUTH_RPC =
+    CHECK_AUTH_SERV_RPC =
       rpc_makeUserServerFunction(server, makeCHECK_AUTH(), CHECK_AUTH_realize);
 
-    SET_LOG_MASK_RPC =
+    SET_LOG_MASK_SERV_RPC =
       rpc_makeUserServerFunction(server, makeSET_LOG_MASK(), SET_LOG_MASK_realize);
 
-    INDEX_GET_COUNT_RPC =
+    INDEX_GET_COUNT_SERV_RPC =
       rpc_makeUserServerFunction(server, makeINDEX_GET_COUNT(), INDEX_GET_COUNT_realize);
 
-    INDEX_GET_STATS_RPC =
+    INDEX_GET_STATS_SERV_RPC =
       rpc_makeUserServerFunction(server, makeINDEX_GET_STATS(), INDEX_GET_STATS_realize);
 
-    INDEX_SIMUL_STATS_RPC =
+    INDEX_SIMUL_STATS_SERV_RPC =
       rpc_makeUserServerFunction(server, makeINDEX_SIMUL_STATS(), INDEX_SIMUL_STATS_realize);
 
-    COLLECTION_GET_IMPLSTATS_RPC =
+    COLLECTION_GET_IMPLSTATS_SERV_RPC =
       rpc_makeUserServerFunction(server, makeCOLLECTION_GET_IMPLSTATS(), COLLECTION_GET_IMPLSTATS_realize);
 
-    COLLECTION_SIMUL_IMPLSTATS_RPC =
+    COLLECTION_SIMUL_IMPLSTATS_SERV_RPC =
       rpc_makeUserServerFunction(server, makeCOLLECTION_SIMUL_IMPLSTATS(), COLLECTION_SIMUL_IMPLSTATS_realize);
 
-    INDEX_GET_IMPL_RPC =
+    INDEX_GET_IMPL_SERV_RPC =
       rpc_makeUserServerFunction(server, makeINDEX_GET_IMPL(), INDEX_GET_IMPL_realize);
 
-    COLLECTION_GET_IMPL_RPC =
+    COLLECTION_GET_IMPL_SERV_RPC =
       rpc_makeUserServerFunction(server, makeCOLLECTION_GET_IMPL(), COLLECTION_GET_IMPL_realize);
 
-    GET_DEFAULT_DATASPACE_RPC =
+    GET_DEFAULT_DATASPACE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeGET_DEFAULT_DATASPACE(), GET_DEFAULT_DATASPACE_realize);
 
-    SET_DEFAULT_DATASPACE_RPC =
+    SET_DEFAULT_DATASPACE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeSET_DEFAULT_DATASPACE(), SET_DEFAULT_DATASPACE_realize);
 
-    DATASPACE_SET_CURRENT_DATAFILE_RPC =
+    DATASPACE_SET_CURRENT_DATAFILE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeDATASPACE_SET_CURRENT_DATAFILE(), DATASPACE_SET_CURRENT_DATAFILE_realize);
 
-    DATASPACE_GET_CURRENT_DATAFILE_RPC =
+    DATASPACE_GET_CURRENT_DATAFILE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeDATASPACE_GET_CURRENT_DATAFILE(), DATASPACE_GET_CURRENT_DATAFILE_realize);
 
-    GET_DEFAULT_INDEX_DATASPACE_RPC =
+    GET_DEFAULT_INDEX_DATASPACE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeGET_DEFAULT_INDEX_DATASPACE(), GET_DEFAULT_INDEX_DATASPACE_realize);
 
-    SET_DEFAULT_INDEX_DATASPACE_RPC =
+    SET_DEFAULT_INDEX_DATASPACE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeSET_DEFAULT_INDEX_DATASPACE(), SET_DEFAULT_INDEX_DATASPACE_realize);
 
-    GET_INDEX_LOCATIONS_RPC =
+    GET_INDEX_LOCATIONS_SERV_RPC =
       rpc_makeUserServerFunction(server, makeGET_INDEX_LOCATIONS(), GET_INDEX_LOCATIONS_realize);
 
-    MOVE_INDEX_RPC =
+    MOVE_INDEX_SERV_RPC =
       rpc_makeUserServerFunction(server, makeMOVE_INDEX(), MOVE_INDEX_realize);
 
-    GET_INSTANCE_CLASS_LOCATIONS_RPC =
+    GET_INSTANCE_CLASS_LOCATIONS_SERV_RPC =
       rpc_makeUserServerFunction(server, makeGET_INSTANCE_CLASS_LOCATIONS(), GET_INSTANCE_CLASS_LOCATIONS_realize);
 
-    MOVE_INSTANCE_CLASS_RPC =
+    MOVE_INSTANCE_CLASS_SERV_RPC =
       rpc_makeUserServerFunction(server, makeMOVE_INSTANCE_CLASS(), MOVE_INSTANCE_CLASS_realize);
 
-    GET_OBJECTS_LOCATIONS_RPC =
+    GET_OBJECTS_LOCATIONS_SERV_RPC =
       rpc_makeUserServerFunction(server, makeGET_OBJECTS_LOCATIONS(), GET_OBJECTS_LOCATIONS_realize);
 
-    MOVE_OBJECTS_RPC =
+    MOVE_OBJECTS_SERV_RPC =
       rpc_makeUserServerFunction(server, makeMOVE_OBJECTS(), MOVE_OBJECTS_realize);
 
-    GET_ATTRIBUTE_LOCATIONS_RPC =
+    GET_ATTRIBUTE_LOCATIONS_SERV_RPC =
       rpc_makeUserServerFunction(server, makeGET_ATTRIBUTE_LOCATIONS(), GET_ATTRIBUTE_LOCATIONS_realize);
 
-    MOVE_ATTRIBUTE_RPC =
+    MOVE_ATTRIBUTE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeMOVE_ATTRIBUTE(), MOVE_ATTRIBUTE_realize);
 
-    CREATE_DATAFILE_RPC =
+    CREATE_DATAFILE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeCREATE_DATAFILE(), CREATE_DATAFILE_realize);
 
-    DELETE_DATAFILE_RPC =
+    DELETE_DATAFILE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeDELETE_DATAFILE(), DELETE_DATAFILE_realize);
 
-    MOVE_DATAFILE_RPC =
+    MOVE_DATAFILE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeMOVE_DATAFILE(), MOVE_DATAFILE_realize);
 
-    DEFRAGMENT_DATAFILE_RPC =
+    DEFRAGMENT_DATAFILE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeDEFRAGMENT_DATAFILE(), DEFRAGMENT_DATAFILE_realize);
 
-    RESIZE_DATAFILE_RPC =
+    RESIZE_DATAFILE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeRESIZE_DATAFILE(), RESIZE_DATAFILE_realize);
 
-    GET_DATAFILEI_NFO_RPC =
+    GET_DATAFILEI_NFO_SERV_RPC =
       rpc_makeUserServerFunction(server, makeGET_DATAFILEI_NFO(), GET_DATAFILEI_NFO_realize);
 
-    RENAME_DATAFILE_RPC =
+    RENAME_DATAFILE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeRENAME_DATAFILE(), RENAME_DATAFILE_realize);
 
-    CREATE_DATASPACE_RPC =
+    CREATE_DATASPACE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeCREATE_DATASPACE(), CREATE_DATASPACE_realize);
 
-    UPDATE_DATASPACE_RPC =
+    UPDATE_DATASPACE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeUPDATE_DATASPACE(), UPDATE_DATASPACE_realize);
 
-    DELETE_DATASPACE_RPC =
+    DELETE_DATASPACE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeDELETE_DATASPACE(), DELETE_DATASPACE_realize);
 
-    RENAME_DATASPACE_RPC =
+    RENAME_DATASPACE_SERV_RPC =
       rpc_makeUserServerFunction(server, makeRENAME_DATASPACE(), RENAME_DATASPACE_realize);
 
-    GET_SERVER_OUTOFBAND_DATA_RPC =
+    GET_SERVER_OUTOFBAND_DATA_SERV_RPC =
       rpc_makeUserServerFunction(server, makeGET_SERVER_OUTOFBAND_DATA(), GET_SERVER_OUTOFBAND_DATA_realize);
 
     /* declare arg size */

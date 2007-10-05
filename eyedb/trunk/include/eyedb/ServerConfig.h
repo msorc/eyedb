@@ -49,7 +49,7 @@ namespace eyedb {
        @param name
     */
 
-    static const char* getSValue(const char *name) {
+    static const char *getSValue(const char *name) {
       return getInstance()->getValue(name);
     }
 

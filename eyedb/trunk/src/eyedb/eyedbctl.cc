@@ -320,6 +320,7 @@ main(int argc, char *argv[])
 	break;
     }
 
+    std::string s_l;
     if (!*listen && (s = eyedb::ServerConfig::getSValue("listen")))
       listen = s;
 

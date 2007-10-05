@@ -227,6 +227,49 @@ namespace eyedb {
 
   void Connection::init()
   {
+#if 0
+    std::string value;
+    if (!default_host) {
+      value = ClientConfig::getCValue("host");
+      if (value != Config::UNKNOWN_VALUE) {
+	default_host = strdup(value.c_str());
+      }
+      else
+	default_host = strdup("localhost");
+    }
+
+    if (!default_port) {
+      value = ClientConfig::getCValue("port");
+      if (value != Config::UNKNOWN_VALUE) {
+	default_port = strdup(value.c_str());
+      }
+      else {
+	default_port = strdup(DefaultIDBPortValue);
+      }
+    }
+
+    if (!set_auth_required) {
+      if (!default_user) {
+	value = ClientConfig::getCValue("user");
+	if (value != Config::UNKNOWN_VALUE) {
+	  setDefaultUser(strdup(value.c_str()));
+	}
+	else {
+	  setDefaultUser(strdup(""));
+	}
+      }
+
+      if (!default_passwd) {
+	value = ClientConfig::getCValue("passwd");
+	if (value != Config::UNKNOWN_VALUE) {
+	  setDefaultPasswd(strdup(value.c_str()));
+	}
+	else {
+	  setDefaultPasswd(strdup(""));
+	}
+      }
+    }
+#else
     const char *s;
 
     if (!default_host)
@@ -245,6 +288,7 @@ namespace eyedb {
 	  setDefaultPasswd(((s = ClientConfig::getCValue("passwd")) ?
 			    strdup(s) : strdup("")));
       }
+#endif
   }
 
   void Connection::_release()
