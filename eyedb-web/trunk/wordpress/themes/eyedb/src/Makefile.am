@@ -1,10 +1,11 @@
-THEME_FILES=style.css
+SUBDIRS=images
 
-WEB_HOST=@WEB_HOST@
-WEB_DIR=@WEB_DIR@
-UPLOAD_METHOD=@UPLOAD_METHOD@
+FILES_TO_UPLOAD=\
+footer.php \
+header.php \
+index.php \
+style.css
 
-upload:
-	$(top_srcdir)/upload.sh $(UPLOAD_METHOD) $(WEB_HOST) $(WEB_DIR) $(THEME_FILES)
+include $(top_srcdir)/Makefile.include
 
-EXTRA_DIST=$(THEME_FILES)
+

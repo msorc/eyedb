@@ -14,4 +14,7 @@
 
 <body>
 
-<h1>EyeDB</h1>
+<div id="Header">
+<img src="<?php bloginfo('stylesheet_directory'); ?>/images/eyedb-logo.png" width="766" height="75" alt="EyeDB" usemap ="#headermap"/>
+</div>
+

@@ -27,5 +27,5 @@ AC_SUBST(WEB_HOST)
 AC_SUBST(WEB_DIR)
 AC_SUBST(UPLOAD_METHOD)
 
-AC_CONFIG_FILES(Makefile src/Makefile)
+AC_CONFIG_FILES(Makefile src/Makefile src/images/Makefile)
 AC_OUTPUT

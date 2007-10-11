@@ -1,0 +1,11 @@
+WEB_HOST=@WEB_HOST@
+WEB_DIR=@WEB_DIR@
+UPLOAD_METHOD=@UPLOAD_METHOD@
+
+upload:
+	@if test x"$(SUBDIRS)" != x ; then \
+		for subdir in $(SUBDIRS); do (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $@) ; done  ; \
+	fi
+	$(top_srcdir)/upload.sh $(UPLOAD_METHOD) $(WEB_HOST) $(WEB_DIR)$(WEB_SUB_DIR) $(FILES_TO_UPLOAD)
+
+EXTRA_DIST=$(FILES_TO_UPLOAD)
