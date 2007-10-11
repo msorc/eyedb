@@ -1,4 +1,4 @@
-AC_INIT(style.css)
+AC_INIT(src/style.css)
 AM_INIT_AUTOMAKE(eyedb-theme, 1.0.0)
 
 DEFAULT_WEB_HOST="sysra.com"
@@ -27,5 +27,5 @@ AC_SUBST(WEB_HOST)
 AC_SUBST(WEB_DIR)
 AC_SUBST(UPLOAD_METHOD)
 
-AC_CONFIG_FILES(Makefile)
+AC_CONFIG_FILES(Makefile src/Makefile)
 AC_OUTPUT
