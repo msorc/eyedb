@@ -1,0 +1,31 @@
+AC_INIT(style.css)
+AM_INIT_AUTOMAKE(eyedb-theme, 1.0.0)
+
+DEFAULT_WEB_HOST="sysra.com"
+DEFAULT_WEB_DIR="eyedb.org/www/wordpress/current/wp-content/themes/eyedb"
+DEFAULT_UPLOAD_METHOD="--ssh"
+
+AC_ARG_WITH( web-host, 
+	     AS_HELP_STRING([--with-web-host=HOST],[gives web host for file upload]),
+	     ac_web_host="$withval",
+	     ac_web_host="$DEFAULT_WEB_HOST")
+
+AC_ARG_WITH( web-dir, 
+	     AS_HELP_STRING([--with-web-dir=DIR],[gives web host directory for file upload]),
+	     ac_web_dir="$withval",
+	     ac_web_dir="$DEFAULT_WEB_DIR")
+
+AC_ARG_WITH( upload-method, 
+	     AS_HELP_STRING([--with-upload-method=MTH],[gives upload method, can be ftp or ssh]),
+	     ac_upload_method="$withval",
+	     ac_upload_method="$DEFAULT_UPLOAD_METHOD")
+
+WEB_HOST="$ac_web_host"
+WEB_DIR="$ac_web_dir"
+UPLOAD_METHOD="$ac_upload_method"
+AC_SUBST(WEB_HOST)
+AC_SUBST(WEB_DIR)
+AC_SUBST(UPLOAD_METHOD)
+
+AC_CONFIG_FILES(Makefile)
+AC_OUTPUT
