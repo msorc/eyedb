@@ -4,7 +4,7 @@ function ssh_upload() {
     WEB_HOST="$1"
     WEB_DIR="$2"
     shift 2
-    ssh $WEB_HOST mkdir $WEB_DIR
+    if ssh $WEB_HOST test ! -d $WEB_DIR ; then ssh $WEB_HOST mkdir $WEB_DIR ; fi
     scp $* $WEB_HOST:$WEB_DIR
 }
 
