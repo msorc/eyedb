@@ -462,6 +462,11 @@ HIdx::HIdx(DbHandle *_dbh, const Oid *_oid,
   if (stat)
     return;
 
+#ifdef FORCE_COPY
+  nocopy = False;
+#else
+  nocopy = isWholeMapped(dbh);
+#endif
   x2h_idx(&hidx);
 
   keytype.type = (Type)hidx.keytype;
@@ -1145,8 +1150,8 @@ HIdx::count_manage(DbHandle *_dbh, int inc)
 {
   unsigned int count;
   Status s = objectRead(_dbh, sizeof(unsigned int),
-			      sizeof(unsigned int), &count,
-			      DefaultLock, 0, 0, &treeoid);
+			sizeof(unsigned int), &count,
+			DefaultLock, 0, 0, &treeoid);
   if (s)
     return s;
   count = x2h_u32(count);
@@ -1156,8 +1161,8 @@ HIdx::count_manage(DbHandle *_dbh, int inc)
   count = h2x_u32(hidx.object_count);
 
   s = objectWrite(_dbh, sizeof(unsigned int),
-		     sizeof(unsigned int), &count, &treeoid);
-
+		  sizeof(unsigned int), &count, &treeoid);
+  
   if (s) hidx.object_count = o_count;
   return s;
 }
@@ -3017,6 +3022,15 @@ HIdx::collapse_realize(short dspid, HIdx *idx_n)
       printf("}\n");
 #endif
     }
+  }
+
+  if (idx_n) {
+    idx_n->hidx.object_count = hidx.object_count;
+    unsigned int count = h2x_u32(idx_n->hidx.object_count);
+    s = objectWrite(dbh, sizeof(unsigned int),
+		    sizeof(unsigned int), &count, &idx_n->treeoid);
+    if (s)
+      return s;
   }
 
   delete [] clistobj_data;

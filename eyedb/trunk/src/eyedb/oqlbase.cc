@@ -56,8 +56,8 @@ namespace eyedb {
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   LinkedList oqmlObjectManager::freeList;
-  ObjCache *oqmlObjectManager::objCacheIdx = new ObjCache(1024);;
-  ObjCache *oqmlObjectManager::objCacheObj = new ObjCache(1024);;
+  ObjCache *oqmlObjectManager::objCacheIdx = new ObjCache(1024);
+  ObjCache *oqmlObjectManager::objCacheObj = new ObjCache(1024);
 
   gbLink *oqmlGarbManager::first, *oqmlGarbManager::last;
   oqmlBool oqmlGarbManager::garbaging = oqml_False;
@@ -1371,7 +1371,7 @@ namespace eyedb {
 				   const Class *) const
   {
     size = strlen(shstr->s);
-    len = strlen(shstr->s);;
+    len = strlen(shstr->s);
     *val = (Data)shstr->s;
     return oqml_True;
   }

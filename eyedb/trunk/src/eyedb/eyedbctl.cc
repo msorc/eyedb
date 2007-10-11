@@ -330,7 +330,8 @@ main(int argc, char *argv[])
       unlink_ports(smdport, listen);
     }
 
-    sbindir = eyedblib::CompileBuiltin::getSbindir();
+    //    sbindir = eyedblib::CompileBuiltin::getSbindir();
+    sbindir = ServerConfig::getSValue("@sbindir");
 
     int ac;
     char **av;
