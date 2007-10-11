@@ -1,10 +1,4 @@
-THEME_FILES=style.css
-
-WEB_HOST=@WEB_HOST@
-WEB_DIR=@WEB_DIR@
-UPLOAD_METHOD=@UPLOAD_METHOD@
+SUBDIRS=src
 
 upload:
-	$(top_srcdir)/upload.sh $(UPLOAD_METHOD) $(WEB_HOST) $(WEB_DIR) $(THEME_FILES)
-
-EXTRA_DIST=$(THEME_FILES)
+	(cd src; $(MAKE) $@)
