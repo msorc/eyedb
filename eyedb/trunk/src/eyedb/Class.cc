@@ -3320,9 +3320,9 @@ namespace eyedb {
   Class::sort(Bool _sort_down_to_top) const
   {
     ((Class *)this)->sort_down_to_top = _sort_down_to_top;
-    qsort(subclasses, subclass_count, sizeof(Class *),
-	  (sort_down_to_top ? sort_down_to_top_cmp :
-	   sort_top_to_down_cmp));
+    ::qsort(subclasses, subclass_count, sizeof(Class *),
+	    (sort_down_to_top ? sort_down_to_top_cmp :
+	     sort_top_to_down_cmp));
     return Success;
   }
 

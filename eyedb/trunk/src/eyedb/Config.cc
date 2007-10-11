@@ -505,8 +505,7 @@ namespace eyedb {
     LinkedListCursor c(config.list);
     Item *item;
     while(c.getNext((void *&)item)) {
-      //list.insertObjectFirst(new Item(*item));
-      list.insertObjectLast(new Item(*item));
+      list.insertObjectFirst(new Item(*item));
     }
 
     var_map = config.var_map ? new VarMap(*config.var_map) : 0;
@@ -631,8 +630,7 @@ namespace eyedb {
     checkIsIn(name);
 
     Item *item = new Item(name, value);
-    //list.insertObjectFirst(item);
-    list.insertObjectLast(item);
+    list.insertObjectFirst(item);
   }
 
   static char *copySTDString(const std::string &value)
@@ -752,8 +750,14 @@ namespace eyedb {
       }
     }
 
+    Item *ritems = new Item[n];
+    for (unsigned int i = 0; i < n; i++) {
+      ritems[i] = items[n-i-1];
+    }
+
+    delete [] items;
     item_cnt = n;
-    return items;
+    return ritems;
   }
 
 
