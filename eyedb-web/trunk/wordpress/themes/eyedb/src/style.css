@@ -10,3 +10,7 @@ Version: 1.0.0
 Licensed under the General Public Licence.
 
 */
+
+#Header img {
+ border: solid 0px;
+}
