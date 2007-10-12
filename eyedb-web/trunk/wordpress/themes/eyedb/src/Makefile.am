@@ -6,6 +6,7 @@ header.php \
 home_template.php \
 index.php \
 page.php \
+single.php \
 style.css
 
 include $(top_srcdir)/Makefile.include
