@@ -16,5 +16,14 @@
 
 <div id="Header">
 <img src="<?php bloginfo('stylesheet_directory'); ?>/images/eyedb-logo.png" width="766" height="75" alt="EyeDB" usemap ="#headermap"/>
+<map id ="headermap" name="headermap"><area shape ="rect" coords ="5,5,175,55" href ="index.php" alt="EyeDB" /></map> 
 </div>
+
+<div id="Nav">
+<?php 
+  /* Home page is id 3 */
+  wp_list_pages('title_li=&child_of=3&depth=1&sort_column=menu_order' ); 
+?>
+</div>
+
 
