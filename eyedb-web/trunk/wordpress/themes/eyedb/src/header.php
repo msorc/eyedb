@@ -5,18 +5,16 @@
 <meta http-equiv="Content-Type" content="<?php bloginfo('html_type'); ?>; charset=<?php bloginfo('charset'); ?>" />
 <meta name="generator" content="WordPress <?php bloginfo('version'); ?>" /> <!-- leave this for stats -->
 <meta name="keywords" content="eyedb, database, object" />
-
-<title><?php bloginfo('name'); ?><?php wp_title(); ?></title>
-
-<link rel="stylesheet" type="text/css" media="screen" href="<?php bloginfo('stylesheet_url'); ?>" />
-
+<title><?php bloginfo('name'); ?></title>
+<link rel="stylesheet" type="text/css" href="<?php bloginfo('stylesheet_url'); ?>"  media="screen"/>
 </head>
 
 <body>
 
-<div id="Header">
-<img src="<?php bloginfo('stylesheet_directory'); ?>/images/eyedb-logo.png" width="766" height="75" alt="EyeDB" usemap ="#headermap"/>
-<map id ="headermap" name="headermap"><area shape ="rect" coords ="5,5,175,55" href ="index.php" alt="EyeDB" /></map> 
+<div id="header">
+<img src="<?php bloginfo('stylesheet_directory'); ?>/images/eyedb-logo.png" width="766" height="75" alt="EyeDB"/>
+<h1>EyeDB</h1>
+<p>open source object database</p>
 </div>
 
 <div id="Nav">
