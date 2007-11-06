@@ -39,5 +39,9 @@ CMDCLASS_GETOPT(IDXUpdateCmd, "update");
 CMDCLASS_GETOPT(IDXListCmd, "list");
 CMDCLASS_GETOPT(IDXStatsCmd, "stats");
 CMDCLASS_GETOPT(IDXSimulateCmd, "simulate");
+CMDCLASS_GETOPT(IDXMoveCmd, "move");
+CMDCLASS_GETOPT(IDXSetdefdspCmd, "setdefdsp");
+CMDCLASS_GETOPT(IDXGetdefdspCmd, "getdefdsp");
+CMDCLASS_GETOPT(IDXGetlocaCmd, "getloca");
 
 #endif
