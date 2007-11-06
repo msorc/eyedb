@@ -48,12 +48,19 @@ IDXTopic::IDXTopic() : Topic("index")
   addCommand(new IDXListCmd(this));
   addCommand(new IDXStatsCmd(this));
   addCommand(new IDXSimulateCmd(this));
+  addCommand(new IDXMoveCmd(this));
+  addCommand(new IDXSetdefdspCmd(this));
+  addCommand(new IDXGetdefdspCmd(this));
+  addCommand(new IDXGetlocaCmd(this));
+
 }
 
 static const std::string PROPAGATE_OPT("propagate");
 static const std::string TYPE_OPT("type");
 static const std::string FULL_OPT("full");
 static const std::string FORMAT_OPT("format");
+static const std::string COLLAPSE_OPT("collapse");
+static const std::string LOCA_OPT("loca");
 
 
 //
@@ -220,7 +227,7 @@ int IDXCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   if (argv.size() < 2)
     return usage();
 
-  const char *dbname = argv[0].c_str();
+  const char *dbName = argv[0].c_str();
   const char *attributePath = argv[1].c_str();
 
   const char *hints = 0;
@@ -242,7 +249,7 @@ int IDXCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   conn.open();
 
-  Database *db = new Database(dbname);
+  Database *db = new Database(dbName);
 
   db->open( &conn, Database::DBRW);
   
@@ -326,12 +333,12 @@ int IDXDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   if (argv.size() < 2)
     return usage();
 
-  const char *dbname = argv[0].c_str();
+  const char *dbName = argv[0].c_str();
   const char *attributePath = argv[1].c_str();
 
   conn.open();
 
-  Database *db = new Database(dbname);
+  Database *db = new Database(dbName);
 
   db->open( &conn, Database::DBRW);
   
@@ -416,7 +423,7 @@ int IDXUpdateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   if (argv.size() < 2)
     return usage();
 
-  const char *dbname = argv[0].c_str();
+  const char *dbName = argv[0].c_str();
   const char *attributePath = argv[1].c_str();
 
   const char *hints = "";
@@ -438,7 +445,7 @@ int IDXUpdateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   conn.open();
 
-  Database *db = new Database(dbname);
+  Database *db = new Database(dbName);
 
   db->open( &conn, Database::DBRW);
   
@@ -545,7 +552,7 @@ int IDXListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
   if (argv.size() < 1)
     return usage();
 
-  const char *dbname = argv[0].c_str();
+  const char *dbName = argv[0].c_str();
 
   bool full = map.find(FULL_OPT) != map.end();
   bool all = map.find(ALL_OPT) != map.end();
@@ -555,7 +562,7 @@ int IDXListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 
   conn.open();
 
-  Database *db = new Database(dbname);
+  Database *db = new Database(dbName);
 
   db->open( &conn, Database::DBSRead);
   
@@ -649,7 +656,7 @@ int IDXStatsCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv
   if (argv.size() < 1)
     return usage();
 
-  const char *dbname = argv[0].c_str();
+  const char *dbName = argv[0].c_str();
 
   bool full = map.find(FULL_OPT) != map.end();
 
@@ -659,7 +666,7 @@ int IDXStatsCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv
 
   conn.open();
 
-  Database *db = new Database(dbname);
+  Database *db = new Database(dbName);
 
   db->open( &conn, Database::DBSRead);
   
@@ -718,6 +725,7 @@ void IDXSimulateCmd::init()
 			 OptionStringType(),
 			 Option::MandatoryValue | Option::Mandatory,
 			 OptionDesc( "Index type (supported types are: hash, btree)", "TYPE")));
+
   getopt = new GetOpt(getExtName(), opts);
 }
 
@@ -750,7 +758,7 @@ int IDXSimulateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &a
   if (argv.size() < 2)
     return usage();
 
-  const char *dbname = argv[0].c_str();
+  const char *dbName = argv[0].c_str();
   const char *attributePath = argv[1].c_str();
 
   const char *hints = "";
@@ -773,7 +781,7 @@ int IDXSimulateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &a
 
   conn.open();
 
-  Database *db = new Database(dbname);
+  Database *db = new Database(dbName);
 
   db->open( &conn, Database::DBRW);
   
@@ -810,3 +818,401 @@ int IDXSimulateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &a
 
   return 0;
 }
+
+//
+// IDXMoveCmd
+//
+//  # index move: ajouter une option --collapse + une info dans le protocole
+//  eyedbadmin index move <dbname> <index name> <dest dataspace>
+void IDXMoveCmd::init()
+{
+  std::vector<Option> opts;
+
+  opts.push_back(HELP_OPT);
+
+  opts.push_back( Option(COLLAPSE_OPT, OptionBoolType()));
+
+  getopt = new GetOpt(getExtName(), opts);
+}
+
+int IDXMoveCmd::usage()
+{
+  getopt->usage("", "");
+  std::cerr << " DBNAME INDEXNAME DESTDATASPACE\n";
+  return 1;
+}
+
+int IDXMoveCmd::help()
+{
+  stdhelp();
+  getopt->displayOpt("DBNAME", "Database name");
+  getopt->displayOpt("INDEXNAME", "Name of index to move");
+  getopt->displayOpt("DESTDATASPACE", "Destination dataspace");
+  return 1;
+}
+
+const char *
+get_op(const char *s, int &offset)
+{
+  if (s[0] == '~')
+    {
+      if (s[1] == '~')
+	{
+	  offset = 2;
+	  return "~~";
+	}
+
+      offset = 1;
+      return "~";
+    }
+
+  if (s[0] == '!')
+    {
+      if (s[1] == '~')
+	{
+	  if (s[2] == '~')
+	    {
+	      offset = 3;
+	      return "!~~";
+	    }
+
+	  offset = 2;
+	  return "!~";
+	}
+    }
+
+  offset = 0;
+  return "=";
+}
+
+#define CHECK(S) \
+  if (S) { \
+   print_prog(); \
+   (S)->print(); \
+   return 1; \
+   }
+
+static int
+get_idxs( Database *db, const char *attrpath, ObjectArray &obj_arr)
+{
+  int offset;
+  const char *op = get_op(attrpath, offset);
+  OQL q(db, "select index.attrpath %s \"%s\"", op, &attrpath[offset]);
+  q.execute(obj_arr);
+
+  if (!obj_arr.getCount()) {
+    std::cerr << PROG_NAME << ": ";
+    fprintf(stderr, "no index %s found\n", attrpath);
+    return 1;
+  }
+
+  return 0;
+}
+
+int IDXMoveCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+{
+  if (! getopt->parse(PROG_NAME, argv))
+    return usage();
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end())
+    return help();
+
+  if (argv.size() < 3)
+    return usage();
+
+  const char *dbName = argv[0].c_str();
+  const char *indexName = argv[1].c_str();
+  const char *dataspaceName = argv[2].c_str();
+
+  bool collapse = map.find(COLLAPSE_OPT) != map.end();
+
+  conn.open();
+
+  Database *db = new Database(dbName);
+
+  db->open( &conn, Database::DBRW);
+  
+  db->transactionBeginExclusive();
+  
+  const Dataspace *dataspace;
+  db->getDataspace( dataspaceName, dataspace);
+
+  ObjectArray obj_arr;
+  if (get_idxs( db, indexName, obj_arr)) 
+    return 1;
+
+  for (int i = 0; i < obj_arr.getCount(); i++) {
+    Index *idx = (Index *)obj_arr[i];
+       idx->move(dataspace);
+//     idx->move(dataspace, collapse);
+  }
+
+  db->transactionCommit();
+
+  return 0;
+}
+
+//
+// IDXSetdefdspCmd
+//
+//  eyedbadmin index setdefdsp <dbname> <idx name> <dataspace>
+void IDXSetdefdspCmd::init()
+{
+  std::vector<Option> opts;
+
+  opts.push_back(HELP_OPT);
+
+  getopt = new GetOpt(getExtName(), opts);
+}
+
+int IDXSetdefdspCmd::usage()
+{
+  getopt->usage("", "");
+  std::cerr << " DBNAME INDEXNAME DATASPACE\n";
+  return 1;
+}
+
+int IDXSetdefdspCmd::help()
+{
+  stdhelp();
+  getopt->displayOpt("DBNAME", "Database name");
+  getopt->displayOpt("INDEXNAME", "Name of index");
+  getopt->displayOpt("DATASPACE", "Dataspace");
+  return 1;
+}
+
+int IDXSetdefdspCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+{
+  if (! getopt->parse(PROG_NAME, argv))
+    return usage();
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end())
+    return help();
+
+  if (argv.size() < 1)
+    return usage();
+
+  const char *dbName = argv[0].c_str();
+  const char *indexName = argv[1].c_str();
+  const char *dataspaceName = argv[2].c_str();
+
+  conn.open();
+
+  Database *db = new Database(dbName);
+
+  db->open( &conn, Database::DBRW);
+  
+  db->transactionBeginExclusive();
+  
+  const Dataspace *dataspace;
+  db->getDataspace(dataspaceName, dataspace);
+
+  ObjectArray obj_arr;
+  if (get_idxs( db, indexName, obj_arr)) return 1;
+
+  for (int i = 0; i < obj_arr.getCount(); i++) {
+    Index *idx = (Index *)obj_arr[i];
+    idx->setDefaultDataspace(dataspace);
+  }
+
+  db->transactionCommit();
+
+  return 0;
+}
+
+//
+// IDXGetdefdspCmd
+//
+//  eyedbadmin index getdefdsp <dbname> <idx name>
+void IDXGetdefdspCmd::init()
+{
+  std::vector<Option> opts;
+  opts.push_back(HELP_OPT);
+  getopt = new GetOpt(getExtName(), opts);
+}
+
+int IDXGetdefdspCmd::usage()
+{
+  getopt->usage("", "");
+  std::cerr << " DBNAME INDEXNAME\n";
+  return 1;
+}
+
+int IDXGetdefdspCmd::help()
+{
+  stdhelp();
+  getopt->displayOpt("DBNAME", "Database name");
+  getopt->displayOpt("INDEXNAME", "Name of index");
+  return 1;
+}
+
+static void
+print( Database *db, const Dataspace *dataspace, Bool def = False)
+{
+  if (!dataspace) {
+    db->getDefaultDataspace(dataspace);
+    print( db, dataspace, True);
+    return;
+  }
+
+  printf("  Dataspace #%d", dataspace->getId());
+  if (def)
+    printf(" (default)");
+  printf("\n");
+  printf("   Name %s\n", dataspace->getName());
+  unsigned int datafile_cnt;
+  const Datafile **datafiles = dataspace->getDatafiles(datafile_cnt);
+  printf("   Composed of {\n", datafile_cnt);
+
+  for (int i = 0; i < datafile_cnt; i++) {
+    printf("     Datafile #%d\n", datafiles[i]->getId());
+    if (*datafiles[i]->getName())
+      printf("       Name %s\n", datafiles[i]->getName());
+    printf("       File %s\n", datafiles[i]->getFile());
+  }
+
+  printf("   }\n");
+}
+
+int IDXGetdefdspCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+{
+  if (! getopt->parse(PROG_NAME, argv))
+    return usage();
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end())
+    return help();
+
+  if (argv.size() < 1)
+    return usage();
+
+  const char *dbName = argv[0].c_str();
+  const char *indexName = argv[1].c_str();
+
+  conn.open();
+
+  Database *db = new Database(dbName);
+
+  db->open( &conn, Database::DBRW);
+  
+  db->transactionBeginExclusive();
+  
+  ObjectArray obj_arr;
+  if (get_idxs( db, indexName, obj_arr)) 
+    return 1;
+
+  for (int i = 0; i < obj_arr.getCount(); i++) {
+    Index *idx = (Index *)obj_arr[i];
+    const Dataspace *dataspace;
+    idx->getDefaultDataspace(dataspace);
+
+    if (i) 
+      printf("\n");
+    printf("Default dataspace for index '%s':\n", idx->getAttrpath().c_str());
+
+    print( db, dataspace);
+  }
+
+  db->transactionCommit();
+
+  return 0;
+}
+
+//
+// IDXGetlocaCmd
+//
+//  eyedbadmin index --stats|--loca|--all getloca <dbname> <idx name>
+void IDXGetlocaCmd::init()
+{
+  std::vector<Option> opts;
+
+  opts.push_back(HELP_OPT);
+
+  opts.push_back( Option(STATS_OPT, OptionBoolType()));
+  opts.push_back( Option(LOCA_OPT, OptionBoolType()));
+  opts.push_back( Option(ALL_OPT, OptionBoolType()));
+
+  getopt = new GetOpt(getExtName(), opts);
+}
+
+int IDXGetlocaCmd::usage()
+{
+  getopt->usage("", "");
+  std::cerr << " DBNAME INDEXNAME\n";
+  return 1;
+}
+
+int IDXGetlocaCmd::help()
+{
+  stdhelp();
+  getopt->displayOpt("DBNAME", "Database name");
+  getopt->displayOpt("INDEXNAME", "Name of index");
+  return 1;
+}
+
+int IDXGetlocaCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+{
+  if (! getopt->parse(PROG_NAME, argv))
+    return usage();
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end())
+    return help();
+
+  if (argv.size() < 1)
+    return usage();
+
+  const char *dbName = argv[0].c_str();
+  const char *indexName = argv[1].c_str();
+
+  bool locaOpt = false;
+  bool statsOpt = false;
+  if (map.find(LOCA_OPT) != map.end())
+    locaOpt = true;
+  if (map.find(STATS_OPT) != map.end())
+    statsOpt = true;
+  if (map.find(ALL_OPT) != map.end()) {
+    locaOpt = true;
+    statsOpt = true;
+  }    
+
+  conn.open();
+
+  Database *db = new Database(dbName);
+
+  db->open( &conn, Database::DBRW);
+  
+  db->transactionBeginExclusive();
+  
+  ObjectArray obj_arr;
+  if (get_idxs( db, indexName, obj_arr)) 
+    return 1;
+
+  for (int i = 0; i < obj_arr.getCount(); i++) {
+    Index *idx = (Index *)obj_arr[i];
+    ObjectLocationArray locarr;
+    idx->getObjectLocations(locarr);
+
+    if (locaOpt)
+      cout << locarr(db) << endl;
+
+    if (statsOpt) {
+      PageStats *pgs = locarr.computePageStats(db);
+      cout << *pgs;
+      delete pgs;
+    }
+  }
+
+  db->transactionCommit();
+
+  return 0;
+}
+
+
+
