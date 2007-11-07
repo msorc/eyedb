@@ -1,7 +1,8 @@
 import pexpect
 import sys
 
-dbname='foo'
+dbname = 'dataspace_test_db'
+
 command="eyedbadmin2 dataspace list %s" % (dbname,)
 child = pexpect.spawn(command)
 r = child.expect( "Dataspace #0")
