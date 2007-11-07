@@ -1,7 +1,7 @@
 import pexpect
 import sys
 
-dbname='foo'
+dbname = 'dataspace_test_db'
 dspname='bar'
 newdspname='bur'
 

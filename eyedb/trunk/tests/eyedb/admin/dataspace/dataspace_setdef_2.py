@@ -1,7 +1,7 @@
 import pexpect
 import sys
 
-dbname='foo'
+dbname = 'dataspace_test_db'
 dspname='DEFAULT'
 
 command="eyedbadmin2 dataspace setdef %s %s" % (dbname,dspname)

@@ -1,8 +1,9 @@
 import pexpect
 import sys
 
-dbname='foo'
+dbname = 'dataspace_test_db'
 dspname='XYZZY'
+
 command="eyedbadmin2 dataspace list %s %s " % (dbname, dspname)
 child = pexpect.spawn(command)
 child.expect( "eyedb error: dataspace %s not found in database %s" % (dspname, dbname))
