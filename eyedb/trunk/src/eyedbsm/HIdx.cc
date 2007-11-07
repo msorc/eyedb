@@ -3832,7 +3832,7 @@ void *HIdx::copy_key(const void *key, unsigned int keysz, Boolean isstr, Boolean
     return strdup((char *)key);
 
   char *k = (char *)m_malloc(keysz);
-  assert((long)k > 0);
+  assert(k);
 
   if (isstr) {
     int len = strlen((char *)key)+1;
