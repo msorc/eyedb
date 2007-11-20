@@ -565,6 +565,7 @@ src/bindings/Makefile dnl
 src/bindings/python/Makefile dnl
 src/eyedb/Makefile dnl
 src/eyedb/admin/Makefile dnl
+src/eyedb/admin/old/Makefile dnl
 src/commands/Makefile dnl
 src/commands/server/Makefile dnl
 src/eyedbsm/Makefile dnl

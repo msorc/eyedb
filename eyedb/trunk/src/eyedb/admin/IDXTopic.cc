@@ -1151,7 +1151,7 @@ int IDXGetlocaCmd::help()
 {
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
-  getopt->displayOpt("INDEXNAME", "Name of index");
+  getopt->displayOpt("INDEXNAME", "Index name");
   return 1;
 }
 
