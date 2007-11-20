@@ -51,6 +51,14 @@ FD: from eyedbidxadmin [IDXTopic module]
   eyedbadmin index stats [DONE]
   eyedbadmin index simulate [DONE]
 
+   from eyedbloca
+  # index move: ajouter une option --collapse + une info dans le protocole
+  eyedbadmin index move <dbname> <index name> <dest dataspace> [DONE, MISSING PROTOCOL]
+  eyedbadmin index setdefdsp <dbname> <idx name> [DONE]
+  eyedbadmin index getdefdsp <dbname> <idx name> [DONE]
+  eyedbadmin index --stats|--loca|--all getloca <dbname> <idx name> [DONE]
+  # => eyedbgetidxloca
+
 Later:
   from eyedbloca
   eyedbadmin class getinstdefdsp
@@ -81,14 +89,6 @@ Later:
   from eyedbloca
   eyedbadmin object getloca
   eyedbadmin object move
-
-  from eyedbloca
-  # index move: ajouter une option --collapse + une info dans le protocole
-  eyedbadmin index move <dbname> <index name> <dest dataspace>
-  eyedbadmin index setdefdsp <dbname> <idx name>
-  eyedbadmin index getdefdsp <dbname> <idx name>
-  eyedbadmin index --stats|--loca|--all getloca <dbname> <idx name>
-  # => eyedbgetidxloca
 
   from eyedbconsadmin
   eyedbadmin constraint create

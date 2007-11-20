@@ -33,9 +33,9 @@ public:
   CLSTopic();
 };
 
-CMDCLASS(CLSGetInstDefDSPCmd, "getinstdefdsp");
-CMDCLASS(CLSSetInstDefDSPCmd, "setinstdefdsp");
-CMDCLASS(CLSMoveInstCmd, "moveinst");
-CMDCLASS(CLSGetInstLocaCmd, "getinstloca");
+CMDCLASS_GETOPT(CLSGetInstDefDSPCmd, "getinstdefdsp");
+CMDCLASS_GETOPT(CLSSetInstDefDSPCmd, "setinstdefdsp");
+CMDCLASS_GETOPT(CLSMoveInstCmd, "moveinst");
+CMDCLASS_GETOPT(CLSGetInstLocaCmd, "getinstloca");
 
 #endif

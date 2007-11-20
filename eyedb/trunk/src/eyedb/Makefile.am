@@ -219,14 +219,8 @@ sysclsmthfe_la_DEPENDENCIES= $(top_srcdir)/VERSION
 bin_PROGRAMS=					\
 eyedboql					\
 eyedbodl					\
-eyedbloca					\
-eyedbidxadmin					\
-eyedbprotadmin					\
-eyedbconsadmin					\
-eyedbcollimpladmin				\
 eyedbcrypt					\
-eyedbgetenv					\
-eyedbadmin
+eyedbgetenv
 
 sbin_PROGRAMS=					\
 eyedbd						\
@@ -249,21 +243,6 @@ eyedboql_LDADD= $(EYEDBCLLIBS)
 eyedbodl_SOURCES= eyedbodl.cc
 eyedbodl_LDADD= $(EYEDBCLLIBS)
 
-eyedbloca_SOURCES= eyedbloca.cc
-eyedbloca_LDADD= $(EYEDBCLLIBS)
-
-eyedbidxadmin_SOURCES= eyedbidxadmin.cc
-eyedbidxadmin_LDADD= $(EYEDBCLLIBS)
-
-eyedbprotadmin_SOURCES= eyedbprotadmin.cc
-eyedbprotadmin_LDADD= $(EYEDBCLLIBS)
-
-eyedbconsadmin_SOURCES= eyedbconsadmin.cc
-eyedbconsadmin_LDADD= $(EYEDBCLLIBS)
-
-eyedbcollimpladmin_SOURCES= eyedbcollimpladmin.cc
-eyedbcollimpladmin_LDADD= $(EYEDBCLLIBS)
-
 eyedbcrypt_SOURCES= eyedbcrypt.cc
 eyedbcrypt_LDADD= $(EYEDBCLLIBS)
 
@@ -275,9 +254,6 @@ eyedbctl_LDADD= $(EYEDBCLLIBS)
 
 eyedbrc_SOURCES= eyedbrc.cc
 eyedbrc_LDADD= $(EYEDBCLLIBS)
-
-eyedbadmin_SOURCES=eyedbadmin.cc
-eyedbadmin_LDADD= $(EYEDBCLLIBS)
 
 noinst_HEADERS= \
 api_lib.h \
