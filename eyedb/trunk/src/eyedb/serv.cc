@@ -242,20 +242,22 @@ namespace eyedb {
       status = RPCInvalidClientId;
     else
       {
-	DbCreateDescription dbdesc;
+	DbCreateDescription *dbdesc = (DbCreateDescription *)malloc(sizeof(DbCreateDescription));
       
 	status = IDB_dbInfo((ConnHandle *)ci->user_data,
 			    ua[0].a_string, ua[1].a_string,
 			    ua[2].a_string, ua[3].a_string,
 			    &ua[4].a_int,
-			    &dbdesc);
+			    dbdesc);
 
 	if (!status)
-	  ua[5].a_data.data = code_dbdescription(&dbdesc, &ua[5].a_data.size);
+	  ua[5].a_data.data = code_dbdescription(dbdesc, &ua[5].a_data.size);
 	else
 	  ua[5].a_data.data = (unsigned char *)malloc(1);
 
 	ua[5].a_data.status = rpc_TempDataUsed;
+
+	free(dbdesc);
       }
 
     RPC_STATUS_MAKE(status, ua, 6);
@@ -274,13 +276,14 @@ namespace eyedb {
       status = RPCInvalidClientId;
     else
       {
-	DbCreateDescription dbdesc;
-	decode_dbdescription((unsigned char *)ua[4].a_data.data, &ua[4].a_data, &dbdesc);
+	DbCreateDescription *dbdesc = (DbCreateDescription *)malloc(sizeof(DbCreateDescription));
+	decode_dbdescription((unsigned char *)ua[4].a_data.data, &ua[4].a_data, dbdesc);
       
 	status = IDB_dbMove((ConnHandle *)ci->user_data,
 			    ua[0].a_string, ua[1].a_string,
 			    ua[2].a_string, ua[3].a_string,
-			    &dbdesc);
+			    dbdesc);
+	free(dbdesc);
       }
 
     RPC_STATUS_MAKE(status, ua, 5);
@@ -299,13 +302,14 @@ namespace eyedb {
       status = RPCInvalidClientId;
     else
       {
-	DbCreateDescription dbdesc;
-	decode_dbdescription((unsigned char *)ua[6].a_data.data, &ua[6].a_data, &dbdesc);
+	DbCreateDescription *dbdesc = (DbCreateDescription *)malloc(sizeof(DbCreateDescription));
+	decode_dbdescription((unsigned char *)ua[6].a_data.data, &ua[6].a_data, dbdesc);
       
 	status = IDB_dbCopy((ConnHandle *)ci->user_data,
 			    ua[0].a_string, ua[1].a_string,
 			    ua[2].a_string, ua[3].a_string,
-			    ua[4].a_string, (Bool)ua[5].a_int, &dbdesc);
+			    ua[4].a_string, (Bool)ua[5].a_int, dbdesc);
+	free(dbdesc);
       }
 
     RPC_STATUS_MAKE(status, ua, 7);
@@ -344,12 +348,13 @@ namespace eyedb {
       status = RPCInvalidClientId;
     else
       {
-	DbCreateDescription dbdesc;
-	decode_dbdescription((unsigned char *)ua[2].a_data.data, &ua[2].a_data, &dbdesc);
+	DbCreateDescription *dbdesc = (DbCreateDescription *)malloc(sizeof(DbCreateDescription));
+	decode_dbdescription((unsigned char *)ua[2].a_data.data, &ua[2].a_data, dbdesc);
       
 	status = IDB_dbmCreate((ConnHandle *)ci->user_data,
 			       ua[0].a_string, ua[1].a_string,
-			       &dbdesc);
+			       dbdesc);
+	free(dbdesc);
       }
 
     RPC_STATUS_MAKE(status, ua, 3);

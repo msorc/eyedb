@@ -285,7 +285,7 @@ void USRListCmd::init()
 int USRListCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " [USER]...\n";
+  std::cerr << " [USER]\n";
   return 1;
 }
 

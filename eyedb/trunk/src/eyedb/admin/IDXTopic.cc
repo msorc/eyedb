@@ -308,7 +308,7 @@ void IDXDeleteCmd::init()
 int IDXDeleteCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " delete DBNAME ATTRPATH...\n";
+  std::cerr << " DBNAME ATTRPATH\n";
   return 1;
 }
 
@@ -526,7 +526,7 @@ void IDXListCmd::init()
 int IDXListCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " DBNAME [ATTRPATH|CLASSNAME]...\n";
+  std::cerr << " DBNAME [ATTRPATH|CLASSNAME]\n";
   return 1;
 }
 
@@ -610,7 +610,7 @@ void IDXStatsCmd::init()
 int IDXStatsCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " DBNAME [ATTRPATH|CLASSNAME]...\n";
+  std::cerr << " DBNAME [ATTRPATH|CLASSNAME]\n";
   return 1;
 }
 
