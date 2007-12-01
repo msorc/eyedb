@@ -494,7 +494,7 @@ void DTFListCmd::init()
 int DTFListCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " DBNAME [DATID|DATNAME]...\n";
+  std::cerr << " DBNAME [DATID|DATNAME]\n";
   return 1;
 }
 

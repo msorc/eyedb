@@ -58,7 +58,7 @@ void DSPCreateCmd::init()
 int DSPCreateCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " DBNAME DSPNAME DATID|DATNAME...\n";
+  std::cerr << " DBNAME DSPNAME DATID|DATNAME\n";
   return 1;
 }
 
@@ -120,7 +120,7 @@ void DSPUpdateCmd::init()
 int DSPUpdateCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " DBNAME DSPNAME DATID|DATNAME...\n";
+  std::cerr << " DBNAME DSPNAME DATID|DATNAME\n";
   return 1;
 }
 
@@ -301,7 +301,7 @@ void DSPListCmd::init()
 int DSPListCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " DBNAME [DSPNAME]...\n";
+  std::cerr << " DBNAME [DSPNAME]\n";
   return 1;
 }
 

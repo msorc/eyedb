@@ -202,7 +202,7 @@ $(top_srcdir)/src/eyedb/utils.cc: utils.odl
 EXTRA_DIST= odl.l odl.y oql.l oql.y DBM.odl syscls.odl oqlctb.odl utils.odl comp_time.cc comp_time.h make_pattern.cc
 
 somthdir=$(pkglibdir)
-somth_LTLIBRARIES=oqlctbmthfe.la utilsmthfe.la sysclsmthfe.la 
+somth_LTLIBRARIES=oqlctbmthfe.la utilsmthfe.la 
 
 oqlctbmthfe_la_SOURCES=oqlctbmthfe.cc oqlctbstubsfe.cc
 oqlctbmthfe_la_LDFLAGS=-module -release $(EYEDB_VERSION)
@@ -211,10 +211,6 @@ oqlctbmthfe_la_DEPENDENCIES= $(top_srcdir)/VERSION
 utilsmthfe_la_SOURCES=utilsmthfe.cc utilsstubsfe.cc
 utilsmthfe_la_LDFLAGS=-module -release $(EYEDB_VERSION)
 utilsmthfe_la_DEPENDENCIES= $(top_srcdir)/VERSION
-
-sysclsmthfe_la_SOURCES=sysclsmthfe.cc sysclsstubsfe.cc
-sysclsmthfe_la_LDFLAGS=-module -release $(EYEDB_VERSION)
-sysclsmthfe_la_DEPENDENCIES= $(top_srcdir)/VERSION
 
 bin_PROGRAMS=					\
 eyedboql					\
