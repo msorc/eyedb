@@ -2,7 +2,10 @@ dnl checking whether Posix threads implementation supports PTHREAD_PROCESS_SHARE
 AC_DEFUN([AC_PTHREAD_PROCESS_SHARED],[
 	AC_MSG_CHECKING(whether PTHREAD_PROCESS_SHARED is supported)
 	AC_RUN_IFELSE(
-		[AC_LANG_PROGRAM([[#include <pthread.h>]],
+		[AC_LANG_PROGRAM([[
+#include <pthread.h>
+#include <stdlib.h>
+]],
 				[[
 pthread_mutex_t mut;
 pthread_mutexattr_t mattr;
