@@ -47,8 +47,8 @@ static Database *db;
 static int
 usage()
 {
-  fprintf(stderr, "usage: " PROG " <dbname> <image> [<images>] "
-	  "[--class=<classname> <attrname>]\n");
+  fprintf(stderr, "usage: " PROG " DBNAME IMAGE... "
+	  "[--class=CLASSNAME ATTRNAME]\n");
   return 1;
 }
 

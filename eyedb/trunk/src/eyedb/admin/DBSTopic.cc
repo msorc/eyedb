@@ -66,9 +66,9 @@ void DBSCreateCmd::init()
   std::vector<Option> opts;
 
   opts.push_back(HELP_OPT);
-  opts.push_back(Option(DBFILE_OPT, OptionStringType(), /*Option::Mandatory|*/Option::MandatoryValue, OptionDesc("Database file", "<dbfile>")));
-  opts.push_back(Option(FILEDIR_OPT, OptionStringType(), Option::MandatoryValue, OptionDesc("Database file directory", "<filedir>")));
-  opts.push_back(Option(MAXOBJCNT_OPT, OptionIntType(), Option::MandatoryValue, OptionDesc("Maximum database object count", "<object-count>")));
+  opts.push_back(Option(DBFILE_OPT, OptionStringType(), /*Option::Mandatory|*/Option::MandatoryValue, OptionDesc("Database file", "DBFILE")));
+  opts.push_back(Option(FILEDIR_OPT, OptionStringType(), Option::MandatoryValue, OptionDesc("Database file directory", "FILEDIR")));
+  opts.push_back(Option(MAXOBJCNT_OPT, OptionIntType(), Option::MandatoryValue, OptionDesc("Maximum database object count", "OBJECT_COUNT")));
 
   getopt = new GetOpt(getExtName(), opts);
 }
@@ -76,14 +76,14 @@ void DBSCreateCmd::init()
 int DBSCreateCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " <dbname>\n";
+  std::cerr << " DBNAME\n";
   return 1;
 }
 
 int DBSCreateCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("<dbname>", "Database to create");
+  getopt->displayOpt("DBNAME", "Database to create");
   return 1;
 }
 
@@ -185,14 +185,14 @@ void DBSListCmd::init()
 int DBSListCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " {[~]<dbname>}\n";
+  std::cerr << " [~]DBNAMES...\n";
   return 1;
 }
 
 int DBSListCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("{[~]<dbname>}", "Database(s) to list (~ means regular expression)");
+  getopt->displayOpt("[~]DBNAMES...", "Database(s) to list (~ means regular expression)");
   return 1;
 }
 
@@ -601,7 +601,7 @@ int DBSRenameCmd::usage()
 {
   getopt->usage("", "");
 
-  std::cerr << " <dbname> <new_dbname>\n";
+  std::cerr << " DBNAME NEW_DBNAME\n";
 
   return 1;
 }
@@ -610,8 +610,8 @@ int DBSRenameCmd::help()
 {
   stdhelp();
 
-  getopt->displayOpt("<dbname>    ", "Database to rename");
-  getopt->displayOpt("<new_dbname>", "New database name");
+  getopt->displayOpt("DBNAME    ", "Database to rename");
+  getopt->displayOpt("NEW_DBNAME", "New database name");
 
   return 1;
 }
@@ -664,14 +664,14 @@ void DBSDeleteCmd::init()
 int DBSDeleteCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " {<dbname>}\n";
+  std::cerr << " DBNAMES...\n";
   return 1;
 }
 
 int DBSDeleteCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("{<dbname>}", "Database(s) to delete");
+  getopt->displayOpt("DBNAMES...", "Database(s) to delete");
   return 1;
 }
 

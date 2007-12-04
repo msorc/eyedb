@@ -213,36 +213,36 @@ do { \
 
     opts[opt_cnt++] = 
       Option('U', prefix + user_opt, OptionStringType(),
-	     Option::MandatoryValue, OptionDesc("User name", "<user>|@"));
+	     Option::MandatoryValue, OptionDesc("User name", "USER|@"));
 
     opts[opt_cnt++] = 
       Option('P', prefix + passwd_opt, OptionStringType(),
-	     Option::OptionalValue,  OptionDesc("Password", "<passwd>"));
+	     Option::OptionalValue,  OptionDesc("Password", "PASSWD"));
 
     if (listen) {
       opts[opt_cnt++] = 
 	Option(listen_opt, OptionStringType(),
 	       Option::MandatoryValue,
-	       OptionDesc("listen host and ports", "[<host>:]<port>"));
+	       OptionDesc("listen host and ports", "[HOST:]PORT"));
 
       opts[opt_cnt++] = 
 	Option(prefix + granted_dbm_opt, OptionStringType(),
 	       Option::MandatoryValue,
-	       OptionDesc("Granted EYEDBDBM database files", "<dbmfiles>"));
+	       OptionDesc("Granted EYEDBDBM database files", "DBMFILES"));
 
       opts[opt_cnt++] = 
 	Option(prefix + default_dbm_opt, OptionStringType(),
 	       Option::MandatoryValue,
-	       OptionDesc("Default EYEDBDBM database file", "<dbmfile>"));
+	       OptionDesc("Default EYEDBDBM database file", "DBMFILE"));
     }
     else {
       opts[opt_cnt++] = 
 	Option(prefix + host_opt, OptionStringType(), Option::MandatoryValue,
-	       OptionDesc("eyedbd host", "<host>"));
+	       OptionDesc("eyedbd host", "HOST"));
 
       opts[opt_cnt++] = 
 	Option(prefix + port_opt, OptionStringType(), Option::MandatoryValue,
-	       OptionDesc("eyedbd port", "<port>"));
+	       OptionDesc("eyedbd port", "PORT"));
 
       opts[opt_cnt++] = 
 	Option(prefix + inet_opt, OptionStringType(), 0,
@@ -250,47 +250,47 @@ do { \
 
       opts[opt_cnt++] = 
 	Option(prefix + dbm_opt, OptionStringType(), Option::MandatoryValue,
-	       OptionDesc("EYEDBDBM database file", "<dbmfile>"));
+	       OptionDesc("EYEDBDBM database file", "DBMFILE"));
     }
 
 
     opts[opt_cnt++] = 
       Option(prefix + conf_opt, OptionStringType(), Option::MandatoryValue,
-	     OptionDesc("Client Configuration file", "<conffile>"));
+	     OptionDesc("Client Configuration file", "CONFFILE"));
 
     opts[opt_cnt++] = 
       Option(prefix + server_conf_opt, OptionStringType(),
 	     Option::MandatoryValue,
 	     OptionDesc(std::string("Server Configuration file") +
 			(listen ? "" : " (used for local opening)"),
-			"<conffile>"));
+			"CONFFILE"));
 
     opts[opt_cnt++] = 
       Option(prefix + smd_port_opt, OptionStringType(), Option::MandatoryValue,
 	     OptionDesc(std::string("eyedbsmd port") +
 			(listen ? "" : " (used for local opening)"),
-			"<port>"));
+			"PORT"));
     
     opts[opt_cnt++] = 
       Option(prefix + default_file_mask_opt, OptionIntType(), Option::MandatoryValue,
-	     OptionDesc("Default file mask", "<mask>"));
+	     OptionDesc("Default file mask", "MASK"));
     
     opts[opt_cnt++] = 
       Option(prefix + default_file_group_opt, OptionStringType(), Option::MandatoryValue,
-	     OptionDesc("Default file group", "<group>"));
+	     OptionDesc("Default file group", "GROUP"));
     
     opts[opt_cnt++] = 
       Option(prefix + maximum_server_memory_size_opt, OptionIntType(), Option::MandatoryValue,
 	     OptionDesc("Maximum server memory size (in Mb)",
-			"<size>"));
+			"SIZE"));
     
     opts[opt_cnt++] = 
       Option(prefix + logdev_opt, OptionStringType(), Option::MandatoryValue,
-	     OptionDesc("Output log file", "<logfile>"));
+	     OptionDesc("Output log file", "LOGFILE"));
 
     opts[opt_cnt++] = 
       Option(prefix + logmask_opt, OptionStringType(), Option::MandatoryValue,
-	     OptionDesc("Output log mask", "<mask>"));
+	     OptionDesc("Output log mask", "MASK"));
 
     opts[opt_cnt++] = 
       Option(prefix + logdate_opt, OptionBoolType(), Option::MandatoryValue,
@@ -311,11 +311,11 @@ do { \
     opts[opt_cnt++] = 
       Option(prefix + error_policy_opt, errorChoice, Option::MandatoryValue,
 	     OptionDesc("Control error policy: status|exception|abort|stop|echo",
-			"<value>"));
+			"VALUE"));
     opts[opt_cnt++] = 
       Option(prefix + trans_def_mag_opt, OptionIntType(), Option::MandatoryValue,
 	     OptionDesc("Default transaction magnitude order",
-			"<magorder>"));
+			"MAGORDER"));
 
     opts[opt_cnt++] = 
       Option(prefix + arch_opt, OptionBoolType(), 0,

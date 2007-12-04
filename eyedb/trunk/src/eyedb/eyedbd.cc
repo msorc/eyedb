@@ -94,10 +94,10 @@ get_opts(int argc, char *argv[],
 
   Option opts[] = {
     Option(access_file_opt, OptionStringType(),
-	   Option::MandatoryValue, OptionDesc("Access file", "<access file>")),
+	   Option::MandatoryValue, OptionDesc("Access file", "ACCESS_FILE")),
 #ifndef NO_DATDIR
     Option(datdir_opt, OptionStringType(),
-	   Option::MandatoryValue, OptionDesc("Default datafile directory", "<datdir>")),
+	   Option::MandatoryValue, OptionDesc("Default datafile directory", "DATDIR")),
 #endif
     Option(nod_opt, OptionBoolType(),
 	   0, OptionDesc("No daemon: does not close fd 0, 1 & 2")),

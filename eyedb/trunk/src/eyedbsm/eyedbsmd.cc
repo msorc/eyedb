@@ -768,7 +768,7 @@ init()
 
 static int
 usage(const char *prog) {
-  fprintf(stderr, "usage: %s [-p <port>|--port=<port>] [--status] [--stop]\n", prog);
+  fprintf(stderr, "usage: %s [-p PORT|--port=PORT] [--status] [--stop]\n", prog);
   return notice(1);
 }
 
