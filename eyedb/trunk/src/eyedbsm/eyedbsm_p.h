@@ -38,11 +38,6 @@
 #include <eyedblib/log.h>
 #include <unistd.h>
 
-// 4/12/07: these two flags are exclusive
-#ifdef HAVE_PTHREAD_PROCESS_SHARED
-#undef HAVE_SEMAPHORE_POLICY_SYSV_IPC
-#endif
-
 namespace eyedbsm {
 
   struct ObjectHeader {

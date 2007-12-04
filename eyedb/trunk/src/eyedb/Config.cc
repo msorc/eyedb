@@ -831,7 +831,7 @@ namespace eyedb {
     // Server Parameters
     setValue( "maximum_memory_size", "0");
     setValue( "access_file", "%@sysconfdir%/eyedb/Access");
-#ifndef HAVE_PTHREAD_PROCESS_SHARED
+#ifdef HAVE_EYEDBSMD
     setValue( "smdport", "%@pipedir%/eyedbsmd");
 #endif
     setValue( "default_file_group", "");
@@ -864,7 +864,7 @@ namespace eyedb {
     // Server Parameters
     setValue( "maximum_memory_size", "0");
     setValue( "access_file", (sysconfdir + "/eyedb/Access").c_str());
-#ifndef HAVE_PTHREAD_PROCESS_SHARED
+#ifdef HAVE_EYEDBSMD
     setValue( "smdport", (pipedir + "/eyedbsmd").c_str());
 #endif
     setValue( "default_file_group", "");
@@ -951,7 +951,7 @@ namespace eyedb {
       server_map["maximum_memory_size"] = true;
       server_map["default_file_group"] = true;
       server_map["default_file_mask"] = true;
-#ifndef HAVE_PTHREAD_PROCESS_SHARED
+#ifdef HAVE_EYEDBSMD
       server_map["smdport"] = true;
 #endif
       server_map["listen"] = true;

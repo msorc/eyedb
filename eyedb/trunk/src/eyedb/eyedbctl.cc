@@ -146,7 +146,7 @@ execute(const char *prog, const char *arg, Bool pipes)
 static int
 startServer(int argc, char *argv[], const char *smdport)
 {
-#ifndef HAVE_PTHREAD_PROCESS_SHARED
+#ifdef HAVE_EYEDBSMD
   smdcli_conn_t *conn = smdcli_open(smd_get_port());
   if (conn) {
     if (smdcli_declare(conn) < 0)
@@ -235,7 +235,7 @@ static void unlink_ports(const char *smdport, const char *_listen)
     p = q + 1;
   }
 
-#ifndef HAVE_PTHREAD_PROCESS_SHARED
+#ifdef HAVE_EYEDBSMD
   unlink(smdport);
 #endif
 }
@@ -379,7 +379,7 @@ main(int argc, char *argv[])
 	return 1;
       }
 
-#ifdef HAVE_PTHREAD_PROCESS_SHARED
+#ifndef HAVE_EYEDBSMD
       return 0;
 #else
       smdcli_conn_t *conn = smdcli_open(smd_get_port());

@@ -179,7 +179,7 @@ do { \
     static const std::string host_opt = "host";
     static const std::string port_opt = "port";
     static const std::string inet_opt = "inet";
-#ifndef HAVE_PTHREAD_PROCESS_SHARED
+#ifdef HAVE_EYEDBSMD
     static const std::string smd_port_opt = "smd-port";
 #endif
     static const std::string maximum_server_memory_size_opt = "maximum-server-memory-size";
@@ -261,7 +261,7 @@ do { \
 			(listen ? "" : " (used for local opening)"),
 			"CONFFILE"));
 
-#ifndef HAVE_PTHREAD_PROCESS_SHARED
+#ifdef HAVE_EYEDBSMD
     opts[opt_cnt++] = 
       Option(prefix + smd_port_opt, OptionStringType(), Option::MandatoryValue,
 	     OptionDesc(std::string("eyedbsmd port") +
@@ -508,7 +508,7 @@ do { \
     }
 #endif
 
-#ifndef HAVE_PTHREAD_PROCESS_SHARED
+#ifdef HAVE_EYEDBSMD
     if (map.find(smd_port_opt) != map.end()) {
 #ifndef USE_POSTINIT
       smd_set_port(map[smd_port_opt].value.c_str());
@@ -753,7 +753,7 @@ do { \
 
   static void postinit()
   {
-#ifndef HAVE_PTHREAD_PROCESS_SHARED
+#ifdef HAVE_EYEDBSMD
     const char *smdport = ServerConfig::getSValue("smdport");
     if (smdport)
       smd_set_port(smdport);
