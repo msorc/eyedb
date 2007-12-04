@@ -38,6 +38,11 @@
 #include <eyedblib/log.h>
 #include <unistd.h>
 
+// 4/12/07: these two flags are exclusive
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
+#undef HAVE_SEMAPHORE_POLICY_SYSV_IPC
+#endif
+
 namespace eyedbsm {
 
   struct ObjectHeader {
@@ -284,7 +289,7 @@ if (!(X)) \
 ((TRCTX)->params.lockmode != ReadNWriteN && \
  (TRCTX)->params.lockmode != DatabaseW)
 
-  static char* msg_1 = __FILE__;
+  static const char* msg_1 = __FILE__;
 #define TTT(S) (write( 1, S, strlen(S)))
   static int dummy_off_t_1 = (sizeof(off_t) != 8 ? (TTT(msg_1), *(char *)0 = 0) : 1);
 

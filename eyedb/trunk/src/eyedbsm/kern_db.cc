@@ -1378,13 +1378,15 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 
     vd = (DbDescription *)m_calloc(sizeof(DbDescription), 1);
 
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
+    smdcli_conn_t *conn = 0;
+#else
     smdcli_conn_t *conn = smdcli_open(smd_get_port());
     if (!conn) {
       free(vd);
       return statusMake(ERROR, "cannot connect to eyedbsmd on port "
 			"%s", smd_get_port());
     }
-
 #ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
     if (smdcli_init_getsems(conn, dbfile, vd->semkeys)) {
       free(vd);
@@ -1399,6 +1401,8 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
       return statusMake(ERROR, "protocol error with eyedbsmd on port "
 			"%s", smd_get_port());
     }
+#endif
+
 #endif
 
     if ((shmfd = shmfileOpen(dbfile)) < 0) {

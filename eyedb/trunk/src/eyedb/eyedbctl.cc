@@ -146,6 +146,7 @@ execute(const char *prog, const char *arg, Bool pipes)
 static int
 startServer(int argc, char *argv[], const char *smdport)
 {
+#ifndef HAVE_PTHREAD_PROCESS_SHARED
   smdcli_conn_t *conn = smdcli_open(smd_get_port());
   if (conn) {
     if (smdcli_declare(conn) < 0)
@@ -155,6 +156,7 @@ startServer(int argc, char *argv[], const char *smdport)
   }
   else if (execute("eyedbsmd", (std::string("--port=") + smdport).c_str(), True) < 0)
     return 1;
+#endif
 
 #ifdef PIPE_SYNC
   int pfd[2];
@@ -233,7 +235,9 @@ static void unlink_ports(const char *smdport, const char *_listen)
     p = q + 1;
   }
 
+#ifndef HAVE_PTHREAD_PROCESS_SHARED
   unlink(smdport);
+#endif
 }
 
 static void make_host_port(const char *_listen, const char *&host,
@@ -375,6 +379,9 @@ main(int argc, char *argv[])
 	return 1;
       }
 
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
+      return 0;
+#else
       smdcli_conn_t *conn = smdcli_open(smd_get_port());
       if (!conn) {
 	fprintf(stderr, "cannot connect to eyedbsmd daemon\n");
@@ -385,6 +392,7 @@ main(int argc, char *argv[])
       smdcli_close(conn);
       conn = 0;
       return r;
+#endif
     }
 
     sesslog.display(stdout, force);
