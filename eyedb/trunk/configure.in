@@ -287,6 +287,12 @@ guess)
 	;;
 esac
 
+# determine if we must use eyedbsmd, depending on the semaphore policy
+if test "$ac_semaphore_policy" = "sysv_ipc" ; then
+   AC_DEFINE(HAVE_EYEDBSMD, 1, [Define to 1 if we must use eyedbsmd])
+fi
+
+
 # installation directories
 eyedb_databasedir="$ac_eyedb_databasedir"
 AC_SUBST(eyedb_databasedir)
