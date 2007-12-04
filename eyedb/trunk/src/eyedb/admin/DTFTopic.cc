@@ -387,6 +387,9 @@ int DTFResizeCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   if (map.find("help") != map.end())
     return help();
 
+  if (argv.size() != 3)
+    return usage();
+
   const char *dbname = argv[0].c_str();
   const char *datname = argv[1].c_str();
   const char *new_size = argv[2].c_str();
@@ -447,6 +450,10 @@ int DTFDefragmentCmd::perform(eyedb::Connection &conn, std::vector<std::string> 
 
   if (map.find("help") != map.end())
     return help();
+
+  if (argv.size() != 2) {
+    return usage();
+  }
 
   const char *dbname = argv[0].c_str();
   const char *datname = argv[1].c_str();
