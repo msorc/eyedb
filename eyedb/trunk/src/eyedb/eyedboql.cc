@@ -207,7 +207,7 @@ main(int argc, char *argv[])
 
   Option opts[] = {
     Option('d', database_opt, OptionStringType(),
-	   Option::MandatoryValue, OptionDesc("Database name", "<name>")),
+	   Option::MandatoryValue, OptionDesc("Database name", "NAME")),
     Option('r', read_opt, OptionBoolType(),
 	   0, OptionDesc("Open database in read mode")),
     Option('w', read_write_opt, OptionBoolType(),
@@ -217,7 +217,7 @@ main(int argc, char *argv[])
     Option('l', local_opt, OptionBoolType(),
 	   0, OptionDesc("Open database in local mode")),
     Option('c', command_opt, OptionStringType(),
-	   Option::MandatoryValue, OptionDesc("OQL command to execute", "<command>")),
+	   Option::MandatoryValue, OptionDesc("OQL command to execute", "COMMAND")),
     Option('p', print_opt, OptionBoolType(),
 	   0, OptionDesc("Display all the objects loaded")),
     Option(full_opt, OptionBoolType(),
@@ -237,17 +237,17 @@ main(int argc, char *argv[])
   GetOpt getopt(argv[0], opts, sizeof(opts)/sizeof(opts[0]));
 
   if (!getopt.parse(argc, argv)) {
-    print_standard_usage(getopt, "[{<file>}]");
+    print_standard_usage(getopt, "[FILE...]");
     exit(0);
   }
 
   GetOpt::Map &map = getopt.getMap();
 
   if (map.find(help_opt) != map.end()) {
-    print_standard_usage(getopt, "[{<file>}]");
+    print_standard_usage(getopt, "[FILE..]");
 
     std::vector<std::string> options;
-    options.push_back("{<file>}");
+    options.push_back("FILE...");
     options.push_back("File(s) to execute");
 
     cerr << "\n\n";

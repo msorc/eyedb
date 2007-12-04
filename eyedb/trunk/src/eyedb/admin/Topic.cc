@@ -103,10 +103,10 @@ int TopicSet::usage()
   std::cerr << PROG_NAME << " usage:\n";
   std::cerr << "  " << PROG_NAME << " --help\n";
   std::cerr << "  " << PROG_NAME << " --help-eyedb-options\n";
-  std::cerr << "  " << PROG_NAME << " <topic> --help\n";
-  std::cerr << "  " << PROG_NAME << " <topic> <command> --help\n";
-  std::cerr << "  " << PROG_NAME << " <topic> <command> <options>\n\n";
-  std::cerr << "where <topic> is one of the following:\n";
+  std::cerr << "  " << PROG_NAME << " TOPIC --help\n";
+  std::cerr << "  " << PROG_NAME << " TOPIC COMMAND --help\n";
+  std::cerr << "  " << PROG_NAME << " TOPIC COMMAND OPTIONS\n\n";
+  std::cerr << "where TOPIC is one of the following:\n";
 
   std::vector<Topic *>::iterator begin = topic_v.begin();
   std::vector<Topic *>::iterator end = topic_v.end();
@@ -214,8 +214,8 @@ int Topic::usage(const std::string &tname)
 {
   std::cerr << PROG_NAME << " " << name << " usage:\n\n";
   std::cerr << "  " << PROG_NAME << " " << tname << " --help\n";
-  std::cerr << "  " << PROG_NAME << " " << tname << " <command> <options>\n\n";
-  std::cerr << "where <command> is one of the following:\n";
+  std::cerr << "  " << PROG_NAME << " " << tname << " COMMAND OPTIONS\n\n";
+  std::cerr << "where COMMAND is one of the following:\n";
 
   std::vector<Command *>::iterator begin = cmd_v.begin();
   std::vector<Command *>::iterator end = cmd_v.end();

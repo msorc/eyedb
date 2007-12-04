@@ -106,14 +106,14 @@ sig_h(int sig)
 static int
 usage(const char *prog)
 {
-  fprintf(stderr, "usage: %s [--alias=<alias>] [--wdir=<directory>] "
-	 "[--cgidir=<directory>] "
-	 "[--server-timeout=<timeout>] "
-	 "[--max-servers=<maxservers>] "
-	 "[--cookie-timeout=<timeout> [--access-file=<accessfile>]\n",
+  fprintf(stderr, "usage: %s [--alias=ALIAS] [--wdir=DIRECTORY] "
+	 "[--cgidir=DIRECTORY] "
+	 "[--server-timeout=TIMEOUT] "
+	 "[--max-servers=MAXSERVERS] "
+	 "[--cookie-timeout=TIMEOUT [--access-file=ACCESS_FILE]\n",
 	 prog);
   fflush(stderr);
-  cerr << "\n\nSTANDARD HELP TBD\\n\n";
+  //cerr << "\n\nSTANDARD HELP TBD\\n\n";
   //print_standard_usage(getopt, "", std::cerr, true);
   cerr << "\nCommon Options:\n";
   print_common_help(cerr);

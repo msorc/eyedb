@@ -215,154 +215,154 @@ static int
 usage(unsigned int mode = 0)
 {
   if (!mode || mode == mDatabaseCreate || (mode & M_DATABASE))
-    fprintf(stderr, "%s database create <dbfile> <dbid> <objmax> {<datafile> <name> <maxsize (Kb)> linkmap|<sizeslot> phy|log}\n", prog);
+    fprintf(stderr, "%s database create DBFILE DBID OBJMAX {DATAFILE NAME MAXSIZE_KB linkmap|SIZESLOT phy|log}...\n", prog);
 
   if (!mode || mode == mDatabaseDelete || (mode & M_DATABASE))
-    fprintf(stderr, "%s database delete <dbfile>\n", prog);
+    fprintf(stderr, "%s database delete DBFILE\n", prog);
 
   if (!mode || mode == mDatabaseMove || (mode & M_DATABASE))
-    fprintf(stderr, "%s database move <dbfile> <new dbfile> {<new datafile>}\n", prog);
+    fprintf(stderr, "%s database move DBFILE NEW_DBFILE NEW_DATAFILES...\n", prog);
 
   if (!mode || mode == mDatabaseCopy || (mode & M_DATABASE))
-    fprintf(stderr, "%s database copy <dbfile> <new dbfile> {<new datafile>}\n", prog);
+    fprintf(stderr, "%s database copy DBFILE NEW_DBFILE NEW_DATAFILES...\n", prog);
 
   if (!mode || mode == mDatabaseSetobjmax || (mode & M_DATABASE))
-    fprintf(stderr, "%s database set:objmax <dbfile> <new objmax>\n", prog);
+    fprintf(stderr, "%s database set:objmax DBFILE NEW_OBJMAX\n", prog);
 
   if (!mode || mode == mDatabaseDisplay || (mode & M_DATABASE))
-    fprintf(stderr, "%s database display <dbfile>\n", prog);
+    fprintf(stderr, "%s database display DBFILE\n", prog);
  
   if (!mode)
     fprintf(stderr, "\n");
 
   if (!mode || mode == mDatafileCreate || (mode & M_DATAFILE))
-    fprintf(stderr, "%s datafile create <dbfile> <file> <name> <size (Kb)> linkmap|<sizeslot> <log|phy>\n", prog);
+    fprintf(stderr, "%s datafile create DBFILE FILE NAME SIZE_KB linkmap|SIZESLOT log|phy\n", prog);
 
   if (!mode || mode == mDatafileMove || (mode & M_DATAFILE))
-    fprintf(stderr, "%s datafile move <dbfile> <datafile> <new datafile>\n", prog);
+    fprintf(stderr, "%s datafile move DBFILE DATAFILE NEW_DATAFILE\n", prog);
 
   if (!mode || mode == mDatafileResize || (mode & M_DATAFILE))
-    fprintf(stderr, "%s datafile resize <dbfile> <datafile> <new size (Kb)>\n", prog);
+    fprintf(stderr, "%s datafile resize DBFILE DATAFILE NEW_SIZE_KB\n", prog);
 
   if (!mode || mode == mDatafileDelete || (mode & M_DATAFILE))
-    fprintf(stderr, "%s datafile delete <dbfile> <datafile>\n", prog);
+    fprintf(stderr, "%s datafile delete DBFILE DATAFILE\n", prog);
 
   if (!mode || mode == mDatafileDefragment || (mode & M_DATAFILE))
-    fprintf(stderr, "%s datafile defragment <dbfile> <datafile>\n", prog);
+    fprintf(stderr, "%s datafile defragment DBFILE DATAFILE\n", prog);
 
   if (!mode || mode == mDatafileDisplay || (mode & M_DATAFILE))
-    fprintf(stderr, "%s datafile display <dbfile> [{<datafile>}]\n", prog);
+    fprintf(stderr, "%s datafile display DBFILE [DATAFILES...]\n", prog);
 
   if (!mode || mode == mDatafileRename || (mode & M_DATAFILE))
-    fprintf(stderr, "%s datafile rename <dbfile> <datafile> <name>\n", prog);
+    fprintf(stderr, "%s datafile rename DBFILE DATAFILE NAME\n", prog);
 
   if (!mode)
     fprintf(stderr, "\n");
 
   if (!mode || mode == mDataspaceCreate || (mode & M_DATASPACE))
-    fprintf(stderr, "%s dataspace create <dbfile> <dataspace> {<datafile>}\n", prog);
+    fprintf(stderr, "%s dataspace create DBFILE DATASPACE DATAFILES...\n", prog);
 
   if (!mode || mode == mDataspaceUpdate || (mode & M_DATASPACE))
-    fprintf(stderr, "%s dataspace update <dbfile> <dataspace> {<datafile>}\n", prog);
+    fprintf(stderr, "%s dataspace update DBFILE DATASPACE DATAFILES...\n", prog);
 
   if (!mode || mode == mDataspaceDelete || (mode & M_DATASPACE))
-    fprintf(stderr, "%s dataspace delete <dbfile> <dataspace>\n", prog);
+    fprintf(stderr, "%s dataspace delete DBFILE DATASPACE\n", prog);
 
   if (!mode || mode == mDataspaceRename || (mode & M_DATASPACE))
-    fprintf(stderr, "%s dataspace rename <dbfile> <dataspace> <new dataspace>\n", prog);
+    fprintf(stderr, "%s dataspace rename DBFILE DATASPACE NEW_DATASPACE\n", prog);
 
   if (!mode || mode == mDataspaceDisplay || (mode & M_DATASPACE))
-    fprintf(stderr, "%s dataspace display <dbfile> [{<dataspace>}]\n", prog);
+    fprintf(stderr, "%s dataspace display DBFILE [DATASPACES...]\n", prog);
 
   if (!mode || mode == mDataspaceSetDefault || (mode & M_DATASPACE))
-    fprintf(stderr, "%s dataspace set:default <dbfile> <dataspace>\n", prog);
+    fprintf(stderr, "%s dataspace set:default DBFILE DATASPACE\n", prog);
 
   if (!mode || mode == mDataspaceGetDefault || (mode & M_DATASPACE))
-    fprintf(stderr, "%s dataspace get:default <dbfile>\n", prog);
+    fprintf(stderr, "%s dataspace get:default DBFILE\n", prog);
 
   if (!mode || mode == mDataspaceSetCurDat || (mode & M_DATASPACE))
-    fprintf(stderr, "%s dataspace set:curdat <dbfile> <dataspace> <curdat>\n", prog);
+    fprintf(stderr, "%s dataspace set:curdat DBFILE DATASPACE CURDAT\n", prog);
 
   if (!mode || mode == mDataspaceGetCurDat || (mode & M_DATASPACE))
-    fprintf(stderr, "%s dataspace get:curdat <dbfile> <dataspace>\n", prog);
+    fprintf(stderr, "%s dataspace get:curdat DBFILE DATASPACE\n", prog);
 
   if (!mode)
     fprintf(stderr, "\n");
 
   if (!mode || mode == mShmemResize || (mode & M_SHMEM))
-    fprintf(stderr, "%s shmem resize <dbfile> <newsize (Kb)>\n", prog);
+    fprintf(stderr, "%s shmem resize DBFILE NEW_SIZE_KB\n", prog);
 
   if (!mode || mode == mShmemDspmap || (mode & M_SHMEM))
-    fprintf(stderr, "%s shmem display:map <dbfile>\n", prog);
+    fprintf(stderr, "%s shmem display:map DBFILE\n", prog);
 
   if (!mode || mode == mShmemDspsize || (mode & M_SHMEM))
-    fprintf(stderr, "%s shmem display:size <dbfile>\n", prog);
+    fprintf(stderr, "%s shmem display:size DBFILE\n", prog);
 
   if (!mode || mode == mShmemCheck || (mode & M_SHMEM))
-    fprintf(stderr, "%s shmem check <dbfile>\n", prog);
+    fprintf(stderr, "%s shmem check DBFILE\n", prog);
 
   if (!mode || mode == mShmemCleanup || (mode & M_SHMEM))
-    fprintf(stderr, "%s shmem cleanup <dbfile>\n", prog);
+    fprintf(stderr, "%s shmem cleanup DBFILE\n", prog);
 
   if (!mode)
     fprintf(stderr, "\n");
 
   if (!mode || mode == mMutexUnlock || (mode & M_MUTEX))
-    fprintf(stderr, "%s mutex unlock <dbfile>\n", prog);
+    fprintf(stderr, "%s mutex unlock DBFILE\n", prog);
 
   if (!mode || mode == mMutexReset || (mode & M_MUTEX))
-    fprintf(stderr, "%s mutex reset <dbfile>\n", prog);
+    fprintf(stderr, "%s mutex reset DBFILE\n", prog);
 
   if (!mode || mode == mMutexDisplay || (mode & M_MUTEX))
-    fprintf(stderr, "%s mutex display <dbfile>\n", prog);
+    fprintf(stderr, "%s mutex display DBFILE\n", prog);
 
   if (!mode)
     fprintf(stderr, "\n");
 
   if (!mode || mode == mTransactionDisplay || (mode & M_TRANSACTION))
-    fprintf(stderr, "%s transaction display [<server-pid>] <dbfile>\n", prog);
+    fprintf(stderr, "%s transaction display [SERVER_PID] DBFILE\n", prog);
 
   if (!mode || mode == mTransactionDspoidlock || (mode & M_TRANSACTION))
-    fprintf(stderr, "%s transaction display:lockedoids <dbfile>\n", prog);
+    fprintf(stderr, "%s transaction display:lockedoids DBFILE\n", prog);
 
   if (!mode || mode == mTransactionDsphead || (mode & M_TRANSACTION))
-    fprintf(stderr, "%s transaction display:header [<server-pid>] <dbfile>\n", prog);
+    fprintf(stderr, "%s transaction display:header [SERVER_PID] DBFILE\n", prog);
 
   if (!mode || mode == mTransactionAbrtInact || (mode & M_TRANSACTION))
-    fprintf(stderr, "%s transaction abort:inactive <dbfile>\n", prog);
+    fprintf(stderr, "%s transaction abort:inactive DBFILE\n", prog);
 
   if (!mode)
     fprintf(stderr, "\n");
 
   if (!mode || mode == mOidMoveDat || (mode & M_OID))
-    fprintf(stderr, "%s oid move:datafile <dbfile> <from_datafile> <to_datafile>\n", prog);
+    fprintf(stderr, "%s oid move:datafile DBFILE FROM_DATAFILE TO_DATAFILE\n", prog);
 
   if (!mode || mode == mOidMoveDsp || (mode & M_OID))
-    fprintf(stderr, "%s oid move:dataspace <dbfile> <from_dataspace> <to_dataspace>\n", prog);
+    fprintf(stderr, "%s oid move:dataspace DBFILE FROM_DATASPACE TO_DATASPACE\n", prog);
 
   if (!mode || mode == mOidDspList || (mode & M_OID))
-    fprintf(stderr, "%s oid display:list <dbfile> [<datafile>]\n", prog);
+    fprintf(stderr, "%s oid display:list DBFILE [DATAFILE]\n", prog);
 
   if (!mode || mode == mOidDspCount || (mode & M_OID))
-    fprintf(stderr, "%s oid display:count <dbfile> [<datafile>]\n", prog);
+    fprintf(stderr, "%s oid display:count DBFILE [DATAFILE]\n", prog);
 
   if (!mode || mode == mOidGetCurLastNx || (mode & M_OID))
-    fprintf(stderr, "%s oid get:curlastnx <dbfile>\n", prog);
+    fprintf(stderr, "%s oid get:curlastnx DBFILE\n", prog);
 
   if (!mode || mode == mOidSetLastNx || (mode & M_OID))
-    fprintf(stderr, "%s oid set:lastnx <dbfile> <lastnx>\n", prog);
+    fprintf(stderr, "%s oid set:lastnx DBFILE LASTNX\n", prog);
 
   if (!mode || mode == mOidSetCurNx || (mode & M_OID))
-    fprintf(stderr, "%s oid set:curnx <dbfile> <curnx>\n", prog);
+    fprintf(stderr, "%s oid set:curnx DBFILE CURNX\n", prog);
 
   if (!mode || mode == mOidSyncCurLastNx || (mode & M_OID))
-    fprintf(stderr, "%s oid sync:curlastnx <dbfile>\n", prog);
+    fprintf(stderr, "%s oid sync:curlastnx DBFILE\n", prog);
 
   if (!mode || mode == mOidDspLoca || (mode & M_OID))
-    fprintf(stderr, "%s oid display:loca <dbfile> [<datafile>]\n", prog);
+    fprintf(stderr, "%s oid display:loca DBFILE [DATAFILE]\n", prog);
 
   if (!mode || mode == mOidDspLoca || (mode & M_OID))
-    fprintf(stderr, "%s oid display:locastats <dbfile> [<datafile>]\n", prog);
+    fprintf(stderr, "%s oid display:locastats DBFILE [DATAFILE]\n", prog);
 
   return 1;
 }

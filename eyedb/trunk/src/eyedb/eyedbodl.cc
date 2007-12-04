@@ -56,57 +56,57 @@ usage(const char *msg = 0, const char *etc = 0)
   }
 
   fprintf(stderr, "\nUsage:\n");
-  fprintf(stderr, "%s--gencode=C++ [--package=<package>]%s", us, nl);
+  fprintf(stderr, "%s--gencode=C++ [--package=PACKAGE]%s", us, nl);
 
-  fprintf(stderr, "%s[--output-dir=<dirname>] [--output-file-prefix=<prefix>]%s",
+  fprintf(stderr, "%s[--output-dir=DIRNAME] [--output-file-prefix=PREFIX]%s",
 	  sp, nl);
-  fprintf(stderr, "%s[--schema-name=<schname>] [--namespace=<namespace>] [--use-smart-pointers=yes|no]%s", sp, nl);
-  fprintf(stderr, "%s[--class-prefix=<prefix>] [--db-class-prefix=<dbprefix>]%s", sp, nl);
+  fprintf(stderr, "%s[--schema-name=SCHNAME] [--namespace=NAMESPACE] [--use-smart-pointers=yes|no]%s", sp, nl);
+  fprintf(stderr, "%s[--class-prefix=PREFIX] [--db-class-prefix=DBPREFIX]%s", sp, nl);
   fprintf(stderr, "%s[--attr-style=implicit|explicit]%s", sp, nl);
   fprintf(stderr, "%s[--dynamic-attr]%s", sp, nl);
   fprintf(stderr, "%s[--gen-class-stubs] [--class-enums=yes|no]%s", sp, nl);
-  fprintf(stderr, "%s[--c-suffix=<suffix>] [--h-suffix=<suffix>] [--export]%s",
+  fprintf(stderr, "%s[--c-suffix=SUFFIX] [--h-suffix=SUFFIX] [--export]%s",
 	  sp, nl);
 
   fprintf(stderr, "%s[--down-casting=yes|no] [--gencode-error-policy=status|exception]%s",
 	  sp, nl);
-  fprintf(stderr, "%s[--attr-cache=yes|no] [--rootclass=<rootclass>] [--no-rootclass]%s", sp, nl);
-  fprintf(stderr, "%s[--cpp=<cpp>] [--cpp-flags=<flags>] [--no-cpp]%s%s<odlfile>|-|-d <dbname>|--database=<dbname> [<openflags>]\n", sp, nl, sp);
+  fprintf(stderr, "%s[--attr-cache=yes|no] [--rootclass=ROOTCLASS] [--no-rootclass]%s", sp, nl);
+  fprintf(stderr, "%s[--cpp=CPP] [--cpp-flags=FLAGS] [--no-cpp]%s%sODLFILE|-|-d DBNAME|--database=DBNAME [OPENFLAGS]\n", sp, nl, sp);
 
  
-  fprintf(stderr, "\n%s--gencode=Java --package=<package>%s", us, nl);
+  fprintf(stderr, "\n%s--gencode=Java --package=PACKAGE%s", us, nl);
 
-  fprintf(stderr, "%s[--output-dir=<dirname>] [--output-file-prefix=<prefix>]%s",
+  fprintf(stderr, "%s[--output-dir=DIRNAME] [--output-file-prefix=PREFIX]%s",
 	  sp, nl);
-  fprintf(stderr, "%s[--schema-name=<schname>]%s", sp, nl);
-  fprintf(stderr, "%s[--class-prefix=<prefix>] [--db-class-prefix=<dbprefix>]%s", sp, nl);
+  fprintf(stderr, "%s[--schema-name=SCHNAME]%s", sp, nl);
+  fprintf(stderr, "%s[--class-prefix=PREFIX] [--db-class-prefix=DBPREFIX]%s", sp, nl);
   fprintf(stderr, "%s[--attr-style=implicit|explicit]%s", sp, nl);
   fprintf(stderr, "%s[--dynamic-attr]%s", sp, nl);
   fprintf(stderr, "%s[--down-casting=yes|no] [--gencode-error-policy=status|exception]%s",
 	  sp, nl);
-  fprintf(stderr, "%s[--cpp=<cpp>] [--cpp-flags=<flags>] [--no-cpp]%s%s<odlfile>|-|-d <dbname>|--database=<dbname> [<openflags>]\n", sp, nl, sp);
+  fprintf(stderr, "%s[--cpp=CPP] [--cpp-flags=FLAGS] [--no-cpp]%s%sODLFILE|-|-d DBNAME|--database=DBNAME [OPENFLAGS]\n", sp, nl, sp);
 
 #ifdef SUPPORT_CORBA
-  fprintf(stderr, "\n%s--gencode Orbix|Orbacus|IDL --package <package> -idl-module <module>\n", us);
+  fprintf(stderr, "\n%s--gencode Orbix|Orbacus|IDL --package PACKAGE -idl-module MODULE\n", us);
 
-  fprintf(stderr, "%s[--imdl <imdlfile>] [--idl-target <idlfile>] [--output-dir <dirname>] [--no-generic-idl]\n",
+  fprintf(stderr, "%s[--imdl IMDLFILE] [--idl-target IDLFILE] [--output-dir DIRNAME] [--no-generic-idl]\n",
 	  sp);
-  fprintf(stderr, "%s[--generic-idl <idlfile>] [--class-prefix <prefix>]\n", sp);
+  fprintf(stderr, "%s[--generic-idl IDLFILE] [--class-prefix PREFIX]\n", sp);
   fprintf(stderr, "%s[--factory yes|no] [--sync yes|no] [--comments yes|no]\n", sp);
-  fprintf(stderr, "%s[--cpp <cpp] [--cpp-flags <flags] [--no-cpp] <odlfile>|-|-d <dbname>|--database=<dbname> [<openflags>]\n", sp);
+  fprintf(stderr, "%s[--cpp CPP [--cpp-flags FLAGS [--no-cpp] ODLFILE|-|-d DBNAME|--database=DBNAME [OPENFLAGS]\n", sp);
 #endif
 
-  fprintf(stderr, "\n%s--gencode=ODL -d <dbname>|--database=<dbname> [--system-class] [-o <odlfile>] [<openflags>]%s", us, nl);
-  fprintf(stderr, "\n%s--diff -d <dbname>|--database=<dbname> [--system-class] [<openflags>]%s", us, nl);
-  fprintf(stderr, "%s[--cpp=<cpp>] [--cpp-flags=<flags>] [--no-cpp] <odlfile>|-\n",
+  fprintf(stderr, "\n%s--gencode=ODL -d DBNAME|--database=DBNAME [--system-class] [-o ODLFILE] [OPENFLAGS]%s", us, nl);
+  fprintf(stderr, "\n%s--diff -d DBNAME|--database=DBNAME [--system-class] [OPENFLAGS]%s", us, nl);
+  fprintf(stderr, "%s[--cpp=CPP] [--cpp-flags=FLAGS] [--no-cpp] ODLFILE|-\n",
 	  sp);
 
-  fprintf(stderr, "\n%s-u|-update -d <dbname>|--database=<dbname>%s", us, nl);
-  fprintf(stderr, "%s[--db-class-prefix=<dbprefix>] [<openflags>]%s", sp, nl);
-  fprintf(stderr, "%s[--schema-name=<schname>] [--rmv-undef-attrcomp=yes|no]%s%s[--update-index=yes|no]%s", sp, nl, sp, nl);
-  fprintf(stderr, "%s[--cpp=<cpp>] [--cpp-flags=<flags>] [--no-cpp]%s%s[--rmcls={<class>}] [--rmsch] [<odlfile>|-]\n",
+  fprintf(stderr, "\n%s-u|-update -d DBNAME|--database=DBNAME%s", us, nl);
+  fprintf(stderr, "%s[--db-class-prefix=DBPREFIX] [OPENFLAGS]%s", sp, nl);
+  fprintf(stderr, "%s[--schema-name=SCHNAME] [--rmv-undef-attrcomp=yes|no]%s%s[--update-index=yes|no]%s", sp, nl, sp, nl);
+  fprintf(stderr, "%s[--cpp=CPP] [--cpp-flags=FLAGS] [--no-cpp]%s%s[--rmcls=CLASS...] [--rmsch] [ODLFILE|-]\n",
 	  sp, nl, sp);
-  fprintf(stderr, "\n%s--checkfile <odlfile>|-\n", us);
+  fprintf(stderr, "\n%s--checkfile ODLFILE|-\n", us);
 
   fprintf(stderr, "\n%s--help\n", us);
 
@@ -127,23 +127,23 @@ help()
 #endif
 
   fprintf(stderr, "--gencode=ODL                 Generates ODL\n");
-  fprintf(stderr, "--update|-u                   Updates schema in database <dbname>\n");
+  fprintf(stderr, "--update|-u                   Updates schema in database DBNAME\n");
   fprintf(stderr, "--diff                        Displays the differences between a database schema and an odl file\n");
   fprintf(stderr, "--checkfile                   Check input ODL file\n");
   fprintf(stderr, "--help                        Displays the current information\n");
 
   fprintf(stderr, "\nThe following options must be added to the --gencode=C++ or Java option:\n");
-  fprintf(stderr, "<odlfile>|-|-d <dbname>|--database=<dbname> Input ODL file (or - for standard input) or the database name\n");
+  fprintf(stderr, "ODLFILE|-|-d DBNAME|--database=DBNAME Input ODL file (or - for standard input) or the database name\n");
 
   fprintf(stderr, "\nThe following options can be added to the --gencode=C++ or Java option:\n");
-  fprintf(stderr, "--package=<package>           Package name\n");
-  fprintf(stderr, "--output-dir=<dirname>        Output directory for generated files\n");
-  fprintf(stderr, "--output-file-prefix=<prefix> Ouput file prefix (default is the package name)\n");
-  fprintf(stderr, "--class-prefix=<prefix>       Prefix to be put at the begining of each runtime class\n");
-  fprintf(stderr, "--db-class-prefix=<prefix>    Prefix to be put at the begining of each database class\n");
+  fprintf(stderr, "--package=PACKAGE             Package name\n");
+  fprintf(stderr, "--output-dir=DIRNAME          Output directory for generated files\n");
+  fprintf(stderr, "--output-file-prefix=PREFIX   Ouput file prefix (default is the package name)\n");
+  fprintf(stderr, "--class-prefix=PREFIX         Prefix to be put at the begining of each runtime class\n");
+  fprintf(stderr, "--db-class-prefix=PREFIX      Prefix to be put at the begining of each database class\n");
   fprintf(stderr, "--attr-style=implicit         Attribute methods have the attribute name\n");
   fprintf(stderr, "--attr-style=explicit         Attribute methods have the attribute name prefixed by get/set (default)\n");
-  fprintf(stderr, "--schema-name=<schname>       Schema name (default is <package>)\n");
+  fprintf(stderr, "--schema-name=SCHNAME         Schema name (default is PACKAGE)\n");
   fprintf(stderr, "--export                      Export class instances in the .h file\n");
   fprintf(stderr, "--dynamic-attr                Uses a dynamic fetch for attributes in the get and set methods\n");
   fprintf(stderr, "--down-casting=yes            Generates the down casting methods (the default)\n");
@@ -151,35 +151,35 @@ help()
   fprintf(stderr, "--attr-cache=yes              Use a second level cache for attribute value\n");
   fprintf(stderr, "--attr-cache=no               Does not use a second level cache for attribute value (the default)\n");
   fprintf(stderr, "\nFor the --gencode=C++ option only\n");
-  fprintf(stderr, "--namespace=<namespace>       Define classes with the namespace <namespace>\n");
+  fprintf(stderr, "--namespace=NAMESPACE         Define classes with the namespace NAMESPACE\n");
   fprintf(stderr, "--use-smart-pointers=yes|no   The generated C++ code will use (=yes) smart pointers or not (=no)\n");
-  fprintf(stderr, "--c-suffix=<suffix>           Use <suffix> as the C file suffix\n");
-  fprintf(stderr, "--h-suffix=<suffix>           Use <suffix> as the H file suffix\n");
+  fprintf(stderr, "--c-suffix=SUFFIX             Use SUFFIX as the C file suffix\n");
+  fprintf(stderr, "--h-suffix=SUFFIX             Use SUFFIX as the H file suffix\n");
   fprintf(stderr, "--gen-class-stubs             Generates a file class_stubs.h for each class\n");
   fprintf(stderr, "--class-enums=yes             Generates enums within a class\n");
   fprintf(stderr, "--class-enums=no              Do not generate enums within a class (default)\n");
   fprintf(stderr, "--gencode-error-policy=status Status oriented error policy (the default)\n");
   fprintf(stderr, "--gencode-error-policy=exception Exception oriented error policy\n");
-  fprintf(stderr, "--rootclass=<rootclass>       Use <rootclass> name for the root class instead of the package name\n");
+  fprintf(stderr, "--rootclass=ROOTCLASS         Use ROOTCLASS name for the root class instead of the package name\n");
   fprintf(stderr, "--no-rootclass                Does not use any root class\n");
 
   fprintf(stderr, "\nThe following options can be added to the --gencode=ODL option:\n");
   fprintf(stderr, "--system-class                Generates system class ODL\n");
 #ifdef SUPPORT_CORBA
   fprintf(stderr, "\nThe following options must be added to the --gencode=Orbix, Orbacus or IDL option:\n");
-  fprintf(stderr, "--package=<package>           Package name\n");
-  fprintf(stderr, "--idl-module <module>         The IDL module name\n");
+  fprintf(stderr, "--package=PACKAGE             Package name\n");
+  fprintf(stderr, "--idl-module MODULE           The IDL module name\n");
   fprintf(stderr, "\nOne of the following options must be added to the --gencode Orbix or Orbacus option:\n");
-  fprintf(stderr, "<odlfile>|-|-d <dbname>|--database=<dbname> Input ODL file (- is the standard input) or\n");
+  fprintf(stderr, "ODLFILE|-|-d DBNAME|--database=DBNAME Input ODL file (- is the standard input) or\n");
   fprintf(stderr, "                                the database which contains the schema\n");
 
   fprintf(stderr, "\nThe following options can be added to the --gencode Orbix, Orbacus or IDL option:\n");
-  fprintf(stderr, "--output-dir <dirname>        Output directory for generated files\n");
-  fprintf(stderr, "--imdl <imdlfile>|-           IMDL file (- is the standard input)\n");
-  fprintf(stderr, "--idl-target <idlfile>        The target IDL file\n");
+  fprintf(stderr, "--output-dir DIRNAME          Output directory for generated files\n");
+  fprintf(stderr, "--imdl IMDLFILE|-             IMDL file (- is the standard input)\n");
+  fprintf(stderr, "--idl-target IDLFILE          The target IDL file\n");
   fprintf(stderr, "--no-generic-idl              The EyeDB generic IDL file 'eyedb.idl' will not\n");
   fprintf(stderr, "                                be automatically included in the IDML file\n");
-  fprintf(stderr, "--generic-idl <idlfile>       Give the location of the EyeDB generic IDL file\n");
+  fprintf(stderr, "--generic-idl IDLFILE         Give the location of the EyeDB generic IDL file\n");
   fprintf(stderr, "                                'eyedb.idl'\n");
   fprintf(stderr, "--factory yes                 The factory interface will be generated\n");
   fprintf(stderr, "                                (the default when -idl-target is not used)\n");
@@ -192,35 +192,35 @@ help()
 #endif
 
   fprintf(stderr, "\nThe following option must be added to the --update|-u option:\n");
-  fprintf(stderr, "-d <dbname>|--database=<dbname> Database for which operation is performed\n");
+  fprintf(stderr, "-d DBNAME|--database=DBNAME   Database for which operation is performed\n");
 
   fprintf(stderr, "\nThe following options can be added to the --update|-u option:\n");
-  fprintf(stderr, "<odlfile>|-                   Input ODL file or '-' (standard input)\n");
-  fprintf(stderr, "--schema-name=<schname>       Schema name (default is package)\n");
-  fprintf(stderr, "--db-class-prefix=<prefix>    Prefix to be put at the begining of each database class\n");
+  fprintf(stderr, "ODLFILE|-                     Input ODL file or '-' (standard input)\n");
+  fprintf(stderr, "--schema-name=SCHNAME         Schema name (default is package)\n");
+  fprintf(stderr, "--db-class-prefix=PREFIX      Prefix to be put at the begining of each database class\n");
   fprintf(stderr, "--rmv-undef-attrcomp=yes|no   Removes (yes) or not (no) the undefined attribute components (constraint, index and implementation). Default is no\n");
   fprintf(stderr, "--update-index=yes|no         Updates (yes) or not (no) the index with a different implementation in the DB. Default is no\n");
-  fprintf(stderr, "--rmcls={<class>}             Removes the given class list\n");
+  fprintf(stderr, "--rmcls=CLASS...              Removes the given class list\n");
   fprintf(stderr, "--rmsch                       Removes the entire schema\n");
 
   fprintf(stderr, "\nThe following options must be added to the --diff option:\n");
-  fprintf(stderr, "-d <dbname>|--database=<dbname> Database for which the schema difference is performed\n");
-  fprintf(stderr, "<odlfile>                       The input ODL file for which the schema difference is performed\n");
+  fprintf(stderr, "-d DBNAME|--database=DBNAME Database for which the schema difference is performed\n");
+  fprintf(stderr, "ODLFILE                       The input ODL file for which the schema difference is performed\n");
   fprintf(stderr, "\nThe following options can be added to the --diff option:\n");
   fprintf(stderr, "--system-class                Performs difference on system classes also\n");
   fprintf(stderr, "\nThe following option must be added to the --checkfile option:\n");
-  fprintf(stderr, "<odlfile>|-                   Input ODL file or '-' (standard input)\n");
+  fprintf(stderr, "ODLFILE|-                     Input ODL file or '-' (standard input)\n");
 
 #ifdef SUPPORT_CORBA
-  fprintf(stderr, "\nThe following options can be added when an <odlfile>, an <idlfile>\n");
-  fprintf(stderr, "or an <imdlfile> is set:\n");
+  fprintf(stderr, "\nThe following options can be added when an ODLFILE, an IDLFILE\n");
+  fprintf(stderr, "or an IMDLFILE is set:\n");
 #else
-  fprintf(stderr, "\nThe following options can be added when an <odlfile> is set:\n");
+  fprintf(stderr, "\nThe following options can be added when an ODLFILE is set:\n");
 #endif
-  fprintf(stderr, "--cpp=<cpp>                   Uses <cpp> preprocessor instead of the default one\n");
-  fprintf(stderr, "--cpp-flags=<cpp-flags>       Adds <cpp-flags> to the preprocessing command\n");
+  fprintf(stderr, "--cpp=CPP                     Uses CPP preprocessor instead of the default one\n");
+  fprintf(stderr, "--cpp-flags=CPP_FLAGS         Adds CPP_FLAGS to the preprocessing command\n");
   fprintf(stderr, "--no-cpp                      Does not use any preprocessor\n");
-  //fprintf(stderr, "\nThe following options can be added when the -d <dbname>|--database=<dbname> is used:,\n");
+  //fprintf(stderr, "\nThe following options can be added when the -d DBNAME|--database=DBNAME is used:,\n");
 
   print_use_help(cerr);
 
@@ -643,7 +643,7 @@ checkOpts(Bool dirname_set)
   make_package(package, odlfile);
 
   if (update && !dbname)
-    return usage("Must specified -d <dbname>|--database=<dbname> option when -u is used");
+    return usage("Must specified -d DBNAME|--database=DBNAME option when -u is used");
 
 #ifdef SUPPORT_CORBA
   if ((orbix_gen || orbacus_gen || idl_gen) && !package)
@@ -681,11 +681,11 @@ checkOpts(Bool dirname_set)
   if (orbix_gen || orbacus_gen || idl_gen || odl_lang)
     {
       if (!odlfile && !dbname)
-	return usage("using --gencode=%s : must specify an <odlfile> or a database (-d <dbname>|--database=<dbname>)", get_gen_opt());
+	return usage("using --gencode=%s : must specify an ODLFILE or a database (-d DBNAME|--database=DBNAME)", get_gen_opt());
 
       /*
 	if (odlfile && dbname)
-	return usage("using -gencode %s : must specify an <odlfile> or a database (-d <dbname>)", get_gen_opt());
+	return usage("using -gencode %s : must specify an ODLFILE or a database (-d DBNAME)", get_gen_opt());
       */
     }
   //else
@@ -697,7 +697,7 @@ checkOpts(Bool dirname_set)
     // nop
   }
   else if (!cplus_gen && !java_gen && !odl_gen && !odlfile)
-    return usage("an <odlfile> must be specified; use '-' for standard input");
+    return usage("an ODLFILE must be specified; use '-' for standard input");
 
   if (diff) {
     if (!odlfile || !dbname)

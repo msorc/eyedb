@@ -220,27 +220,27 @@ static int
 usage()
 {
   fprintf(stderr, "usage:\n");
-  fprintf(stderr, "  %s --get-name=<name>|default -d <dbname>\n", prog);
-  fprintf(stderr, "  %s --get-user=<user> -d <dbname>\n", prog);
-  fprintf(stderr, "  %s --get-all -d <dbname>\n\n", prog);
+  fprintf(stderr, "  %s --get-name=NAME|default -d DBNAME\n", prog);
+  fprintf(stderr, "  %s --get-user=USER -d DBNAME\n", prog);
+  fprintf(stderr, "  %s --get-all -d DBNAME\n\n", prog);
 
-  fprintf(stderr, "  %s --set-name=<name>|default <conffile> -d <dbname>\n", prog);
-  fprintf(stderr, "  %s --set-user=<user> <conffile> -d <dbname>\n", prog);
-  fprintf(stderr, "  %s --set-name-user=<name>|default:<user> <conffile> -d <dbname>\n\n", prog);
+  fprintf(stderr, "  %s --set-name=NAME|default CONFFILE -d DBNAME\n", prog);
+  fprintf(stderr, "  %s --set-user=USER CONFFILE -d DBNAME\n", prog);
+  fprintf(stderr, "  %s --set-name-user=NAME|default:USER CONFFILE -d DBNAME\n\n", prog);
 
-  fprintf(stderr, "  %s --rm-name=<name>|default -d <dbname>\n", prog);
-  fprintf(stderr, "  %s --rm-user=<user> -d <dbname>\n\n", prog);
+  fprintf(stderr, "  %s --rm-name=NAME|default -d DBNAME\n", prog);
+  fprintf(stderr, "  %s --rm-user=USER -d DBNAME\n\n", prog);
 
-  fprintf(stderr, "  %s --mv-name=<name>|default:<newname>|default -d <dbname>\n", prog);
-  fprintf(stderr, "  %s --mv-user=<user>:<newuser> -d <dbname>\n\n", prog);
+  fprintf(stderr, "  %s --mv-name=NAME|default:NEWNAME|default -d DBNAME\n", prog);
+  fprintf(stderr, "  %s --mv-user=USER:NEWUSER -d DBNAME\n\n", prog);
 
-  fprintf(stderr, "  %s --cp-name=<name>|default:<newname>|default -d <dbname>\n", prog);
-  fprintf(stderr, "  %s --cp-user=<user>:<newuser> -d <dbname>\n\n", prog);
+  fprintf(stderr, "  %s --cp-name=NAME|default:NEWNAME|default -d DBNAME\n", prog);
+  fprintf(stderr, "  %s --cp-user=USER:NEWUSER -d DBNAME\n\n", prog);
 
-  fprintf(stderr, "  %s --expand <conffile> -d <dbname>\n", prog);
+  fprintf(stderr, "  %s --expand CONFFILE -d DBNAME\n", prog);
 
-  fprintf(stderr, "  %s --check <conffile>\n", prog);
-  fprintf(stderr, "  %s --template -d <dbname>\n", prog);
+  fprintf(stderr, "  %s --check CONFFILE\n", prog);
+  fprintf(stderr, "  %s --template -d DBNAME\n", prog);
 
   return 1;
 }
