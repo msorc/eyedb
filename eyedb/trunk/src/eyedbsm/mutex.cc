@@ -40,6 +40,9 @@
 #endif
 #include <unistd.h>
 #include <stdlib.h>
+#include "eyedbsm_p.h"
+#include "mutex.h"
+
 #ifdef HAVE_SEMAPHORE_POLICY_SYSV_IPC
 #include <sys/sem.h>
 /* SEM_FAST could not work because in this case we need as many semaphores
@@ -47,8 +50,6 @@
 #define UT_SEM_FAST
 #endif
 
-#include "eyedbsm_p.h"
-#include "mutex.h"
 #include <eyedblib/performer.h>
 
 #define NMT 10
@@ -285,6 +286,8 @@ do { \
     ESM_ASSERT_ABORT(mp->id>=0, 0, 0);
     ESM_ASSERT_ABORT(mp->plocked, 0, 0);
     int sid = mp->id;
+#else
+    int sid = 0;
 #endif
 
 #ifdef UT_SEM_FAST
@@ -405,6 +408,8 @@ do { \
     ESM_ASSERT_ABORT(mp->id>=0, 0, 0);
     ESM_ASSERT_ABORT(mp->plocked, 0, 0);
     int sid = mp->id;
+#else
+    int sid = 0;
 #endif
 
 #ifdef UT_SEM_FAST

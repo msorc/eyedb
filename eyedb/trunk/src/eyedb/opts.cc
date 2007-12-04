@@ -24,6 +24,7 @@
 
 // 3/6/05: should be splitted into opts.cc, init.cc, version.cc
 
+#include "eyedbconfig.h"
 #include "eyedb_p.h"
 #include "eyedb/DBM_Database.h"
 #include "eyedb/GenHashTable.h"
@@ -156,13 +157,6 @@ do { \
 
     // disconnect this condition because it should work also for
     // local opening mode
-    /*if (listen)*/ { // means : server mode
-#if 0
-      const char *smdport = ServerConfig::getSValue("smdport");
-      if (smdport)
-	smd_set_port(smdport);
-#endif
-    }
 
     if (getenv("RPC_MIN_SIZE")) {
       RPC_MIN_SIZE = atoi(getenv("RPC_MIN_SIZE"));
@@ -185,7 +179,9 @@ do { \
     static const std::string host_opt = "host";
     static const std::string port_opt = "port";
     static const std::string inet_opt = "inet";
+#ifndef HAVE_PTHREAD_PROCESS_SHARED
     static const std::string smd_port_opt = "smd-port";
+#endif
     static const std::string maximum_server_memory_size_opt = "maximum-server-memory-size";
     static const std::string default_file_mask_opt = "default-file-mask";
     static const std::string default_file_group_opt = "default-file-group";
@@ -265,11 +261,13 @@ do { \
 			(listen ? "" : " (used for local opening)"),
 			"CONFFILE"));
 
+#ifndef HAVE_PTHREAD_PROCESS_SHARED
     opts[opt_cnt++] = 
       Option(prefix + smd_port_opt, OptionStringType(), Option::MandatoryValue,
 	     OptionDesc(std::string("eyedbsmd port") +
 			(listen ? "" : " (used for local opening)"),
 			"PORT"));
+#endif
     
     opts[opt_cnt++] = 
       Option(prefix + default_file_mask_opt, OptionIntType(), Option::MandatoryValue,
@@ -510,6 +508,7 @@ do { \
     }
 #endif
 
+#ifndef HAVE_PTHREAD_PROCESS_SHARED
     if (map.find(smd_port_opt) != map.end()) {
 #ifndef USE_POSTINIT
       smd_set_port(map[smd_port_opt].value.c_str());
@@ -523,6 +522,7 @@ do { \
       if (smdport)
 	smd_set_port(smdport);
     }
+#endif
 #endif
 
     if (map.find(trans_def_mag_opt) != map.end())
@@ -753,9 +753,11 @@ do { \
 
   static void postinit()
   {
+#ifndef HAVE_PTHREAD_PROCESS_SHARED
     const char *smdport = ServerConfig::getSValue("smdport");
     if (smdport)
       smd_set_port(smdport);
+#endif
 
     const char *max_memsize = ServerConfig::getSValue("maximum_memory_size");
     if (max_memsize) {

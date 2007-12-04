@@ -267,7 +267,7 @@ namespace eyedbsm {
   oid2objh(const Oid *oid, const DbHandle *dbh, ObjectHeader **objh,
 	   MmapH *hdl, Boolean *oid2addr_failed);
 
-  static char* msg_2 = __FILE__;
+  static const char* msg_2 = __FILE__;
 #define TTT(S) (write( 1, S, strlen(S)))
  static int dummy_off_t_2 = (sizeof(off_t) != 8 ? (TTT(msg_2), *(char *)0 = 0) : 1);
 
@@ -531,7 +531,6 @@ namespace eyedbsm {
 #define objDataAll(DATA)  (*(char *)((char *)DATA+sizeof(int)))
 #define objDataData(DATA) (((char *)(DATA)+objDataOffset))
 #define objDataMask(DATA) (objDataData(DATA) + objDataSize(DATA))
-
 }
 
 #endif

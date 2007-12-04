@@ -604,7 +604,9 @@ namespace eyedb {
     fprintf(fd, "  Program Pid   %d\n", connhead->pid);
     fprintf(fd, "  Running Under %s\n\n", getUserName(connhead->uid));
 
+#ifndef HAVE_PTHREAD_PROCESS_SHARED
     fprintf(fd, "  SMD Port      %s\n", connhead->smdport);
+#endif
     
     fprintf(fd, "  Listening on  ");
 
