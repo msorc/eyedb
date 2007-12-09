@@ -26,7 +26,7 @@
 #include "kern_p.h"
 
 //#define NX_TRACE
-#define DSP_INVALID_OID
+//#define DSP_INVALID_OID
 #define SKIP_NX_LOCK
 
 namespace eyedbsm {

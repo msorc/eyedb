@@ -433,7 +433,7 @@ static int printDBEntry(Connection &conn, DBEntry *dbentry, DBM_Database *dbm, u
     dstats.display();
   }
 
-  printf( "\n");
+  //printf( "\n");
 
   return 0;
 }

@@ -35,8 +35,9 @@ int main(int c_argc, char *c_argv[])
   eyedb::init(c_argc, c_argv);
 
   std::vector<std::string> argv;
-  for (int n = 1; n < c_argc; n++)
+  for (int n = 1; n < c_argc; n++) {
     argv.push_back(c_argv[n]);
+  }
 
   Exception::setMode(Exception::ExceptionMode);
 
