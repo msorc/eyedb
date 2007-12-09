@@ -215,7 +215,6 @@ utilsmthfe_la_DEPENDENCIES= $(top_srcdir)/VERSION
 bin_PROGRAMS=					\
 eyedboql					\
 eyedbodl					\
-eyedbcrypt					\
 eyedbgetenv
 
 sbin_PROGRAMS=					\
@@ -238,9 +237,6 @@ eyedboql_LDADD= $(EYEDBCLLIBS)
 
 eyedbodl_SOURCES= eyedbodl.cc
 eyedbodl_LDADD= $(EYEDBCLLIBS)
-
-eyedbcrypt_SOURCES= eyedbcrypt.cc
-eyedbcrypt_LDADD= $(EYEDBCLLIBS)
 
 eyedbgetenv_SOURCES= eyedbgetenv.cc
 eyedbgetenv_LDADD= $(EYEDBCLLIBS)
