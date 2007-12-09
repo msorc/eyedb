@@ -993,7 +993,7 @@ int IDXSetdefdspCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
   if (map.find("help") != map.end())
     return help();
 
-  if (argv.size() < 1)
+  if (argv.size() < 3)
     return usage();
 
   const char *dbName = argv[0].c_str();
@@ -1088,7 +1088,7 @@ int IDXGetdefdspCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
   if (map.find("help") != map.end())
     return help();
 
-  if (argv.size() < 1)
+  if (argv.size() < 2)
     return usage();
 
   const char *dbName = argv[0].c_str();
@@ -1155,6 +1155,22 @@ int IDXGetlocaCmd::help()
   return 1;
 }
 
+//#define GET_ARG(ARGV, I) ((ARGV).size() <= (I) ? usage(), exit(1), std::string() : (ARGV)[I])
+
+#define GETARG(VAR, ARGV, I) \
+ if ((ARGV).size() <= (I)) \
+   return usage(); \
+ VAR = (ARGV)[I].c_str()
+
+inline std::string get_arg(std::vector<std::string> &argv, unsigned int idx)
+{
+  if (argv.size() <= idx) {
+    exit(1);
+  }
+
+  return argv[idx];
+}
+
 int IDXGetlocaCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
   if (! getopt->parse(PROGNAME, argv))
@@ -1165,10 +1181,13 @@ int IDXGetlocaCmd::perform(eyedb::Connection &conn, std::vector<std::string> &ar
   if (map.find("help") != map.end())
     return help();
 
-  if (argv.size() < 1)
+  if (argv.size() < 2)
     return usage();
 
-  const char *dbName = argv[0].c_str();
+  //const char *dbName = argv[0].c_str();
+  //const char *dbName;
+  GETARG(const char *dbName, argv, 0);
+  //const char *dbName	    = get_arg(argv, 0).c_str();
   const char *indexName = argv[1].c_str();
 
   bool locaOpt = false;
