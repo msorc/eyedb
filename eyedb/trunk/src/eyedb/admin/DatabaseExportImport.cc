@@ -37,7 +37,7 @@
 using namespace eyedb;
 using namespace std;
 
-extern const std::string PROG_NAME;
+extern const std::string PROGNAME;
 static unsigned int magic = 0xde728eab;
 
 // 
@@ -436,13 +436,13 @@ methods_manage(Database *db, DBMethod*& mths, unsigned int& nmths)
 	const char *s = Executable::getSOFile(extref);
 
 	if (!s) {
-	  std::cerr << PROG_NAME << ": error: cannot find file for extref '" << extref << "'\n";
+	  std::cerr << PROGNAME << ": error: cannot find file for extref '" << extref << "'\n";
 	  err = 1;
 	  continue;
 	}
 
 	if ((mths[nmths].fd = open(s, O_RDONLY)) < 0) {
-	  std::cerr << PROG_NAME << ": error: cannot open method file '" << (const char *)s << "' for reading\n";
+	  std::cerr << PROGNAME << ": error: cannot open method file '" << (const char *)s << "' for reading\n";
 	  err = 1;
 	  continue;
 	}
@@ -452,7 +452,7 @@ methods_manage(Database *db, DBMethod*& mths, unsigned int& nmths)
 	nmths++;
 
 	if (nmths == r) {
-	  std::cerr << PROG_NAME << ": error: no '" << Executable::makeExtRef(extref) << "' method file found.\n";
+	  std::cerr << PROGNAME << ": error: no '" << Executable::makeExtRef(extref) << "' method file found.\n";
 	  err = 1;
 	  strcpy(mths[nmths++].extref, extref);
 	}
@@ -467,7 +467,7 @@ methods_manage(Database *db, DBMethod*& mths, unsigned int& nmths)
 int eyedb::databaseExport( Connection &conn, const char *dbname, const char *file)
 {
   if (!eyedb::ServerConfig::getSValue("sopath")) {
-    std::cerr << PROG_NAME << ": error: variable 'sopath' must be set in your configuration file.\n";
+    std::cerr << PROGNAME << ": error: variable 'sopath' must be set in your configuration file.\n";
     return 1;
   }
 
@@ -483,14 +483,14 @@ int eyedb::databaseExport( Connection &conn, const char *dbname, const char *fil
 
   int dbfd = open(dbdesc.dbfile, O_RDONLY);
   if (dbfd < 0) {
-    std::cerr << PROG_NAME << ": error: cannot open dbfile '" << dbdesc.dbfile << "' for reading\n";
+    std::cerr << PROGNAME << ": error: cannot open dbfile '" << dbdesc.dbfile << "' for reading\n";
     return 1;
   }
 
   const char *ompfile = get_ompfile(dbdesc.dbfile);
   int ompfd = open(ompfile, O_RDONLY);
   if (ompfd < 0) {
-    std::cerr << PROG_NAME << ": error: cannot open ompfile '" << ompfile << "' for reading\n";
+    std::cerr << PROGNAME << ": error: cannot open ompfile '" << ompfile << "' for reading\n";
     return 1;
   }
 
@@ -517,12 +517,12 @@ int eyedb::databaseExport( Connection &conn, const char *dbname, const char *fil
 
     if (*datafiles[i].file) {
       if ((datafiles[i].datfd = open(file, O_RDONLY)) < 0) {
-	std::cerr << PROG_NAME << ": error: cannot open datafile '" << file << "' for reading.\n";
+	std::cerr << PROGNAME << ": error: cannot open datafile '" << file << "' for reading.\n";
 	return 1;
       }
 
       if ((datafiles[i].dmpfd = open(dmpfileGet(file), O_RDONLY)) < 0) {
-	std::cerr << PROG_NAME << ": error: cannot open dmpfile '" << dmpfileGet( file) << "' for reading.\n";
+	std::cerr << PROGNAME << ": error: cannot open dmpfile '" << dmpfileGet( file) << "' for reading.\n";
 	return 1;
       }
     }
@@ -556,7 +556,7 @@ int eyedb::databaseExport( Connection &conn, const char *dbname, const char *fil
     fd = creat(file, 0666);
 
     if (fd < 0) {
-      std::cerr << PROG_NAME << ": error: cannot create file '" << file << "'\n";
+      std::cerr << PROGNAME << ": error: cannot create file '" << file << "'\n";
       return 1;
     }
   }
@@ -648,7 +648,7 @@ decode_file(int fd, const char *f, const char *, const char *dir,
   READ_XDR_32(fd, &m, sizeof(m));
 
   if (m != magic) {
-    std::cerr << PROG_NAME << ": error: invalid EyeDB export file while decoding file '" << f << "'\n";
+    std::cerr << PROGNAME << ": error: invalid EyeDB export file while decoding file '" << f << "'\n";
     return 1;
   }
 
@@ -672,7 +672,7 @@ decode_file(int fd, const char *f, const char *, const char *dir,
     if (check_if_exist) {
       fddest = open(file, O_RDONLY);
       if (fddest >= 0) {
-	std::cerr << PROG_NAME << ": error: file '" << file << "' already exists: cannot overwrite it.\n";
+	std::cerr << PROGNAME << ": error: file '" << file << "' already exists: cannot overwrite it.\n";
 	close(fddest);
 	return 1;
       }
@@ -682,7 +682,7 @@ decode_file(int fd, const char *f, const char *, const char *dir,
   }
 
   if (fddest < 0) {
-    std::cerr << PROG_NAME <<  ": error: cannot create file '" << file << "'\n";
+    std::cerr << PROGNAME <<  ": error: cannot create file '" << file << "'\n";
     return 1;
   }
   
@@ -699,7 +699,7 @@ dbimport_getinfo(int fd, const char *file, DBInfo &info, unsigned int &version)
   READ_XDR_32(fd, &m, sizeof(m));
 
   if (m != magic) {
-    std::cerr << PROG_NAME <<  ": error: invalid EyeDB export file\n";
+    std::cerr << PROGNAME <<  ": error: invalid EyeDB export file\n";
     return 1;
   }
 
@@ -772,13 +772,13 @@ check_datafile_size(int ind, const eyedbsm::Datafile *datf)
 {
   if (!ind && datf->maxsize < MIN_DATAFILE_1)
     {
-      std::cerr << PROG_NAME << ": error: datafile " << datf->file << ": the KB size of the first datafile must be greater than " << MIN_DATAFILE_1 << "[" << datf->maxsize << "Kb]\n";
+      std::cerr << PROGNAME << ": error: datafile " << datf->file << ": the KB size of the first datafile must be greater than " << MIN_DATAFILE_1 << "[" << datf->maxsize << "Kb]\n";
       return 1;
     }
       
   if (datf->maxsize < MIN_DATAFILE)
     {
-      std::cerr << PROG_NAME << "error: datafile " << datf->file << ": the KB size of a datafile must be greater than " << MIN_DATAFILE << "[" << datf->maxsize << "Kb]\n";
+      std::cerr << PROGNAME << "error: datafile " << datf->file << ": the KB size of a datafile must be greater than " << MIN_DATAFILE << "[" << datf->maxsize << "Kb]\n";
       return 1;
     }
 
@@ -948,7 +948,7 @@ dbimport_realize( Connection &conn, int fd, const char *file, const char *dbname
   }
   else {
     if (!dbname) {
-      std::cerr << PROG_NAME << ": error: use -db option when importing from a pipe.\n";
+      std::cerr << PROGNAME << ": error: use -db option when importing from a pipe.\n";
       return 1;
     }
 
@@ -1173,7 +1173,7 @@ int eyedb::databaseImport( Connection &conn, const char *dbname, const char *fil
     fd = open(file, O_RDONLY);
 
     if (fd < 0) {
-      std::cerr << PROG_NAME << ": error: cannot open file '" << file << "' for reading.\n";
+      std::cerr << PROGNAME << ": error: cannot open file '" << file << "' for reading.\n";
       return 1;
     }
   }
@@ -1192,7 +1192,7 @@ int eyedb::databaseImport( Connection &conn, const char *dbname, const char *fil
   }
 
   if (conn.getServerUid() != getuid()) {
-    std::cerr << PROG_NAME 
+    std::cerr << PROGNAME 
 	      << "EyeDB server is running under user '" 
 	      << getUserName(conn.getServerUid()) 
 	      << "': database importation must be done under the same uid than the EyeDB server.\n";

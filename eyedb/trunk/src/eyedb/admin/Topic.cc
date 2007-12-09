@@ -100,12 +100,12 @@ int TopicSet::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 
 int TopicSet::usage()
 {
-  std::cerr << PROG_NAME << " usage:\n";
-  std::cerr << "  " << PROG_NAME << " --help\n";
-  std::cerr << "  " << PROG_NAME << " --help-eyedb-options\n";
-  std::cerr << "  " << PROG_NAME << " TOPIC --help\n";
-  std::cerr << "  " << PROG_NAME << " TOPIC COMMAND --help\n";
-  std::cerr << "  " << PROG_NAME << " TOPIC COMMAND OPTIONS\n\n";
+  std::cerr << PROGNAME << " usage:\n";
+  std::cerr << "  " << PROGNAME << " --help\n";
+  std::cerr << "  " << PROGNAME << " --help-eyedb-options\n";
+  std::cerr << "  " << PROGNAME << " TOPIC --help\n";
+  std::cerr << "  " << PROGNAME << " TOPIC COMMAND --help\n";
+  std::cerr << "  " << PROGNAME << " TOPIC COMMAND OPTIONS\n\n";
   std::cerr << "where TOPIC is one of the following:\n";
 
   std::vector<Topic *>::iterator begin = topic_v.begin();
@@ -127,7 +127,7 @@ int TopicSet::help()
   std::vector<Topic *>::iterator begin = topic_v.begin();
   std::vector<Topic *>::iterator end = topic_v.end();
 
-  std::cerr << PROG_NAME << " help:\n\n";
+  std::cerr << PROGNAME << " help:\n\n";
 
   for (int n = 0; begin != end; n++) {
     Topic *topic = *begin;
@@ -138,7 +138,7 @@ int TopicSet::help()
       std::cerr << '\n';
     }
 
-    //std::cerr << "  " << PROG_NAME << " " << topic->getName() << " --help\n";
+    //std::cerr << "  " << PROGNAME << " " << topic->getName() << " --help\n";
     while (b != e) {
       Command *cmd = *b;
       std::cerr << "  ";
@@ -212,9 +212,9 @@ Command *Topic::getCommand(const std::string &name)
 
 int Topic::usage(const std::string &tname)
 {
-  std::cerr << PROG_NAME << " " << name << " usage:\n\n";
-  std::cerr << "  " << PROG_NAME << " " << tname << " --help\n";
-  std::cerr << "  " << PROG_NAME << " " << tname << " COMMAND OPTIONS\n\n";
+  std::cerr << PROGNAME << " " << name << " usage:\n\n";
+  std::cerr << "  " << PROGNAME << " " << tname << " --help\n";
+  std::cerr << "  " << PROGNAME << " " << tname << " COMMAND OPTIONS\n\n";
   std::cerr << "where COMMAND is one of the following:\n";
 
   std::vector<Command *>::iterator begin = cmd_v.begin();
@@ -234,7 +234,7 @@ int Topic::help()
   std::vector<Command *>::iterator begin = cmd_v.begin();
   std::vector<Command *>::iterator end = cmd_v.end();
 
-  std::cerr << PROG_NAME << " " << name << " help:\n\n";
+  std::cerr << PROGNAME << " " << name << " help:\n\n";
 
   while (begin != end) {
     Command *cmd = *begin;
@@ -249,6 +249,6 @@ int Topic::help()
 std::string Command::getExtName() const
 {
   if (isShortcutMode())
-    return PROG_NAME;
-  return PROG_NAME + " " + topic->getName() + " " + getName();
+    return PROGNAME;
+  return PROGNAME + " " + topic->getName() + " " + getName();
 }

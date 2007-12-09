@@ -84,7 +84,7 @@ int CLSGetInstDefDSPCmd::help()
 
 int CLSGetInstDefDSPCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -159,7 +159,7 @@ int CLSSetInstDefDSPCmd::help()
 
 int CLSSetInstDefDSPCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -220,7 +220,7 @@ int CLSMoveInstCmd::help()
 
 int CLSMoveInstCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -285,7 +285,7 @@ int CLSGetInstLocaCmd::help()
 
 int CLSGetInstLocaCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();

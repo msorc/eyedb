@@ -74,7 +74,7 @@ int DSPCreateCmd::help()
 
 int DSPCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -136,7 +136,7 @@ int DSPUpdateCmd::help()
 
 int DSPUpdateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -199,7 +199,7 @@ int DSPDeleteCmd::help()
 
 int DSPDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -257,7 +257,7 @@ int DSPRenameCmd::help()
 
 int DSPRenameCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -315,7 +315,7 @@ int DSPListCmd::help()
 
 int DSPListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -380,7 +380,7 @@ int DSPSetDefCmd::help()
 
 int DSPSetDefCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -436,7 +436,7 @@ int DSPGetDefCmd::help()
 
 int DSPGetDefCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -493,7 +493,7 @@ int DSPSetCurDatCmd::help()
 
 int DSPSetCurDatCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -554,7 +554,7 @@ int DSPGetCurDatCmd::help()
 
 int DSPGetCurDatCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();

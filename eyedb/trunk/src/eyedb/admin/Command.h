@@ -33,7 +33,7 @@
 
 class Topic;
 
-extern const std::string PROG_NAME;
+extern std::string PROGNAME;
 
 class Command {
 
@@ -65,7 +65,7 @@ class CLS : public Command { \
 public: \
   CLS(Topic *topic) : Command(topic, NAME) { } \
 \
-  virtual int usage() { std::cout << PROG_NAME << " " << topic->getName() << " " << NAME << " OPTIONS\n"; return 1; } \
+  virtual int usage() { std::cout << PROGNAME << " " << topic->getName() << " " << NAME << " OPTIONS\n"; return 1; } \
   virtual int help() { std::cout << "help: " << NAME << '\n'; return 1; } \
   virtual int perform(eyedb::Connection &conn, std::vector<std::string> &argv) { return 1; } \
 }
