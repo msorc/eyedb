@@ -46,7 +46,7 @@ Note: tests depends on datafile create,delete,list
 FD: from eyedbidxadmin [IDXTopic module]
   eyedbadmin index create [DONE]
   eyedbadmin index delete [DONE]
-  eyedbadmin index update
+  eyedbadmin index update [DONE, NOT TESTED]
   eyedbadmin index list [DONE]
   eyedbadmin index stats [DONE]
   eyedbadmin index simulate [DONE]
