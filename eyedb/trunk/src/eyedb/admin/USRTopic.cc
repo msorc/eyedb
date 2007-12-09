@@ -53,7 +53,7 @@ USRTopic::USRTopic() : Topic("user")
 #define N 4
 
 static void
-passwd_realize(const char *prompt, char **passwd, int retype = 1)
+passwd_realize(const char *prompt, const char *&passwd, int retype = 1)
 {
   static int n;
   static char pswd[N][12];
@@ -83,7 +83,7 @@ passwd_realize(const char *prompt, char **passwd, int retype = 1)
       printf("passwords differ, try again.\n");
     }
 
-  *passwd = p;
+  passwd = p;
 }
 
 static void
@@ -163,8 +163,8 @@ int USRAddCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
   } else
     user_type = EyeDBUser;
 
-  char *username = 0;
-  char *passwd = 0;
+  const char *username = 0;
+  const char *passwd = 0;
 
   if (argv.size() >= 1) {
     username = strdup(argv[0].c_str());
@@ -186,7 +186,7 @@ int USRAddCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
     char buf[128];
 
     sprintf(buf, "%s password", username);
-    passwd_realize(buf, &passwd);
+    passwd_realize(buf, passwd);
   }
   if (!passwd)
     passwd = "";
@@ -318,7 +318,7 @@ str_sys_mode(SysAccessMode sysmode)
   if (sysmode == SuperUserSysAccessMode)
     return "SUPERUSER_SYSACCESS_MODE";
 
-  char *concat;
+  const char *concat;
   *sysstr = 0;
 
   concat = "";
@@ -346,7 +346,7 @@ str_user_mode(DBAccessMode usermode)
   if (usermode == AdminDBAccessMode)
     return "ADMIN_DBACCESS_MODE";
 
-  char *concat;
+  const char *concat;
   *userstr = 0;
 
   concat = "";
@@ -782,21 +782,21 @@ int USRPasswdCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   }
 
   char *username = strdup(argv[0].c_str());
-  char *passwd = 0;
-  char *newpasswd = 0;
+  const char *passwd = 0;
+  const char *newpasswd = 0;
 
   if (argv.size() >= 2) {
     passwd = strdup(argv[1].c_str());
 
     if (argv.size() >= 3)
-      newpasswd = strdup(argv[1].c_str());
+      newpasswd = strdup(argv[2].c_str());
   }
 
   if (!passwd)
-    passwd_realize("user old password", &passwd, 0);
+    passwd_realize("user old password", passwd, 0);
 
   if (!newpasswd)
-    passwd_realize("user new password", &newpasswd);
+    passwd_realize("user new password", newpasswd);
 
   char userauth[32];
   char passwdauth[10];

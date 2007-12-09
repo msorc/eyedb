@@ -207,7 +207,7 @@ int DSPDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   if (map.find("help") != map.end())
     return help();
 
-  if (argv.size() < 2)
+  if (argv.size() != 2)
     return usage();
 
   const char *dbname = argv[0].c_str();
@@ -265,7 +265,7 @@ int DSPRenameCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   if (map.find("help") != map.end())
     return help();
 
-  if (argv.size() < 3)
+  if (argv.size() != 3)
     return usage();
 
   const char *dbname = argv[0].c_str();

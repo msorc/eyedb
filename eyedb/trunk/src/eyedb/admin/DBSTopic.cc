@@ -319,7 +319,7 @@ static const char *sysModeStr(SysAccessMode sysmode)
   if (sysmode == SuperUserSysAccessMode)
     return "SUPERUSER_SYSACCESS_MODE";
 
-  char *concat;
+  const char *concat;
   *sysstr = 0;
 
   concat = "";
@@ -346,7 +346,7 @@ static const char *userModeStr(DBAccessMode usermode)
   if (usermode == AdminDBAccessMode)
     return "ADMIN_DBACCESS_MODE";
 
-  char *concat;
+  const char *concat;
   *userstr = 0;
 
   concat = "";
