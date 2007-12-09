@@ -1378,7 +1378,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 
     vd = (DbDescription *)m_calloc(sizeof(DbDescription), 1);
 
-#ifdef HAVE_PTHREAD_PROCESS_SHARED
+#ifndef HAVE_EYEDBSMD
     smdcli_conn_t *conn = 0;
 #else
     smdcli_conn_t *conn = smdcli_open(smd_get_port());
@@ -1402,7 +1402,6 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 			"%s", smd_get_port());
     }
 #endif
-
 #endif
 
     if ((shmfd = shmfileOpen(dbfile)) < 0) {

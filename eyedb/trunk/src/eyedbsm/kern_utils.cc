@@ -454,15 +454,15 @@ namespace eyedbsm {
     return Success;
   }
 
-  void
-  display_invalid_oid(const Oid *oid, ObjectHeader *xobjh)
+  void display_invalid_oid(const Oid *oid, ObjectHeader *xobjh)
   {
-    printf("invalid oid: %s\n", getOidString(oid));
-    printf("xobjh = %p", xobjh);
-    if (xobjh)
-      printf(" unique=%d size=%u [%u]", x2h_u32(xobjh->unique),
+    printf("eyedbsm: invalid oid: %s ", getOidString(oid));
+    printf(", xobjh: %p", xobjh);
+    if (xobjh) {
+      printf(" , unique: %d, size: %u [%u]", x2h_u32(xobjh->unique),
 	     x2h_u32(xobjh->size),
 	     x2h_makeValid(xobjh->size));
+    }
     printf("\n");
   }
 
