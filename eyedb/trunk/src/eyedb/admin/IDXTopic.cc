@@ -134,7 +134,7 @@ indexGet( Database *db, const char *name, LinkedList &indexlist)
     Attribute::getIndex(db, name, index);
     
     if (!index) {
-      std::cerr << PROG_NAME;
+      std::cerr << PROGNAME;
       fprintf(stderr, ": index '%s' not found\n", name);
       return 1;
     }
@@ -146,7 +146,7 @@ indexGet( Database *db, const char *name, LinkedList &indexlist)
     // name is a class name
     cls = db->getSchema()->getClass(name);
     if (!cls) {
-      std::cerr << PROG_NAME;
+      std::cerr << PROGNAME;
       fprintf(stderr, ": class '%s' not found\n", name);
       return 1;
     }
@@ -216,7 +216,7 @@ int IDXCreateCmd::help()
 
 int IDXCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -322,7 +322,7 @@ int IDXDeleteCmd::help()
 
 int IDXDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -354,7 +354,7 @@ int IDXDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   Attribute::getIndex(db, attributePath, index);
       
   if (!index) {
-    std::cerr << PROG_NAME;
+    std::cerr << PROGNAME;
     fprintf(stderr, ": index '%s' not found\n", attributePath);
     return 1;
   }
@@ -412,7 +412,7 @@ int IDXUpdateCmd::help()
 
 int IDXUpdateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -541,7 +541,7 @@ int IDXListCmd::help()
 
 int IDXListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -645,7 +645,7 @@ int IDXStatsCmd::help()
 
 int IDXStatsCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -747,7 +747,7 @@ int IDXSimulateCmd::help()
 
 int IDXSimulateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -901,7 +901,7 @@ get_idxs( Database *db, const char *attrpath, ObjectArray &obj_arr)
   q.execute(obj_arr);
 
   if (!obj_arr.getCount()) {
-    std::cerr << PROG_NAME << ": ";
+    std::cerr << PROGNAME << ": ";
     fprintf(stderr, "no index %s found\n", attrpath);
     return 1;
   }
@@ -911,7 +911,7 @@ get_idxs( Database *db, const char *attrpath, ObjectArray &obj_arr)
 
 int IDXMoveCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -985,7 +985,7 @@ int IDXSetdefdspCmd::help()
 
 int IDXSetdefdspCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -1080,7 +1080,7 @@ print( Database *db, const Dataspace *dataspace, Bool def = False)
 
 int IDXGetdefdspCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -1157,7 +1157,7 @@ int IDXGetlocaCmd::help()
 
 int IDXGetlocaCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();

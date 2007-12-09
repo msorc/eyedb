@@ -104,7 +104,7 @@ int DTFCreateCmd::help()
 
 int DTFCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (!getopt->parse(PROG_NAME, argv))
+  if (!getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -181,7 +181,7 @@ int DTFDeleteCmd::help()
 
 int DTFDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -249,7 +249,7 @@ int DTFMoveCmd::help()
 
 int DTFMoveCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -317,7 +317,7 @@ int DTFRenameCmd::help()
 
 int DTFRenameCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -379,7 +379,7 @@ int DTFResizeCmd::help()
 
 int DTFResizeCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -443,7 +443,7 @@ int DTFDefragmentCmd::help()
 
 int DTFDefragmentCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -516,7 +516,7 @@ int DTFListCmd::help()
 
 int DTFListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();

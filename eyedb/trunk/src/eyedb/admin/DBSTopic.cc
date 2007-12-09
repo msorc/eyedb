@@ -89,7 +89,7 @@ int DBSCreateCmd::help()
 
 int DBSCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  bool r = getopt->parse(PROG_NAME, argv);
+  bool r = getopt->parse(PROGNAME, argv);
 
   GetOpt::Map &map = getopt->getMap();
 
@@ -532,7 +532,7 @@ static unsigned getListOptions(const GetOpt::Map &map)
 
 int DBSListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  bool r = getopt->parse(PROG_NAME, argv);
+  bool r = getopt->parse(PROGNAME, argv);
 
   GetOpt::Map &map = getopt->getMap();
 
@@ -618,7 +618,7 @@ int DBSRenameCmd::help()
 
 int DBSRenameCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  bool r = getopt->parse(PROG_NAME, argv);
+  bool r = getopt->parse(PROGNAME, argv);
 
   GetOpt::Map &map = getopt->getMap();
 
@@ -677,7 +677,7 @@ int DBSDeleteCmd::help()
 
 int DBSDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  bool r = getopt->parse(PROG_NAME, argv);
+  bool r = getopt->parse(PROGNAME, argv);
 
   GetOpt::Map &map = getopt->getMap();
 
@@ -758,7 +758,7 @@ int DBSMoveCmd::help()
 
 int DBSMoveCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -858,7 +858,7 @@ int DBSCopyCmd::help()
 
 int DBSCopyCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -896,7 +896,7 @@ int DBSCopyCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
   db->getInfo( &conn, 0, 0, &oldDesc);
 
   if (oldDesc.sedbdesc.ndat > 1 && map.find(FILEDIR_OPT) == map.end()) {
-    std::cerr << PROG_NAME << ": error: when copying a database with more than one datafile, option --filedir is mandatory\n";
+    std::cerr << PROGNAME << ": error: when copying a database with more than one datafile, option --filedir is mandatory\n";
     return 1;
   }
 
@@ -979,7 +979,7 @@ static int getDbAccessMode(const char *accessMode, DBAccessMode &dbMode)
 
 int DBSDefAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -1035,7 +1035,7 @@ int DBSExportCmd::help()
 
 int DBSExportCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();
@@ -1099,7 +1099,7 @@ int DBSImportCmd::help()
 
 int DBSImportCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (! getopt->parse(PROG_NAME, argv))
+  if (! getopt->parse(PROGNAME, argv))
     return usage();
 
   GetOpt::Map &map = getopt->getMap();

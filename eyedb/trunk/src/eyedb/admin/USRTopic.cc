@@ -144,7 +144,7 @@ int USRAddCmd::help()
 
 int USRAddCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (!getopt->parse(PROG_NAME, argv)) {
+  if (!getopt->parse(PROGNAME, argv)) {
     return usage();
   }
 
@@ -235,7 +235,7 @@ int USRDeleteCmd::help()
 
 int USRDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (!getopt->parse(PROG_NAME, argv)) {
+  if (!getopt->parse(PROGNAME, argv)) {
     return usage();
   }
 
@@ -384,7 +384,7 @@ get_sys_access(DBM_Database *dbm, const char *username)
   obj_arr.garbage();
 
   if (status) {
-    std::cerr << PROG_NAME;
+    std::cerr << PROGNAME;
     status->print();
     exit(1);
   }
@@ -498,7 +498,7 @@ list_selected_users(DBM_Database *dbm, std::vector<std::string> &argv)
     dbm->getUser( username, user);
     
     if (!user) {
-      std::cerr << PROG_NAME;
+      std::cerr << PROGNAME;
       std::cerr << ": user " << username << " not found\n";
       error = 1;
     }
@@ -519,7 +519,7 @@ list_selected_users(DBM_Database *dbm, std::vector<std::string> &argv)
 
 int USRListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (!getopt->parse(PROG_NAME, argv)) {
+  if (!getopt->parse(PROGNAME, argv)) {
     return usage();
   }
 
@@ -579,7 +579,7 @@ int USRSysAccessCmd::help()
 
 int USRSysAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (!getopt->parse(PROG_NAME, argv)) {
+  if (!getopt->parse(PROGNAME, argv)) {
     return usage();
   }
 
@@ -699,7 +699,7 @@ userdbaccessset_realize(const char *username, const char *dbname,
 
 int USRDBAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (!getopt->parse(PROG_NAME, argv)) {
+  if (!getopt->parse(PROGNAME, argv)) {
     return usage();
   }
 
@@ -767,7 +767,7 @@ int USRPasswdCmd::help()
 
 int USRPasswdCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
-  if (!getopt->parse(PROG_NAME, argv)) {
+  if (!getopt->parse(PROGNAME, argv)) {
     return usage();
   }
 

@@ -28,7 +28,7 @@
 
 using namespace eyedb;
 
-const std::string PROG_NAME = "eyedbdbcreate";
+std::string PROGNAME = "eyedbdbcreate";
 
 int main(int c_argc, char *c_argv[])
 {
