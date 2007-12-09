@@ -67,4 +67,3 @@ install-exec-hook:
 		if [ -L $$f ] ; then rm $$f ; fi ; \
 		if [ ! -f $$f ] ; then ln -s eyedbadmin $$f ; fi ; \
 	done
-
