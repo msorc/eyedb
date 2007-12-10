@@ -219,8 +219,7 @@ eyedbgetenv
 
 sbin_PROGRAMS=					\
 eyedbd						\
-eyedbctl					\
-eyedbrc						
+eyedbctl
 
 EYEDBSVLIBS=libeyedb.la $(top_builddir)/src/lib/libeyedbrpcbe.la $(top_builddir)/src/lib/libeyedbrpcfe.la $(top_builddir)/src/eyedbsm/libeyedbsm.la $(top_builddir)/src/lib/libeyedbutils.la
 
@@ -243,9 +242,6 @@ eyedbgetenv_LDADD= $(EYEDBCLLIBS)
 
 eyedbctl_SOURCES= eyedbctl.cc
 eyedbctl_LDADD= $(EYEDBCLLIBS)
-
-eyedbrc_SOURCES= eyedbrc.cc
-eyedbrc_LDADD= $(EYEDBCLLIBS)
 
 noinst_HEADERS= \
 api_lib.h \
