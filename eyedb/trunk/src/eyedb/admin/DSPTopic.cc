@@ -64,6 +64,7 @@ int DSPCreateCmd::usage()
 
 int DSPCreateCmd::help()
 {
+  getopt->adjustMaxLen("DSPNAME");
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("DSPNAME", "Dataspace name");
@@ -126,6 +127,7 @@ int DSPUpdateCmd::usage()
 
 int DSPUpdateCmd::help()
 {
+  getopt->adjustMaxLen("DSPNAME");
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("DSPNAME", "Dataspace name");
@@ -191,6 +193,7 @@ int DSPDeleteCmd::usage()
 
 int DSPDeleteCmd::help()
 {
+  getopt->adjustMaxLen("DSPNAME");
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("DSPNAME", "Dataspace name");
@@ -248,6 +251,7 @@ int DSPRenameCmd::usage()
 
 int DSPRenameCmd::help()
 {
+  getopt->adjustMaxLen("NEWDSPNAME");
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("DSPNAME", "Dataspace name");
@@ -307,6 +311,7 @@ int DSPListCmd::usage()
 
 int DSPListCmd::help()
 {
+  getopt->adjustMaxLen("DSPNAME");
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("DSPNAME", "Dataspace name");
@@ -372,6 +377,7 @@ int DSPSetDefCmd::usage()
 
 int DSPSetDefCmd::help()
 {
+  getopt->adjustMaxLen("DSPNAME");
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("DSPNAME", "Dataspace name");
@@ -483,6 +489,7 @@ int DSPSetCurDatCmd::usage()
 
 int DSPSetCurDatCmd::help()
 {
+  getopt->adjustMaxLen("DSPNAME");
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("DSPNAME", "Dataspace name");
@@ -546,6 +553,7 @@ int DSPGetCurDatCmd::usage()
 
 int DSPGetCurDatCmd::help()
 {
+  getopt->adjustMaxLen("DSPNAME");
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("DSPNAME", "Dataspace name");

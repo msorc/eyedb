@@ -188,6 +188,19 @@ void GetOpt::displayHelpOpt(const Option &opt, ostream &os) const
   }
 }
 
+void GetOpt::adjustMaxLen(const std::string &opt)
+{
+  adjustMaxLen(opt.length());
+}
+
+void GetOpt::adjustMaxLen(unsigned int maxlen)
+{
+  (void)getMaxLen();
+  if (_maxlen < maxlen) {
+    _maxlen = maxlen;
+  }
+}
+
 unsigned int GetOpt::getMaxLen() const
 {
   if (_maxlen)
@@ -513,9 +526,15 @@ bool GetOpt::parse(const std::string &prog, std::vector<std::string> &argv)
 
   //display("after: " , argv);
 
+#if 1
+  for (unsigned int n = 0; n < argc; n++) {
+    free(c_argv[n]);
+  }
+#else
   for (unsigned int n = 0; n < argv_cnt + 1; n++) {
     free(c_argv[n]);
   }
+#endif
 
   delete [] c_argv;
   return r;

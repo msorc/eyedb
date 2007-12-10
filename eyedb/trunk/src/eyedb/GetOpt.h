@@ -292,6 +292,8 @@ public:
   typedef std::map<std::string, OptionValue> Map;
   GetOpt::Map &getMap() {return map;}
 
+  void adjustMaxLen(const std::string &opt);
+  void adjustMaxLen(unsigned int maxlen);
 
 private:
   std::string prog;
