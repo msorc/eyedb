@@ -314,6 +314,7 @@ int IDXDeleteCmd::usage()
 
 int IDXDeleteCmd::help()
 {
+  getopt->adjustMaxLen("ATTRPATH");
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("ATTRPATH", "Attribute path");
@@ -403,6 +404,7 @@ int IDXUpdateCmd::usage()
 
 int IDXUpdateCmd::help()
 {
+  getopt->adjustMaxLen("ATTRPATH");
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("ATTRPATH", "Attribute path");
@@ -516,9 +518,11 @@ void IDXListCmd::init()
 
   opts.push_back(HELP_OPT);
 
-  opts.push_back( Option(FULL_OPT, OptionBoolType()));
+  opts.push_back( Option(FULL_OPT, OptionBoolType(), 0,
+			 OptionDesc("Displays full information")));
 
-  opts.push_back( Option(ALL_OPT, OptionBoolType()));
+  opts.push_back( Option(ALL_OPT, OptionBoolType(), 0,
+			 OptionDesc("Displays all indexes")));
 
   getopt = new GetOpt(getExtName(), opts);
 }
@@ -532,6 +536,7 @@ int IDXListCmd::usage()
 
 int IDXListCmd::help()
 {
+  getopt->adjustMaxLen("CLASSNAME");
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("ATTRPATH", "Attribute path");
@@ -597,7 +602,8 @@ void IDXStatsCmd::init()
 
   opts.push_back(HELP_OPT);
 
-  opts.push_back( Option(FULL_OPT, OptionBoolType()));
+  opts.push_back( Option(FULL_OPT, OptionBoolType(), 0,
+			 OptionDesc("Display all index entry statistics")));
 
   opts.push_back( Option(FORMAT_OPT, 
 			 OptionStringType(),
@@ -830,7 +836,8 @@ void IDXMoveCmd::init()
 
   opts.push_back(HELP_OPT);
 
-  opts.push_back( Option(COLLAPSE_OPT, OptionBoolType()));
+  // not yet implemented
+  //opts.push_back( Option(COLLAPSE_OPT, OptionBoolType()));
 
   getopt = new GetOpt(getExtName(), opts);
 }
@@ -844,6 +851,7 @@ int IDXMoveCmd::usage()
 
 int IDXMoveCmd::help()
 {
+  getopt->adjustMaxLen("DESTDATASPACE");
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("INDEXNAME", "Name of index to move");
@@ -976,6 +984,7 @@ int IDXSetdefdspCmd::usage()
 
 int IDXSetdefdspCmd::help()
 {
+  getopt->adjustMaxLen("DATASPACE");
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("INDEXNAME", "Name of index");
@@ -1044,6 +1053,7 @@ int IDXGetdefdspCmd::usage()
 
 int IDXGetdefdspCmd::help()
 {
+  getopt->adjustMaxLen("INDEXNAME");
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("INDEXNAME", "Name of index");
@@ -1133,9 +1143,9 @@ void IDXGetlocaCmd::init()
 
   opts.push_back(HELP_OPT);
 
-  opts.push_back( Option(STATS_OPT, OptionBoolType()));
-  opts.push_back( Option(LOCA_OPT, OptionBoolType()));
-  opts.push_back( Option(ALL_OPT, OptionBoolType()));
+  opts.push_back( Option(STATS_OPT, OptionBoolType(), 0, OptionDesc("Displays statistics information")));
+  opts.push_back( Option(LOCA_OPT, OptionBoolType(), 0, OptionDesc("Displays localization information")));
+  opts.push_back( Option(ALL_OPT, OptionBoolType(), 0, OptionDesc("Displays localization and statistics information")));
 
   getopt = new GetOpt(getExtName(), opts);
 }
@@ -1149,6 +1159,7 @@ int IDXGetlocaCmd::usage()
 
 int IDXGetlocaCmd::help()
 {
+  getopt->adjustMaxLen("INDEXNAME");
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("INDEXNAME", "Index name");

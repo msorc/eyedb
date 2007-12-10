@@ -601,17 +601,17 @@ int DBSRenameCmd::usage()
 {
   getopt->usage("", "");
 
-  std::cerr << " DBNAME NEW_DBNAME\n";
+  std::cerr << " DBNAME NEWDBNAME\n";
 
   return 1;
 }
 
 int DBSRenameCmd::help()
 {
+  getopt->adjustMaxLen("NEWDBNAME");
   stdhelp();
-
-  getopt->displayOpt("DBNAME    ", "Database to rename");
-  getopt->displayOpt("NEW_DBNAME", "New database name");
+  getopt->displayOpt("DBNAME", "Database to rename");
+  getopt->displayOpt("NEWDBNAME", "New database name");
 
   return 1;
 }
@@ -844,7 +844,7 @@ void DBSCopyCmd::init()
 int DBSCopyCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " DBNAME NEW_DBNAME\n";
+  std::cerr << " DBNAME NEWDBNAME\n";
   return 1;
 }
 
@@ -852,7 +852,7 @@ int DBSCopyCmd::help()
 {
   stdhelp();
   getopt->displayOpt("DBNAME", "Database to copy");
-  getopt->displayOpt("NEW_DBNAME", "New database name");
+  getopt->displayOpt("NEWDBNAME", "New database name");
   return 1;
 }
 

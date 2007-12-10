@@ -119,11 +119,13 @@ void USRAddCmd::init()
   std::vector<Option> opts;
 
   opts.push_back(HELP_OPT);
-  opts.push_back( Option(ADD_UNIX_OPT,
-			 OptionBoolType()));
-  opts.push_back( Option(ADD_STRICT_UNIX_OPT, 
-			 OptionBoolType()));
-
+  opts.push_back(Option(ADD_UNIX_OPT,
+			OptionBoolType(),
+			0,
+			OptionDesc("User is mapped on a Unix user: Unix and eyedb authentication mechanisms are supported")));
+  opts.push_back(Option(ADD_STRICT_UNIX_OPT, 
+			OptionBoolType(), 0,
+			OptionDesc("User is mapped on a Unix user: only Unix authentication mechanism is supported")));
   getopt = new GetOpt(getExtName(), opts);
 }
 
@@ -136,6 +138,7 @@ int USRAddCmd::usage()
 
 int USRAddCmd::help()
 {
+  getopt->adjustMaxLen("PASSWORD");
   stdhelp();
   getopt->displayOpt("USER", "User name");
   getopt->displayOpt("PASSWORD", "Password for specified user");
@@ -662,6 +665,7 @@ int USRDBAccessCmd::usage()
 
 int USRDBAccessCmd::help()
 {
+  getopt->adjustMaxLen("DBNAME");
   stdhelp();
   getopt->displayOpt("USER", "User name");
   getopt->displayOpt("DBNAME", "Database name");
@@ -757,6 +761,7 @@ int USRPasswdCmd::usage()
 
 int USRPasswdCmd::help()
 {
+  getopt->adjustMaxLen("NEWPASSWORD");
   stdhelp();
   getopt->displayOpt("USER", "User name");
   getopt->displayOpt("PASSWORD", "User password");

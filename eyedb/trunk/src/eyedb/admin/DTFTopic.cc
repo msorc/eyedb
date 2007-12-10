@@ -97,7 +97,7 @@ int DTFCreateCmd::usage()
 int DTFCreateCmd::help()
 {
   stdhelp();
-  getopt->displayOpt("DBNAME", "Database");
+  getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("DATAFILE", "Datafile");
   return 1;
 }
@@ -172,8 +172,9 @@ int DTFDeleteCmd::usage()
 
 int DTFDeleteCmd::help()
 {
+  getopt->adjustMaxLen("DATNAME");
   stdhelp();
-  getopt->displayOpt("DBNAME", "Database");
+  getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("DATID", "Datafile id");
   getopt->displayOpt("DATNAME", "Datafile name");
   return 1;
@@ -233,17 +234,18 @@ void DTFMoveCmd::init()
 int DTFMoveCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " DBNAME DATID|DATNAME NEW_DATAFILE\n";
+  std::cerr << " DBNAME DATID|DATNAME NEWDATAFILE\n";
   return 1;
 }
 
 int DTFMoveCmd::help()
 {
+  getopt->adjustMaxLen("NEWDATAFILE");
   stdhelp();
-  getopt->displayOpt("DBNAME", "Database");
+  getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("DATID", "Datafile id");
   getopt->displayOpt("DATNAME", "Datafile name");
-  getopt->displayOpt("NEW_DATAFILE", "New datafile");
+  getopt->displayOpt("NEWDATAFILE", "New datafile");
   return 1;
 }
 
@@ -301,17 +303,18 @@ void DTFRenameCmd::init()
 int DTFRenameCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " DBNAME DATID|DATNAME NEW_NAME\n";
+  std::cerr << " DBNAME DATID|DATNAME NEWNAME\n";
   return 1;
 }
 
 int DTFRenameCmd::help()
 {
+  getopt->adjustMaxLen("NEWNAME");
   stdhelp();
-  getopt->displayOpt("DBNAME", "Database");
+  getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("DATID", "Datafile id");
   getopt->displayOpt("DATNAME", "Datafile name");
-  getopt->displayOpt("NEW_NAME", "New name");
+  getopt->displayOpt("NEWNAME", "New name");
   return 1;
 }
 
@@ -363,17 +366,18 @@ void DTFResizeCmd::init()
 int DTFResizeCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " DBNAME DATID|DATNAME NEW_SIZE\n";
+  std::cerr << " DBNAME DATID|DATNAME NEWSIZE\n";
   return 1;
 }
 
 int DTFResizeCmd::help()
 {
+  getopt->adjustMaxLen("NEWSIZE");
   stdhelp();
-  getopt->displayOpt("DBNAME", "Database");
+  getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("DATID", "Datafile id");
   getopt->displayOpt("DATNAME", "Datafile name");
-  getopt->displayOpt("NEW_SIZE", "New size (in Mb)");
+  getopt->displayOpt("NEWSIZE", "New size (in Mb)");
   return 1;
 }
 
@@ -428,14 +432,15 @@ void DTFDefragmentCmd::init()
 int DTFDefragmentCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " DBNAME DATID|DATNAME NEW_SIZE\n";
+  std::cerr << " DBNAME DATID|DATNAME\n";
   return 1;
 }
 
 int DTFDefragmentCmd::help()
 {
+  getopt->adjustMaxLen("DATNAME");
   stdhelp();
-  getopt->displayOpt("DBNAME", "Database");
+  getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("DATID", "Datafile id");
   getopt->displayOpt("DATNAME", "Datafile name");
   return 1;
@@ -507,8 +512,9 @@ int DTFListCmd::usage()
 
 int DTFListCmd::help()
 {
+  getopt->adjustMaxLen("DATNAME");
   stdhelp();
-  getopt->displayOpt("DBNAME", "Database");
+  getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("DATID", "Datafile id");
   getopt->displayOpt("DATNAME", "Datafile name");
   return 1;

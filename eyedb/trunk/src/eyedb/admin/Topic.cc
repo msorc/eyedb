@@ -49,11 +49,13 @@ TopicSet::TopicSet()
   addTopic(new DSPTopic());
   addTopic(new USRTopic());
   addTopic(new IDXTopic());
-  addTopic(new CLSTopic());
-  addTopic(new COLTopic());
-  addTopic(new ATRTopic());
-  addTopic(new OBJTopic());
-  addTopic(new CNSTopic());
+
+  // not yet implemented
+  //addTopic(new CLSTopic());
+  //addTopic(new COLTopic());
+  //addTopic(new ATRTopic());
+  //addTopic(new OBJTopic());
+  //addTopic(new CNSTopic());
 }
 
 int TopicSet::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
