@@ -58,30 +58,30 @@ administration manuals.
 The next step is to create a database to perform our tests.\\
 \\
 Before creating a database, you can check that you are authorized to perform this
-operation, using the \texttt{eyedbuserlist} command, as in:
+operation, using the \texttt{eyedbadmin} command, as in:
 \verbsize \begin{verbatim}
-% eyedbuserlist
+% eyedbadmin user list
 name      : "francois" [strict unix user]
 sysaccess : SUPERUSER_SYSACCESS_MODE
 \end{verbatim}
 \normalsize
-If you are running the \texttt{eyedbuserlist} command under the same
+If you are running the \texttt{eyedbadmin} command under the same
 Unix user as the one used when installing \eyedb, the command output
 will be a message like the one above, showing that you have
 \texttt{superuser} priviledge and are thus allowed to create a
 database.\\
 \\
-Creating a database is performed using the \texttt{eyedbcreate} tool, as in:
+Creating a database is performed using the \texttt{eyedbadmin} tool, as in:
 \verbsize
 \begin{verbatim}
-% eyedbdbcreate foo
+% eyedbadmin database create foo
 \end{verbatim}
 where \texttt{foo} is the name of the database.\\
 \\
-Similarly, deleting a database is performed using the \texttt{eyedbdelete} tool, as in:
+Similarly, deleting a database is performed using the \texttt{eyedbadmin} tool, as in:
 \verbsize
 \begin{verbatim}
-% eyedbdbdelete foo
+% eyedb database delete foo
 \end{verbatim}
 where \texttt{foo} is the name of the database.
 \sect{Defining a simple schema with ODL}
