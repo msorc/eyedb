@@ -118,7 +118,7 @@ divided into different families:
 \item Server management programs:
 \bi
 \item \ttv{eyedbd}: the \eyedb server,
-\item \ttv{eyedbrc}: the \eyedb launcher used to start or stop
+\item \ttv{eyedbctl}: the \eyedb launcher used to start or stop
 the server or to get status information on the opened sessions.
 \ei
 \item Generic administration program:
@@ -534,11 +534,11 @@ All the server configuration variable values can be overriden by a command line
 option or a hard coded value: for instance, the \ttv{sv\_port} configuration
 variable value can be overriden by using a server command line option
 as follows:
-\ttv{eyedbrc -sv\_port 7863}.
+\ttv{eyedbctl -sv\_port 7863}.
 \\
 \\
 Here is the list of all the standard server options that are recognized
-by \ttv{eyedb} and \ttv{eyedbrc}:
+by \ttv{eyedb} and \ttv{eyedbctl}:
 \bi
 \item \ttv{-sv\_port} \emph{ports}:  listening ports,
 \item \ttv{-sv\_access\_file} \emph{accessfile}: access file (default is \tdir/\ttv{eyedb/etc/EyeDB.access}),
@@ -557,7 +557,7 @@ For instance, to launch an \eyedb server listening on the ports \ttv{7362} and
 \ttv{/tmp/pipes1}, using the default volume directory \ttv{/export/DB}
 and the default EYEDBDBM database file \ttv{/export/DB/dbmdb.db}:
 \begin{verbatim}
-eyedbrc start -sv_port 7362 /tmp/pipes1 -sv_voldir /export/DB \
+eyedbctl start -sv_port 7362 /tmp/pipes1 -sv_voldir /export/DB \
               -eyedbdbm /export/DB/dbmdb.db
 \end{verbatim}
 
@@ -569,11 +569,11 @@ There are three ways to launch the server:
 \be
 \item running directly the program \ttv{eyedbd}: this way is not
 recommended.
-\item running the program \ttv{eyedbrc} with the {start} option, for
+\item running the program \ttv{eyedbctl} with the {start} option, for
 instance: \\
-\mbox{ }\ttv{eyedbrc start} \\
-\mbox{ }\ttv{eyedbrc start -sv\_port 7763} \\
-\mbox{ }\ttv{eyedbrc start -eyedblog `eyegetenv topdir`/log/eyedbd.log}
+\mbox{ }\ttv{eyedbctl start} \\
+\mbox{ }\ttv{eyedbctl start -sv\_port 7763} \\
+\mbox{ }\ttv{eyedbctl start -eyedblog `eyegetenv topdir`/log/eyedbd.log}
 \item running a \ttv{rc.eyedb} shell script: a template is given
 in the distribution (file \tdir/\ttv{eyedb/etc/rc.eyedb}); this way
 is recommended as this shell script can launch all the \eyedb servers:
@@ -584,7 +584,7 @@ is recommended as this shell script can launch all the \eyedb servers:
 \item the \ttv{eyedborbacusd} generic Orbix server.
 \ee
 \ee
-Note that the \ttv{rc.eyedb} uses \ttv{eyedbrc start} to launch the
+Note that the \ttv{rc.eyedb} uses \ttv{eyedbctl start} to launch the
 \eyedb server.
 \subsection{Listening ports}
 There are two types of listening ports: TCP/IP ports and named pipes:
@@ -602,7 +602,7 @@ to the \emph{Users} section for information about that.
 \ei
 It is a good idea to make the \eyedb server listening both on
 a TCP/IP port and on a named pipe, for instance:\\
-\ttv{eyedbrc start -sv\_port 8100 /tmp/.eyedb-pipe}\\
+\ttv{eyedbctl start -sv\_port 8100 /tmp/.eyedb-pipe}\\
 launches an \eyedb server listening both on the TCP/IP port \ttv{8100}
 and on the named pipe \ttv{/tmp/.eyedb-pipe}.
 \\
@@ -611,10 +611,10 @@ transmission is faster, and clients on the LAN or a WAN will use
 the TCP/IP port.
 \subsection{Lauching Several Servers}
 Note that launching one \eyedb server as follows:\\
-\ttv{eyedbrc start -sv\_port 8100 /tmp/.eyedb-pipe}\\
+\ttv{eyedbctl start -sv\_port 8100 /tmp/.eyedb-pipe}\\
 is equivalent to launch two \eyedb servers as follows:\\
-\ttv{eyedbrc start -sv\_port 8100}\\
-\ttv{eyedbrc start -sv\_port /tmp/.eyedb-pipe}\\
+\ttv{eyedbctl start -sv\_port 8100}\\
+\ttv{eyedbctl start -sv\_port /tmp/.eyedb-pipe}\\
 \\
 The differences is that in the first case, there is only one server listening
 on two ports, while in the second case there are two servers listening on
@@ -622,9 +622,9 @@ one port each.\\
 If you launch the server without using the \ttv{-sv\_port} option,
 the value of the listening port will be taken from the configuration
 file, so:\\
-\ttv{eyedbrc start}\\
+\ttv{eyedbctl start}\\
 is equivalent to:\\
-\ttv{eyedbrc start -sv\_port `eyedbgetenv sv\_port`}
+\ttv{eyedbctl start -sv\_port `eyedbgetenv sv\_port`}
 \\
 \\
 There can be as many servers as you want on the same computer dealing
@@ -640,17 +640,17 @@ Assume that two clients (for instance two
 \ttv{eyedboql}) are connected to the \eyedb server, there are three
 server processus:
 \bi
-\item the master server that has been launched using the \ttv{eyedbrc start}
+\item the master server that has been launched using the \ttv{eyedbctl start}
 command,
 \item two children of the master server, each one coressponding to each
 client.
 \ei
 \subsection{Getting Session Information}
-The command \ttv{eyedbrc status} gives all the information about the
+The command \ttv{eyedbctl status} gives all the information about the
 opened sessions. For instance the following information could be displayed
 after launching the server:
 \verbsize\begin{verbatim}
-% eyedbrc status
+% eyedbctl status
 EyeDB Server is up from Thu Apr  1 14:18:05 1999
  
   Version 2.6.6
@@ -664,7 +664,7 @@ EyeDB Server is up from Thu Apr  1 14:18:05 1999
 \end{verbatim}\normalsize
 If two \ttv{eyedboql} clients are connected:
 \verbsize\begin{verbatim}
-% eyedbrc status
+% eyedbctl status
 EyeDB Server is up from Thu Apr  1 14:18:05 1999
  
   Version 2.6.6
@@ -696,9 +696,9 @@ Client #1
   Databases Opened 'EYEDBDBM' [mode='read/trsless/local']
 \end{verbatim}\normalsize
 If you have launched your server on another port as the default port,
-you must use \ttv{eyedbrc status} with the \ttv{-sv\_port} command line option,
+you must use \ttv{eyedbctl status} with the \ttv{-sv\_port} command line option,
 as follows:\\
-\ttv{eyedbrc status -sv\_port /tmp/.eyedb-pipe}
+\ttv{eyedbctl status -sv\_port /tmp/.eyedb-pipe}
 
 \subsection{The TCP/IP access file}
 \newcommand{\tcpip}{\emph{IP-address-or-mask}}
@@ -783,12 +783,12 @@ computer \ttv{B}, you will get the following message:\\
 \ttv{database opening error: database 'DB' is hold by computer A}.
 
 \section{Stopping the servers}
-To stop the \eyedb servers, you need to use the \ttv{eyedbrc stop}
+To stop the \eyedb servers, you need to use the \ttv{eyedbctl stop}
 command, for instance:
 {\verbsize\begin{verbatim}
-eyedbrc stop
-eyedbrc stop -sv_port 8100
-eyedbrc stop -sv_port /tmp/.eyedb-pipe
+eyedbctl stop
+eyedbctl stop -sv_port 8100
+eyedbctl stop -sv_port /tmp/.eyedb-pipe
 \end{verbatim}}
 \subsection{License Management}
 To be able to launch a server, the license file must contain
