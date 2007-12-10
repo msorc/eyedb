@@ -66,7 +66,7 @@ static const std::string LOCA_OPT("loca");
 //
 // Helper functions
 //
-static void indexTrace( Database *db, Index *idx, bool full)
+static void indexTrace(Database *db, Index *idx, bool full)
 {
   if (!full) {
     printf("%s index on %s\n", idx->asHashIndex() ? "hash" : "btree",
@@ -104,7 +104,7 @@ static void indexTrace( Database *db, Index *idx, bool full)
 }
 
 static int
-indexGet( Database *db, const Class *cls, LinkedList &indexlist)
+indexGet(Database *db, const Class *cls, LinkedList &indexlist)
 {
   const LinkedList *classindexlist;
 
@@ -120,7 +120,7 @@ indexGet( Database *db, const Class *cls, LinkedList &indexlist)
 }
 
 static int
-indexGet( Database *db, const char *name, LinkedList &indexlist)
+indexGet(Database *db, const char *name, LinkedList &indexlist)
 {
   Status s;
   const Class *cls;
@@ -158,7 +158,7 @@ indexGet( Database *db, const char *name, LinkedList &indexlist)
 }
 
 static int
-indexGetAll( Database *db, LinkedList &indexlist, bool all)
+indexGetAll(Database *db, LinkedList &indexlist, bool all)
 {
   LinkedListCursor c(db->getSchema()->getClassList());
   const Class *cls;
@@ -183,17 +183,17 @@ void IDXCreateCmd::init()
   std::vector<std::string> propagate_choices;
   const std::string ON("on");
   const std::string OFF("off");
-  propagate_choices.push_back( ON);
-  propagate_choices.push_back( OFF);
-  opts.push_back( Option(PROPAGATE_OPT, 
-			 OptionChoiceType("on_off",propagate_choices,ON),
-			 Option::MandatoryValue,
-			 OptionDesc( "Propagation type", "on|off")));
+  propagate_choices.push_back(ON);
+  propagate_choices.push_back(OFF);
+  opts.push_back(Option(PROPAGATE_OPT, 
+			OptionChoiceType("on_off",propagate_choices,ON),
+			Option::MandatoryValue,
+			OptionDesc("Propagation type", "on|off")));
 
-  opts.push_back( Option(TYPE_OPT, 
-			 OptionStringType(),
-			 Option::MandatoryValue,
-			 OptionDesc( "Index type (supported types are: hash, btree)", "TYPE")));
+  opts.push_back(Option(TYPE_OPT, 
+			OptionStringType(),
+			Option::MandatoryValue,
+			OptionDesc("Index type (supported types are: hash, btree)", "TYPE")));
 
   getopt = new GetOpt(getExtName(), opts);
 }
@@ -244,21 +244,21 @@ int IDXCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   bool propagate = true;
   if (map.find(PROPAGATE_OPT) != map.end()) {
-    propagate = !strcmp( map[PROPAGATE_OPT].value.c_str(), "on");
+    propagate = !strcmp(map[PROPAGATE_OPT].value.c_str(), "on");
   }
 
   conn.open();
 
   Database *db = new Database(dbName);
 
-  db->open( &conn, Database::DBRW);
+  db->open(&conn, Database::DBRW);
   
   db->transactionBeginExclusive();
   
   const Class *cls;
   const Attribute *attribute;
 
-  Attribute::checkAttrPath( db->getSchema(), cls, attribute, attributePath);
+  Attribute::checkAttrPath(db->getSchema(), cls, attribute, attributePath);
   
   if (!typeOption) {
     if (attribute->isString() 
@@ -341,7 +341,7 @@ int IDXDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   Database *db = new Database(dbName);
 
-  db->open( &conn, Database::DBRW);
+  db->open(&conn, Database::DBRW);
   
   db->transactionBeginExclusive();
   
@@ -380,17 +380,17 @@ void IDXUpdateCmd::init()
   std::vector<std::string> propagate_choices;
   const std::string ON("on");
   const std::string OFF("off");
-  propagate_choices.push_back( ON);
-  propagate_choices.push_back( OFF);
-  opts.push_back( Option(PROPAGATE_OPT, 
-			 OptionChoiceType("on_off",propagate_choices,ON),
-			 Option::MandatoryValue,
-			 OptionDesc( "Propagation type", "on|off")));
+  propagate_choices.push_back(ON);
+  propagate_choices.push_back(OFF);
+  opts.push_back(Option(PROPAGATE_OPT, 
+			OptionChoiceType("on_off",propagate_choices,ON),
+			Option::MandatoryValue,
+			OptionDesc("Propagation type", "on|off")));
 
-  opts.push_back( Option(TYPE_OPT, 
-			 OptionStringType(),
-			 Option::MandatoryValue,
-			 OptionDesc( "Index type (supported types are: hash, btree)", "TYPE")));
+  opts.push_back(Option(TYPE_OPT, 
+			OptionStringType(),
+			Option::MandatoryValue,
+			OptionDesc("Index type (supported types are: hash, btree)", "TYPE")));
 
   getopt = new GetOpt(getExtName(), opts);
 }
@@ -449,12 +449,12 @@ int IDXUpdateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   Database *db = new Database(dbName);
 
-  db->open( &conn, Database::DBRW);
+  db->open(&conn, Database::DBRW);
   
   db->transactionBeginExclusive();
   
   LinkedList indexList;
-  if (indexGet( db, attributePath, indexList))
+  if (indexGet(db, attributePath, indexList))
     return 1;
 
   Index *index = (Index *)indexList.getObject(0);
@@ -476,20 +476,20 @@ int IDXUpdateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   bool propagate;
   if (propagateOption)
-    propagate = !strcmp( propagateOption, "on");
+    propagate = !strcmp(propagateOption, "on");
   else
     propagate = index->getPropagate();
 
   printf("Updating %s index on %s\n", (type == IndexImpl::Hash) ? "hash" : "btree", attributePath);
 
-  index->setPropagate( (propagate)? eyedb::True : eyedb::False);
+  index->setPropagate((propagate)? eyedb::True : eyedb::False);
 
   if (onlyPropagate) {
     index->store();
   } else {
     IndexImpl *impl = 0;
 
-    IndexImpl::make( db, type, hints, impl, index->getIsString());
+    IndexImpl::make(db, type, hints, impl, index->getIsString());
     
     // The index type has changed
     if ((type == IndexImpl::Hash && index->asBTreeIndex()) ||
@@ -518,11 +518,11 @@ void IDXListCmd::init()
 
   opts.push_back(HELP_OPT);
 
-  opts.push_back( Option(FULL_OPT, OptionBoolType(), 0,
-			 OptionDesc("Displays full information")));
+  opts.push_back(Option(FULL_OPT, OptionBoolType(), 0,
+			OptionDesc("Displays complete information")));
 
-  opts.push_back( Option(ALL_OPT, OptionBoolType(), 0,
-			 OptionDesc("Displays all indexes")));
+  opts.push_back(Option(ALL_OPT, OptionBoolType(), 0,
+			OptionDesc("Displays all indexes")));
 
   getopt = new GetOpt(getExtName(), opts);
 }
@@ -569,18 +569,18 @@ int IDXListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 
   Database *db = new Database(dbName);
 
-  db->open( &conn, Database::DBSRead);
+  db->open(&conn, Database::DBSRead);
   
   db->transactionBegin();
   
   LinkedList indexList;
 
   if (argv.size() < 2) {
-    if (indexGetAll( db, indexList, all))
+    if (indexGetAll(db, indexList, all))
       return 1;
   } else {
-    for ( int i = 1; i < argv.size(); i++) {
-      if (indexGet( db, argv[i].c_str(), indexList))
+    for (int i = 1; i < argv.size(); i++) {
+      if (indexGet(db, argv[i].c_str(), indexList))
 	return 1;
     }
   }
@@ -588,7 +588,7 @@ int IDXListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
   LinkedListCursor c(indexList);
   Index *index;
   while (c.getNext((void *&)index))
-    indexTrace( db, index, full);
+    indexTrace(db, index, full);
 
   return 0;
 }
@@ -602,13 +602,13 @@ void IDXStatsCmd::init()
 
   opts.push_back(HELP_OPT);
 
-  opts.push_back( Option(FULL_OPT, OptionBoolType(), 0,
-			 OptionDesc("Display all index entry statistics")));
+  opts.push_back(Option(FULL_OPT, OptionBoolType(), 0,
+			OptionDesc("Display all index entry statistics")));
 
-  opts.push_back( Option(FORMAT_OPT, 
-			 OptionStringType(),
-			 Option::MandatoryValue,
-			 OptionDesc( "Statistics format", "FORMAT")));
+  opts.push_back(Option(FORMAT_OPT, 
+			OptionStringType(),
+			Option::MandatoryValue,
+			OptionDesc("Statistics format", "FORMAT")));
 
   getopt = new GetOpt(getExtName(), opts);
 }
@@ -674,18 +674,18 @@ int IDXStatsCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv
 
   Database *db = new Database(dbName);
 
-  db->open( &conn, Database::DBSRead);
+  db->open(&conn, Database::DBSRead);
   
   db->transactionBegin();
   
   LinkedList indexList;
 
   if (argv.size() < 2) {
-    if (indexGetAll( db, indexList, false))
+    if (indexGetAll(db, indexList, false))
       return 1;
   } else {
-    for ( int i = 1; i < argv.size(); i++) {
-      if (indexGet( db, argv[i].c_str(), indexList))
+    for (int i = 1; i < argv.size(); i++) {
+      if (indexGet(db, argv[i].c_str(), indexList))
 	return 1;
     }
   }
@@ -720,17 +720,18 @@ void IDXSimulateCmd::init()
 
   opts.push_back(HELP_OPT);
 
-  opts.push_back( Option(FULL_OPT, OptionBoolType()));
+  opts.push_back(Option(FULL_OPT, OptionBoolType(), 0,
+		 OptionDesc("Displays complete information")));
 
-  opts.push_back( Option(FORMAT_OPT, 
-			 OptionStringType(),
-			 Option::MandatoryValue,
-			 OptionDesc( "Statistics format", "FORMAT")));
+  opts.push_back(Option(FORMAT_OPT, 
+			OptionStringType(),
+			Option::MandatoryValue,
+			OptionDesc("Statistics format", "FORMAT")));
 
-  opts.push_back( Option(TYPE_OPT, 
-			 OptionStringType(),
-			 Option::MandatoryValue | Option::Mandatory,
-			 OptionDesc( "Index type (supported types are: hash, btree)", "TYPE")));
+  opts.push_back(Option(TYPE_OPT, 
+			OptionStringType(),
+			Option::MandatoryValue,
+			OptionDesc("Index type (supported types are: hash, btree)", "TYPE")));
 
   getopt = new GetOpt(getExtName(), opts);
 }
@@ -789,13 +790,13 @@ int IDXSimulateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &a
 
   Database *db = new Database(dbName);
 
-  db->open( &conn, Database::DBRW);
+  db->open(&conn, Database::DBRW);
   
   db->transactionBeginExclusive();
   
   LinkedList indexList;
 
-  if (indexGet( db, attributePath, indexList))
+  if (indexGet(db, attributePath, indexList))
     return 1;
 
   IndexImpl::Type type;
@@ -837,7 +838,7 @@ void IDXMoveCmd::init()
   opts.push_back(HELP_OPT);
 
   // not yet implemented
-  //opts.push_back( Option(COLLAPSE_OPT, OptionBoolType()));
+  //opts.push_back(Option(COLLAPSE_OPT, OptionBoolType()));
 
   getopt = new GetOpt(getExtName(), opts);
 }
@@ -901,7 +902,7 @@ get_op(const char *s, int &offset)
    }
 
 static int
-get_idxs( Database *db, const char *attrpath, ObjectArray &obj_arr)
+get_idxs(Database *db, const char *attrpath, ObjectArray &obj_arr)
 {
   int offset;
   const char *op = get_op(attrpath, offset);
@@ -940,21 +941,21 @@ int IDXMoveCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 
   Database *db = new Database(dbName);
 
-  db->open( &conn, Database::DBRW);
+  db->open(&conn, Database::DBRW);
   
   db->transactionBeginExclusive();
   
   const Dataspace *dataspace;
-  db->getDataspace( dataspaceName, dataspace);
+  db->getDataspace(dataspaceName, dataspace);
 
   ObjectArray obj_arr;
-  if (get_idxs( db, indexName, obj_arr)) 
+  if (get_idxs(db, indexName, obj_arr)) 
     return 1;
 
   for (int i = 0; i < obj_arr.getCount(); i++) {
     Index *idx = (Index *)obj_arr[i];
-       idx->move(dataspace);
-//     idx->move(dataspace, collapse);
+    idx->move(dataspace);
+    //     idx->move(dataspace, collapse);
   }
 
   db->transactionCommit();
@@ -1013,7 +1014,7 @@ int IDXSetdefdspCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
 
   Database *db = new Database(dbName);
 
-  db->open( &conn, Database::DBRW);
+  db->open(&conn, Database::DBRW);
   
   db->transactionBeginExclusive();
   
@@ -1021,7 +1022,7 @@ int IDXSetdefdspCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
   db->getDataspace(dataspaceName, dataspace);
 
   ObjectArray obj_arr;
-  if (get_idxs( db, indexName, obj_arr)) return 1;
+  if (get_idxs(db, indexName, obj_arr)) return 1;
 
   for (int i = 0; i < obj_arr.getCount(); i++) {
     Index *idx = (Index *)obj_arr[i];
@@ -1061,11 +1062,11 @@ int IDXGetdefdspCmd::help()
 }
 
 static void
-print( Database *db, const Dataspace *dataspace, Bool def = False)
+print(Database *db, const Dataspace *dataspace, Bool def = False)
 {
   if (!dataspace) {
     db->getDefaultDataspace(dataspace);
-    print( db, dataspace, True);
+    print(db, dataspace, True);
     return;
   }
 
@@ -1108,12 +1109,12 @@ int IDXGetdefdspCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
 
   Database *db = new Database(dbName);
 
-  db->open( &conn, Database::DBRW);
+  db->open(&conn, Database::DBRW);
   
   db->transactionBeginExclusive();
   
   ObjectArray obj_arr;
-  if (get_idxs( db, indexName, obj_arr)) 
+  if (get_idxs(db, indexName, obj_arr)) 
     return 1;
 
   for (int i = 0; i < obj_arr.getCount(); i++) {
@@ -1125,7 +1126,7 @@ int IDXGetdefdspCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
       printf("\n");
     printf("Default dataspace for index '%s':\n", idx->getAttrpath().c_str());
 
-    print( db, dataspace);
+    print(db, dataspace);
   }
 
   db->transactionCommit();
@@ -1143,9 +1144,9 @@ void IDXGetlocaCmd::init()
 
   opts.push_back(HELP_OPT);
 
-  opts.push_back( Option(STATS_OPT, OptionBoolType(), 0, OptionDesc("Displays statistics information")));
-  opts.push_back( Option(LOCA_OPT, OptionBoolType(), 0, OptionDesc("Displays localization information")));
-  opts.push_back( Option(ALL_OPT, OptionBoolType(), 0, OptionDesc("Displays localization and statistics information")));
+  opts.push_back(Option(STATS_OPT, OptionBoolType(), 0, OptionDesc("Displays statistics information")));
+  opts.push_back(Option(LOCA_OPT, OptionBoolType(), 0, OptionDesc("Displays localization information")));
+  opts.push_back(Option(ALL_OPT, OptionBoolType(), 0, OptionDesc("Displays localization and statistics information")));
 
   getopt = new GetOpt(getExtName(), opts);
 }
@@ -1216,12 +1217,12 @@ int IDXGetlocaCmd::perform(eyedb::Connection &conn, std::vector<std::string> &ar
 
   Database *db = new Database(dbName);
 
-  db->open( &conn, Database::DBRW);
+  db->open(&conn, Database::DBRW);
   
   db->transactionBeginExclusive();
   
   ObjectArray obj_arr;
-  if (get_idxs( db, indexName, obj_arr)) 
+  if (get_idxs(db, indexName, obj_arr)) 
     return 1;
 
   for (int i = 0; i < obj_arr.getCount(); i++) {
@@ -1243,6 +1244,3 @@ int IDXGetlocaCmd::perform(eyedb::Connection &conn, std::vector<std::string> &ar
 
   return 0;
 }
-
-
-

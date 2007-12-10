@@ -93,17 +93,17 @@ int DSPCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   Database *db = new Database(dbname);
 
-  db->open( &conn, Database::DBRW);
+  db->open(&conn, Database::DBRW);
   
   db->transactionBeginExclusive();
   
   int count = argv.size() - 2;
   const Datafile **datafiles = new const Datafile *[count];
-  for ( int i = 0; i < count; i++) {
-    db->getDatafile( argv[i+2].c_str(), datafiles[i]);
+  for (int i = 0; i < count; i++) {
+    db->getDatafile(argv[i+2].c_str(), datafiles[i]);
   }
 
-  db->createDataspace( dspname, datafiles, count);
+  db->createDataspace(dspname, datafiles, count);
   
   db->transactionCommit();
 
@@ -156,7 +156,7 @@ int DSPUpdateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   Database *db = new Database(dbname);
 
-  db->open( &conn, Database::DBRW);
+  db->open(&conn, Database::DBRW);
   
   db->transactionBeginExclusive();
   
@@ -166,7 +166,7 @@ int DSPUpdateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   int count = argv.size() - 2;
   const Datafile **datafiles = new const Datafile *[count];
   for (int i = 0; i < count; i++) {
-    db->getDatafile( argv[i+2].c_str(), datafiles[i]);
+    db->getDatafile(argv[i+2].c_str(), datafiles[i]);
   }
 
   dataspace->update(datafiles, count);
@@ -220,7 +220,7 @@ int DSPDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   Database *db = new Database(dbname);
 
-  db->open( &conn, Database::DBRW);
+  db->open(&conn, Database::DBRW);
   
   db->transactionBeginExclusive();
   
@@ -280,7 +280,7 @@ int DSPRenameCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   Database *db = new Database(dbname);
 
-  db->open( &conn, Database::DBRW);
+  db->open(&conn, Database::DBRW);
   
   db->transactionBeginExclusive();
   
@@ -337,12 +337,12 @@ int DSPListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 
   Database *db = new Database(dbname);
 
-  db->open( &conn, Database::DBSRead);
+  db->open(&conn, Database::DBSRead);
   
-  if ( argv.size() > 1) {
+  if (argv.size() > 1) {
     for (int i = 1; i < argv.size(); i++) {
       const Dataspace *dataspace;
-      db->getDataspace( argv[i].c_str(), dataspace);
+      db->getDataspace(argv[i].c_str(), dataspace);
       cout << *dataspace;
     }
   }
@@ -404,7 +404,7 @@ int DSPSetDefCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   Database *db = new Database(dbname);
 
-  db->open( &conn, Database::DBRW);
+  db->open(&conn, Database::DBRW);
   
   db->transactionBeginExclusive();
   
@@ -459,7 +459,7 @@ int DSPGetDefCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   Database *db = new Database(dbname);
 
-  db->open( &conn, Database::DBRW);
+  db->open(&conn, Database::DBRW);
   
   db->transactionBeginExclusive();
   
@@ -519,7 +519,7 @@ int DSPSetCurDatCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
 
   Database *db = new Database(dbname);
 
-  db->open( &conn, Database::DBRW);
+  db->open(&conn, Database::DBRW);
   
   db->transactionBeginExclusive();
   
@@ -580,7 +580,7 @@ int DSPGetCurDatCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
 
   Database *db = new Database(dbname);
 
-  db->open( &conn, Database::DBRW);
+  db->open(&conn, Database::DBRW);
   
   db->transactionBeginExclusive();
   
@@ -596,5 +596,3 @@ int DSPGetCurDatCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
 
   return 0;
 }
-
-
