@@ -291,7 +291,7 @@ esac
 if test "$ac_semaphore_policy" = "sysv_ipc" ; then
    AC_DEFINE(HAVE_EYEDBSMD, 1, [Define to 1 if we must use eyedbsmd])
 fi
-
+AM_CONDITIONAL(COND_EYEDBSMD, test "$ac_semaphore_policy" = "sysv_ipc")
 
 # installation directories
 eyedb_databasedir="$ac_eyedb_databasedir"
