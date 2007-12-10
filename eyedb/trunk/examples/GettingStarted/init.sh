@@ -4,13 +4,13 @@ SCHEMA=$1
 DATABASE=person_g
 
 echo Creating the database $DATABASE
-echo eyedbdbcreate $DATABASE
-eyedbdbcreate $DATABASE
+echo eyedbadmin database create $DATABASE
+eyedbadmin database create $DATABASE
 
 echo
 echo Changing the default access to read/write
-echo eyedbdbaccess $DATABASE rw
-eyedbdbaccess $DATABASE rw
+echo eyedbadmin database defaccess $DATABASE rw
+eyedbadmin database defaccess $DATABASE rw
 
 echo
 echo Updating the database $DATABASE with the schema person...
