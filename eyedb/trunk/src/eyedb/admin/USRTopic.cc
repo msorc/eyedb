@@ -18,8 +18,8 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
-   Author: Francois Dechelle <francois@dechelle.net>
+  Author: Eric Viara <viara@sysra.com>
+  Author: Francois Dechelle <francois@dechelle.net>
 */
 
 #include "eyedbconfig.h"
@@ -87,7 +87,7 @@ passwd_realize(const char *prompt, const char *&passwd, int retype = 1)
 }
 
 static void
-auth_realize( char *userauth, char *passwdauth)
+auth_realize(char *userauth, char *passwdauth)
 {
   const char *s;
   errno = 0;
@@ -197,7 +197,7 @@ int USRAddCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
   char userauth[32];
   char passwdauth[10];
 
-  auth_realize( userauth, passwdauth);
+  auth_realize(userauth, passwdauth);
 
   DBM_Database *dbmdatabase = new DBM_Database();
 
@@ -260,13 +260,13 @@ int USRDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   char userauth[32];
   char passwdauth[10];
 
-  auth_realize( userauth, passwdauth);
+  auth_realize(userauth, passwdauth);
 
   DBM_Database *dbmdatabase = new DBM_Database();
 
   conn.open();
 
-  dbmdatabase->deleteUser( &conn, username, userauth, passwdauth);
+  dbmdatabase->deleteUser(&conn, username, userauth, passwdauth);
 
   return 0;
 }
@@ -300,7 +300,7 @@ int USRListCmd::help()
 }
 
 #define XC(M, SM, XM, STR, C) \
-if ( ((M) & (XM)) == (M) ) \
+if (((M) & (XM)) == (M) ) \
 { \
   strcat(STR, C); \
   strcat(STR, SM); \
@@ -356,12 +356,12 @@ str_user_mode(DBAccessMode usermode)
 
   XC(ReadWriteExecDBAccessMode, "READ_WRITE_EXEC_DBACCESS_MODE",
      usermode, userstr, concat)
-  else XC(ReadExecDBAccessMode, "READ_EXEC_DBACCESS_MODE",
-	  usermode, userstr, concat)
-  else XC(ReadWriteDBAccessMode, "READ_WRITE_DBACCESS_MODE",
-	  usermode, userstr, concat)
-  else XC(ReadDBAccessMode, "READ_DBACCESS_MODE",
-	  usermode, userstr, concat);
+    else XC(ReadExecDBAccessMode, "READ_EXEC_DBACCESS_MODE",
+	    usermode, userstr, concat)
+	   else XC(ReadWriteDBAccessMode, "READ_WRITE_DBACCESS_MODE",
+		   usermode, userstr, concat)
+		  else XC(ReadDBAccessMode, "READ_DBACCESS_MODE",
+			  usermode, userstr, concat);
 
   return userstr;
 }
@@ -468,24 +468,24 @@ print_user(DBM_Database *dbm, UserEntry *user)
 static int
 list_all_users(DBM_Database *dbm)
 {
-    dbm->transactionBegin();
+  dbm->transactionBegin();
 
-    OQL q(dbm, "select user_entry");
-    ObjectArray obj_arr;
+  OQL q(dbm, "select user_entry");
+  ObjectArray obj_arr;
 
-    q.execute(obj_arr);
+  q.execute(obj_arr);
     
-    for (int i = 0; i < obj_arr.getCount(); i++) {
-      if (i)
-	printf("\n");
-      print_user(dbm, (UserEntry *)obj_arr[i]);
-    }
+  for (int i = 0; i < obj_arr.getCount(); i++) {
+    if (i)
+      printf("\n");
+    print_user(dbm, (UserEntry *)obj_arr[i]);
+  }
     
-    obj_arr.garbage();
+  obj_arr.garbage();
 
-    dbm->transactionCommit();
+  dbm->transactionCommit();
 
-    return 0;
+  return 0;
 }
 
 static int
@@ -498,7 +498,7 @@ list_selected_users(DBM_Database *dbm, std::vector<std::string> &argv)
   for (int i = 0; i < argv.size(); i++) {
     UserEntry *user;
     const char *username = argv[i].c_str();
-    dbm->getUser( username, user);
+    dbm->getUser(username, user);
     
     if (!user) {
       std::cerr << PROGNAME;
@@ -535,7 +535,7 @@ int USRListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
   char userauth[32];
   char passwdauth[10];
 
-  auth_realize( userauth, passwdauth);
+  auth_realize(userauth, passwdauth);
 
   DBM_Database *dbm = new DBM_Database();
 
@@ -544,10 +544,10 @@ int USRListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
   dbm->open(&conn, Database::DBSRead, userauth, passwdauth);
 
   if (argv.size() < 1) {
-    return list_all_users( dbm);
+    return list_all_users(dbm);
   }
 
-  return list_selected_users( dbm, argv);
+  return list_selected_users(dbm, argv);
 }
 
 
@@ -598,7 +598,7 @@ int USRSysAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
 
   const char *username = argv[0].c_str();
   int sysmode = 0;
-  char *p = strdup( argv[1].c_str());
+  char *p = strdup(argv[1].c_str());
   
   for (;;)
     {
@@ -631,7 +631,7 @@ int USRSysAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
   char userauth[32];
   char passwdauth[10];
 
-  auth_realize( userauth, passwdauth);
+  auth_realize(userauth, passwdauth);
 
   DBM_Database *dbmdatabase = new DBM_Database();
 
@@ -728,13 +728,13 @@ int USRDBAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &a
   char userauth[32];
   char passwdauth[10];
 
-  auth_realize( userauth, passwdauth);
+  auth_realize(userauth, passwdauth);
 
   Database *db = new Database(dbname, Database::getDefaultDBMDB());
 
   conn.open();
 
-  db->setUserDBAccess(  &conn, username, dbmode, userauth, passwdauth);
+  db->setUserDBAccess( &conn, username, dbmode, userauth, passwdauth);
 
   return 0;
 }
@@ -806,14 +806,13 @@ int USRPasswdCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   char userauth[32];
   char passwdauth[10];
 
-  auth_realize( userauth, passwdauth);
+  auth_realize(userauth, passwdauth);
 
   DBM_Database *dbmdatabase = new DBM_Database();
 
   conn.open();
 
-  dbmdatabase->setPasswd( &conn, username, passwd, newpasswd);
+  dbmdatabase->setPasswd(&conn, username, passwd, newpasswd);
 
   return 0;
 }
-

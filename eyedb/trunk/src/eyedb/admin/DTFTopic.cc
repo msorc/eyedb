@@ -18,8 +18,8 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
-   Author: Francois Dechelle <francois@dechelle.net>
+  Author: Eric Viara <viara@sysra.com>
+  Author: Francois Dechelle <francois@dechelle.net>
 */
 
 #include "eyedbconfig.h"
@@ -142,7 +142,7 @@ int DTFCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   Database *db = new Database(dbname);
 
-  db->open( &conn, Database::DBRW);
+  db->open(&conn, Database::DBRW);
 
   db->transactionBeginExclusive();
 
@@ -200,7 +200,7 @@ int DTFDeleteCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   Database *db = new Database(dbname);
 
-  db->open( &conn, Database::DBRW);
+  db->open(&conn, Database::DBRW);
 
   db->transactionBeginExclusive();
 
@@ -274,14 +274,14 @@ int DTFMoveCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 
   Database *db = new Database(dbname);
 
-  db->open( &conn, Database::DBRW);
+  db->open(&conn, Database::DBRW);
 
   db->transactionBeginExclusive();
 
   const Datafile *datafile;
   db->getDatafile(datname, datafile);
   
-  datafile->move( filedir, new_filename);
+  datafile->move(filedir, new_filename);
 
   db->transactionCommit();
 
@@ -339,14 +339,14 @@ int DTFRenameCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   Database *db = new Database(dbname);
 
-  db->open( &conn, Database::DBRW);
+  db->open(&conn, Database::DBRW);
 
   db->transactionBeginExclusive();
 
   const Datafile *datafile;
   db->getDatafile(datname, datafile);
   
-  datafile->rename( new_name);
+  datafile->rename(new_name);
 
   db->transactionCommit();
 
@@ -398,21 +398,21 @@ int DTFResizeCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   const char *datname = argv[1].c_str();
   const char *new_size = argv[2].c_str();
 
-  if ( !eyedblib::is_number(new_size))
+  if (!eyedblib::is_number(new_size))
     return usage();
 
   conn.open();
 
   Database *db = new Database(dbname);
 
-  db->open( &conn, Database::DBRW);
+  db->open(&conn, Database::DBRW);
 
   db->transactionBeginExclusive();
 
   const Datafile *datafile;
   db->getDatafile(datname, datafile);
   
-  datafile->resize( atoi(new_size)*1024);
+  datafile->resize(atoi(new_size)*1024);
 
   db->transactionCommit();
 
@@ -467,7 +467,7 @@ int DTFDefragmentCmd::perform(eyedb::Connection &conn, std::vector<std::string> 
 
   Database *db = new Database(dbname);
 
-  db->open( &conn, Database::DBRW);
+  db->open(&conn, Database::DBRW);
 
   db->transactionBeginExclusive();
 
@@ -490,15 +490,15 @@ void DTFListCmd::init()
 
   opts.push_back(HELP_OPT);
 
-  opts.push_back( Option(ALL_OPT,
-			 OptionBoolType(),
-			 0,
-			 OptionDesc("List all")));
+  opts.push_back(Option(ALL_OPT,
+			OptionBoolType(),
+			0,
+			OptionDesc("List all")));
 
-  opts.push_back( Option(STATS_OPT, 
-			 OptionBoolType(),
-			 0,
-			 OptionDesc("List only statistics on datafiles")));
+  opts.push_back(Option(STATS_OPT, 
+			OptionBoolType(),
+			0,
+			OptionDesc("List only statistics on datafiles")));
 
   getopt = new GetOpt(getExtName(), opts);
 }
@@ -557,7 +557,7 @@ int DTFListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 
   Database *db = new Database(dbname.c_str());
 
-  db->open( &conn, Database::DBSRead);
+  db->open(&conn, Database::DBSRead);
 
   db->transactionBegin();
 
@@ -570,7 +570,7 @@ int DTFListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
     count = argv.size() - 1;
     datafiles = new const Datafile*[count];
     for (int i = 0; i < count; i++) {
-      db->getDatafile( argv[i+1].c_str(), datafiles[i]);
+      db->getDatafile(argv[i+1].c_str(), datafiles[i]);
     }
   }
 
@@ -593,4 +593,3 @@ int DTFListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 
   return 0;
 }
-

@@ -18,8 +18,8 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
-   Author: Francois Dechelle <francois@dechelle.net>
+  Author: Eric Viara <viara@sysra.com>
+  Author: Francois Dechelle <francois@dechelle.net>
 */
 
 #include "eyedbconfig.h"
@@ -223,7 +223,7 @@ static DbInfoDescription *getDBInfo(Connection &conn, DBEntry *dbentry, Database
 
 static void
 printDatafiles(Connection &conn, DBEntry *dbentry, Bool datafiles,
-		DbInfoDescription *dbdesc)
+	       DbInfoDescription *dbdesc)
 {
   int dbid;
   static char indent[] = "            ";
@@ -287,20 +287,20 @@ static int getDBAccess(DBM_Database *dbm, const char *name, const char *fieldnam
 }
 
 static int getDBAccessUser(DBM_Database *dbm, const char *username,
-			      DBUserAccess **dbaccess)
+			   DBUserAccess **dbaccess)
 {
   return getDBAccess(dbm, username, "user->name", dbaccess);
 }
 
 static int getDBAccessDB(DBM_Database *dbm, const char *dbname,
-			    DBUserAccess **dbaccess)
+			 DBUserAccess **dbaccess)
 {
   return getDBAccess(dbm, dbname, "dbentry->dbname", dbaccess);
 }
 
 
 #define OPTCONCAT(M, SM, XM, STR, C) \
- if ( ((M) & (XM)) == (M) ) { \
+ if (((M) & (XM)) == (M) ) { \
    strcat(STR, C); \
    strcat(STR, SM); \
    C = " | "; \
@@ -353,12 +353,12 @@ static const char *userModeStr(DBAccessMode usermode)
 
   OPTCONCAT(ReadWriteExecDBAccessMode, "READ_WRITE_EXEC_DBACCESS_MODE",
 	    usermode, userstr, concat)
-  else OPTCONCAT(ReadExecDBAccessMode, "READ_EXEC_DBACCESS_MODE",
-		 usermode, userstr, concat)
-  else OPTCONCAT(ReadWriteDBAccessMode, "READ_WRITE_DBACCESS_MODE",
-		 usermode, userstr, concat)
-  else OPTCONCAT(ReadDBAccessMode, "READ_DBACCESS_MODE",
-		 usermode, userstr, concat);
+    else OPTCONCAT(ReadExecDBAccessMode, "READ_EXEC_DBACCESS_MODE",
+		   usermode, userstr, concat)
+	   else OPTCONCAT(ReadWriteDBAccessMode, "READ_WRITE_DBACCESS_MODE",
+			  usermode, userstr, concat)
+		  else OPTCONCAT(ReadDBAccessMode, "READ_DBACCESS_MODE",
+				 usermode, userstr, concat);
 
   return userstr;
 }
@@ -433,7 +433,7 @@ static int printDBEntry(Connection &conn, DBEntry *dbentry, DBM_Database *dbm, u
     dstats.display();
   }
 
-  //printf( "\n");
+  //printf("\n");
 
   return 0;
 }
@@ -776,7 +776,7 @@ int DBSMoveCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
   if (map.find(FILEDIR_OPT) != map.end())
     filedir = map[FILEDIR_OPT].value;
   else
-    filedir = std::string( eyedb::ServerConfig::getSValue("datadir"));
+    filedir = std::string(eyedb::ServerConfig::getSValue("datadir"));
 #else
   // filedir is a mandatory option
   std::string filedir = map[FILEDIR_OPT].value;
@@ -794,7 +794,7 @@ int DBSMoveCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
   Database *db = new Database(dbname);
 
   DbCreateDescription oldDesc;
-  db->getInfo( &conn, 0, 0, &oldDesc);
+  db->getInfo(&conn, 0, 0, &oldDesc);
 
   DbCreateDescription newDesc;
   strcpy(newDesc.dbfile, dbfile.c_str());
@@ -806,9 +806,9 @@ int DBSMoveCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
     const char *datafile = oldDesc.sedbdesc.dat[i].file;
     char *p = (char *)strrchr(datafile, '/');
     if (p)
-      strcpy( newDesc.sedbdesc.dat[i].file, strdup((filedir + (p+1)).c_str()));
+      strcpy(newDesc.sedbdesc.dat[i].file, strdup((filedir + (p+1)).c_str()));
     else
-      strcpy( newDesc.sedbdesc.dat[i].file, strdup( datafile));
+      strcpy(newDesc.sedbdesc.dat[i].file, strdup(datafile));
 
     newDesc.sedbdesc.dat[i].maxsize = 0;
     newDesc.sedbdesc.dat[i].sizeslot = 0;
@@ -878,7 +878,7 @@ int DBSCopyCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
   if (map.find(FILEDIR_OPT) != map.end())
     filedir = map[FILEDIR_OPT].value;
   else
-    filedir = std::string( eyedb::ServerConfig::getSValue("datadir"));
+    filedir = std::string(eyedb::ServerConfig::getSValue("datadir"));
 
   std::string dbfile;
   if (map.find(DBFILE_OPT) != map.end()) {
@@ -893,7 +893,7 @@ int DBSCopyCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
   Database *db = new Database(dbname);
 
   DbCreateDescription oldDesc;
-  db->getInfo( &conn, 0, 0, &oldDesc);
+  db->getInfo(&conn, 0, 0, &oldDesc);
 
   if (oldDesc.sedbdesc.ndat > 1 && map.find(FILEDIR_OPT) == map.end()) {
     std::cerr << PROGNAME << ": error: when copying a database with more than one datafile, option --filedir is mandatory\n";
@@ -908,7 +908,7 @@ int DBSCopyCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 
   if (oldDesc.sedbdesc.ndat == 1) {
     std::string newDatafile = filedir + "/" + newDbname + ".dat";
-    strcpy( newDesc.sedbdesc.dat[0].file, newDatafile.c_str());
+    strcpy(newDesc.sedbdesc.dat[0].file, newDatafile.c_str());
     newDesc.sedbdesc.dat[0].maxsize = 0;
     newDesc.sedbdesc.dat[0].sizeslot = 0;
   } else {
@@ -916,16 +916,16 @@ int DBSCopyCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
       const char *datafile = oldDesc.sedbdesc.dat[i].file;
       char *p = (char *)strrchr(datafile, '/');
       if (p)
-	strcpy( newDesc.sedbdesc.dat[i].file, strdup((filedir + (p+1)).c_str()));
+	strcpy(newDesc.sedbdesc.dat[i].file, strdup((filedir + (p+1)).c_str()));
       else
-	strcpy( newDesc.sedbdesc.dat[i].file, strdup( datafile));
+	strcpy(newDesc.sedbdesc.dat[i].file, strdup(datafile));
 
       newDesc.sedbdesc.dat[i].maxsize = 0;
       newDesc.sedbdesc.dat[i].sizeslot = 0;
     }
   }
 
-  db->copy( &conn, newDbname, False, &newDesc);
+  db->copy(&conn, newDbname, False, &newDesc);
 
   return 0;
 }
@@ -994,14 +994,14 @@ int DBSDefAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
   const char *accessMode= argv[1].c_str();
 
   DBAccessMode dbMode;
-  if (getDbAccessMode( accessMode, dbMode))
+  if (getDbAccessMode(accessMode, dbMode))
     return help();
 
   conn.open();
 
   Database *db = new Database(dbname);
 
-  db->setDefaultDBAccess( &conn, dbMode);
+  db->setDefaultDBAccess(&conn, dbMode);
 
   return 0;
 }
@@ -1052,7 +1052,7 @@ int DBSExportCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   conn.open();
 
-  return databaseExport( conn, dbname, filename);
+  return databaseExport(conn, dbname, filename);
 }
 
 //
@@ -1126,7 +1126,5 @@ int DBSImportCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   conn.open();
 
-  return databaseImport( conn, dbname, filename, filedir, mthdir, listOnly);
+  return databaseImport(conn, dbname, filename, filedir, mthdir, listOnly);
 }
-
-
