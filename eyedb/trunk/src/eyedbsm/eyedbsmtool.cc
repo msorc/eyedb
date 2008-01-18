@@ -102,12 +102,12 @@ static DbShmHeader *sm_shmh;
 static DbHeader *sm_h;
 static XMHandle *sm_xmh;
 static int sm_fdshm;
-static int sm_shmsize;
+static int unsigned sm_shmsize;
 static const char *sm_shmfile;
 static Mutex *sm_mutex;
 static int sm_locked;
 
-static int
+static unsigned int
 shmsize_get(int shmfd)
 {
   struct stat stat;
@@ -808,7 +808,8 @@ datafile_get(const char *dat)
 static void
 datafile_display_fragmentation(short datid)
 {
-  MapHeader *xmp = sm_h->dat(datid).mp();
+  DatafileDesc dat = sm_h->dat(datid);
+  MapHeader *xmp = dat.mp();
   x2h_prologue(xmp, mp);
   char *mapaddr = sm_dbh->vd->dmp_addr[datid];
   char *s, *start, *end;
@@ -1250,8 +1251,17 @@ dataspace_realize(int argc, char *argv[])
   return usage(M_DATASPACE);
 }
 
-#define MINSHMSIZE   0x400000
-#define MAXSHMSIZE 0x40000000
+#define MINSHMSIZE   0x400000U
+
+// 1. must be detected by configure
+// 2. the amount of memory may be detected by configure also
+#define HAVE_WIDE_MEMORY_MAPPED
+
+#ifdef HAVE_WIDE_MEMORY_MAPPED
+#define MAXSHMSIZE 0x120000000U
+#else
+#define MAXSHMSIZE 0x40000000U
+#endif
 
 static int
 activetrans_get()
@@ -1279,7 +1289,7 @@ shmem_resize_realize(int argc, char *argv[])
   sm_OPEN(argv[0], VOLRW);
   sm_SHMH_INIT(argv[0], True);
 
-  int newshmsize = atoi(argv[1])*ONE_K;
+  unsigned int newshmsize = (unsigned int)atoi(argv[1])*ONE_K;
 
   DbShmHeader dbhshm;
   int r = 1;
@@ -1315,13 +1325,17 @@ shmem_resize_realize(int argc, char *argv[])
       printf("\n");
     }
   else if (ftruncate(sm_fdshm, newshmsize))
-    fprintf(stderr, "ftruncate(\"%s\", %d) returns: '%s'\n",
+    fprintf(stderr, "ftruncate(\"%s\", %u) returns: '%s'\n",
 	    sm_shmfile, newshmsize, strerror(errno));
   else
     r = 0;
 
-  if (!r)
+  if (!r) {
+    munmap(sm_shmh, sm_shmsize);
+    sm_shmsize = newshmsize;
+    sm_SHMH_INIT(argv[0], True);
     ESM_transInit(sm_dbh->vd, (char *)sm_shmh, newshmsize);
+  }
 
   ut_file_unlock(sm_fdshm);
   return r;
@@ -1345,7 +1359,7 @@ shm_dspsize_realize(int argc, char *argv[])
     return usage(mShmemDspsize);
 
   sm_SHMH_INIT(argv[0], False);
-  printf("Shm Size %d bytes [~ %dM]\n", sm_shmsize, sm_shmsize/(1024*1024));
+  printf("Shm Size %u bytes [~ %uM]\n", sm_shmsize, sm_shmsize/(1024*1024));
 
   return 0;
 }

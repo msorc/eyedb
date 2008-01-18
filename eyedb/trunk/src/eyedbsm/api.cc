@@ -610,6 +610,14 @@ return (((S).err == SUCCESS) ? Success : &(S))
   }
 
   Status
+  datResetCurSlot(DbHandle const *dbh, const char *datfile)
+  {
+    if (!dbh->tr_cnt)
+      return statusMake(TRANSACTION_NEEDED, "datResetCurSlot");
+    return ESM_datResetCurSlot((DbHandle *)dbh, datfile);
+  }
+
+  Status
   dspCheck(DbHandle const *dbh, const char *dataspace, short *dspid,
 	   short datid[], unsigned int *ndat)
   {

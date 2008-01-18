@@ -108,7 +108,10 @@ namespace eyedbsm {
   shmfileOpen(const char *dbfile);
     
   extern Boolean
-  filelockX(int shmfd);
+  filelockS(int fd);
+
+  extern Boolean
+  filelockX(int fd);
 
   extern Boolean
   fileunlock(int fd);

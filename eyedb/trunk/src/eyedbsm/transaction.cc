@@ -1667,7 +1667,7 @@ do { \
 #define TRHT_COUNT 4096
 
   void
-  ESM_transInit(DbDescription *vd, char *addr, int shmsize)
+  ESM_transInit(DbDescription *vd, char *addr, unsigned int shmsize)
   {
     DbShmHeader *shmh = (DbShmHeader *)addr;
     XMHandle *xmh;
