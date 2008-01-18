@@ -286,7 +286,7 @@ namespace eyedbsm {
 		    unsigned int length, Boolean, Boolean);
 
   extern void
-  ESM_transInit(DbDescription *, char *, int);
+  ESM_transInit(DbDescription *, char *, unsigned int);
 
   extern Status
   ESM_transactionCreate(DbHandle const *, const TransactionParams *params,

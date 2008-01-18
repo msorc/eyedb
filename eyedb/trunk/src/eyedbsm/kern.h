@@ -163,6 +163,8 @@ extern Status
   ESM_datMoveObjects(DbHandle const *dbh, const char *dat_src,
 		    const char *dat_dest),
 		    
+  ESM_datResetCurSlot(DbHandle const *dbh, const char *datfile),
+
   ESM_datDefragment(DbHandle const *dbh, const char *datfile, mode_t file_mask, const char *file_group),
 
   ESM_datsCompress(DbHandle const *dbh),

@@ -39,7 +39,7 @@
 
 int ut_file_lock(int fd, ut_Lock excl, ut_Block block)
 {
-  FLOCK_DECL flk;
+  FLOCK_DECL flk = {0};
 
   flk.l_type = (excl == ut_LOCKX ? F_WRLCK : F_RDLCK);
 
@@ -48,7 +48,7 @@ int ut_file_lock(int fd, ut_Lock excl, ut_Block block)
 
 int ut_file_unlock(int fd)
 {
-  FLOCK_DECL flk;
+  FLOCK_DECL flk = {0};
 
   flk.l_type = F_UNLCK;
 

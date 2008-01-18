@@ -92,6 +92,12 @@ namespace eyedbsm {
   }
 
   Boolean
+  filelockS(int fd)
+  {
+    return ut_file_lock(fd, ut_LOCKS, ut_NOBLOCK) >= 0 ? True : False;
+  }
+
+  Boolean
   filelockX(int fd)
   {
     return ut_file_lock(fd, ut_LOCKX, ut_NOBLOCK) >= 0 ? True : False;

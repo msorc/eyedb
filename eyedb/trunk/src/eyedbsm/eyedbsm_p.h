@@ -178,6 +178,7 @@ namespace eyedbsm {
   struct DbDescription {
     /* general information */
     int dbid, flags, shmfd;
+    int lkfd;
     OpenHints hints;
     Boolean rsuser, suser;
     int uid, uid_ind;

@@ -41,6 +41,7 @@
 #include "eyedblib/rpc_lib.h"
 #include "kern_p.h"
 #include <eyedbsm/smd.h>
+#include <map>
 #include "lib/compile_builtin.h"
 
 static const char defDsp[] = "DEFAULT";
@@ -79,6 +80,9 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 
   int dbsext_len = 4; /* strlen(dbsext); */
   int datext_len = 4; /* strlen(datext); */
+
+  static Status
+  dbCleanupRealize(const char *shmfile, int sm_fdshm);
 
   static Status
   dbcreate_error(Status status, const char *dbfile,
@@ -209,7 +213,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 
     if ((dbfd->dbsfd = dbsfileCreate(dbfile, file_mode, file_gid)) < 0)
       return statusMake(INVALID_DBFILE,
-			"%scannot create database system file: '%s' [%s]",
+			"%scannot create database file: '%s' [%s]",
 			pr, dbfile, strerror(errno));
 
     return Success;
@@ -365,7 +369,8 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     sizeslot = ((dbc->dat[i].mtype == BitmapType) ? dbc->dat[i].sizeslot :
 		sizeof(eyedblib::int32));
 
-    MapHeader *xmp = dbh->dat(i).mp();
+    DatafileDesc dat = dbh->dat(i);
+    MapHeader *xmp = dat.mp();
 
     xmp->pow2() = power2(sizeslot);
     if (xmp->pow2() < 0) {
@@ -1243,7 +1248,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 
 #define NO_BLOCK
   static void
-  ESM_DbInitialize(DbDescription *vd, void *shm_addr, int shmsize)
+  ESM_DbInitialize(DbDescription *vd, void *shm_addr, unsigned int shmsize)
   {
     DbMutexesInit(vd, (DbShmHeader *)shm_addr);
     ESM_transInit(vd, (char *)shm_addr, shmsize);
@@ -1328,6 +1333,92 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
   {
     static OpenHints hints = {SegmentMap, ESM_MMAP_WIDE_SEGMENT};
     return &hints;
+  }
+
+  static bool TRACE_CLEANUP = (getenv("EYEDB_TRACE_CLEANUP") != 0);
+  static bool SLEEP_CLEANUP = (getenv("EYEDB_SLEEP_CLEANUP") != 0);
+  
+  static std::map<std::string, unsigned int> db_map;
+
+  static Status db_clean_shm(const char *dbfile, int *lkfd, int shmfd)
+  {
+#undef PR
+#define PR "dbOpenPrologue: "
+    errno = 0;
+
+    if (db_map.find(dbfile) != db_map.end()) {
+      if (TRACE_CLEANUP) {
+	fprintf(stderr, "eyedbsm: found database %s %d\n", dbfile, db_map[dbfile]);
+      }
+      db_map[dbfile]++;
+      return Success;
+    }
+
+    const char *lockfile = fileGet(dbfile, ".lck");
+    if ((*lkfd = open(lockfile, O_RDWR)) < 0) {
+      int fd = creat(lockfile, DEFAULT_CREATION_MODE);
+      if (TRACE_CLEANUP) {
+	fprintf(stderr, "eyedbsm: creating lockfile %s\n", lockfile);
+      }
+
+      if (fd < 0) {
+	return statusMake(INVALID_DBFILE,
+			  "%scannot create lock file: '%s' [%s]",
+			  PR, lockfile, strerror(errno));
+      }
+      close(fd);
+
+      if ((*lkfd = open(lockfile, O_RDWR)) < 0) {
+	return statusMake(INVALID_DBFILE,
+			  "%scannot open lock file: '%s' [%s]",
+			  PR, lockfile, strerror(errno));
+      }
+    }
+
+    if (filelockX(*lkfd)) {
+      if (TRACE_CLEANUP) {
+	fprintf(stderr, "eyedbsm: cleaning up database %s %d %s\n", dbfile, errno, strerror(errno));
+      }
+
+      dbCleanupRealize(shmfileGet(dbfile), shmfd);
+
+      if (SLEEP_CLEANUP) {
+	int sl = atoi(getenv("EYEDB_SLEEP_CLEANUP"));
+	if (TRACE_CLEANUP) {
+	  fprintf(stderr, "eyedbsm: waiting for %d seconds\n", sl);
+	}
+	sleep(sl);
+      }
+
+      if (!filelockS(*lkfd)) {
+	return statusMake(ERROR, PR "cannot open database '%s': cannot lock dbfile in share mode", dbfile);
+      }
+
+      db_map[dbfile] = 1;
+      return Success;
+    }
+
+    if (TRACE_CLEANUP) {
+      fprintf(stderr, "eyedbsm: does not clean up database %s %d %s\n", dbfile, errno, strerror(errno));
+    }
+
+    for (int try_n = 0; !filelockS(*lkfd); try_n++) {
+#define MAX_TRY_LOCK_CNT 100
+      if (try_n == MAX_TRY_LOCK_CNT) {
+	return statusMake(ERROR, PR "cannot open database '%s': cannot lock dbfile in share mode", dbfile);
+      }
+      if (TRACE_CLEANUP) {
+	fprintf(stderr, "eyedbsm: waiting before continuing...\n");
+      }
+      usleep(10000);
+    }
+
+    if (TRACE_CLEANUP) {
+      fprintf(stderr, "eyedbsm: continuing for database '%s'\n", dbfile);
+    }
+
+    db_map[dbfile] = 1;
+    return Success;
   }
 
   Status
@@ -1445,6 +1536,14 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
       free(dbh);
       return se;
     }
+
+#ifndef HAVE_EYEDBSMD
+    if (se = db_clean_shm(dbfile, &vd->lkfd, shmfd)) {
+      free(vd);
+      free(dbh);
+      return se;
+    }
+#endif
 
     dbh = new DbHeader();
     x2h_dbHeader(dbh, &xdbh);
@@ -1808,19 +1907,38 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
       ESM_dbCloseEpilogue(dbh->vd, (DbShmHeader *)dbh->vd->shm_addr, dbh->vd->xid,
 			  dbh->vd->flags, dbh->dbfile);
 
-    if (se = shmUnmap(dbh->dbfile, dbh->vd, fdSizeGet(dbh->vd->shmfd)))
+    if (se = shmUnmap(dbh->dbfile, dbh->vd, fdSizeGet(dbh->vd->shmfd))) {
       return se;
+    }
 
-    if (se = syscheck(PR, close(dbh->vd->shmfd), ""))
+    if (se = syscheck(PR, close(dbh->vd->shmfd), "")) {
       return se;
+    }
 
-    if (dbh->vd->conn)
+#ifndef HAVE_EYEDBSMD
+    if (!--db_map[dbh->dbfile]) {
+      if (TRACE_CLEANUP) {
+	fprintf(stderr, "eyedbsm: closing lockfile map\n");
+      }
+
+      if (se = syscheck(PR, close(dbh->vd->lkfd), "")) {
+	return se;
+      }
+
+      db_map.erase(dbh->dbfile);
+    }
+#endif
+
+    if (dbh->vd->conn) {
       smdcli_close(dbh->vd->conn);
+    }
 
     XMClose(dbh->vd->trs_mh);
+
     free(dbh->vd);
     free(dbh->dbfile);
     free((char *)dbh);
+
     return Success;
   }
 
@@ -2046,10 +2164,11 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     const char *shmfile = shmfileGet(dbfile);
     int fd;
 
+    printf("dbCleanup from ??\n");
     if ((fd = open(dbfile, O_RDWR)) < 0)
       return statusMake(ERROR, "cannot open dbfile %s for writing",
 			dbfile);
-
+    
     close(fd);
 
     fd = open(shmfile, O_RDWR);

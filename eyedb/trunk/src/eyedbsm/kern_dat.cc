@@ -517,6 +517,24 @@ namespace eyedbsm {
   }
 
   Status
+  ESM_datResetCurSlot(DbHandle const *dbh, const char *datfile)
+  {
+    CHECK_X(dbh, "reseting datafile current slot");
+
+    short datid;
+    Status s;
+
+    /* check if datfile is registered */
+    s = get_datid(dbh, datfile, datid);
+    if (s) return s;
+
+    DbHeader _dbh(DBSADDR(dbh));
+    _dbh.dat(datid).mp()->u_bmh_slot_cur() = 0;
+    
+    return Success;
+  }
+
+  Status
   ESM_datDefragment(DbHandle const *dbh, const char *datfile, mode_t file_mask, const char *file_group)
   {
     CHECK_X(dbh, "defragmenting a datafile");
@@ -584,15 +602,92 @@ namespace eyedbsm {
 
     DbHeader _dbh_n(DBSADDR(dbh_n));
     
+    DatafileDesc dat = _dbh_n.dat(datid);
+    DatafileDesc tmp_dat = _dbh_n.dat(tmp_datid);
+
     _dbh_n.dat(datid).mp()->u_bmh_slot_cur() = 0; // added 20/09/07
 
     _dbh_n.dat(datid).__lastslot() = _dbh_n.dat(tmp_datid).__lastslot();
     _dbh_n.dat(datid).__maxsize() = _dbh_n.dat(tmp_datid).__maxsize();
 
+    // ABSOLUTELY WRONG: _dbh_n.dat(datid) will be freed after the expression,
+    // so dmp and smp will not been available after this expression !!!
+    /*
     MapHeader *dmp = _dbh_n.dat(datid).mp();
     MapHeader *smp = _dbh_n.dat(tmp_datid).mp();
+    */
 
+    MapHeader *dmp = dat.mp();
+    MapHeader *smp = tmp_dat.mp();
+
+#ifdef TRACE
+    NS nns = _dbh_n.dat(datid).mp()->mstat_u_bmstat_busy_slots();
+	
+    std::cerr << "eyedbsm: before busy slots " <<
+      _dbh_n.dat(datid).mp()->mstat_u_bmstat_busy_slots() <<
+      " " <<
+      nns <<
+      " " <<
+      x2h_u32(_dbh_n.dat(datid).mp()->mstat_u_bmstat_busy_slots()) <<
+      " " <<
+      dmp->mstat_u_bmstat_busy_slots() <<
+      " " <<
+      x2h_u32(dmp->mstat_u_bmstat_busy_slots()) << '\n';
+
+    std::cerr << "eyedbsm: before busy size " <<
+      x2h_u64(_dbh_n.dat(datid).mp()->mstat_u_bmstat_busy_size()) <<
+      " " <<
+      x2h_u64(dmp->mstat_u_bmstat_busy_size()) << '\n';
+#endif
+
+#if 1
+    //    printf("dmp->_addr() %p smp->_addr() %p\n", dmp->_addr(), smp->_addr());
     memcpy(dmp->_addr(), smp->_addr(), MapHeader_SIZE);
+#else
+    dmp->mtype() = smp->mtype();
+    dmp->sizeslot() = smp->sizeslot();
+    dmp->pow2() = smp->pow2();
+    dmp->nslots() = smp->nslots();
+    dmp->nbobjs() = smp->nbobjs();
+    dmp->mstat_mtype() = smp->mstat_mtype();
+ 
+    dmp->u_bmh_slot_cur() = smp->u_bmh_slot_cur();
+    dmp->u_bmh_slot_lastbusy() = smp->u_bmh_slot_lastbusy();
+    dmp->u_bmh_retry() = smp->u_bmh_retry();
+ 
+    dmp->mstat_u_bmstat_obj_count() = smp->mstat_u_bmstat_obj_count();
+    dmp->mstat_u_bmstat_busy_slots() = smp->mstat_u_bmstat_busy_slots();
+    dmp->mstat_u_bmstat_busy_size() = smp->mstat_u_bmstat_busy_size();
+    dmp->mstat_u_bmstat_hole_size() = smp->mstat_u_bmstat_hole_size();
+#endif
+
+#ifdef TRACE
+    std::cerr << "eyedbsm: after busy slots " <<
+      x2h_u32(_dbh_n.dat(datid).mp()->mstat_u_bmstat_busy_slots()) <<
+      " " <<
+      x2h_u32(dmp->mstat_u_bmstat_busy_slots()) << '\n';
+
+    std::cerr << "eyedbsm: after busy size " <<
+      x2h_u64(_dbh_n.dat(datid).mp()->mstat_u_bmstat_busy_size()) <<
+      " " <<
+      x2h_u64(dmp->mstat_u_bmstat_busy_size()) << '\n';
+
+    std::cerr << "eyedbsm: defragment dataid " <<  datid << " "  << tmp_datid << '\n';
+
+    std::cerr << "eyedbsm: tmp busy slots " <<
+      x2h_u32(_dbh_n.dat(tmp_datid).mp()->mstat_u_bmstat_busy_slots()) <<
+      " " <<
+      x2h_u32(smp->mstat_u_bmstat_busy_slots()) << '\n';
+
+    std::cerr << "eyedbsm: tmp busy size " <<
+      x2h_u64(_dbh_n.dat(tmp_datid).mp()->mstat_u_bmstat_busy_size()) <<
+      " " <<
+      x2h_u64(smp->mstat_u_bmstat_busy_size()) << '\n';
+
+    if (dmp->mstat_u_bmstat_busy_slots() != smp->mstat_u_bmstat_busy_slots()) {
+      abort();
+    }
+#endif
 
     strcpy(_dbh_n.dat(datid).file(), datfile_keep);
     strcpy(_dbh_n.dat(datid).name(), datname_keep);

@@ -533,6 +533,8 @@ namespace eyedbsm {
     datCheck(DbHandle const *dbh, const char *datfile,
 	     short *datid, short *dspid),
 		    
+    datResetCurSlot(DbHandle const *dbh, const char *datfile),
+
     datDefragment(DbHandle const *dbh, const char *datfile, mode_t file_mask, const char *file_group),
 
     datRename(DbHandle const *dbh, const char *datfile, const char *name),
