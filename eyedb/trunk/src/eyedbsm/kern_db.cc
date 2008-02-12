@@ -1937,6 +1937,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 
     free(dbh->vd);
     free(dbh->dbfile);
+    memset((char *)dbh, 0, sizeof(*dbh)); // secure
     free((char *)dbh);
 
     return Success;
@@ -2153,6 +2154,8 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     ESM_initHost(sm_shmh);
 
     munmap(shm_addr, sm_shmsize);
+
+    cleanup = False;
 
     return Success;
   }

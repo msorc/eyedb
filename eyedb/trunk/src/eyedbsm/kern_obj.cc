@@ -204,7 +204,7 @@ namespace eyedbsm {
     OidLoc oidloc;
     memset(&oidloc, 0, sizeof(oidloc));
 
-    int rsize = size + sizeof(ObjectHeader);
+    unsigned rsize = size + sizeof(ObjectHeader);
     MmapH hdl;
     const MapHeader *mp;
 
@@ -274,7 +274,7 @@ namespace eyedbsm {
     ObjectHeader objh;
     char *addr;
     unsigned int sizeslot = x2h_u32(mp->sizeslot());
-    int ls = oidloc.ns + SZ2NS_XDR(rsize, mp);
+    NS ls = oidloc.ns + SZ2NS_XDR(rsize, mp);
     Mutex *mt = LSL_MTX(dbh);
     unsigned int xid = dbh->vd->xid;
     DatType dtype = getDatType(&_dbh, datid);
@@ -306,30 +306,29 @@ namespace eyedbsm {
       MUTEX_LOCK(mt, xid);
 
     // was: if (ls >= dbh->vd->dbhead->lastslot)
-    if (ls >= x2h_u32(_dbh.dat(datid).__lastslot()))
-      {
-	static char zero = 0;
-	int ls1 = ls + SLOT_INC;
-	int fd = dbh->vd->dmd[datid].fd;
-
-	if (se = syscheck(PR, lseek(fd, ((long long)ls1 * sizeslot) - 1,
-				    0), ""))
-	  {
-	    if (NEED_LOCK(trctx))
-	      MUTEX_UNLOCK(mt, xid);
-	    return se;
-	  }
-
-	if (se = syscheckn(PR, write(fd, &zero, sizeof(char)), sizeof(char), ""))
-	  {
-	    if (NEED_LOCK(trctx))
-	      MUTEX_UNLOCK(mt, xid);
-	    return se;
-	  }
-
-	_dbh.dat(datid).__lastslot() = h2x_u32(ls1);
+    if (ls >= x2h_u32(_dbh.dat(datid).__lastslot())) {
+      static char zero = 0;
+      NS ls1 = ls + SLOT_INC;
+      int fd = dbh->vd->dmd[datid].fd;
+      
+      if (se = syscheck(PR, lseek(fd, ((off_t)ls1 * sizeslot) - 1,
+				  0), "")) {
+	if (NEED_LOCK(trctx))
+	  MUTEX_UNLOCK(mt, xid);
+	std::cerr << "lseek error: fd=" << fd << " ls=" << ls1 << ", off=" << ((off_t)ls1 * sizeslot)  << '\n';
+	return se;
+      }
+      
+      if (se = syscheckn(PR, write(fd, &zero, sizeof(char)), sizeof(char), "")) {
+	if (NEED_LOCK(trctx))
+	  MUTEX_UNLOCK(mt, xid);
+	std::cerr << "write error\n";
+	return se;
       }
 
+      _dbh.dat(datid).__lastslot() = h2x_u32(ls1);
+    }
+    
     if (NEED_LOCK(trctx))
       MUTEX_UNLOCK(mt, xid);
 
