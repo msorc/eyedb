@@ -1258,7 +1258,7 @@ dataspace_realize(int argc, char *argv[])
 #define HAVE_WIDE_MEMORY_MAPPED
 
 #ifdef HAVE_WIDE_MEMORY_MAPPED
-#define MAXSHMSIZE 0xB4000000U
+#define MAXSHMSIZE 0x120000000U
 #else
 #define MAXSHMSIZE 0x40000000U
 #endif
