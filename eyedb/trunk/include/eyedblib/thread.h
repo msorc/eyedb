@@ -45,7 +45,10 @@ namespace eyedblib {
     };
     Mutex(Mutex::Type type, bool lock = false);
     Mutex(bool lock = false);
+
+    int init(Mutex::Type type, bool lock = false);
     int init(bool lock = false);
+
     int lock();
     int unlock();
     bool isLocked() const {return locked;}
