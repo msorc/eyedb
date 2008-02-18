@@ -86,7 +86,7 @@ get_opts(int argc, char *argv[],
 #endif
 
   static const std::string access_file_opt = "access-file";
-  static const std::string datdir_opt = "datadir";
+  static const std::string datdir_opt = "databasedir";
   static const std::string nod_opt = "nod";
   static const std::string sesslogdev_opt = "sesslogdev";
   static const std::string sessloglevel_opt = "sessloglevel";
@@ -141,10 +141,10 @@ get_opts(int argc, char *argv[],
 
 #ifndef NO_DATDIR
   if (!*datdir) {
-    if (s = eyedb::ServerConfig::getSValue("datadir"))
+    if (s = eyedb::ServerConfig::getSValue("databasedir"))
       *datdir = strdup(s);
     else {
-      fprintf(stderr, "configuration variable datadir is not set\n");
+      fprintf(stderr, "configuration variable databasedir is not set\n");
       exit(1);
     }
   }

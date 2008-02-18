@@ -3,7 +3,7 @@
 # This file is a template that you can use to override the default values.
 
 # Bases directory
-#datadir = @eyedb_databasedir@;
+#databasedir = @eyedb_databasedir@;
 
 # Temporary files directory
 #tmpdir = @eyedb_tmpdir@;

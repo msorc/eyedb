@@ -498,7 +498,7 @@ dbcreate_prologue(Database *db, const char *dbname,
 
 #else
   std::string dirname = (deffiledir ? deffiledir :
-			 eyedb::ClientConfig::getCValue("datadir"));
+			 eyedb::ClientConfig::getCValue("databasedir"));
   if (!dbfile) {
     if (strcmp(dbname, DBM_Database::getDbName()))
       dbfile = strdup((dirname + "/" + dbname + ".dbs").c_str());
@@ -584,7 +584,7 @@ dbmove_prologue(Database *db, const char *dbname,
     dbfile = strdup((dirname + dbfile).c_str());
 #else
   std::string dirname = (deffiledir ? deffiledir :
-			 eyedb::ClientConfig::getCValue("datadir"));
+			 eyedb::ClientConfig::getCValue("databasedir"));
   if (!dbfile)
     {
       if (!deffiledir)
@@ -661,7 +661,7 @@ dbcopy_prologue(Database *db, const char *dbname, const char *newdbname,
     dbfile = strdup((dirname + dbfile).c_str());
 #else
   std::string dirname = (deffiledir ? deffiledir :
-			 eyedb::ClientConfig::getCValue("datadir"));
+			 eyedb::ClientConfig::getCValue("databasedir"));
   if (!dbfile)
     dbfile = strdup((dirname + "/" + newdbname + ".dbs").c_str());
   else if (dbfile[0] != '/')
@@ -1628,7 +1628,7 @@ dbimport_realize(int fd, const char *file, const char *dbname,
   int i;
   if (lseek_ok && !_filedir) {
     getansw("Directory for Database File",
-	    dbdir, eyedb::ServerConfig::getSValue("datadir"));
+	    dbdir, eyedb::ServerConfig::getSValue("databasedir"));
 
     for (i = 0; i < info.ndat; i++) {
       if (!*info.datafiles[i].file)
@@ -1643,7 +1643,7 @@ dbimport_realize(int fd, const char *file, const char *dbname,
   }
   else {
     if (!_filedir) {
-      _filedir = eyedb::ServerConfig::getSValue("datadir");
+      _filedir = eyedb::ServerConfig::getSValue("databasedir");
     }
 
     /*

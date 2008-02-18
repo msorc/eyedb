@@ -674,7 +674,7 @@ namespace eyedb {
 
     std::string dbs;
     if (*dbfile != '/') {
-      dbs = string(ServerConfig::getSValue("datadir")) + "/" + dbfile;
+      dbs = string(ServerConfig::getSValue("databasedir")) + "/" + dbfile;
       dbfile = dbs.c_str();
     }
 
@@ -6777,7 +6777,7 @@ do { \
   }
 
   void
-  IDB_init(const char *datadir,
+  IDB_init(const char *databasedir,
 	   const char *dummy, // was  _passwdfile,
 	   void *xsesslog, int _timeout)
   {
@@ -6793,8 +6793,8 @@ do { \
     eyedb::init();
     config_init();
 
-    if (datadir)
-      ServerConfig::getInstance()->setValue("datadir", datadir);
+    if (databasedir)
+      ServerConfig::getInstance()->setValue("databasedir", databasedir);
   }
 
   RPCStatus
