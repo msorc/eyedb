@@ -1255,7 +1255,8 @@ dataspace_realize(int argc, char *argv[])
 
 // 1. must be detected by configure
 // 2. the amount of memory may be detected by configure also
-#define HAVE_WIDE_MEMORY_MAPPED
+//#define HAVE_WIDE_MEMORY_MAPPED
+#undef HAVE_WIDE_MEMORY_MAPPED
 
 #ifdef HAVE_WIDE_MEMORY_MAPPED
 #define MAXSHMSIZE 0x120000000U

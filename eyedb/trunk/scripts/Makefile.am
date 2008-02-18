@@ -4,7 +4,6 @@ EDIT = sed \
         -e 's,@bindir\@,$(bindir),g' \
         -e 's,@sbindir\@,$(sbindir),g' \
         -e 's,@exec_prefix\@,$(exec_prefix),g' \
-        -e 's,@datadir\@,$(pkgdatadir),g' \
         -e 's,@libdir\@,$(libdir),g' \
         -e 's,@eyedb_databasedir\@,$(eyedb_databasedir),g' \
         -e 's,@eyedb_pipedir\@,$(eyedb_pipedir),g' \

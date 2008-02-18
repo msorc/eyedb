@@ -791,6 +791,8 @@ namespace eyedb {
   void
   ServerConfig::setDefaults()
   {
+    std::string bindir = eyedblib::CompileBuiltin::getBindir();
+    std::string sbindir = eyedblib::CompileBuiltin::getSbindir();
     std::string libdir = eyedblib::CompileBuiltin::getLibdir();
     std::string databasedir = eyedblib::CompileBuiltin::getDatabasedir();
     std::string pipedir = eyedblib::CompileBuiltin::getPipedir();
@@ -798,20 +800,16 @@ namespace eyedb {
     std::string sysconfdir = eyedblib::CompileBuiltin::getSysconfdir();
 
 #ifdef BUILTIN_VARS
-    std::string bindir = eyedblib::CompileBuiltin::getBindir();
-    std::string sbindir = eyedblib::CompileBuiltin::getSbindir();
-    std::string datadir = eyedblib::CompileBuiltin::getDatadir();
-
     setValue("@bindir", bindir.c_str());;
     setValue("@sbindir", sbindir.c_str());;
     setValue("@libdir", libdir.c_str());;
-    setValue("@datadir", datadir.c_str());;
-    setValue("@sysconfdir", sysconfdir.c_str());;
+    setValue("@databasedir", databasedir.c_str());;
     setValue("@pipedir", pipedir.c_str());;
     setValue("@tmpdir", tmpdir.c_str());;
+    setValue("@sysconfdir", sysconfdir.c_str());;
 
     // Bases directory
-    setValue( "datadir", "%@datadir%");
+    setValue( "databasedir", "%@databasedir%");
 
     // tmpdir
     setValue( "tmpdir", "%@tmpdir%");
@@ -844,7 +842,7 @@ namespace eyedb {
     setValue( "oqlpath", "%@libdir%/eyedb/oql");
 #else
     // Bases directory
-    setValue( "datadir", databasedir.c_str());
+    setValue( "databasedir", databasedir.c_str());
 
     // tmpdir
     setValue( "tmpdir", tmpdir.c_str());
@@ -931,7 +929,7 @@ namespace eyedb {
       server_map["@sbindir"] = true;
       server_map["@libdir"] = true;
       server_map["@sysconfdir"] = true;
-      server_map["@datadir"] = true;
+      server_map["@databasedir"] = true;
       server_map["@pipedir"] = true;
       server_map["@tmpdir"] = true;
 #endif
@@ -942,7 +940,7 @@ namespace eyedb {
       client_map["passwd"] = true;
       client_map["dbm"] = true;
 
-      server_map["datadir"] = true;
+      server_map["databasedir"] = true;
       server_map["tmpdir"] = true;
       server_map["sopath"] = true;
       server_map["granted_dbm"] = true;

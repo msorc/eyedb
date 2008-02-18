@@ -74,7 +74,7 @@ namespace eyedb {
       const char *voldir = default_voldir;
 
       if (!voldir)
-	voldir = ClientConfig::getCValue("datadir");
+	voldir = ClientConfig::getCValue("databasedir");
 
       if (voldir)
 	strcpy(dirname, voldir);

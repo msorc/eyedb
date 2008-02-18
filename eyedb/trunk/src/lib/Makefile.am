@@ -27,7 +27,6 @@ compile_builtin.lo: $(srcdir)/compile_builtin.cc
 		-DCXX=\"$(CXX)\" \
 		-DBINDIR=\"$(bindir)\" \
 		-DSBINDIR=\"$(sbindir)\" \
-		-DDATADIR=\"$(datadir)\" \
 		-DLIBDIR=\"$(libdir)\" \
 		-DEYEDB_DATABASEDIR=\"$(eyedb_databasedir)\" \
 		-DEYEDB_PIPEDIR=\"$(eyedb_pipedir)\" \

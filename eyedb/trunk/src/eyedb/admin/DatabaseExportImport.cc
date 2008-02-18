@@ -962,7 +962,7 @@ dbimport_realize( Connection &conn, int fd, const char *file, const char *dbname
   int i;
   if (lseek_ok && !_filedir) {
     getansw("Directory for Database File",
-	    dbdir, eyedb::ServerConfig::getSValue("datadir"));
+	    dbdir, eyedb::ServerConfig::getSValue("databasedir"));
 
     for (i = 0; i < info.ndat; i++) {
       if (!*info.datafiles[i].file)
@@ -977,7 +977,7 @@ dbimport_realize( Connection &conn, int fd, const char *file, const char *dbname
   }
   else {
     if (!_filedir)
-      _filedir = eyedb::ServerConfig::getSValue("datadir");
+      _filedir = eyedb::ServerConfig::getSValue("databasedir");
 
     /*
       for (i = 0; i < info.ndat; i++)

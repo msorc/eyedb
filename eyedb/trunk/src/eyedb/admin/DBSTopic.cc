@@ -115,7 +115,7 @@ int DBSCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   }
 
   if (!filedir) {
-    filedir = eyedb::ServerConfig::getSValue("datadir");
+    filedir = eyedb::ServerConfig::getSValue("databasedir");
   }
 
   std::string dirname = filedir;
@@ -776,7 +776,7 @@ int DBSMoveCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
   if (map.find(FILEDIR_OPT) != map.end())
     filedir = map[FILEDIR_OPT].value;
   else
-    filedir = std::string(eyedb::ServerConfig::getSValue("datadir"));
+    filedir = std::string(eyedb::ServerConfig::getSValue("databasedir"));
 #else
   // filedir is a mandatory option
   std::string filedir = map[FILEDIR_OPT].value;
@@ -878,7 +878,7 @@ int DBSCopyCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
   if (map.find(FILEDIR_OPT) != map.end())
     filedir = map[FILEDIR_OPT].value;
   else
-    filedir = std::string(eyedb::ServerConfig::getSValue("datadir"));
+    filedir = std::string(eyedb::ServerConfig::getSValue("databasedir"));
 
   std::string dbfile;
   if (map.find(DBFILE_OPT) != map.end()) {
