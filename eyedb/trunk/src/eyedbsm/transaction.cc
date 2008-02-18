@@ -760,7 +760,8 @@ do { \
 #ifdef TRS_INTER_MUT
     mutexInit(dbh->vd, &tro->mut, &tro->mp, "TRANSACTION");
 #else
-    tro->mut.init();
+    // EV 15/02/08: really PROCESS_PRIVATE ?
+    tro->mut.init(eyedblib::Mutex::PROCESS_PRIVATE);
 #endif
 
     HashTableTRObjectInsert(xmh, trs_ht, tro);
@@ -1733,7 +1734,7 @@ do { \
 #ifdef TRS_INTER_MUT
     mutexInit(dbh->vd, &trs->mut, &trs->mp, "TRANSACTION");
 #else
-    trs->mut.init();
+    trs->mut.init(eyedblib::Mutex::PROCESS_PRIVATE);
 #endif
 
     ESM_transactionRegister(trs, mp, xid);

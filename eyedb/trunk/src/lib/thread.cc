@@ -66,8 +66,13 @@ namespace eyedblib {
     init(_lock);
   }
 
-  int
-  Mutex::init(bool _lock)
+  int Mutex::init(Type _type, bool _lock)
+  {
+    type = _type;
+    init(_lock);
+  }
+
+  int Mutex::init(bool _lock)
   {
     pthread_mutexattr_t mattr;
     int r = pthread_mutexattr_init(&mattr);
