@@ -545,7 +545,7 @@ int DBSListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
   }
 
   if (argv.size() == 0) {
-    argv.push_back("~");
+    argv.push_back("~.*");
   }
 
   unsigned int options = getListOptions(map);;

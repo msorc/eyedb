@@ -37,6 +37,7 @@
 #include <eyedb/gbx.h>
 #include <eyedb/base.h>
 #include <eyedb/Error.h>
+#include <eyedb/init.h>
 
 #include <eyedb/Oid.h>
 #include <eyedb/Exception.h>
@@ -117,7 +118,6 @@
 #include <eyedb/GenHashTable.h>
 
 #include <eyedb/DBM.h>
-#include <eyedb/init.h>
 #include <eyedb/syscls.h>
 #include <eyedb/utils.h>
 #include <eyedb/opts.h>
