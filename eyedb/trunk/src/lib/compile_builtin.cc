@@ -75,4 +75,9 @@ namespace eyedblib {
     return SYSCONFDIR;
   }
 
+  const char* CompileBuiltin::getPkgdatadir()
+  {
+    return PKGDATADIR;
+  }
+
 }

@@ -58,7 +58,7 @@ static const char make_pattern[] =
 "# %s %s"
 "#\n"
 "\n"
-"include %s/eyedb/Makefile.eyedb\n"
+"include %s/Makefile.eyedb\n"
 "\n"
 "CXXFLAGS += $(EYEDB_CXXFLAGS) $(EYEDB_CPPFLAGS)\n"
 "LDFLAGS  += ${EYEDB_LDFLAGS}\n"
