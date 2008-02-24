@@ -32,6 +32,7 @@ compile_builtin.lo: $(srcdir)/compile_builtin.cc
 		-DEYEDB_PIPEDIR=\"$(eyedb_pipedir)\" \
 		-DEYEDB_TMPDIR=\"$(eyedb_tmpdir)\" \
 		-DSYSCONFDIR=\"$(sysconfdir)\" \
+		-DPKGDATADIR=\"$(pkgdatadir)\" \
 		-c -o $@ $<
 
 libeyedbrpcbe_la_SOURCES= \
