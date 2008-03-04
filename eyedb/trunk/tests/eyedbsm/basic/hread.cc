@@ -47,6 +47,11 @@ read_hash(void *x)
   }
 
   const eyedbsm::Idx::KeyType &kt = hidx.getKeyType();
+  printf("\nKey Size %d\n", hidx.getIdx().keysz);
+  printf("Key Count %u\n", hidx.getIdx().key_count);
+  printf("Data Size %u\n", hidx.getIdx().datasz);
+  printf("Data %sgrouped by key\n\n", hidx.isDataGroupedByKey() ? "" : "not ");
+
   printf("%d Key Count\n", hidx.getKeyCount());
   printf("%d Objects Inserted\n", hidx.getCount());
   eyedbsm::Oid *oids;
@@ -96,32 +101,32 @@ read_hash(void *x)
 
   printf("%d found\n", count);
 
-#if 1
-  eyedbsm::HIdxCursor c1(&hidx);
-  count = 0;
-  for (;;) {
-    eyedbsm::Idx::Key key;
-    unsigned int found_cnt;
-    s = c1.next(&found_cnt, &key);
-    if (s) {
-      eyedbsm::statusPrint(s, "getting next");
-      break;
+  if (hidx.isDataGroupedByKey()) {
+    eyedbsm::HIdxCursor c1(&hidx);
+    count = 0;
+    for (;;) {
+      eyedbsm::Idx::Key key;
+      unsigned int found_cnt;
+      s = c1.next(&found_cnt, &key);
+      if (s) {
+	eyedbsm::statusPrint(s, "getting next");
+	break;
+      }
+
+      if (!found_cnt)
+	break;
+
+      count += found_cnt;
+
+      if (o_verbose) {
+	printf("keydata [%d]\n\t", found_cnt);
+	o_trace_data(kt, (char *)key.getKey(), eyedbsm::False);
+	printf("\n");
+      }
     }
 
-    if (!found_cnt)
-      break;
-
-    count += found_cnt;
-
-    if (o_verbose) {
-      printf("keydata [%d]\n\t", found_cnt);
-      o_trace_data(kt, (char *)key.getKey(), eyedbsm::False);
-      printf("\n");
-    }
+    printf("%d found\n", count);
   }
-
-  printf("%d found\n", count);
-#endif
 
   o_count = count;
   if (getenv("DUMPMAP"))

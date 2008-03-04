@@ -25,8 +25,9 @@
 /*
  * Files:
  *  .dbs: database system file: contains database file header
- *  .omp: object mapping file
  *  .shm: shm file (transaction information)
+ *  .lck: lock file (to avoid use of eyedbsmd daemon, when it is possible)
+ *  .omp: object mapping file
  *  .dat: data files
  *  .dmp: data mapping file (allocator per datafile)
  */
@@ -111,8 +112,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     return status;
   }
 
-  static int
-  fileCreate(const char *file, mode_t file_mode, gid_t file_gid)
+  static int fileCreate(const char *file, mode_t file_mode, gid_t file_gid)
   {
     int fd;
 
@@ -1356,7 +1356,13 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 
     const char *lockfile = fileGet(dbfile, ".lck");
     if ((*lkfd = open(lockfile, O_RDWR)) < 0) {
-      int fd = creat(lockfile, DEFAULT_CREATION_MODE);
+      struct stat st;
+      mode_t file_mode = DEFAULT_CREATION_MODE;
+      if (stat(shmfileGet(dbfile), &st) >= 0) {
+	file_mode = st.st_mode;
+      }
+
+      int fd = fileCreate(lockfile, file_mode, (gid_t)-1);
       if (TRACE_CLEANUP) {
 	fprintf(stderr, "eyedbsm: creating lockfile %s\n", lockfile);
       }
