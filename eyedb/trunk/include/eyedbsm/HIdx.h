@@ -157,8 +157,7 @@ namespace eyedbsm {
 			  CellHeader &o, unsigned int datasz);
     Status insert_perform(const void *key, std::vector<const void *> &xdata_v, unsigned int datasz);
     Status insert_perform(const void *key, const void *xdata, unsigned int datasz);
-    Status remove_perform(const void *key, const void *xdata, Boolean *found,
-			  unsigned char **prdata, unsigned int *pdatacnt, int *found_idx, unsigned int incr_alloc);
+    Status remove_perform(const void *key, const void *xdata, unsigned int datasz, Boolean *found, unsigned char **prdata, unsigned int *pdatacnt, int *found_idx, unsigned int incr_alloc);
     Status remove_realize(CListHeader *chd, unsigned int chd_key,
 			  const char *, const char *, const char *,
 			  const CellHeader *, const Oid *);

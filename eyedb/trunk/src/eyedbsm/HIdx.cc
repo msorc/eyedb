@@ -2185,7 +2185,7 @@ Status HIdx::insert_perform(const void *key, std::vector<const void *> &xdata_v,
 #endif
     Boolean found = False;
     unsigned int datacnt = 0;
-    s = remove_perform(key, 0, &found, &rdata, &datacnt, 0, xdata_v_cnt);
+    s = remove_perform(key, 0, 0, &found, &rdata, &datacnt, 0, xdata_v_cnt);
     if (s)
       return s;
 
@@ -2544,7 +2544,7 @@ Status HIdx::remove(const void *key, const void *data, unsigned int datasz, Bool
     return statusMake(ERROR, "Fixed size hash index: the data size must be equals to %u", hidx.datasz);
   }
 
-  return statusMake(NOT_YET_IMPLEMENTED, "HIdx::remove(const void *key, const void *data, unsigned int datasz, Boolean *found)");
+  return remove_perform(key, data, datasz, found, 0, 0, 0, 0);
 }
 
 Status HIdx::remove(const void *key, const void *xdata, Boolean *found)
@@ -2559,7 +2559,7 @@ Status HIdx::remove(const void *key, const void *xdata, Boolean *found)
     Boolean xfound = False;
     unsigned int datacnt = 0;
     int found_idx = -1;
-    Status s = remove_perform(key, xdata, &xfound, &rdata, &datacnt, &found_idx, 0);
+    Status s = remove_perform(key, xdata, 0, &xfound, &rdata, &datacnt, &found_idx, 0);
     if (s)
       return s;
 
@@ -2593,12 +2593,12 @@ Status HIdx::remove(const void *key, const void *xdata, Boolean *found)
     return s;
   }
   else {
-    return remove_perform(key, xdata, found, 0, 0, 0, 0);
+    return remove_perform(key, xdata, 0, found, 0, 0, 0, 0);
   }
 }
 
 Status
-HIdx::remove_perform(const void *key, const void *xdata, Boolean *found, unsigned char **prdata, unsigned int *pdatacnt, int *found_idx, unsigned int incr_alloc)
+HIdx::remove_perform(const void *key, const void *xdata, unsigned int datasz, Boolean *found, unsigned char **prdata, unsigned int *pdatacnt, int *found_idx, unsigned int incr_alloc)
 {
   Status s;
   
@@ -2607,6 +2607,10 @@ HIdx::remove_perform(const void *key, const void *xdata, Boolean *found, unsigne
 
   if (s = checkOpened())
     return s;
+
+  if (!datasz) {
+    datasz = hidx.datasz;
+  }
 
 #ifdef CACHE_FOR_LOCK
   // remove(const void *key, const void *xdata, found?)
@@ -2705,8 +2709,7 @@ HIdx::remove_perform(const void *key, const void *xdata, Boolean *found, unsigne
 		assert(found_idx);
 		*found_idx = -1;
 		for (unsigned int n = 0; n < *pdatacnt; n++) {
-		  r = memcmp(xdata, curcell + get_off(curcell, this) + data_group_sz(n, this),
-			     hidx.datasz);
+		  r = memcmp(xdata, curcell + get_off(curcell, this) + data_group_sz(n, this), datasz);
 		  if (!r) {
 		    *found_idx = n;
 		    break;
@@ -2726,10 +2729,23 @@ HIdx::remove_perform(const void *key, const void *xdata, Boolean *found, unsigne
 	    }
 	    else {
 #ifdef BUG_DATA_STORE2
-	      r = memcmp(xdata, curcell + get_off(curcell, this),
-			     hidx.datasz);
+	      if (isDataVarSize()) {
+		unsigned int xdatasz;
+		memcpy(&xdatasz, curcell + get_off(curcell, this), DATASZ_SIZE);
+		unsigned ndatasz = x2h_u32(xdatasz);
+		if (ndatasz != datasz) {
+		  r = -1;
+		}
+		else {
+		  r = memcmp(xdata, curcell + get_off(curcell, this) + DATASZ_SIZE, datasz);
+		}
+	      }
+	      else {
+		r = memcmp(xdata, curcell + get_off(curcell, this), datasz);
+	      }
 #else
-	      r = memcmp(xdata, curcell + o.size - hidx.datasz, hidx.datasz);
+	      assert(0);
+	      r = memcmp(xdata, curcell + o.size - datasz, datasz);
 #endif
 	    }
 	    if (!r) {
@@ -2747,8 +2763,9 @@ HIdx::remove_perform(const void *key, const void *xdata, Boolean *found, unsigne
 	      dumpMemoryMap(chd, "after remove_realize ");
 #endif
 
-	      if (!s && found)
+	      if (!s && found) {
 		*found = True;
+	      }
 	      free(start);
 	      return s;
 	    }
