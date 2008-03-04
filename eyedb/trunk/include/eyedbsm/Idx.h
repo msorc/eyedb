@@ -110,7 +110,11 @@ namespace eyedbsm {
 
     virtual eyedbsm::Status insert(const void *key, const void *data) = 0;
 
+    virtual eyedbsm::Status insert(const void *key, const void *data, unsigned int datasz) = 0;
+
     virtual eyedbsm::Status remove(const void *key, const void *data, eyedbsm::Boolean *found = 0) = 0;
+
+    virtual eyedbsm::Status remove(const void *key, const void *data, unsigned int datasz, eyedbsm::Boolean *found = 0) = 0;
 
     virtual eyedbsm::Status search(const void *key, unsigned int *found_cnt) = 0;
 
@@ -230,6 +234,43 @@ namespace eyedbsm {
 		    unsigned int size);
   };
 
+  class DataBuffer {
+
+  public:
+    DataBuffer() : data(0), datasz(0), allocsz(0) { }
+
+    DataBuffer(const DataBuffer &buffer) : data(0), datasz(0), allocsz(0) {
+      *this = buffer;
+    }
+
+    DataBuffer &operator=(const DataBuffer &buffer) {
+      garbage();
+      setData(buffer.data, buffer.datasz);
+      return *this;
+    }
+
+    void *getData(unsigned int &_datasz) const {
+      _datasz = datasz;
+      return (void *)data;
+    }
+
+    void setData(void *data, unsigned int datasz);
+
+    ~DataBuffer() {
+      garbage();
+    }
+
+  private:
+    unsigned char *data;
+    unsigned int datasz;
+    unsigned int allocsz;
+
+    void garbage() {
+      delete [] data;
+      data = 0;
+    }
+  };
+
   class IdxCursor {
 
   public:
@@ -246,6 +287,15 @@ namespace eyedbsm {
        @return
     */
     virtual Status next(eyedbsm::Boolean *found, void *data = 0, Idx::Key *key = 0) = 0;
+
+    /**
+       Not yet documented
+       @param found
+       @param data
+       @param key
+       @return
+    */
+    virtual Status next(eyedbsm::Boolean *found, DataBuffer &data, Idx::Key *key = 0) = 0;
 
     /**
        Not yet documented

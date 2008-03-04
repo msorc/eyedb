@@ -338,34 +338,43 @@ namespace eyedbsm {
     /**
        Not yet documented
        @param key
-       @param xdata
+       @param data
        @return
     */
-    Status insert(const void *key, const void *xdata);
+    Status insert(const void *key, const void *data);
 
     /**
        Not yet documented
        @param key
-       @param xdata_v
+       @param data
+       @param datasz
        @return
     */
-    Status insert(const void *key, std::vector<const void *> &xdata_v);
+    Status insert(const void *key, const void *data, unsigned int datasz);
 
     /**
        Not yet documented
        @param key
-       @param xdata
+       @param data_v
        @return
     */
-    Status insert_cache(const void *key, const void *xdata);
+    Status insert(const void *key, std::vector<const void *> &data_v);
 
     /**
        Not yet documented
        @param key
-       @param xdata_v
+       @param data
        @return
     */
-    Status insert_cache(const void *key, std::vector<const void *> &xdata_v);
+    Status insert_cache(const void *key, const void *data);
+
+    /**
+       Not yet documented
+       @param key
+       @param data_v
+       @return
+    */
+    Status insert_cache(const void *key, std::vector<const void *> &data_v);
 
     /**
        Not yet documented
@@ -376,17 +385,27 @@ namespace eyedbsm {
     /**
        Not yet documented
        @param key
-       @param xdata
+       @param data
        @param found
        @return
     */
-    Status remove(const void *key, const void *xdata, Boolean *found = 0);
+    Status remove(const void *key, const void *data, Boolean *found = 0);
+
+    /**
+       Not yet documented
+       @param key
+       @param data
+       @param datasz
+       @param found
+       @return
+    */
+    Status remove(const void *key, const void *data, unsigned int datasz, Boolean *found = 0);
 
     /**
        Not yet documented
        @param key
        @param found_cnt
-       @param xdata
+       @param data
        @return
     */
     Status search(const void *key, unsigned int *found_cnt);
@@ -395,10 +414,10 @@ namespace eyedbsm {
        Not yet documented
        @param key
        @param found
-       @param xdata
+       @param data
        @return
     */
-    Status searchAny(const void *key, Boolean *found, void *xdata = 0);
+    Status searchAny(const void *key, Boolean *found, void *data = 0);
 
     /**
        Not yet documented
@@ -431,6 +450,12 @@ namespace eyedbsm {
        @return
     */
     Boolean isDataGroupedByKey() const {return data_grouped_by_key;}
+
+    /**
+       Not yet documented
+       @return
+    */
+    bool isDataVarSize() const {return hidx.datasz == 0;}
 
     /**
        Not yet documented
@@ -627,7 +652,7 @@ namespace eyedbsm {
     Boolean state;
     Boolean (*user_cmp)(const void *key, void *cmp_arg);
     void *cmp_arg;
-    void append_next(void *data, Idx::Key *key, unsigned int n);
+    void append_next(void *data, Idx::Key *key, unsigned int n, DataBuffer *dataBuffer);
 
     void init(DbHandle *);
 
@@ -652,8 +677,7 @@ namespace eyedbsm {
 	       void *cmp_arg,
 	       LinkList *);
 
-    Status next(Boolean *found, unsigned int *found_cnt, void *data,
-		Idx::Key *key);
+    Status next(Boolean *found, unsigned int *found_cnt, void *data, Idx::Key *key, DataBuffer *dataBuffer);
 
   public:
     /**
@@ -684,6 +708,15 @@ namespace eyedbsm {
        @return
     */
     Status next(Boolean *found, void *data = 0, Idx::Key *key = 0);
+
+    /**
+       Not yet documented
+       @param found
+       @param data
+       @param key
+       @return
+    */
+    Status next(Boolean *found, DataBuffer &data, Idx::Key *key = 0);
 
     /**
        Not yet documented

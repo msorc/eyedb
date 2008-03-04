@@ -25,47 +25,126 @@
 
 #include "olib.h"
 
-static const unsigned int DATASZ = sizeof(eyedbsm::Oid);
+//#define FIXED_DATASZ
 
-static void create_hash(void *x)
+#ifdef FIXED_DATASZ
+static const unsigned int INDEX_DATASZ = sizeof(eyedbsm::Oid);
+static const unsigned int DATASZ = INDEX_DATASZ;
+#else
+static const unsigned int INDEX_DATASZ = 0;
+static const unsigned int DATASZ = 128;
+#endif
+
+//#define DATA_GROUPED_BY_KEY
+
+#define NN 120
+
+static eyedbsm::Status create_hash()
 {
   eyedbsm::Idx::KeyType kt = o_get_idxKeyType("string:-1");
 
-  eyedbsm::HIdx hidx(o_dbh, kt, DATASZ, o_dspid, o_magorder,
+#ifdef DATA_GROUPED_BY_KEY
+  o_impl_hints[eyedbsm::HIdx::DataGroupedByKey_Hints] = 4;
+#endif
+
+  eyedbsm::HIdx hidx(o_dbh, kt, INDEX_DATASZ, o_dspid, o_magorder,
 		     o_keycount, o_impl_hints, eyedbsm::HIdxImplHintsCount);
 
   eyedbsm::Status s = hidx.status();
 
   if (s) {
     eyedbsm::statusPrint(s, "creating hash index");
+    return s;
   }
 
   o_oids[0] = hidx.oid();
 
   printf("has created hash index %s [keytype: %s]\n", o_getOidString(&o_oids[0]), o_keytype);
+
+  return eyedbsm::Success;
 }
 
-static void o_insert()
+static void make_key(char key[], int n)
+{
+  sprintf(key, "key-%d", n/3);
+}
+
+static void make_data(char data[], int n)
+{
+#ifdef FIXED_DATASZ
+  memset(data, 0, DATASZ);
+  sprintf(data, "#%d", n, 2*n);
+#else
+  sprintf(data, "data-#%d", n, 100*n);
+#endif
+}
+
+static eyedbsm::Status o_insert()
 {
   eyedbsm::HIdx hidx(o_dbh, &o_oids[0]);
 
-  for (int n = 0; n < 120; n++) {
+  for (int n = 0; n < NN; n++) {
     char key[64];
-    sprintf(key, "key-%d", n);
     char data[DATASZ];
-    memset(data, 0, sizeof(data));
-    sprintf(data, "#%d", n, 2*n);
+
+    make_key(key, n);
+    make_data(data, n);
+
+#ifdef DATA_GROUPED_BY_KEY
+    eyedbsm::Status s = hidx.insert_cache(key, data);
+#else
+#ifdef FIXED_DATASZ
     eyedbsm::Status s = hidx.insert(key, data);
+#else
+    eyedbsm::Status s = hidx.insert(key, data, strlen(data)+1);
+#endif
+#endif
     if (s) {
       eyedbsm::statusPrint(s, "inserting");
-      break;
+      return s;
     }
   }
+
+#ifdef DATA_GROUPED_BY_KEY
+  eyedbsm::Status s = hidx.flush_cache();
+  if (s) {
+    eyedbsm::statusPrint(s, "inserting");
+    return s;
+  }
+#endif
+
+  return eyedbsm::Success;
 }
 
-static void o_read()
+static eyedbsm::Status o_remove()
 {
   eyedbsm::HIdx hidx(o_dbh, &o_oids[0]);
+
+  for (int n = 0; n < 120; n += 3) {
+    char key[64];
+    char data[DATASZ];
+
+    make_key(key, n);
+    make_data(data, n);
+
+    eyedbsm::Status s = hidx.remove(key, data);
+    if (s) {
+      eyedbsm::statusPrint(s, "removing");
+      return s;
+    }
+  }
+
+  return eyedbsm::Success;
+}
+
+static eyedbsm::Status o_read()
+{
+  eyedbsm::HIdx hidx(o_dbh, &o_oids[0]);
+
+  printf("\nKey Size %d\n", hidx.getIdx().keysz);
+  printf("Key Count %u\n", hidx.getIdx().key_count);
+  printf("Data Size %u\n", hidx.getIdx().datasz);
+  printf("Data %sgrouped by key\n\n", hidx.isDataGroupedByKey() ? "" : "not ");
 
   eyedbsm::HIdxCursor c(&hidx);
   unsigned int count;
@@ -78,16 +157,63 @@ static void o_read()
     eyedbsm::Status s = c.next(&found, data, &key);
     if (s) {
       eyedbsm::statusPrint(s, "getting next");
-      break;
+      return s;
     }
 
-    if (!found)
+    if (!found) {
       break;
+    }
 
     printf("[%s] -> [%s]\n", key.getKey(), data);
   }
 
   printf("count %u\n", count);
+
+  eyedbsm::HIdxCursor c1(&hidx);
+
+  for (count = 0; ; count++) {
+    eyedbsm::Idx::Key key;
+    eyedbsm::Boolean found;
+    eyedbsm::DataBuffer dataBuffer;
+
+    eyedbsm::Status s = c1.next(&found, dataBuffer, &key);
+    if (s) {
+      eyedbsm::statusPrint(s, "getting next");
+      return s;
+    }
+
+    if (!found) {
+      break;
+    }
+
+    unsigned int datasz;
+    void *data = dataBuffer.getData(datasz);
+    printf("[%s] -> [%s] %u\n", key.getKey(), data, datasz);
+  }
+
+  printf("count %u\n", count);
+
+  if (hidx.isDataGroupedByKey()) {
+    eyedbsm::HIdxCursor c2(&hidx);
+    for (;;) {
+      eyedbsm::Idx::Key key;
+      unsigned int found_cnt;
+      eyedbsm::Status s = c2.next(&found_cnt, &key);
+
+      if (s) {
+	eyedbsm::statusPrint(s, "getting next");
+	return s;
+      }
+
+      if (!found_cnt) {
+	break;
+      }
+
+      printf("[%s] -> %d items\n", key.getKey(), found_cnt);
+    }
+  }
+
+  return eyedbsm::Success;
 }
 
 static int usage(const char *prog)
@@ -119,7 +245,8 @@ int main(int argc, char *argv[])
   if (o_trsbegin())
     return 1;
 
-  o_bench(create_hash, 0);
+  if (create_hash())
+    return 1;
 
   if (o_trsend())
     return 1;
@@ -129,7 +256,8 @@ int main(int argc, char *argv[])
   if (o_trsbegin())
     return 1;
 
-  o_insert();
+  if (o_insert())
+    return 1;
 
   if (o_trsend())
     return 1;
@@ -137,11 +265,42 @@ int main(int argc, char *argv[])
   if (o_trsbegin())
     return 1;
 
-  o_read();
+  if (o_read())
+    return 1;
+
+  if (o_trsend())
+    return 1;
+
+  if (o_trsbegin())
+    return 1;
+
+  if (o_remove())
+    return 1;
+
+  if (o_trsend())
+    return 1;
+
+  if (o_trsbegin())
+    return 1;
+
+  if (o_read())
+    return 1;
 
   if (o_trsend())
     return 1;
 
   return o_release();
 }
+
+
+
+
+
+
+
+
+
+
+
+
 

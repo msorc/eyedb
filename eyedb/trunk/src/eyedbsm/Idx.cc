@@ -463,4 +463,18 @@ cmp(type const * p, type const * q, unsigned i, unsigned char bswap) \
       return 0;
     }
   }
+
+  void DataBuffer::setData(void *_data, unsigned int _datasz)
+  {
+    static const unsigned int INCRSZ = 512;
+    datasz = _datasz;
+
+    if (datasz > allocsz) {
+      allocsz = datasz + INCRSZ;
+      delete [] data;
+      data = new unsigned char[allocsz];
+    }
+
+    memcpy(data, _data, datasz);
+  }
 }

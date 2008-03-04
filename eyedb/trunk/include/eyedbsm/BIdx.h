@@ -308,10 +308,29 @@ namespace eyedbsm {
        Not yet documented
        @param key
        @param data
+       @param datasz
+       @return
+    */
+    Status insert(const void *key, const void *data, unsigned int datasz);
+
+    /**
+       Not yet documented
+       @param key
+       @param data
        @param found
        @return
     */
     eyedbsm::Status remove(void const * key, void const * data, eyedbsm::Boolean * found = 0);
+
+    /**
+       Not yet documented
+       @param key
+       @param data
+       @param datasz
+       @param found
+       @return
+    */
+    Status remove(const void *key, const void *data, unsigned int datasz, Boolean *found = 0);
 
     /**
        Not yet documented
@@ -398,6 +417,15 @@ namespace eyedbsm {
        @return
     */
     Status next(eyedbsm::Boolean * found, void * data = 0, Idx::Key * key = 0);
+
+    /**
+       Not yet documented
+       @param found
+       @param data
+       @param key
+       @return
+    */
+    Status next(Boolean *found, DataBuffer &data, Idx::Key *key = 0);
 
     /**
        Not yet documented
