@@ -31,7 +31,7 @@
 static const unsigned int INDEX_DATASZ = sizeof(eyedbsm::Oid);
 static const unsigned int DATASZ = INDEX_DATASZ;
 #else
-static const unsigned int INDEX_DATASZ = 0;
+static const unsigned int INDEX_DATASZ = eyedbsm::HIdxDataVarSize;
 static const unsigned int DATASZ = 128;
 #endif
 
@@ -232,6 +232,22 @@ static eyedbsm::Status o_read()
   return eyedbsm::Success;
 }
 
+static eyedbsm::Status o_move()
+{
+  eyedbsm::HIdx hidx(o_dbh, &o_oids[0]);
+
+  eyedbsm::Oid newoid;
+  eyedbsm::Status s = hidx.move((short)o_dspid, newoid);
+  if (s) {
+    eyedbsm::statusPrint(s, "moving hash index");
+    return s;
+  }
+
+  printf("%s -> %s\n", eyedbsm::getOidString(&o_oids[0]), eyedbsm::getOidString(&newoid));
+  o_oids[0] = newoid;
+  return eyedbsm::Success;
+}
+
 static int usage(const char *prog)
 {
   std::cerr << "usage: " << prog << " DATABASE HOIDFILE\n";
@@ -309,6 +325,14 @@ int main(int argc, char *argv[])
     if (o_trsend())
       return 1;
 
+    if (o_trsbegin())
+      return 1;
+
+    if (o_move())
+      return 1;
+
+    if (o_trsend())
+      return 1;
   }
 
   return o_release();

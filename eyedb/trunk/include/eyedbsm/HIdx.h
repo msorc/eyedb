@@ -46,6 +46,7 @@ namespace eyedbsm {
   class HIdxCursor;
 
   static const int HIdxImplHintsCount = 8;
+  static const unsigned int HIdxDataVarSize = ~0U;
 
   /**
      Not yet documented.
@@ -454,7 +455,7 @@ namespace eyedbsm {
        Not yet documented
        @return
     */
-    bool isDataVarSize() const {return hidx.datasz == 0;}
+    bool isDataVarSize() const {return hidx.datasz == HIdxDataVarSize;}
 
     /**
        Not yet documented
