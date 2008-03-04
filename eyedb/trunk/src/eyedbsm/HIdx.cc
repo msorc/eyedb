@@ -2049,7 +2049,7 @@ Status HIdx::insert_cache(const void *key, const void *xdata)
 Status HIdx::insert_cache(const void *key, std::vector<const void *> &xdata_v)
 {
   if (isDataVarSize()) {
-    return statusMake(ERROR, "Variable size hash index: cannot use cache");
+    return statusMake(ERROR, "Variable data size hash index: cannot use cache");
   }
 
   unsigned int xdata_v_cnt = xdata_v.size();
@@ -2093,7 +2093,7 @@ Status HIdx::flush_cache(bool insert_data)
 Status HIdx::insert(const void *key, const void *xdata)
 { 
   if (isDataVarSize()) {
-    return statusMake(ERROR, "Variable size hash index: the data size must be given at insertion, use HIdx::insert(const void *key, const void *data, unsigned int datasz)");
+    return statusMake(ERROR, "Variable data size hash index: the data size must be given at insertion, use HIdx::insert(const void *key, const void *data, unsigned int datasz)");
   }
 
   return insert_perform(key, xdata, 0);
@@ -2111,7 +2111,7 @@ Status HIdx::insert(const void *key, const void *data, unsigned int datasz)
 Status HIdx::insert(const void *key, std::vector<const void *> &xdata_v)
 { 
   if (isDataVarSize()) {
-    return statusMake(ERROR, "Variable size hash index: the method HIdx::insert(const void *key, std::vector<const void *> &data_v) is not supported");
+    return statusMake(ERROR, "Variable data size hash index: the method HIdx::insert(const void *key, std::vector<const void *> &data_v) is not supported");
   }
 
   return insert_perform(key, xdata_v, 0);
@@ -2559,7 +2559,7 @@ Status HIdx::remove(const void *key, const void *data, unsigned int datasz, Bool
 Status HIdx::remove(const void *key, const void *xdata, Boolean *found)
 {
   if (isDataVarSize()) {
-    return statusMake(ERROR, "Variable size hash index: the data size must be given at removing, use HIdx::remove(const void *key, const void *data, unsigned int datasz, Boolean *found)");
+    return statusMake(ERROR, "Variable data size hash index: the data size must be given at removing, use HIdx::remove(const void *key, const void *data, unsigned int datasz, Boolean *found)");
   }
 
   unsigned char *rdata = 0;
@@ -3120,13 +3120,14 @@ HIdx::cmp(const void *key, const void *d, unsigned char bswap) const
 Status HIdx::searchAny(const void *key, Boolean *found, void *xdata)
 {
   if (isDataVarSize() && xdata) {
-    return statusMake(ERROR, "Variable size hash index: cannot use the searchAny() method");
+    return statusMake(ERROR, "Variable data size hash index: cannot use the HIdx::searchAny(const void *key, Boolean *found, void *data) method when data is not null");
   }
 
   unsigned int found_cnt;
   Status s = search_realize(key, &found_cnt, True, xdata);
-  if (s)
+  if (s) {
     return s;
+  }
   *found = (found_cnt != 0) ? eyedbsm::True : eyedbsm::False;
   return Success;
 }
@@ -4338,12 +4339,11 @@ HIdx::getStats(std::string &stats) const
 
     if (cell_count) {
       busy++;
-      stats += std::string("  Cell #") + str_convert(n) + ": " + str_convert((long)cell_count) + " objects, " + str_convert((long)nobjs) + " hash object" + (nobjs != 1 ? "s" : "") + "\n";
+      stats += std::string("  Cell #") + str_convert(n) + ": " + str_convert((long)cell_count) + " object" + (cell_count != 1 ? "s" : "") + ", " + str_convert((long)nobjs) + " hash object" + (nobjs != 1 ? "s" : "") + "\n";
       total += cell_count;
     }
     else
       free++;
-      
   }
 
   stats += std::string("  Total object count: ") + str_convert((long)total) +
