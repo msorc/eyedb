@@ -238,6 +238,11 @@ namespace eyedbsm {
     return Success;
   }		
 
+  Status BIdxCursor::next(Boolean *found, DataBuffer &data, Idx::Key *key)
+  {
+    return statusMake(NOT_YET_IMPLEMENTED, "BIdxCursor::next(Boolean *found, DataBuffer &data, Idx::Key *key)");
+  }
+
   Status
   BIdxCursor::next(unsigned int *found_cnt, Idx::Key *key)
   {

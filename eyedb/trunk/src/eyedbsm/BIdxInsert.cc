@@ -229,9 +229,13 @@ namespace eyedbsm {
     return x->write();
   }
 
+  Status BIdx::insert(const void *key, const void *data, unsigned int datasz)
+  {
+    return statusMake(NOT_YET_IMPLEMENTED, "BIdx::insert(const void *key, const void *data, unsigned int datasz)");
+  }
+
   //#define USE_CACHE
-  Status
-  BIdx::insert(void const * key, void const * data)
+  Status BIdx::insert(void const * key, void const * data)
   {
     if (stat)
       return stat;

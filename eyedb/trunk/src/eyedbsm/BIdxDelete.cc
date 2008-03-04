@@ -252,8 +252,12 @@ namespace eyedbsm {
     return Success;
   }
 
-  Status
-  BIdx::remove(void const * key, void const * data, Boolean * found)
+  Status BIdx::remove(const void *key, const void *data, unsigned int datasz, Boolean *found)
+  {
+    return statusMake(NOT_YET_IMPLEMENTED, "BIdx::remove(const void *key, const void *data, unsigned int datasz, Boolean *found)");
+  }
+
+  Status BIdx::remove(void const * key, void const * data, Boolean * found)
   {
     if (stat)
       return stat;

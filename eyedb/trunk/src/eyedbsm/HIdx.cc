@@ -56,6 +56,8 @@ namespace eyedbsm {
 
 #define OPTIM_LARGE_OBJECTS
 
+#define DATASZ_SIZE 4
+
 #define NEW_WAIT
 //#define MULTI_LIST
 
@@ -357,6 +359,11 @@ HIdx::init(DbHandle *_dbh, unsigned int _keytype,
   if (!hidx.impl_hints[SzMax_Hints])
     hidx.impl_hints[SzMax_Hints] = get_sizemax_def(hidx);
 
+  if (_isDataGroupedByKey(hidx) && isDataVarSize()) {
+    stat = statusMake(NOT_YET_IMPLEMENTED, "data_grouped_by_key hash indexes does not yet support variable size data");
+    return;
+  }
+
   mask = hidx.key_count - 1;
   unsigned int (*gkey)(int) = get_gkey(version);
 
@@ -384,6 +391,7 @@ HIdx::init(DbHandle *_dbh, unsigned int _keytype,
   assert(sizeof(xidx) <= KEY_OFF * sizeof(CListHeader));
 
   bsize = hidx.impl_hints[IniSize_Hints];
+
   /*
     printf("creating index header size=%d, magorder=%d\n", sizeof(Oid) * len,
     hidx.mag_order);
@@ -1069,7 +1077,14 @@ HIdx::insert_realize(CListHeader &chd, unsigned int chd_k, const void *key,
   h2x_overhead(&to, &o);
   mcp(data, &to, sizeof(to));
   //  memcpy(data + ovsize - hidx.datasz, xdata, hidx.datasz);
-  memcpy(data + ovsize - datasz, xdata, datasz);
+  if (isDataVarSize()) {
+    unsigned int xdatasz = h2x_u32(datasz);
+    memcpy(data + ovsize - datasz - DATASZ_SIZE, &xdatasz, DATASZ_SIZE);
+    memcpy(data + ovsize - datasz, xdata, datasz);
+  }
+  else {
+    memcpy(data + ovsize - datasz, xdata, datasz);
+  }
   //printf("writing OBJECT %s of size %d offset = %d total = %d\n", getOidString(&koid), ovsize, offset, offset+ovsize);
   s = objectWrite(dbh, offset, ovsize, data, &koid);
   free(data);
@@ -2066,28 +2081,41 @@ Status HIdx::flush_cache(bool insert_data)
   return Success;
 }
 
-Status
-HIdx::insert(const void *key, const void *xdata)
+Status HIdx::insert(const void *key, const void *xdata)
 { 
+  if (isDataVarSize()) {
+    return statusMake(ERROR, "Variable size hash index: the data size must be given at insertion, use HIdx::insert(const void *key, const void *data, unsigned int datasz)");
+  }
+
   return insert_perform(key, xdata, 0);
 }
 
-Status
-HIdx::insert(const void *key, std::vector<const void *> &xdata_v)
+Status HIdx::insert(const void *key, const void *data, unsigned int datasz)
+{
+  if (!isDataVarSize() && hidx.datasz != datasz) {
+    return statusMake(ERROR, "Fixed size hash index: the data size must be equals to %u", hidx.datasz);
+  }
+
+  return insert_perform(key, data, datasz);
+}
+
+Status HIdx::insert(const void *key, std::vector<const void *> &xdata_v)
 { 
+  if (isDataVarSize()) {
+    return statusMake(ERROR, "Variable size hash index: the method HIdx::insert(const void *key, std::vector<const void *> &data_v) is not supported");
+  }
+
   return insert_perform(key, xdata_v, 0);
 }
 
-Status
-HIdx::insert_perform(const void *key, const void *xdata, unsigned int datasz)
+Status HIdx::insert_perform(const void *key, const void *xdata, unsigned int datasz)
 {
   std::vector<const void *> xdata_v;
   xdata_v.push_back(xdata);
   return insert_perform(key, xdata_v, datasz);
 }
 
-Status
-HIdx::insert_perform(const void *key, std::vector<const void *> &xdata_v, unsigned int xdatasz)
+Status HIdx::insert_perform(const void *key, std::vector<const void *> &xdata_v, unsigned int xdatasz)
 { 
   Status s;
 
@@ -2134,7 +2162,12 @@ HIdx::insert_perform(const void *key, std::vector<const void *> &xdata_v, unsign
   if (datasz) {
     assert(xdata_v_cnt == 1);
     direct = true;
-    size += datasz - hidx.datasz;
+    if (isDataVarSize()) {
+      size += datasz + DATASZ_SIZE;
+    }
+    else {
+      size += datasz - hidx.datasz;
+    }
   }
   else {
     direct = false;
@@ -2505,9 +2538,21 @@ HIdx::remove_realize(CListHeader *chd, unsigned int chd_k,
 #define get_off(X, THIS) \
  ((THIS)->hidx.keysz != HIdx::VarSize ? (THIS)->hidx.keysz : strlen(X) + 1)
 
-Status
-HIdx::remove(const void *key, const void *xdata, Boolean *found)
+Status HIdx::remove(const void *key, const void *data, unsigned int datasz, Boolean *found)
 {
+  if (!isDataVarSize() && hidx.datasz != datasz) {
+    return statusMake(ERROR, "Fixed size hash index: the data size must be equals to %u", hidx.datasz);
+  }
+
+  return statusMake(NOT_YET_IMPLEMENTED, "HIdx::remove(const void *key, const void *data, unsigned int datasz, Boolean *found)");
+}
+
+Status HIdx::remove(const void *key, const void *xdata, Boolean *found)
+{
+  if (isDataVarSize()) {
+    return statusMake(ERROR, "Variable size hash index: the data size must be given at removing, use HIdx::remove(const void *key, const void *data, unsigned int datasz, Boolean *found)");
+  }
+
   unsigned char *rdata = 0;
 
   if (data_grouped_by_key) {
@@ -3631,8 +3676,7 @@ HIdxCursor::parallelInit(int thread_cnt)
   return True;
 }
 
-void
-HIdxCursor::init(DbHandle *dbh)
+void HIdxCursor::init(DbHandle *dbh)
 {
   state = True;
   master = False;
@@ -3672,6 +3716,11 @@ HIdxCursor::HIdxCursor(const HIdx *_idx,
   sexcl(_sexcl), eexcl(_eexcl)
 {
   init(idx->dbh);
+  if (idx->isDataVarSize()) {
+    // cannot have data variable size and parallel mode
+    state = False;
+    return;
+  }
   slave = True;
   equal = False;
   Boolean isstr = (STRTYPE(idx) ? True : False);
@@ -3890,7 +3939,7 @@ HIdxCursor::cmp(const void *key) const
   return 1;
 }
 
-void HIdxCursor::append_next(void *data, Idx::Key *key, unsigned int n)
+void HIdxCursor::append_next(void *data, Idx::Key *key, unsigned int n, DataBuffer *dataBuffer)
 {
   int off = get_off(cur, idx);
 
@@ -3900,29 +3949,56 @@ void HIdxCursor::append_next(void *data, Idx::Key *key, unsigned int n)
     data = l->data;
     key = &l->key;
   }
-  else
+  else {
     l = 0;
+  }
 
-  if (data) {
+  if (data || dataBuffer) {
     if (idx->isDataGroupedByKey()) {
-      memcpy(data, cur + off + data_group_sz(n, idx), idx->hidx.datasz);
+      if (dataBuffer) {
+	dataBuffer->setData(cur + off + data_group_sz(n, idx), idx->hidx.datasz);
+      }
+      else if (data) {
+	memcpy(data, cur + off + data_group_sz(n, idx), idx->hidx.datasz);
+      }
     }
     else {
-      memcpy(data, cur + off, idx->hidx.datasz);
+      if (idx->isDataVarSize()) {
+	unsigned int xdatasz, datasz;
+
+	memcpy(&xdatasz, cur + off, DATASZ_SIZE);
+	datasz = x2h_u32(xdatasz);
+
+	if (dataBuffer) {
+	  dataBuffer->setData(cur + off + DATASZ_SIZE, datasz);
+	}
+	else if (data) {
+	  memcpy(data, cur + off + DATASZ_SIZE, datasz);
+	}
+      }
+      else {
+	if (dataBuffer) {
+	  dataBuffer->setData(cur + off, idx->hidx.datasz);
+	}
+	else if (data) {
+	  memcpy(data, cur + off, idx->hidx.datasz);
+	}
+      }
     }
   }
 	
-  if (key)
+  if (key) {
     key->setKey(cur, (idx->hidx.keysz != HIdx::VarSize ?
 		      idx->hidx.keysz : strlen(cur) + 1),
 		idx->keytype);
+  }
   
-  if (slave)
+  if (slave) {
     list->insert(l);
+  }
 }
 
-Status
-HIdxCursor::next(unsigned int *found_cnt, Idx::Key *key)
+Status HIdxCursor::next(unsigned int *found_cnt, Idx::Key *key)
 {
   if (!idx->isDataGroupedByKey()) {
     *found_cnt = 0;
@@ -3931,17 +4007,21 @@ HIdxCursor::next(unsigned int *found_cnt, Idx::Key *key)
   }
 
   Boolean found;
-  return next(&found, found_cnt, 0, key);
+  return next(&found, found_cnt, 0, key, 0);
 }
 
-Status
-HIdxCursor::next(Boolean *found, void *data, Idx::Key *key)
+Status HIdxCursor::next(Boolean *found, void *data, Idx::Key *key)
 {
-  return next(found, 0, data, key);
+  return next(found, 0, data, key, 0);
+}
+
+Status HIdxCursor::next(Boolean *found, DataBuffer &dataBuffer, Idx::Key *key)
+{
+  return next(found, 0, 0, key, &dataBuffer);
 }
 
 Status
-HIdxCursor::next(Boolean *found, unsigned int *found_cnt, void *data, Idx::Key *key)
+HIdxCursor::next(Boolean *found, unsigned int *found_cnt, void *data, Idx::Key *key, DataBuffer *dataBuffer)
 {
   if (!state) {
     if (found_cnt)
@@ -3961,11 +4041,16 @@ HIdxCursor::next(Boolean *found, unsigned int *found_cnt, void *data, Idx::Key *
 #endif
 	Link *l = tlist->peek();
 	if (l) {
-	  if (data)
+	  if (dataBuffer) {
+	    dataBuffer->setData(l->data, idx->hidx.datasz);
+	  }
+	  else if (data) {
 	    memcpy(data, l->data, idx->hidx.datasz);
+	  }
 
-	  if (key)
+	  if (key) {
 	    key->setKey(l->key.getKey(), l->key.getSize(), idx->keytype);
+	  }
 
 	  delete l;
 	  *found = True;
@@ -4043,7 +4128,7 @@ HIdxCursor::next(Boolean *found, unsigned int *found_cnt, void *data, Idx::Key *
     printf("...CURSOR DATACNT %d idata=%d\n", datacnt, idata);
 #endif
     *found = True;
-    append_next(data, key, idata);
+    append_next(data, key, idata, dataBuffer);
     return Success;
   }
   else if (datacnt) {
@@ -4110,7 +4195,7 @@ HIdxCursor::next(Boolean *found, unsigned int *found_cnt, void *data, Idx::Key *
 	  *found_cnt = datacnt;
 
 	*found = True;
-	append_next(data, key, 0);
+	append_next(data, key, 0, dataBuffer);
 
 	if (!idx->isDataGroupedByKey())
 	  cur += o.size;
