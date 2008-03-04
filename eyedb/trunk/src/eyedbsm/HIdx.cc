@@ -719,12 +719,13 @@ fpos_(void const * p, int offset)
   return (char const *)p + offset;
 }
 
-inline Status
-HIdx::get_key(unsigned int &n, const void *key, unsigned int *size) const
+inline Status HIdx::get_key(unsigned int &n, const void *key, unsigned int *size) const
 {
   key = fpos_(key, keytype.offset);
   Status s;
   unsigned int x;
+
+  unsigned int datasz = (isDataVarSize() ? 0 : hidx.datasz);
 
   if (STRTYPE(this)) {
     int len = strlen((char *)key);
@@ -733,10 +734,12 @@ HIdx::get_key(unsigned int &n, const void *key, unsigned int *size) const
       return s;
     
     if (size) {
-      if (hidx.keysz == VarSize)
-	*size = hidx.datasz + len + 1;
-      else
-	*size = hidx.datasz + hidx.keysz;
+      if (hidx.keysz == VarSize) {
+	*size = datasz + len + 1;
+      }
+      else {
+	*size = datasz + hidx.keysz;
+      }
     }
     
     n = (pow2 ? (x & mask) : (x % mask));
@@ -746,8 +749,10 @@ HIdx::get_key(unsigned int &n, const void *key, unsigned int *size) const
   s = get_rawdata_hash_key(key, hidx.keysz - keytype.offset, x);
   if (s)
     return s;
-  if (size)
-    *size = hidx.datasz + hidx.keysz;
+
+  if (size) {
+    *size = datasz + hidx.keysz;
+  }
   
   n = (pow2 ? (x & mask) : (x % mask));
   return Success;
@@ -2043,6 +2048,10 @@ Status HIdx::insert_cache(const void *key, const void *xdata)
 
 Status HIdx::insert_cache(const void *key, std::vector<const void *> &xdata_v)
 {
+  if (isDataVarSize()) {
+    return statusMake(ERROR, "Variable size hash index: cannot use cache");
+  }
+
   unsigned int xdata_v_cnt = xdata_v.size();
   HKey hkey(this, key, true);
   std::vector<const void *> &v = cache_map[hkey];
@@ -3037,7 +3046,9 @@ HIdx::collapse_realize(short dspid, HIdx *idx_n)
 	if (s)
 	  return s;
 	
-	chd.clobj_last = chd.clobj_last;
+	// Corrected: 4/03/08
+	//chd.clobj_last = chd.clobj_last;
+	chd.clobj_last = chd.clobj_first;
 	
 	if (idx_n) {
 	  s = idx_n->writeCListHeader(chd_k, chd);
@@ -3108,6 +3119,10 @@ HIdx::cmp(const void *key, const void *d, unsigned char bswap) const
 
 Status HIdx::searchAny(const void *key, Boolean *found, void *xdata)
 {
+  if (isDataVarSize() && xdata) {
+    return statusMake(ERROR, "Variable size hash index: cannot use the searchAny() method");
+  }
+
   unsigned int found_cnt;
   Status s = search_realize(key, &found_cnt, True, xdata);
   if (s)
