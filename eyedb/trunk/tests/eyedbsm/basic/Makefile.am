@@ -12,6 +12,7 @@ hread \
 hsearch \
 hstats \
 hvsinsert \
+hvarszdata \
 idxread \
 ochsize \
 ocreate \
@@ -66,6 +67,9 @@ hstats_LDADD= olib.o $(EYEDBSMLIBS)
 
 hvsinsert_SOURCES= hvsinsert.cc
 hvsinsert_LDADD= olib.o $(EYEDBSMLIBS)
+
+hvarszdata_SOURCES= hvarszdata.cc
+hvarszdata_LDADD= olib.o $(EYEDBSMLIBS)
 
 idxread_SOURCES= idxread.cc
 idxread_LDADD= olib.o $(EYEDBSMLIBS)
