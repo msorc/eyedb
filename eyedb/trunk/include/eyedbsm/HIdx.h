@@ -515,8 +515,13 @@ namespace eyedbsm {
     */
     static unsigned int getKeyCount(unsigned int magorder);
 
-    // used for audit and scalibility
+    /**
+       Not yet documented
+       @param stats
+       @return
+    */
     Status getStats(std::string& stats) const;
+
     struct Stats {
       _Idx idx;
       struct Entry {

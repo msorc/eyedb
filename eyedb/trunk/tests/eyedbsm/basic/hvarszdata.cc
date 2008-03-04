@@ -181,6 +181,15 @@ static eyedbsm::Status o_read()
     char xdata[DATASZ];
     make_data(xdata, nn);
     assert(!memcmp(xdata, data, strlen(data)+1));
+
+    found = eyedbsm::False;
+    //    s = hidx.searchAny(key.getKey(), &found, xdata);
+    s = hidx.searchAny(key.getKey(), &found);
+    if (s) {
+      eyedbsm::statusPrint(s, "searching");
+      return s;
+    }
+    assert(found);
   }
 
   printf("count %u\n", count);
@@ -205,6 +214,11 @@ static eyedbsm::Status o_read()
     unsigned int datasz;
     void *data = dataBuffer.getData(datasz);
     printf("[%s] -> [%s] %u\n", key.getKey(), data, datasz);
+
+    int nn = atoi(&((char *)key.getKey())[4]);
+    char xdata[DATASZ];
+    make_data(xdata, nn);
+    assert(!memcmp(xdata, (char *)data, strlen((char *)data)+1));
   }
 
   printf("count %u\n", count);
@@ -228,6 +242,22 @@ static eyedbsm::Status o_read()
       printf("[%s] -> %d items\n", key.getKey(), found_cnt);
     }
   }
+
+  return eyedbsm::Success;
+}
+
+static eyedbsm::Status o_stats()
+{
+  eyedbsm::HIdx hidx(o_dbh, &o_oids[0]);
+
+  std::string stats;
+  eyedbsm::Status s = hidx.getStats(stats);
+  if (s) {
+    eyedbsm::statusPrint(s, "stating hash index");
+    return s;
+  }
+
+  std::cout << stats;
 
   return eyedbsm::Success;
 }
@@ -320,6 +350,15 @@ int main(int argc, char *argv[])
       return 1;
 
     if (o_read())
+      return 1;
+
+    if (o_trsend())
+      return 1;
+
+    if (o_trsbegin())
+      return 1;
+
+    if (o_stats())
       return 1;
 
     if (o_trsend())
