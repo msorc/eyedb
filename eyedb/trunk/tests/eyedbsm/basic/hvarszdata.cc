@@ -37,7 +37,8 @@ static const unsigned int DATASZ = 128;
 
 //#define DATA_GROUPED_BY_KEY
 
-#define NN 120
+static unsigned int NN;
+static unsigned int STEP_RM;
 
 static eyedbsm::Status create_hash()
 {
@@ -66,7 +67,11 @@ static eyedbsm::Status create_hash()
 
 static void make_key(char key[], int n)
 {
+#ifdef DATA_GROUPED_BY_KEY
   sprintf(key, "key-%d", n/3);
+#else
+  sprintf(key, "key-%d", n);
+#endif
 }
 
 static void make_data(char data[], int n)
@@ -103,6 +108,7 @@ static eyedbsm::Status o_insert()
       eyedbsm::statusPrint(s, "inserting");
       return s;
     }
+    printf("inserting [%s] -> [%s]\n", key, data);
   }
 
 #ifdef DATA_GROUPED_BY_KEY
@@ -120,18 +126,24 @@ static eyedbsm::Status o_remove()
 {
   eyedbsm::HIdx hidx(o_dbh, &o_oids[0]);
 
-  for (int n = 0; n < 120; n += 3) {
+  for (int n = 0; n < NN; n += STEP_RM) {
     char key[64];
     char data[DATASZ];
 
     make_key(key, n);
     make_data(data, n);
 
+    eyedbsm::Boolean found;
+#ifdef FIXED_DATASZ
     eyedbsm::Status s = hidx.remove(key, data);
+#else
+    eyedbsm::Status s = hidx.remove(key, data, strlen(data)+1, &found);
+#endif
     if (s) {
       eyedbsm::statusPrint(s, "removing");
       return s;
     }
+    assert(found);
   }
 
   return eyedbsm::Success;
@@ -165,6 +177,10 @@ static eyedbsm::Status o_read()
     }
 
     printf("[%s] -> [%s]\n", key.getKey(), data);
+    int nn = atoi(&((char *)key.getKey())[4]);
+    char xdata[DATASZ];
+    make_data(xdata, nn);
+    assert(!memcmp(xdata, data, strlen(data)+1));
   }
 
   printf("count %u\n", count);
@@ -253,54 +269,47 @@ int main(int argc, char *argv[])
 
   o_write_oids(o_oids, 1); // not really necessary
 
-  if (o_trsbegin())
-    return 1;
+  for (int n = 0; n < 10; n++) {
+    NN = (n+1) * 120;
+    STEP_RM = 3*(n+1);
 
-  if (o_insert())
-    return 1;
+    if (o_trsbegin())
+      return 1;
 
-  if (o_trsend())
-    return 1;
+    if (o_insert())
+      return 1;
 
-  if (o_trsbegin())
-    return 1;
+    if (o_trsend())
+      return 1;
 
-  if (o_read())
-    return 1;
+    if (o_trsbegin())
+      return 1;
 
-  if (o_trsend())
-    return 1;
+    if (o_read())
+      return 1;
 
-  if (o_trsbegin())
-    return 1;
+    if (o_trsend())
+      return 1;
 
-  if (o_remove())
-    return 1;
+    if (o_trsbegin())
+      return 1;
 
-  if (o_trsend())
-    return 1;
+    if (o_remove())
+      return 1;
 
-  if (o_trsbegin())
-    return 1;
+    if (o_trsend())
+      return 1;
 
-  if (o_read())
-    return 1;
+    if (o_trsbegin())
+      return 1;
 
-  if (o_trsend())
-    return 1;
+    if (o_read())
+      return 1;
+
+    if (o_trsend())
+      return 1;
+
+  }
 
   return o_release();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
