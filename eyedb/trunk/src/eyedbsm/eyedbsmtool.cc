@@ -490,8 +490,10 @@ shmem_cleanup_realize(int argc, char *argv[])
       if (!strcasecmp(s, "y") || !strcasecmp(s, "yes"))
 	{
 	  Status status = dbCleanup(argv[0]);
-	  if (status)
+	  if (status){
 	    statusPrint(status, "");
+	    return 1;
+	  }
 	  break;
 	}
       else if (!strcasecmp(s, "n") || !strcasecmp(s, "no"))
@@ -1332,7 +1334,7 @@ shmem_resize_realize(int argc, char *argv[])
     r = 0;
 
   if (!r) {
-    munmap(sm_shmh, sm_shmsize);
+    munmap((caddr_t)sm_shmh, sm_shmsize);
     sm_shmsize = newshmsize;
     sm_SHMH_INIT(argv[0], True);
     ESM_transInit(sm_dbh->vd, (char *)sm_shmh, newshmsize);

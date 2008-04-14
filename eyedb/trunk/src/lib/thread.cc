@@ -69,7 +69,7 @@ namespace eyedblib {
   int Mutex::init(Type _type, bool _lock)
   {
     type = _type;
-    init(_lock);
+    return init(_lock);
   }
 
   int Mutex::init(bool _lock)

@@ -89,9 +89,8 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
   dbcreate_error(Status status, const char *dbfile,
 		 const DbCreateDescription *dbc, int n, DBFD *dbfd)
   {
-    char *pwd;
-
-    push_dir(dbfile, &pwd);
+    char pwd[DEFAULT_PWD_SIZE];
+    push_dir(dbfile, pwd, sizeof pwd);
 
     unlink(dbfile); 
     unlink(objmapfileGet(dbfile));
@@ -268,8 +267,8 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     Status status;
     unsigned int sizeslot;
 
-    char *pwd;
-    status = push_dir(dbfile, &pwd);
+    char pwd[DEFAULT_PWD_SIZE];
+    status = push_dir(dbfile, pwd, sizeof pwd);
     if (status) return status;
 
     if (datfile_len <= datext_len ||
@@ -517,8 +516,8 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 
     dbh.memzero();
       
-    char *pwd;
-    status = push_dir(dbfile, &pwd);
+    char pwd[DEFAULT_PWD_SIZE];
+    status = push_dir(dbfile, pwd, sizeof pwd);
     if (status) return status;
 
     Boolean ok = False;
@@ -616,8 +615,8 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     if (s = ESM_dbOpen(dbfile, VOLRW, 0, 0, 0, 0, 0, 0, &dbh))
       return s;
 
-    char *pwd;
-    s = push_dir(dbfile, &pwd);
+    char pwd[DEFAULT_PWD_SIZE];
+    s = push_dir(dbfile, pwd, sizeof pwd);
     if (s) return s;
 
     DbHeader _dbh(DBSADDR(dbh));;
@@ -1596,8 +1595,8 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 
     m_lock(vd->m_dbs);
 
-    char *pwd;
-    se = push_dir(dbfile, &pwd);
+    char pwd[DEFAULT_PWD_SIZE];
+    se = push_dir(dbfile, pwd, sizeof pwd);
     if (se) return se;
 
     /* maps header file */
@@ -1992,8 +1991,8 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     Oid::NX lastidxblkalloc = cur_nx + BLKIDXALLOC_INC;
     Oid::NX lastidxbusy = x2h_u32(LASTIDXBUSY(dbh));
 
-    char *pwd;
-    Status status = push_dir(dbh->dbfile, &pwd);
+    char pwd[DEFAULT_PWD_SIZE];
+    Status status = push_dir(dbh->dbfile, pwd, sizeof pwd);
     if (status) return status;
 
     if (lastidxblkalloc < lastidxbusy)
@@ -2031,8 +2030,8 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     const char *file = dmpfileGet(_dbh.dat(datid).file());
     size_t size = lastnsblkalloc;
 
-    char *pwd;
-    Status status = push_dir(dbh->dbfile, &pwd);
+    char pwd[DEFAULT_PWD_SIZE];
+    Status status = push_dir(dbh->dbfile, pwd, sizeof pwd);
     if (status) return status;
 
     size_t cursize = fileSizeGet(file);
