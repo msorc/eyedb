@@ -147,7 +147,7 @@ namespace eyedbsm {
   fcouldnot(char const *pre, char const *what, char const *which);
 
   extern Status
-  push_dir(const char *dbfile, char **pwd);
+  push_dir(const char *dbfile, char *pwd, unsigned int pwd_size);
 
   extern Status
   pop_dir(char *pwd);
@@ -535,5 +535,7 @@ namespace eyedbsm {
 #define objDataData(DATA) (((char *)(DATA)+objDataOffset))
 #define objDataMask(DATA) (objDataData(DATA) + objDataSize(DATA))
 }
+
+#define DEFAULT_PWD_SIZE 1024
 
 #endif

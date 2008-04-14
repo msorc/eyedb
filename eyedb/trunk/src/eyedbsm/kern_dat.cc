@@ -449,8 +449,8 @@ namespace eyedbsm {
       return statusMake(ERROR, "datafile '%s' is partially used: cannot "
 			"be deleted", datfile);
 
-    char *pwd;
-    s = push_dir(dbh->dbfile, &pwd);
+    char pwd[DEFAULT_PWD_SIZE];
+    s = push_dir(dbh->dbfile, pwd, sizeof pwd);
     if (s) return s;
 
     unlink(dfd->file());
@@ -771,8 +771,8 @@ namespace eyedbsm {
     const MapHeader *xmp = dat->mp();
     x2h_prologue(xmp, mp);
 
-    char *pwd;
-    s = push_dir(dbh->dbfile, &pwd);
+    char pwd[DEFAULT_PWD_SIZE];
+    s = push_dir(dbh->dbfile, pwd, sizeof pwd);
     if (s) return s;
 
     strcpy(info->datafile.file, dat->file());

@@ -367,6 +367,7 @@ namespace eyedbsm {
 
 #define PWDMAX 1024
 
+#if 0
   Status
   push_dir(const char *dbfile, char **pwd)
   {
@@ -385,17 +386,41 @@ namespace eyedbsm {
 
     return Success;
   }
+#endif
+
+  Status
+  push_dir(const char *dbfile, char *pwd, unsigned int pwd_size)
+  {
+    const char *dir = get_dir(dbfile);
+
+    if (!*dir) {
+      *pwd = 0;
+      return Success;
+    }
+
+    getcwd(pwd, pwd_size);
+    if (chdir(dir)) {
+      *pwd = 0;
+      return statusMake(ERROR, "cannot change to directory '%s'", dir);
+    }
+
+    return Success;
+  }
 
   Status
   pop_dir(char *pwd)
   {
-    if (!pwd)
+    if (!pwd) {
       return Success;
+    }
 
-    if (chdir(pwd))
+    if (chdir(pwd)) {
       return statusMake(ERROR, "cannot change to directory '%s'", pwd);
+    }
 
+#if 0
     free(pwd);
+#endif
     return Success;
   }
 
