@@ -1,0 +1,47 @@
+body {
+/*  background-color: #F8F8FF; */
+}
+
+/* header ------------------------------ */
+#header {
+  background: #20225E url('../images/eyedb-banner.png') top left no-repeat;
+}
+
+/* container ------------------------------ */
+#container  {
+  background-color: #EBF0FD;
+}
+
+/* content ------------------------------ */
+#content  {
+/*  background-color: #F8F8FF; */
+    background-color: #FFFFFF;
+}
+
+/* sidecolumn ------------------------------ */
+#sidecolumn {
+  background-color: #EBF0FD;
+}
+
+
+/* sidebar ------------------------------ */
+#sidebar li a:hover {
+    background: #E0E8F0 /*url(../images/menu-hover.png)*/;
+}
+#pages a:link {
+  color: #501010;
+}
+#pages a:visited {
+  color: #501010;
+}
+#pages a:hover {
+  color: #501010;
+}
+#pages a:active {
+  color: #501010;
+}
+
+/* footer ------------------------------ */
+#footer {
+  background: #20225E url('../images/eyedb-footer.png') top left repeat-x;
+}

@@ -1,8 +1,8 @@
-AC_INIT(src/style.css)
+AC_INIT(themes/eyedb/style.css)
 AM_INIT_AUTOMAKE(eyedb-theme, 1.0.0)
 
 DEFAULT_WEB_HOST="sysra.com"
-DEFAULT_WEB_DIR="eyedb.org/www/wordpress/current/wp-content/themes/eyedb"
+DEFAULT_WEB_DIR="eyedb.org/www/wordpress/current/wp-content"
 DEFAULT_UPLOAD_METHOD="--ssh"
 
 AC_ARG_WITH( web-host, 
@@ -27,5 +27,11 @@ AC_SUBST(WEB_HOST)
 AC_SUBST(WEB_DIR)
 AC_SUBST(UPLOAD_METHOD)
 
-AC_CONFIG_FILES(Makefile src/Makefile src/images/Makefile)
+AC_CONFIG_FILES( dnl
+Makefile dnl
+themes/Makefile dnl
+themes/eyedb/Makefile dnl
+themes/eyedb/css/Makefile dnl
+themes/eyedb/images/Makefile dnl
+)
 AC_OUTPUT
