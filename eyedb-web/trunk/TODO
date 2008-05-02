@@ -1,0 +1,61 @@
+TODO:
+- ajouter plugins: multilingue, spam, cache
+- mise en page: squelette, CSS
+- traduction en français
+
+
+RUBRIQUES:
+
+Rubriques actuelles:
+features
+quick tour
+history
+publications
+platforms
+licensing
+mailing lists
+sourceforge
+wiki
+blog
+documentation
+
+Rubriques nouveau site:
+  news
+  features
+  quick tour
+  télécharger
+  documentation
+  articles
+ Communauté
+  listes de mails
+  wiki
+  sourceforge
+
+  
+Inkscape.org:
+    * Dernières nouvelles
+    * FAQ
+    * Télécharger
+    * Clip Art
+    * Documentation
+    * Outils
+    * Captures d'écrans
+    * Etudes de cas
+    * Articles
+    * Tutorials
+    * Galeries
+  Communauté
+    * Discussion
+    * Listes de distribution
+    * Forums
+    * Planète Inkscape
+    * Wiki
+    * Rapports de Bugs
+    * Demandes de fonctionnalités
+  Développeurs
+    * Résumé du projet
+    * Documentation
+    * Feuille de route
+    * Write a specification
+    * Correctifs
+    * SVN
