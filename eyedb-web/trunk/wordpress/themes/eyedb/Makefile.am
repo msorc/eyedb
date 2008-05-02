@@ -1,4 +1,18 @@
-SUBDIRS=src
+SUBDIRS=css images
 
-upload:
-	(cd src; $(MAKE) $@)
+WEB_SUB_DIR=/themes/eyedb
+
+FILES_TO_UPLOAD=\
+footer.php \
+functions.php \
+header.php \
+home_template.php \
+index.php \
+page.php \
+sidebar.php \
+single.php \
+style.css
+
+include $(top_srcdir)/Makefile.include
+
+

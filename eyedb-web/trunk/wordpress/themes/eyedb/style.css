@@ -1,0 +1,15 @@
+/*   
+Theme Name: EyeDB
+Theme URI: http://sf.net/projects/eyedb
+Description: The Wordpress theme for the EyeDB web site
+Author: Fran&ccedil;ois D&eacute;chelle
+Author URI: http://blog.dechelle.net
+Template: 
+Version: 1.0.0
+
+Licensed under the General Public Licence.
+
+*/
+
+@import "css/layout.css";
+@import "css/eyedb-blue-flavour.css";

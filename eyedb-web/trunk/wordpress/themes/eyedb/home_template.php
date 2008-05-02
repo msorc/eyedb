@@ -5,7 +5,9 @@ Template Name: HomeTemplate
 ?>
 <?php get_header(); ?>
 
-<div id="static">
+<?php get_sidebar(); ?>
+
+<div id="content">
 
 <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
 <div class="entrytext">
@@ -14,17 +16,17 @@ Template Name: HomeTemplate
 </div>
 <?php endwhile; endif; ?>
 	
-</div>
-
 <?php query_posts('category_name=News'); ?>
 
 <?php if (have_posts()) : echo '<h2>' . __('News') . '</h2>'; while (have_posts()) : the_post(); ?>
-<div id="News">
+<div id="firstpagenews">
 <h3 class="storytitle"><a href="<?php the_permalink() ?>"><?php the_title(); ?></a></h3>
 <div class="storycontent">
 <?php the_content(__('(Read on ...)')); ?>
 </div>
 </div>
 <?php endwhile; endif; ?>
+
+</div> <!-- /content -->
 
 <?php get_footer(); ?>
