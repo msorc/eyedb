@@ -12,7 +12,6 @@
 <body>
 
 <div id="header">
-<img src="<?php bloginfo('stylesheet_directory'); ?>/images/eyedb-logo.png" width="766" height="75" alt="EyeDB"/>
 <h1>EyeDB</h1>
 <p>open source object database</p>
 </div>
