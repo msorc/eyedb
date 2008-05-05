@@ -6,9 +6,8 @@ Template Name: HomeTemplate
 <?php get_header(); ?>
 
 <?php get_sidebar(); ?>
-
 <div id="content">
-
+<h2>Welcome to EyeDB</h2>
 <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
 <div class="entrytext">
 <?php the_content('<p class="serif">Read the rest of this page &raquo;</p>'); ?>
@@ -26,7 +25,5 @@ Template Name: HomeTemplate
 </div>
 </div>
 <?php endwhile; endif; ?>
-
-</div> <!-- /content -->
-
+</div><!-- /content -->
 <?php get_footer(); ?>

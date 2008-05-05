@@ -1,19 +1,22 @@
-/*
-* {
-  margin:0;
-  padding: 0;
-}
-*/
-
 body {
   font-family:Verdana, Arial, Helvetica, sans-serif;
   font-size: 0.8em;
-  padding: 15px 0 0 0;
+  margin: 10px 0;
+  text-align: center;
+}
+
+/* container ------------------------------ */
+#container {
+  width: 766px;
+  margin: 0 auto 0 75px;
+  text-align: left;
 }
 
 /* header ------------------------------ */
 #header {
   height: 75px;
+  margin: 0;
+  padding: 0;
 }
 
 #header h1 {
@@ -30,38 +33,25 @@ body {
   color: white;
 }
 
-/* container ------------------------------ */
-#container  {
-  width: 766px;
-  margin: 0 auto;
-  padding: 0 0 0 0;
-  text-align:left;
-}
-
-/* content ------------------------------ */
-#content  {
-  margin-left: 150px;
-  padding: 32px 5px 50px 5px;
-}
-
 /* sidecolumn ------------------------------ */
 #sidecolumn {
   float: left;
   width: 150px;
   text-align: left;
-  padding: 15px 0px 15px 0px;
 /*  line-height:1.5em; */
+  margin: 0;
+  padding: 0;
 }
 
 /* sidebar ------------------------------ */
 #sidebar {
-  margin: 0px;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
   list-style-type: none;
 }
 #sidebar li {
-  margin: 0px;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
 }
 #sidebar li a {
     display: block;
@@ -87,17 +77,54 @@ body {
   padding-left: 2px;
 }
 
+/* content ------------------------------ */
+#content  {
+  margin: 0 0 0 150px;
+  padding: 0px 5px 75px 5px;
+}
+
+#content h1, #content h2, #content h3, #content h4, #content h5, #content h6 {
+  color: black;
+  font-weight: normal;
+  margin: 0 0 0.2em 0;
+}
+
+#content h1 {
+  font-size: 200%;
+  border-bottom: 1px solid #aaaaaa;
+  padding: 0.5em 0 0.17em 0;
+}
+
+#content h2 {
+  font-size: 188%;
+  border-bottom: 1px solid #aaaaaa;
+  padding: 0.5em 0 0.17em 0;
+}
+#content h3 {
+  font-size: 132%;
+}
+
+#content h4 {
+  font-size: 116%;
+}
+
+#content h5 {
+  font-size: 100%;
+}
+
+#content h6 {
+  font-size: 80%;
+}
 
 /* paragraphs ------------------------------ */
 p {
-  margin: 0 0 1em 0;
+/*  margin: 0.6em 0 0 0; */
 }
 
 /* footer ------------------------------ */
 #footer {
   clear: both;
-  margin: 0;
-  padding: 0;
   height: 30px;
+  margin: 0;
 }
 

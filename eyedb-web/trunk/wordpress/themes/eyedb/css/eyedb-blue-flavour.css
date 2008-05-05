@@ -7,14 +7,13 @@ body {
   background: #20225E url('../images/eyedb-banner.png') top left no-repeat;
 }
 
-/* container ------------------------------ */
+/* global ------------------------------ */
 #container  {
-  background-color: #EBF0FD;
+/*  background-color: #FF0000; */
 }
 
 /* content ------------------------------ */
 #content  {
-/*  background-color: #F8F8FF; */
     background-color: #FFFFFF;
 }
 
@@ -22,7 +21,6 @@ body {
 #sidecolumn {
   background-color: #EBF0FD;
 }
-
 
 /* sidebar ------------------------------ */
 #sidebar li a:hover {
@@ -44,4 +42,6 @@ body {
 /* footer ------------------------------ */
 #footer {
   background: #20225E url('../images/eyedb-footer.png') top left repeat-x;
+  margin:0;
+  padding:0;
 }
