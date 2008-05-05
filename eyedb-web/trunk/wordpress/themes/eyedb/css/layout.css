@@ -8,7 +8,7 @@ body {
 /* container ------------------------------ */
 #container {
   width: 766px;
-  margin: 0 auto 0 75px;
+  margin: 0 auto;
   text-align: left;
 }
 
@@ -45,14 +45,16 @@ body {
 
 /* sidebar ------------------------------ */
 #sidebar {
-  margin: 0;
+  margin: 10px 0 0 0;
   padding: 0;
   list-style-type: none;
 }
+
 #sidebar li {
   margin: 0;
   padding: 0;
 }
+
 #sidebar li a {
     display: block;
     border-top: 1px #ffffff solid;
@@ -79,7 +81,7 @@ body {
 
 /* content ------------------------------ */
 #content  {
-  margin: 0 0 0 150px;
+  margin: 10px 0 0 150px;
   padding: 0px 5px 75px 5px;
 }
 
@@ -92,13 +94,13 @@ body {
 #content h1 {
   font-size: 200%;
   border-bottom: 1px solid #aaaaaa;
-  padding: 0.5em 0 0.17em 0;
+  padding: 0 0 0.17em 0;
 }
 
 #content h2 {
   font-size: 188%;
   border-bottom: 1px solid #aaaaaa;
-  padding: 0.5em 0 0.17em 0;
+  padding: 0 0 0.17em 0;
 }
 #content h3 {
   font-size: 132%;
@@ -119,6 +121,11 @@ body {
 /* paragraphs ------------------------------ */
 p {
 /*  margin: 0.6em 0 0 0; */
+}
+
+.code {
+ margin: 0 5px 0 5px;
+ padding: 5px;
 }
 
 /* footer ------------------------------ */
