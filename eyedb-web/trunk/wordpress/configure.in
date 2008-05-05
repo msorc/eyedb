@@ -2,7 +2,7 @@ AC_INIT(themes/eyedb/style.css)
 AM_INIT_AUTOMAKE(eyedb-theme, 1.0.0)
 
 DEFAULT_WEB_HOST="sysra.com"
-DEFAULT_WEB_DIR="eyedb.org/www/wordpress/current/wp-content"
+DEFAULT_WEB_DIR="eyedb.org/www/wordpress/wp-content"
 DEFAULT_UPLOAD_METHOD="--ssh"
 
 AC_ARG_WITH( web-host, 

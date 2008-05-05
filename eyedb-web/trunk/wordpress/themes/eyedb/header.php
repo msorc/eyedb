@@ -25,12 +25,7 @@
 
 <div id="container">
 
-<!-- header ________________________________________ -->
-
 <div id="header">
 <h1>EyeDB</h1>
 <p>open source object database</p>
 </div> <!-- /header -->
-
-
-
