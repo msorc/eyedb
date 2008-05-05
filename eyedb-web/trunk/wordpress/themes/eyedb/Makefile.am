@@ -9,6 +9,7 @@ header.php \
 home_template.php \
 index.php \
 page.php \
+quicktour_template.php \
 sidebar.php \
 single.php \
 style.css

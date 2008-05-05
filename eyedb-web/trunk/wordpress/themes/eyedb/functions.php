@@ -18,12 +18,26 @@ if ( function_exists('register_sidebar_widget') ) {
   unregister_widget_control(__('Pages'));
 }
 
-function quicktour_nav($previous, $next)
+function quicktour_nav()
 {
+  $quicktour_pages = get_pages( 'sort_column=menu_order&child_of=6');
+
+  foreach ($quicktour_pages as $k => $v) {
+    print( "****************************************\n"); 
+    print( $k); 
+    if ($k == 0 && $v->ID == the_ID())
+      print ( "=== FIRST\n");
+    if ($k == (count($quicktour_pages) - 1)  && $v->ID == the_ID())
+      print ( "=== LAST\n");
+    print( "****************************************\n"); 
+  }
+
+  return;
+
   $s = "<p class=\"quicktournav\">";
   if ($previous)
     $s .= "<a href=\"/home/quick-tour/$previous\">Previous</a> | ";
-  $s .= "<a href=\"/home/quick-tour\">Top</a>";
+  $s .= "<a href=\"/home/quick-tour\">Quick</a>";
   if ($next)
     $s .= " | <a href=\"/home/quick-tour/$next\">Next</a>";
   $s .= "</p>\n";
