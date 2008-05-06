@@ -97,8 +97,31 @@ li.widget_links ul {
   padding: 0;
   list-style-type: none;
 }
-
 li.widget_links a {
+  padding-left: 5px
+}
+
+li.widget_downloads {
+  margin: 0;
+  padding: 0;
+}
+li.widget_downloads h2 {
+  font-weight: bold;
+  font-size: 110%;
+  font-variant: small-caps;
+  height: 19px;
+  margin: 0;
+  padding: 0 0 0 2px;
+}
+li.widget_downloads ul {
+  border-top: 1px #ffffff solid;
+  border-bottom: 1px #ffffff solid;
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+li.widget_downloads a {
   padding-left: 5px
 }
 
@@ -162,7 +185,31 @@ p {
 /* footer ------------------------------ */
 #footer {
   clear: both;
-  height: 30px;
+  height: 40px;
   margin: 0;
+  padding:0;
 }
-
+#cclicense {
+  float: left;
+  line-height: 40px;
+  font-size: 0.8em;
+  border-top: 1px solid #ddd;
+  padding-top: 0;
+  padding-bottom: 1.5em;
+  text-align: left; 
+}
+#cclicense p {
+  margin-top: 0;
+  padding-top: 0 !important;
+} 
+#cclicense img {
+  float: left; 
+  margin-right: 10px; 
+}
+#meta {
+  font-size: 0.8em;
+  margin-right: 5px;
+  margin-top: 5px;
+  vertical-align: top;
+  float: right;
+}

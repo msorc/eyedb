@@ -3,9 +3,14 @@ TODO:
 -- licensing??
 -- platforms??
 - ajouter liens à gauche DONE
-- ajouter bouton download
+- ajouter bouton download DONE
+- mise en page: 
+-- footer: CC, contact, admin, logo sourceforge
+-- page news
+-- commentaires sur les news
+- look: changer la bannière avec eyedb en police du logo SVG
 - ajouter plugins: spam, cache
-- mise en page: footer, page news, commentaires sur les news
+
 + tard:
 - documentation? dans wordpress? ailleurs?
 - ajouter search

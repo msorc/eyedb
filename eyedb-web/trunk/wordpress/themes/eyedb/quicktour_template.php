@@ -11,6 +11,7 @@ Template Name: QuicktourTemplate
 <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
 <div class="post">
 <h2 id="post-<?php the_ID(); ?>"><?php the_title(); ?></h2>
+<?php quicktour_nav($post->ID) ?>
 <div class="entrytext">
 <?php the_content('<p class="serif">Read the rest of this page &raquo;</p>'); ?>
 <?php link_pages('<p><strong>Pages:</strong> ', '</p>', 'number'); ?>
