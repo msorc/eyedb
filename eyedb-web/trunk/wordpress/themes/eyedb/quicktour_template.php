@@ -15,9 +15,9 @@ Template Name: QuicktourTemplate
 <?php the_content('<p class="serif">Read the rest of this page &raquo;</p>'); ?>
 <?php link_pages('<p><strong>Pages:</strong> ', '</p>', 'number'); ?>
 </div>
+<?php quicktour_nav($post->ID) ?>
 </div>
 <?php endwhile; endif; ?>
-<?php quicktour_nav() ?>
 </div> <!-- /content -->
 
 <?php get_footer(); ?>

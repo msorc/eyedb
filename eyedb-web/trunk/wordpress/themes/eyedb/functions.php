@@ -18,29 +18,36 @@ if ( function_exists('register_sidebar_widget') ) {
   unregister_widget_control(__('Pages'));
 }
 
-function quicktour_nav()
+function quicktour_nav($id)
 {
   $quicktour_pages = get_pages( 'sort_column=menu_order&child_of=6');
 
+//   echo "<pre>\n";
+//   print_r( $quicktour_pages);
+//   echo "</pre>\n";
+
+  $index = -1;
   foreach ($quicktour_pages as $k => $v) {
-    print( "****************************************\n"); 
-    print( $k); 
-    if ($k == 0 && $v->ID == the_ID())
-      print ( "=== FIRST\n");
-    if ($k == (count($quicktour_pages) - 1)  && $v->ID == the_ID())
-      print ( "=== LAST\n");
-    print( "****************************************\n"); 
+    if ($v->ID == $id)
+      $index = $k;
   }
 
-  return;
+  if ($index == -1) {
+    echo "<!-- error in quicktour_nav -->\n";
+    return;
+  }
 
-  $s = "<p class=\"quicktournav\">";
-  if ($previous)
-    $s .= "<a href=\"/home/quick-tour/$previous\">Previous</a> | ";
-  $s .= "<a href=\"/home/quick-tour\">Quick</a>";
-  if ($next)
-    $s .= " | <a href=\"/home/quick-tour/$next\">Next</a>";
-  $s .= "</p>\n";
+  $s = "<p class=\"quicktournav\">\n";
+  // seems guid fields are not updated w.r.t. permalinks
+  if ($index != 0) {
+    $s .= "<a href=\"".str_replace('/home','',$quicktour_pages[$index-1]->guid)."\">Previous</a> | ";
+  }    
+  $s .= "<a href=\"/quick-tour\">Top</a>";
+  if ($index != count($quicktour_pages)-1) {
+    $s .= " | <a href=\"".str_replace('/home','',$quicktour_pages[$index+1]->guid)."\">Next</a>";
+  }
+
+  $s .= "\n</p>\n";
 
   echo $s;
 }
