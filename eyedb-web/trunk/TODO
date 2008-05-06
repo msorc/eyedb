@@ -1,10 +1,16 @@
 TODO:
-- terminer le transfert du contenu ancien -> nouveau
-- ajouter plugins: multilingue, spam, cache
-- mise en page: footer, recherche, page news
+- terminer le transfert du contenu ancien -> nouveau:
+-- licensing??
+-- platforms??
+- ajouter liens à gauche DONE
+- ajouter bouton download
+- ajouter plugins: spam, cache
+- mise en page: footer, page news, commentaires sur les news
++ tard:
 - documentation? dans wordpress? ailleurs?
+- ajouter search
 - changer banner pour nouvelle police eyedb (logo)
-- traduction en français
+- traduction en français (plugin multilingue)
 
 RUBRIQUES:
 

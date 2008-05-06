@@ -29,23 +29,31 @@ body {
 #sidebar li a:hover {
     background: #E0E8F0 /*url(../images/menu-hover.png)*/;
 }
-#pages a:link {
+#sidebar li a:link {
   color: #501010;
 }
-#pages a:visited {
+#sidebar li a:visited {
   color: #501010;
 }
-#pages a:hover {
+#sidebar li a:hover {
   color: #501010;
 }
-#pages a:active {
+#sidebar li a:active {
   color: #501010;
 }
 
-/* code ------------------------------ */
+li.widget_links h2 {
+  background-color: #d5d6e7;
+  color: #666666;
+}
+
+/* others ------------------------------ */
 .code {
   background-color: #EEEEFF;
   border: 1px solid black;
+}
+.mailinglists tr {
+  background-color: #EEEEEE;
 }
 
 /* footer ------------------------------ */
