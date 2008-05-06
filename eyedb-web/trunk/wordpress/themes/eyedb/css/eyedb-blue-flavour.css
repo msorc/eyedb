@@ -42,7 +42,7 @@ body {
   color: #501010;
 }
 
-li.widget_links h2 {
+li.widget h2 {
   background-color: #d5d6e7;
   color: #666666;
 }
@@ -58,7 +58,34 @@ li.widget_links h2 {
 
 /* footer ------------------------------ */
 #footer {
-  background: #20225E url('../images/eyedb-footer.png') top left repeat-x;
-  margin:0;
-  padding:0;
+  background: #20225E url('../images/eyedb-footer.png') bottom left repeat-x;
+}
+#cclicense img {
+  border: 0 none;
+}
+#cclicense {
+  color: white;
+}
+#cclicense a:link {
+  color: white;
+}
+#cclicense a:visited {
+  color: white;
+}
+#cclicense a:hover {
+  color: white;
+}
+#cclicense a:active {
+  color: white;
+}
+#meta {
+  color: #ffffff;
+}
+#meta a:link {
+}
+#meta a:visited {
+}
+#meta a:hover {
+}
+#meta a:active {
 }
