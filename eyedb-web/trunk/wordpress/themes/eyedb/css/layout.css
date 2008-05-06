@@ -56,27 +56,50 @@ body {
 }
 
 #sidebar li a {
-    display: block;
-    border-top: 1px #ffffff solid;
-    border-bottom: 1px #ffffff solid;
-    padding: 0px 0px 0px 5px
-    text-decoration: none;
-    line-height: 18px;
-    height: 18px;
-    font-weight: normal;
-    font-size: 11px;
+  display: block;
+  text-decoration: none;
+  font-weight: normal;
+  font-size: 11px;
+  border-top: 1px #ffffff solid;
+  border-bottom: 1px #ffffff solid;
+  line-height: 18px;
+  height: 18px;
+}
+
+#pages a {
+  padding-left: 5px
 }
 
 #pages ul {
   border-top: 1px #ffffff solid;
   border-bottom: 1px #ffffff solid;
-  margin: 0px;
-  padding: 0px 0px 0px 0px;
+  margin: 0;
+  padding: 0;
   list-style-type: none;
 }
-#pages a {
-  text-decoration: none;
-  padding-left: 2px;
+
+li.widget_links {
+  margin: 0;
+  padding: 0;
+}
+li.widget_links h2 {
+  font-weight: bold;
+  font-size: 110%;
+  font-variant: small-caps;
+  height: 19px;
+  margin: 0;
+  padding: 0 0 0 2px;
+}
+li.widget_links ul {
+  border-top: 1px #ffffff solid;
+  border-bottom: 1px #ffffff solid;
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+li.widget_links a {
+  padding-left: 5px
 }
 
 /* content ------------------------------ */
@@ -130,6 +153,10 @@ p {
 
 .quicktournav {
   text-align: right;
+}
+
+.mailinglists a {
+  padding-left: 10px;
 }
 
 /* footer ------------------------------ */
