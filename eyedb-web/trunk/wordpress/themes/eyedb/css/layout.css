@@ -164,6 +164,19 @@ li.widget_downloads a {
   font-size: 80%;
 }
 
+#content a:link {
+  text-decoration: none;
+}
+#content a:visited {
+  text-decoration: none;
+}
+#content a:hover {
+  text-decoration: underline;
+}
+#content a:active {
+  text-decoration: none;
+}
+
 /* paragraphs ------------------------------ */
 p {
 /*  margin: 0.6em 0 0 0; */
@@ -188,28 +201,30 @@ p {
   height: 40px;
   margin: 0;
   padding:0;
+  font-size: 0.8em;
 }
+#footer .sourceforge {
+  display:inline;
+  width:88px;
+  height:31px;
+  float:left;
+  margin: 5px 7px 0 5px;
+}
+#footer .sourceforge img {
+  border: 0 none;
+}
+
 #cclicense {
   float: left;
-  line-height: 40px;
-  font-size: 0.8em;
-  border-top: 1px solid #ddd;
-  padding-top: 0;
-  padding-bottom: 1.5em;
   text-align: left; 
+  margin: 5px 0 0 5px;
 }
-#cclicense p {
-  margin-top: 0;
-  padding-top: 0 !important;
-} 
 #cclicense img {
   float: left; 
-  margin-right: 10px; 
+  margin-right: 5px; 
+  border: 0 none;
 }
 #meta {
-  font-size: 0.8em;
-  margin-right: 5px;
-  margin-top: 5px;
-  vertical-align: top;
+  margin: 5px 5px 0 0;
   float: right;
 }

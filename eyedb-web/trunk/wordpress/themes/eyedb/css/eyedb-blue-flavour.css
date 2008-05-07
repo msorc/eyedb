@@ -17,6 +17,19 @@ body {
     background-color: #FFFFFF;
 }
 
+#content a:link {
+  color: blue;
+}
+#content a:visited {
+  color: blue;
+}
+#content a:hover {
+  color: blue;
+}
+#content a:active {
+  color: blue;
+}
+
 /* sidecolumn ------------------------------ */
 #sidecolumn {
 }
@@ -56,12 +69,22 @@ li.widget h2 {
   background-color: #EEEEEE;
 }
 
+#cclicense a:link {
+  color: white;
+}
+#cclicense a:visited {
+  color: white;
+}
+#cclicense a:hover {
+  color: white;
+}
+#cclicense a:active {
+  color: white;
+}
+
 /* footer ------------------------------ */
 #footer {
   background: #20225E url('../images/eyedb-footer.png') bottom left repeat-x;
-}
-#cclicense img {
-  border: 0 none;
 }
 #cclicense {
   color: white;
@@ -79,13 +102,17 @@ li.widget h2 {
   color: white;
 }
 #meta {
-  color: #ffffff;
+  color: white;
 }
 #meta a:link {
+  color: white;
 }
 #meta a:visited {
+  color: white;
 }
 #meta a:hover {
+  color: white;
 }
 #meta a:active {
+  color: white;
 }
