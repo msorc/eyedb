@@ -19,10 +19,11 @@ Template Name: HomeTemplate
 
 <?php if (have_posts()) : echo '<h2>' . __('News') . '</h2>'; while (have_posts()) : the_post(); ?>
 <div id="firstpagenews">
-<h3 class="storytitle"><a href="<?php the_permalink() ?>"><?php the_title(); ?></a></h3>
-<div class="storycontent">
+<h3 class="posttitle"><a href="<?php the_permalink() ?>"><?php the_title(); ?></a></h3>
+<p class="storycontent">
 <?php the_content(__('(Read on ...)')); ?>
-</div>
+</p>
+<p><?php echo __('Posted on '); the_date(); /* echo ' - '; comments_number(); */ ?></p>
 </div>
 <?php endwhile; endif; ?>
 </div><!-- /content -->
