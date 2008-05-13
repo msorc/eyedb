@@ -1,4 +1,5 @@
 FILES_TO_UPLOAD=\
+creativecommons-by-sa-88x31.png \
 eyedb-banner.png \
 eyedb-footer.png 
 
