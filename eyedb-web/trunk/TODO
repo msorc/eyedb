@@ -5,17 +5,18 @@ TODO:
 - ajouter liens à gauche DONE
 - ajouter bouton download DONE
 - mise en page: 
--- footer: CC, contact, admin, logo sourceforge
--- page news
--- commentaires sur les news
+-- footer: CC, contact, admin, logo sourceforge DONE
+-- page news DONE
 - look: changer la bannière avec eyedb en police du logo SVG
 - ajouter plugins: spam, cache
 
 + tard:
+-- commentaires sur les news
 - documentation? dans wordpress? ailleurs?
 - ajouter search
 - changer banner pour nouvelle police eyedb (logo)
 - traduction en français (plugin multilingue)
+
 
 RUBRIQUES:
 
