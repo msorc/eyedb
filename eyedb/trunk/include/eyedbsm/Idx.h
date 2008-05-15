@@ -271,6 +271,30 @@ namespace eyedbsm {
     }
   };
 
+  class AllocBuffer {
+
+  public:
+    AllocBuffer() : allocsz(0), data(0) { }
+
+    char *alloc(unsigned int size) {
+      if (size > allocsz) {
+	allocsz = 2 * size;
+	delete [] data;
+	data = new char[allocsz];
+      }
+      return data;
+    }
+    
+    ~AllocBuffer() {
+      delete [] data;
+      data = 0;
+    }
+
+  private:
+    unsigned int allocsz;
+    char *data;
+  };
+
   class IdxCursor {
 
   public:
