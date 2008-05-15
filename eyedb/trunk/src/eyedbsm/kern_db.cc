@@ -2172,7 +2172,6 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     const char *shmfile = shmfileGet(dbfile);
     int fd;
 
-    printf("dbCleanup from ??\n");
     if ((fd = open(dbfile, O_RDWR)) < 0)
       return statusMake(ERROR, "cannot open dbfile %s for writing",
 			dbfile);

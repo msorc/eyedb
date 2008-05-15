@@ -36,6 +36,8 @@ namespace eyedblib {
   class ThreadPerformer;
 }
 
+#define HAS_ALLOC_BUFFER
+
 namespace eyedbsm {
 
   /**
@@ -51,9 +53,15 @@ namespace eyedbsm {
   /**
      Not yet documented.
   */
+
   class HIdx : public Idx {
 
     friend class HIdxCursor;
+
+#ifdef HAS_ALLOC_BUFFER
+    AllocBuffer insert_buffer;
+    AllocBuffer makeobj_buffer;
+#endif
 
   public: /* conceptually private */
     class CellHeader;

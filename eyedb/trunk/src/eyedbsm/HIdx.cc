@@ -1008,7 +1008,11 @@ HIdx::insert_realize(CListHeader &chd, unsigned int chd_k, const void *key,
     ovsize += osize - size;
 #endif
 
+#ifdef HAS_ALLOC_BUFFER
+  char *data = insert_buffer.alloc(ovsize);
+#else
   char *data = (char *)m_malloc(ovsize);
+#endif
   if (STRTYPE(this))
     memcpy(data + sizeof(CellHeader), key, strlen((char *)key)+1);
   else if (hidx.keytype == tUnsignedChar || hidx.keytype == tChar ||
@@ -1092,7 +1096,9 @@ HIdx::insert_realize(CListHeader &chd, unsigned int chd_k, const void *key,
   }
   //printf("writing OBJECT %s of size %d offset = %d total = %d\n", getOidString(&koid), ovsize, offset, offset+ovsize);
   s = objectWrite(dbh, offset, ovsize, data, &koid);
+#ifndef HAS_ALLOC_BUFFER
   free(data);
+#endif
   if (s)
     return s;  
 
@@ -1546,10 +1552,22 @@ HIdx::makeObject(CListHeader &chd, unsigned int chd_k, Oid &koid, int &offset,
   unsigned int size = sizeof(CListObjHeader) + utsize;
 
 #ifdef OPTIM_LARGE_OBJECTS
+
   int alloc_size = sizeof(CListObjHeader) + sizeof(CellHeader);
+#ifdef HAS_ALLOC_BUFFER
+  char *d = makeobj_buffer.alloc(alloc_size);
+#else
   char *d = (char *)m_malloc(alloc_size);
+#endif
+
+#else
+
+#ifdef HAS_ALLOC_BUFFER
+  char *d = makeobj_buffer.alloc(size);
 #else
   char *d = (char *)m_malloc(size);
+#endif
+
 #endif
 
   offset = sizeof(CListObjHeader);
@@ -1584,7 +1602,10 @@ HIdx::makeObject(CListHeader &chd, unsigned int chd_k, Oid &koid, int &offset,
 #else
   Status s = objectCreate(dbh, d, size, hidx.dspid, &koid);
 #endif
+
+#ifndef HAS_ALLOC_BUFFER
   free(d);
+#endif
 
   if (s)
     return s;
