@@ -93,7 +93,7 @@ object_dump(FILE *fd, eyedb::Object *o)
   if (!cls->asStructClass())
     eyedb::Exception::make("cannot display non struct object");
 
-  int attr_cnt;
+  unsigned int attr_cnt;
   const eyedb::Attribute **attrs = cls->getAttributes(attr_cnt);
 
   fprintf(fd, "object %s of class %s {\n", o->getOid().toString(),

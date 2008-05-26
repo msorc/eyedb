@@ -135,7 +135,7 @@ struct_class_dump(FILE *fd, const eyedb::StructClass *cls)
     fprintf(fd, " extends %s", cls->getParent()->getName());
 
   fprintf(fd, " {\n");
-  int attr_cnt;
+  unsigned int attr_cnt;
   const eyedb::Attribute **attrs = cls->getAttributes(attr_cnt);
 
   for (int i = 0; i < attr_cnt; i++) {
