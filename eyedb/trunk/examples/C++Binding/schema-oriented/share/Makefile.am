@@ -14,7 +14,8 @@ EYEDBODL = $(EYEDBODL_exe) --gencode=C++
 EYEDBODLFLAGS= --package=person --schema-name=person
 
 person.cc person.h : schema.odl
-	if test -x $(EYEDBODL_exe) ; then \
+	-if test -x $(EYEDBODL_exe) ; then \
+		echo $(EYEDBODL) $(EYEDBODLFLAGS) $< ; \
 		$(EYEDBODL) $(EYEDBODLFLAGS) $< ; \
 	else \
 		echo Warning: $(EYEDBODL) not found ; \

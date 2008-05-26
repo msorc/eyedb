@@ -43,7 +43,7 @@ class PersonTest {
       person.Database.init();
 
       // Open the connection with the backend
-      //      org.eyedb.Connection conn = new org.eyedb.Connection();
+      org.eyedb.Connection conn = new org.eyedb.Connection();
 
       // Open the database named outargs[0]
       person.Database db = new person.Database(outargs[0]);
