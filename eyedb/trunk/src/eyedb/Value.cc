@@ -1059,9 +1059,11 @@ namespace eyedb {
 	break;
 
       case tObject:
+	throw *eyedb::Exception::make(eyedb::IDB_UNSERIALIZABLE_TYPE_ERROR, "tObject");
 	break;
 
       case tObjectPtr:
+	throw *eyedb::Exception::make(eyedb::IDB_UNSERIALIZABLE_TYPE_ERROR, "tObjectPtr");
 	break;
 
       case tList:
