@@ -1052,6 +1052,7 @@ namespace eyedb {
 	break;
 
       case tData:
+	throw *eyedb::Exception::make(eyedb::IDB_UNSERIALIZABLE_TYPE_ERROR, "tData");
 	break;
 
       case tOid:
@@ -1097,7 +1098,7 @@ namespace eyedb {
 	break;
 
       default:
-	abort();
+	throw *eyedb::Exception::make(eyedb::IDB_INTERNAL_ERROR, "Unknown type in Value code()");
 	break;
       }
   }
