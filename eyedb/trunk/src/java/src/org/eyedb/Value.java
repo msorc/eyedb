@@ -58,12 +58,13 @@ public class Value {
   static public final int DATA = 11;
   static public final int OID = 12;
   static public final int OBJECT = 13;
-  static public final int POBJ = 14;
-  static public final int LIST = 15;
-  static public final int SET = 16;
-  static public final int ARRAY = 17;
-  static public final int BAG = 18;
-  static public final int STRUCT = 19;
+  static public final int OBJECTPTR = 14;
+  static public final int POBJ = 15;
+  static public final int LIST = 16;
+  static public final int SET = 17;
+  static public final int ARRAY = 18;
+  static public final int BAG = 19;
+  static public final int STRUCT = 20;
 
   /*
    * Constructor Methods
