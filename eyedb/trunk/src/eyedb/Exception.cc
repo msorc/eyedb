@@ -180,6 +180,7 @@ statusDesc[ST].desc = MSG
 	MAKE_DESC(IDB_SESSION_LOG_CREATION_ERROR, "session log creation error");
 	MAKE_DESC(IDB_SESSION_LOG_OPEN_ERROR, "session log opening error");
 	MAKE_DESC(IDB_SESSION_LOG_NO_SPACE_LEFT, "no space left on session log");
+	MAKE_DESC(IDB_UNSERIALIZABLE_TYPE_ERROR, "non serializable type used in serialization");
 
 	// checking
 	int error = 0;
