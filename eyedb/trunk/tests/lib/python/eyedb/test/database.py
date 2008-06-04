@@ -1,19 +1,7 @@
 import pexpect
 import sys
 
-def test_simple_command( command, expected_output = None, expected_status = 0):
-    child = pexpect.spawn(command)
-    child.logfile = sys.stdout
-    if expected_output is not None:
-        for o in expected_output:
-            child.expect(o)
-    child.expect(pexpect.EOF)
-    child.close()
-    if child.exitstatus != expected_status:
-        sys.exit( child.exitstatus)
-    return child.exitstatus
-
-def create_eyedb_database( dbname):
+def database_create( dbname):
     # test if database exists
     dblist = "eyedbadmin2 database list %s" % (dbname,)
     child = pexpect.spawn( dblist)

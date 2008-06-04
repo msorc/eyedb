@@ -1,0 +1,9 @@
+if COND_PYTHON_PEXPECT
+PEXPECT_DIRS= GettingStarted
+else
+PEXPECT_DIRS=
+endif
+
+SUBDIRS= $(PEXPECT_DIRS)
+
+
