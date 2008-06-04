@@ -348,7 +348,10 @@ AM_PATH_PYTHON(,ac_python_found="yes",ac_python_found="no")
 if test "$ac_python_found" = "yes" ; then
    AC_PYTHON_MODULE(pexpect,ac_python_pexpect="yes",ac_python_pexpect="no")
 fi
-AM_CONDITIONAL(COND_PYTHON_PEXPECT, test "$ac_python_found" != "no" -a "$ac_python_pexpect" != "no")
+if test "$ac_python_found" = "yes" -a "$ac_python_pexpect" = "yes" ; then
+   COND_PYTHON_PEXPECT="yes"
+fi
+AM_CONDITIONAL(COND_PYTHON_PEXPECT, test x"$COND_PYTHON_PEXPECT" = xyes)
 
 # ========================================
 # SWIG
@@ -590,6 +593,8 @@ src/www/eyedb.conf dnl
 src/www/html/Makefile dnl
 src/www/icons/Makefile dnl
 tests/Makefile dnl
+tests/examples/Makefile dnl
+tests/examples/GettingStarted/Makefile dnl
 tests/eyedb/Makefile dnl
 tests/eyedb/admin/Makefile dnl
 tests/eyedb/admin/database/Makefile dnl
@@ -645,6 +650,9 @@ echo "  Java compiler: ${JAVAC:-none}"
 echo "  Java compiler flags: ${JAVACFLAGS:-none}"
 echo "  Java virtual machine: ${JAVA:-none}"
 echo "  Jar utility: ${JAR:-none}"
+echo 
+echo "  *** EyeDB Python pexpect tests ***" 
+echo "  Run Python pexpect tests: ${COND_PYTHON_PEXPECT:-no}"
 echo 
 echo "  *** EyeDB Swig multi-languages binding ***" 
 echo "  Compile Swig bindings: ${COND_SWIG:-no}"
