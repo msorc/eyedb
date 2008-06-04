@@ -1,1 +1,2 @@
-SUBDIRS=eyedbsm eyedb
+SUBDIRS=eyedbsm eyedb examples
+
