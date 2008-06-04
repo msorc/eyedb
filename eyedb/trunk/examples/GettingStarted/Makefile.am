@@ -20,6 +20,13 @@ JAVA_FILES=PersonTest.java $(JAVA_ODL_FILES)
 JAVAROOT=$(top_builddir)/examples/GettingStarted
 CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_builddir)/src/java/eyedb.jar
 
+# Code snippet from autoconf documentation:
+# http://www.gnu.org/software/autoconf/manual/autoconf.html#Installation-Directory-Variables
+EDIT= sed \
+        -e 's,@bindir[@],$(bindir),g' \
+        -e 's,@exec_prefix[@],$(exec_prefix),g' \
+        -e 's,@prefix[@],$(prefix),g' 
+
 check-local: class.stamp
 class.stamp: $(JAVA_FILES)
 	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(AM_JAVACFLAGS) $(JAVACFLAGS) $?
@@ -50,8 +57,13 @@ clean-local:
 	rm -f person.cc person.h personmthbe-skel.cc personmthfe-skel.cc personstubsbe.cc personstubsfe.cc $(JAVA_ODL_FILES)
 	-rm -f class.stamp *.class
 
+%.sh: Makefile $(srcdir)/%.sh.in
+	rm -f $@ $@.tmp
+	$(EDIT) '$(srcdir)/$@.in' >$@.tmp
+	mv $@.tmp $@
+
 init:
-	sh $(srcdir)/init.sh $(srcdir)/schema.odl
+	sh init.sh $(srcdir)/schema.odl
 .PHONY: init
 
 # Dependencies
