@@ -1,22 +1,28 @@
-import pexpect
-import sys
-import os
-from eyedb.test.command import run_command
+from eyedb.test.command import run_simple_command
 
-def server_status():
-    status_cmd = [ "%s/eyedbctl" % (os.environ['sbindir'],), "status" ]
-    return run_command( status_cmd, do_exit=False)
+def server_status( sbindir = None):
+    status_cmd = ''
+    if sbindir is not None:
+        status_cmd = sbindir + '/'
+    status_cmd = status_cmd + 'eyedbctl status'
+    return run_simple_command( status_cmd, do_exit=False)
 
-def server_start():
-    if  server_status() != 0:
-        start_cmd = ["%s/eyedbctl" % (os.environ['sbindir'],), "start" ]
-        status = run_command( start_cmd, do_exit=False)
+def server_start( sbindir = None):
+    if  server_status( sbindir) != 0:
+        start_cmd = ''
+        if sbindir is not None:
+            start_cmd = sbindir + '/'
+        start_cmd = start_cmd + 'eyedbctl start'
+        status = run_simple_command( start_cmd, do_exit=False)
         return status
     return 0
 
-def server_stop():
-    if server_status() == 0:
-        stop_cmd = ["%s/eyedbctl" % (os.environ['sbindir'],), "stop" ]
-#        stop_cmd = "%s/eyedbctl stop" % (os.environ['sbindir'],)
-        return run_command( stop_cmd, do_exit=False)
+def server_stop( sbindir = None):
+    if  server_status( sbindir) == 0:
+        stop_cmd = ''
+        if sbindir is not None:
+            stop_cmd = sbindir + '/'
+        stop_cmd = stop_cmd + 'eyedbctl stop'
+        status = run_simple_command( stop_cmd, do_exit=False)
+        return status
     return 0
