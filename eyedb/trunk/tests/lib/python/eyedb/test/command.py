@@ -3,8 +3,12 @@ import sys
 import os
 import subprocess
 
-def run_command( cmd, expected_status = 0, do_exit = True):
-    p = subprocess.Popen( cmd)
+def run_simple_command( cmd, expected_status = 0, do_exit = True):
+    if type(cmd) == str:
+        cmd_list = cmd.split(' ')
+    else:
+        cmd_list = cmd
+    p = subprocess.Popen( cmd_list)
     status = p.wait()
     if do_exit and status != expected_status:
         sys.exit( status)
