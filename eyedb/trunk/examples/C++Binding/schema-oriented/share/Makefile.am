@@ -13,6 +13,13 @@ EYEDBODL_exe=$(bindir)/eyedbodl
 EYEDBODL = $(EYEDBODL_exe) --gencode=C++
 EYEDBODLFLAGS= --package=person --schema-name=person
 
+# Code snippet from autoconf documentation:
+# http://www.gnu.org/software/autoconf/manual/autoconf.html#Installation-Directory-Variables
+EDIT= sed \
+        -e 's,@bindir[@],$(bindir),g' \
+        -e 's,@exec_prefix[@],$(exec_prefix),g' \
+        -e 's,@prefix[@],$(prefix),g' 
+
 person.cc person.h : schema.odl
 	-if test -x $(EYEDBODL_exe) ; then \
 		echo $(EYEDBODL) $(EYEDBODLFLAGS) $< ; \
@@ -20,6 +27,11 @@ person.cc person.h : schema.odl
 	else \
 		echo Warning: $(EYEDBODL) not found ; \
 	fi
+
+%.sh: Makefile $(srcdir)/%.sh.in
+	rm -f $@ $@.tmp
+	$(EDIT) '$(srcdir)/$@.in' >$@.tmp
+	mv $@.tmp $@
 
 init:
 	sh $(srcdir)/init.sh $(srcdir)/schema.odl

@@ -5,6 +5,6 @@ cpp_test = [ "%s/examples/C++Binding/schema-oriented/store/store" % (os.environ[
              'person_c',
              'nadine',
              '32',
-             'raymond']
+             'henry']
 run_simple_command( cpp_test)
 
