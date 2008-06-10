@@ -48,6 +48,7 @@ class Basic {
 
 	catch(org.eyedb.Exception e) {
 	    e.print();
+	    System.exit(1);
 	}
 
 	System.err.println("#### Done");

@@ -39,6 +39,10 @@ def run_java_command( java_class, java=None, args=None, classpath=[]):
     classpath.append( "%s/src/java/eyedb.jar" % (os.environ['top_builddir'],) )
     if java is None:
         java = os.environ['JAVA']
-    java_command = "%s -cp %s %s --user=%s %s" % (java, ':'.join( classpath), java_class, os.environ['USER'], args)
-    print java_command
+    java_command = [ java, "-cp", ':'.join( classpath), java_class, "--user=%s" % (os.environ['USER'],)]
+    if type(args) == str:
+        java_command.append(args)
+    else:
+        java_command.extend( args)
+    print ' '.join(java_command)
     run_simple_command( java_command)

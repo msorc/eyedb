@@ -595,6 +595,17 @@ src/www/icons/Makefile dnl
 tests/Makefile dnl
 tests/examples/Makefile dnl
 tests/examples/GettingStarted/Makefile dnl
+tests/examples/JavaBinding/Makefile dnl
+tests/examples/JavaBinding/schema-oriented/Makefile dnl
+tests/examples/JavaBinding/schema-oriented/share/Makefile dnl
+tests/examples/JavaBinding/schema-oriented/store/Makefile dnl
+tests/examples/JavaBinding/generic/Makefile dnl
+tests/examples/JavaBinding/generic/appli/Makefile dnl
+tests/examples/JavaBinding/generic/appli/basic/Makefile dnl
+tests/examples/JavaBinding/generic/appli/collections/Makefile dnl
+tests/examples/JavaBinding/generic/appli/query/Makefile dnl
+tests/examples/JavaBinding/generic/appli/schema/Makefile dnl
+tests/examples/JavaBinding/generic/appli/store/Makefile dnl
 tests/eyedb/Makefile dnl
 tests/eyedb/admin/Makefile dnl
 tests/eyedb/admin/database/Makefile dnl

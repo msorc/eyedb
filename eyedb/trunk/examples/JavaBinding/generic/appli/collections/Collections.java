@@ -62,6 +62,7 @@ class Collections {
 
     catch(org.eyedb.Exception e) {
       e.print();
+      System.exit( 1);
     }
 
     display_("Done");
