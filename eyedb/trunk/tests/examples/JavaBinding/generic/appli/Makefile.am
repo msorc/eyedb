@@ -1,2 +1,1 @@
-SUBDIRS=basic 
-#collections query schema store
+SUBDIRS=basic collections query schema store
