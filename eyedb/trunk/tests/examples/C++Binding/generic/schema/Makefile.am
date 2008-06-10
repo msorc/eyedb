@@ -2,6 +2,6 @@ TESTS_ENVIRONMENT= bindir=$(bindir) sbindir=$(sbindir) libdir=$(libdir) top_buil
 
 TESTS=\
 $(top_srcdir)/tests/examples/test_start_server.py \
-test_cpp_object.py \
-test_cpp_schema.py \
+test_object_dump.py \
+test_schema_dump.py \
 $(top_srcdir)/tests/examples/test_stop_server.py
