@@ -1,0 +1,3 @@
+SUBDIRS=generic 
+#schema-oriented
+
