@@ -1,9 +1,7 @@
 import os
-from eyedb.test.command import run_simple_command
+from eyedb.test.command import run_java_command
 
-# run the GettingStarted Java part
-java_test = "%s -cp %s/examples/GettingStarted:%s/eyedb/java/eyedb.jar PersonTest --user=%s person_g" % (os.environ['JAVA'], os.environ['top_builddir'],os.environ['libdir'], os.environ['USER'])
-print java_test
-run_simple_command( java_test)
+subdir = "%s/examples/GettingStarted" % (os.environ['top_builddir'])
+run_java_command( 'PersonTest', args='person_g', classpath=[subdir])
 
 

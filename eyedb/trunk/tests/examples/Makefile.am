@@ -1,5 +1,5 @@
 if COND_PYTHON_PEXPECT
-PEXPECT_DIRS= GettingStarted
+PEXPECT_DIRS= GettingStarted JavaBinding
 else
 PEXPECT_DIRS=
 endif
