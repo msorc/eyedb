@@ -1,6 +1,7 @@
 import pexpect
 import sys
 import os
+import re
 import subprocess
 
 def run_simple_command( cmd, expected_status = 0, do_exit = True):
@@ -33,3 +34,11 @@ def run_command_1( command, expected_status = 0, do_exit = True):
     if do_exit and exitstatus != expected_status:
         sys.exit( exitstatus)
     return exitstatus
+
+def run_java_command( java_class, java=None, args=None, classpath=[]):
+    classpath.append( "%s/src/java/eyedb.jar" % (os.environ['top_builddir'],) )
+    if java is None:
+        java = os.environ['JAVA']
+    java_command = "%s -cp %s %s --user=%s %s" % (java, ':'.join( classpath), java_class, os.environ['USER'], args)
+    print java_command
+    run_simple_command( java_command)
