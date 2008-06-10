@@ -137,7 +137,7 @@ public class PersonTest {
     static void test0(org.eyedb.Database db) throws org.eyedb.Exception {
 	long ms = System.currentTimeMillis();
 	long ms2 = org.eyedb.RPClib.read_ms;
-	Person ps[] = new Person[10000];
+	Person ps[] = new Person[1000];
 	for (int i = 0; i < ps.length; i++) {
 	    ps[i] = makePerson(db, i, "#R");
 	    ps[i].store();
