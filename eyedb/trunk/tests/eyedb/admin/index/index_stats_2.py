@@ -1,4 +1,5 @@
 import pexpect
+import os
 import sys
 
 dbname = 'index_test_db'
@@ -8,7 +9,7 @@ attribute_3 = 'Person.age'
 attribute_4 = 'Person.id'
 
 # get the index statistics
-command="eyedbadmin2 index stats %s" % (dbname,)
+command="%s/eyedbadmin index stats %s" % (os.environ['bindir'], dbname)
 child = pexpect.spawn(command)
 child.logfile = sys.stdout
 r = child.expect("Index on %s" % (attribute_1,))

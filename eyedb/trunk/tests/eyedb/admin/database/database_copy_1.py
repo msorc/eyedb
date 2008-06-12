@@ -1,9 +1,8 @@
-from common import test_simple_command
-import sys
+from eyedb.test.command import run_simple_command
+import os
 
 dbname = 'new_database_test_db'
 copy_dbname = 'copy_database_test_db'
 
-command="eyedbadmin2 database copy %s %s" % (dbname, copy_dbname)
-test_simple_command( command)
-sys.exit( 0)
+command="%s/eyedbadmin database copy %s %s" % (os.environ['bindir'], dbname, copy_dbname)
+run_simple_command( command)

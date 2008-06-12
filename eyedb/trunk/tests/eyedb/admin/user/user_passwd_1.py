@@ -1,11 +1,12 @@
 import pexpect
 import sys
+import os
 
 username='toto'
 password='titi'
 newpassword='tata'
 
-command="eyedbadmin2 user passwd %s " % (username,)
+command="%s/eyedbadmin user passwd %s " % ( os.environ['bindir'], username)
 child = pexpect.spawn(command)
 child.logfile = sys.stdout
 r = child.expect("user old password: ")

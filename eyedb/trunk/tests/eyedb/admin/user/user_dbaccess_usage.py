@@ -1,9 +1,12 @@
-from common import test_simple_command
+import pexpect
+import sys
+import os
 
-command='eyedbadmin2 user dbaccess'
-expected_output= [
-"eyedbadmin user dbaccess \[--help\] USER DBNAME MODE",
-]
-
-test_simple_command( command, expected_output, expected_status = 1)
-
+command="%s/eyedbadmin user dbaccess" % (os.environ['bindir'],)
+child = pexpect.spawn( command)
+child.logfile = sys.stdout
+child.expect("eyedbadmin user dbaccess \[--help\] USER DBNAME MODE")
+child.close()
+if child.exitstatus == 1:
+    sys.exit(0)
+sys.exit( child.exitstatus)

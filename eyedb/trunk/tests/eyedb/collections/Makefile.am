@@ -1,2 +1,4 @@
-SUBDIRS=basic litcoll
+SUBDIRS=basic 
+# litcoll problem?
+
 

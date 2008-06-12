@@ -1,9 +1,8 @@
-from common import test_simple_command
-import sys
+from eyedb.test.command import run_simple_command
+import os
 
 dbname = 'database_test_db'
 filedir = '/var/tmp'
 
-command="eyedbadmin2 database move --filedir=%s %s" % (filedir,dbname,)
-test_simple_command( command)
-sys.exit( 0)
+command="%s/eyedbadmin database move --filedir=%s %s" % (os.environ['bindir'], filedir, dbname,)
+run_simple_command( command)

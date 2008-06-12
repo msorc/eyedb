@@ -1,8 +1,7 @@
-from common import test_simple_command
-import sys
+from eyedb.test.command import run_simple_command
+import os
 
 dbname = 'database_test_db'
 
-command="eyedbadmin2 database create %s" % (dbname,)
-test_simple_command( command)
-sys.exit( 0)
+command="%s/eyedbadmin database create %s" % (os.environ['bindir'], dbname,)
+run_simple_command( command)

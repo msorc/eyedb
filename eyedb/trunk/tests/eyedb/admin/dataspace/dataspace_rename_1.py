@@ -1,14 +1,9 @@
-import pexpect
-import sys
+from eyedb.test.command import run_simple_command
+import os
 
 dbname = 'dataspace_test_db'
 dspname='bar'
 newdspname='bur'
 
-command="eyedbadmin2 dataspace rename %s %s %s" % (dbname,dspname,newdspname)
-child = pexpect.spawn(command)
-r = child.expect(pexpect.EOF)
-child.close()
-sys.exit(child.exitstatus)
-
-
+command="%s/eyedbadmin dataspace rename %s %s %s" % (os.environ['bindir'], dbname, dspname, newdspname)
+run_simple_command( command)

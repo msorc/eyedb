@@ -1,12 +1,8 @@
-import pexpect
-import sys
+from eyedb.test.command import run_simple_command
+import os
 
 username='toto'
-command="eyedbadmin2 user delete %s" % (username,)
-child = pexpect.spawn(command)
-child.logfile = sys.stdout
-r = child.expect(pexpect.EOF)
-child.close()
-sys.exit(child.exitstatus)
 
+command="%s/eyedbadmin user delete %s" % (os.environ['bindir'], username)
+run_simple_command( command)
 

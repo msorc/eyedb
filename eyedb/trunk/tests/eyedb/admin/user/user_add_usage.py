@@ -1,15 +1,17 @@
-from common import test_simple_command
+import pexpect
+import sys
+import os
 
-command='eyedbadmin2 user add'
-expected_output= [
-'eyedbadmin user add \[--help\] \[--unix\] \[--strict-unix\] \[USER \[PASSWORD\]]',
-'',
-'  --help        Displays the current help',
-'  --unix        ',
-'  --strict-unix ',
-'  USER          User name',
-'  PASSWORD      Password for specified user'
-]
-
-test_simple_command( command, expected_output, expected_status = 1)
-
+command="%s/eyedbadmin user add" % (os.environ['bindir'],)
+child = pexpect.spawn( command)
+child.logfile = sys.stdout
+child.expect('eyedbadmin user add \[--help\] \[--unix\] \[--strict-unix\] \[USER \[PASSWORD\]]')
+child.expect('  --help        Displays the current help')
+child.expect('  --unix        ')
+child.expect('  --strict-unix ')
+child.expect('  USER          User name')
+child.expect('  PASSWORD      Password for specified user')
+child.close()
+if child.exitstatus == 1:
+    sys.exit(0)
+sys.exit( child.exitstatus)

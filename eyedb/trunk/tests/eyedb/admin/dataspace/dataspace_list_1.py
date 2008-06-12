@@ -1,9 +1,10 @@
 import pexpect
 import sys
+import os
 
 dbname = 'dataspace_test_db'
 
-command="eyedbadmin2 dataspace list %s" % (dbname,)
+command="%s/eyedbadmin dataspace list %s" % (os.environ['bindir'], dbname)
 child = pexpect.spawn(command)
 r = child.expect( "Dataspace #0")
 r = child.expect( "Name DEFAULT")

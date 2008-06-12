@@ -1,11 +1,12 @@
 import pexpect
 import sys
+import os
 
 dbname = 'datafile_test_db'
 datafile='test.dat'
 name='test'
 
-command="eyedbadmin2 datafile list %s" % (dbname,)
+command="%s/eyedbadmin datafile list %s" % (os.environ['bindir'], dbname)
 child = pexpect.spawn(command)
 child.logfile = sys.stdout
 
