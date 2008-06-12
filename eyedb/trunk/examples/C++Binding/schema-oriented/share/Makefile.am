@@ -20,13 +20,18 @@ EDIT= sed \
         -e 's,@exec_prefix[@],$(exec_prefix),g' \
         -e 's,@prefix[@],$(prefix),g' 
 
-person.cc person.h : schema.odl
+BUILT_SOURCES=personstubsbe.cc personstubsfe.cc
+
+person.cc person.h personstubsbe.cc personstubsfe.cc: schema.odl
 	-if test -x $(EYEDBODL_exe) ; then \
 		echo $(EYEDBODL) $(EYEDBODLFLAGS) $< ; \
 		$(EYEDBODL) $(EYEDBODLFLAGS) $< ; \
 	else \
 		echo Warning: $(EYEDBODL) not found ; \
 	fi
+
+clean-local:
+	rm -f person.cc person.h personmthbe-skel.cc personmthfe-skel.cc personstubsbe.cc personstubsfe.cc 
 
 %.sh: Makefile $(srcdir)/%.sh.in
 	rm -f $@ $@.tmp

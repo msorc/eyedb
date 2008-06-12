@@ -24,6 +24,7 @@ personmthfe.lo: $(srcdir)/personmthfe.cc
 personmthbe.la: personmthbe.lo $(top_builddir)/examples/C++Binding/schema-oriented/share/person.lo $(top_builddir)/examples/C++Binding/schema-oriented/share/personstubsbe.lo 
 	-test ! -d tmp && mkdir tmp
 	$(CXXLINK) -rpath $(abs_top_builddir)/examples/C++Binding/schema-oriented/methods/tmp -module $^ $(LIBS)
+
 personmthbe.so: personmthbe.la
 	$(LIBTOOL) --mode=install $(INSTALL) $^ $(DESTDIR)$(abs_top_builddir)/examples/C++Binding/schema-oriented/methods/tmp
 	cp tmp/personmthbe.so.0.0.0 ./personmthbe.so
