@@ -1,10 +1,11 @@
 import pexpect
 import sys
+import os
 
 dbname = 'new_database_test_db'
 copy_dbname = 'copy_database_test_db'
 
-command="eyedbadmin2 database list %s" % (dbname,)
+command="%s/eyedbadmin database list %s" % (os.environ['bindir'], dbname)
 child = pexpect.spawn(command)
 child.logfile = sys.stdout
 child.expect( "Database Name")
@@ -14,7 +15,7 @@ child.close()
 if child.exitstatus != 0:
     sys.exit(child.exitstatus)
 
-command="eyedbadmin2 database list %s" % (copy_dbname,)
+command="%s/eyedbadmin database list %s" % (os.environ['bindir'], copy_dbname)
 child = pexpect.spawn(command)
 child.logfile = sys.stdout
 child.expect( "Database Name")

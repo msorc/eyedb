@@ -1,6 +1,7 @@
-TESTS_ENVIRONMENT= PATH=$$PATH:$(bindir) PYTHONPATH=$(top_srcdir)/tests/eyedb/admin:$$PYTHONPATH $(PYTHON) 
+TESTS_ENVIRONMENT= bindir=$(bindir) sbindir=$(sbindir) PYTHONPATH=$(top_srcdir)/tests/lib/python:$$PYTHONPATH $(PYTHON) 
 
 TESTS=\
+$(top_srcdir)/tests/lib/python/eyedb/test/test_start_server.py \
 database_create_1.py \
 database_list_1.py \
 database_move_1.py \
@@ -12,4 +13,5 @@ database_list_4.py \
 database_defaccess_1.py \
 database_list_5.py \
 database_delete_1.py \
-database_list_6.py 
+database_list_6.py \
+$(top_srcdir)/tests/lib/python/eyedb/test/test_stop_server.py

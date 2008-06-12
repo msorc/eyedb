@@ -1,9 +1,14 @@
-from common import test_simple_command
+import pexpect
+import sys
+import os
 
-command='eyedbadmin2 user sysaccess'
-expected_output= [
-"eyedbadmin user sysaccess \[--help\] USER \['\+' combination of\] dbcreate\|adduser\|deleteuser\|setuserpasswd\|admin\|superuser\|no",
-]
+command="%s/eyedbadmin user sysaccess" % (os.environ['bindir'],)
 
-test_simple_command( command, expected_output, expected_status = 1)
-
+child = pexpect.spawn( command)
+child.logfile = sys.stdout
+r = child.expect("eyedbadmin user sysaccess \[--help\] USER \['\+' combination of\] dbcreate\|adduser\|deleteuser\|setuserpasswd\|admin\|superuser\|no")
+r = child.expect( pexpect.EOF)
+child.close()
+if child.exitstatus == 1:
+    sys.exit(0)
+sys.exit( child.exitstatus)

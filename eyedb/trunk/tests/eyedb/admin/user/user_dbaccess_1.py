@@ -1,13 +1,8 @@
-import pexpect
-import sys
+from eyedb.test.command import run_simple_command
+import os
 
 username='toto'
 dbname='foo'
 
-command="eyedbadmin2 user dbaccess %s %s rwx" % (username,dbname)
-child = pexpect.spawn(command)
-child.logfile = sys.stdout
-r = child.expect(pexpect.EOF)
-child.close()
-sys.exit(child.exitstatus)
-
+command="%s/eyedbadmin user dbaccess %s %s rwx" % (os.environ['bindir'], username, dbname)
+run_simple_command( command)

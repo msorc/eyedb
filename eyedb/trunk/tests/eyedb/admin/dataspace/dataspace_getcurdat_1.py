@@ -1,10 +1,11 @@
 import pexpect
 import sys
+import os
 
 dbname = 'dataspace_test_db'
 dspname='DEFAULT'
 
-command="eyedbadmin2 dataspace getcurdat %s %s" % (dbname,dspname)
+command="%s/eyedbadmin dataspace getcurdat %s %s" % (os.environ['bindir'], dbname, dspname)
 child = pexpect.spawn(command)
 r = child.expect( "Datafile")
 r = child.expect( "Name *DEFAULT")

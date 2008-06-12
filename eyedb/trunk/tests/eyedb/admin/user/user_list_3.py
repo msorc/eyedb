@@ -1,9 +1,10 @@
 import pexpect
 import sys
+import os
 
 username='toto'
-command="eyedbadmin2 user list"
-child = pexpect.spawn(command)
+command="%s/eyedbadmin user list" % (os.environ['bindir'],)
+child = pexpect.spawn( command)
 child.logfile = sys.stdout
 child.expect("name .*: \"%s\"\r\n" % (username,))
 child.expect("sysaccess .*: SET_USER_PASSWD_SYSACCESS_MODE\r\n")

@@ -1,5 +1,14 @@
-from common import test_simple_command
+import pexpect
+import sys
+import os
 
-command='eyedbadmin2 user delete'
-expected_output=['eyedbadmin user delete \[--help\] USER']
-test_simple_command( command, expected_output, expected_status=1)
+command="%s/eyedbadmin user delete" % (os.environ['bindir'],)
+
+child = pexpect.spawn( command)
+child.logfile = sys.stdout
+r = child.expect('eyedbadmin user delete \[--help\] USER')
+r = child.expect( pexpect.EOF)
+child.close()
+if child.exitstatus == 1:
+    sys.exit(0)
+sys.exit( child.exitstatus)

@@ -1,8 +1,9 @@
 import pexpect
 import sys
+import os
 
 username='toto'
-command="eyedbadmin2 user list %s" % (username,)
+command="%s/eyedbadmin user list %s" % ( os.environ['bindir'], username)
 child = pexpect.spawn(command)
 child.logfile = sys.stdout
 child.expect("eyedbadmin: user %s not found\r\n" % (username,))

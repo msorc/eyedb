@@ -1,21 +1,15 @@
-import pexpect
+from eyedb.test.command import run_simple_command
 import sys
+import os
 
 username='toto'
 
-command="eyedbadmin2 user sysaccess %s dbcreate" % (username,)
-child = pexpect.spawn(command)
-child.logfile = sys.stdout
-r = child.expect(pexpect.EOF)
-child.close()
-if child.exitstatus != 0:
-    sys.exit(child.exitstatus)
+command="%s/eyedbadmin user sysaccess %s dbcreate" % ( os.environ['bindir'], username)
+status = run_simple_command( command, do_exit = False)
+if status != 0:
+    sys.exit( status)
 
-command="eyedbadmin2 user sysaccess %s setuserpasswd" % (username,)
-child = pexpect.spawn(command)
-child.logfile = sys.stdout
-r = child.expect(pexpect.EOF)
-child.close()
-sys.exit(child.exitstatus)
+command="%s/eyedbadmin user sysaccess %s setuserpasswd" % ( os.environ['bindir'], username)
+run_simple_command( command)
 
 

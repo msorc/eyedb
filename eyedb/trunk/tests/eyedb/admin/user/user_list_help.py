@@ -1,10 +1,20 @@
-from common import test_simple_command
+import pexpect
+import sys
+import os
 
-command='eyedbadmin2 user list --help'
-expected_output=[
-'eyedbadmin user list \[--help\] \[USER\]',
-'',
-'  --help Displays the current help',
-'  USER   User name',
-]
-test_simple_command( command, expected_output, expected_status=1)
+command='%s/eyedbadmin user list --help' % (os.environ['bindir'],)
+
+child = pexpect.spawn( command)
+child.logfile = sys.stdout
+r = child.expect('eyedbadmin user list \[--help\] \[USER\]')
+r = child.expect('\n')
+r = child.expect('  --help Displays the current help')
+r = child.expect('  USER   User name')
+r = child.expect(pexpect.EOF)
+child.close()
+if child.exitstatus == 1:
+    sys.exit(0)
+sys.exit( child.exitstatus)
+
+
+
