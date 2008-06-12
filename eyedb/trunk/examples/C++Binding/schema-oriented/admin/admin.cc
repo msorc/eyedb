@@ -74,7 +74,7 @@ main(int argc, char *argv[])
     cout << db.getSchema() << endl;
 
     // looking for all user
-    eyedb::OQL q_user(&db, "select User");
+    eyedb::OQL q_user(&db, "select user_entry");
 
     eyedb::ObjectArray user_arr;
     q_user.execute(user_arr);
@@ -87,7 +87,7 @@ main(int argc, char *argv[])
     cout << "}\n" << endl;
 
     // looking for all database entry
-    eyedb::OQL q_db(&db, "select eyedb::DBEntry");
+    eyedb::OQL q_db(&db, "select database_entry");
 
     eyedb::ObjectArray db_arr;
     q_db.execute(db_arr);
@@ -100,7 +100,7 @@ main(int argc, char *argv[])
       // looking for all user which has any permission on this
       // database
       eyedb::OQL q_useraccess(&db,
-			      "select eyedb::DBUserAccess->dbentry->dbname = \"%s\"",
+			      "select database_user_access->dbentry->dbname = \"%s\"",
 			      dbentry->dbname().c_str());
       eyedb::ObjectArray useraccess_arr;
       q_useraccess.execute(useraccess_arr);
