@@ -281,7 +281,7 @@ namespace eyedb {
   static void
   begin_args_usage(FILE *fd, OQLCommand *cmd)
   {
-    fprintf(fd, "[R_S_W_S|R_S_W_SX|R_S_W_X|R_SX_W_SX|R_SX_W_X|R_X_W_X|R_N_W_S|R_N_W_SX|R_N_W_X|R_N_W_N|DB_W|DB_RW|DB_Wtrans] [RV_OFF|RV_FULL|RV_PARTIAL] [MG=<magorder>] [RT=<ratioalrt>] [TM=<wait_timeout>] [TRSOFF]\n");
+    fprintf(fd, "[R_S_W_S|R_S_W_SX|R_S_W_X|R_SX_W_SX|R_SX_W_X|R_X_W_X|R_N_W_S|R_N_W_SX|R_N_W_X|R_N_W_N|DB_W|DB_RW|DB_Wtrans] [RV_OFF|RV_FULL|RV_PARTIAL] [MG=MAGORDER] [RT=RATIOALRT] [TM=WAIT_TIMEOUT] [TRSOFF]\n");
   }
 
   static void
@@ -308,9 +308,9 @@ namespace eyedb {
     fprintf(fd, "%sRV_FULL     full recovery (not yet implemented)\n", help_indent);
     fprintf(fd, "%sRV_PARTIAL  partial recovery\n", help_indent);
     fprintf(fd, "\n");
-    fprintf(fd, "%sMG=<magorder>  magnitude order of object count\n", help_indent);
-    fprintf(fd, "%sRT=<ratioalrt> ratio alert\n", help_indent);
-    fprintf(fd, "%sTM=<timeout>   wait timeout in seconds\n", help_indent);
+    fprintf(fd, "%sMG=MAGORDER  magnitude order of object count\n", help_indent);
+    fprintf(fd, "%sRT=RATIOALRT ratio alert\n", help_indent);
+    fprintf(fd, "%sTM=TIMEOUT   wait timeout in seconds\n", help_indent);
     fprintf(fd, "%sTRSOFF      no transaction processing\n", help_indent);
   }
 
@@ -393,7 +393,7 @@ namespace eyedb {
   user_usage(FILE *fd, OQLCommand *cmd, bool indent)
   {
     command_s_print(fd, cmd, indent);
-    fprintf(fd, "[<user> [<passwd>]]\n");
+    fprintf(fd, "[USER [PASSWD]]\n");
   }
 
   static void
@@ -404,8 +404,8 @@ namespace eyedb {
     fprintf(fd, command_help);
     fprintf(fd, "%ssets the current user\n", help_indent);
     fprintf(fd, options_help);
-    fprintf(fd, "%s<user>   the new user. Ask for it, if not present\n", help_indent);
-    fprintf(fd, "%s<passwd> the password. Ask for it, if not present\n", help_indent);
+    fprintf(fd, "%sUSER   the new user. Ask for it, if not present\n", help_indent);
+    fprintf(fd, "%sPASSWD the password. Ask for it, if not present\n", help_indent);
 
   }
 
@@ -413,7 +413,7 @@ namespace eyedb {
   help_usage(FILE *fd, OQLCommand *cmd, bool indent)
   {
     command_s_print(fd, cmd, indent);
-    fprintf(fd, "[<command>]\n");
+    fprintf(fd, "[COMMAND]\n");
   }
 
   static void
@@ -424,14 +424,14 @@ namespace eyedb {
     fprintf(fd, command_help);
     fprintf(fd, "%sdisplays usage of all commands or help of one command\n", help_indent);
     fprintf(fd, option_help);
-    fprintf(fd, "%s<command>  name of the command for which to display help\n", help_indent);
+    fprintf(fd, "%sCOMMAND  name of the command for which to display help\n", help_indent);
   }
 
   static void
   setprompt_usage(FILE *fd, OQLCommand *cmd, bool indent)
   {
     command_s_print(fd, cmd, indent);
-    fprintf(fd, "[1|2] <prompt>\n");
+    fprintf(fd, "[1|2] PROMPT\n");
   }
 
   static void
@@ -444,7 +444,7 @@ namespace eyedb {
     fprintf(fd, option_help);
     fprintf(fd, "%s1        prompt level 1 (default)\n", help_indent);
     fprintf(fd, "%s2        prompt level 2\n", help_indent);
-    fprintf(fd, "%s<prompt> new prompt\n", help_indent);
+    fprintf(fd, "%sPROMPT   new prompt\n", help_indent);
   }
 
   static void
@@ -473,7 +473,7 @@ namespace eyedb {
   settermchar_usage(FILE *fd, OQLCommand *cmd, bool indent)
   {
     command_s_print(fd, cmd, indent);
-    fprintf(fd, "[<char>]\n");
+    fprintf(fd, "[CHAR]\n");
   }
 
   static void
@@ -484,7 +484,7 @@ namespace eyedb {
     fprintf(fd, command_help);
     fprintf(fd, "%ssets the terminal statement character\n", help_indent);
     fprintf(fd, option_help);
-    fprintf(fd, "%s<char>  the terminal statement character (default ';')\n", help_indent);
+    fprintf(fd, "%sCHAR  the terminal statement character (default ';')\n", help_indent);
   }
 
   static void
@@ -531,7 +531,7 @@ namespace eyedb {
   time_usage(FILE *fd, OQLCommand *cmd, bool indent)
   {
     command_s_print(fd, cmd, indent);
-    fprintf(fd, "[-raz] [<message>]\n");
+    fprintf(fd, "[-raz] [MESSAGE]\n");
   }
 
   static void
@@ -558,14 +558,14 @@ namespace eyedb {
     fprintf(fd, "%sdisplays the time in seconds since beginning of last 'time -raz' and optional message\n", help_indent);
     fprintf(fd, options_help);
     fprintf(fd, "%s-raz      reset the time\n", help_indent);
-    fprintf(fd, "%s<message> displays the message\n", help_indent);
+    fprintf(fd, "%sMESSAGE displays the message\n", help_indent);
   }
 
   static void
   setescapechar_usage(FILE *fd, OQLCommand *cmd, bool indent)
   {
     command_s_print(fd, cmd, indent);
-    fprintf(fd, "<char>\n");
+    fprintf(fd, "CHAR\n");
   }
 
   static void
@@ -574,16 +574,16 @@ namespace eyedb {
     setescapechar_usage(fd, cmd, false);
 
     fprintf(fd, command_help);
-    fprintf(fd, "%schanges escape character to <char> (default is \\)\n", help_indent);
+    fprintf(fd, "%schanges escape character to CHAR (default is \\)\n", help_indent);
     fprintf(fd, option_help);
-    fprintf(fd, "%s<char>    the new escape character\n", help_indent);
+    fprintf(fd, "%sCHAR    the new escape character\n", help_indent);
   }
 
   static void
   shell_usage(FILE *fd, OQLCommand *cmd, bool indent)
   {
     command_s_print(fd, cmd, indent);
-    fprintf(fd, "[{<arg>}]\n");
+    fprintf(fd, "[ARG...]\n");
   }
 
   static void
@@ -593,14 +593,14 @@ namespace eyedb {
     fprintf(fd, command_help);
     fprintf(fd, "%sexecutes shell command\n", help_indent);
     fprintf(fd, option_help);
-    fprintf(fd, "%s[{<arg>}] optional shell command (if no present executes a shell)\n", help_indent);
+    fprintf(fd, "%s[ARG...] optional shell command (if no present executes a shell)\n", help_indent);
   }
 
   static void
   open_usage(FILE *fd, OQLCommand *cmd, bool indent)
   {
     command_s_print(fd, cmd, indent);
-    fprintf(fd, "[<database> [rw|ro|sr] [local]\n");
+    fprintf(fd, "[DATABASE [rw|ro|sr] [local]\n");
   }
 
   static void
@@ -610,7 +610,7 @@ namespace eyedb {
     fprintf(fd, command_help);
     fprintf(fd, "%sopens a database or return the current database\n", help_indent);
     fprintf(fd, options_help);
-    fprintf(fd, "%s<database> the database to open (if not present, returns the current opened database)\n", help_indent);
+    fprintf(fd, "%sDATABASE the database to open (if not present, returns the current opened database)\n", help_indent);
     fprintf(fd, "%srw         opens in read/write mode\n", help_indent);
     fprintf(fd, "%sro         opens in read only mode\n", help_indent);
     fprintf(fd, "%ssr         opens in strict read mode\n", help_indent);
@@ -621,7 +621,7 @@ namespace eyedb {
   setdbmdb_usage(FILE *fd, OQLCommand *cmd, bool indent)
   {
     command_s_print(fd, cmd, indent);
-    fprintf(fd, "[<dbmdb>]\n");
+    fprintf(fd, "[DBMDB]\n");
   }
 
   static void
@@ -630,16 +630,16 @@ namespace eyedb {
     setdbmdb_usage(fd, cmd, false);
 
     fprintf(fd, command_help);
-    fprintf(fd, "%ssets the EYEDBDBM database to <dbmdb>\n", help_indent);
+    fprintf(fd, "%ssets the EYEDBDBM database to DBMDB\n", help_indent);
     fprintf(fd, option_help);
-    fprintf(fd, "%s<dbmdb> the EYEDBM database\n", help_indent);
+    fprintf(fd, "%sDBMDB the EYEDBM database\n", help_indent);
   }
 
   static void
   print_usage(FILE *fd, OQLCommand *cmd, bool indent)
   {
     command_s_print(fd, cmd, indent);
-    fprintf(fd, "[{<oid>}] [full] [ctime] [mtime] [cmtime] [contents] [native] [attrcomp] [attrcomp*] [compoid] [method] [all] [local|remote]\n");
+    fprintf(fd, "[OID...] [full] [ctime] [mtime] [cmtime] [contents] [native] [attrcomp] [attrcomp*] [compoid] [method] [all] [local|remote]\n");
   }
 
   static void
@@ -650,7 +650,7 @@ namespace eyedb {
     fprintf(fd, command_help);
     fprintf(fd, "%sdisplays objets from an oid list or from the last oids returned\n", help_indent);
     fprintf(fd, options_help);
-    fprintf(fd, "%s[{<oid>}] optional oid list\n", help_indent);
+    fprintf(fd, "%s[OID...]    optional oid list\n", help_indent);
     fprintf(fd, "%sfull      follows all links between objects\n", help_indent);
     fprintf(fd, "%sctime     displays creation time\n", help_indent);
     fprintf(fd, "%smtime     displays modification time\n", help_indent);
@@ -812,7 +812,7 @@ namespace eyedb {
   echo_usage(FILE *fd, OQLCommand *cmd, bool indent)
   {
     command_s_print(fd, cmd, indent);
-    fprintf(fd, "{<arg>}\n");
+    fprintf(fd, "ARG...\n");
   }
 
   static void
@@ -824,14 +824,14 @@ namespace eyedb {
     fprintf(fd, "%sdisplays the given arguments\n", help_indent);
 
     fprintf(fd, options_help);
-    fprintf(fd, "%s{<arg>} the arguments to display\n", help_indent);
+    fprintf(fd, "%sARG... the arguments to display\n", help_indent);
   }
 
   static void
   read_usage(FILE *fd, OQLCommand *cmd, bool indent)
   {
     command_s_print(fd, cmd, indent);
-    fprintf(fd, "<file>\n");
+    fprintf(fd, "FILE\n");
   }
 
   static void
@@ -842,7 +842,7 @@ namespace eyedb {
     fprintf(fd, "%sexecutes OQL and meta commands contained in a file\n", help_indent);
 
     fprintf(fd, options_help);
-    fprintf(fd, "%s<file>   the file to read\n", help_indent);
+    fprintf(fd, "%sFILE   the file to read\n", help_indent);
   }
 
 #include <pwd.h>
@@ -1070,7 +1070,7 @@ namespace eyedb {
 
     fprintf(pipe,
 	    "Type `%chelp name' to find out more about the command `name'.\n"
-	    "\neyedboql commands :\n\n",
+	    "\neyedboql commands:\n\n",
 	    parser->getEscapeChar(), parser->getEscapeChar());
   
     while (cmd)
