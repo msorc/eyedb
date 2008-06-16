@@ -42,6 +42,20 @@ using namespace std;
 #include <unistd.h>
 #include <fcntl.h>
 
+#ifdef HAVE_LIBREADLINE
+#include <readline/readline.h>
+#include <readline/history.h>
+#endif
+#ifdef HAVE_LIBEDITLINE
+extern "C" {
+  // This include file is broken: not ANSI-C, cannot compile it with a C++ compiler
+  // #include <editline.h>
+  // So we prototype the functions by hand :(
+  extern char *readline( char*);
+  extern void add_history( char*);
+}
+#endif
+
 #ifdef MOZILLA
 #include <X11/Xlib.h>
 
@@ -2458,43 +2472,34 @@ namespace eyedb {
       fprintf(fd, prompt_str);
   }
 
-  /*
-    static void
-    percent_manage(char *line)
-    {
-    char tmp[4096];
-    char *p = tmp, *q = line;
-
-    char c;
-
-    while (c = *line++)
-    {
-    if (c == '%')
-    *p++ = '%';
-    *p++ = c;
-    }
-
-    *p = 0;
-    strcpy(q, tmp);
-    }
-  */
-
-  //#define PURIFY
-
   int OQLParser::parse(FILE *fd, Bool mode)
   {
-    char line[4096];
+    char linebuf[4096];
+    char *line;
 
-    if (fgets(line, sizeof(line)-1, fd)) {
-      //percent_manage(line);
-      if (!parse(line, mode))
+#if defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
+    if (fd == stdin)
+      line = readline( "");
+    else
+      line = fgets(linebuf, sizeof(linebuf)-1, fd);
+#else
+    line = fgets(linebuf, sizeof(linebuf)-1, fd);
+#endif
+      
+    if (line) {
+      int ret = parse(line, mode);
+
+#if defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
+      if (fd == stdin) {
+	add_history( line);
+	free( line);
+      }
+#endif
+
+      if (!ret)
 	return 0;
       return 1;
-    }
-    else if (!oql_interrupt) {
-#ifdef PURIFY
-      return 0;
-#endif
+    } else if (!oql_interrupt) {
       if (fd == stdin) {
 	printf("\n");
 	quit_command(this, 0, 0);
