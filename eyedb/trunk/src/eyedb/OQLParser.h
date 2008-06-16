@@ -112,6 +112,9 @@ class OQLParser {
   const char *getPrompt() const;
   void setSecondPrompt(const char *);
   const char *getSecondPrompt() const;
+
+  const char *getEffectivePrompt() const;
+
   void setEscapeChar(char);
   char getEscapeChar() const;
   void setTermChar(char);
