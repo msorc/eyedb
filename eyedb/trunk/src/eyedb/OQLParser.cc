@@ -51,8 +51,8 @@ extern "C" {
   // This include file is broken: not ANSI-C, cannot compile it with a C++ compiler
   // #include <editline.h>
   // So we prototype the functions by hand :(
-  extern char *readline( char*);
-  extern void add_history( char*);
+  extern char *readline( const char*);
+  extern void add_history( const char*);
 }
 #endif
 
@@ -2466,10 +2466,19 @@ namespace eyedb {
     oql_interrupt = False;
     setBackendInterrupt(False);
 
+#if defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
+    if (fd != stdout)
+      fprintf(fd, getEffectivePrompt());
+#else
+    fprintf(fd, getEffectivePrompt());
+#endif    
+  }
+
+  const char *OQLParser::getEffectivePrompt() const
+  {
     if (oql_buffer_len && !is_empty(oql_buffer))
-      fprintf(fd, second_prompt_str);
-    else
-      fprintf(fd, prompt_str);
+      return getSecondPrompt();
+    return getPrompt();
   }
 
   int OQLParser::parse(FILE *fd, Bool mode)
@@ -2479,7 +2488,7 @@ namespace eyedb {
 
 #if defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
     if (fd == stdin)
-      line = readline( "");
+      line = readline( getEffectivePrompt());
     else
       line = fgets(linebuf, sizeof(linebuf)-1, fd);
 #else
