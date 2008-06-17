@@ -2487,7 +2487,9 @@ namespace eyedb {
     char *line;
 
 #if defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
-    if (fd == stdin)
+    int use_readline = fd == stdin && isatty( STDIN_FILENO);
+
+    if (use_readline)
       line = readline( getEffectivePrompt());
     else
       line = fgets(linebuf, sizeof(linebuf)-1, fd);
@@ -2499,7 +2501,7 @@ namespace eyedb {
       int ret = parse(line, mode);
 
 #if defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
-      if (fd == stdin) {
+      if (use_readline) {
 	add_history( line);
 	free( line);
       }
