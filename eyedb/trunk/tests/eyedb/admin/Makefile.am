@@ -5,7 +5,3 @@ PEXPECT_DIRS=
 endif
 
 SUBDIRS= $(PEXPECT_DIRS)
-
-noinst_PYTHON=\
-common.py 
-
