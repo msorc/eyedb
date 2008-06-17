@@ -1,4 +1,4 @@
 SUBDIRS=basic 
-# litcoll problem?
+DIST_SUBDIRS=basic litcoll
 
 
