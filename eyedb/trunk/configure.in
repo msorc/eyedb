@@ -649,6 +649,10 @@ tests/eyedb/dataspace/dspsch/Makefile dnl
 tests/eyedb/export/Makefile dnl
 tests/eyedbsm/Makefile dnl
 tests/eyedbsm/basic/Makefile dnl
+tests/lib/Makefile dnl
+tests/lib/python/Makefile dnl
+tests/lib/python/eyedb/Makefile dnl
+tests/lib/python/eyedb/test/Makefile dnl
 )
 AC_OUTPUT
 
@@ -681,6 +685,8 @@ echo "  C++ compiler flags: ${CXXFLAGS:-none}"
 echo "  Compile with debug: ${enable_debug:-no}"
 echo "  Compile with optimization: ${enable_optimize:-no}"
 echo "  Semaphore policy: ${ac_semaphore_policy}"
+V=$(if test x"$ac_cv_check_readline" = x"yes"; then echo "readline"; elif test x"$ac_cv_check_editline" = x"yes"; then echo "editline"; else echo "none" ; fi)
+echo "  Command line editing in OQL: $V"
 echo "  Libraries: ${LIBS}"
 echo 
 echo "  *** EyeDB Java binding ***" 
