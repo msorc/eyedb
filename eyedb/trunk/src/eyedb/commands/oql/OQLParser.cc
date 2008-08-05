@@ -1093,8 +1093,17 @@ namespace eyedb {
 	cmd = parser->get_next_command(cmd);
       }
 
+#ifdef HAVE_LIBREADLINE
+    fprintf(pipe, "\nThis version of eyedboql was compiled with GNU readline library for command line editing.\n");
+    fprintf(pipe, "See readline man page for a complete description of available command line editing features.\n");
+#elif defined(HAVE_LIBEDITLINE)
+    fprintf(pipe, "\nThis version of eyedboql was compiled with editline library for command line editing.\n");
+    fprintf(pipe, "See editline man page for a complete description of available command line editing features.\n");
+#endif
+
     if (pipe != stderr)
       pclose(pipe);
+
     return 1;
   }
 

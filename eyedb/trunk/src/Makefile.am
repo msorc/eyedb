@@ -10,5 +10,5 @@ else
 SWIG_SRC_DIR= 
 endif
 
-SUBDIRS= lib eyedbsm eyedb commands oql www $(JAVA_SRC_DIR) $(SWIG_SRC_DIR)
+SUBDIRS= lib eyedbsm eyedb oql www $(JAVA_SRC_DIR) $(SWIG_SRC_DIR)
 

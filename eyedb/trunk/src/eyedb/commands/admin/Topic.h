@@ -26,7 +26,7 @@
 
 #include "Const.h"
 #include "Command.h"
-#include "../GetOpt.h"
+#include "GetOpt.h"
 
 class Topic {
 
