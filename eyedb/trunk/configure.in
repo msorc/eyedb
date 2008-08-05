@@ -82,7 +82,7 @@ AC_ARG_WITH( tmpdir,
 AC_ARG_WITH(readline, 
 	     AS_HELP_STRING([--with-readline=(readline|editline|no)],[use GNU readline or BSD editline for line editing (default is editline)]),
 	     ac_eyedb_readline="$withval",
-	     ac_eyedb_readline='editline')
+	     ac_eyedb_readline='readline')
 #
 # End of arguments collect
 
@@ -589,10 +589,11 @@ src/Makefile dnl
 src/bindings/Makefile dnl
 src/bindings/python/Makefile dnl
 src/eyedb/Makefile dnl
-src/eyedb/admin/Makefile dnl
-src/eyedb/admin/old/Makefile dnl
-src/commands/Makefile dnl
-src/commands/server/Makefile dnl
+src/eyedb/commands/Makefile dnl
+src/eyedb/commands/admin/Makefile dnl
+src/eyedb/commands/admin/old/Makefile dnl
+src/eyedb/commands/oql/Makefile dnl
+src/eyedb/commands/server/Makefile dnl
 src/eyedbsm/Makefile dnl
 src/java/Makefile dnl
 src/java/src/Makefile dnl

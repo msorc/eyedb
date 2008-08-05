@@ -1,4 +1,4 @@
-SUBDIRS=. admin
+SUBDIRS=. commands 
 
 lib_LTLIBRARIES= libeyedb.la
 
@@ -213,7 +213,6 @@ utilsmthfe_la_LDFLAGS=-module -release $(EYEDB_VERSION)
 utilsmthfe_la_DEPENDENCIES= $(top_srcdir)/VERSION
 
 bin_PROGRAMS=					\
-eyedboql					\
 eyedbodl					\
 eyedbgetenv
 
@@ -229,10 +228,6 @@ eyedbd_SOURCES= eyedbd.cc serv.cc serv_lib.cc rpc_lib.cc misc.cc
 eyedbd_LDADD= $(EYEDBSVLIBS)
 eyedbd_CFLAGS = $(AM_CFLAGS) # renaming trick
 eyedbd_CXXFLAGS = $(AM_CXXFLAGS) # renaming trick
-
-eyedboql_SOURCES= eyedboql.cc OQLParser.cc # remote.c
-eyedboql_CFLAGS=$(AM_CFLAGS) $(X_CFLAGS)
-eyedboql_LDADD= $(EYEDBCLLIBS)
 
 eyedbodl_SOURCES= eyedbodl.cc
 eyedbodl_LDADD= $(EYEDBCLLIBS)
@@ -284,7 +279,6 @@ oqlctb.h \
 oql_p.h \
 oqlinline.h \
 oqliter.h \
-OQLParser.h \
 rpc.h \
 rpc_lib.h \
 SchemaInfo.h \
