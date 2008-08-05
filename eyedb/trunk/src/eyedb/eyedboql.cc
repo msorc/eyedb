@@ -374,12 +374,6 @@ main(int argc, char *argv[])
 
   fprintf(stdout, "Welcome to eyedboql.\n  Type `%chelp' to display the command list.\n", parser->getEscapeChar());
   fprintf(stdout, "  Type `%ccopyright' to display the copyright.\n", parser->getEscapeChar());
-#ifdef HAVE_LIBREADLINE
-  fprintf(stdout, "\n  This version of eyedboql was compiled with GNU readline library.\n");
-#endif
-#ifdef HAVE_LIBEDITLINE
-  fprintf(stdout, "\n  This version of eyedboql was compiled with BSD editline library.\n");
-#endif
   parser->setInterrupt(False);
   signal(SIGINT, oql_sig_h);
   parser->clear_oql_buffer();
