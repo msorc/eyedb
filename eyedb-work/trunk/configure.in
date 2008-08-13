@@ -80,6 +80,7 @@ topics/dict/Makefile
 topics/dump_restore/Makefile
 topics/eyedbsm/online_backup/Makefile
 topics/index/Makefile
+topics/java-unix-socket/Makefile
 topics/objgarb/Makefile
 topics/odlplugin/Makefile
 topics/oql/array/Makefile

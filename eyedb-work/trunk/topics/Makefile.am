@@ -11,6 +11,7 @@ dict \
 dump_restore \
 eyedbsm/online_backup \
 index \
+java-unix-socket \
 objgarb \
 odlplugin \
 oql/array \
