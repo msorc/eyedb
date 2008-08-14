@@ -9,4 +9,12 @@ public class UnixSocket extends Socket {
 	{
 		super( new UnixSocketImpl());
 	}
+
+	public UnixSocket( UnixSocketAddress socketAddress) throws IOException
+	{
+	    this();
+	    this.socketAddress = socketAddress;
+	}
+
+    private UnixSocketAddress socketAddress;
 }

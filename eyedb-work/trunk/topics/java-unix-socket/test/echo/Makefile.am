@@ -1,15 +1,15 @@
 noinst_JAVA= \
 Client.java \
-LocalClient.java \
-LocalServer.java \
 Server.java \
 TCPClient.java \
 TCPServer.java \
-TestLocalClient.java \
-TestLocalServer.java \
 TestTCPClient.java \
-TestTCPServer.java
+TestTCPServer.java \
+TestUnixClient.java \
+TestUnixServer.java \
+UnixClient.java \
+UnixServer.java 
 
-JAVAROOT=$(top_builddir)/topics/java-unix-socket/test/echo
-CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_srcdir)/topics/java-unix-socket/test/echo
+JAVAROOT=$(top_builddir)/topics/java-unix-socket/build
+CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_srcdir)/topics/java-unix-socket/test/echo:$(top_builddir)/topics/java-unix-socket/build
 

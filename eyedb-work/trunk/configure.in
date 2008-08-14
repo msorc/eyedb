@@ -62,29 +62,51 @@ then
 	JAVACFLAGS="$JAVACFLAGS -g"
 fi
 
+
+#
+# Should it be moved to a topic specific configure.in?
+#
+AC_ARG_WITH(jni-include,
+		AS_HELP_STRING([--with-jni-include],
+				[give JNI include path for Java native libraries]),
+		ac_jni_include="$withval",
+		)
+JNI_INCLUDE_PATH="$ac_jni_include"
+AC_SUBST(JNI_INCLUDE_PATH)
+
 # ========================================
 # Generate output files
 # ========================================
-AC_OUTPUT(
-Makefile
-topics/Makefile
-topics/bugs/OQL_1/Makefile
-topics/bugs/OQL_2/Makefile
-topics/bugs/OQL_3/Makefile
-topics/bugs/OQL_4/Makefile
-topics/collections/basic/Makefile
-topics/collections/general/Makefile
-topics/collections/literal/Makefile
-topics/collections/set/Makefile
-topics/dict/Makefile
-topics/dump_restore/Makefile
-topics/eyedbsm/online_backup/Makefile
-topics/index/Makefile
-topics/java-unix-socket/Makefile
-topics/objgarb/Makefile
-topics/odlplugin/Makefile
-topics/oql/array/Makefile
-topics/schemaflex/Makefile
-topics/union/Makefile
-topics/virtattr/Makefile
+AC_CONFIG_FILES( dnl
+Makefile dnl
+topics/Makefile dnl
+topics/bugs/OQL_1/Makefile dnl
+topics/bugs/OQL_2/Makefile dnl
+topics/bugs/OQL_3/Makefile dnl
+topics/bugs/OQL_4/Makefile dnl
+topics/collections/basic/Makefile dnl
+topics/collections/general/Makefile dnl
+topics/collections/literal/Makefile dnl
+topics/collections/set/Makefile dnl
+topics/dict/Makefile dnl
+topics/dump_restore/Makefile dnl
+topics/eyedbsm/online_backup/Makefile dnl
+topics/java-unix-socket/Makefile dnl
+topics/java-unix-socket/java/Makefile dnl
+topics/java-unix-socket/java/org/Makefile dnl
+topics/java-unix-socket/java/org/eyedb/Makefile dnl
+topics/java-unix-socket/java/org/eyedb/java/Makefile dnl
+topics/java-unix-socket/java/org/eyedb/java/net/Makefile dnl
+topics/java-unix-socket/java/org/eyedb/java/net/unix/Makefile dnl
+topics/java-unix-socket/native/Makefile dnl
+topics/java-unix-socket/test/Makefile dnl
+topics/java-unix-socket/test/echo/Makefile dnl
+topics/index/Makefile dnl
+topics/objgarb/Makefile dnl
+topics/odlplugin/Makefile dnl
+topics/oql/array/Makefile dnl
+topics/schemaflex/Makefile dnl
+topics/union/Makefile dnl
+topics/virtattr/Makefile dnl
 )
+AC_OUTPUT
