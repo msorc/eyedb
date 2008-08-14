@@ -1,1 +1,1 @@
-SUBDIRS=java test
+SUBDIRS=java native test
