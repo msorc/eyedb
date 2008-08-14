@@ -4,6 +4,7 @@ import org.eyedb.java.net.unix.UnixSocketAddress;
 public class UnixClient extends Client {
     public UnixClient( String path) throws Exception
     {
-	super( new UnixSocket( new UnixSocketAddress( path)));
+	super( new UnixSocket());
+	clientSocket.connect( new UnixSocketAddress( path));
     }
 }

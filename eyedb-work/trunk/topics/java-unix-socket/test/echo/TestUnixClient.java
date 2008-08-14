@@ -1,8 +1,8 @@
-class TestLocalClient {
+class TestUnixClient {
     public static void main( String[] args)
     {
 	try {
-	    Client client = new LocalClient( "/var/tmp/classpath-socket");
+	    Client client = new UnixClient( "/var/tmp/classpath-socket");
 	    client.run( 1000);
 	}
 	catch( Exception e) {
