@@ -19,5 +19,5 @@ public class Client {
 	is.read(b);
     }
 
-    private Socket clientSocket;
+    protected Socket clientSocket;
 }

@@ -1,8 +1,8 @@
-class TestLocalServer {
+class TestUnixServer {
     public static void main( String[] args)
     {
 	try {
-	    LocalServer server = new LocalServer( "/var/tmp/classpath-socket");
+	    UnixServer server = new UnixServer( "/var/tmp/classpath-socket");
 	    server.run( 1000);
 	}
 	catch( Exception e) {

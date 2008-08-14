@@ -17,11 +17,27 @@ JNIEXPORT jint JNICALL Java_org_eyedb_java_net_unix_UnixSocketImpl_available
 
 /*
  * Class:     org_eyedb_java_net_unix_UnixSocketImpl
+ * Method:    bind
+ * Signature: (Lorg/eyedb/java/net/unix/UnixSocketAddress;I)V
+ */
+JNIEXPORT void JNICALL Java_org_eyedb_java_net_unix_UnixSocketImpl_bind
+  (JNIEnv *, jobject, jobject, jint);
+
+/*
+ * Class:     org_eyedb_java_net_unix_UnixSocketImpl
  * Method:    close
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_org_eyedb_java_net_unix_UnixSocketImpl_close
   (JNIEnv *, jobject);
+
+/*
+ * Class:     org_eyedb_java_net_unix_UnixSocketImpl
+ * Method:    connect
+ * Signature: (Ljava/net/SocketAddress;I)V
+ */
+JNIEXPORT void JNICALL Java_org_eyedb_java_net_unix_UnixSocketImpl_connect
+  (JNIEnv *, jobject, jobject, jint);
 
 /*
  * Class:     org_eyedb_java_net_unix_UnixSocketImpl

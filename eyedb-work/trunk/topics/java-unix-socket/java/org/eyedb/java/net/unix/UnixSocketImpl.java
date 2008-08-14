@@ -22,9 +22,10 @@ public class UnixSocketImpl extends SocketImpl {
 
 	protected void bind(InetAddress arg0, int port) throws IOException 
 	{
-		// TODO Auto-generated method stub
-
+	    throw new SocketException ("unsupported method");
 	}
+
+    protected native void bind(UnixSocketAddress addr, int backlog) throws IOException;
 
 	protected native void close() throws IOException;
 
@@ -33,11 +34,7 @@ public class UnixSocketImpl extends SocketImpl {
 	    throw new SocketException ("unsupported method");
 	}
 
-	protected void connect(SocketAddress addr, int timeout) throws IOException 
-	{
-		// TODO Auto-generated method stub
-
-	}
+    protected native void connect(SocketAddress addr, int timeout) throws IOException;
 
 	protected void connect(String host, int port) throws IOException 
 	{
@@ -60,9 +57,9 @@ public class UnixSocketImpl extends SocketImpl {
 
 	protected native void listen(int backlog) throws IOException; 
 
-	protected void sendUrgentData(int arg0) throws IOException {
-		// TODO Auto-generated method stub
-
+	protected void sendUrgentData(int arg0) throws IOException
+    {
+	    throw new SocketException ("unsupported method");
 	}
 
 	public Object getOption(int arg0) throws SocketException 
