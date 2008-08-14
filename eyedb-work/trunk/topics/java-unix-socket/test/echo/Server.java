@@ -13,6 +13,8 @@ public class Server {
     {
 	Socket clientSocket = serverSocket.accept();
 
+	System.out.println( "Client connected: socket=" + clientSocket);
+
 	InputStream is = clientSocket.getInputStream();
 	OutputStream os = clientSocket.getOutputStream();
 	byte[] b = new byte[n];
@@ -22,5 +24,5 @@ public class Server {
 	os.flush();
     }
 
-    private ServerSocket serverSocket;
+    protected ServerSocket serverSocket;
 }
