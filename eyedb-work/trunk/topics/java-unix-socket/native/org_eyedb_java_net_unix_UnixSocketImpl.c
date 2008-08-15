@@ -79,10 +79,11 @@ Java_org_eyedb_java_net_unix_UnixSocketImpl_bind(JNIEnv *env, jobject this, jobj
     }
 
   strncpy( sockAddr.sun_path, path, sizeof (sockAddr.sun_path));
-  sockAddr.sun_path[sizeof (sockAddr.sun_path)] = '\0';
-  sockAddr.sun_family = AF_LOCAL;
-  if (bind (fd, (struct sockaddr *) &sockAddr, SUN_LEN (&sockAddr)))  {
+  sockAddr.sun_path[sizeof (sockAddr.sun_path) - 1] = '\0';
+  sockAddr.sun_family = AF_UNIX;
+  if (bind (fd, (struct sockaddr *) &sockAddr, SUN_LEN( &sockAddr)))  {
     throwException( env, "java/io/IOException", strerror(errno));
+    return;
   }
 
   (*env)->ReleaseStringUTFChars (env, (jstring)pathStr, path);
@@ -96,6 +97,43 @@ Java_org_eyedb_java_net_unix_UnixSocketImpl_close( JNIEnv *env, jobject this)
 void 
 Java_org_eyedb_java_net_unix_UnixSocketImpl_connect(JNIEnv *env, jobject this, jobject addr, jint timeout)
 {
+  int fd;
+  jfieldID fdId;
+  jclass socketImplClass;
+  jclass socketAddressClass;
+  jmethodID getPathId;
+  jobject pathStr;
+  const char *path;
+  struct sockaddr_un sockAddr;
+
+  /* Get the file descriptor */
+  socketImplClass = (*env)->GetObjectClass (env, this);
+  fdId = (*env)->GetFieldID (env, socketImplClass, "fd", "I");
+  fd = (*env)->GetIntField (env, this, fdId);
+
+  /* Get the path from addr argument */
+  socketAddressClass = (*env)->GetObjectClass (env, addr);
+  getPathId = (*env)->GetMethodID (env, socketAddressClass, "getPath", "()Ljava/lang/String;");
+  pathStr = (*env)->CallObjectMethod (env, addr, getPathId);
+  path = (*env)->GetStringUTFChars (env, (jstring)pathStr, NULL);
+
+  /* Connect the socket */
+  if (strlen (path) > sizeof (sockAddr.sun_path))
+    {
+      throwException( env, "java/io/IOException", strerror( ENAMETOOLONG));
+      return;
+    }
+
+  strncpy (sockAddr.sun_path, path, sizeof (sockAddr.sun_path));
+  sockAddr.sun_path[sizeof (sockAddr.sun_path) - 1] = '\0';
+  sockAddr.sun_family = AF_UNIX;
+
+  if (connect (fd, (struct sockaddr *) &sockAddr, SUN_LEN(&sockAddr)) < 0) {
+    throwException( env, "java/io/IOException", strerror(errno));
+    return;
+  }
+
+  (*env)->ReleaseStringUTFChars (env, (jstring)pathStr, path);
 }
 
 void 

@@ -2,7 +2,7 @@ class TestUnixClient {
     public static void main( String[] args)
     {
 	try {
-	    Client client = new UnixClient( "/var/tmp/classpath-socket");
+	    Client client = new UnixClient( "/var/tmp/java-unix-socket");
 	    client.run( 1000);
 	}
 	catch( Exception e) {

@@ -50,12 +50,12 @@ public class UnixSocketImpl extends SocketImpl {
 	throw new SocketException ("unsupported method");
     }
 
-    protected native void connect(SocketAddress addr, int timeout) throws IOException;
-
     protected void connect(String host, int port) throws IOException 
     {
 	throw new SocketException ("unsupported method");
     }
+
+    protected native void connect(SocketAddress addr, int timeout) throws IOException;
 
     protected native void create(boolean stream) throws IOException;
 	
