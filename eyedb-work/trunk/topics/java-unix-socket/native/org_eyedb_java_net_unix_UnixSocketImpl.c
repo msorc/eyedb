@@ -15,6 +15,33 @@ throwException( JNIEnv *env, const char *exceptionName, const char *msg)
   (*env)->ThrowNew (env, exceptionClass, msg);
 }
 
+void 
+Java_org_eyedb_java_net_unix_UnixSocketImpl_accept(JNIEnv *env, jobject this, jobject sockImpl)
+{
+  int fd;
+  jfieldID fdId;
+  jclass socketImplClass;
+  int newFd;
+
+  /* Should we check that sockImpl is a UnixSocketImpl? Probably not because the only call to accept
+     is done by UnixSocketServer that guarantees to pass a correct sockImpl.
+  */
+
+  /* Get the file descriptor */
+  socketImplClass = (*env)->GetObjectClass (env, this);
+  fdId = (*env)->GetFieldID (env, socketImplClass, "fd", "I");
+  fd = (*env)->GetIntField (env, this, fdId);
+
+  newFd = accept( fd, 0, 0);
+
+  if (newFd == -1) {
+    throwException( env, "java/io/IOException", strerror( errno));
+    return;
+  }
+
+  (*env)->SetIntField (env, sockImpl, fdId, (jint)newFd);
+}
+
 jint 
 Java_org_eyedb_java_net_unix_UnixSocketImpl_available( JNIEnv *env, jobject this)
 {

@@ -32,9 +32,7 @@ public class UnixSocketImpl extends SocketImpl {
 	return fd;
     }
 
-    protected void accept(SocketImpl s) throws IOException
-    {
-    }
+    protected native void accept(SocketImpl s) throws IOException;
 
     protected native int available() throws IOException;
 
