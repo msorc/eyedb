@@ -10,65 +10,83 @@ import java.net.SocketImpl;
 
 public class UnixSocketImpl extends SocketImpl {
 
-	UnixSocketImpl()
-	{
+    static
+    {
+	try {
+	    System.loadLibrary ("eyedbunixsocket");
 	}
+	catch (Exception x) {
+	    x.printStackTrace ();
+	}
+    }
+    
+    private int fd;
+
+    UnixSocketImpl()
+    {
+	fd = -1;
+    }
 	
-	protected void accept(SocketImpl s) throws IOException
-	{
-	}
+    protected int getFD()
+    {
+	return fd;
+    }
 
-	protected native int available() throws IOException;
+    protected void accept(SocketImpl s) throws IOException
+    {
+    }
 
-	protected void bind(InetAddress arg0, int port) throws IOException 
-	{
-	    throw new SocketException ("unsupported method");
-	}
+    protected native int available() throws IOException;
 
-    protected native void bind(UnixSocketAddress addr, int backlog) throws IOException;
+    protected void bind(InetAddress arg0, int port) throws IOException 
+    {
+	throw new SocketException ("unsupported method");
+    }
 
-	protected native void close() throws IOException;
+    protected native void bind(UnixSocketAddress addr) throws IOException;
 
-	protected void connect(InetAddress addr, int port) throws IOException 
-	{
-	    throw new SocketException ("unsupported method");
-	}
+    protected native void close() throws IOException;
+
+    protected void connect(InetAddress addr, int port) throws IOException 
+    {
+	throw new SocketException ("unsupported method");
+    }
 
     protected native void connect(SocketAddress addr, int timeout) throws IOException;
 
-	protected void connect(String host, int port) throws IOException 
-	{
-	    throw new SocketException ("unsupported method");
-	}
-
-	protected native void create(boolean arg0) throws IOException;
-	
-	protected InputStream getInputStream() throws IOException 
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	protected OutputStream getOutputStream() throws IOException 
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	protected native void listen(int backlog) throws IOException; 
-
-	protected void sendUrgentData(int arg0) throws IOException
+    protected void connect(String host, int port) throws IOException 
     {
-	    throw new SocketException ("unsupported method");
-	}
+	throw new SocketException ("unsupported method");
+    }
 
-	public Object getOption(int arg0) throws SocketException 
-	{
-	    throw new SocketException ("unsupported method");
-	}
+    protected native void create(boolean stream) throws IOException;
+	
+    protected InputStream getInputStream() throws IOException 
+    {
+	// TODO Auto-generated method stub
+	return null;
+    }
 
-	public void setOption(int arg0, Object arg1) throws SocketException 
-	{
-	    throw new SocketException ("unsupported method");
-	}
+    protected OutputStream getOutputStream() throws IOException 
+    {
+	// TODO Auto-generated method stub
+	return null;
+    }
+
+    protected native void listen(int backlog) throws IOException; 
+
+    protected void sendUrgentData(int arg0) throws IOException
+    {
+	throw new SocketException ("unsupported method");
+    }
+
+    public Object getOption(int arg0) throws SocketException 
+    {
+	throw new SocketException ("unsupported method");
+    }
+
+    public void setOption(int arg0, Object arg1) throws SocketException 
+    {
+	throw new SocketException ("unsupported method");
+    }
 }
