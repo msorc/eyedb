@@ -9,6 +9,14 @@ extern "C" {
 #endif
 /*
  * Class:     org_eyedb_java_net_unix_UnixSocketImpl
+ * Method:    accept
+ * Signature: (Ljava/net/SocketImpl;)V
+ */
+JNIEXPORT void JNICALL Java_org_eyedb_java_net_unix_UnixSocketImpl_accept
+  (JNIEnv *, jobject, jobject);
+
+/*
+ * Class:     org_eyedb_java_net_unix_UnixSocketImpl
  * Method:    available
  * Signature: ()I
  */
