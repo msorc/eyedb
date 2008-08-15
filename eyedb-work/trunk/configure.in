@@ -66,13 +66,10 @@ fi
 #
 # Should it be moved to a topic specific configure.in?
 #
-AC_ARG_WITH(jni-include,
-		AS_HELP_STRING([--with-jni-include],
-				[give JNI include path for Java native libraries]),
-		ac_jni_include="$withval",
-		)
-JNI_INCLUDE_PATH="$ac_jni_include"
+AC_ARG_VAR(JNI_INCLUDE_PATH,[include path for jni.h])
 AC_SUBST(JNI_INCLUDE_PATH)
+AC_ARG_VAR(JAVAH,[Java javah utility to generate header file for native methods])
+AC_SUBST(JAVAH)
 
 # ========================================
 # Generate output files
