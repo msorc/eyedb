@@ -1,6 +1,6 @@
 TESTS_ENVIRONMENT= bindir=$(bindir) sbindir=$(sbindir) PYTHONPATH=$(top_srcdir)/tests/lib/python:$$PYTHONPATH $(PYTHON) 
 
-DATAFILE_TESTS=\
+DIRECTORY_TESTS=\
 datafile_create_database_1.py \
 datafile_list_1.py \
 datafile_create_1.py \
@@ -17,7 +17,7 @@ datafile_delete_database_1.py
 
 TESTS=\
 $(top_srcdir)/tests/lib/python/eyedb/test/test_start_server.py \
-$(DATAFILE_TESTS) \
+$(DIRECTORY_TESTS) \
 $(top_srcdir)/tests/lib/python/eyedb/test/test_stop_server.py
 
-noinst_PYTHON= $(DATAFILE_TESTS)
+noinst_PYTHON= $(DIRECTORY_TESTS)

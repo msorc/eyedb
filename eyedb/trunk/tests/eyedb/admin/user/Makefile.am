@@ -1,6 +1,6 @@
 TESTS_ENVIRONMENT= bindir=$(bindir) sbindir=$(sbindir) PYTHONPATH=$(top_srcdir)/tests/lib/python:$PYTHONPATH $(PYTHON) 
 
-USER_TESTS=\
+DIRECTORY_TESTS=\
 user_list_help.py \
 user_list_1.py \
 user_list_not_found.py \
@@ -17,7 +17,7 @@ user_delete_1.py
 
 TESTS=\
 $(top_srcdir)/tests/lib/python/eyedb/test/test_start_server.py \
-$(USER_TESTS) \
+$(DIRECTORY_TESTS) \
 $(top_srcdir)/tests/lib/python/eyedb/test/test_stop_server.py
 
-noinst_PYTHON= $(USER_TESTS)
+noinst_PYTHON= $(DIRECTORY_TESTS)
