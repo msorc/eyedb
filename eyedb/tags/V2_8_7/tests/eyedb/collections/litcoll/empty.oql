@@ -1,0 +1,7 @@
+
+\open litcoll rw
+
+for (x in (select A)) delete x;
+for (x in (select B)) delete x;
+
+\commit

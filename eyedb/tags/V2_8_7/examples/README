@@ -1,0 +1,126 @@
+
+                                   EyeDB examples README
+
+
+EyeDB examples are organized in 3 directories:
+- GettingStarted/ : self-contained simple example with a schema, C++ and Java code
+- C++Binding/ : examples using the EyeDB C++ API
+- JavaBinding/ : examples using the EyeDB Java API
+
+
+GettingStarted
+==============
+
+This directory contains a simple schema and two simple programs 
+using the EyEDB C++ and Java APIs.
+
+To run the C++ and Java examples in the GettingStarted/ directory:
+
+1) compile them with 'make check'
+
+2) run the init.sh script with 'make init'
+This script creates the database 'person_g' and insert a few objects.
+NOTE: this must be done only once.
+
+3) run the 'persontest' C++ program with:
+./persontest person_g
+
+4) run the 'PersonTest Java program using the eyedbjrun script:
+CLASSPATH=. eyedbjrun PersonTest person_g
+
+'eyedbjrun' is a script that calls the Java virtual machine and passes
+the right options (for instance to define the hostname and the TCP
+port used to connect to the EyEDB server). 'eyedbjrun' is located in
+the binaries installation directory.
+
+5) check the database using eyedboql:
+% eyedboql -d person_g
+? select Person->lastname;
+= bag(NULL, NULL, NULL, "poppins", "poppins", "travolta", "stuart", "wayne", "wayne", "baby2", "baby3", "baby1")
+? select Person->firstname;
+= bag("john", "john", "john", "mary", "mary", "mary", "baby2", "baby2", "baby3", "baby3", "baby1", "baby1")
+? \quit
+%
+
+
+C++Binding
+==========
+
+This directory contains C++ programs that use the EyEDB C++ API.
+This API is described in EyeDB 'C++ Binding' manual.
+
+To run the C++ examples in the C++Binding/ directory:
+
+1) compile them with 'make check'
+
+2) run the init.sh script located in C++Binding/schema-oriented/share
+with 'make init'
+This script creates the database 'person_c' and insert a few objects.
+NOTE: this must be done only once.
+
+3) run the programs
+
+To run the examples, cd to the following directories and
+run the indicated commands:
+
+DIRECTORY               COMMANDS
+-------------------------------------------------------
+generic/query           ./query person_c "select Person"
+                        ./query person_c "select Person.name ~ \"j\""
+                        ./query person_c "select Person.age"
+-------------------------------------------------------
+generic/store           ./store person_c raymond 32
+                        ./store person_c titou 2
+-------------------------------------------------------
+schema-oriented/query   ./query person_c "select Person"
+                        ./query person_c "select Person.name ~ \"j\""
+-------------------------------------------------------
+schema-oriented/store   ./store person_c nadine 32 raymond
+-------------------------------------------------------
+schema-oriented/methods ./methods person_c john 12
+                         NOTE THAT for this directory, you need to copy
+                         the *.so files to EyeDB dynamic objects directory:
+                         cp *.so $EYEDBROOT/etc/so
+-------------------------------------------------------
+schema-oriented/admin   ./admin
+-------------------------------------------------------
+
+
+JavaBinding
+===========
+
+This directory contains Java programs that use the EyEDB Java API.
+This API is described in EyeDB 'Java Binding' manual.
+
+To run the Java examples in the JavaBinding/ directory:
+
+1) compile them with 'make check'
+
+2) run the init.sh script located in JavaBinding/schema-oriented/share
+with 'make init'
+This script creates the database 'person_j' and insert a few objects.
+NOTE: this must be done only once.
+
+3) run the programs
+
+To run the examples, cd to the following directories and
+run the indicated commands:
+
+DIRECTORY                   RUNNING EXAMPLES
+----------------------------------------------------------------
+generic/applet            open the applet.html page in a Java enabled browser
+----------------------------------------------------------------
+generic/appli/basic       CLASSPATH=. eyedbjrun Basic person_j
+----------------------------------------------------------------
+generic/appli/query       CLASSPATH=. eyedbjrun Query person_j <any valid query>
+                          for instance:
+                          CLASSPATH=. eyedbjrun Query person_j "select Person"
+----------------------------------------------------------------
+generic/appli/store       CLASSPATH=. eyedbjrun Store person_j <name> <age>
+----------------------------------------------------------------
+generic/appli/collections CLASSPATH=. eyedbjrun Collections person_j <prefix>
+----------------------------------------------------------------
+generic/appli/schema      CLASSPATH=. eyedbjrun SchemaDump person_j
+----------------------------------------------------------------
+schema-oriented/store     CLASSPATH=.:../share/person.jar eyedbjrun PersonTest person_j <prefix>
+----------------------------------------------------------------
