@@ -1,0 +1,198 @@
+# -*-rpm-spec-*-
+
+%define name    eyedb
+%define version @EYEDB_VERSION@ 
+%define release %mkrel 42
+%define group   Databases
+
+%define _requires_exceptions devel(libcrypt(64bit))\\|devel(libdl(64bit))\\|devel(libgcc_s(64bit))\\|devel(libm(64bit))\\|devel(libnsl(64bit))\\|devel(libstdc++(64bit))  
+
+%define _unpackaged_files_terminate_build	0
+%define _missing_doc_files_terminate_build	0
+
+%define eyedb_localstatedir %{_localstatedir}/eyedb
+%define eyedb_databasedir %{eyedb_localstatedir}/db
+%define eyedb_pipedir %{eyedb_localstatedir}/pipes
+%define eyedb_tmpdir %{eyedb_localstatedir}/tmp
+
+Name:           %{name} 
+Summary:        EyeDB is an Object Database Management System
+Version:        %{version} 
+Release:        %{release} 
+URL:            http://www.eyedb.org
+License:        LGPL
+Group:          %{group}
+Source0:        %{name}-%{version}.tar.bz2
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-buildroot 
+
+%description
+EyeDB is an Object Database Management System (ODBMS).
+
+%package common
+Summary: EyeDB client and server common libraries
+Group: %{group}
+Provides: %{name}-common = %{version}
+BuildRequires: make
+BuildRequires: gcc-c++
+BuildRequires: bison
+BuildRequires: flex
+%description common
+EyeDB client and server common libraries
+
+%package client
+Summary: EyeDB client libraries and binaries
+Group: %{group}
+Provides: %{name}-client = %{version}
+BuildRequires: make
+BuildRequires: gcc-c++
+%description client
+EyeDB client libraries and binaries
+
+%package server
+Summary: EyeDB server libraries and binaries
+Group: %{group}
+Provides: %{name}-server = %{version}
+BuildRequires: make
+BuildRequires: gcc-c++
+%description server
+EyeDB server libraries and binaries
+
+%package devel
+Summary: EyeDB headers files
+Group: %{group}
+Provides: %{name}-devel = %{version}
+BuildRequires: make
+BuildRequires: gcc-c++
+%description devel
+EyeDB headers files
+
+%package doc
+Summary: EyeDB documentation
+Group: %{group}
+Provides: %{name}-doc = %{version}
+BuildRequires: make
+BuildRequires: libxslt-proc
+BuildRequires: docbook-style-xsl
+BuildRequires: tetex-latex
+#BuildRequires: latex2html
+%description doc
+EyeDB documentation
+
+# other packages: -java, -www
+# java: don't forget %{_bindir}/eyedbgetenv
+
+%prep 
+%setup -q
+
+%build 
+%configure --with-databasedir=%{eyedb_databasedir} --with-pipedir=%{eyedb_pipedir} --with-tmpdir=%{eyedb_tmpdir}
+%make 
+
+%install
+[ "%{buildroot}" != "/" ] && rm -rf %{buildroot} 
+make DESTDIR=%{buildroot} install
+# Install directories
+install -d -m 700 %{buildroot}%{eyedb_databasedir}
+install -d -m 700 %{buildroot}%{eyedb_pipedir}
+install -d -m 700 %{buildroot}%{eyedb_tmpdir}
+# Install the init script
+install -d %{buildroot}%{_initrddir}
+install -m0755 scripts/eyedb.init %{buildroot}%{_initrddir}/eyedb
+# Install the sysconfiguration file
+# FIXME
+#install -d %{buildroot}%{_sysconfdir}/sysconfig
+#install -m0644 eyedb.sysconfig %{buildroot}%{_sysconfdir}/sysconfig/eyedb
+
+%pre server
+# create eyedb user
+%_pre_useradd eyedb %{eyedb_localstatedir} /bin/bash
+
+%post server
+su -l eyedb -s /bin/bash -c /usr/share/eyedb/tools/eyedb-postinstall.sh
+%_post_service %{name}
+
+%preun server
+%_preun_service %{name}
+
+%postun server
+%_postun_userdel eyedb
+
+%clean 
+#rm -rf %{buildroot}
+
+%files common
+%defattr(-,root,root)
+%{_libdir}/libeyedb-%{version}.so
+%{_libdir}/libeyedb.so
+%{_libdir}/libeyedbsm-%{version}.so
+%{_libdir}/libeyedbsm.so
+%{_libdir}/libeyedbutils-%{version}.so
+%{_libdir}/libeyedbutils.so
+%{_libdir}/libeyedbrpcfe-%{version}.so
+%{_libdir}/libeyedbrpcfe.so
+%{_docdir}/%{name}/AUTHORS
+%{_docdir}/%{name}/COPYING
+%{_docdir}/%{name}/README
+
+%files client
+%defattr(-,root,root)
+%{_bindir}/eyedbadmin
+%{_bindir}/eyedbodl
+%{_bindir}/eyedboql
+%{_bindir}/eyedbloca
+%{_bindir}/eyedbidxadmin
+%{_bindir}/eyedbprotadmin
+%{_bindir}/eyedbconsadmin
+%{_bindir}/eyedbcollimpladmin
+%{_bindir}/eyedbgetenv
+%{_datadir}/%{name}/eyedb.conf.sample
+
+%files server
+%defattr(-,root,root)
+%{_sbindir}/eyedbctl
+%{_sbindir}/eyedbd
+%{_sbindir}/eyedbsmd
+%{_sbindir}/eyedbsmtool
+#%{_sbindir}/eyedbdbminit
+%{_libdir}/libeyedbrpcbe-%{version}.so
+%{_libdir}/libeyedbrpcbe.so
+%{_libdir}/eyedb/oqlctbmthfe-%{version}.so
+%{_libdir}/eyedb/oqlctbmthfe.so
+%{_libdir}/eyedb/sysclsmthfe-%{version}.so
+%{_libdir}/eyedb/sysclsmthfe.so
+%{_libdir}/eyedb/utilsmthfe-%{version}.so
+%{_libdir}/eyedb/utilsmthfe.so
+%{_libdir}/eyedb/oql/stdlib.oql
+%{_datadir}/%{name}/eyedbd.conf.sample
+%{_datadir}/%{name}/Access.sample
+%{_datadir}/%{name}/tools/eyedb-postinstall.sh
+%{_initrddir}/eyedb
+%attr(700,eyedb,eyedb) %dir %{eyedb_databasedir}
+%attr(700,eyedb,eyedb) %dir %{eyedb_pipedir}
+%attr(700,eyedb,eyedb) %dir %{eyedb_tmpdir}
+# man pages
+
+%files devel
+%defattr(-,root,root)
+%{_includedir}/eyedb/*.h
+%{_includedir}/eyedb/internals/*.h
+%{_includedir}/eyedblib/*.h
+%{_includedir}/eyedbsm/*.h
+%{_libdir}/pkgconfig/eyedb.pc
+# must add .la libraries
+
+%files doc
+%defattr(-,root,root)
+%{_docdir}/%{name}/index.html
+%{_docdir}/%{name}/eyedbdoc.css
+%dir %{_docdir}/%{name}/examples
+%dir %{_docdir}/%{name}/images
+%dir %{_docdir}/%{name}/manual
+# man pages
+# to be completed
+# in which package should the APIs docs go?
+#%{_docdir}/%{name}-%{version}/api
+
+%changelog 
+* Fri Feb 9 2007 Francois Dechelle <francois@dechelle.net>
+- initial spec file

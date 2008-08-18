@@ -1,0 +1,137 @@
+
+NAME                    SECTION  PRIORITY  WHO  STATUS
+
+GENERAL:
+eyedb                   7        1     	   FD   
+eyedb-options           1        1         FD   Almost ok (defaults for log switches?)
+eyedb-tools             1        1         FD   
+
+CONFIGURATION:       		      
+eyedb-config            5        1         FD   
+eyedbgetenv             1        1         FD   
+
+SERVER:
+eyedbd                  8        1         EV   
+eyedbctl                8        1         EV   
+
+EYEDBSM:
+eyedbsmd                8        1         EV   
+eyedbsmtool             8        2         ??   
+
+DATABASE ARCHITECTURE:
+eyedb-database          5        2         ??   
+eyedb-datafile          5        2         ??   
+eyedb-dataspace         5        2         ??   
+
+ADMINISTRATION:
+eyedbadmin              1        1         FD   OK for databases sub-commands
+
+DATAFILES:
+eyedbdatcreate          1        2         ??   
+eyedbdatdelete          1        2         ??   
+eyedbdatlist            1        2         ??   
+eyedbdatmove            1        2         ??   
+eyedbdatrename          1        2         ??   
+eyedbdatresize          1        2         ??   
+eyedbdatdefragment      1        2         ??   
+
+DATASPACES:
+eyedbdspcreate          1        2         ??   
+eyedbdspdelete          1        2         ??   
+eyedbdsplist            1        2         ??   
+eyedbdsprename          1        2         ??   
+eyedbdspupdate          1        2         ??   
+eyedbdspgetcurdat       1        2         ??   
+eyedbdspgetdefault      1        2         ??   
+eyedbdspsetcurdat       1        2         ??   
+eyedbdspsetdefault      1        2         ??   
+
+INDEXES:
+eyedbidxcreate          1        2         ??   
+eyedbidxdelete          1        2         ??   
+eyedbidxlist            1        2         ??   
+eyedbidxstats           1        2         ??   
+eyedbidxupdate          1        2         ??   
+eyedbidxsimulate        1        2         ??   
+
+ODL:
+eyedbodl                1        1         FD   
+
+OQL:
+eyedboql                1        1         FD   
+
+ACCESS CONTROL:
+eyedbsysaccess          1        1         EV   
+eyedbuseradd            1        1         EV   
+eyedbuserdbaccess       1        1         EV   
+eyedbuserdelete         1        1         EV   
+eyedbuserlist           1        1         EV   
+eyedbuserpasswd         1        1         EV   
+eyedbpasswd             1        1         EV   
+eyedbdbaccess           1        1         EV   
+eyedbprotadmin          1        1         EV   
+
+JAVA LAUNCHER:
+eyedbjrun               1        1         FD   
+
+LOCATION:
+eyedbloca               1        2         ??   
+eyedbgetattrloca        1        2         ??   
+eyedbgetcollloca        1        2         ??   
+eyedbgetdefattrdsp      1        2         ??   
+eyedbgetdefcolldsp      1        2         ??   
+eyedbgetdefdsp          1        2         ??   
+eyedbgetdefidxdsp       1        2         ??   
+eyedbgetdefinstdsp      1        2         ??   
+eyedbgetidxloca         1        2         ??   
+eyedbgetinstloca        1        2         ??   
+eyedbgetobjloca         1        2         ??   
+eyedbsetdefattrdsp      1        2         ??   
+eyedbsetdefcolldsp      1        2         ??   
+eyedbsetdefdsp          1        2         ??   
+eyedbsetdefidxdsp       1        2         ??   
+eyedbsetdefinstdsp      1        2         ??   
+eyedbmvattr             1        2         ??   
+eyedbmvcoll             1        2         ??   
+eyedbmvidx              1        2         ??   
+eyedbmvinst             1        2         ??   
+eyedbmvobj              1        2         ??   
+
+COLLECTION
+eyedbcollimpladmin      1        2         ??   
+eyedbcollimplgetdef     1        2         ??   
+eyedbcollimpllist       1        2         ??   
+eyedbcollimplsetdef     1        2         ??   
+eyedbcollimplsimulate   1        2         ??   
+eyedbcollimplstats      1        2         ??   
+eyedbcollimplupdate     1        2         ??   
+
+CONSTRAINT MANAGEMENT
+eyedbconsadmin          1        2         ??   
+eyedbconscreate         1        2         ??   
+eyedbconsdelete         1        2         ??   
+eyedbconslist           1        2         ??   
+
+WEB:
+eyedbwwwd               1        3         ??   
+eyedbwconf              1        3         ??   
+eyedbputimage           1        3         ??   
+
+MISC:
+eyedbcrypt              1        2         ??   
+
+
+MAN SECTIONS:
+       1   Executable programs or shell commands
+       2   System calls (functions provided by the kernel)
+       3   Library calls (functions within program libraries)
+       4   Special files (usually found in /dev)
+       5   File formats and conventions eg /etc/passwd
+       6   Games
+       7   Miscellaneous (including macro  packages  and  conven-
+           tions), e.g. man(7), groff(7)
+       8   System administration commands (usually only for root)
+       9   Kernel routines [Non standard]
+
+
+
