@@ -1,5 +1,6 @@
 eyedbexamplesdir=$(datadir)/doc/$(PACKAGE)/examples/C++Binding/schema-oriented/share
-dist_eyedbexamples_DATA=init.sh schema.odl
+dist_eyedbexamples_DATA= schema.odl
+nodist_eyedbexamples_DATA= init.sh
 eyedbexamples_DATA=Makefile.eyedb-examples
 
 check_LTLIBRARIES= libperson.la
@@ -45,3 +46,4 @@ init:
 # Dependencies
 person.$(OBJEXT): person.h
 
+EXTRA_DIST=init.sh.in

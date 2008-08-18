@@ -1,5 +1,6 @@
 eyedbexamplesdir=$(datadir)/doc/$(PACKAGE)/examples/GettingStarted
-dist_eyedbexamples_DATA= PersonTest.java schema.odl persontest.cc init.sh
+dist_eyedbexamples_DATA= PersonTest.java schema.odl persontest.cc 
+nodist_eyedbexamples_DATA= init.sh
 eyedbexamples_DATA= Makefile.eyedb-examples
 
 # C++ program
@@ -68,3 +69,5 @@ init:
 
 # Dependencies
 persontest.$(OBJEXT): person.h
+
+EXTRA_DIST=init.sh.in
