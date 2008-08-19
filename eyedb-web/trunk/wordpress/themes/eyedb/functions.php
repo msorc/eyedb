@@ -85,7 +85,7 @@ class RSSParser {
     xml_set_element_handler($xml_parser, "startElement", "endElement");
     xml_set_character_data_handler($xml_parser, "characterData");
 
-    $fp = fopen( $url, "r");
+    $fp = @fopen( $url, "r");
 
     if (!$fp)
       return null;
@@ -175,30 +175,30 @@ if ( function_exists('register_sidebar_widget') ) {
 }
 
 function eyedb_widget_download() {
-  $rss_url = 'http://sourceforge.net/export/rss2_projfiles.php?group_id=127988';
-  $rss_parser = new RSSParser();
-  $item_array = $rss_parser->parse( $rss_url);
-
-  if ($item_array == null || count($item_array) == 0) {
-    echo "<!-- error in eyedb_widget_download -->\n";
-    return;
-  }
 
   echo '<li id="download" class="widget widget_downloads"><h2 class="widgettitle">'.__('Download')."</h2>\n";
   echo "<ul>\n";
 
-  $download_link = 'http://sourceforge.net/project/showfiles.php?group_id=127988&package_id=140123&release_id=';
-  foreach ($item_array as $item)
-    {
-      if( ereg( "EyeDB [0-9]+.[0-9]+.[0-9]+", $item->title, $release)) {
-	ereg( "release_id=([0-9]+)", $item->link, $release_id);
-	printf( "<li><a href=\"%s\">%s</a></li>\n", $download_link.$release_id[1], $release[0]);
-	break;
+  $rss_url = 'http://sourceforge.net/export/rss2_projfiles.php?group_id=127988';
+  $rss_parser = new RSSParser();
+  $item_array = $rss_parser->parse( $rss_url);
+
+  $download_link_prefix = 'http://sourceforge.net/project/showfiles.php?group_id=127988&package_id=140123&release_id=';
+  if ($item_array != null) {
+    foreach ($item_array as $item)
+      {
+	if( ereg( "EyeDB [0-9]+.[0-9]+.[0-9]+", $item->title, $release)) {
+	  ereg( "release_id=([0-9]+)", $item->link, $release_id);
+	  ereg( "[0-9]+.[0-9]+.[0-9]+", $release[0], $release_number);
+	  $download_link = $download_link_prefix.$release_id[1];
+	  printf( "<li><a href=\"%s\">Latest: %s</a></li>\n", $download_link, $release_number[0]);
+	  break;
+	}
       }
-    }
+  }
   
   $download_link = 'http://sourceforge.net/project/showfiles.php?group_id=127988';
-  printf( "<li><a href=\"%s\">%s</a></li>\n", $download_link, "Other downloads");
+  printf( "<li><a href=\"%s\">%s</a></li>\n", $download_link, "All downloads");
 
   echo "</ul>\n";
 }
