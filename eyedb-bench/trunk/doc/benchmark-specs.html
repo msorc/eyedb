@@ -1,0 +1,84 @@
+<html>
+<body>
+
+<h1>EyeDB comparative study specifications</h1>
+
+<h2>Goals of the study</h2>
+
+The goals are the following:
+<ul>
+<li>have precise performance measurement</li>
+<li>compare EyeDB with other object persistency solutions, in term of performance but also functionalities, </li>
+<li>improve EyeDB performance in order to be faster than other solutions</li>
+</ul>
+
+<h2>What are the competitors to evaluate</h2>
+
+
+<p>
+Java:
+<ul>
+  <li>Hibernate</li>
+  <li>db4o</li>
+  <li>JDBC</li>
+  <li>JDO</li>
+  <li>other proprietary solutions: versant?</li>
+</ul>
+</p>
+
+<p>
+C++:
+<ul>
+  <li><b><i>to be completed</i></b></li>
+</ul>
+</p>
+
+<h2>Benchmark framework</h2>
+
+<p>
+The benchmarks will address only the object persistence layer, without any integration in a web application server like Tomcat or other:
+<ul>
+  <li>no need to address the problem of database connections pooling</li>
+  <li>no problem of concurrency</li>
+</ul>
+</p>
+
+<p>
+However, as integrating EyeDB in a web application environment is an interesting target and requires some new developments, this point should be addressed later.
+</p>
+
+<p>
+The benchmarks will therefore consist in comparing execution time, memory, machine load (other points?) when running objects persistency operations:
+<ul>
+  <li>object creation</li>
+  <li>object loading</li>
+  <li>object querying (is there a difference between loading and querying? in Hibernate yes, you can load an object without using the query language)</li>
+  <li>object modification</li>
+  <li>object deletion</li>
+</ul>
+</p>
+
+<h2>Benchmark application</h2>
+
+<p>
+In order to have meaningful benchmarks, a real application and data model must be chosen, that contains: inheritance, relations (all cardinality), <b>what else?<b>
+</p>
+
+<p>
+Instead of reusing the "quicktour", we will reuse the "petshop" (or petstore) application, a classical example application in the Java world that implements an on-line shop. Several sources of the petshop exist:
+<ul>
+  <li>https://betterpetshop.dev.java.net/</li>
+  <li>http://java.sun.com/developer/releases/petstore/</li>
+  <li>http://java.sys-con.com/node/46977</li>
+</ul>
+</p>
+
+<p>
+The benchmark application will reuse from the petshop application only the data model, with possible additions in order to use all EyeDB features (in particular relationship and relational integrity). An ODL model of the petshop is already available (see in this directory the ODL file).
+</p>
+
+<p>
+  The data model will be implemented by a DAO [<a href="http://en.wikipedia.org/wiki/Data_Access_Object">http://en.wikipedia.org/wiki/Data_Access_Object</a>] engine, in order to separate as much as possible the benchmark code from the implementation of the access to the persistence layer. This pattern is used widely in the Spring framework [<a href="http://www.springframework.org/">http://www.springframework.org</a>], but a priori the benchmark will not use the Spring framework (<b><i>to be further evaluated</i></b>).
+
+</body>
+</html>
