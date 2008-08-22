@@ -3,6 +3,7 @@
 
 <h1>EyeDB comparative study specifications</h1>
 
+
 <h2>Goals of the study</h2>
 
 The goals are the following:
@@ -12,8 +13,8 @@ The goals are the following:
 <li>improve EyeDB performance in order to be faster than other solutions</li>
 </ul>
 
-<h2>What are the competitors to evaluate</h2>
 
+<h2>What are the competitors to evaluate</h2>
 
 <p>
 Java:
@@ -33,6 +34,7 @@ C++:
 </ul>
 </p>
 
+
 <h2>Benchmark framework</h2>
 
 <p>
@@ -48,37 +50,60 @@ However, as integrating EyeDB in a web application environment is an interesting
 </p>
 
 <p>
-The benchmarks will therefore consist in comparing execution time, memory, machine load (other points?) when running objects persistency operations:
+  The benchmarks will therefore consist in comparing execution time, memory, machine load (<b><i>other points?</i></b>) when running objects persistency operations:
 <ul>
   <li>object creation</li>
   <li>object loading</li>
-  <li>object querying (is there a difference between loading and querying? in Hibernate yes, you can load an object without using the query language)</li>
+  <li>object querying (<b><i>is there a difference between loading and querying? in Hibernate yes, you can load an object without using the query language</i></b>)</li>
   <li>object modification</li>
   <li>object deletion</li>
 </ul>
 </p>
 
+
 <h2>Benchmark application</h2>
 
 <p>
-In order to have meaningful benchmarks, a real application and data model must be chosen, that contains: inheritance, relations (all cardinality), <b>what else?<b>
+  In order to have meaningful benchmarks, a real application and data model must be chosen, that contains: inheritance, relations (all cardinality), <b><i>what else?</i></b>.
 </p>
 
 <p>
 Instead of reusing the "quicktour", we will reuse the "petshop" (or petstore) application, a classical example application in the Java world that implements an on-line shop. Several sources of the petshop exist:
 <ul>
-  <li>https://betterpetshop.dev.java.net/</li>
-  <li>http://java.sun.com/developer/releases/petstore/</li>
-  <li>http://java.sys-con.com/node/46977</li>
+  <li><a href="http://betterpetshop.dev.java.net">http://betterpetshop.dev.java.net</a> (this implementation uses Spring)</li>
+  <li><a href="http://java.sun.com/developer/releases/petstore">http://java.sun.com/developer/releases/petstore</a></li>
+  <li><a href="http://java.sys-con.com/node/46977">http://java.sys-con.com/node/46977</a></li>
+  <li><a href="https://blueprints.dev.java.net/petstore/">https://blueprints.dev.java.net/petstore/</a></li>
 </ul>
 </p>
 
 <p>
-The benchmark application will reuse from the petshop application only the data model, with possible additions in order to use all EyeDB features (in particular relationship and relational integrity). An ODL model of the petshop is already available (see in this directory the ODL file).
+  The benchmark application will reuse from the petshop application only the data model, with possible additions in order to use all EyeDB features (in particular relationship and relational integrity). An ODL model of the petshop is already available (see in this directory the <a href="petshop.odl">ODL file</a>).
 </p>
 
 <p>
   The data model will be implemented by a DAO [<a href="http://en.wikipedia.org/wiki/Data_Access_Object">http://en.wikipedia.org/wiki/Data_Access_Object</a>] engine, in order to separate as much as possible the benchmark code from the implementation of the access to the persistence layer. This pattern is used widely in the Spring framework [<a href="http://www.springframework.org/">http://www.springframework.org</a>], but a priori the benchmark will not use the Spring framework (<b><i>to be further evaluated</i></b>).
+
+
+<h2>Benchmarks results presentation</h2>
+
+<p>
+  (<b><i>to be done</i></b>)
+</p>
+
+
+<h2>TODO</h2>
+
+<p>
+Benchmarck application:
+<ul>
+  <li>extract the data model from the different petshops, describe it in UML and complete it if not rich enough</li>
+  <li>specify the DAO interface, starting for instance from the implementation of the petshop that uses Spring</li>
+  <li>implement the DAO for EyeDB, Hibernate and db4o, as a starting point</li>
+  <li>implement the benchmark code on top of the DAO (the benchmark code may be independant from the persistence layer, if DAO is well designed)</li>
+  <li>run the benchmarks</li>
+</ul>
+</p>
 
 </body>
 </html>
