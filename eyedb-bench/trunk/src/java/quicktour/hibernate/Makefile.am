@@ -29,3 +29,5 @@ EDIT = sed \
 	mv $*.sh.tmp $*.sh
 
 runit.sh: Makefile
+
+EXTRA_DIST= hibernate.cfg.xml Course.hbm.xml Person.hbm.xml Student.hbm.xml Teacher.hbm.xml

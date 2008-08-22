@@ -1,0 +1,20 @@
+2006-06-05  Francois Dechelle <francois@dechelle.net>
+
+	* Completed hibernate create benchmark. The database has not been checked.
+	* Added README
+
+2006-06-01  Francois Dechelle <francois@dechelle.net>
+
+	* Completed db4o create benchmark. However, the resulting database has not been reviewed for coherency.
+
+2006-05-31  Francois Dechelle <francois@dechelle.net>
+
+	* Adding benchmarks based on EyeDB quicktour schema.
+	In commited version, only EyeDB create benchmark is functional, db4o create benchmark in progress.
+
+2006-05-18  Francois Dechelle <francois@dechelle.net>
+
+	* Updated configure.in to be more flexible w.r.t. EyeDB directories and jar, some cleanup and renaming
+	* Added first Hibernate bench. EyeDB is 3 times faster.
+
+

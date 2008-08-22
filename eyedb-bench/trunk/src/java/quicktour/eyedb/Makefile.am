@@ -44,3 +44,5 @@ runit.sh: Makefile
 clean-local:
 	-rm -f $(JAVA_ODL_FILES)
 	-rm -f $(ODL_PACKAGE)/*.class
+
+EXTRA_DIST= quicktour.odl
