@@ -16,17 +16,17 @@ start_server() {
 }
 
 delete_db() {
-    if $EYEDB_BINDIR/eyedbdblist --port=$PORT $DATABASE > /dev/null 2>&1; then
-	$EYEDB_BINDIR/eyedbdbdelete --port=$PORT $DATABASE
+    if $EYEDB_BINDIR/eyedbadmin database list --port=$PORT $DATABASE > /dev/null 2>&1; then
+	$EYEDB_BINDIR/eyedbadmin database delete --port=$PORT $DATABASE
     fi
 }
 
 create_db() {
-    if $EYEDB_BINDIR/eyedbdblist --port=$PORT $DATABASE > /dev/null 2>&1; then
+    if $EYEDB_BINDIR/eyedbadmin database list --port=$PORT $DATABASE > /dev/null 2>&1; then
 	:
     else
-	$EYEDB_BINDIR/eyedbdbcreate --port=$PORT $DATABASE
-	$EYEDB_BINDIR/eyedbdbaccess --port=$PORT $DATABASE rw
+	$EYEDB_BINDIR/eyedbadmin database create --port=$PORT $DATABASE
+	$EYEDB_BINDIR/eyedbadmin database defaccess --port=$PORT $DATABASE rw
 	$EYEDB_BINDIR/eyedbodl --port=$PORT --update --database=$DATABASE $SCHEMA
     fi
 }
