@@ -1,0 +1,3 @@
+
+- add a 'bench' target in Makefiles that runs the benches
+- run the benchs using the make 'bench' target

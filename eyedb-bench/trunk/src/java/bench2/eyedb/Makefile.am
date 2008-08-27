@@ -14,7 +14,7 @@ EyedbBench2.java \
 $(JAVA_ODL_FILES)
 
 JAVAROOT=$(top_builddir)/src/java/bench2/eyedb
-CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_srcdir)/src/java:$(EYEDB_JAR)
+CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_builddir)/src/java/eyedb-benchmarks.jar:$(top_srcdir)/src/java:$(EYEDB_JAR)
 
 noinst_DATA=runit.sh
 

@@ -6,7 +6,7 @@ dist_package_JAVA =\
 Db4oServer.java 
 
 JAVAROOT=$(top_builddir)/src/java/common/db4o
-CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_srcdir)/src/java:$(DB4O_JAR)
+CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_builddir)/src/java/eyedb-benchmarks.jar:$(top_srcdir)/src/java:$(DB4O_JAR)
 
 noinst_DATA=start-server.sh stop-server.sh
 
