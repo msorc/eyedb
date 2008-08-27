@@ -16,6 +16,9 @@ $(JAVA_ODL_FILES)
 JAVAROOT=$(top_builddir)/src/java/bench1/eyedb
 CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_builddir)/src/java/eyedb-benchmarks.jar:$(top_srcdir)/src/java:$(EYEDB_JAR)
 
+TESTS_ENVIRONMENT=$(SHELL)
+TESTS=runit.sh
+
 noinst_DATA=runit.sh
 
 EDIT = sed \
@@ -38,3 +41,4 @@ runit.sh: Makefile
 clean-local:
 	-rm -f $(JAVA_ODL_FILES)
 	-rm -f person/*.class
+
