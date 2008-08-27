@@ -1,16 +1,19 @@
 #!/bin/bash
-BENCHMARK=$1
-PROPERTIES=hibernate.properties
-
 HIBERNATE_JAR=@HIBERNATE_JAR@
 HIBERNATE_CLASSPATH=@HIBERNATE_CLASSPATH@
 JDBC_CONNECTOR_JAR=@JDBC_CONNECTOR_JAR@
+SLF4J_JAR=@SLF4J_JAR@
 JAVA=@JAVA@
+srcdir=@srcdir@
+
+#BENCHMARK=$1
+BENCHMARK=CreateBenchmark
+PROPERTIES=${srcdir}/hibernate.properties
 
 set -e
 
 run_benchmark() {
-    CLASSPATH=.:../../eyedb-benchmarks.jar:$HIBERNATE_JAR:$HIBERNATE_CLASSPATH:$JDBC_CONNECTOR_JAR
+    CLASSPATH=.:../../eyedb-benchmarks.jar:$HIBERNATE_JAR:$HIBERNATE_CLASSPATH:$JDBC_CONNECTOR_JAR:$SLF4J_JAR:$srcdir
     CLASSPATH=$CLASSPATH time $JAVA org.eyedb.benchmark.Run $BENCHMARK $PROPERTIES
 }
 

@@ -1,28 +1,29 @@
 #!/bin/bash
-BENCHMARK=$1
-PROPERTIES=eyedb.properties
-
 EYEDB_BINDIR=@EYEDB_BINDIR@
 EYEDB_SBINDIR=@EYEDB_SBINDIR@
 EYEDB_JAR=@EYEDB_JAR@
 JAVA=@JAVA@
+srcdir=@srcdir@
+#BENCHMARK=$1
+BENCHMARK=CreateBenchmark
+PROPERTIES=${srcdir}/eyedb.properties
 
 DATABASE=`grep database $PROPERTIES | awk -F = '{print $2}'`
 PORT=`grep tcp_port $PROPERTIES | awk -F = '{print $2}'`
-SCHEMA=quicktour.odl
+SCHEMA=${srcdir}/quicktour.odl
 
 start_server() {
     $EYEDB_SBINDIR/eyedbctl start --listen=$PORT --nod
 }
 
 delete_db() {
-    if $EYEDB_BINDIR/eyedbadmin database list --port=$PORT $DATABASE > /dev/null 2>&1; then
+    if $EYEDB_BINDIR/eyedbadmin database list --port=$PORT $DATABASE 2>&1 | grep -v 'not found' > /dev/null ; then
 	$EYEDB_BINDIR/eyedbadmin database delete --port=$PORT $DATABASE
     fi
 }
 
 create_db() {
-    if $EYEDB_BINDIR/eyedbadmin database list --port=$PORT $DATABASE > /dev/null 2>&1; then
+    if $EYEDB_BINDIR/eyedbadmin database list --port=$PORT $DATABASE 2>&1 | grep -v 'not found' > /dev/null ; then
 	:
     else
 	$EYEDB_BINDIR/eyedbadmin database create --port=$PORT $DATABASE
