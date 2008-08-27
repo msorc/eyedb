@@ -1,0 +1,130 @@
+<html>
+<head>
+<title>Readme</title>
+<Style>
+BODY, P, TD { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt; color: #666666 }
+H2,H3,H4,H5 { color: black; font-weight: bold; }
+H2 { font-size: 13pt; }
+H3 { font-size: 12pt; }
+H4 { font-size: 10pt; color: black; }
+</style>
+</head>
+<body bgcolor="#FFFFFF" color=#000000>
+    This folder contains library files, which you can use in your projects.
+    <br />
+    <br />
+    <table>
+        <tr>
+            <td style="width: 230px">
+                ant.jar</td>
+            <td style="width: 500px">
+                ant build tool, used to build db4o sources (<a href="http://ant.apache.org/">http://ant.apache.org/</a>)</td>
+        </tr>
+        <tr>
+            <td style="width: 230px">
+                bloat-1.0.jar</td>
+            <td style="width: 500px">
+                bytecode optimization library, used to optmize Native Queries and Transparent Activation</td>
+        </tr>
+        <tr>
+           <td style="width: 230px">
+               db4o-7.2.54.11278-bench.jar</td>
+           <td style="width: 500px">
+               IO benchmark library
+           </td>
+	</tr>
+        <tr>
+           <td style="width: 230px">
+               db4o-7.2.54.11278-instrumentation.jar</td>
+           <td style="width: 500px">
+               Instrumentation layer on top of bloat
+           </td>
+		</tr>
+		<tr>
+          <td style="width: 230px">
+              db4o-7.2.54.11278-db4ounit.jar
+          </td>
+          <td style="width: 500px">
+             <a href="http://developer.db4o.com/Resources/view.aspx/Reference/Working_With_Source_Code/Testing_Db4o">
+                  testing framework</a> for db4o needs
+          </td>
+		</tr>
+		<tr>
+            <td style="width: 230px">
+                db4o-7.2.54.11278-java1.1.jar</td>
+            <td style="width: 500px">
+                db4o database engine core for JDK1.1</td>
+        </tr>
+        <tr>
+            <td style="width: 230px">
+                db4o-7.2.54.11278-java1.2.jar</td>
+            <td style="width: 500px">
+                db4o database engine core for JDK 1.2 - JDK 1.4</td>
+        </tr>
+        <tr>
+            <td style="width: 230px">
+                db4o-7.2.54.11278-java5.jar</td>
+            <td style="width: 500px">
+                db4o database engine core for JDK 5 and JDK 6</td>
+        </tr>
+        <tr>
+            <td style="width: 230px">
+                db4o-7.2.54.11278-nqopt.jar</td>
+            <td style="width: 500px">
+                Native Query optimization library. This library should be available in the classpath
+                for NQ optimization</td>
+        </tr>
+		<tr>
+            <td style="width: 230px">
+               db4o-7.2.54.11278-osgi.jar</td>
+           <td style="width: 500px">
+               db4o for OSGi. See <a href="../doc/osgi/index.html">OSGi API documentation</a>.</td>
+		</tr>
+        <tr>
+            <td style="width: 230px">
+                db4o-7.2.54.11278-osgi-test.jar</td>
+            <td style="width: 500px">
+                db4o OSGI tests</td>
+        </tr>
+        <tr>
+            <td style="width: 230px">
+                db4o-7.2.54.11278-taj.jar</td>
+            <td style="width: 500px">
+                db4o instrumentation classes for Transparent Activation
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 230px">
+                db4o-7.2.54.11278-tools.jar</td>
+            <td style="width: 500px">
+                db4o tools user interface, contains db4o enhancer and Ant tasks
+            </td>
+        </tr>
+    </table>
+    <br />
+    <br />
+    <h2>
+        USING DB4O LIBRARIES
+    </h2>
+    <p>
+        For using db4o with JDK1.1 you will only need db4o-7.2.54.11278-java1.1.jar.
+    </p>
+    <p>
+        For JDK 1.2 - JDK 6 you will need the respective db4o core database engine library.
+	</p>
+	<p>
+        For Native Query optimization on JDK 1.2 - JDK 6 you will additionally need:<br>
+        bloat-1.0.jar<br>
+        db4o-7.2.54.11278-classedit.jar<br>
+        db4o-nqopt-7.2.54.11278.jar<br>
+        db4o-7.2.54.11278-tools.jar 
+	</p>
+	<p>
+		For Transparent Activation optimization on JDK 1.2 - JDK 6 you will additionally need:<br>
+        bloat-1.0.jar<br>
+        db4o-7.2.54.11278-classedit.jar<br>
+        db4o-7.2.54.11278-taj.jar<br>
+        db4o-7.2.54.11278-tools.jar
+	</p>      
+</body>
+</html>
