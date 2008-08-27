@@ -3,12 +3,15 @@ HIBERNATE_JAR=@HIBERNATE_JAR@
 HIBERNATE_CLASSPATH=@HIBERNATE_CLASSPATH@
 JDBC_CONNECTOR_JAR=@JDBC_CONNECTOR_JAR@
 JAVA=@JAVA@
+srcdir=@srcdir@
+
+PROPERTIES=${srcdir}/hibernate.properties
 
 set -e
 
 run_benchmark() {
     CLASSPATH=.:../../eyedb-benchmarks.jar:$HIBERNATE_JAR:$HIBERNATE_CLASSPATH:$JDBC_CONNECTOR_JAR
-    CLASSPATH=$CLASSPATH $JAVA org.eyedb.benchmark.Run HibernateBench hibernate.properties
+    CLASSPATH=$CLASSPATH $JAVA org.eyedb.benchmark.Run HibernateBench $PROPERTIES
 }
 
 run_benchmark

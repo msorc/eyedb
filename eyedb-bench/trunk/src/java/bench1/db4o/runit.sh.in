@@ -1,18 +1,22 @@
 #!/bin/bash
 DB4O_JAR=@DB4O_JAR@
 JAVA=@JAVA@
+srcdir=@srcdir@
+
+CLIENT_PROPERTIES=${srcdir}/db4o.client.properties
+SERVER_PROPERTIES=${srcdir}/db4o.server.properties
 
 set -e
 
 start_server() {
     CLASSPATH=.:../../eyedb-benchmarks.jar:$DB4O_JAR
-    CLASSPATH=$CLASSPATH $JAVA Db4oServer db4o.server.properties &
+    CLASSPATH=$CLASSPATH $JAVA Db4oServer ${SERVER_PROPERTIES} &
     echo $! > server.pid
 }
 
 run_benchmark() {
     CLASSPATH=.:../../eyedb-benchmarks.jar:$DB4O_JAR
-    CLASSPATH=$CLASSPATH $JAVA org.eyedb.benchmark.Run Db4oBench db4o.client.properties
+    CLASSPATH=$CLASSPATH $JAVA org.eyedb.benchmark.Run Db4oBench ${CLIENT_PROPERTIES}
 }
 
 stop_server() {

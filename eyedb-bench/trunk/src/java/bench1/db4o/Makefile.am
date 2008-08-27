@@ -14,8 +14,9 @@ CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_builddir)/src/java/eyedb-benchmarks.j
 noinst_DATA=runit.sh runit-local.sh
 
 EDIT = sed \
-        -e 's,@DB4O_JAR\@,$(DB4O_JAR),g' \
-        -e 's,@JAVA\@,$(JAVA),g' 
+	-e 's,@srcdir[@],$(srcdir),g' \
+        -e 's,@DB4O_JAR[@],$(DB4O_JAR),g' \
+        -e 's,@JAVA[@],$(JAVA),g' 
 
 %.sh: $(srcdir)/%.sh.in
 	rm -f $*.sh $*.sh.tmp
