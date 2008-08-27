@@ -124,10 +124,12 @@ AC_SUBST(DB4O_JAR)
 AC_ARG_VAR(HIBERNATE_JAR,[Hibernate jar file])
 AC_ARG_VAR(HIBERNATE_LIBDIR,[Hibernate libraries directory])
 AC_ARG_VAR(JDBC_CONNECTOR_JAR,[JDBC connector jar file])
+AC_ARG_VAR(SLF4J_CONNECTOR_JAR,[SLF4J jar file])
 # To be changed if Hibernate or JDBC version changes
 HIBERNATE_JAR_DEFAULT=${srcdir}/lib/java/hibernate/hibernate-distribution-3.3.0.SP1/hibernate3.jar
 HIBERNATE_LIBDIR_DEFAULT=${srcdir}/lib/java/hibernate/hibernate-distribution-3.3.0.SP1/lib/required
 JDBC_CONNECTOR_JAR_DEFAULT=${srcdir}/lib/java/jdbc/mysql-connector-java-5.1.6/mysql-connector-java-5.1.6-bin.jar
+SLF4J_JAR_DEFAULT=${srcdir}/lib/java/slf4j/slf4j-1.5.2/slf4j-simple-1.5.2.jar 
 
 if test "$ac_enable_hibernate" = "yes" ; then
 
@@ -148,6 +150,11 @@ if test "$ac_enable_hibernate" = "yes" ; then
 	JDBC_CONNECTOR_JAR=$JDBC_CONNECTOR_JAR_DEFAULT
    fi
    AC_CHECK_FILE($JDBC_CONNECTOR_JAR,HAVE_JDBC_CONNECTOR_JAR="yes",HAVE_JDBC_CONNECTOR_JAR="no")
+
+   if test x"$SLF4J_JAR" = x ; then
+	SLF4J_JAR=$SLF4J_JAR_DEFAULT
+   fi
+   AC_CHECK_FILE($SLF4J_JAR,HAVE_SLF4J_JAR="yes",HAVE_SLF4J_JAR="no")
 fi
 
 if test "$ac_enable_hibernate" = "yes" -a "$HAVE_HIBERNATE_JAR" = "yes" -a "$HAVE_JDBC_CONNECTOR_JAR" = "yes" ; then
@@ -158,6 +165,7 @@ AM_CONDITIONAL(COND_HIBERNATE, test x"$COND_HIBERNATE" = xyes)
 AC_SUBST(HIBERNATE_JAR)
 AC_SUBST(HIBERNATE_CLASSPATH)
 AC_SUBST(JDBC_CONNECTOR_JAR)
+AC_SUBST(SLF4J_JAR)
 
 
 # ========================================
