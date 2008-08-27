@@ -14,10 +14,11 @@ CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_builddir)/src/java/eyedb-benchmarks.j
 noinst_DATA=runit.sh
 
 EDIT = sed \
-	-e 's,@HIBERNATE_JAR\@,$(HIBERNATE_JAR),g' \
-	-e 's,@HIBERNATE_CLASSPATH\@,$(HIBERNATE_CLASSPATH),g '\
-	-e 's,@JDBC_CONNECTOR_JAR\@,$(JDBC_CONNECTOR_JAR),g '\
-	-e 's,@JAVA\@,$(JAVA),g' 
+	-e 's,@srcdir[@],$(srcdir),g' \
+	-e 's,@HIBERNATE_JAR[@],$(HIBERNATE_JAR),g' \
+	-e 's,@HIBERNATE_CLASSPATH[@],$(HIBERNATE_CLASSPATH),g '\
+	-e 's,@JDBC_CONNECTOR_JAR[@],$(JDBC_CONNECTOR_JAR),g '\
+	-e 's,@JAVA[@],$(JAVA),g' 
 
 %.sh: $(srcdir)/%.sh.in
 	rm -f $*.sh $*.sh.tmp
