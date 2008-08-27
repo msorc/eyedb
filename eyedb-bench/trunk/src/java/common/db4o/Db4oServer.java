@@ -45,7 +45,7 @@ public class Db4oServer implements MessageRecipient {
 
 	    db4oServer.grantAccess(user, pass);
       
-	    db4oServer.ext().configure().setMessageRecipient(this);
+	    db4oServer.ext().configure().clientServer().setMessageRecipient(this);
       
 	    Thread.currentThread().setName(this.getClass().getName());
       
@@ -63,7 +63,7 @@ public class Db4oServer implements MessageRecipient {
 	}
     }
   
-    public void processMessage(ObjectContainer con, Object message)
+    public void processMessage( MessageContext con, Object message)
     {
 // 	if (message instanceof StopServer) {
 // 	    close();
