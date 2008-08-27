@@ -3,28 +3,29 @@ EYEDB_BINDIR=@EYEDB_BINDIR@
 EYEDB_SBINDIR=@EYEDB_SBINDIR@
 EYEDB_JAR=@EYEDB_JAR@
 JAVA=@JAVA@
+srcdir=@srcdir@
 
-PROPERTIES=eyedb.properties
+PROPERTIES=${srcdir}/eyedb.properties
 DATABASE=`grep database $PROPERTIES | awk -F = '{print $2}'`
 PORT=`grep tcp_port $PROPERTIES | awk -F = '{print $2}'`
-SCHEMA=person.odl
+SCHEMA=${srcdir}/person.odl
 
 start_server() {
     $EYEDB_SBINDIR/eyedbctl start --listen=$PORT --nod
 }
 
 delete_db() {
-    if $EYEDB_BINDIR/eyedbdblist --port=$PORT $DATABASE > /dev/null 2>&1; then
-	$EYEDB_BINDIR/eyedbdbdelete --port=$PORT $DATABASE
+    if $EYEDB_BINDIR/eyedbadmin database list --port=$PORT $DATABASE 2>&1 | grep -v 'not found' > /dev/null ; then
+	$EYEDB_BINDIR/eyedbadmin database delete --port=$PORT $DATABASE
     fi
 }
 
 create_db() {
-    if $EYEDB_BINDIR/eyedbdblist --port=$PORT $DATABASE > /dev/null 2>&1; then
+    if $EYEDB_BINDIR/eyedbadmin database list --port=$PORT $DATABASE 2>&1 | grep -v 'not found' > /dev/null ; then
 	:
     else
-	$EYEDB_BINDIR/eyedbdbcreate --port=$PORT $DATABASE
-	$EYEDB_BINDIR/eyedbdbaccess --port=$PORT $DATABASE rw
+	$EYEDB_BINDIR/eyedbadmin database create --port=$PORT $DATABASE
+	$EYEDB_BINDIR/eyedbadmin database defaccess --port=$PORT $DATABASE rw
 	$EYEDB_BINDIR/eyedbodl --port=$PORT --update --database=$DATABASE $SCHEMA
     fi
 }
