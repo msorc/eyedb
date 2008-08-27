@@ -13,9 +13,13 @@ Teacher.java
 JAVAROOT=$(top_builddir)/src/java/quicktour/db4o
 CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_builddir)/src/java/eyedb-benchmarks.jar:$(top_srcdir)/src/java:$(DB4O_JAR)
 
+TESTS_ENVIRONMENT=$(SHELL) -x
+TESTS=runit.sh
+
 noinst_DATA=runit.sh runit-local.sh
 
 EDIT = sed \
+	-e 's,@srcdir[@],$(srcdir),g' \
         -e 's,@DB4O_JAR\@,$(DB4O_JAR),g' \
         -e 's,@JAVA\@,$(JAVA),g' 
 

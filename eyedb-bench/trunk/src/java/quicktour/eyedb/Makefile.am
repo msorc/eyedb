@@ -25,9 +25,13 @@ $(JAVA_ODL_FILES)
 JAVAROOT=$(top_builddir)/src/java/quicktour/eyedb
 CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_builddir)/src/java/eyedb-benchmarks.jar:$(top_srcdir)/src/java:$(EYEDB_JAR)
 
+TESTS_ENVIRONMENT=$(SHELL)
+TESTS=runit.sh
+
 noinst_DATA=runit.sh
 
 EDIT = sed \
+	-e 's,@srcdir[@],$(srcdir),g' \
 	-e 's,@EYEDB_BINDIR\@,$(EYEDB_BINDIR),g' \
 	-e 's,@EYEDB_SBINDIR\@,$(EYEDB_SBINDIR),g' \
 	-e 's,@EYEDB_JAR\@,$(EYEDB_JAR),g' \
