@@ -19,7 +19,7 @@ public abstract class Benchmark extends org.eyedb.benchmark.Benchmark {
 	try {
 	    client = Db4o.openClient( host, port, user, password);
 	}
-	catch( IOException e) {
+	catch( Exception e) {
 	    e.printStackTrace();
 	    System.exit( 1);
 	}
