@@ -3,6 +3,7 @@ BENCHMARK=$1
 PROPERTIES=eyedb.properties
 
 EYEDB_BINDIR=@EYEDB_BINDIR@
+EYEDB_SBINDIR=@EYEDB_SBINDIR@
 EYEDB_JAR=@EYEDB_JAR@
 JAVA=@JAVA@
 
@@ -11,7 +12,7 @@ PORT=`grep tcp_port $PROPERTIES | awk -F = '{print $2}'`
 SCHEMA=quicktour.odl
 
 start_server() {
-    $EYEDB_BINDIR/eyedbrc start --listen=$PORT --nod
+    $EYEDB_SBINDIR/eyedbctl start --listen=$PORT --nod
 }
 
 delete_db() {
@@ -36,7 +37,7 @@ run_benchmark() {
 }
 
 stop_server() {
-    $EYEDB_BINDIR/eyedbrc stop --listen=$PORT 
+    $EYEDB_SBINDIR/eyedbctl stop --listen=$PORT 
 }
 
 stop_server

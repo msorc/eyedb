@@ -1,5 +1,5 @@
 EYEDB_BINDIR=@EYEDB_BINDIR@
-EYEDB_LIBDIR=@EYEDB_LIBDIR@
+EYEDB_SBINDIR=@EYEDB_SBINDIR@
 EYEDB_JAR=@EYEDB_JAR@
 
 EYEDBODLJAVA = $(EYEDB_BINDIR)/eyedbodl --gencode=java
@@ -20,7 +20,7 @@ noinst_DATA=runit.sh
 
 EDIT = sed \
 	-e 's,@EYEDB_BINDIR\@,$(EYEDB_BINDIR),g' \
-	-e 's,@EYEDB_LIBDIR\@,$(EYEDB_LIBDIR),g' \
+	-e 's,@EYEDB_SBINDIR\@,$(EYEDB_SBINDIR),g' \
 	-e 's,@EYEDB_JAR\@,$(EYEDB_JAR),g' \
 	-e 's,@JAVA\@,$(JAVA),g' 
 
