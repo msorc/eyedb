@@ -80,9 +80,9 @@ AC_ARG_WITH( tmpdir,
 	     ac_eyedb_tmpdir='${localstatedir}/lib/eyedb/tmp')
 # readline
 AC_ARG_WITH(readline, 
-	     AS_HELP_STRING([--with-readline=(readline|editline|no)],[use GNU readline or BSD editline for line editing (default is editline)]),
+	     AS_HELP_STRING([--with-readline=(readline|editline)],[use GNU readline or BSD editline for line editing (default is readline if available)]),
 	     ac_eyedb_readline="$withval",
-	     ac_eyedb_readline='readline')
+	     ac_eyedb_readline='none')
 #
 # End of arguments collect
 
@@ -266,10 +266,17 @@ fi
 
 # check for readline
 case "$ac_eyedb_readline" in
-readline|editline)
-	AC_CHECK_READLINE($ac_eyedb_readline)
+readline)
+	ac_eyedb_readline_tries=readline
+;;
+editline)
+	ac_eyedb_readline_tries=editline
+;;
+none)
+	ac_eyedb_readline_tries="readline editline"
 ;;
 esac
+AC_CHECK_READLINE($ac_eyedb_readline_tries)
 
 # determine the semaphore implementation for this platform
 AC_PTHREAD_PROCESS_SHARED
