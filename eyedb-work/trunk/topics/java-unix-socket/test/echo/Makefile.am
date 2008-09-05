@@ -7,9 +7,12 @@ TestTCPClient.java \
 TestTCPServer.java \
 TestUnixClient.java \
 TestUnixServer.java \
+TestUnix.java \
 UnixClient.java \
 UnixServer.java 
 
 JAVAROOT=$(top_builddir)/topics/java-unix-socket/build
 CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_srcdir)/topics/java-unix-socket/test/echo:$(top_builddir)/topics/java-unix-socket/build
 
+run:
+	$(JAVA) -Djava.library.path=$(top_builddir)/topics/java-unix-socket/native/.libs -cp $(JAVAROOT):$(top_builddir)/topics/java-unix-socket/build TestUnix
