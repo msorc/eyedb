@@ -6,7 +6,8 @@ for ac_readline_lib in $1 ; do
 	    ac_save_LIBS=$LIBS
 	    LIBS="$LIBS -lreadline"
 	    AC_LINK_IFELSE(
-		[AC_LANG_PROGRAM([[#include <readline/readline.h>]],[[readline("");]])],
+		[AC_LANG_PROGRAM([[#include <stdio.h>
+#include <readline/readline.h>]],[[readline("");]])],
 		    ac_cv_check_readline="yes",
 		    ac_cv_check_readline="no"
 		)
