@@ -1,6 +1,8 @@
 package org.eyedb.java.net.unix;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketImpl;
@@ -28,6 +30,16 @@ public class UnixSocket extends Socket {
             throw new IllegalArgumentException("Unsupported address type");
 
 	impl.connect( endpoint, timeout);
+    }
+
+    public InputStream getInputStream() throws IOException
+    {
+	return impl.getInputStream();
+    }
+
+    public OutputStream getOutputStream() throws IOException
+    {
+	return impl.getOutputStream();
     }
 
     protected SocketImpl getImpl() throws SocketException

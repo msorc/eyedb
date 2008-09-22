@@ -178,3 +178,55 @@ Java_org_eyedb_java_net_unix_UnixSocketImpl_listen( JNIEnv *env, jobject this, j
     return;
   }
 }
+
+jint 
+Java_org_eyedb_java_net_unix_UnixSocketImpl_read( JNIEnv *env, jobject this, jbyteArray buff, jint off, jint len)
+{
+  int fd;
+  jfieldID fdId;
+  jclass socketImplClass;
+  jbyte *p;
+  int ret;
+
+  /* Get the file descriptor */
+  socketImplClass = (*env)->GetObjectClass (env, this);
+  fdId = (*env)->GetFieldID (env, socketImplClass, "fd", "I");
+  fd = (*env)->GetIntField (env, this, fdId);
+
+  /* Read the bytes using read() */
+  p = (*env)->GetByteArrayElements( env, buff, NULL);
+
+  ret = read( fd, (void *)(p+off), (int)len);
+  if (ret < 0)
+    {
+      throwException( env, "java/io/IOException", strerror( errno));
+    }
+
+  (*env)->ReleaseByteArrayElements( env, buff, p, JNI_ABORT);
+
+  return ret;
+}
+
+void 
+Java_org_eyedb_java_net_unix_UnixSocketImpl_write( JNIEnv *env, jobject this, jbyteArray buff, jint off, jint len)
+{
+  int fd;
+  jfieldID fdId;
+  jclass socketImplClass;
+  jbyte *p;
+
+  /* Get the file descriptor */
+  socketImplClass = (*env)->GetObjectClass (env, this);
+  fdId = (*env)->GetFieldID (env, socketImplClass, "fd", "I");
+  fd = (*env)->GetIntField (env, this, fdId);
+
+  /* Write the bytes using write() */
+  p = (*env)->GetByteArrayElements( env, buff, NULL);
+
+  if (write( fd, (void *)(p+off), (int)len) < 0)
+    {
+      throwException( env, "java/io/IOException", strerror( errno));
+    }
+
+  (*env)->ReleaseByteArrayElements( env, buff, p, JNI_ABORT);
+}

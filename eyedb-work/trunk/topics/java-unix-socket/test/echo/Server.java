@@ -13,15 +13,20 @@ public class Server {
     {
 	Socket clientSocket = serverSocket.accept();
 
-	System.out.println( "Client connected: socket=" + clientSocket);
+	System.out.println( "[server] client connected: socket=" + clientSocket);
 
 	InputStream is = clientSocket.getInputStream();
 	OutputStream os = clientSocket.getOutputStream();
 	byte[] b = new byte[n];
 
 	is.read(b);
+
+	System.out.println( "[server] read " + n + " bytes");
+
 	os.write(b);
 	os.flush();
+
+	System.out.println( "[server] writen " + n + " bytes");
     }
 
     protected ServerSocket serverSocket;

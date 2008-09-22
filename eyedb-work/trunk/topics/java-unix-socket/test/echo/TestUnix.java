@@ -41,13 +41,13 @@ class TestUnix {
 	private int size;
     }
 
-    TestUnix()
+    TestUnix( String path)
     {
 	try {
-	    Thread serverThread = new UnixServerThread( "/var/tmp/java-unix-socket", 1000);
+	    Thread serverThread = new UnixServerThread( path, 1000);
 	    serverThread.start();
 
-	    Thread clientThread = new UnixClientThread( "/var/tmp/java-unix-socket", 1000);
+	    Thread clientThread = new UnixClientThread( path, 1000);
 	    clientThread.start();
 
 	    serverThread.join();
@@ -60,6 +60,6 @@ class TestUnix {
 
     public static void main( String[] args)
     {
-	new TestUnix();
+	new TestUnix( args[0]);
     }
 }
