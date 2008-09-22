@@ -21,6 +21,8 @@ public class UnixSocketImpl extends SocketImpl {
     }
     
     private int fd;
+    private InputStream inputStream;
+    private OutputStream outputStream;
 
     UnixSocketImpl()
     {
@@ -61,17 +63,25 @@ public class UnixSocketImpl extends SocketImpl {
 	
     protected InputStream getInputStream() throws IOException 
     {
-	// TODO Auto-generated method stub
-	return null;
+	if (inputStream == null)
+	    inputStream = new UnixSocketInputStream( this);
+
+	return inputStream;
     }
 
     protected OutputStream getOutputStream() throws IOException 
     {
-	// TODO Auto-generated method stub
-	return null;
+	if (outputStream == null)
+	    outputStream = new UnixSocketOutputStream( this);
+
+	return outputStream;
     }
 
     protected native void listen(int backlog) throws IOException; 
+
+    protected native int read( byte[] buff, int off, int len) throws IOException;
+
+    protected native void write( byte[] buff, int off, int len) throws IOException;
 
     protected void sendUrgentData(int arg0) throws IOException
     {

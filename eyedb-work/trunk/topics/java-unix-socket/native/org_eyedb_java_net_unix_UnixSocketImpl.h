@@ -63,6 +63,22 @@ JNIEXPORT void JNICALL Java_org_eyedb_java_net_unix_UnixSocketImpl_create
 JNIEXPORT void JNICALL Java_org_eyedb_java_net_unix_UnixSocketImpl_listen
   (JNIEnv *, jobject, jint);
 
+/*
+ * Class:     org_eyedb_java_net_unix_UnixSocketImpl
+ * Method:    read
+ * Signature: ([BII)I
+ */
+JNIEXPORT jint JNICALL Java_org_eyedb_java_net_unix_UnixSocketImpl_read
+  (JNIEnv *, jobject, jbyteArray, jint, jint);
+
+/*
+ * Class:     org_eyedb_java_net_unix_UnixSocketImpl
+ * Method:    write
+ * Signature: ([BII)V
+ */
+JNIEXPORT void JNICALL Java_org_eyedb_java_net_unix_UnixSocketImpl_write
+  (JNIEnv *, jobject, jbyteArray, jint, jint);
+
 #ifdef __cplusplus
 }
 #endif
