@@ -6,7 +6,7 @@ ODL_PACKAGE=quicktour
 EYEDBODLJAVA = $(EYEDB_BINDIR)/eyedbodl --gencode=java
 EYEDBODLJAVAFLAGS= --no-rootclass --package=$(ODL_PACKAGE)
 
-packagedir=$(pkglibdir)/java/classes/quicktour/create/eyedb
+packagedir=$(pkglibdir)/java/classes/org/eyedb/benchmark/quicktour/eyedb
 
 JAVA_ODL_FILES=$(addprefix $(ODL_PACKAGE)/, \
 Course.java \
@@ -22,7 +22,7 @@ Benchmark.java \
 CreateBenchmark.java \
 $(JAVA_ODL_FILES)
 
-JAVAROOT=$(top_builddir)/src/java/quicktour/eyedb
+JAVAROOT=$(top_builddir)/src/java
 CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_builddir)/src/java/eyedb-benchmarks.jar:$(top_srcdir)/src/java:$(EYEDB_JAR)
 
 TESTS_ENVIRONMENT=$(SHELL)

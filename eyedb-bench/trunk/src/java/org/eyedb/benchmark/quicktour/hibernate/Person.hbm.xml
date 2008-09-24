@@ -5,7 +5,7 @@
 
 <hibernate-mapping>
 
-  <class name="Person" table="PERSON">
+  <class name="org.eyedb.benchmark.quicktour.hibernate.Person" table="PERSON">
 
     <id name="id" column="PERSON_ID">
       <generator class="native"/>

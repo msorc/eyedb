@@ -3,7 +3,7 @@ HIBERNATE_CLASSPATH=@HIBERNATE_CLASSPATH@
 JDBC_CONNECTOR_JAR=@JDBC_CONNECTOR_JAR@
 SLF4J_JAR=@SLF4J_JAR@
 
-packagedir=$(pkglibdir)/java/classes/quicktour/hibernate
+packagedir=$(pkglibdir)/java/classes/org/eyedb/benchmark/quicktour/hibernate
 
 dist_package_JAVA =\
 Benchmark.java \
@@ -13,7 +13,7 @@ Student.java \
 Course.java \
 Teacher.java
 
-JAVAROOT=$(top_builddir)/src/java/quicktour/hibernate
+JAVAROOT=$(top_builddir)/src/java
 CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_builddir)/src/java/eyedb-benchmarks.jar:$(top_srcdir)/src/java:$(HIBERNATE_JAR)
 
 TESTS_ENVIRONMENT=$(SHELL)

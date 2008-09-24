@@ -1,13 +1,13 @@
-SUBDIRS=org . common bench1 quicktour
+SUBDIRS=org . common bench1
 
 JARFILE=eyedb-benchmarks.jar
-noinst_DATA= $(JARFILE)
+#noinst_DATA= $(JARFILE)
 
 STAMP_FILE=classdist_package.stamp
 JAR_DEPS=\
 ./org/eyedb/benchmark/$(STAMP_FILE) 
 
-CLEANFILES=$(JARFILE)
+#CLEANFILES=$(JARFILE)
 
 JAR=@JAR@
 

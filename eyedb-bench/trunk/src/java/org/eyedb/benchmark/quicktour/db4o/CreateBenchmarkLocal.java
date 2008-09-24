@@ -1,3 +1,5 @@
+package org.eyedb.benchmark.quicktour.db4o;
+
 import com.db4o.*;
 import com.db4o.messaging.*;
 import org.eyedb.benchmark.*;

@@ -1,3 +1,5 @@
+package org.eyedb.benchmark.quicktour.hibernate;
+
 import java.util.*;
 
 public class Course {

@@ -1,3 +1,5 @@
+package org.eyedb.benchmark.quicktour.hibernate;
+
 public class Person {
     public Person()
     {
