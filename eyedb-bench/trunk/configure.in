@@ -178,6 +178,14 @@ src/java/Makefile dnl
 src/java/org/Makefile dnl
 src/java/org/eyedb/Makefile dnl
 src/java/org/eyedb/benchmark/Makefile dnl
+src/java/org/eyedb/benchmark/framework/Makefile dnl
+src/java/org/eyedb/benchmark/polepos/Makefile dnl
+src/java/org/eyedb/benchmark/polepos/teams/Makefile dnl
+src/java/org/eyedb/benchmark/polepos/teams/eyedb/Makefile dnl
+src/java/org/eyedb/benchmark/quicktour/Makefile dnl
+src/java/org/eyedb/benchmark/quicktour/db4o/Makefile dnl
+src/java/org/eyedb/benchmark/quicktour/eyedb/Makefile dnl
+src/java/org/eyedb/benchmark/quicktour/hibernate/Makefile dnl
 src/java/common/Makefile dnl
 src/java/common/db4o/Makefile dnl
 src/java/bench1/Makefile dnl
@@ -187,9 +195,5 @@ src/java/bench1/hibernate/Makefile dnl
 src/java/bench2/Makefile dnl
 src/java/bench2/eyedb/Makefile dnl
 src/java/bench2/db4o/Makefile dnl
-src/java/quicktour/Makefile dnl
-src/java/quicktour/db4o/Makefile dnl
-src/java/quicktour/eyedb/Makefile dnl
-src/java/quicktour/hibernate/Makefile dnl
 )
 AC_OUTPUT

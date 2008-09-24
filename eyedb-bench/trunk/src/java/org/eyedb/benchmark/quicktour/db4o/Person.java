@@ -1,3 +1,5 @@
+package org.eyedb.benchmark.quicktour.db4o;
+
 public class Person {
     public Person( String firstName, String lastName)
     {

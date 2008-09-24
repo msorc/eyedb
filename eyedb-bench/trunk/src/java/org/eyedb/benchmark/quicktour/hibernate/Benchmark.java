@@ -1,3 +1,5 @@
+package org.eyedb.benchmark.quicktour.hibernate;
+
 import org.eyedb.benchmark.*;
 import org.hibernate.*;
 import org.hibernate.cfg.*;

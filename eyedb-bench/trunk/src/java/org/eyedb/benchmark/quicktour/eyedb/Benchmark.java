@@ -1,3 +1,5 @@
+package org.eyedb.benchmark.quicktour.eyedb;
+
 /**
  * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)
  */

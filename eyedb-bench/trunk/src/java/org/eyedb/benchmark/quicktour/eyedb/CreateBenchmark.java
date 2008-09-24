@@ -1,3 +1,5 @@
+package org.eyedb.benchmark.quicktour.eyedb;
+
 import java.util.Random;
 import quicktour.*;
 

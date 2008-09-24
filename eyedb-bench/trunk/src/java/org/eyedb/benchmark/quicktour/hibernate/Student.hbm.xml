@@ -5,13 +5,13 @@
 
 <hibernate-mapping>
 
-  <joined-subclass name="Teacher" table="TEACHER" extends="Person">
+  <joined-subclass name="org.eyedb.benchmark.quicktour.hibernate.Student" table="STUDENT" extends="Person">
 
     <key column="PERSON_ID"/>
 
-    <set name="courses" inverse="true">
+    <set name="courses" table="STUDENT_COURSE" inverse="true">
       <key column="PERSON_ID"/>
-      <one-to-many class="Course"/>
+      <many-to-many column="COURSE_ID" class="org.eyedb.benchmark.quicktour.hibernate.Course"/>
     </set>
 
   </joined-subclass>

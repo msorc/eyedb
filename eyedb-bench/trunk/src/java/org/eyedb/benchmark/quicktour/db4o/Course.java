@@ -1,3 +1,5 @@
+package org.eyedb.benchmark.quicktour.db4o;
+
 import java.util.*;
 
 public class Course {

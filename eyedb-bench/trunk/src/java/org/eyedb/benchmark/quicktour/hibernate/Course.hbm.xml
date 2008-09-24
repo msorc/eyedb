@@ -5,7 +5,7 @@
 
 <hibernate-mapping>
 
-  <class name="Course" table="COURSE">
+  <class name="org.eyedb.benchmark.quicktour.hibernate.Course" table="COURSE">
 
     <id name="id" column="COURSE_ID">
       <generator class="native"/>
@@ -19,7 +19,7 @@
 
     <set name="students" table="STUDENT_COURSE" inverse="true">
       <key column="COURSE_ID"/>
-      <many-to-many column="STUDENT_ID" class="Student"/>
+      <many-to-many column="STUDENT_ID" class="org.eyedb.benchmark.quicktour.hibernate.Student"/>
     </set>
 
   </class>
