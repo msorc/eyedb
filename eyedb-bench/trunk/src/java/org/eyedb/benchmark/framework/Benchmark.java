@@ -1,4 +1,4 @@
-package org.eyedb.benchmark;
+package org.eyedb.benchmark.framework;
 
 import java.io.*;
 

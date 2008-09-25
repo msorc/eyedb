@@ -2,13 +2,14 @@ EYEDB_BINDIR=@EYEDB_BINDIR@
 EYEDB_SBINDIR=@EYEDB_SBINDIR@
 EYEDB_JAR=@EYEDB_JAR@
 
-ODL_PACKAGE=quicktour
+ODL_PACKAGE=org.eyedb.benchmark.quicktour.eyedb.quicktour
+ODL_DIR=quicktour
 EYEDBODLJAVA = $(EYEDB_BINDIR)/eyedbodl --gencode=java
-EYEDBODLJAVAFLAGS= --no-rootclass --package=$(ODL_PACKAGE)
+EYEDBODLJAVAFLAGS= --no-rootclass --package=$(ODL_PACKAGE) --output-dir=$(ODL_DIR)
 
 packagedir=$(pkglibdir)/java/classes/org/eyedb/benchmark/quicktour/eyedb
 
-JAVA_ODL_FILES=$(addprefix $(ODL_PACKAGE)/, \
+JAVA_ODL_FILES=$(addprefix $(ODL_DIR)/, \
 Course.java \
 Database.java \
 Person.java \

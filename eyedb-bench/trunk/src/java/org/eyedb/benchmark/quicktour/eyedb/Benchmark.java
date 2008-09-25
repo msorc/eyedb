@@ -4,7 +4,7 @@ package org.eyedb.benchmark.quicktour.eyedb;
  * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)
  */
 
-public abstract class Benchmark extends org.eyedb.benchmark.Benchmark {
+public abstract class Benchmark extends org.eyedb.benchmark.framework.Benchmark {
 
     public void prepare()
     {
@@ -20,13 +20,13 @@ public abstract class Benchmark extends org.eyedb.benchmark.Benchmark {
      
 	try {
 	    // Initialize the package
-	    quicktour.Database.init();
+	    org.eyedb.benchmark.quicktour.eyedb.quicktour.Database.init();
 
 	    // Open the connection with the backend
 	    connection = new org.eyedb.Connection();
 
 	    // Open the database
-	    database = new quicktour.Database( databaseName);
+	    database = new org.eyedb.benchmark.quicktour.eyedb.quicktour.Database( databaseName);
 	    database.open(connection, org.eyedb.Database.DBRW);
 	}
 	catch(org.eyedb.Exception e) { // Catch any eyedb exception
@@ -51,5 +51,5 @@ public abstract class Benchmark extends org.eyedb.benchmark.Benchmark {
     }
 
     protected org.eyedb.Connection connection;
-    protected quicktour.Database database;
+    protected org.eyedb.benchmark.quicktour.eyedb.quicktour.Database database;
 }
