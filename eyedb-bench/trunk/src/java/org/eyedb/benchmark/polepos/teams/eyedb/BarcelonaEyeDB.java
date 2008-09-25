@@ -1,5 +1,6 @@
 package org.eyedb.benchmark.polepos.teams.eyedb;
 
+import java.util.Iterator;
 import org.eyedb.benchmark.polepos.teams.eyedb.barcelona.Database;
 import org.eyedb.benchmark.polepos.teams.eyedb.barcelona.B4;
 import org.polepos.circuits.barcelona.BarcelonaDriver;
@@ -48,13 +49,55 @@ public class BarcelonaEyeDB extends EyeDBDriver implements BarcelonaDriver {
     
     public void read()
     {
+	try {
+	    Iterator it = iterate( "select b from B4 as b");
+
+	    while (it.hasNext()) {
+		B4 b4 = (B4)it.next();
+		addToCheckSum( b4.getB4());
+	    }
+	}
+	catch( org.eyedb.Exception e) {
+	    e.printStackTrace();
+	}
     }
     
     public void query()
     {
+	try {
+	    int count = setup().getSelectCount();
+
+	    for (int i = 0; i < count; i++) {
+		Iterator it = iterate( "select b from B4 as b where b.b2=" + (i+1));
+
+		while (it.hasNext()) {
+		    B4 b4 = (B4)it.next();
+		    addToCheckSum( b4.getB4());
+		}	       
+	    }
+	}
+	catch( org.eyedb.Exception e) {
+	    e.printStackTrace();
+	}
     }
     
     public void delete()
     {
+	try {
+	    getDatabase().transactionBegin();
+
+	    Iterator it = iterate( "select b from B4 as b");
+
+	    while (it.hasNext()) {
+		B4 b4 = (B4)it.next();
+		b4.remove();
+		addToCheckSum( 5);
+	    }
+
+            getDatabase().transactionCommit();
+	}
+	catch( org.eyedb.Exception e) {
+	    e.printStackTrace();
+	}
     }
 }
