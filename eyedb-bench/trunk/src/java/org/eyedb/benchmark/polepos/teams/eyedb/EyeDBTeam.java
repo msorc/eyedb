@@ -6,11 +6,13 @@ import org.polepos.framework.Team;
 
 public class EyeDBTeam extends Team {
     
-    private final Car[] mCars;
+    private Car[] cars;
     
     public EyeDBTeam()
     {
-	mCars = new EyeDBCar[2];
+	cars = new EyeDBCar[1];
+	for ( int i = 0; i < cars.length; i++)
+	    cars[i] = new EyeDBCar();
     }
 
     public String name()
@@ -32,7 +34,7 @@ public class EyeDBTeam extends Team {
 
     public Car[] cars()
     {
-	return mCars;
+	return cars;
     }
     
     public Driver[] drivers() 
