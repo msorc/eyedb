@@ -11,7 +11,7 @@ Course.java \
 Teacher.java
 
 JAVAROOT=$(top_builddir)/src/java
-CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_builddir)/src/java/eyedb-benchmarks.jar:$(top_srcdir)/src/java:$(DB4O_JAR)
+CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_srcdir)/src/java:$(DB4O_JAR)
 
 TESTS_ENVIRONMENT=$(SHELL) -x
 TESTS=runit.sh

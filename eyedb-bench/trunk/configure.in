@@ -2,7 +2,7 @@
 # configure.in for eyedb-benchmarks
 # 
 
-AC_INIT(src/java/org/eyedb/benchmark/StopWatch.java)
+AC_INIT(src/java/org/eyedb/benchmark/framework/StopWatch.java)
 
 PACKAGE_NAME=eyedb-benchmarks
 PACKAGE_VERSION=1.0.0
@@ -32,6 +32,11 @@ AC_ARG_ENABLE(hibernate,
 		AS_HELP_STRING([--enable-hibernate],
 				[enable hibernate code compilation [default=yes]]),,
 		ac_enable_hibernate="yes")
+# Polepositin
+AC_ARG_ENABLE(polepos,
+		AS_HELP_STRING([--enable-polepos],
+				[enable polepos code compilation [default=yes]]),,
+		ac_enable_polepos="yes")
 
 # ========================================
 # JAVA compilation
@@ -100,14 +105,17 @@ AC_SUBST(EYEDB_JAR)
 # ========================================
 
 AC_ARG_VAR(DB4O_JAR,[DB4O jar file])
+
 # To be changed if DB4O version changes
-DB4O_JAR_DEFAULT=${srcdir}/lib/java/db4o/db4o-7.2/lib/db4o-7.2.54.11278-java5.jar
+DB4O_JAR_DEFAULT=lib/java/db4o/db4o-7.2/lib/db4o-7.2.54.11278-java5.jar
 
 if test "$ac_enable_db4o" = "yes" ; then
    if test x"$DB4O_JAR" = x ; then
-	DB4O_JAR=$DB4O_JAR_DEFAULT
+	DB4O_JAR='${top_srcdir}'/$DB4O_JAR_DEFAULT
+	HAVE_DB4O_JAR="yes"
+   else
+	AC_CHECK_FILE($DB4O_JAR,HAVE_DB4O_JAR="yes",HAVE_DB4O_JAR="no")
    fi
-   AC_CHECK_FILE($DB4O_JAR,HAVE_DB4O_JAR="yes",HAVE_DB4O_JAR="no")
 fi
 if test "$ac_enable_db4o" = "yes" -a "$HAVE_DB4O_JAR" = "yes" ; then
    COND_DB4O="yes"
@@ -122,39 +130,53 @@ AC_SUBST(DB4O_JAR)
 # ========================================
 
 AC_ARG_VAR(HIBERNATE_JAR,[Hibernate jar file])
-AC_ARG_VAR(HIBERNATE_LIBDIR,[Hibernate libraries directory])
 AC_ARG_VAR(JDBC_CONNECTOR_JAR,[JDBC connector jar file])
 AC_ARG_VAR(SLF4J_CONNECTOR_JAR,[SLF4J jar file])
+AC_ARG_VAR(HIBERNATE_LIBDIR,[Hibernate libraries directory])
+
 # To be changed if Hibernate or JDBC version changes
-HIBERNATE_JAR_DEFAULT=${srcdir}/lib/java/hibernate/hibernate-distribution-3.3.0.SP1/hibernate3.jar
-HIBERNATE_LIBDIR_DEFAULT=${srcdir}/lib/java/hibernate/hibernate-distribution-3.3.0.SP1/lib/required
-JDBC_CONNECTOR_JAR_DEFAULT=${srcdir}/lib/java/jdbc/mysql-connector-java-5.1.6/mysql-connector-java-5.1.6-bin.jar
-SLF4J_JAR_DEFAULT=${srcdir}/lib/java/slf4j/slf4j-1.5.2/slf4j-simple-1.5.2.jar 
+HIBERNATE_JAR_DEFAULT=lib/java/hibernate/hibernate-distribution-3.3.0.SP1/hibernate3.jar
+JDBC_CONNECTOR_JAR_DEFAULT=lib/java/jdbc/mysql-connector-java-5.1.6/mysql-connector-java-5.1.6-bin.jar
+SLF4J_JAR_DEFAULT=lib/java/slf4j/slf4j-1.5.2/slf4j-simple-1.5.2.jar
+HIBERNATE_LIBDIR_DEFAULT=lib/java/hibernate/hibernate-distribution-3.3.0.SP1/lib/required
 
 if test "$ac_enable_hibernate" = "yes" ; then
 
    if test x"$HIBERNATE_JAR" = x ; then
-	HIBERNATE_JAR=$HIBERNATE_JAR_DEFAULT
+	HIBERNATE_JAR='${top_srcdir}'/$HIBERNATE_JAR_DEFAULT
+	HAVE_HIBERNATE_JAR="yes"
+   else
+	AC_CHECK_FILE($HIBERNATE_JAR,HAVE_HIBERNATE_JAR="yes",HAVE_HIBERNATE_JAR="no")
    fi
-   AC_CHECK_FILE($HIBERNATE_JAR,HAVE_HIBERNATE_JAR="yes",HAVE_HIBERNATE_JAR="no")
-   if test x"$HIBERNATE_LIBDIR" = x ; then
-	HIBERNATE_LIBDIR=$HIBERNATE_LIBDIR_DEFAULT
+
+   if test x"$JDBC_CONNECTOR_JAR" = x ; then
+	JDBC_CONNECTOR_JAR='${top_srcdir}'/$JDBC_CONNECTOR_JAR_DEFAULT
+	HAVE_JDBC_CONNECTOR_JAR="yes"
+   else
+	AC_CHECK_FILE($JDBC_CONNECTOR_JAR,HAVE_JDBC_CONNECTOR_JAR="yes",HAVE_JDBC_CONNECTOR_JAR="no")
+   fi
+
+   if test x"$SLF4J_JAR" = x ; then
+	SLF4J_JAR='${top_srcdir}'/$SLF4J_JAR_DEFAULT
+	HAVE_SLF4J_JAR="yes"
+   else
+	AC_CHECK_FILE($SLF4J_JAR,HAVE_SLF4J_JAR="yes",HAVE_SLF4J_JAR="no")
    fi
 
    HIBERNATE_CLASSPATH=""
-   for j in "$HIBERNATE_LIBDIR"/*.jar ; do 
-       HIBERNATE_CLASSPATH="$j:$HIBERNATE_CLASSPATH"
-   done
-
-   if test x"$JDBC_CONNECTOR_JAR" = x ; then
-	JDBC_CONNECTOR_JAR=$JDBC_CONNECTOR_JAR_DEFAULT
+   if test x"$HIBERNATE_LIBDIR" = x ; then
+	HIBERNATE_LIBDIR=$HIBERNATE_LIBDIR_DEFAULT
+	for j in "${srcdir}/$HIBERNATE_LIBDIR"/*.jar ; do 
+	    j=`echo $j | sed -e "s+^${srcdir}/++"`
+       	    HIBERNATE_CLASSPATH='${top_srcdir}'/$j:$HIBERNATE_CLASSPATH
+	done
+   else
+	for j in "$HIBERNATE_LIBDIR"/*.jar ; do 
+       	    HIBERNATE_CLASSPATH="$j:$HIBERNATE_CLASSPATH"
+	done
    fi
-   AC_CHECK_FILE($JDBC_CONNECTOR_JAR,HAVE_JDBC_CONNECTOR_JAR="yes",HAVE_JDBC_CONNECTOR_JAR="no")
+   HIBERNATE_CLASSPATH="$HIBERNATE_CLASSPATH:$JDBC_CONNECTOR_JAR:$SLF4J_JAR"
 
-   if test x"$SLF4J_JAR" = x ; then
-	SLF4J_JAR=$SLF4J_JAR_DEFAULT
-   fi
-   AC_CHECK_FILE($SLF4J_JAR,HAVE_SLF4J_JAR="yes",HAVE_SLF4J_JAR="no")
 fi
 
 if test "$ac_enable_hibernate" = "yes" -a "$HAVE_HIBERNATE_JAR" = "yes" -a "$HAVE_JDBC_CONNECTOR_JAR" = "yes" ; then
@@ -164,8 +186,31 @@ AM_CONDITIONAL(COND_HIBERNATE, test x"$COND_HIBERNATE" = xyes)
 
 AC_SUBST(HIBERNATE_JAR)
 AC_SUBST(HIBERNATE_CLASSPATH)
-AC_SUBST(JDBC_CONNECTOR_JAR)
-AC_SUBST(SLF4J_JAR)
+
+
+# ========================================
+# Poleposition benchmarks
+# ========================================
+
+AC_ARG_VAR(POLEPOS_JAR,[Poleposition benchmarks jar file])
+
+# To be changed if POLEPOS version changes
+POLEPOS_JAR_DEFAULT=lib/java/polepos/polepos-0.20/polepos-0.20.jar
+
+if test "$ac_enable_polepos" = "yes" ; then
+   if test x"$POLEPOS_JAR" = x ; then
+	POLEPOS_JAR='${top_srcdir}'/$POLEPOS_JAR_DEFAULT
+	HAVE_POLEPOS_JAR="yes"
+   else
+	AC_CHECK_FILE($POLEPOS_JAR,HAVE_POLEPOS_JAR="yes",HAVE_POLEPOS_JAR="no")
+   fi
+fi
+if test "$ac_enable_polepos" = "yes" -a "$HAVE_POLEPOS_JAR" = "yes" ; then
+   COND_POLEPOS="yes"
+fi
+AM_CONDITIONAL(COND_POLEPOS, test x"$COND_POLEPOS" = xyes)
+
+AC_SUBST(POLEPOS_JAR)
 
 
 # ========================================

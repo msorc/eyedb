@@ -1,1 +1,7 @@
-SUBDIRS=framework polepos quicktour
+if COND_POLEPOS
+POLEPOS_SUBDIR=polepos
+else
+POLEPOS_SUBDIR=
+endif
+
+SUBDIRS=framework $(POLEPOS_SUBDIR) quicktour

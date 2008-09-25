@@ -1,3 +1,5 @@
+POLEPOS_JAR=@POLEPOS_JAR@
+
 EYEDB_BINDIR=@EYEDB_BINDIR@
 EYEDB_SBINDIR=@EYEDB_SBINDIR@
 EYEDB_JAR=@EYEDB_JAR@
@@ -6,7 +8,7 @@ ODL_PACKAGE=polepos
 EYEDBODLJAVA = $(EYEDB_BINDIR)/eyedbodl --gencode=java
 EYEDBODLJAVAFLAGS= --no-rootclass --package=$(ODL_PACKAGE)
 
-#packagedir=$(pkglibdir)/java/classes/org/eyedb/benchmark/polepos/teams/eyedb
+packagedir=$(pkglibdir)/java/classes/org/eyedb/benchmark/polepos/teams/eyedb
 
 JAVA_ODL_FILES=$(addprefix $(ODL_PACKAGE)/, \
 Course.java \
@@ -17,13 +19,19 @@ set_class_Student_ref.java \
 Student.java \
 Teacher.java )
 
-#dist_package_JAVA =\
-#Benchmark.java \
-#CreateBenchmark.java \
-#$(JAVA_ODL_FILES)
+dist_package_JAVA =\
+BahrainEyeDB.java \
+BarcelonaEyeDB.java \
+EyeDBCar.java \
+EyeDBDriver.java \
+EyeDBTeam.java \
+ImolaEyeDB.java \
+MelbourneEyeDB.java \
+SepangEyeDB.java
+
 
 JAVAROOT=$(top_builddir)/src/java
-CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_srcdir)/src/java:$(EYEDB_JAR)
+CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_srcdir)/src/java:$(EYEDB_JAR):$(POLEPOS_JAR)
 
 TESTS_ENVIRONMENT=$(SHELL)
 TESTS=runit.sh
@@ -47,8 +55,8 @@ $(JAVA_ODL_FILES): quicktour.odl
 
 runit.sh: Makefile
 
-#clean-local:
-#	-rm -f $(JAVA_ODL_FILES)
-#	-rm -f $(ODL_PACKAGE)/*.class
+clean-local:
+	-rm -f $(JAVA_ODL_FILES)
+	-rm -f $(ODL_PACKAGE)/*.class
 
-#EXTRA_DIST= quicktour.odl
+EXTRA_DIST= quicktour.odl

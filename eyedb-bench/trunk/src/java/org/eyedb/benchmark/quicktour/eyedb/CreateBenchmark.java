@@ -1,7 +1,7 @@
 package org.eyedb.benchmark.quicktour.eyedb;
 
 import java.util.Random;
-import quicktour.*;
+import org.eyedb.benchmark.quicktour.eyedb.quicktour.*;
 
 /**
  * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)

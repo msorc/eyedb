@@ -9,7 +9,7 @@ import java.io.*;
  * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)
  */
 
-public abstract class Benchmark extends org.eyedb.benchmark.Benchmark {
+public abstract class Benchmark extends org.eyedb.benchmark.framework.Benchmark {
 
     public void prepare()
     {
