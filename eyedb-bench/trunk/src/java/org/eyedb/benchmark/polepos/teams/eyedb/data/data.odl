@@ -27,3 +27,10 @@ class IndexedPilot {
       index on name;
       index on licenseID;
 };
+
+class Pilot {
+      attribute string name;
+      attribute string firstName;
+      attribute int points;
+      attribute int licenseID;
+};

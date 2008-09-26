@@ -27,6 +27,7 @@ public class BahrainEyeDB extends EyeDBDriver implements BahrainDriver {
                 if ( commitInterval > 0  &&  ++commitCount >= commitInterval ) {
                     commitCount = 0;
 		    getDatabase().transactionCommit();
+		    getDatabase().transactionBegin();
                 }
                 
                 addToCheckSum(i);

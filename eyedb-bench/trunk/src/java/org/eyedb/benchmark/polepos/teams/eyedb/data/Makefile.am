@@ -8,7 +8,7 @@ EYEDB_BINDIR=@EYEDB_BINDIR@
 ODL_PACKAGE= org.eyedb.benchmark.polepos.teams.eyedb.data
 EYEDBODLJAVA= $(EYEDB_BINDIR)/eyedbodl
 EYEDBODLJAVAFLAGS= --gencode=java --no-rootclass --package=$(ODL_PACKAGE) --output-dir=.
-JAVA_ODL_FILES= B0.java B1.java B2.java B3.java B4.java IndexedPilot.java Database.java 
+JAVA_ODL_FILES= B0.java B1.java B2.java B3.java B4.java IndexedPilot.java Pilot.java Database.java 
 BUILT_SOURCES= $(JAVA_ODL_FILES)
 
 $(JAVA_ODL_FILES): data.odl
