@@ -1,5 +1,6 @@
 package org.eyedb.benchmark.polepos.teams.eyedb;
 
+import java.util.Iterator;
 import org.polepos.circuits.sepang.SepangDriver;
 
 public class SepangEyeDB extends EyeDBDriver implements SepangDriver {

@@ -227,6 +227,7 @@ src/java/org/eyedb/benchmark/framework/Makefile dnl
 src/java/org/eyedb/benchmark/polepos/Makefile dnl
 src/java/org/eyedb/benchmark/polepos/teams/Makefile dnl
 src/java/org/eyedb/benchmark/polepos/teams/eyedb/Makefile dnl
+src/java/org/eyedb/benchmark/polepos/teams/eyedb/data/Makefile dnl
 src/java/org/eyedb/benchmark/quicktour/Makefile dnl
 src/java/org/eyedb/benchmark/quicktour/db4o/Makefile dnl
 src/java/org/eyedb/benchmark/quicktour/eyedb/Makefile dnl
