@@ -34,3 +34,10 @@ class Pilot {
       attribute int points;
       attribute int licenseID;
 };
+
+class Tree {
+      attribute Tree *preceding;
+      attribute Tree *subsequent;
+      attribute string name;
+      attribute int depth;
+};
