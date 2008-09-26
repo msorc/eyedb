@@ -24,5 +24,6 @@ class IndexedPilot {
       attribute string firstName;
       attribute int points;
       attribute int licenseID;
+      index on name;
       index on licenseID;
 };

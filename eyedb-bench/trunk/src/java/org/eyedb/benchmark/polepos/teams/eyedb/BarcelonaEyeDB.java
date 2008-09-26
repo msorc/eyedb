@@ -72,7 +72,6 @@ public class BarcelonaEyeDB extends EyeDBDriver implements BarcelonaDriver {
 	    getDatabase().transactionBegin();
 
 	    Iterator it = iterate( "select b from B4 as b");
-
 	    while (it.hasNext()) {
 		B4 b = (B4)it.next();
 		b.remove();
