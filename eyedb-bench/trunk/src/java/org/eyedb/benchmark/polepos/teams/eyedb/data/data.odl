@@ -18,3 +18,11 @@ class B3 extends B2 {
 class B4 extends B3 {
       attribute int b4;
 };
+
+class IndexedPilot {
+      attribute string name;
+      attribute string firstName;
+      attribute int points;
+      attribute int licenseID;
+      index on licenseID;
+};

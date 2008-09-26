@@ -1,5 +1,7 @@
 package org.eyedb.benchmark.polepos.teams.eyedb;
 
+import java.util.Iterator;
+import org.eyedb.benchmark.polepos.teams.eyedb.data.IndexedPilot;
 import org.polepos.circuits.bahrain.BahrainDriver;
 
 public class BahrainEyeDB extends EyeDBDriver implements BahrainDriver {

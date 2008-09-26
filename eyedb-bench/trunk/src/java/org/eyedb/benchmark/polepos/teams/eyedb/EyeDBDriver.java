@@ -5,8 +5,22 @@ import org.eyedb.Database;
 import org.eyedb.ObjectArray;
 import org.eyedb.OQL;
 import org.polepos.framework.Driver;
+import org.polepos.framework.CarMotorFailureException;
 
 public abstract class EyeDBDriver extends Driver {
+
+    public void prepare() throws CarMotorFailureException 
+    {
+	try {
+	    org.eyedb.benchmark.polepos.teams.eyedb.data.Database.init();
+	    
+	    getEyeDBCar().openConnection( new org.eyedb.benchmark.polepos.teams.eyedb.data.Database( "poleposition"));
+	}
+	catch( org.eyedb.Exception e) {
+	    e.printStackTrace();
+            throw new CarMotorFailureException();
+	}
+    }
 
     public void backToPit()
     {

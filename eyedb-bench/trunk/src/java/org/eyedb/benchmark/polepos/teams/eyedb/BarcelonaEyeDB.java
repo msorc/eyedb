@@ -1,25 +1,11 @@
 package org.eyedb.benchmark.polepos.teams.eyedb;
 
 import java.util.Iterator;
-import org.eyedb.benchmark.polepos.teams.eyedb.barcelona.B4;
+import org.eyedb.benchmark.polepos.teams.eyedb.data.B4;
 import org.polepos.circuits.barcelona.BarcelonaDriver;
-import org.polepos.framework.CarMotorFailureException;
 
 public class BarcelonaEyeDB extends EyeDBDriver implements BarcelonaDriver {
     
-    public void prepare() throws CarMotorFailureException 
-    {
-	try {
-	    org.eyedb.benchmark.polepos.teams.eyedb.barcelona.Database.init();
-	    
-	    getEyeDBCar().openConnection( new org.eyedb.benchmark.polepos.teams.eyedb.barcelona.Database( "barcelona"));
-	}
-	catch( org.eyedb.Exception e) {
-	    e.printStackTrace();
-            throw new CarMotorFailureException();
-	}
-    }
-
     public void write()
     {
         try {
