@@ -1,7 +1,6 @@
 package org.eyedb.benchmark.polepos.teams.eyedb;
 
 import java.util.Iterator;
-import org.eyedb.benchmark.polepos.teams.eyedb.barcelona.Database;
 import org.eyedb.benchmark.polepos.teams.eyedb.barcelona.B4;
 import org.polepos.circuits.barcelona.BarcelonaDriver;
 import org.polepos.framework.CarMotorFailureException;
@@ -53,8 +52,8 @@ public class BarcelonaEyeDB extends EyeDBDriver implements BarcelonaDriver {
 	    Iterator it = iterate( "select b from B4 as b");
 
 	    while (it.hasNext()) {
-		B4 b4 = (B4)it.next();
-		addToCheckSum( b4.getB4());
+		B4 b = (B4)it.next();
+		addToCheckSum( b.getB4());
 	    }
 	}
 	catch( org.eyedb.Exception e) {
@@ -71,8 +70,8 @@ public class BarcelonaEyeDB extends EyeDBDriver implements BarcelonaDriver {
 		Iterator it = iterate( "select b from B4 as b where b.b2=" + (i+1));
 
 		while (it.hasNext()) {
-		    B4 b4 = (B4)it.next();
-		    addToCheckSum( b4.getB4());
+		    B4 b = (B4)it.next();
+		    addToCheckSum( b.getB4());
 		}	       
 	    }
 	}
@@ -89,8 +88,8 @@ public class BarcelonaEyeDB extends EyeDBDriver implements BarcelonaDriver {
 	    Iterator it = iterate( "select b from B4 as b");
 
 	    while (it.hasNext()) {
-		B4 b4 = (B4)it.next();
-		b4.remove();
+		B4 b = (B4)it.next();
+		b.remove();
 		addToCheckSum( 5);
 	    }
 

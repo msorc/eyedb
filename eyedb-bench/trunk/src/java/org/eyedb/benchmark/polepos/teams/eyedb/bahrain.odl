@@ -1,0 +1,7 @@
+class IndexedPilot {
+      attribute String name;
+      attribute String firstName;
+      attribute int points;
+      attribute int licenceID;
+      index on licenseID;
+};
