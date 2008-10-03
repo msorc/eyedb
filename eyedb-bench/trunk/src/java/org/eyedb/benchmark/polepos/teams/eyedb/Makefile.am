@@ -11,10 +11,10 @@ ImolaEyeDB.java \
 MelbourneEyeDB.java \
 SepangEyeDB.java 
 
-POLEPOS_JAR=@POLEPOS_JAR@
+POLEPOS_DIR=@POLEPOS_DIR@
 EYEDB_JAR=@EYEDB_JAR@
 JAVAROOT=$(top_builddir)/src/java
-CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_srcdir)/src/java:$(EYEDB_JAR):$(POLEPOS_JAR)
+CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_srcdir)/src/java:$(EYEDB_JAR):$(POLEPOS_DIR)/bin
 
 
 

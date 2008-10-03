@@ -32,7 +32,7 @@ AC_ARG_ENABLE(hibernate,
 		AS_HELP_STRING([--enable-hibernate],
 				[enable hibernate code compilation [default=yes]]),,
 		ac_enable_hibernate="yes")
-# Polepositin
+# Poleposition
 AC_ARG_ENABLE(polepos,
 		AS_HELP_STRING([--enable-polepos],
 				[enable polepos code compilation [default=yes]]),,
@@ -192,25 +192,21 @@ AC_SUBST(HIBERNATE_CLASSPATH)
 # Poleposition benchmarks
 # ========================================
 
-AC_ARG_VAR(POLEPOS_JAR,[Poleposition benchmarks jar file])
-
-# To be changed if POLEPOS version changes
-POLEPOS_JAR_DEFAULT=lib/java/polepos/polepos-0.20/polepos-0.20.jar
+AC_ARG_VAR(POLEPOS_DIR,[Poleposition benchmarks source directory])
 
 if test "$ac_enable_polepos" = "yes" ; then
-   if test x"$POLEPOS_JAR" = x ; then
-	POLEPOS_JAR='${top_srcdir}'/$POLEPOS_JAR_DEFAULT
-	HAVE_POLEPOS_JAR="yes"
+   if test x"$POLEPOS_DIR" = x ; then
+	HAVE_POLEPOS="no"
    else
-	AC_CHECK_FILE($POLEPOS_JAR,HAVE_POLEPOS_JAR="yes",HAVE_POLEPOS_JAR="no")
+	AC_CHECK_FILE($POLEPOS_DIR,HAVE_POLEPOS="yes",HAVE_POLEPOS="no")
    fi
 fi
-if test "$ac_enable_polepos" = "yes" -a "$HAVE_POLEPOS_JAR" = "yes" ; then
+if test "$ac_enable_polepos" = "yes" -a "$HAVE_POLEPOS" = "yes" ; then
    COND_POLEPOS="yes"
 fi
 AM_CONDITIONAL(COND_POLEPOS, test x"$COND_POLEPOS" = xyes)
 
-AC_SUBST(POLEPOS_JAR)
+AC_SUBST(POLEPOS_DIR)
 
 
 # ========================================
