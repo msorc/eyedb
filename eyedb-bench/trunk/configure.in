@@ -215,6 +215,8 @@ AC_SUBST(POLEPOS_DIR)
 AC_CONFIG_FILES(
 Makefile dnl
 run/Makefile dnl
+run/polepos/Makefile dnl
+run/polepos/eyedb/Makefile dnl
 run/quicktour/Makefile dnl
 run/quicktour/db4o/Makefile dnl
 run/quicktour/eyedb/Makefile dnl

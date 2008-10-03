@@ -1,0 +1,2 @@
+SUBDIRS= polepos quicktour
+
