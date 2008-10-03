@@ -12,8 +12,6 @@ public class EyeDBCar extends Car {
 
     void openConnection( Database database) throws org.eyedb.Exception
     {
-	Root.init( "", new String[] { "--user=" + System.getProperty( "user.name")});
-
 	connection = new Connection();
 	database.open(connection, Database.DBRW);
 

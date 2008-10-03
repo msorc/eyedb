@@ -1,20 +1,54 @@
 package org.eyedb.benchmark.polepos.teams.eyedb;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Iterator;
+import java.util.Properties;
 import org.eyedb.Database;
 import org.eyedb.ObjectArray;
 import org.eyedb.OQL;
+import org.eyedb.Root;
 import org.polepos.framework.Driver;
 import org.polepos.framework.CarMotorFailureException;
 
 public abstract class EyeDBDriver extends Driver {
 
+    private Properties properties;
+    private static final String filename = "eyedb.properties";
+
+    public EyeDBDriver()
+    {
+	properties = new Properties();
+
+	try {
+	    properties.load( new FileInputStream( filename));
+	}
+	catch( IOException e) {
+	    e.printStackTrace();
+	}
+    }
+
+    private Properties getProperties()
+    {
+	return properties;
+    }
+
     public void prepare() throws CarMotorFailureException 
     {
 	try {
+	    String databaseName = getProperties().getProperty( "database");
+
+	    String[] args = new String[]{ 
+		"--user=" + System.getProperty( "user.name"),
+		"--dbm=default",
+		"--port=" + getProperties().getProperty( "tcp_port"),
+	    };
+
+	    Root.init( databaseName, args);
+
 	    org.eyedb.benchmark.polepos.teams.eyedb.data.Database.init();
 	    
-	    getEyeDBCar().openConnection( new org.eyedb.benchmark.polepos.teams.eyedb.data.Database( "poleposition"));
+	    getEyeDBCar().openConnection( new org.eyedb.benchmark.polepos.teams.eyedb.data.Database( databaseName));
 	}
 	catch( org.eyedb.Exception e) {
 	    e.printStackTrace();
