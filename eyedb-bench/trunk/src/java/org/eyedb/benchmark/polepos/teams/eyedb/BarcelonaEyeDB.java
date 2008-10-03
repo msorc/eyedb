@@ -35,12 +35,16 @@ public class BarcelonaEyeDB extends EyeDBDriver implements BarcelonaDriver {
     public void read()
     {
 	try {
+	    getDatabase().transactionBegin();
+
 	    Iterator it = iterate( "select b from B4 as b");
 
 	    while (it.hasNext()) {
 		B4 b = (B4)it.next();
 		addToCheckSum( b.getB4());
 	    }
+
+            getDatabase().transactionCommit();
 	}
 	catch( org.eyedb.Exception e) {
 	    e.printStackTrace();
@@ -50,6 +54,8 @@ public class BarcelonaEyeDB extends EyeDBDriver implements BarcelonaDriver {
     public void query()
     {
 	try {
+	    getDatabase().transactionBegin();
+
 	    int count = setup().getSelectCount();
 
 	    for (int i = 0; i < count; i++) {
@@ -60,6 +66,8 @@ public class BarcelonaEyeDB extends EyeDBDriver implements BarcelonaDriver {
 		    addToCheckSum( b.getB4());
 		}	       
 	    }
+
+            getDatabase().transactionCommit();
 	}
 	catch( org.eyedb.Exception e) {
 	    e.printStackTrace();

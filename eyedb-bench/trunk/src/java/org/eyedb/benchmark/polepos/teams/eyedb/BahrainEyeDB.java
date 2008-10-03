@@ -43,6 +43,8 @@ public class BahrainEyeDB extends EyeDBDriver implements BahrainDriver {
     public void query_indexed_string()
     {
         try {
+	    getDatabase().transactionBegin();
+
 	    int count = setup().getSelectCount();
         
 	    for (int i = 0; i < count; i++) {
@@ -53,6 +55,8 @@ public class BahrainEyeDB extends EyeDBDriver implements BahrainDriver {
 		    addToCheckSum( p.getPoints());
 		}	       
 	    }
+
+	    getDatabase().transactionCommit();
         }
         catch ( org.eyedb.Exception ex ) {
             ex.printStackTrace();
@@ -81,6 +85,8 @@ public class BahrainEyeDB extends EyeDBDriver implements BahrainDriver {
     public void query_indexed_int()
     {
         try {
+	    getDatabase().transactionBegin();
+
 	    int count = setup().getSelectCount();
         
 	    for (int i = 0; i < count; i++) {
@@ -91,6 +97,8 @@ public class BahrainEyeDB extends EyeDBDriver implements BahrainDriver {
 		    addToCheckSum( p.getPoints());
 		}	       
 	    }
+
+	    getDatabase().transactionCommit();
         }
         catch ( org.eyedb.Exception ex ) {
             ex.printStackTrace();
