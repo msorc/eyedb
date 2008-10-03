@@ -19,11 +19,11 @@ public class RunSeasonEyeDB extends AbstractRunner {
 	@Override
 	public Circuit[] circuits() {
 		return new Circuit[] { 
+				new Bahrain(),
+				new Barcelona(), 
+				new Imola(),
 				new Melbourne(), 
 				new Sepang(), 
-				new Bahrain(),
-				new Imola(),
-				new Barcelona(), 
 		};
 	}
 
