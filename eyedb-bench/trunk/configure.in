@@ -218,6 +218,11 @@ AC_SUBST(POLEPOS_JAR)
 # ========================================
 AC_CONFIG_FILES(
 Makefile dnl
+run/Makefile dnl
+run/quicktour/Makefile dnl
+run/quicktour/db4o/Makefile dnl
+run/quicktour/eyedb/Makefile dnl
+run/quicktour/hibernate/Makefile dnl
 src/Makefile dnl
 src/java/Makefile dnl
 src/java/org/Makefile dnl
