@@ -8,7 +8,9 @@ STAMP_FILE=classdist_package.stamp
 JAR_DEPS=\
 ./org/eyedb/benchmark/quicktour/eyedb/$(STAMP_FILE) \
 ./org/eyedb/benchmark/framework/$(STAMP_FILE) \
-./org/eyedb/benchmark/polepos/$(STAMP_FILE)
+./org/eyedb/benchmark/polepos/$(STAMP_FILE) \
+./org/eyedb/benchmark/polepos/teams/eyedb/data/$(STAMP_FILE) \
+./org/eyedb/benchmark/polepos/teams/eyedb/$(STAMP_FILE)
 
 OTHER_FILES_TO_JAR= \
 org/eyedb/benchmark/quicktour/hibernate/Course.hbm.xml \
