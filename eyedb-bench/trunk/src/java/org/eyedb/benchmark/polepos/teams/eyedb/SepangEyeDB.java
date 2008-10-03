@@ -43,6 +43,8 @@ public class SepangEyeDB extends EyeDBDriver implements SepangDriver {
     public void read()
     {
 	try {
+	    getDatabase().transactionBegin();
+
             TreeUtil.traverse( findRoot(), new TreeVisitor() {
 		    public void visit( Tree tree)
 		    {
@@ -53,6 +55,8 @@ public class SepangEyeDB extends EyeDBDriver implements SepangDriver {
 			}
 		    }
 		});
+
+            getDatabase().transactionCommit();
 	}
         catch ( org.eyedb.Exception ex ) {
             ex.printStackTrace();
