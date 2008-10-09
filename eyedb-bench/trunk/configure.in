@@ -12,6 +12,11 @@ AM_INIT_AUTOMAKE(${PACKAGE_NAME}, ${PACKAGE_VERSION})
 # ========================================
 # Collect command line arguments
 # ========================================
+# C++
+AC_ARG_ENABLE(cpp,
+		AS_HELP_STRING([--enable-cpp],
+				[enable C++ code compilation [default=yes]]),,
+		ac_enable_cpp="yes")
 # Java
 AC_ARG_ENABLE(java,
 		AS_HELP_STRING([--enable-java],
@@ -38,6 +43,21 @@ AC_ARG_ENABLE(polepos,
 				[enable polepos code compilation [default=yes]]),,
 		ac_enable_polepos="yes")
 
+
+# ========================================
+# C++ compilation
+# ========================================
+if test "$ac_enable_cpp" = "yes"
+then
+	AC_PROG_CXX
+	AC_PROG_LIBTOOL
+fi
+
+if test "$ac_enable_cpp" = "yes" -a x"$CXX" != x ; then
+   COND_CPP="yes"
+fi
+AM_CONDITIONAL(COND_CPP, test x"$COND_CPP" = xyes)
+
 # ========================================
 # JAVA compilation
 # ========================================
@@ -62,7 +82,7 @@ then
 
 fi
 
-if test "$ac_enable_java" = "yes" -a x"$JAVAC" != x -a x"$JAR" != x  ; then
+if test "$ac_enable_java" = "yes" -a x"$JAVAC" != x -a x"$JAR" != x ; then
    COND_JAVA="yes"
 fi
 AM_CONDITIONAL(COND_JAVA, test x"$COND_JAVA" = xyes)
@@ -86,6 +106,8 @@ then
    fi
    EYEDB_BINDIR=$EYEDB_INSTALLDIR/bin
    EYEDB_SBINDIR=$EYEDB_INSTALLDIR/sbin
+   EYEDB_INCLUDEDIR=$EYEDB_INSTALLDIR/include
+   EYEDB_LIBDIR=$EYEDB_INSTALLDIR/lib
 
    EYEDB_JAR=${EYEDB_INSTALLDIR}/lib/eyedb/java/eyedb.jar
    AC_CHECK_FILE($EYEDB_JAR,HAVE_EYEDB_JAR="yes",HAVE_EYEDB_JAR="no")
@@ -98,6 +120,8 @@ AM_CONDITIONAL(COND_EYEDB, test x"$COND_EYEDB" = xyes)
 
 AC_SUBST(EYEDB_BINDIR)
 AC_SUBST(EYEDB_SBINDIR)
+AC_SUBST(EYEDB_INCLUDEDIR)
+AC_SUBST(EYEDB_LIBDIR)
 AC_SUBST(EYEDB_JAR)
 
 # ========================================
@@ -212,6 +236,8 @@ AC_SUBST(POLEPOS_DIR)
 # ========================================
 # Generate output files
 # ========================================
+AC_CONFIG_LINKS( ${srcdir}/src/cpp/benchmark/polepos/eyedb/polepos.odl:${srcdir}/src/java/org/eyedb/benchmark/polepos/teams/eyedb/data/data.odl )
+
 AC_CONFIG_FILES(
 Makefile dnl
 run/Makefile dnl
@@ -222,6 +248,10 @@ run/quicktour/db4o/Makefile dnl
 run/quicktour/eyedb/Makefile dnl
 run/quicktour/hibernate/Makefile dnl
 src/Makefile dnl
+src/cpp/Makefile dnl
+src/cpp/benchmark/Makefile dnl
+src/cpp/polepos/Makefile dnl
+src/cpp/polepos/eyedb/Makefile dnl
 src/java/Makefile dnl
 src/java/org/Makefile dnl
 src/java/org/eyedb/Makefile dnl
