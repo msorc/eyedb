@@ -236,7 +236,7 @@ AC_SUBST(POLEPOS_DIR)
 # ========================================
 # Generate output files
 # ========================================
-AC_CONFIG_LINKS( ${srcdir}/src/cpp/benchmark/polepos/eyedb/polepos.odl:${srcdir}/src/java/org/eyedb/benchmark/polepos/teams/eyedb/data/data.odl )
+AC_CONFIG_LINKS( ${srcdir}/src/cpp/polepos/eyedb/polepos.odl:${srcdir}/src/java/org/eyedb/benchmark/polepos/teams/eyedb/data/data.odl )
 
 AC_CONFIG_FILES(
 Makefile dnl
