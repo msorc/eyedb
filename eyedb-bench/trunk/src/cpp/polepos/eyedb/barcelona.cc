@@ -41,7 +41,14 @@ void Barcelona::destroy()
 {
 }
 
-int main( int argc, char **argv)
+void Barcelona::run()
 {
-  return 0;
+  write();
+  lap( "write");
+  read();
+  lap( "read");
+  query();
+  lap( "query");
+  destroy();
+  lap( "destroy");
 }

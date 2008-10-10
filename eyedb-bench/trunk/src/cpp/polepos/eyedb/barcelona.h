@@ -15,6 +15,8 @@ public:
   void query();
   void destroy();
 
+  void run();
+
 private:
 
 };
