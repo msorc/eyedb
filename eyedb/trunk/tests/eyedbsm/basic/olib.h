@@ -1,7 +1,7 @@
 
 /* 
    EyeDB Object Database Management System
-   Copyright (C) 1994-1999,2004-2006 SYSRA
+   Copyright (C) 1994-2008 SYSRA
    
    EyeDB is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
