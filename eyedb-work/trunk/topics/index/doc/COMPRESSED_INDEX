@@ -1,0 +1,130 @@
+
+Compressed Hash Index [23/04/07]
+
+Data grouping introduction
+--------------------------
+
+Idea :
+add an implemention hints : data group size (0 is the default as currently)
+
+Let an bucket entry :
+W1: data1; W2: data2; W3: data3; W1: data4
+
+note: word #0 and #4 are the same (W1), so one can gather the two word entries :
+W1: data1+data4
+
+Unfornately, data index is fixed size, so this is not directly possible.
+It is difficult to have a variable size data unless the index is no more writable (more or less). In this case, one can do:
+W1: datacnt(=2) data1+data4; W2: datacnt(=1) data2; W3: datacnt(=1) data3; etc.
+
+Another way is to have a fixed size data :
+Wx: datacnt data(s)|oid; 
+
+if datacnt <= data group size (given in the implementation hints), data(s) is included, else oid contains data.
+
+The data grouping is independant of the key type : var of fixed strings, numeric type.
+The datacnt attached to each key is interesting as it may be helpful for statistics information.
+
+Note: datacnt may be compressed: 8-1, 16-1, 24-1 or 32-bit size.
+
+Collapse introduction
+---------------------
+
+Another compression consists in implementing a collapse() method to collapse the linked listed objects in the bucket. This method is orthogonal to the implementation of the data group size and can be called on the standard indexes.
+The collapse process must get rid of holes (free cells) in the objets.
+
+Word dictionnary
+----------------
+
+The data grouping implements actually an implicit dictionnary : the difference is that this dictionnary is not in one object and is very fragmented.
+So a dictionnary may be helpful to gather all the words in one object :
+W1, W2, W3, etc.
+warning: W1 may be (and is essentially) variable size, so the dictionnary can only be accessed in a sequential way, not random.
+It can be very useful for substring or regular match :
+let an word expression W, one scans the dictionnary to find all words which match W (substring or regex).
+Then we search this words in the index.
+
+One may add also cnt in this dictionnary (I am not shure this is very useful but why not).
+The management of a dictionnary may be added in an implementation hints too : manage or not a dictionnary.
+Then the dictionnary may be accessed with specific method.
+This dictionnary can be created and updated synchronously or created asynchonously.
+If it has been createda synchonously, it is then updated synchronously.
+
+Data grouping implementation
+----------------------------
+
+Let see the two data grouping implementations:
+implementation #1
+data variable size
+Wx: datacnt data(s)
+
+implementation #2
+data fixed size
+Wx: datacnt data(s)|oid
+
+through the methods : insert(), search(), remove()
+
+implementation #1
+
+- insert(W, datai)
+search W (see below)
+if (found) {
+  copy the entry: W: datacnt data(s)
+  remove the full entry by calling removeDataGroup
+    ==> warning, this may lead to holes that may be managed: allocation and difficult allocation as object are not fixed sized
+    ==> Note: a variable size allocator is already be used in HIdx
+    ==> and if a cell is freed and one or both its neighbours are already freed, collapse is done, so hole count is minimized
+  add W: ++datacnt data(s)+datai by calling insertDataGroup()
+    ==> warning: object size cannot changed in physical datafile, so it may be difficult to add a new data group
+} else {
+  add W: 1 datai
+}
+
+- search(W)
+found W key
+scan the bucket and search for W: only one, so one can stop when we found it.
+Warning: as data is variable, one must take the datacnt into account to jump to the next word
+
+- remove(W, datai)
+search W
+get the entry and find datai (for (i = 0 < datacnt) !memcmp(datai, ...)
+if (found) {
+  copy the entry: W: datacnt data(s)
+  remove the full entry by calling removeDataGroup():
+  if (datacnt - 1 != 0) {
+    add W: --datacnt data(s)-datai by calling insertDataGroup()
+  }
+} else {
+  return false;
+}
+
+implementation #2
+- insert(W, datai)
+search W (see below)
+if (found) {
+   if datacnt+1 <= data group size (given in the implementation hints):
+      add datai at the end of the data(s)
+   else {
+      if datacnt <= data group size {
+          object is not created, so create it: size == datacnt+1 * sizeof(data)
+          copy the data(s)+datai to the new object
+          report oid to W: datacnt oid
+      }
+      else {
+          change object size to datacnt+1 * sizeof(data)
+          => warning: in physical datafile, one cannot change object size, so object must be removed and rebuilt with a new oid. Then this case is nearly the same as prevsously
+      }
+   }
+   => note: the allocation management is easier in this case as there is no removing
+}
+
+- search(W)
+- remove(W, datai)
+
+See how allocation is implemented in standard hash indexes (for remove and then insert): it must not be so easy because key may be of variable size (tVarString)
+=> HASH_INDEX file
+
+Notes :
+- DataGroupedByKey does not mean variable data size : the public interfaces must be the same : the returned data is always of the same size
+- the cursor is different as it must keep the data number
+- one needs a few specific private methods to deal with this type of indexes
