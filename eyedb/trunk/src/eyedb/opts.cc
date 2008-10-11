@@ -1,6 +1,6 @@
 /* 
    EyeDB Object Database Management System
-   Copyright (C) 1994-1999,2004-2006 SYSRA
+   Copyright (C) 1994-2008 SYSRA
    
    EyeDB is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -100,7 +100,7 @@ namespace eyedb {
   void
   printVersion()
   {
-    printf("EyeDB Copyright (C) 1994-1999,2004-2006 SYSRA\n");
+    printf("EyeDB Copyright (C) 1994-2008 SYSRA\n");
     printf(" Version      V%s\n", getVersion());
     printf(" Compiled     %s\n", getCompilationTime());
     printf(" Architecture %s\n", Architecture::getArchitecture()->getArch());
