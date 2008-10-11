@@ -1222,7 +1222,7 @@ HIdx::readCListObjHeader(const Oid &koid, CListObjHeader &h) const
 Status
 HIdx::writeCListObjHeader(const Oid &koid, const CListObjHeader &h) const
 {
-#if 1
+#if 0
   if (h.cell_free_first != NullOffset) {
     CellHeader o = {0};
     Status s = readCellHeader(h.cell_free_first, koid, o);
@@ -1310,7 +1310,7 @@ void HIdx::checkChain(const CListHeader *chd, const std::string &msg) const
 {
  Oid koid = chd->clobj_free_first;
 
-  //printf("\nChecking chain %s {\n", msg.c_str());
+ //printf("\nChecking chain %s {\n", msg.c_str());
 
   int cnt = 0;
   while (koid.getNX()) {
@@ -2446,6 +2446,7 @@ HIdx::remove_realize(CListHeader *chd, unsigned int chd_k,
 			const char *start, const CellHeader *o,
 			const Oid *koid)
 {
+  Status s;
   CListObjHeader h;
 
   mcp(&h, start, sizeof(CListObjHeader));
@@ -2488,11 +2489,17 @@ HIdx::remove_realize(CListHeader *chd, unsigned int chd_k,
 #endif
 
   if (no.free && po.free) {
-      suppressCell(prevcell-start, h, *koid);
-      suppressCell(nextcell-start, h, *koid);
-      insertCell(prevcell-start,
-		 o->size + po.size + no.size + 2 * sizeof(CellHeader),
-		 h, *koid);
+    s = suppressCell(prevcell-start, h, *koid);
+    if (s)
+      return s;
+    s = suppressCell(nextcell-start, h, *koid);
+    if (s)
+      return s;
+    s = insertCell(prevcell-start,
+		   o->size + po.size + no.size + 2 * sizeof(CellHeader),
+		   h, *koid);
+    if (s)
+      return s;
 
       //h.free_whole += o->size + 2 * sizeof(CellHeader);
 #ifdef TRACK_MAP
@@ -2500,29 +2507,35 @@ HIdx::remove_realize(CListHeader *chd, unsigned int chd_k,
 #endif
     }
   else if (no.free) {
-      suppressCell(nextcell-start, h, *koid);
+    s = suppressCell(nextcell-start, h, *koid);
+    if (s)
+      return s;
       // 24/04/07: BUG ?
-      insertCell(curcell-start,
-		 o->size + no.size + sizeof(CellHeader),
-		 h, *koid);
-      //h.free_whole += o->size + sizeof(CellHeader);
+    s = insertCell(curcell-start,
+		   o->size + no.size + sizeof(CellHeader),
+		   h, *koid);
+    //h.free_whole += o->size + sizeof(CellHeader);
 #ifdef TRACK_MAP
-      printf("case no.free\n");
+    printf("case no.free\n");
 #endif
     }
   else if (po.free) {
     // WARNING: 24/04/07 these 2 lines have been swapped !
-      suppressCell(prevcell-start, h, *koid);
-      insertCell(prevcell-start,
-		 o->size + po.size + sizeof(CellHeader),
-		 h, *koid);
+    s = suppressCell(prevcell-start, h, *koid);
+    if (s)
+      return s;
+    s = insertCell(prevcell-start,
+		   o->size + po.size + sizeof(CellHeader),
+		   h, *koid);
       //h.free_whole += o->size + sizeof(CellHeader);
 #ifdef TRACK_MAP
       printf("case po.free\n");
 #endif
     }
   else {
-      insertCell(curcell-start, o->size, h, *koid);
+    s = insertCell(curcell-start, o->size, h, *koid);
+    if (s)
+      return s;
       //h.free_whole += o->size;
 #ifdef TRACK_MAP
       printf("case *no* free\n");
@@ -2532,7 +2545,6 @@ HIdx::remove_realize(CListHeader *chd, unsigned int chd_k,
   // EV: 3/05/07: WHY ??
   h.alloc_cnt--;
 
-  Status s;
   Boolean rmobj = False;
   if (!h.alloc_cnt) {
     s = suppressObjectFromFreeList(*chd, chd_k, h, *koid);
