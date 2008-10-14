@@ -3,9 +3,9 @@ noinst_PROGRAMS= barcelona
 nodist_barcelona_SOURCES= polepos.cc barcelona.cc
 
 EYEDB_INCLUDEDIR=@EYEDB_INCLUDEDIR@
-INCLUDES=-I$(EYEDB_INCLUDEDIR)
+INCLUDES=-I$(EYEDB_INCLUDEDIR) -I$(top_srcdir)/src/cpp/benchmark
 EYEDB_LIBDIR=@EYEDB_LIBDIR@
-LDADD=-L$(EYEDB_LIBDIR) -leyedb -leyedbrpcfe -leyedbsm -leyedbutils -lpthread
+LDADD=-L$(EYEDB_LIBDIR) -leyedb -leyedbrpcfe -leyedbsm -leyedbutils -lpthread $(top_builddir)/src/cpp/benchmark/libeyedbbenchmark.la
 
 EYEDB_BINDIR=@EYEDB_BINDIR@
 EYEDBODLCXX= $(EYEDB_BINDIR)/eyedbodl

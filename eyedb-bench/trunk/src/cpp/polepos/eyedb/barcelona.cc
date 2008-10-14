@@ -1,6 +1,23 @@
-#include <eyedb/eyedb.h>
 #include "barcelona.h"
 #include "polepos.h"
+
+void Barcelona::prepare()
+{
+  loadProperties( "eyedb.properties");
+
+  eyedb::Exception::setMode(eyedb::Exception::ExceptionMode);
+
+  std::string dbName;
+  getStringProperty( "database", dbName);
+
+  conn = new eyedb::Connection( true);
+  database = new poleposDatabase( conn, dbName.c_str(), eyedb::Database::DBRW);
+}
+
+void Barcelona::finish()
+{
+  database->close();
+}
 
 void Barcelona::write()
 {
@@ -52,3 +69,15 @@ void Barcelona::run()
   destroy();
   lap( "destroy");
 }
+
+int main(int argc, char *argv[])
+{
+  polepos initializer(argc, argv);
+
+  Barcelona b;
+
+  b.prepare();
+  b.bench();
+  b.finish();
+}
+

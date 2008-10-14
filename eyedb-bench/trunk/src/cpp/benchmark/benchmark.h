@@ -7,9 +7,6 @@ namespace eyedb {
     class Benchmark {
     public:
 
-      void loadProperties( const std::string &filename);
-      void loadProperties( std::istream &is);
-
       virtual const char* getName() = 0;
       virtual const char* getDescription() = 0;
 
@@ -23,6 +20,14 @@ namespace eyedb {
       }
 
       void bench();
+
+      void loadProperties( const std::string &filename);
+      void loadProperties( std::istream &is);
+
+      int getIntProperty( const std::string &name, int &value, int defaultValue = -1);
+      int getIntProperty( const std::string &name, std::vector<int> &values);
+
+      int getStringProperty( const std::string &name, std::string &value, const std::string &defaultValue = "");
 
       void printProperties();
 
