@@ -31,7 +31,7 @@ namespace eyedb {
       void printProperties();
 
     private:
-      void lexicalError( char c);
+      void lexicalError( char c, int pos, int line);
 
       StopWatch stopwatch;
       std::map<const std::string, std::string> properties;
