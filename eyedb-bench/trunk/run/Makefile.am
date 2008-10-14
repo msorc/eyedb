@@ -1,2 +1,3 @@
-SUBDIRS= polepos quicktour
+SUBDIRS= cpp java
+
 

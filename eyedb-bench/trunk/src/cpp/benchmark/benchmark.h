@@ -14,12 +14,11 @@ namespace eyedb {
       virtual void run() = 0;
       virtual void finish() = 0;
 
-      void lap( const std::string &name) 
-      { 
-	stopwatch.lap( name); 
-      }
-
       void bench();
+
+      void report();
+
+      StopWatch &getStopwatch() { return stopwatch; }
 
       void loadProperties( const std::string &filename);
       void loadProperties( std::istream &is);
