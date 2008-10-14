@@ -12,9 +12,9 @@ public:
   }
 
   void write( int count);
-  void read( int count);
-  void query( int count);
-  void destroy( int count);
+  void read();
+  void query( int selectCount);
+  void destroy();
 
   void prepare();
   void run();

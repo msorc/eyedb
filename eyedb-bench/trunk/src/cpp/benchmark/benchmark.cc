@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <iomanip>
 #include "benchmark.h"
 
 using namespace eyedb::benchmark;
@@ -9,10 +10,10 @@ using namespace std;
 
 void Benchmark::bench()
 {
-  cout << "--------------------------------------------------" << endl;
+  cout << "----------------------------------------------------------------------" << endl;
   cout << getName() << endl;
   cout << getDescription() << endl;
-  cout << "--------------------------------------------------" << endl;
+  cout << "----------------------------------------------------------------------" << endl;
 
   prepare();
   stopwatch.start();
@@ -26,9 +27,9 @@ void Benchmark::bench()
 void Benchmark::report()
 {
   for ( int i = 0; i < getStopwatch().getLapCount(); i++)
-    cout << "[" << getStopwatch().getLapName(i) << "] " << getStopwatch().getLapTime( i) << "ms" << endl;
+    cout << "[" << setiosflags(ios::left) << setw(10) << getStopwatch().getLapName(i) << "] " << getStopwatch().getLapTime( i) << "ms" << endl;
 
-  cout << "[total] " << getStopwatch().getTotalTime() << "ms" << endl;
+  cout << "[" << setiosflags(ios::left) << setw(10) << "total" << "] " << getStopwatch().getTotalTime() << "ms" << endl;
   cout << endl;
 }
 
