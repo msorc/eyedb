@@ -2,6 +2,12 @@
 EYEDB_BINDIR=@EYEDB_BINDIR@
 EYEDB_SBINDIR=@EYEDB_SBINDIR@
 
+read_properties() {
+    PROPERTIES=$1
+    DATABASE=`grep database $PROPERTIES | awk -F = '{print $2}'`
+    PORT=`grep tcp_port $PROPERTIES | awk -F = '{print $2}'`
+}
+
 start_server() {
     PORT=$1
     $EYEDB_SBINDIR/eyedbctl start --listen=$PORT --nod

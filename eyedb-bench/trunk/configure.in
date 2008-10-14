@@ -243,9 +243,12 @@ Makefile dnl
 run/Makefile dnl
 run/cpp/Makefile dnl
 run/cpp/polepos/Makefile dnl
+run/cpp/polepos/eyedb/Makefile dnl
+run/cpp/polepos/eyedb/runit.sh dnl
 run/java/Makefile dnl
 run/java/polepos/Makefile dnl
 run/java/polepos/eyedb/Makefile dnl
+run/java/polepos/eyedb/runit.sh dnl
 run/java/quicktour/Makefile dnl
 run/java/quicktour/db4o/Makefile dnl
 run/java/quicktour/eyedb/Makefile dnl

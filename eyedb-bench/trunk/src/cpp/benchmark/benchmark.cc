@@ -53,9 +53,35 @@ void Benchmark::loadProperties( const string &filename)
   infile.close();
 }
 
-void Benchmark::lexicalError( char c)
+void Benchmark::lexicalError( char c, int pos, int line)
 {
-  cerr << "Error parsing property file: invalid character '" << c << "'\n";
+  cerr << "Error parsing property file: invalid character '" << c << "' near position " << pos << " on line " << line << endl;
+}
+
+static char getchar( istream &is, int &pos, int &line)
+{
+  char c = is.get();
+
+  if (c == '\n') {
+    line++;
+    pos = 0;
+  }
+  else
+    pos++;
+
+  return c;
+}
+
+static void ungetchar( istream &is, char c, int &pos, int &line)
+{
+  is.unget();
+
+  if (c == '\n') {
+    line--;
+    pos = 0;
+  }
+  else
+    pos--;
 }
 
 void Benchmark::loadProperties( istream &is)
@@ -63,10 +89,12 @@ void Benchmark::loadProperties( istream &is)
   char c;
   enum { BEGIN, NAME1, NAME, SKIP1, EQUAL, SKIP2, VALUE, SKIP3 } state;
   string name, value;
+  int pos, line;
 
   state = BEGIN;
+  line = pos = 1;
   while ( true) {
-    c = is.get();
+    c = getchar(is, pos, line);
 
     if (is.eof())
       break;
@@ -75,55 +103,55 @@ void Benchmark::loadProperties( istream &is)
     case BEGIN:
       if (isblank(c) || c == '\n') {
       } else if (isalpha(c)) {
-	is.unget();
+	ungetchar( is, c, pos, line);
 	state = NAME1;
       } else
-	lexicalError( c);
+	lexicalError( c, pos, line);
       break;
     case NAME1:
       if (isalpha(c)) {
 	name += c;
 	state = NAME;
       } else
-	lexicalError( c);
+	lexicalError( c, pos, line);
       break;
     case NAME:
-      if (isalnum(c) || c == '.') {
+      if (isalnum(c) || c == '.' || c == '_') {
 	name += c;
 	state = NAME;
       } else if (isblank(c))
 	state = SKIP1;
       else if (c == '=') {
-	is.unget();
+	ungetchar( is, c, pos, line);
 	state = EQUAL;
       } else
- 	lexicalError( c);
+ 	lexicalError( c, pos, line);
       break;
     case SKIP1:
       if (isblank(c)) {
       } else if (c == '=') {
-	is.unget();
+	ungetchar( is, c, pos, line);
 	state = EQUAL;
       } else
-	lexicalError( c);
+	lexicalError( c, pos, line);
       break;
     case EQUAL:
       if (c == '=') {
 	state = SKIP2;
       } else
-	lexicalError( c);
+	lexicalError( c, pos, line);
       break;
     case SKIP2:
       if (isblank(c)) {
       } else if (isalnum(c)) {
-	is.unget();
+	ungetchar( is, c, pos, line);
 	state = VALUE;
       } else
-	lexicalError( c);
+	lexicalError( c, pos, line);
       break;
     case VALUE:
       if (isspace(c)) {
-	is.unget();
+	ungetchar( is, c, pos, line);
 	properties[name] = value;
 	name.clear();
 	value.clear();
@@ -137,7 +165,7 @@ void Benchmark::loadProperties( istream &is)
       } else if (c == '\n') {
 	state = BEGIN;
       } else
-	lexicalError( c);
+	lexicalError( c, pos, line);
       break;
     }
   }
