@@ -1,0 +1,19 @@
+#!/bin/bash
+top_builddir=@top_builddir@
+top_srcdir=@top_srcdir@
+SCHEMA=$top_srcdir/src/cpp/polepos/eyedb/polepos.odl
+
+run_benchmark() {
+    $top_builddir/src/cpp/polepos/eyedb/barcelona
+}
+
+. $top_builddir/run/utils/eyedb/functions
+
+read_properties eyedb.properties
+stop_server $PORT
+set -e
+start_server $PORT
+delete_db $PORT $DATABASE
+create_db $PORT $DATABASE $SCHEMA
+run_benchmark
+stop_server $PORT
