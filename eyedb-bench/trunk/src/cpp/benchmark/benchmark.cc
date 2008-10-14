@@ -1,10 +1,22 @@
 #include <ctype.h>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include "benchmark.h"
 
 using namespace eyedb::benchmark;
 using namespace std;
+
+void Benchmark::bench()
+{
+  prepare();
+  stopwatch.start();
+  run();
+  stopwatch.stop();
+  finish();
+
+  // Print results
+}
 
 void Benchmark::loadProperties( const string &filename)
 {
@@ -13,6 +25,11 @@ void Benchmark::loadProperties( const string &filename)
   infile.exceptions( ifstream::badbit );
   try {
     infile.open (filename.c_str());
+    if (infile.fail()) {
+      cerr << "Error reading properties file " << filename << endl;
+      return;
+    }
+
     loadProperties( infile);
   }
   catch (ifstream::failure e) {
@@ -112,6 +129,56 @@ void Benchmark::loadProperties( istream &is)
   }
 }
 
+int Benchmark::getIntProperty( const std::string &name, int &value, int defaultValue)
+{
+  value = defaultValue;
+
+  if (properties.find( name) == properties.end())
+    return 0;
+
+  std::istringstream iss(properties[name]);
+
+  if ( iss >> value && iss.eof())
+    return 1;
+
+  return 0;
+}
+
+int Benchmark::getIntProperty( const std::string &name, std::vector<int> &values)
+{
+  values.clear();
+
+  if (properties.find( name) == properties.end())
+    return 0;
+
+  istringstream iss(properties[name]);
+
+  string s;
+  while ( std::getline( iss, s, ',' ) ) {
+    istringstream iss2(s);
+    int value;
+
+    if ( iss2 >> value && iss2.eof())
+      values.push_back( value);
+    else
+      return 0;
+  }
+  
+  return 1;
+}
+
+int Benchmark::getStringProperty( const string &name, string &value, const string &defaultValue)
+{
+  if (properties.find( name) == properties.end()) {
+    value.assign( defaultValue);
+    return 0;
+  }
+
+  value.assign( properties[name]);
+
+  return 1;
+}
+
 void Benchmark::printProperties()
 {
   map<const string, string>::const_iterator begin = properties.begin();
@@ -123,11 +190,3 @@ void Benchmark::printProperties()
   }
 }
 
-void Benchmark::bench()
-{
-  prepare();
-  stopwatch.start();
-  run();
-  stopwatch.stop();
-  finish();
-}
