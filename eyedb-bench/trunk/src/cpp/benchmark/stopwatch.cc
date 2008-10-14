@@ -17,20 +17,23 @@ unsigned long StopWatch::stop()
   if (running) {
     running = false;
     totalTime = time();
-  } else
-    totalTime = 0;
+  }
 
   return totalTime;
 }
 
 unsigned long StopWatch::lap( const std::string &name)
 {
-  unsigned long t = time();
-  unsigned long delta = t - lapTime;
-  laps.push_back( Lap( name, delta));
-  lapTime = t;
+  if (running) {
+    unsigned long t = time();
+    unsigned long delta = t - lapTime;
+    laps.push_back( Lap( name, delta));
+    lapTime = t;
 
-  return delta;
+    return delta;
+  }
+
+  return 0;
 }
 
 void StopWatch::reset()

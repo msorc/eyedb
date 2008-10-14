@@ -31,10 +31,10 @@ int test( int n)
 
   w.stop();
 
-  std::cout << "Total " << w.getTotalTime() << std::endl;
-
   for ( int i = 0; i < w.getLapCount(); i++)
     std::cout << "lap[" << i << "] " << w.getLapName(i) << " " << w.getLapTime( i) << std::endl;
+
+  std::cout << "Total " << w.getTotalTime() << std::endl;
 
   return r;
 }

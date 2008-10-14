@@ -9,13 +9,27 @@ using namespace std;
 
 void Benchmark::bench()
 {
+  cout << "--------------------------------------------------" << endl;
+  cout << getName() << endl;
+  cout << getDescription() << endl;
+  cout << "--------------------------------------------------" << endl;
+
   prepare();
   stopwatch.start();
   run();
   stopwatch.stop();
   finish();
 
-  // Print results
+  cout << endl;
+}
+
+void Benchmark::report()
+{
+  for ( int i = 0; i < getStopwatch().getLapCount(); i++)
+    cout << "[" << getStopwatch().getLapName(i) << "] " << getStopwatch().getLapTime( i) << "ms" << endl;
+
+  cout << "[total] " << getStopwatch().getTotalTime() << "ms" << endl;
+  cout << endl;
 }
 
 void Benchmark::loadProperties( const string &filename)
@@ -129,14 +143,14 @@ void Benchmark::loadProperties( istream &is)
   }
 }
 
-int Benchmark::getIntProperty( const std::string &name, int &value, int defaultValue)
+int Benchmark::getIntProperty( const string &name, int &value, int defaultValue)
 {
   value = defaultValue;
 
   if (properties.find( name) == properties.end())
     return 0;
 
-  std::istringstream iss(properties[name]);
+  istringstream iss(properties[name]);
 
   if ( iss >> value && iss.eof())
     return 1;
@@ -144,7 +158,7 @@ int Benchmark::getIntProperty( const std::string &name, int &value, int defaultV
   return 0;
 }
 
-int Benchmark::getIntProperty( const std::string &name, std::vector<int> &values)
+int Benchmark::getIntProperty( const string &name, vector<int> &values)
 {
   values.clear();
 
@@ -154,7 +168,7 @@ int Benchmark::getIntProperty( const std::string &name, std::vector<int> &values
   istringstream iss(properties[name]);
 
   string s;
-  while ( std::getline( iss, s, ',' ) ) {
+  while ( getline( iss, s, ',' ) ) {
     istringstream iss2(s);
     int value;
 

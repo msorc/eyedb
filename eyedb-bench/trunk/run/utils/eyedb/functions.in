@@ -1,0 +1,35 @@
+#!/bin/bash
+EYEDB_BINDIR=@EYEDB_BINDIR@
+EYEDB_SBINDIR=@EYEDB_SBINDIR@
+
+start_server() {
+    PORT=$1
+    $EYEDB_SBINDIR/eyedbctl start --listen=$PORT --nod
+}
+
+stop_server() {
+    PORT=$1
+    $EYEDB_SBINDIR/eyedbctl stop --listen=$PORT 
+}
+
+delete_db() {
+    PORT=$1
+    DATABASE=$2
+    if $EYEDB_BINDIR/eyedbadmin database list --port=$PORT $DATABASE 2>&1 | grep -v 'not found' > /dev/null ; then
+	$EYEDB_BINDIR/eyedbadmin database delete --port=$PORT $DATABASE
+    fi
+}
+
+create_db() {
+    PORT=$1
+    DATABASE=$2
+    SCHEMA=$3
+    if $EYEDB_BINDIR/eyedbadmin database list --port=$PORT $DATABASE 2>&1 | grep -v 'not found' > /dev/null ; then
+	:
+    else
+	$EYEDB_BINDIR/eyedbadmin database create --port=$PORT $DATABASE
+	$EYEDB_BINDIR/eyedbadmin database defaccess --port=$PORT $DATABASE rw
+	$EYEDB_BINDIR/eyedbodl --port=$PORT --update --database=$DATABASE $SCHEMA
+    fi
+}
+

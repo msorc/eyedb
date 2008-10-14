@@ -1,5 +1,8 @@
+#include <vector>
 #include "barcelona.h"
 #include "polepos.h"
+
+using namespace std;
 
 void Barcelona::prepare()
 {
@@ -7,7 +10,7 @@ void Barcelona::prepare()
 
   eyedb::Exception::setMode(eyedb::Exception::ExceptionMode);
 
-  std::string dbName;
+  string dbName;
   getStringProperty( "database", dbName);
 
   conn = new eyedb::Connection( true);
@@ -19,14 +22,11 @@ void Barcelona::finish()
   database->close();
 }
 
-void Barcelona::write()
+void Barcelona::write( int count)
 {
   try {
     getDatabase()->transactionBegin();
             
-    //    int count = setup()->getObjectCount(); 
-    int count = 10000; 
-
     for ( int i = 0; i < count; i++) {
       B4 *b4 = new B4( getDatabase());
 
@@ -46,28 +46,45 @@ void Barcelona::write()
   }
 }
 
-void Barcelona::read()
+void Barcelona::read( int count)
 {
 }
 
-void Barcelona::query()
+void Barcelona::query( int count)
 {
 }
 
-void Barcelona::destroy()
+void Barcelona::destroy( int count)
 {
 }
 
 void Barcelona::run()
 {
-  write();
-  lap( "write");
-  read();
-  lap( "read");
-  query();
-  lap( "query");
-  destroy();
-  lap( "destroy");
+  vector<int> objects;
+
+  getIntProperty( "objects", objects);
+
+  for (int i = 0; i < objects.size(); i++) {
+    getStopwatch().start();
+
+    write( objects[i]);
+    getStopwatch().lap( "write");
+
+    read( objects[i]);
+    getStopwatch().lap( "read");
+
+    query( objects[i]);
+    getStopwatch().lap( "query");
+
+    destroy( objects[i]);
+    getStopwatch().lap( "destroy");
+
+    getStopwatch().stop();
+
+    report();
+
+    getStopwatch().reset();
+  }
 }
 
 int main(int argc, char *argv[])
@@ -80,4 +97,3 @@ int main(int argc, char *argv[])
   b.bench();
   b.finish();
 }
-

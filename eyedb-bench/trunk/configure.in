@@ -241,12 +241,16 @@ AC_CONFIG_LINKS( ${srcdir}/src/cpp/polepos/eyedb/polepos.odl:${srcdir}/src/java/
 AC_CONFIG_FILES(
 Makefile dnl
 run/Makefile dnl
-run/polepos/Makefile dnl
-run/polepos/eyedb/Makefile dnl
-run/quicktour/Makefile dnl
-run/quicktour/db4o/Makefile dnl
-run/quicktour/eyedb/Makefile dnl
-run/quicktour/hibernate/Makefile dnl
+run/cpp/Makefile dnl
+run/cpp/polepos/Makefile dnl
+run/java/Makefile dnl
+run/java/polepos/Makefile dnl
+run/java/polepos/eyedb/Makefile dnl
+run/java/quicktour/Makefile dnl
+run/java/quicktour/db4o/Makefile dnl
+run/java/quicktour/eyedb/Makefile dnl
+run/java/quicktour/hibernate/Makefile dnl
+run/utils/eyedb/functions dnl
 src/Makefile dnl
 src/cpp/Makefile dnl
 src/cpp/benchmark/Makefile dnl
