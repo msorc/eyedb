@@ -15,7 +15,17 @@ void Barcelona::prepare()
   getStringProperty( "database", dbName);
 
   conn = new eyedb::Connection( true);
-  database = new poleposDatabase( conn, dbName.c_str(), eyedb::Database::DBRW);
+
+  string mode;
+  eyedb::Database::OpenFlag flags;
+  if (getStringProperty( "mode", mode) && mode == "local")
+    flags = eyedb::Database::DBRWLocal;
+  else
+    flags = eyedb::Database::DBRW;
+
+  cout << flags << endl;
+
+  database = new poleposDatabase( conn, dbName.c_str(), flags);
 }
 
 void Barcelona::finish()
