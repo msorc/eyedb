@@ -26,11 +26,15 @@ void Benchmark::bench()
 
 void Benchmark::report()
 {
-  for ( int i = 0; i < getStopwatch().getLapCount(); i++)
-    cout << "[" << setiosflags(ios::left) << setw(10) << getStopwatch().getLapName(i) << "] " << getStopwatch().getLapTime( i) << "ms" << endl;
+  for ( int i = 0; i < getStopwatch().getLapCount(); i++) {
+    cout << "[" << setiosflags(ios::left) << setw(10) << getStopwatch().getLapName(i) << "] ";
+    cout << getStopwatch().getLapTime( i) << "ms";
+    cout << endl;
+  }
 
-  cout << "[" << setiosflags(ios::left) << setw(10) << "total" << "] " << getStopwatch().getTotalTime() << "ms" << endl;
-  cout << endl;
+  cout << "[" << setiosflags(ios::left) << setw(10) << "total" << "] ";
+  cout << getStopwatch().getTotalTime() << "ms";
+  cout << endl << endl;
 }
 
 void Benchmark::loadProperties( const string &filename)

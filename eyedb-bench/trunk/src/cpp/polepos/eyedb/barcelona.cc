@@ -133,7 +133,7 @@ void Barcelona::run()
 
   for (int i = 0; i < objects.size(); i++) {
 
-    cout << "Running bench for " << objects[i] << " objects, " << selects[i] << " selects" << endl;
+    cout << "Running bench with" << " selects:" << selects[i] << " objects:" << objects[i] << endl;
 
     getStopwatch().start();
 
