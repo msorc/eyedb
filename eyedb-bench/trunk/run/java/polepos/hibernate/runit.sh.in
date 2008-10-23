@@ -1,0 +1,35 @@
+#!/bin/bash
+POLEPOS_DIR=@POLEPOS_DIR@
+JAVA=@JAVA@
+top_builddir=@top_builddir@
+
+EYEDB_BENCHMARK_JAR=${top_builddir}/src/java/eyedb-benchmark.jar
+
+build_classpath() {
+    CLASSPATH=""
+    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/graph/jfreechart-1.0.0-pre2.jar
+    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/graph/jcommon-1.0.0-pre2.jar
+    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/graph/itext-1.2.jar
+    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/graph/velocity-dep-1.4.jar
+    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/hibernate-2.1/cglib-full-2.0.2.jar
+    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/hibernate-2.1/commons-collections-2.1.1.jar
+    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/hibernate-2.1/commons-lang-1.0.1.jar
+    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/hibernate-2.1/commons-logging-1.0.4.jar
+    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/hibernate-2.1/dom4j-1.4.jar
+    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/hibernate-2.1/ehcache-0.9.jar
+    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/hibernate-2.1/hibernate2.jar
+    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/hibernate-2.1/jta.jar
+    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/hibernate-2.1/odmg-3.0.jar
+    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/hibernate-2.1/xalan-2.4.0.jar
+    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/hibernate-2.1/xerces-2.4.0.jar
+    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/hibernate-2.1/xml-apis.jar
+    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/mysql-connector-java-3.1.6-bin.jar
+    CLASSPATH=$CLASSPATH:$EYEDB_BENCHMARK_JAR:$POLEPOS_DIR/bin
+}
+
+run_benchmark() {
+    CLASSPATH=$CLASSPATH $JAVA org.eyedb.benchmark.polepos.RunSeasonHibernate
+}
+
+build_classpath
+run_benchmark
