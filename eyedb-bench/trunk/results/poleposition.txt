@@ -1,0 +1,34 @@
+Barcelona	writes, reads, queries and deletes objects with a 5 level inheritance structure									
+										
+Objets:	1000	3000	10000	30000		Objets:	1000	3000	10000	30000
+EyeDB, C++, normal				Ratio EyeDB Java/EyeDB C++ normal				
+write	154	497	1608	5081		write	1,23	1,24	1,27	1,15
+read	154	270	880	2782		read	1,05	1,1	0,84	0,81
+query	5152	14434	44135	132540		query	2,03	1,86	2,06	2,02
+destroy	247	734	2498	8822		destroy	1,36	1,16	1,03	0,99
+total	5707	15935	49121	149225		total	1,95	1,79	1,96	1,91
+EyeDB, C++, local				Ratio EyeDB Java/EyeDB C++ local				
+write	102	320	974	3412		write	1,85	1,93	2,1	1,71
+read	107	121	406	1342		read	1,51	2,46	1,81	1,68
+query	4925	12709	41186	132636		query	2,12	2,11	2,21	2,02
+destroy	187	460	1929	6691		destroy	1,8	1,84	1,34	1,3
+total	5321	13610	44495	144081		total	2,09	2,1	2,17	1,97
+EyeDB, Java										
+write	189	618	2042	5848						
+read	162	298	736	2258						
+query	10446	26779	91078	267720						
+delete	337	848	2578	8728						
+total	11134	28543	96434	284554						
+db4o						Ratio EyeDB Java/db3o for each phase				
+write	53	107	375	768		write	3,57	5,78	5,45	7,61
+read	10	18	51	141		read	16,2	16,56	14,43	16,01
+query	12	11	15	12		query	870,5	2434,45	6071,87	22310
+delete	31	84	305	981		destroy	10,87	10,1	8,45	8,9
+total	106	220	746	1902		total	105,04	129,74	129,27	149,61
+Hibernate, MySQL				Ratio EyeDB Java/Hibernate for each phase				
+write	554	1715	5426	16401		write	0,34	0,36	0,38	0,36
+read	421	1469	4209	15069		read	0,38	0,2	0,17	0,15
+query	99	78	56	79		query	105,52	343,32	1626,39	3388,86
+delete	784	2039	7126	31586		destroy	0,43	0,42	0,36	0,28
+total	1858	5301	16817	63135		total	5,99	5,38	5,73	4,51
+
