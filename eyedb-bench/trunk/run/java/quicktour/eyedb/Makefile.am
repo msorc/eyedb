@@ -6,6 +6,8 @@ noinst_DATA=runit.sh
 
 EDIT = sed \
 	-e 's,@srcdir[@],$(srcdir),g' \
+	-e 's,@top_srcdir[@],$(top_srcdir),g' \
+	-e 's,@top_builddir[@],$(top_builddir),g' \
 	-e 's,@EYEDB_BINDIR\@,$(EYEDB_BINDIR),g' \
 	-e 's,@EYEDB_SBINDIR\@,$(EYEDB_SBINDIR),g' \
 	-e 's,@EYEDB_JAR\@,$(EYEDB_JAR),g' \

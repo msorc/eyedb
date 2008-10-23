@@ -10,7 +10,7 @@ HibernateBench.java \
 Person.java
 
 JAVAROOT=$(top_builddir)/src/java/bench1/hibernate
-CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_builddir)/src/java/eyedb-benchmarks.jar:$(top_srcdir)/src/java:$(HIBERNATE_JAR)
+CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_builddir)/src/java/eyedb-benchmark.jar:$(top_srcdir)/src/java:$(HIBERNATE_JAR)
 
 TESTS_ENVIRONMENT=$(SHELL)
 TESTS=runit.sh

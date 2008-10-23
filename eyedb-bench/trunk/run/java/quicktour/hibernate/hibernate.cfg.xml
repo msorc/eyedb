@@ -31,10 +31,10 @@
         <!-- Drop and re-create the database schema on startup -->
         <property name="hbm2ddl.auto">create</property>
 
-        <mapping resource="Person.hbm.xml"/>
-        <mapping resource="Course.hbm.xml"/>
-        <mapping resource="Student.hbm.xml"/>
-        <mapping resource="Teacher.hbm.xml"/>
+        <mapping resource="org/eyedb/benchmark/quicktour/hibernate/Person.hbm.xml"/>
+        <mapping resource="org/eyedb/benchmark/quicktour/hibernate/Course.hbm.xml"/>
+        <mapping resource="org/eyedb/benchmark/quicktour/hibernate/Student.hbm.xml"/>
+        <mapping resource="org/eyedb/benchmark/quicktour/hibernate/Teacher.hbm.xml"/>
 
     </session-factory>
 

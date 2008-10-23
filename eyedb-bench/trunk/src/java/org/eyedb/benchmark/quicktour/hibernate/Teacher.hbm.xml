@@ -5,7 +5,7 @@
 
 <hibernate-mapping>
 
-  <joined-subclass name="org.eyedb.benchmark.quicktour.hibernate.Teacher" table="TEACHER" extends="Person">
+  <joined-subclass name="org.eyedb.benchmark.quicktour.hibernate.Teacher" table="TEACHER" extends="org.eyedb.benchmark.quicktour.hibernate.Person">
 
     <key column="PERSON_ID"/>
 
