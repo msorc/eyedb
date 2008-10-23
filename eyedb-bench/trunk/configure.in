@@ -135,7 +135,7 @@ DB4O_JAR_DEFAULT=lib/java/db4o/db4o-7.2/lib/db4o-7.2.54.11278-java5.jar
 
 if test "$ac_enable_db4o" = "yes" ; then
    if test x"$DB4O_JAR" = x ; then
-	DB4O_JAR='${top_srcdir}'/$DB4O_JAR_DEFAULT
+	DB4O_JAR='${abs_top_srcdir}'/$DB4O_JAR_DEFAULT
 	HAVE_DB4O_JAR="yes"
    else
 	AC_CHECK_FILE($DB4O_JAR,HAVE_DB4O_JAR="yes",HAVE_DB4O_JAR="no")
@@ -167,14 +167,14 @@ HIBERNATE_LIBDIR_DEFAULT=lib/java/hibernate/hibernate-distribution-3.3.0.SP1/lib
 if test "$ac_enable_hibernate" = "yes" ; then
 
    if test x"$HIBERNATE_JAR" = x ; then
-	HIBERNATE_JAR='${top_srcdir}'/$HIBERNATE_JAR_DEFAULT
+	HIBERNATE_JAR='${abs_top_srcdir}'/$HIBERNATE_JAR_DEFAULT
 	HAVE_HIBERNATE_JAR="yes"
    else
 	AC_CHECK_FILE($HIBERNATE_JAR,HAVE_HIBERNATE_JAR="yes",HAVE_HIBERNATE_JAR="no")
    fi
 
    if test x"$JDBC_CONNECTOR_JAR" = x ; then
-	JDBC_CONNECTOR_JAR='${top_srcdir}'/$JDBC_CONNECTOR_JAR_DEFAULT
+	JDBC_CONNECTOR_JAR='${abs_top_srcdir}'/$JDBC_CONNECTOR_JAR_DEFAULT
 	HAVE_JDBC_CONNECTOR_JAR="yes"
    else
 	AC_CHECK_FILE($JDBC_CONNECTOR_JAR,HAVE_JDBC_CONNECTOR_JAR="yes",HAVE_JDBC_CONNECTOR_JAR="no")
@@ -192,7 +192,7 @@ if test "$ac_enable_hibernate" = "yes" ; then
 	HIBERNATE_LIBDIR=$HIBERNATE_LIBDIR_DEFAULT
 	for j in "${srcdir}/$HIBERNATE_LIBDIR"/*.jar ; do 
 	    j=`echo $j | sed -e "s+^${srcdir}/++"`
-       	    HIBERNATE_CLASSPATH='${top_srcdir}'/$j:$HIBERNATE_CLASSPATH
+       	    HIBERNATE_CLASSPATH='${abs_top_srcdir}'/$j:$HIBERNATE_CLASSPATH
 	done
    else
 	for j in "$HIBERNATE_LIBDIR"/*.jar ; do 

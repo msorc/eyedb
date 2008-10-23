@@ -1,37 +1,27 @@
 #!/bin/bash
+top_builddir=@top_builddir@
+srcdir=@srcdir@
 DB4O_JAR=@DB4O_JAR@
 JAVA=@JAVA@
-srcdir=@srcdir@
+
+EYEDB_BENCHMARK_JAR=${top_builddir}/src/java/eyedb-benchmarks.jar
 
 #BENCHMARK=$1
 #BENCHMARK=CreateBenchmarkLocal
-BENCHMARK=CreateBenchmark
+BENCHMARK=org.eyedb.benchmark.quicktour.db4o.CreateBenchmark
 CLIENT_PROPERTIES=${srcdir}/db4o.client.properties
 SERVER_PROPERTIES=${srcdir}/db4o.server.properties
 
+run_benchmark() {
+    CLASSPATH=$EYEDB_BENCHMARK_JAR:$DB4O_JAR
+    CLASSPATH=$CLASSPATH $JAVA org.eyedb.benchmark.framework.Run $BENCHMARK $CLIENT_PROPERTIES
+}
+
+. $top_builddir/run/utils/db4o/functions
+
 set -e
 
-start_server() {
-    CLASSPATH=.:../../eyedb-benchmarks.jar:../../common/db4o:$DB4O_JAR
-    CLASSPATH=$CLASSPATH $JAVA Db4oServer ${SERVER_PROPERTIES} &
-    echo $! > server.pid
-}
-
-run_benchmark() {
-    CLASSPATH=.:../../eyedb-benchmarks.jar:$DB4O_JAR
-    CLASSPATH=$CLASSPATH time $JAVA org.eyedb.benchmark.Run $BENCHMARK $CLIENT_PROPERTIES
-}
-
-stop_server() {
-    if test -f server.pid; then
-	kill -1 `cat server.pid`
-	rm -f server.pid
-    else
-	echo 'No server PID file, cannot stop server'
-    fi
-}
-
-start_server
+start_server $SERVER_PROPERTIES
 sleep 1
 run_benchmark
 stop_server
