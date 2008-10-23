@@ -2,9 +2,6 @@ EYEDB_BINDIR=@EYEDB_BINDIR@
 EYEDB_SBINDIR=@EYEDB_SBINDIR@
 EYEDB_JAR=@EYEDB_JAR@
 
-TESTS_ENVIRONMENT=$(SHELL)
-TESTS=runit.sh
-
 noinst_DATA=runit.sh
 
 EDIT = sed \
@@ -20,4 +17,7 @@ EDIT = sed \
 	mv $*.sh.tmp $*.sh
 
 runit.sh: Makefile
+
+bench: runit.sh
+	$(SHELL) runit.sh
 

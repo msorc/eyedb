@@ -1,8 +1,5 @@
 DB4O_JAR=@DB4O_JAR@
 
-TESTS_ENVIRONMENT=$(SHELL) -x
-TESTS=runit.sh
-
 noinst_DATA=runit.sh runit-local.sh
 
 EDIT = sed \
@@ -17,3 +14,7 @@ EDIT = sed \
 
 runit.sh: Makefile
 runit-local.sh: Makefile
+
+bench: runit.sh
+	$(SHELL) runit.sh
+

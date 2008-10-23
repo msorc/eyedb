@@ -22,6 +22,7 @@ namespace eyedb {
 
       void loadProperties( const std::string &filename);
       void loadProperties( std::istream &is);
+      void loadProperties( int &argc, char **argv);
 
       int getIntProperty( const std::string &name, int &value, int defaultValue = -1);
       int getIntProperty( const std::string &name, std::vector<int> &values);

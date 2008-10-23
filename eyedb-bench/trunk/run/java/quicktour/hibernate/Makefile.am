@@ -3,9 +3,6 @@ HIBERNATE_CLASSPATH=@HIBERNATE_CLASSPATH@
 JDBC_CONNECTOR_JAR=@JDBC_CONNECTOR_JAR@
 SLF4J_JAR=@SLF4J_JAR@
 
-TESTS_ENVIRONMENT=$(SHELL)
-TESTS=runit.sh
-
 noinst_DATA=runit.sh
 
 EDIT = sed \
@@ -22,5 +19,8 @@ EDIT = sed \
 	mv $*.sh.tmp $*.sh
 
 runit.sh: Makefile
+
+bench: runit.sh
+	$(SHELL) runit.sh
 
 EXTRA_DIST=hibernate.properties

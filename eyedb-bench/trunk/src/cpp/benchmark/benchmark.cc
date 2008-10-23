@@ -176,6 +176,27 @@ void Benchmark::loadProperties( istream &is)
   }
 }
 
+void Benchmark::loadProperties( int &argc, char **argv)
+{
+  for (int i = 0; i < argc; ) {
+    if (!strncmp( argv[i], "-D", 2)) {
+	char *s = argv[i] + 2;
+	char *v = strchr( s, '=');
+
+	if (v != NULL) {
+	  *v = '\0';
+	  properties[s] = v+1;
+
+	  for ( int j = i; j < argc-1; j++)
+	    argv[j] = argv[j+1];
+	  argc--;
+	}
+      }
+    else
+      i++;
+  }
+}
+
 int Benchmark::getIntProperty( const string &name, int &value, int defaultValue)
 {
   value = defaultValue;

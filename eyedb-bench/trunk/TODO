@@ -1,6 +1,20 @@
 
-- add a 'bench' target in Makefiles that runs the benches
-- run the benchs using the make 'bench' target
+- output report in a way that makes it easy to copy/paste in 
+results document
+
+- update Java code to integrate C++ features (laps)
+
+- add profiling flags to C++ compilation
+
+- add command line options to pass properties (-DKEY=VALUE) [DONE]
+- add options or properties to polepos in order to run only specified parts 
+(write/read/query/delete)
+- add more detailled report in bench output
+
+- finish porting polepos to C++
+
+- add a 'bench' target in Makefiles that runs the benches [DONE]
 
 - update README
 - add license (GPL?) and copyright information in all files
+
