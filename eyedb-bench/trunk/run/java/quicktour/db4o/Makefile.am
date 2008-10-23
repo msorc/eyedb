@@ -4,6 +4,7 @@ noinst_DATA=runit.sh runit-local.sh
 
 EDIT = sed \
 	-e 's,@srcdir[@],$(srcdir),g' \
+	-e 's,@top_builddir[@],$(top_builddir),g' \
         -e 's,@DB4O_JAR\@,$(DB4O_JAR),g' \
         -e 's,@JAVA\@,$(JAVA),g' 
 
@@ -16,5 +17,5 @@ runit.sh: Makefile
 runit-local.sh: Makefile
 
 bench: runit.sh
-	$(SHELL) runit.sh
+	$(SHELL) -x runit.sh
 
