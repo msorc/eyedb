@@ -1,0 +1,23 @@
+#!/bin/bash
+abs_top_srcdir=@abs_top_srcdir@
+abs_top_builddir=@abs_top_builddir@
+DB4O_JAR=@DB4O_JAR@
+JAVA=@JAVA@
+
+EYEDB_BENCHMARK_JAR=${abs_top_builddir}/src/java/eyedb-benchmark.jar
+
+start_server() {
+    SERVER_PROPERTIES=$1
+    CLASSPATH=$CLASSPATH:$EYEDB_BENCHMARK_JAR:$DB4O_JAR
+    CLASSPATH=$CLASSPATH $JAVA org.eyedb.benchmark.utils.db4o.Db4oServer ${SERVER_PROPERTIES} &
+    echo $! > server.pid
+}
+
+stop_server() {
+    if test -f server.pid; then
+	kill -1 `cat server.pid`
+	rm -f server.pid
+    else
+	echo 'No server PID file, cannot stop server'
+    fi
+}

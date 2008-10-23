@@ -1,0 +1,23 @@
+#!/bin/bash
+POLEPOS_DIR=@POLEPOS_DIR@
+JAVA=@JAVA@
+top_builddir=@top_builddir@
+
+EYEDB_BENCHMARK_JAR=${top_builddir}/src/java/eyedb-benchmark.jar
+
+build_classpath() {
+    CLASSPATH=""
+    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/graph/jfreechart-1.0.0-pre2.jar
+    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/graph/jcommon-1.0.0-pre2.jar
+    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/graph/itext-1.2.jar
+    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/graph/velocity-dep-1.4.jar
+    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/db4o-6.3-java5.jar
+    CLASSPATH=$CLASSPATH:$EYEDB_BENCHMARK_JAR:$POLEPOS_DIR/bin
+}
+
+run_benchmark() {
+    CLASSPATH=$CLASSPATH $JAVA org.eyedb.benchmark.polepos.RunSeasonDb4o
+}
+
+build_classpath
+run_benchmark

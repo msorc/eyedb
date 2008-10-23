@@ -1,4 +1,4 @@
-SUBDIRS=eyedb
+SUBDIRS=db4o eyedb hibernate
 
 bench:
 	for d in $(SUBDIRS) ; do \

@@ -2,6 +2,7 @@ SUBDIRS=teams
 
 packagedir=$(pkglibdir)/java/classes/org/eyedb/benchmark/polepos
 dist_package_JAVA =\
+RunSeasonDb4o.java \
 RunSeasonEyeDB.java 
 
 POLEPOS_DIR=@POLEPOS_DIR@
