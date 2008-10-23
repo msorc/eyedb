@@ -24,5 +24,3 @@ runit.sh: Makefile
 
 bench: runit.sh
 	$(SHELL) runit.sh
-
-
