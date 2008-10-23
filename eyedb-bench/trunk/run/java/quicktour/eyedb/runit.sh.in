@@ -1,51 +1,28 @@
 #!/bin/bash
-EYEDB_BINDIR=@EYEDB_BINDIR@
-EYEDB_SBINDIR=@EYEDB_SBINDIR@
+top_srcdir=@top_srcdir@
+top_builddir=@top_builddir@
 EYEDB_JAR=@EYEDB_JAR@
 JAVA=@JAVA@
-srcdir=@srcdir@
+
+EYEDB_BENCHMARK_JAR=${top_builddir}/src/java/eyedb-benchmark.jar
 #BENCHMARK=$1
-BENCHMARK=CreateBenchmark
-PROPERTIES=${srcdir}/eyedb.properties
-
-DATABASE=`grep database $PROPERTIES | awk -F = '{print $2}'`
-PORT=`grep tcp_port $PROPERTIES | awk -F = '{print $2}'`
-SCHEMA=${srcdir}/quicktour.odl
-
-start_server() {
-    $EYEDB_SBINDIR/eyedbctl start --listen=$PORT --nod
-}
-
-delete_db() {
-    if $EYEDB_BINDIR/eyedbadmin database list --port=$PORT $DATABASE 2>&1 | grep -v 'not found' > /dev/null ; then
-	$EYEDB_BINDIR/eyedbadmin database delete --port=$PORT $DATABASE
-    fi
-}
-
-create_db() {
-    if $EYEDB_BINDIR/eyedbadmin database list --port=$PORT $DATABASE 2>&1 | grep -v 'not found' > /dev/null ; then
-	:
-    else
-	$EYEDB_BINDIR/eyedbadmin database create --port=$PORT $DATABASE
-	$EYEDB_BINDIR/eyedbadmin database defaccess --port=$PORT $DATABASE rw
-	$EYEDB_BINDIR/eyedbodl --port=$PORT --update --database=$DATABASE $SCHEMA
-    fi
-}
+BENCHMARK=org.eyedb.benchmark.quicktour.eyedb.CreateBenchmark
+SCHEMA=${top_srcdir}/src/java/org/eyedb/benchmark/quicktour/eyedb/quicktour/quicktour.odl 
+PROPERTIES=eyedb.properties
 
 run_benchmark() {
-    CLASSPATH=.:../../eyedb-benchmarks.jar:$EYEDB_JAR
-    CLASSPATH=$CLASSPATH time $JAVA org.eyedb.benchmark.Run $BENCHMARK $PROPERTIES
+    CLASSPATH=$EYEDB_BENCHMARK_JAR:$EYEDB_JAR
+    CLASSPATH=$CLASSPATH $JAVA org.eyedb.benchmark.framework.Run $BENCHMARK $PROPERTIES
 }
 
-stop_server() {
-    $EYEDB_SBINDIR/eyedbctl stop --listen=$PORT 
-}
+. $top_builddir/run/utils/eyedb/functions
 
-stop_server
+read_properties $PROPERTIES
+stop_server $PORT
 set -e
-start_server
-delete_db
-create_db
+start_server $PORT
+delete_db $PORT $DATABASE
+create_db $PORT $DATABASE $SCHEMA
 run_benchmark
-stop_server
+stop_server $PORT
 

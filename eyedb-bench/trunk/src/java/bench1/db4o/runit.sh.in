@@ -9,13 +9,13 @@ SERVER_PROPERTIES=${srcdir}/db4o.server.properties
 set -e
 
 start_server() {
-    CLASSPATH=.:../../eyedb-benchmarks.jar:$DB4O_JAR
+    CLASSPATH=.:../../eyedb-benchmark.jar:$DB4O_JAR
     CLASSPATH=$CLASSPATH $JAVA Db4oServer ${SERVER_PROPERTIES} &
     echo $! > server.pid
 }
 
 run_benchmark() {
-    CLASSPATH=.:../../eyedb-benchmarks.jar:$DB4O_JAR
+    CLASSPATH=.:../../eyedb-benchmark.jar:$DB4O_JAR
     CLASSPATH=$CLASSPATH $JAVA org.eyedb.benchmark.Run Db4oBench ${CLIENT_PROPERTIES}
 }
 

@@ -1,36 +1,11 @@
-EYEDB_BINDIR=@EYEDB_BINDIR@
-EYEDB_SBINDIR=@EYEDB_SBINDIR@
-EYEDB_JAR=@EYEDB_JAR@
-
-ODL_PACKAGE=org.eyedb.benchmark.quicktour.eyedb.quicktour
-ODL_DIR=quicktour
-EYEDBODLJAVA = $(EYEDB_BINDIR)/eyedbodl --gencode=java
-EYEDBODLJAVAFLAGS= --no-rootclass --package=$(ODL_PACKAGE) --output-dir=$(ODL_DIR)
+SUBDIRS=quicktour
 
 packagedir=$(pkglibdir)/java/classes/org/eyedb/benchmark/quicktour/eyedb
-
-JAVA_ODL_FILES=$(addprefix $(ODL_DIR)/, \
-Course.java \
-Database.java \
-Person.java \
-set_class_Course_ref.java \
-set_class_Student_ref.java \
-Student.java \
-Teacher.java )
-
 dist_package_JAVA =\
 Benchmark.java \
-CreateBenchmark.java \
-$(JAVA_ODL_FILES)
+CreateBenchmark.java 
 
+EYEDB_JAR=@EYEDB_JAR@
 JAVAROOT=$(top_builddir)/src/java
-CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_builddir)/src/java/eyedb-benchmarks.jar:$(top_srcdir)/src/java:$(EYEDB_JAR)
+CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_builddir)/src/java:$(EYEDB_JAR)
 
-$(JAVA_ODL_FILES): quicktour.odl
-	$(EYEDBODLJAVA) $(EYEDBODLJAVAFLAGS) $<
-
-clean-local:
-	-rm -f $(JAVA_ODL_FILES)
-	-rm -f $(ODL_PACKAGE)/*.class
-
-EXTRA_DIST= quicktour.odl

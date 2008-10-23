@@ -5,7 +5,7 @@ JAVA=@JAVA@
 set -e
 
 run_benchmark() {
-    CLASSPATH=.:../../eyedb-benchmarks.jar:$DB4O_JAR
+    CLASSPATH=.:../../eyedb-benchmark.jar:$DB4O_JAR
     CLASSPATH=$CLASSPATH $JAVA org.eyedb.benchmark.Run Db4oBench1Local db4o.local.properties
 }
 

@@ -8,7 +8,7 @@ Db4oBench1.java \
 Person.java
 
 JAVAROOT=$(top_builddir)/src/java/bench2/db4o
-CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_builddir)/src/java/eyedb-benchmarks.jar:$(top_srcdir)/src/java:$(DB4O_JAR)
+CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_builddir)/src/java/eyedb-benchmark.jar:$(top_srcdir)/src/java:$(DB4O_JAR)
 
 noinst_DATA=runit.sh
 

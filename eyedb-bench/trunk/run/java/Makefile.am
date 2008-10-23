@@ -1,4 +1,4 @@
-SUBDIRS= polepos quicktour
+SUBDIRS= quicktour polepos
 
 bench:
 	for d in $(SUBDIRS) ; do \

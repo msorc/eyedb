@@ -7,6 +7,7 @@ noinst_DATA=runit.sh
 
 EDIT = sed \
 	-e 's,@srcdir[@],$(srcdir),g' \
+	-e 's,@top_builddir[@],$(top_builddir),g' \
 	-e 's,@HIBERNATE_JAR[@],$(HIBERNATE_JAR),g' \
 	-e 's,@HIBERNATE_CLASSPATH[@],$(HIBERNATE_CLASSPATH),g '\
 	-e 's,@JDBC_CONNECTOR_JAR[@],$(JDBC_CONNECTOR_JAR),g '\
