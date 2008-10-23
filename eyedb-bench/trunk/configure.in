@@ -244,15 +244,14 @@ run/Makefile dnl
 run/cpp/Makefile dnl
 run/cpp/polepos/Makefile dnl
 run/cpp/polepos/eyedb/Makefile dnl
-run/cpp/polepos/eyedb/runit.sh dnl
 run/java/Makefile dnl
 run/java/polepos/Makefile dnl
 run/java/polepos/eyedb/Makefile dnl
-run/java/polepos/eyedb/runit.sh dnl
 run/java/quicktour/Makefile dnl
 run/java/quicktour/db4o/Makefile dnl
 run/java/quicktour/eyedb/Makefile dnl
 run/java/quicktour/hibernate/Makefile dnl
+run/utils/db4o/functions dnl
 run/utils/eyedb/functions dnl
 src/Makefile dnl
 src/cpp/Makefile dnl
@@ -272,8 +271,8 @@ src/java/org/eyedb/benchmark/quicktour/Makefile dnl
 src/java/org/eyedb/benchmark/quicktour/db4o/Makefile dnl
 src/java/org/eyedb/benchmark/quicktour/eyedb/Makefile dnl
 src/java/org/eyedb/benchmark/quicktour/hibernate/Makefile dnl
-src/java/common/Makefile dnl
-src/java/common/db4o/Makefile dnl
+src/java/org/eyedb/benchmark/utils/Makefile dnl
+src/java/org/eyedb/benchmark/utils/db4o/Makefile dnl
 src/java/bench1/Makefile dnl
 src/java/bench1/eyedb/Makefile dnl
 src/java/bench1/db4o/Makefile dnl

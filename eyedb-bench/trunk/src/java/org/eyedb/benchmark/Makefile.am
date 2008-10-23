@@ -4,4 +4,4 @@ else
 POLEPOS_SUBDIR=
 endif
 
-SUBDIRS=framework $(POLEPOS_SUBDIR) quicktour
+SUBDIRS=framework $(POLEPOS_SUBDIR) quicktour utils

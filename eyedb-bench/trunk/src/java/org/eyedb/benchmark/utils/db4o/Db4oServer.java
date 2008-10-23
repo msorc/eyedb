@@ -1,6 +1,8 @@
+package org.eyedb.benchmark.utils.db4o;
+
 import com.db4o.*;
 import com.db4o.messaging.*;
-import org.eyedb.benchmark.Properties;
+import org.eyedb.benchmark.framework.Properties;
 import java.io.*;
 
 public class Db4oServer implements MessageRecipient {
@@ -30,7 +32,6 @@ public class Db4oServer implements MessageRecipient {
 	    System.exit( 1);
 	}
     }
-
 
     public void runServer()
     {

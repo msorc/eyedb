@@ -1,3 +1,4 @@
+#include <iostream>
 #include <vector>
 #include <stdio.h>
 #include "barcelona.h"
@@ -7,8 +8,6 @@ using namespace std;
 
 void Barcelona::prepare()
 {
-  loadProperties( "eyedb.properties");
-
   eyedb::Exception::setMode(eyedb::Exception::ExceptionMode);
 
   string dbName;
@@ -169,9 +168,14 @@ void Barcelona::run()
 
 int main(int argc, char *argv[])
 {
-  polepos initializer(argc, argv);
-
   Barcelona b;
+  b.loadProperties( "eyedb.properties");
+  b.loadProperties( argc, argv);
+  b.printProperties();
+  for (int i = 0; i < argc; i++)
+    cout << "[" << i << "] " << argv[i] << endl;
+
+  polepos initializer(argc, argv);
 
   b.bench();
 }
