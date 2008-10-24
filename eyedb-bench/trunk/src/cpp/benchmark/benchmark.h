@@ -11,7 +11,7 @@ namespace eyedb {
 
       virtual const char* getName() = 0;
       virtual const char* getDescription() = 0;
-      virtual const char* getRunInfo() = 0;
+      virtual const char* getRunDescription() = 0;
       
       virtual void prepare() = 0;
       virtual void run() = 0;

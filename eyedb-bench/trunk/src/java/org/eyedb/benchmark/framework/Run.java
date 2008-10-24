@@ -14,7 +14,7 @@ public class Run {
 
 	    benchmark.loadProperties( propertiesFileName);
 
-	    benchmark.doIt();
+	    benchmark.bench();
 	}
 	catch( Exception e) {
 	    e.printStackTrace();

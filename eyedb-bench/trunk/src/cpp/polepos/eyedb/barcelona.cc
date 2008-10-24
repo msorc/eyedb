@@ -8,7 +8,7 @@
 
 using namespace std;
 
-const char* Barcelona::getRunInfo()
+const char* Barcelona::getRunDescription()
 {
   string info = "EyeDB C++ implementation";
 

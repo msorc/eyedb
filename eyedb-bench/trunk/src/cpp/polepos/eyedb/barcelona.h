@@ -22,7 +22,7 @@ public:
 
   const char* getName() { return "Barcelona"; }
   const char* getDescription() { return "writes, reads, queries and deletes objects with a 5 level inheritance structure"; }
-  const char* getRunInfo();
+  const char* getRunDescription();
 
   eyedb::Database *getDatabase() { return database; }
 
