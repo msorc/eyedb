@@ -8,32 +8,69 @@
 using namespace eyedb::benchmark;
 using namespace std;
 
+const int Benchmark::defaultColumnWidth = 10;
+const char Benchmark::defaultColumnSeparator = ',';
+
+Benchmark::Benchmark() 
+  : columnWidth( defaultColumnWidth), columnSeparator( defaultColumnSeparator), 
+    reportLapsDone(false), reportColumnHeadersDone(false) 
+{
+}
+
 void Benchmark::bench()
 {
-  cout << "----------------------------------------------------------------------" << endl;
-  cout << getName() << endl;
-  cout << getDescription() << endl;
-  cout << "----------------------------------------------------------------------" << endl;
-
+  reportBegin();
   prepare();
   stopwatch.start();
   run();
   stopwatch.stop();
   finish();
-
+  reportEnd();
 }
 
-void Benchmark::report()
+void Benchmark::reportBegin()
 {
-  for ( int i = 0; i < getStopwatch().getLapCount(); i++) {
-    cout << "[" << setiosflags(ios::left) << setw(10) << getStopwatch().getLapName(i) << "] ";
-    cout << getStopwatch().getLapTime( i) << "ms";
-    cout << endl;
+  cout << endl;
+  cout << "Bench: " << getName() << endl;
+  cout << getDescription() << endl;
+  cout << endl;
+  cout << getRunInfo() << endl;
+}
+
+void Benchmark::reportLaps()
+{
+  reportLapsDone = true;
+
+  if (!reportColumnHeadersDone) {
+    reportColumnHeadersDone = true;
+
+    if (columnHeaders.size() != 0) {
+      for ( int i = 0; i < columnHeaders.size(); i ++) {
+	cout << setiosflags(ios::right) << setw( columnWidth) << columnHeaders[i];
+	if (i != columnHeaders.size() - 1)
+	  cout << columnSeparator;
+      }
+
+      cout << endl;
+    }
   }
 
-  cout << "[" << setiosflags(ios::left) << setw(10) << "total" << "] ";
-  cout << getStopwatch().getTotalTime() << "ms";
-  cout << endl << endl;
+  if (rowHeader.size() != 0)
+    cout << setiosflags(ios::right) << setw( columnWidth) << rowHeader << columnSeparator;
+
+  for ( int i = 0; i < getStopwatch().getLapCount(); i++) {
+    cout << setiosflags(ios::right) << setw( columnWidth) << getStopwatch().getLapTime( i) << columnSeparator;
+  }
+
+  cout << setiosflags(ios::right) << setw( columnWidth) << getStopwatch().getTotalTime() << endl;
+}
+
+void Benchmark::reportEnd()
+{
+  if (!reportLapsDone)
+    reportLaps();
+
+  cout << endl;
 }
 
 void Benchmark::loadProperties( const string &filename)
