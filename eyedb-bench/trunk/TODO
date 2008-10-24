@@ -1,13 +1,13 @@
 
 - output report in a way that makes it easy to copy/paste in results document: output laps as columns and not lines, add reportBegin() and reportEnd() [DONE]
 
-- update Java code to integrate C++ features (report)
+- update Java code to integrate C++ features [DONE]
 
 - add indexes in Barcelona, check Hibernate code [DONE]
 
 - add profiling flags to C++ compilation
 
-- add command line options to pass properties (-DKEY=VALUE) [DONE]
+- add command line options to pass properties (-DKEY=VALUE) [DONE FOR C++]
 - add options or properties to polepos in order to run only specified parts 
 (write/read/query/delete)
 - add more detailled report in bench output (implementation, platform) [DONE]

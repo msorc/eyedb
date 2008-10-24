@@ -34,7 +34,7 @@ void Benchmark::reportBegin()
   cout << "Bench: " << getName() << endl;
   cout << getDescription() << endl;
   cout << endl;
-  cout << getRunInfo() << endl;
+  cout << getRunDescription() << endl;
 }
 
 void Benchmark::reportLaps()
