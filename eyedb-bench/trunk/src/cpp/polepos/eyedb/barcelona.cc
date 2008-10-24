@@ -1,10 +1,23 @@
 #include <iostream>
+#include <sstream>
+#include <string>
 #include <vector>
 #include <stdio.h>
 #include "barcelona.h"
 #include "polepos.h"
 
 using namespace std;
+
+const char* Barcelona::getRunInfo()
+{
+  string info = "EyeDB C++ implementation";
+
+  string mode;
+  if (getStringProperty( "mode", mode) && mode == "local")
+    info += " local mode";
+
+  return info.c_str();
+}
 
 void Barcelona::prepare()
 {
@@ -22,15 +35,12 @@ void Barcelona::prepare()
   else
     flags = eyedb::Database::DBRW;
 
-  cout << flags << endl;
-
   database = new poleposDatabase( conn, dbName.c_str(), flags);
 }
 
 void Barcelona::finish()
 {
   database->close();
-  //  conn->
 }
 
 void Barcelona::write( int count)
@@ -137,12 +147,23 @@ void Barcelona::run()
   vector<int> objects;
   vector<int> selects;
 
+  addColumnHeader( "objects/selects");
+  addColumnHeader( "write (ms)");
+  addColumnHeader( "read (ms)");
+  addColumnHeader( "query (ms)");
+  addColumnHeader( "destroy (ms)");
+  addColumnHeader( "total (ms)");
+
+  setColumnWidth( 15);
+
   getIntProperty( "objects", objects);
   getIntProperty( "selects", selects);
-
+  
   for (int i = 0; i < objects.size(); i++) {
 
-    cout << "Running bench with" << " selects:" << selects[i] << " objects:" << objects[i] << endl;
+    ostringstream oss;
+    oss << objects[i] << "/" << selects[i];
+    setRowHeader( oss.str());
 
     getStopwatch().start();
 
@@ -160,7 +181,7 @@ void Barcelona::run()
 
     getStopwatch().stop();
 
-    report();
+    reportLaps();
 
     getStopwatch().reset();
   }
@@ -171,9 +192,6 @@ int main(int argc, char *argv[])
   Barcelona b;
   b.loadProperties( "eyedb.properties");
   b.loadProperties( argc, argv);
-  b.printProperties();
-  for (int i = 0; i < argc; i++)
-    cout << "[" << i << "] " << argv[i] << endl;
 
   polepos initializer(argc, argv);
 

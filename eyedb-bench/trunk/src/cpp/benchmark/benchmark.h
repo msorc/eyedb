@@ -7,16 +7,25 @@ namespace eyedb {
     class Benchmark {
     public:
 
+      Benchmark();
+
       virtual const char* getName() = 0;
       virtual const char* getDescription() = 0;
-
+      virtual const char* getRunInfo() = 0;
+      
       virtual void prepare() = 0;
       virtual void run() = 0;
       virtual void finish() = 0;
 
       void bench();
 
-      void report();
+      void setColumnWidth( int width) { columnWidth = width; }
+      void setColumnSeparator( char separator) { columnSeparator = separator; }
+      void addColumnHeader( const std::string &header) { columnHeaders.push_back( header); }
+      void setRowHeader( const std::string &header) { rowHeader = header; }
+      void reportBegin();
+      void reportLaps();
+      void reportEnd();
 
       StopWatch &getStopwatch() { return stopwatch; }
 
@@ -36,6 +45,16 @@ namespace eyedb {
 
       StopWatch stopwatch;
       std::map<const std::string, std::string> properties;
+
+      std::vector< std::string> columnHeaders;
+      std::string rowHeader;
+      int columnWidth;
+      char columnSeparator;
+      bool reportLapsDone;
+      bool reportColumnHeadersDone;
+
+      static const int defaultColumnWidth;
+      static const char defaultColumnSeparator;
     };
   };
 };
