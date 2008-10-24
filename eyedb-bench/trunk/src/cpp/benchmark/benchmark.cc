@@ -21,7 +21,6 @@ void Benchmark::bench()
   stopwatch.stop();
   finish();
 
-  cout << endl;
 }
 
 void Benchmark::report()
