@@ -1,6 +1,7 @@
 package org.eyedb.benchmark.framework;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 /**
  * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)
@@ -12,6 +13,30 @@ public abstract class Benchmark {
     {
 	stopWatch = new StopWatch();
 	properties = new Properties();
+    }
+
+    abstract String getName();
+
+    abstract String getDescription();
+
+    abstract public void prepare();
+
+    abstract public void run();
+
+    abstract public void finish();
+
+    public void bench()
+    {
+	prepare();
+	stopWatch.start();
+	run();
+	stopWatch.stop();
+	finish();
+	System.out.println( "Total bench time: " + stopWatch.getTotalTime() + "mS");
+    }
+
+    public void report()
+    {
     }
 
     protected Properties getProperties()
@@ -31,22 +56,6 @@ public abstract class Benchmark {
 	    e.printStackTrace();
 	    System.exit( 1);
 	}
-    }
-
-    abstract public void prepare();
-
-    abstract public void run();
-
-    abstract public void finish();
-
-    public void doIt()
-    {
-	prepare();
-	stopWatch.start();
-	run();
-	stopWatch.stop();
-	finish();
-	System.out.println( "Total bench time: " + stopWatch.getTotalTime() + "mS");
     }
 
     private StopWatch stopWatch;
