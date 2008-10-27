@@ -131,7 +131,7 @@ AC_SUBST(EYEDB_JAR)
 AC_ARG_VAR(DB4O_JAR,[DB4O jar file])
 
 # To be changed if DB4O version changes
-DB4O_JAR_DEFAULT=lib/java/db4o/db4o-7.2/lib/db4o-7.2.54.11278-java5.jar
+DB4O_JAR_DEFAULT=dependencies/db4o/db4o-7.2/lib/db4o-7.2.54.11278-java5.jar
 
 if test "$ac_enable_db4o" = "yes" ; then
    if test x"$DB4O_JAR" = x ; then
@@ -159,10 +159,10 @@ AC_ARG_VAR(SLF4J_CONNECTOR_JAR,[SLF4J jar file])
 AC_ARG_VAR(HIBERNATE_LIBDIR,[Hibernate libraries directory])
 
 # To be changed if Hibernate or JDBC version changes
-HIBERNATE_JAR_DEFAULT=lib/java/hibernate/hibernate-distribution-3.3.0.SP1/hibernate3.jar
-JDBC_CONNECTOR_JAR_DEFAULT=lib/java/jdbc/mysql-connector-java-5.1.6/mysql-connector-java-5.1.6-bin.jar
-SLF4J_JAR_DEFAULT=lib/java/slf4j/slf4j-1.5.2/slf4j-simple-1.5.2.jar
-HIBERNATE_LIBDIR_DEFAULT=lib/java/hibernate/hibernate-distribution-3.3.0.SP1/lib/required
+HIBERNATE_JAR_DEFAULT=dependencies/hibernate/hibernate-distribution-3.3.0.SP1/hibernate3.jar
+JDBC_CONNECTOR_JAR_DEFAULT=dependencies/jdbc/mysql-connector-java-5.1.6/mysql-connector-java-5.1.6-bin.jar
+SLF4J_JAR_DEFAULT=dependencies/slf4j/slf4j-1.5.2/slf4j-simple-1.5.2.jar
+HIBERNATE_LIBDIR_DEFAULT=dependencies/hibernate/hibernate-distribution-3.3.0.SP1/lib/required
 
 if test "$ac_enable_hibernate" = "yes" ; then
 
