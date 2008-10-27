@@ -56,6 +56,21 @@ public class CreateBenchmark extends Benchmark {
 	return courses;
     }
 
+    public String getName()
+    {
+	return "Quicktour create";
+    }
+
+    public String getDescription()
+    {
+	return "Quicktour objects creation with one-to-many and many-to-many relations with referential integrity check";
+    }
+
+    public String getRunDescription()
+    {
+	return "Hibernate Java implementation";
+    }
+
     public void run()
     {
 	int nStudents = getProperties().getIntProperty( "students");
