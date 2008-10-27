@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd">
+
+<hibernate-mapping package="org.polepos.teams.hibernate.data">
+	<class name="HibernateTree" table="tHibernateTree">
+		<id column="id" type="int">
+        	<generator class="native"/>
+		</id>
+		<many-to-one name="preceding" column="preceding"/>
+		<many-to-one name="subsequent" column="subsequent"/>
+		<property name="name"		column="name"		type="string"	length="100"/>
+		<property name="depth"	    column="depth"	    type="int"/>
+	</class>
+</hibernate-mapping>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jdo>
+    <package name="org.polepos.teams.jdo.data">
+        <class name="JB0"/>
+        <class name="JB1" persistence-capable-superclass="JB0">
+			<extension vendor-name="versant" key="jdbc-inheritance" value="vertical" />
+        </class>
+        <class name="JB2" persistence-capable-superclass="JB1">
+        	<extension vendor-name="versant" key="jdbc-index" value="idx_b2">
+				<extension vendor-name="versant" key="field-name" value="b2" />
+			</extension>
+        	<extension vendor-name="objectdb" key="index" value="b2" /> 
+        	<extension vendor-name="versant" key="jdbc-inheritance" value="vertical" />
+        </class>
+        <class name="JB3" persistence-capable-superclass="JB2">
+        	<extension vendor-name="versant" key="jdbc-inheritance" value="vertical" />
+        </class>
+        <class name="JB4" persistence-capable-superclass="JB3">
+        	<extension vendor-name="versant" key="jdbc-inheritance" value="vertical" />
+        </class>
+        <class name="JdoTree"/>
+        <class name="JdoPilot"/>
+        <class name="JdoIndexedPilot">
+        	<extension vendor-name="objectdb" key="index" value="mName" /> 
+        	<extension vendor-name="objectdb" key="index" value="mLicenseID" />
+        	<extension vendor-name="versant" key="jdbc-index" value="idx_mName">
+				<extension vendor-name="versant" key="field-name" value="mName" />
+			</extension>
+        	<extension vendor-name="versant" key="jdbc-index" value="idx_mLicenseID">
+				<extension vendor-name="versant" key="field-name" value="mLicenseID" />
+			</extension>
+        </class>
+    </package>
+</jdo>

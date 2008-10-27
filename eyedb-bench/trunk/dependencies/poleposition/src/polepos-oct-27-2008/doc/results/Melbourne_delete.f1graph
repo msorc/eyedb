@@ -1,0 +1,9 @@
+Melbourne delete	commitinterval:1000 objects:3000	commitinterval:1000 objects:10000	commitinterval:1000 objects:30000	commitinterval:1000 objects:100000
+db4o/4.5.200	256	742	2218	7621
+Hibernate/hsqldb	241	501	1713	5793
+Hibernate/mysql	896	3285	9130	31120
+JDBC/MySQL	23	130	198	671
+JDBC/Mckoi	487	1597	4943	19112
+JDBC/Derby	270	791	2828	7777
+JDBC/HSQLDB	75	227	784	1983
+JDO/VOA/mysql	292	922	3593	28468

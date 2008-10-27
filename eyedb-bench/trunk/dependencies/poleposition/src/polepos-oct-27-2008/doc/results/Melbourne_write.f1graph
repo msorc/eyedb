@@ -1,0 +1,9 @@
+Melbourne write	commitinterval:1000 objects:3000	commitinterval:1000 objects:10000	commitinterval:1000 objects:30000	commitinterval:1000 objects:100000
+db4o/4.5.200	496	931	2450	8508
+Hibernate/hsqldb	1028	1602	5811	23687
+Hibernate/mysql	2006	5570	16880	61503
+JDBC/MySQL	799	3060	7920	26147
+JDBC/Mckoi	2009	4359	14689	48335
+JDBC/Derby	1236	1383	3896	13498
+JDBC/HSQLDB	91	291	981	3113
+JDO/VOA/mysql	1104	2814	8548	28851

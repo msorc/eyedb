@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>PolePosition benchmark results</title>
+<link rel="stylesheet" href="style.css" type="text/css">
+</head>
+<body>
+<table width="100%">
+	<tr>
+		<td>
+			<h2>PolePosition benchmark results</h2>
+			<a href="http://www.polepos.org">http://www.polepos.org</a>
+		</td>
+		<td valign="top" align="right" height="50">
+			<a href="http://sourceforge.net/projects/polepos/"><img height="31" alt="SourceForge.net Logo" src="http://sourceforge.net/sflogo.php?group_id=134549&amp;type=1"
+					width="88" border="0"> </a>
+		</td>
+	</tr>
+</table>
+<hr/>
+<h3>Imola : retrieve</h3>
+<dd>retrieves objects by native id</dd><br><br><br>
+<table border="0" bgcolor="#000000" align="center" width="754" cellpadding="3" cellspacing="2">
+<tr>
+	<th align="right" bgcolor="#c0c0c0">t [time in ms]</th>
+	<th align="left" bgcolor="#c0c0c0">
+		commitinterval:1000<br>
+		selects:5000<br>
+		objects:10000<br>
+	</th>
+	<th align="left" bgcolor="#c0c0c0">
+		commitinterval:1000<br>
+		selects:5000<br>
+		objects:30000<br>
+	</th>
+	<th align="left" bgcolor="#c0c0c0">
+		commitinterval:1000<br>
+		selects:5000<br>
+		objects:100000<br>
+	</th>
+	<th align="left" bgcolor="#c0c0c0">
+		commitinterval:1000<br>
+		selects:5000<br>
+		objects:300000<br>
+	</th>
+</tr>
+<tr>
+	<th align="right" bgcolor="#c0c0c0"><strong><a href="http://www.db4o.com" target="_blank"> db4o/4.5.200</a></th>
+	<td align="right" bgcolor="#ffffff">252</td>
+	<td align="right" bgcolor="#ffffff">238</td>
+	<td align="right" bgcolor="#ffffff">237</td>
+	<td align="right" bgcolor="#ffffff">236</td>
+</tr>
+<tr>
+	<th align="right" bgcolor="#c0c0c0"><strong><a href="http://www.hibernate.org" target="_blank"> Hibernate/hsqldb</a></th>
+	<td align="right" bgcolor="#ffffff">1183</td>
+	<td align="right" bgcolor="#ffffff">1167</td>
+	<td align="right" bgcolor="#ffffff">1157</td>
+	<td align="right" bgcolor="#ffffff">1134</td>
+</tr>
+<tr>
+	<th align="right" bgcolor="#c0c0c0"><strong><a href="http://www.hibernate.org" target="_blank"> Hibernate/mysql</a></th>
+	<td align="right" bgcolor="#ffffff">3224</td>
+	<td align="right" bgcolor="#ffffff">3212</td>
+	<td align="right" bgcolor="#ffffff">3195</td>
+	<td align="right" bgcolor="#ffffff">3306</td>
+</tr>
+<tr>
+	<th align="right" bgcolor="#c0c0c0"><strong><a href="http://www.mysql.com" target="_blank"> JDBC/MySQL</a></th>
+	<td align="right" bgcolor="#ffffff">1435</td>
+	<td align="right" bgcolor="#ffffff">1415</td>
+	<td align="right" bgcolor="#ffffff">1411</td>
+	<td align="right" bgcolor="#ffffff">1383</td>
+</tr>
+<tr>
+	<th align="right" bgcolor="#c0c0c0"><strong><a href="http://mckoi.com/database/" target="_blank"> JDBC/Mckoi</a></th>
+	<td align="right" bgcolor="#ffffff">1489</td>
+	<td align="right" bgcolor="#ffffff">1547</td>
+	<td align="right" bgcolor="#ffffff">1507</td>
+	<td align="right" bgcolor="#ffffff">1619</td>
+</tr>
+<tr>
+	<th align="right" bgcolor="#c0c0c0"><strong><a href="http://incubator.apache.org/derby/" target="_blank"> JDBC/Derby</a></th>
+	<td align="right" bgcolor="#ffffff">433</td>
+	<td align="right" bgcolor="#ffffff">451</td>
+	<td align="right" bgcolor="#ffffff">462</td>
+	<td align="right" bgcolor="#ffffff">507</td>
+</tr>
+<tr>
+	<th align="right" bgcolor="#c0c0c0"><strong><a href="http://hsqldb.sourceforge.net/" target="_blank"> JDBC/HSQLDB</a></th>
+	<td align="right" bgcolor="#ffffff">18</td>
+	<td align="right" bgcolor="#ffffff">17</td>
+	<td align="right" bgcolor="#ffffff">20</td>
+	<td align="right" bgcolor="#ffffff">22</td>
+</tr>
+<tr>
+	<th align="right" bgcolor="#c0c0c0"><strong><a href="http://www.versant.com/opensource" target="_blank"> JDO/VOA/mysql</a></th>
+	<td align="right" bgcolor="#ffffff">2464</td>
+	<td align="right" bgcolor="#ffffff">2398</td>
+	<td align="right" bgcolor="#ffffff">2418</td>
+	<td align="right" bgcolor="#ffffff">2403</td>
+</tr>
+</table>
+<p align="center">
+<img src="imola_retrieve.jpg" border="2" bordercolor="#000000"/>
+</p></body>
+</html>

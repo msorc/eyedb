@@ -1,0 +1,9 @@
+Bahrain write	commitinterval:1000 selects:900 objects:1000 updates:100	commitinterval:1000 selects:900 objects:3000 updates:100	commitinterval:1000 selects:900 objects:10000 updates:100	commitinterval:1000 selects:900 objects:30000 updates:100
+db4o/4.5.200	270	1059	3452	11305
+Hibernate/hsqldb	176	482	1975	5978
+Hibernate/mysql	574	1692	5648	17772
+JDBC/MySQL	285	1032	2723	8200
+JDBC/Mckoi	592	1346	5142	13857
+JDBC/Derby	256	831	2637	8486
+JDBC/HSQLDB	50	100	337	977
+JDO/VOA/mysql	347	928	3025	9813

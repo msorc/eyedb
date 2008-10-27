@@ -1,0 +1,130 @@
+<project name="poleposition" default="race" basedir=".">
+
+	<property name="polepositionversion" value="0.20" />
+
+	<!--  JDO is turned off temporarily until a stable JDO solution is available with PolePosition
+		<property name="jdo" value="jdo"/>
+	-->
+	<property name="jdo" value="jdo" />
+
+
+	<path id="poleposition_classpath">
+		<fileset dir="lib">
+			<include name="db4o-6.3-java5.jar" />			
+		</fileset>
+		<fileset dir="lib">
+			<include name="**/*.jar" />
+		</fileset>
+
+	</path>
+	
+	<target name="jdoenhance" description="runs the JDO enhancer" if="jdo">
+		<java classname="org.polepos.JdoEnhance">
+			<classpath>
+				<pathelement location="bin" />
+				<fileset dir="lib">
+					<include name="**/*.jar" />
+				</fileset>
+			</classpath>
+		</java>
+	</target>
+	
+        <target name="jormenhance" description="enhances the classes" >
+         <java classname="de.ama.db.tools.Enhancer" fork="true">
+            <classpath>
+                <fileset dir="lib">
+                    <include name="**/*.jar"/>
+                </fileset>
+                <pathelement location="bin/"/>
+            </classpath>
+
+            <arg value="indir" />
+            <arg path="bin"/>
+            <arg value="verbose" />
+            <arg value="1" />
+         </java>
+        </target>
+
+
+	<target name="race" depends="compile, jormenhance" description="runs with all circuits and all teams ">
+
+		<java classname="org.polepos.RunSeason">
+			<classpath>
+				<pathelement location="bin" />
+				<fileset dir="lib">
+					<include name="**/**/*.jar" />
+				</fileset>
+			</classpath>
+
+			<!--  all circuits -->
+			<arg value="melbourne" />
+			<arg value="sepang" />
+			<arg value="bahrain" />
+			<arg value="imola" />
+			<arg value="barcelona" />
+
+			<!--  all teams  -->
+			<arg value="db4o" />
+			<arg value="hibernate" />
+			<arg value="jdbc" />
+			<arg value="${jdo}" />
+			<arg value="GNA-JORM" />
+
+		</java>
+	</target>
+
+	<target name="compile" description="compiles the Poleposition sources">
+		<mkdir dir="bin" />
+		<copy todir=".">
+			<fileset dir="src">
+				<include name="mckoi.conf" />
+			</fileset>
+		</copy>
+		<copy todir="bin">
+			<fileset dir="src">
+				<include name="**/**" />
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+		<javac destdir="bin">
+			<src path="src" />
+			<classpath refid="poleposition_classpath" />
+		</javac>
+	</target>
+
+	<target name="distribute" description="creates a zip to distribute the project">
+
+		<property name="ddir" value="poleposition-${polepositionversion}" />
+		<property name="dfile" value="poleposition-${polepositionversion}.zip" />
+
+		<mkdir dir="${ddir}" />
+
+		<copy overwrite="true" todir="${ddir}">
+			<fileset dir=".">
+				<include name="doc/**" />
+				<include name="lib/**" />
+				<include name="licenses/**" />
+				<include name="settings/**" />
+				<include name="src/**" />
+				<include name="templates/**" />
+				<include name=".classpath" />
+				<include name=".project" />
+				<include name="build.xml" />
+				<include name="COPYING" />
+				<exclude name="**/CVS" />
+			</fileset>
+		</copy>
+
+		<delete file="${dfile}" failonerror="false" />
+
+		<zip destfile="${dfile}">
+			<fileset dir=".">
+				<include name="${ddir}/**" />
+			</fileset>
+		</zip>
+
+	</target>
+
+
+
+</project>

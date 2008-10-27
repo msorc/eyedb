@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>PolePosition benchmark results</title>
+<link rel="stylesheet" href="style.css" type="text/css">
+</head>
+<body>
+<table width="100%">
+	<tr>
+		<td>
+			<h2>PolePosition benchmark results</h2>
+			<a href="http://www.polepos.org">http://www.polepos.org</a>
+		</td>
+		<td valign="top" align="right" height="50">
+			<a href="http://sourceforge.net/projects/polepos/"><img height="31" alt="SourceForge.net Logo" src="http://sourceforge.net/sflogo.php?group_id=134549&amp;type=1"
+					width="88" border="0"> </a>
+		</td>
+	</tr>
+</table>
+<hr/>
+<h3>Barcelona : read</h3>
+<dd>writes, reads, queries and deletes objects with a 5 level inheritance structure</dd><br><br><br>
+<table border="0" bgcolor="#000000" align="center" width="754" cellpadding="3" cellspacing="2">
+<tr>
+	<th align="right" bgcolor="#c0c0c0">t [time in ms]</th>
+	<th align="left" bgcolor="#c0c0c0">
+		selects:100<br>
+		objects:1000<br>
+	</th>
+	<th align="left" bgcolor="#c0c0c0">
+		selects:100<br>
+		objects:3000<br>
+	</th>
+	<th align="left" bgcolor="#c0c0c0">
+		selects:100<br>
+		objects:10000<br>
+	</th>
+	<th align="left" bgcolor="#c0c0c0">
+		selects:100<br>
+		objects:30000<br>
+	</th>
+</tr>
+<tr>
+	<th align="right" bgcolor="#c0c0c0"><strong><a href="http://www.db4o.com" target="_blank"> db4o/4.5.200</a></th>
+	<td align="right" bgcolor="#ffffff">38</td>
+	<td align="right" bgcolor="#ffffff">103</td>
+	<td align="right" bgcolor="#ffffff">383</td>
+	<td align="right" bgcolor="#ffffff">1056</td>
+</tr>
+<tr>
+	<th align="right" bgcolor="#c0c0c0"><strong><a href="http://www.hibernate.org" target="_blank"> Hibernate/hsqldb</a></th>
+	<td align="right" bgcolor="#ffffff">358</td>
+	<td align="right" bgcolor="#ffffff">1089</td>
+	<td align="right" bgcolor="#ffffff">3613</td>
+	<td align="right" bgcolor="#ffffff">10991</td>
+</tr>
+<tr>
+	<th align="right" bgcolor="#c0c0c0"><strong><a href="http://www.hibernate.org" target="_blank"> Hibernate/mysql</a></th>
+	<td align="right" bgcolor="#ffffff">793</td>
+	<td align="right" bgcolor="#ffffff">2166</td>
+	<td align="right" bgcolor="#ffffff">7310</td>
+	<td align="right" bgcolor="#ffffff">21978</td>
+</tr>
+<tr>
+	<th align="right" bgcolor="#c0c0c0"><strong><a href="http://www.mysql.com" target="_blank"> JDBC/MySQL</a></th>
+	<td align="right" bgcolor="#ffffff">411</td>
+	<td align="right" bgcolor="#ffffff">1146</td>
+	<td align="right" bgcolor="#ffffff">3766</td>
+	<td align="right" bgcolor="#ffffff">11360</td>
+</tr>
+<tr>
+	<th align="right" bgcolor="#c0c0c0"><strong><a href="http://mckoi.com/database/" target="_blank"> JDBC/Mckoi</a></th>
+	<td align="right" bgcolor="#ffffff">1582</td>
+	<td align="right" bgcolor="#ffffff">3650</td>
+	<td align="right" bgcolor="#ffffff">12560</td>
+	<td align="right" bgcolor="#ffffff">38674</td>
+</tr>
+<tr>
+	<th align="right" bgcolor="#c0c0c0"><strong><a href="http://incubator.apache.org/derby/" target="_blank"> JDBC/Derby</a></th>
+	<td align="right" bgcolor="#ffffff">4457</td>
+	<td align="right" bgcolor="#ffffff">34021</td>
+	<td align="right" bgcolor="#ffffff">381506</td>
+	<td align="right" bgcolor="#ffffff">3903027</td>
+</tr>
+<tr>
+	<th align="right" bgcolor="#c0c0c0"><strong><a href="http://hsqldb.sourceforge.net/" target="_blank"> JDBC/HSQLDB</a></th>
+	<td align="right" bgcolor="#ffffff">10</td>
+	<td align="right" bgcolor="#ffffff">34</td>
+	<td align="right" bgcolor="#ffffff">137</td>
+	<td align="right" bgcolor="#ffffff">444</td>
+</tr>
+<tr>
+	<th align="right" bgcolor="#c0c0c0"><strong><a href="http://www.versant.com/opensource" target="_blank"> JDO/VOA/mysql</a></th>
+	<td align="right" bgcolor="#ffffff">26</td>
+	<td align="right" bgcolor="#ffffff">65</td>
+	<td align="right" bgcolor="#ffffff">355</td>
+	<td align="right" bgcolor="#ffffff">4609</td>
+</tr>
+</table>
+<p align="center">
+<img src="barcelona_read.jpg" border="2" bordercolor="#000000"/>
+</p></body>
+</html>

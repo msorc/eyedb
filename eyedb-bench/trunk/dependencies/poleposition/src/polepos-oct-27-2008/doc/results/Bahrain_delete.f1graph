@@ -1,0 +1,9 @@
+Bahrain delete	commitinterval:1000 selects:900 objects:1000 updates:100	commitinterval:1000 selects:900 objects:3000 updates:100	commitinterval:1000 selects:900 objects:10000 updates:100	commitinterval:1000 selects:900 objects:30000 updates:100
+db4o/4.5.200	414	1310	4838	15769
+Hibernate/hsqldb	291	868	2944	8886
+Hibernate/mysql	973	2904	9546	29037
+JDBC/MySQL	449	866	2835	8442
+JDBC/Mckoi	430	1361	4395	14238
+JDBC/Derby	292	946	2781	8499
+JDBC/HSQLDB	34	101	265	806
+JDO/VOA/mysql	103	410	1409	9290

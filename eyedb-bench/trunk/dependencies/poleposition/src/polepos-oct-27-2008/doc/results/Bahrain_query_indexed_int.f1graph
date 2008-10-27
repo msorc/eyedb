@@ -1,0 +1,9 @@
+Bahrain query_indexed_int	commitinterval:1000 selects:900 objects:1000 updates:100	commitinterval:1000 selects:900 objects:3000 updates:100	commitinterval:1000 selects:900 objects:10000 updates:100	commitinterval:1000 selects:900 objects:30000 updates:100
+db4o/4.5.200	158	131	143	138
+Hibernate/hsqldb	897	622	623	604
+Hibernate/mysql	1812	1489	1475	1483
+JDBC/MySQL	299	209	202	207
+JDBC/Mckoi	709	395	387	387
+JDBC/Derby	4801	4744	4726	4652
+JDBC/HSQLDB	191	173	135	135
+JDO/VOA/mysql	500	492	486	496

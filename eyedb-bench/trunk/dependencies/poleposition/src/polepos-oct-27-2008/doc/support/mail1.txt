@@ -1,0 +1,106 @@
+
+First of all I suggest that you run the short versions
+of the tests, so you don't have to wait too long for
+completion.
+
+To do that simply change the static variable PROPERTIES
+at the top of the org.polepos.RunSeason class to point to 
+DebugCircuits.properties.
+
+Then I suggest that you comment out JdbcTeam in the 
+TEAM array, also at the top of the RunSeason class, since
+you probably don't want to test against plain JDBC.
+
+Now let's remove the problems with MySQL:
+
+In /settings/Jdbc.properties you will also find the 
+Hibernate Jdbc configuration. Pretty much at the top of
+the file, please change
+
+ hibernate=hsqldb,mysql
+
+to 
+
+ hibernate=hsqldb,mysql
+
+
+Furthermore the VOA JDO configuration also tries to run 
+with MySQL. Let's change that. In /settings/Jdo.properties, 
+pretty much at the end of the file, please change
+
+ voa.jdbc=mysql
+
+to
+
+ voa.jdbc=hsqldb
+
+
+The Versant JDO enhancer does not like to run in-process
+of the test, so let's run it first. Simply start the class
+org.polepos.JdoEnhance
+
+
+If you did all of the above correctly, you should not be
+able to start the RunSeason class and all tests should 
+run through successfully in less than a minute. Of course
+the resulst will not be representative, since the numbers
+of objects used will be too small.
+
+
+db4o is included with the tests out-of-the box. If you 
+get a newer build from them it may be faster than the 
+one included in the tests. Simply exchange db4o.xxx.jar 
+in the /lib/ subfolder and change the settings in the
+Java build path of the Eclipse project, if the name of 
+the Jar has changed.
+
+
+
+We did successful test runs with ObjectDB when we created
+the tests but the company did not provide a version to be
+included with the tests. The JDO enhancers of ObjectDB
+and Versant may not be compatible, so I suggest that you
+try to get ObjectDB running on it's own first. 
+
+
+First of all, please add the ObjectDB libraries to the 
+project.
+
+
+Then:
+
+
+In Jdo.properties exchange the first entry from
+
+ jdo=voa
+
+to
+
+ jdo=objectdb
+
+
+A bit further down change 
+
+ enhancer=voa
+
+to 
+
+ enhancer=objectdb
+
+
+
+Now select Project.clean from the Menu of Eclipse to make sure
+that the old enhanced files are gone.
+
+Then run org.polepos.JdoEnhance again, so the ObjectDB enhancer
+enhances all the persistent files.
+
+
+Now objectdb should also run through successfully.
+
+
+We were not successful to get Poleposition to run with JPox
+but apparently Erik Bengtson managed to do so:
+http://www.jdocentral.com/forums/index.php?showtopic=1522
+
+You may want to connect to him to ask for details.
