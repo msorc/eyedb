@@ -1,5 +1,5 @@
 
-EyeDB benchmarks
+EyeDB benchmark suite
 
 François Déchelle (francois@dechelle.net)
 
@@ -8,27 +8,6 @@ configure flags
 ===============
 
 EyeDB flags:
-  --with-eyedb-installdir=DIRECTORY
-                          gives EyeDB installation directory
-  --with-eyedb-bindir=DIRECTORY
-                          gives EyeDB binaries directory
-  --with-eyedb-jar=FILE   gives EyeDB jar file location
-
-If you use --with-eyedb-installdir, you don't need the other flags (the 
-binaries directory and the jar file location are guessed from the installation
-directory).
-
-db4o flags:
-  --with-db4o-jar=FILE    gives Db4o jar file location
-
-hibernate flags:
-  --with-hibernate-jar=FILE
-                          gives Hibernate jar file location
-  --with-hibernate-libdir=DIRECTORY
-                          gives Hibernate library directory
-  --with-jdbc-driver-jar=FILE
-                          gives JDBC driver jar file location
-
 other variables:
 JAVA   Java virtual machine
 JAVAC  Java compiler

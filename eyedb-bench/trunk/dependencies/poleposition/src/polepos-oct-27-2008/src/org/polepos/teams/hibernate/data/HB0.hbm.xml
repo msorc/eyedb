@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd">
+
+<hibernate-mapping package="org.polepos.teams.hibernate.data">
+	<class name="HB0" table="tHB0">
+		<id column="ID" type="int">
+        	<generator class="native"/>
+		</id>
+		<property name="b0"		column="b0"		type="int"/>
+		<joined-subclass name="HB1" table="tHB1">
+			<key column="parent0"/>
+			<property name="b1"		column="b1"		type="int"/>
+			<joined-subclass name="HB2" table="tHB2">
+				<key column="parent1"/>
+				<property name="b2"		column="b2"		type="int"    index="b2_idx"/>
+				<joined-subclass name="HB3" table="tHB3">
+					<key column="parent2"/>
+					<property name="b3"		column="b3"		type="int"/>
+					<joined-subclass name="HB4" table="tHB4">
+						<key column="parent3"/>
+						<property name="b4"		column="b4"		type="int"/>
+					</joined-subclass>
+				</joined-subclass>
+			</joined-subclass>
+		</joined-subclass>
+	</class>
+</hibernate-mapping>

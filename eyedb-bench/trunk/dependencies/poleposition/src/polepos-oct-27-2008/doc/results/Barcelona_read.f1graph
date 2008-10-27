@@ -1,0 +1,9 @@
+Barcelona read	selects:100 objects:1000	selects:100 objects:3000	selects:100 objects:10000	selects:100 objects:30000
+db4o/4.5.200	38	103	383	1056
+Hibernate/hsqldb	358	1089	3613	10991
+Hibernate/mysql	793	2166	7310	21978
+JDBC/MySQL	411	1146	3766	11360
+JDBC/Mckoi	1582	3650	12560	38674
+JDBC/Derby	4457	34021	381506	3903027
+JDBC/HSQLDB	10	34	137	444
+JDO/VOA/mysql	26	65	355	4609

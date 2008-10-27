@@ -1,0 +1,9 @@
+Sepang read_hot	depth:8	depth:10	depth:12	depth:14
+db4o/4.5.200	1	4	22	98
+Hibernate/hsqldb	1	1	5	19
+Hibernate/mysql	1	2	7	29
+JDBC/MySQL	52	187	785	3072
+JDBC/Mckoi	165	362	1478	7133
+JDBC/Derby	1679	4449	17230	69200
+JDBC/HSQLDB	54	182	691	2829
+JDO/VOA/mysql	0	0	1	5

@@ -1,0 +1,1 @@
+Need to copy sqlitejdbc.dll into system directory if you'd like to run SQLite team.

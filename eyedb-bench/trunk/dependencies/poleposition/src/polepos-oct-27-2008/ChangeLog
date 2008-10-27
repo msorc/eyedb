@@ -1,0 +1,5 @@
+2006-09-23  pvzyl  <pvzyl@users.sourceforge.net>
+
+	* build.xml: added poleposition_classpath to ensure that when we compile using the db4o-5.7-java5.jar.
+	We need to ensure that the newest jar with are picked up. Otherwise compiler breaks with missing methods
+	Included db4o-5.7-java5.jar in lib

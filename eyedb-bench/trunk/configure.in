@@ -218,12 +218,17 @@ AC_SUBST(HIBERNATE_CLASSPATH)
 
 AC_ARG_VAR(POLEPOS_DIR,[Poleposition benchmarks source directory])
 
+# To be changed if Poleposition version changes
+POLEPOS_DIR_DEFAULT=dependencies/poleposition/src/polepos-oct-27-2008
+
 if test "$ac_enable_polepos" = "yes" ; then
    if test x"$POLEPOS_DIR" = x ; then
-	HAVE_POLEPOS="no"
+	POLEPOS_DIR=$POLEPOS_DIR_DEFAULT
+	HAVE_POLEPOS="yes"
    else
 	AC_CHECK_FILE($POLEPOS_DIR,HAVE_POLEPOS="yes",HAVE_POLEPOS="no")
    fi
+#   AC_CHECK_PROG(ANT,ant)
 fi
 if test "$ac_enable_polepos" = "yes" -a "$HAVE_POLEPOS" = "yes" ; then
    COND_POLEPOS="yes"
@@ -240,6 +245,8 @@ AC_CONFIG_LINKS( ${srcdir}/src/cpp/polepos/eyedb/polepos.odl:${srcdir}/src/java/
 
 AC_CONFIG_FILES(
 Makefile dnl
+dependencies/Makefile dnl
+dependencies/poleposition/Makefile dnl
 run/Makefile dnl
 run/cpp/Makefile dnl
 run/cpp/polepos/Makefile dnl

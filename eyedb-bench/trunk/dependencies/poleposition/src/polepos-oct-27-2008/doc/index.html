@@ -1,0 +1,261 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+	<head>
+		<title>PolePosition - the open source database benchmark</title>
+<meta name="description" content="PolePosition is a fully automated database 
+benchmark suite that prints tabular and graphic results for multiple tested 
+disciplines, given JDBC database connections.">
+<meta name="keywords" content="bechmark, database, JDBC, JDO, Hibernate, db4o,
+MySQL, McKoi, Derby, HSQLDB, open source, Java">
+		<link rel="stylesheet" href="style.css" type="text/css">
+	</head>
+	<body>
+		<table width="100%">
+			<tr>
+				<td>
+					<h1>PolePosition</h1>
+					the open source database benchmark<br>
+					<a href="http://www.polepos.org">http://www.polepos.org</a>
+				</td>
+				<td valign="top" align="right" height="50">
+					<a href="http://sourceforge.net/projects/polepos/"><img height="31" alt="SourceForge.net Logo" src="http://sourceforge.net/sflogo.php?group_id=134549&amp;type=1"
+							width="88" border="0"> </a>
+				</td>
+			</tr>
+		</table>
+		<hr>
+		<h2>Content</h2>
+		<p>
+			<ul>
+				<li>
+					<a href="#about">About</a>
+				<li>
+					<a href="#results">Results</a>
+				<li>
+					<a href="#interpretation">Interpretation</a>
+				<li>
+					<a href="#download">Download</a>
+				<li>
+					<a href="#running">Running the tests</a>
+				<li>
+					<a href="#source">Source code</a>
+				<li>
+					<a href="#license">License</a>
+				</li>
+			</ul>
+		<P></P>
+		<hr>
+		<a name="about"></a>
+		<h2>About</h2>
+		<p>
+			PolePosition is a benchmark test suite to compare database engines and 
+			object-relational mapping technology. As of today it is by no means complete. 
+			Database vendors and open source database project participants are invited to 
+			improve the test implementations and to contribute further disciplines 
+			("Circuits"). The PolePosition framework source code will help to implement own 
+			tests quickly and to time and output the results as number series and graphic 
+			visualisations.
+		</p>
+		<p>
+			The authors of the current test implementations do not see themselves as 
+			experts for SQL, JDO or Hibernate or for any of the database engines used. If 
+			you think that you can provide a faster implementation for a circuit, please 
+			supply it to the PolePosition project instead of criticising the authors for 
+			ignorance or the test for lacking objectivity.
+		</p>
+		<p>
+			This is a community project. It is for you! Please think positive, help us and 
+			be nice to us for starting the initiative. If you have a strong ego, good! 
+			Please write a better Circuit, Team, Car or Driver than we did instead of 
+			laughing about us.
+		</p>
+		<p>
+			Objectivity must be the most important goal of the benchmark tests. The results 
+			show very clearly that there can not be one single "best product". Depending on 
+			your application, some circuit results may be very important for you and some 
+			may be completely irrelevant. If you consider basing your choice of database on 
+			this benchmark, bring along lots of time to look at what every test does. You 
+			will not be able to judge the results without looking at the source code that 
+			produces them.
+		</p>
+		<hr>
+		<a name="results"></a>
+		<h2>Results</h2>
+		<p>
+			Sample results from one of our runs of the PolePosition benchmark with all the 
+			included database engines are available in HTML format <a href="results/html/index.html">
+				here</a>. You can also view or download the results as <a href="results/PolePosition.pdf">
+				one big PDF file</a>.
+		</p>
+		<p>
+			You are invited and encouraged to <a href="http://sourceforge.net/project/showfiles.php?group_id=134549">
+				download</a> the test suite and to run the tests yourself with your 
+			favourite database. To use PolePosition with different JDBC databases you only 
+			have to enter JDBC connection parameters into a settings property file. Test 
+			cases are also provided for JDO so you can quickly get the tests running 
+			against your favourite JDO implementation.
+		</p>
+		<hr>
+		<a name="interpretation"></a>
+		<h2>Interpretation</h2>
+		<p>
+			As already expressed above, there is no best product. The importance of 
+			individual results will depend on the respective application. However we think 
+			that we can draw some general conclusions from the results that may be valid 
+			for everyone. Because we have spent days and weeks looking at code and graphs, 
+			we think that we should point out some of our findings, that you may not see 
+			immediately, if you get lost in the multitude of graphics that are provided. 
+			Here are some thoughts:
+			<ul>
+				<li>
+				HSQLDB looks very good on many graphs, because much processing is done in 
+				memory. We did not dig deep enough into HSQLDB source code, to understand if 
+				the behaviour is fully compliant with ACID principles, since ACID transactions 
+				would imply slow sync calls that make sure all data is flushed down to the hard 
+				disc. Before you consider to use HSQLDB for a complex database application, you 
+				should take a close look at Barcelona:query. The query optimizer does not seem 
+				to cope with a query over five tables.
+				<li>
+				The use of O-R mapping technology like Hibernate or JDO O-R mappers has a 
+				strong negative impact on performance. If you can't compensate by throwing 
+				hardware at your app, you may have to avoid O-R mappers, if performance is 
+				important to you. Protagonists of O-R mapping technology may tell you that 
+				caching will bring you back performance. Although this may be true, do not 
+				forget: Data that comes from a cache can always be stale in a multi-user 
+				application. If you want your data to be up-to-date, you have to reread from 
+				the database and an old cache that you can not use will even degrade 
+				performance.
+				<li>
+				As would be expected, object databases like db4o provide best performance for 
+				deep inheritance hierarchies and tree structures.
+				<li>
+				If you need a relational database for whatever reason, MySQL should certainly 
+				be on your evaluation list. We did test quite a few other proprietary products 
+				with the benchmark suite, products that may not be listed here because of their 
+				license agreements. These other products did not look good at all. No wonder 
+				MySQL has such a big and growing installed base.
+				<li>
+					If you take a look at the sources of the tests, they are also a measurement, 
+					how easy it is to work against a specific database. SQL looks like a foreigner 
+					in Java code, very ugly, difficult to write and refactor. O-R mappers and 
+					object databases make life so much easier and productive. The task of storing 
+					objects is very similar among all the products tested. If a strong mainstream 
+					standard for object oriented querying can be reached, SQL will lose ground. 
+					This will happen for sure, the question is, how long it will take.
+				</li>
+			</ul>
+		<P></P>
+		<hr>
+		<a name="download"></a>
+		<h2>Download</h2>
+		<p>
+			All sources of the PolePosition test suite including a couple of open source 
+			database engines to run tests are available for download <a href="http://sourceforge.net/project/showfiles.php?group_id=134549">
+				here</a>.
+		</p>
+		<hr>
+		<a name="running"></a>
+		<h2>Running the tests</h2>
+		<p>
+			We recommend you to use the <a href="http://www.eclipse.org">Eclipse</a> IDE 
+			to&nbsp;work with the test source code. The distribution contains a .project 
+			file for Eclipse to get you started quickly.
+		</p>
+		<p>
+			The full test suite takes at least four hours to run on a fast machine. You may 
+			like to take a look at the configuration possibilities first, so you can run 
+			fewer tests with your favourite engines.
+		</p>
+		<p>
+			The main class to start the PolePosition suite is org.polepos.RunSeason. At the 
+			beginning of the file a static String is set with the path to the circuits 
+			property file. If you change this variable to the uncommented debug version 
+			supplied there also, you can check out all the database engine settings on your 
+			machine first, running with few (insignificant) objects, before you wait for 
+			hours to find the last test to fail.
+		</p>
+		<p>
+			Here are the most important files, that you will find on your machine after you 
+			download and unzip the distribution:
+			<ul>
+				<li>
+					/settings/Jdbc.properties<br>
+					configures the JDBC databases and connection parameters that are to be used.<BR>
+					You can add further JDBC connections in this file.<BR>
+				<li>
+					/settings/Jdo.properties<BR>
+					configures the JDO databases and connection parameters that are to be used.<BR>
+				<li>
+					/settings/Circuits.properties<BR>
+					configures the settings for all circuits<BR>
+				<li>
+					/results/<BR>
+					is where the results of your test run will end up<BR>
+				<li>
+					/build.xml<BR>
+					is a simple Ant script to help you compile and run the tests, if you prefer 
+					that to running from within Eclipse.
+				</li>
+			</ul>
+		<P></P>
+		<hr>
+		<a name="source"></a>
+		<h2>Source Code</h2>
+		<p>
+			Hopefully the source code has turned out readable enough to understand it. What 
+			you may want to look for:
+			<ul>
+				<li>
+					Circuit<br>
+				a set of timed test cases that work against the same data
+				<li>
+					Lap<br>
+				a single (timed) test
+				<li>
+					Team<br>
+				a specific database category or engine that requires specific source code
+				<li>
+					Car<br>
+				a specialized implementation of a team
+				<li>
+					Driver<br>
+				an implementation of a circuit for a team
+				<li>
+					Since JDO and Hibernate modify classes at compile/run-time, they need their own 
+					set of classes for the tests. Accordingly we did not consider it a good idea to 
+					pass a set of objects from the outside into the write methods. Instead we give 
+					all implementations full freedom, to do all the work on their own. By 
+					collecting checksums for every timed task, the benchmark test makes sure that 
+					no implementation cheats by accident.
+				</li>
+			</ul>
+		<P></P>
+		<hr>
+		<a name="license"></a>
+		<h2>License</h2>
+		<p>PolePosition sourcecode is supplied under the <a href="http://www.gnu.org/copyleft/gpl.html">
+				GPL</a>.
+		</p>
+		<p><br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+		</p>
+	</body>
+</html>
