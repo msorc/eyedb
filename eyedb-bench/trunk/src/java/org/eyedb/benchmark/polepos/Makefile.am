@@ -2,6 +2,8 @@ SUBDIRS=teams
 
 packagedir=$(pkglibdir)/java/classes/org/eyedb/benchmark/polepos
 dist_package_JAVA =\
+Racer.java \
+RunSeason.java \
 RunSeasonDb4o.java \
 RunSeasonEyeDB.java \
 RunSeasonHibernate.java 

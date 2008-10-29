@@ -8,31 +8,36 @@ import org.polepos.circuits.melbourne.Melbourne;
 import org.polepos.circuits.sepang.Sepang;
 import org.polepos.framework.Circuit;
 import org.polepos.framework.Team;
-import org.polepos.runner.AbstractRunner;
+import java.util.ArrayList;
+import java.util.List;
 
-public class RunSeasonDb4o extends AbstractRunner {
+public class RunSeasonDb4o extends RunSeason {
 
     public static void main(String[] args)
     {
 	new RunSeasonDb4o().run();
     }
 
-    public Circuit[] circuits() 
+    public List<Circuit> getCircuits() 
     {
-	return new Circuit[] { 
-	    new Bahrain(),
-	    new Barcelona(), 
-	    new Imola(),
-	    new Melbourne(), 
-	    new Sepang(), 
-	};
+	List<Circuit> circuits = new ArrayList<Circuit>();
+
+	circuits.add (new Bahrain());
+	circuits.add (new Barcelona());
+	circuits.add (new Imola());
+	circuits.add (new Melbourne());
+	circuits.add (new Sepang());
+
+	return circuits;
     }
 
-    public Team[] teams() 
+    public List<Team> getTeams() 
     {
-	return new Team[] { 
-	    new Db4oTeam(), 
-	};
+	List<Team> teams = new ArrayList<Team>();
+
+	teams.add( new Db4oTeam());
+
+	return teams;
     }
 
 }
