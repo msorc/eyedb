@@ -6,7 +6,8 @@ Racer.java \
 RunSeason.java \
 RunSeasonDb4o.java \
 RunSeasonEyeDB.java \
-RunSeasonHibernate.java 
+RunSeasonHibernate.java \
+SimpleReporter.java 
 
 POLEPOS_DIR=@POLEPOS_DIR@
 EYEDB_JAR=@EYEDB_JAR@
