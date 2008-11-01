@@ -22,7 +22,7 @@ namespace eyedb {
       void setColumnWidth( int width) { columnWidth = width; }
       void setColumnSeparator( char separator) { columnSeparator = separator; }
       void addColumnHeader( const std::string &header) { columnHeaders.push_back( header); }
-      void setRowHeader( const std::string &header) { rowHeader = header; }
+      void addRowHeader( const std::string &header) { rowHeaders.push_back( header); }
       void reportBegin();
       void reportLaps();
       void reportEnd();
@@ -47,7 +47,7 @@ namespace eyedb {
       std::map<const std::string, std::string> properties;
 
       std::vector< std::string> columnHeaders;
-      std::string rowHeader;
+      std::vector< std::string> rowHeaders;
       int columnWidth;
       char columnSeparator;
       bool reportLapsDone;

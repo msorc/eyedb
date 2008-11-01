@@ -55,14 +55,19 @@ void Benchmark::reportLaps()
     }
   }
 
-  if (rowHeader.size() != 0)
-    cout << setiosflags(ios::right) << setw( columnWidth) << rowHeader << columnSeparator;
+  if (rowHeaders.size() != 0) {
+    for ( int i = 0; i < rowHeaders.size(); i ++) {
+      cout << setiosflags(ios::right) << setw( columnWidth) << rowHeaders[i] << columnSeparator;
+    }
+  }
 
   for ( int i = 0; i < getStopwatch().getLapCount(); i++) {
     cout << setiosflags(ios::right) << setw( columnWidth) << getStopwatch().getLapTime( i) << columnSeparator;
   }
 
   cout << setiosflags(ios::right) << setw( columnWidth) << getStopwatch().getTotalTime() << endl;
+
+  rowHeaders.clear();
 }
 
 void Benchmark::reportEnd()
