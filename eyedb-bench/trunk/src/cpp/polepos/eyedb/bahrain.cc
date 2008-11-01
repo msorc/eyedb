@@ -1,11 +1,11 @@
 #include <sstream>
 #include <vector>
 #include "polepos.h"
-#include "barcelona.h"
+#include "bahrain.h"
 
 using namespace std;
 
-void Barcelona::write( int count)
+void Bahrain::write( int count)
 {
   try {
     getDatabase()->transactionBegin();
@@ -29,7 +29,7 @@ void Barcelona::write( int count)
   }
 }
 
-void Barcelona::read()
+void Bahrain::read()
 {
   try {
     getDatabase()->transactionBegin();
@@ -52,7 +52,7 @@ void Barcelona::read()
   }
 }
 
-void Barcelona::query( int selectCount)
+void Bahrain::query( int selectCount)
 {
   try {
     getDatabase()->transactionBegin();
@@ -80,7 +80,7 @@ void Barcelona::query( int selectCount)
   }
 }
 
-void Barcelona::destroy()
+void Bahrain::destroy()
 {
   try {
     getDatabase()->transactionBegin();
@@ -104,7 +104,7 @@ void Barcelona::destroy()
   }
 }
 
-void Barcelona::run()
+void Bahrain::run()
 {
   vector<int> objects;
   vector<int> selects;
@@ -156,7 +156,7 @@ void Barcelona::run()
 
 int main(int argc, char *argv[])
 {
-  Barcelona b;
+  Bahrain b;
   b.loadProperties( "eyedb.properties");
   b.loadProperties( argc, argv);
 
