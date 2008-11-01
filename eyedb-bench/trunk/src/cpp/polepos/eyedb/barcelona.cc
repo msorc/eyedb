@@ -147,7 +147,8 @@ void Barcelona::run()
   vector<int> objects;
   vector<int> selects;
 
-  addColumnHeader( "objects/selects");
+  addColumnHeader( "selects");
+  addColumnHeader( "objects");
   addColumnHeader( "write (ms)");
   addColumnHeader( "read (ms)");
   addColumnHeader( "query (ms)");
@@ -161,9 +162,13 @@ void Barcelona::run()
   
   for (int i = 0; i < objects.size(); i++) {
 
-    ostringstream oss;
-    oss << objects[i] << "/" << selects[i];
-    setRowHeader( oss.str());
+    ostringstream oss1;
+    oss1 << selects[i];
+    addRowHeader( oss1.str());
+
+    ostringstream oss2;
+    oss2 << objects[i];
+    addRowHeader( oss2.str());
 
     getStopwatch().start();
 

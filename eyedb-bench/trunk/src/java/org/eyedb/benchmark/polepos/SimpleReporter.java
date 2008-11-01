@@ -93,7 +93,7 @@ public class SimpleReporter extends Reporter {
 
 	for ( int i = 0; i < taskNames.size(); i++) {
 	    char c = (i != taskNames.size() - 1) ? columnSeparator : ' ';
-	    fmt.format( "%" + columnWidth + "s%c", taskNames.get(i), c);
+	    fmt.format( "%" + columnWidth + "s%c", taskNames.get(i) + " (ms)", c);
 	}
 
 	System.out.println();
