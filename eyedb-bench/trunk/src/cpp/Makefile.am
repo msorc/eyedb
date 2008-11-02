@@ -1,2 +1,2 @@
-SUBDIRS=benchmark polepos
+SUBDIRS=framework polepos
 

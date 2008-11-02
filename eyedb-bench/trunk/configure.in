@@ -264,7 +264,7 @@ run/utils/db4o/functions dnl
 run/utils/eyedb/functions dnl
 src/Makefile dnl
 src/cpp/Makefile dnl
-src/cpp/benchmark/Makefile dnl
+src/cpp/framework/Makefile dnl
 src/cpp/polepos/Makefile dnl
 src/cpp/polepos/eyedb/Makefile dnl
 src/java/Makefile dnl
