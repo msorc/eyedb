@@ -2,6 +2,8 @@ lib_LTLIBRARIES= libeyedbbenchmark.la
 
 libeyedbbenchmark_la_SOURCES= \
 benchmark.cc \
+properties.cc \
+reporter.cc \
 stopwatch.cc
 
 check_PROGRAMS=test_stopwatch test_benchmark

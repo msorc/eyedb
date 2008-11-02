@@ -2,7 +2,7 @@
 #define _POLEPOS_BENCHMARK_H_
 
 #include <eyedb/eyedb.h>
-#include "benchmark/benchmark.h"
+#include "framework/benchmark.h"
 
 class PoleposBenchmark : public eyedb::benchmark::Benchmark {
  public:

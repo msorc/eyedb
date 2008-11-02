@@ -15,12 +15,12 @@ namespace eyedb {
 	{
 	}
 
-	unsigned long getTime()
+	unsigned long getTime() const
 	{
 	  return time;
 	}
 
-	const std::string& getName() 
+	const std::string& getName() const
 	{
 	  return name; 
 	}
@@ -40,22 +40,22 @@ namespace eyedb {
       unsigned long lap( const std::string &name);
       void reset();
 
-      unsigned long getTotalTime() 
+      unsigned long getTotalTime() const
       {
 	return totalTime; 
       }
 
-      int getLapCount() 
+      int getLapCount() const 
       {
 	return laps.size(); 
       }
 
-      const std::string& getLapName( int i) 
+      const std::string& getLapName( int i) const
       {
 	return laps[i].getName(); 
       }
 
-      unsigned long getLapTime( int i) 
+      unsigned long getLapTime( int i) const
       {
 	return laps[i].getTime(); 
       }

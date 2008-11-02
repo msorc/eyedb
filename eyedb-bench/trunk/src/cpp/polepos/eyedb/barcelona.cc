@@ -157,8 +157,8 @@ void Barcelona::run()
 int main(int argc, char *argv[])
 {
   Barcelona b;
-  b.loadProperties( "eyedb.properties");
-  b.loadProperties( argc, argv);
+  b.getProperties().load( "eyedb.properties");
+  b.getProperties().load( argc, argv);
 
   polepos initializer(argc, argv);
 
