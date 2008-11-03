@@ -5,6 +5,7 @@ dist_package_JAVA =\
 Racer.java \
 RunSeason.java \
 RunSeasonDb4o.java \
+RunSeasonDb4oMod.java \
 RunSeasonEyeDB.java \
 RunSeasonHibernate.java \
 SimpleReporter.java 
