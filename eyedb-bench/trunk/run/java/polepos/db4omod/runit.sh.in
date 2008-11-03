@@ -28,7 +28,7 @@ run_benchmark_all() {
 }
 
 build_classpath
-#run_benchmark_phase_1
-#run_benchmark_phase_2
+run_benchmark_phase_1
+run_benchmark_phase_2
 
-run_benchmark_all
+#run_benchmark_all

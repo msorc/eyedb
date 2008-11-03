@@ -15,7 +15,7 @@ public class Db4oTeam extends org.polepos.teams.db4o.Db4oTeam {
 	    Db4oOptions.CLIENT_SERVER_TCP 
 	};
 
-	configure( options);
+	//	configure( options);
     }
 
     public String name()
