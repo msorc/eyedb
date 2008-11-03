@@ -14,8 +14,8 @@ public:
 
   void run();
 
-  const char* getName() { return "Barcelona"; }
-  const char* getDescription() { return "writes, reads, queries and deletes objects with a 5 level inheritance structure"; }
+  const char* getName() const { return "Barcelona"; }
+  const char* getDescription() const { return "writes, reads, queries and deletes objects with a 5 level inheritance structure"; }
 };
 
 #endif

@@ -10,18 +10,6 @@ void Bahrain::write( int count)
   try {
     getDatabase()->transactionBegin();
             
-    for ( int i = 0; i < count; i++) {
-      B4 *b4 = new B4( getDatabase());
-
-      b4->setB0( i+1);
-      b4->setB1( i+1);
-      b4->setB2( i+1);
-      b4->setB3( i+1);
-      b4->setB4( i+1);
-
-      b4->store( eyedb::FullRecurs);
-    }
-            
     getDatabase()->transactionCommit();
   }
   catch ( eyedb::Exception &ex ) {
@@ -29,30 +17,7 @@ void Bahrain::write( int count)
   }
 }
 
-void Bahrain::read()
-{
-  try {
-    getDatabase()->transactionBegin();
-
-    eyedb::OQL q(getDatabase(), "select b from B4 as b");
-    eyedb::ObjectArray arr;
-
-    q.execute(arr);
-
-    int s = 0;
-    for (int i = 0; i < arr.getCount(); i++) {
-      B4 *b = B4_c(arr[i]);
-      s += b->getB4();
-    }
-
-    getDatabase()->transactionCommit();
-  }
-  catch ( eyedb::Exception &ex ) {
-    ex.print();
-  }
-}
-
-void Bahrain::query( int selectCount)
+void Bahrain::query_indexed_string( int selectCount)
 {
   try {
     getDatabase()->transactionBegin();
@@ -66,11 +31,118 @@ void Bahrain::query( int selectCount)
 
       q.execute(arr);
 
-      int s = 0;
-      for (int i = 0; i < arr.getCount(); i++) {
-	B4 *b = B4_c(arr[i]);
-	s += b->getB4();
-      }
+//       int s = 0;
+//       for (int i = 0; i < arr.getCount(); i++) {
+// 	B4 *b = B4_c(arr[i]);
+// 	s += b->getB4();
+//      }
+    }
+
+    getDatabase()->transactionCommit();
+  }
+  catch ( eyedb::Exception &ex ) {
+    ex.print();
+  }
+}
+
+void Bahrain::query_string( int selectCount)
+{
+  try {
+    getDatabase()->transactionBegin();
+
+    for (int i = 0; i < selectCount; i++) {
+      char tmp[256];
+      sprintf( tmp, "select b from B4 as b where b.b2=%d", i+1);
+
+      eyedb::OQL q(getDatabase(), tmp);
+      eyedb::ObjectArray arr;
+
+      q.execute(arr);
+
+//       int s = 0;
+//       for (int i = 0; i < arr.getCount(); i++) {
+// 	B4 *b = B4_c(arr[i]);
+// 	s += b->getB4();
+//      }
+    }
+
+    getDatabase()->transactionCommit();
+  }
+  catch ( eyedb::Exception &ex ) {
+    ex.print();
+  }
+}
+
+void Bahrain::query_indexed_int( int selectCount)
+{
+  try {
+    getDatabase()->transactionBegin();
+
+    for (int i = 0; i < selectCount; i++) {
+      char tmp[256];
+      sprintf( tmp, "select b from B4 as b where b.b2=%d", i+1);
+
+      eyedb::OQL q(getDatabase(), tmp);
+      eyedb::ObjectArray arr;
+
+      q.execute(arr);
+
+//       int s = 0;
+//       for (int i = 0; i < arr.getCount(); i++) {
+// 	B4 *b = B4_c(arr[i]);
+// 	s += b->getB4();
+//      }
+    }
+
+    getDatabase()->transactionCommit();
+  }
+  catch ( eyedb::Exception &ex ) {
+    ex.print();
+  }
+}
+
+void Bahrain::query_int( int selectCount)
+{
+  try {
+    getDatabase()->transactionBegin();
+
+    for (int i = 0; i < selectCount; i++) {
+      char tmp[256];
+      sprintf( tmp, "select b from B4 as b where b.b2=%d", i+1);
+
+      eyedb::OQL q(getDatabase(), tmp);
+      eyedb::ObjectArray arr;
+
+      q.execute(arr);
+
+//       int s = 0;
+//       for (int i = 0; i < arr.getCount(); i++) {
+// 	B4 *b = B4_c(arr[i]);
+// 	s += b->getB4();
+//      }
+    }
+
+    getDatabase()->transactionCommit();
+  }
+  catch ( eyedb::Exception &ex ) {
+    ex.print();
+  }
+}
+
+void Bahrain::update( int updateCount)
+{
+  try {
+    getDatabase()->transactionBegin();
+
+    eyedb::OQL q(getDatabase(), "select b from B4 as b");
+    eyedb::ObjectArray arr;
+
+    q.execute(arr);
+
+    int s = 0;
+    for (int i = 0; i < arr.getCount(); i++) {
+      B4 *b = B4_c(arr[i]);
+      s += 5;
     }
 
     getDatabase()->transactionCommit();
@@ -108,47 +180,46 @@ void Bahrain::run()
 {
   vector<int> objects;
   vector<int> selects;
+  vector<int> updates;
 
-  addColumnHeader( "selects");
-  addColumnHeader( "objects");
-  addColumnHeader( "write (ms)");
-  addColumnHeader( "read (ms)");
-  addColumnHeader( "query (ms)");
-  addColumnHeader( "destroy (ms)");
-  addColumnHeader( "total (ms)");
-
-  setColumnWidth( 15);
-
-  getIntProperty( "objects", objects);
-  getIntProperty( "selects", selects);
+  getProperties().getIntProperty( "objects", objects);
+  getProperties().getIntProperty( "selects", selects);
+  getProperties().getIntProperty( "updates", selects);
   
+  getResult().addHeader( "objects");
+  getResult().addHeader( "selects");
+  getResult().addHeader( "updates");
+
   for (int i = 0; i < objects.size(); i++) {
 
-    ostringstream oss1;
-    oss1 << selects[i];
-    addRowHeader( oss1.str());
-
-    ostringstream oss2;
-    oss2 << objects[i];
-    addRowHeader( oss2.str());
+    getResult().addValue( objects[i]);
+    getResult().addValue( selects[i]);
+    getResult().addValue( updates[i]);
 
     getStopwatch().start();
 
     write( objects[i]);
     getStopwatch().lap( "write");
 
-    read();
-    getStopwatch().lap( "read");
+    query_indexed_string( selects[i]);
+    getStopwatch().lap( "query_indexed_string");
 
-    query( selects[i]);
-    getStopwatch().lap( "query");
+    query_string( selects[i]);
+    getStopwatch().lap( "query_string");
+
+    query_indexed_int( selects[i]);
+    getStopwatch().lap( "query_indexed_int");
+
+    query_int( selects[i]);
+    getStopwatch().lap( "query_int");
+
+    update( updates[i]);
+    getStopwatch().lap( "update");
 
     destroy();
     getStopwatch().lap( "destroy");
 
     getStopwatch().stop();
-
-    reportLaps();
 
     getStopwatch().reset();
   }
@@ -157,10 +228,13 @@ void Bahrain::run()
 int main(int argc, char *argv[])
 {
   Bahrain b;
-  b.loadProperties( "eyedb.properties");
-  b.loadProperties( argc, argv);
+  b.getProperties().load( "eyedb.properties");
+  b.getProperties().load( argc, argv);
 
   polepos initializer(argc, argv);
 
   b.bench();
+
+  eyedb::benchmark::SimpleReporter r;
+  r.report(b);
 }

@@ -3,7 +3,7 @@
 
 using namespace std;
 
-const char* PoleposBenchmark::getRunDescription()
+const char* PoleposBenchmark::getRunDescription() const
 {
   string info = "EyeDB C++ implementation";
 

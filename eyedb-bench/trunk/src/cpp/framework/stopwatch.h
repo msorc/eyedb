@@ -1,35 +1,16 @@
-#ifndef _STOPWATCH_H_
-#define _STOPWATCH_H_
+#ifndef _EYEDB_BENCHMARK_STOPWATCH_H_
+#define _EYEDB_BENCHMARK_STOPWATCH_H_
 
 #include <vector>
 #include <string>
 
 namespace eyedb {
   namespace benchmark {
+
+    typedef std::pair<std::string,unsigned long> Lap;
+
     class StopWatch {
     public:
-      class Lap {
-      public:
-	Lap( const std::string &name, unsigned long time) 
-	  : name( name), time( time) 
-	{
-	}
-
-	unsigned long getTime() const
-	{
-	  return time;
-	}
-
-	const std::string& getName() const
-	{
-	  return name; 
-	}
-
-      private:
-	std::string name;
-	unsigned long time;
-      };
-
       StopWatch() 
 	: running( false), startTime(0), totalTime(0), lapTime(0) 
       {
@@ -45,6 +26,11 @@ namespace eyedb {
 	return totalTime; 
       }
 
+      const std::vector<Lap> &getLaps()
+      {
+	return laps;
+      }
+
       int getLapCount() const 
       {
 	return laps.size(); 
@@ -52,12 +38,12 @@ namespace eyedb {
 
       const std::string& getLapName( int i) const
       {
-	return laps[i].getName(); 
+	return laps[i].first; 
       }
 
       unsigned long getLapTime( int i) const
       {
-	return laps[i].getTime(); 
+	return laps[i].second; 
       }
 
     private:

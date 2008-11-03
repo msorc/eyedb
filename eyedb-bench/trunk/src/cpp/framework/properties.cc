@@ -168,14 +168,16 @@ void Properties::load( int &argc, char **argv)
   }
 }
 
-int Properties::getIntProperty( const string &name, int &value, int defaultValue)
+int Properties::getIntProperty( const string &name, int &value, int defaultValue) const
 {
   value = defaultValue;
 
-  if (properties.find( name) == properties.end())
+  map<const string, string>::const_iterator it = properties.find( name);
+
+  if (it == properties.end())
     return 0;
 
-  istringstream iss(properties[name]);
+  istringstream iss(it->second);
 
   if ( iss >> value && iss.eof())
     return 1;
@@ -183,14 +185,16 @@ int Properties::getIntProperty( const string &name, int &value, int defaultValue
   return 0;
 }
 
-int Properties::getIntProperty( const string &name, vector<int> &values)
+int Properties::getIntProperty( const string &name, vector<int> &values) const
 {
   values.clear();
 
-  if (properties.find( name) == properties.end())
+  map<const string, string>::const_iterator it = properties.find( name);
+
+  if (it == properties.end())
     return 0;
 
-  istringstream iss(properties[name]);
+  istringstream iss(it->second);
 
   string s;
   while ( getline( iss, s, ',' ) ) {
@@ -206,19 +210,21 @@ int Properties::getIntProperty( const string &name, vector<int> &values)
   return 1;
 }
 
-int Properties::getStringProperty( const string &name, string &value, const string &defaultValue)
+int Properties::getStringProperty( const string &name, string &value, const string &defaultValue) const
 {
-  if (properties.find( name) == properties.end()) {
+  map<const string, string>::const_iterator it = properties.find( name);
+
+  if (it == properties.end()) {
     value.assign( defaultValue);
     return 0;
   }
 
-  value.assign( properties[name]);
+  value.assign( it->second);
 
   return 1;
 }
 
-void Properties::print()
+void Properties::print() const
 {
   map<const string, string>::const_iterator begin = properties.begin();
   map<const string, string>::const_iterator end = properties.end();

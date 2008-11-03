@@ -9,7 +9,7 @@ class PoleposBenchmark : public eyedb::benchmark::Benchmark {
   void prepare();
   void finish();
 
-  const char* getRunDescription();
+  const char* getRunDescription() const;
 
   eyedb::Database *getDatabase() { return database; }
 

@@ -14,12 +14,12 @@ namespace eyedb {
       void load( std::istream &is);
       void load( int &argc, char **argv);
 
-      int getIntProperty( const std::string &name, int &value, int defaultValue = -1);
-      int getIntProperty( const std::string &name, std::vector<int> &values);
+      int getIntProperty( const std::string &name, int &value, int defaultValue = -1) const;
+      int getIntProperty( const std::string &name, std::vector<int> &values) const;
 
-      int getStringProperty( const std::string &name, std::string &value, const std::string &defaultValue = "");
+      int getStringProperty( const std::string &name, std::string &value, const std::string &defaultValue = "") const;
 
-      void print();
+      void print() const;
 
     private:
       void lexicalError( char c, int pos, int line);
