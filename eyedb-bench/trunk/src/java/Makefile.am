@@ -7,6 +7,7 @@ noinst_DATA= $(JARFILE)
 DIRS_TO_JAR= \
 org/eyedb/benchmark/framework \
 org/eyedb/benchmark/polepos \
+org/eyedb/benchmark/polepos/teams/db4o \
 org/eyedb/benchmark/polepos/teams/eyedb \
 org/eyedb/benchmark/polepos/teams/eyedb/data \
 org/eyedb/benchmark/quicktour/db4o \
