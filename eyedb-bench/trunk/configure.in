@@ -254,6 +254,7 @@ run/cpp/polepos/eyedb/Makefile dnl
 run/java/Makefile dnl
 run/java/polepos/Makefile dnl
 run/java/polepos/db4o/Makefile dnl
+run/java/polepos/db4omod/Makefile dnl
 run/java/polepos/eyedb/Makefile dnl
 run/java/polepos/hibernate/Makefile dnl
 run/java/quicktour/Makefile dnl
