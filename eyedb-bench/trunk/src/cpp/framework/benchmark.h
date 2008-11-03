@@ -3,6 +3,8 @@
 
 #include "stopwatch.h"
 #include "properties.h"
+#include "result.h"
+#include "reporter.h"
 
 namespace eyedb {
   namespace benchmark {
@@ -20,12 +22,18 @@ namespace eyedb {
       void bench();
 
       const StopWatch &getStopwatch() const { return stopwatch; }
+      StopWatch &getStopwatch() { return stopwatch; }
 
+      const Properties &getProperties() const { return properties; }
       Properties &getProperties() { return properties; }
+
+      const Result &getResult() const { return result; }
+      Result &getResult() { return result; }
 
     private:
       StopWatch stopwatch;
       Properties properties;
+      Result result;
     };
   };
 };

@@ -6,62 +6,53 @@
 using namespace eyedb::benchmark;
 using namespace std;
 
-const int Reporter::defaultColumnWidth = 10;
-const char Reporter::defaultColumnSeparator = ',';
+const int SimpleReporter::defaultColumnWidth = 10;
+const char SimpleReporter::defaultColumnSeparator = ',';
 
-Reporter::Reporter() 
-  : columnWidth( defaultColumnWidth), columnSeparator( defaultColumnSeparator), 
-    reportLapsDone(false), reportColumnHeadersDone(false) 
+SimpleReporter::SimpleReporter() 
+  : columnWidth( defaultColumnWidth), columnSeparator( defaultColumnSeparator)
 {
 }
 
-void Reporter::reportBegin( const Benchmark &benchmark)
+void SimpleReporter::report( const Benchmark &benchmark)
 {
   cout << endl;
   cout << "Bench: " << benchmark.getName() << endl;
   cout << benchmark.getDescription() << endl;
   cout << endl;
   cout << benchmark.getRunDescription() << endl;
-}
+  cout << endl;
 
-void Reporter::reportLaps( const Benchmark &benchmark)
-{
-  reportLapsDone = true;
-
-  if (!reportColumnHeadersDone) {
-    reportColumnHeadersDone = true;
-
-    if (columnHeaders.size() != 0) {
-      for ( int i = 0; i < columnHeaders.size(); i ++) {
-	cout << setiosflags(ios::right) << setw( columnWidth) << columnHeaders[i];
-	if (i != columnHeaders.size() - 1)
-	  cout << columnSeparator;
-      }
-
-      cout << endl;
-    }
-  }
-
-  if (rowHeaders.size() != 0) {
-    for ( int i = 0; i < rowHeaders.size(); i ++) {
-      cout << setiosflags(ios::right) << setw( columnWidth) << rowHeaders[i] << columnSeparator;
-    }
-  }
-
-  for ( int i = 0; i < benchmark.getStopwatch().getLapCount(); i++) {
-    cout << setiosflags(ios::right) << setw( columnWidth) << benchmark.getStopwatch().getLapTime( i) << columnSeparator;
-  }
-
-  cout << setiosflags(ios::right) << setw( columnWidth) << benchmark.getStopwatch().getTotalTime() << endl;
-
-  rowHeaders.clear();
-}
-
-void Reporter::reportEnd( const Benchmark &benchmark)
-{
-  if (!reportLapsDone)
-    reportLaps( benchmark);
+  reportResult( benchmark.getResult());
 
   cout << endl;
+}
+
+void SimpleReporter::reportResult( const Result &result)
+{
+  vector<string>::const_iterator it;
+  int i;
+
+  for ( it = result.getHeaders().begin(), i = 0; it < result.getHeaders().end(); it++ ) {
+    cout << setiosflags(ios::right) << setw( columnWidth) << *it;
+    if (i != result.getHeaders().size() - 1)
+      cout << columnSeparator;
+  }
+
+  cout << endl;
+
+  for (int i = 0; i < result.size(); i++) {
+
+    vector<unsigned long>::const_iterator it;
+    int j;
+
+    for ( it = result.getValues(i).begin(), j = 0; it < result.getValues(i).end(); it++ ) {
+      cout << setiosflags(ios::right) << setw( columnWidth) << *it;
+      if (i != result.getValues(i).size() - 1)
+	cout << columnSeparator;
+    }
+
+    cout << endl;
+  }
 }
 

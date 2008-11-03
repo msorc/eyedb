@@ -6,9 +6,9 @@ using namespace std;
 
 class TestBenchmark: public Benchmark {
 public:
-  virtual const char* getName() { return "Test"; }
-  virtual const char* getDescription() { return "A test benchmark";};
-  virtual const char* getRunDescription() { return "C++ implementation";};
+  virtual const char* getName() const { return "Test"; }
+  virtual const char* getDescription() const { return "A test benchmark";};
+  virtual const char* getRunDescription() const { return "C++ implementation";};
 
   virtual void prepare() {}
   virtual void run() {}

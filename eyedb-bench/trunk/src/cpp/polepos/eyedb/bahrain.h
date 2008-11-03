@@ -17,8 +17,8 @@ public:
 
   void run();
 
-  const char* getName() { return "Bahrain"; }
-  const char* getDescription() { return "write, query, update and delete simple flat objects individually"; }
+  const char* getName() const { return "Bahrain"; }
+  const char* getDescription() const { return "write, query, update and delete simple flat objects individually"; }
 };
 
 #endif

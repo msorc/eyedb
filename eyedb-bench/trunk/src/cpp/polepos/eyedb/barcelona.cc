@@ -109,28 +109,16 @@ void Barcelona::run()
   vector<int> objects;
   vector<int> selects;
 
-  addColumnHeader( "selects");
-  addColumnHeader( "objects");
-  addColumnHeader( "write (ms)");
-  addColumnHeader( "read (ms)");
-  addColumnHeader( "query (ms)");
-  addColumnHeader( "destroy (ms)");
-  addColumnHeader( "total (ms)");
-
-  setColumnWidth( 15);
-
-  getIntProperty( "objects", objects);
-  getIntProperty( "selects", selects);
+  getProperties().getIntProperty( "objects", objects);
+  getProperties().getIntProperty( "selects", selects);
   
+  getResult().addHeader( "objects");
+  getResult().addHeader( "selects");
+
   for (int i = 0; i < objects.size(); i++) {
 
-    ostringstream oss1;
-    oss1 << selects[i];
-    addRowHeader( oss1.str());
-
-    ostringstream oss2;
-    oss2 << objects[i];
-    addRowHeader( oss2.str());
+    getResult().addValue( objects[i]);
+    getResult().addValue( selects[i]);
 
     getStopwatch().start();
 
@@ -148,9 +136,10 @@ void Barcelona::run()
 
     getStopwatch().stop();
 
-    reportLaps();
+    getResult().addLaps( getStopwatch().getLaps());
 
     getStopwatch().reset();
+    getResult().next();
   }
 }
 
@@ -163,4 +152,7 @@ int main(int argc, char *argv[])
   polepos initializer(argc, argv);
 
   b.bench();
+
+  eyedb::benchmark::SimpleReporter r;
+  r.report(b);
 }
