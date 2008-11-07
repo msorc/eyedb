@@ -80,10 +80,11 @@ public class CreateBenchmark extends Benchmark {
 	int nTeachers = getProperties().getIntProperty( "teachers");
 	int nObjectsPerTransaction = getProperties().getIntProperty( "objects_per_transaction", 1000);
 
-	setColumnWidth( 21);
-	addColumnHeader( "objects/transaction");
-	addColumnHeader( "total (ms)");
-	setRowHeader( "" + nStudents + "/" + nObjectsPerTransaction);
+	getResult().addHeader( "objects");
+	getResult().addHeader( "transaction");
+
+	getResult().addValue( nStudents);
+	getResult().addValue( nObjectsPerTransaction);
 
 	try {
 	    Teacher[] teachers = fillTeachers( nTeachers);
@@ -118,7 +119,11 @@ public class CreateBenchmark extends Benchmark {
 	    e.printStackTrace();
 	    System.exit(1);
 	}
+	
+	getStopWatch().lap( "total");
 
+	getResult().addLaps( getStopWatch().getLaps());
+	
 	System.out.println( "org.eyedb.RPClib.read_ms = " + org.eyedb.RPClib.read_ms);
 	System.out.println( "org.eyedb.RPClib.write_ms = " + org.eyedb.RPClib.write_ms);
 	System.out.println( "org.eyedb.RPClib.write_async_ms = " + org.eyedb.RPClib.write_async_ms);

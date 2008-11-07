@@ -12,7 +12,7 @@ public class Run {
 	    Class benchmarkClass = Class.forName( benchmarkClassName);
 	    Benchmark benchmark = (Benchmark)benchmarkClass.newInstance();
 
-	    benchmark.loadProperties( propertiesFileName);
+	    benchmark.getProperties().load( propertiesFileName);
 
 	    benchmark.bench();
 	}

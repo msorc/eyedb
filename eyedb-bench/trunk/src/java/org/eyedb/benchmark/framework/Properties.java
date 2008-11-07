@@ -1,10 +1,18 @@
 package org.eyedb.benchmark.framework;
 
+import java.io.IOException;
+import java.io.FileInputStream;
+
 /**
  * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)
  */
 
 public class Properties extends java.util.Properties {
+
+    public Properties()
+    {
+	super( System.getProperties());
+    }
 
     public boolean getBooleanProperty( String key)
     {
@@ -74,5 +82,11 @@ public class Properties extends java.util.Properties {
 
 	return defaultValue;
     }
+
+    public void load( String filename) throws IOException
+    {
+	load( new FileInputStream( filename));
+    }
+
 }
 

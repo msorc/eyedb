@@ -30,18 +30,8 @@ public class ImolaEyeDB extends EyeDBDriver implements ImolaDriver {
         try {
 	    getDatabase().transactionBegin();
 
-            for ( int i = 0; i < setup().getObjectCount(); i++ ) {
-		IndexedPilot p = new IndexedPilot( getDatabase());
-		p.setName( "Pilot_" + (i+1));
-		p.setFirstName( "Johnny_" + (i+1));
-		p.setPoints(i+1);
-		p.setLicenseID(i+1);
-                
-		p.store( org.eyedb.RecMode.FullRecurs);
-
-		if (isCommitPoint(i))
-		    getDatabase().transactionCommit();
-            }
+            for ( int i = 0; i < setup().getObjectCount(); i++ )
+		storePilot(i);
 
 	    getDatabase().transactionCommit();
         }
@@ -49,6 +39,23 @@ public class ImolaEyeDB extends EyeDBDriver implements ImolaDriver {
             ex.printStackTrace();
         }
     }
+
+    private void storePilot( int i) throws org.eyedb.Exception
+    {
+	IndexedPilot p = new IndexedPilot( getDatabase());
+	p.setName( "Pilot_" + (i+1));
+	p.setFirstName( "Johnny_" + (i+1));
+	p.setPoints(i+1);
+	p.setLicenseID(i+1);
+                
+	p.store( org.eyedb.RecMode.FullRecurs);
+	
+	if (isCommitPoint(i)) 
+	    getDatabase().transactionCommit();
+
+	if ( i <= setup().getSelectCount())
+	    oids[i] = p.getOid();
+   }
 
     public void retrieve()
     {
