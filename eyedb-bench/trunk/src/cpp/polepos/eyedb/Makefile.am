@@ -1,8 +1,10 @@
-noinst_PROGRAMS= barcelona bahrain
+noinst_PROGRAMS= barcelona bahrain imola
 
 nodist_barcelona_SOURCES= polepos.cc polepos-benchmark.cc barcelona.cc
 
 nodist_bahrain_SOURCES= polepos.cc polepos-benchmark.cc bahrain.cc
+
+nodist_imola_SOURCES= polepos.cc polepos-benchmark.cc imola.cc
 
 EYEDB_INCLUDEDIR=@EYEDB_INCLUDEDIR@
 INCLUDES=-I$(EYEDB_INCLUDEDIR) -I$(top_srcdir)/src/cpp

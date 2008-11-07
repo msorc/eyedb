@@ -53,7 +53,7 @@ public class ImolaEyeDB extends EyeDBDriver implements ImolaDriver {
 	if (isCommitPoint(i)) 
 	    getDatabase().transactionCommit();
 
-	if ( i <= setup().getSelectCount())
+	if ( i < setup().getSelectCount())
 	    oids[i] = p.getOid();
    }
 
