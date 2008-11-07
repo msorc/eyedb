@@ -131,8 +131,8 @@ void Bahrain::remove()
 
     int s = 0;
     for (int i = 0; i < arr.getCount(); i++) {
-      IndexedPilot *b = IndexedPilot_c(arr[i]);
-      b->remove();
+      IndexedPilot *p = IndexedPilot_c(arr[i]);
+      p->remove();
       s += 5;
     }
 
