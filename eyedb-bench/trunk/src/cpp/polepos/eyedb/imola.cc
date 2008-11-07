@@ -19,8 +19,10 @@ void Imola::storePilot( int i, int selectCount, int commitInterval) throw( eyedb
                 
   p->store( eyedb::FullRecurs);
 	
-  if (isCommitPoint(i, commitInterval)) 
+  if (isCommitPoint(i, commitInterval)) {
     getDatabase()->transactionCommit();
+    getDatabase()->transactionBegin();
+  }
 
   if ( i < selectCount)
     oids.push_back( p->getOid());
@@ -53,7 +55,9 @@ void Imola::retrieve()
     
     int s = 0;
     for ( int i = 0; i < oids.size(); i++) {
-      //IndexedPilot *p = 
+      eyedb::Object *p;
+      getDatabase()->loadObject( oids[i], p);
+
     }
 
     getDatabase()->transactionCommit();
@@ -69,9 +73,9 @@ void Imola::run()
   vector<int> selects;
   vector<int> commitinterval;
 
-  getProperties().getIntProperty( "bahrain.objects", objects);
-  getProperties().getIntProperty( "bahrain.selects", selects);
-  getProperties().getIntProperty( "bahrain.commitinterval", commitinterval);
+  getProperties().getIntProperty( "imola.objects", objects);
+  getProperties().getIntProperty( "imola.selects", selects);
+  getProperties().getIntProperty( "imola.commitinterval", commitinterval);
 
   getResult().addHeader( "objects");
   getResult().addHeader( "selects");
