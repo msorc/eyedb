@@ -2,8 +2,6 @@
 
 - add more detailled report in bench output (implementation, platform)
 
-- finish porting polepos to C++
-
 - update README
 - add license (GPL?) and copyright information in all files
 
