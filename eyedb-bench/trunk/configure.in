@@ -97,12 +97,23 @@ AC_SUBST(JAVACFLAGS)
 # EyeDB
 # ========================================
 AC_ARG_VAR(EYEDB_INSTALLDIR,[EyeDB installation directory])
-EYEDB_INSTALLDIR_DEFAULT=/usr
+EYEDB_INSTALLDIR_DEFAULTS="/usr $HOME/projects/eyedb/install $HOME/eyedb-install $HOME/eyedb_install"
 
 if test "$ac_enable_eyedb" = "yes"
 then
    if test x"$EYEDB_INSTALLDIR" = x ; then
-	EYEDB_INSTALLDIR=$EYEDB_INSTALLDIR_DEFAULT
+      AC_MSG_CHECKING(for EyeDB installation directory)
+      EYEDB_INSTALLDIR="none"
+      for d in $EYEDB_INSTALLDIR_DEFAULTS; do
+      	  if test -f $d/lib/eyedb/java/eyedb.jar ; then
+	     EYEDB_INSTALLDIR=$d
+	     break
+	  fi
+      done
+      if test x"$EYEDB_INSTALLDIR" = x"none" ; then
+      	 AC_MSG_ERROR(no EyeDB installation found)
+      fi
+      AC_MSG_RESULT($EYEDB_INSTALLDIR)
    fi
    EYEDB_BINDIR=$EYEDB_INSTALLDIR/bin
    EYEDB_SBINDIR=$EYEDB_INSTALLDIR/sbin
