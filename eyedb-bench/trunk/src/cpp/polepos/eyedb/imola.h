@@ -1,22 +1,26 @@
-#ifndef _BAHRAIN_H_
-#define _BAHRAIN_H_
+#ifndef _IMOLA_H_
+#define _IMOLA_H_
 
+#include <vector>
 #include "polepos-benchmark.h"
 
 class Imola : public PoleposBenchmark {
 
 public:
 
-  void store( int count, int commitInterval);
-  void retrieve( int selectCount);
+  void store( int objectCount, int selectCount, int commitInterval);
+  void retrieve();
 
   void run();
 
   const char* getName() const { return "Imola"; }
-  const char* getDescription() const { return "write, query, update and delete simple flat objects individually"; }
+  const char* getDescription() const { return "retrieves objects by native id"; }
 
- private:
-  void query( int selectCount, const char *queryString);
+private:
+  void storePilot( int i, int selectCount, int commitInterval) throw( eyedb::Exception);
+  bool isCommitPoint( int i, int commitInterval);
+
+  std::vector<eyedb::Oid> oids;
 };
 
 #endif
