@@ -6,7 +6,7 @@
 
 using namespace std;
 
-void Bahrain::write( int count, int commitInterval)
+void Imola::write( int count, int commitInterval)
 {
   try {
     getDatabase()->transactionBegin();
@@ -42,7 +42,7 @@ void Bahrain::write( int count, int commitInterval)
   }
 }
 
-void Bahrain::query( int selectCount, const char *queryString)
+void Imola::query( int selectCount, const char *queryString)
 {
   try {
     getDatabase()->transactionBegin();
@@ -70,27 +70,27 @@ void Bahrain::query( int selectCount, const char *queryString)
   }
 }
 
-void Bahrain::query_indexed_string( int selectCount)
+void Imola::query_indexed_string( int selectCount)
 {
   query( selectCount, "select p from IndexedPilot as p where p.name=\"Pilot_%d\"");
 }
 
-void Bahrain::query_string( int selectCount)
+void Imola::query_string( int selectCount)
 {
   query( selectCount, "select p from IndexedPilot as p where p.firstName=\"Johnny_%d\"");
 }
 
-void Bahrain::query_indexed_int( int selectCount)
+void Imola::query_indexed_int( int selectCount)
 {
   query( selectCount, "select p from IndexedPilot as p where p.licenseID=%d");
 }
 
-void Bahrain::query_int( int selectCount)
+void Imola::query_int( int selectCount)
 {
   query( selectCount, "select p from IndexedPilot as p where p.points=%d");
 }
 
-void Bahrain::update( int updateCount)
+void Imola::update( int updateCount)
 {
   try {
     getDatabase()->transactionBegin();
@@ -119,7 +119,7 @@ void Bahrain::update( int updateCount)
   }
 }
 
-void Bahrain::remove()
+void Imola::remove()
 {
   try {
     getDatabase()->transactionBegin();
@@ -143,7 +143,7 @@ void Bahrain::remove()
   }
 }
 
-void Bahrain::run()
+void Imola::run()
 {
   vector<int> objects;
   vector<int> selects;
@@ -202,7 +202,7 @@ void Bahrain::run()
 
 int main(int argc, char *argv[])
 {
-  Bahrain b;
+  Imola b;
   b.getProperties().load( "eyedb.properties");
   b.getProperties().load( argc, argv);
 

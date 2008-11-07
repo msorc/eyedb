@@ -29,8 +29,8 @@ int main( int ac, char **av)
 
   cout << "== Printing some values" << endl;
   int intValue;
-  b.getProperties().getIntProperty("two", intValue);
-  cout << "two=" << intValue << endl;
+  b.getProperties().getIntProperty("test.two", intValue);
+  cout << "test.two=" << intValue << endl;
   vector<int> count;
   b.getProperties().getIntProperty("count", count);
   for (int i = 0; i < count.size(); i++)

@@ -109,8 +109,8 @@ void Barcelona::run()
   vector<int> objects;
   vector<int> selects;
 
-  getProperties().getIntProperty( "objects", objects);
-  getProperties().getIntProperty( "selects", selects);
+  getProperties().getIntProperty( "barcelona.objects", objects);
+  getProperties().getIntProperty( "barcelona.selects", selects);
   
   getResult().addHeader( "objects");
   getResult().addHeader( "selects");
@@ -139,6 +139,7 @@ void Barcelona::run()
     getResult().addLaps( getStopwatch().getLaps());
 
     getStopwatch().reset();
+
     getResult().next();
   }
 }

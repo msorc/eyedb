@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class StopWatch {
 
-    class Lap {
+    public class Lap {
 	Lap( String name, long time)
 	{
 	    this.name = name;
@@ -76,6 +76,11 @@ public class StopWatch {
     public long getTotalTime()
     {
 	return totalTime;
+    }
+
+    public List<Lap> getLaps()
+    {
+	return laps;
     }
 
     public int getLapCount()

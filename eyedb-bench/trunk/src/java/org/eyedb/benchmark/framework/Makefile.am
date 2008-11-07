@@ -3,7 +3,10 @@ packagedir=$(pkglibdir)/java/classes/org/eyedb/benchmark/framework
 dist_package_JAVA =\
 Benchmark.java \
 Properties.java \
+Reporter.java \
+Result.java \
 Run.java \
+SimpleReporter.java \
 StopWatch.java \
 TestStopWatch.java 
 
