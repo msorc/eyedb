@@ -4,9 +4,15 @@ SUBDIRS=org
 JARFILE=eyedb-benchmark.jar
 noinst_DATA= $(JARFILE)
 
+if COND_OPENOFFICE
+OPENOFFICE_SUBDIR=org/eyedb/benchmark/framework/reporter/openoffice
+else
+OPENOFFICE_SUBDIR=
+endif
+
 DIRS_TO_JAR= \
 org/eyedb/benchmark/framework \
-org/eyedb/benchmark/framework/reporter/openoffice \
+$(OPENOFFICE_SUBDIR) \
 org/eyedb/benchmark/polepos \
 org/eyedb/benchmark/polepos/teams/db4o \
 org/eyedb/benchmark/polepos/teams/eyedb \
