@@ -5,7 +5,7 @@ JAVAROOT=@JAVAROOT@
 OPENOFFICE_CLASSPATH=@OPENOFFICE_CLASSPATH@
 
 runjava() {
-    $JAVA -cp $JAVAROOT:$OPENOFFICE_CLASSPATH $1
+    $JAVA -Dcom.sun.star.lib.loader.unopath=/usr/lib/openoffice/program -cp $JAVAROOT:$OPENOFFICE_CLASSPATH:/usr/lib/openoffice/sdk/classes com.sun.star.lib.loader.Loader $1
 }
 
 runjava org.eyedb.benchmark.framework.reporter.openoffice.OpenOfficeReporterTest
