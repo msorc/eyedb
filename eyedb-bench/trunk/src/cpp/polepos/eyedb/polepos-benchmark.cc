@@ -21,21 +21,31 @@ void PoleposBenchmark::prepare()
   string dbName;
   getProperties().getStringProperty( "database", dbName);
 
-  conn = new eyedb::Connection( true);
+  try {
+    conn = new eyedb::Connection( true);
 
-  string mode;
-  eyedb::Database::OpenFlag flags;
-  if (getProperties().getStringProperty( "mode", mode) && mode == "local")
-    flags = eyedb::Database::DBRWLocal;
-  else
-    flags = eyedb::Database::DBRW;
+    string mode;
+    eyedb::Database::OpenFlag flags;
+    if (getProperties().getStringProperty( "mode", mode) && mode == "local")
+      flags = eyedb::Database::DBRWLocal;
+    else
+      flags = eyedb::Database::DBRW;
 
-  database = new poleposDatabase( conn, dbName.c_str(), flags);
+    database = new poleposDatabase( conn, dbName.c_str(), flags);
+  }
+  catch ( eyedb::Exception &ex ) {
+    ex.print();
+  }
 }
 
 void PoleposBenchmark::finish()
 {
-  database->close();
-  conn->close();
+  try {
+    database->close();
+    conn->close();
+  }
+  catch ( eyedb::Exception &ex ) {
+    ex.print();
+  }
 }
 

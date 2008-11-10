@@ -7,6 +7,8 @@ import org.polepos.framework.Team;
 import org.polepos.framework.TurnSetup;
 import org.polepos.framework.SetupProperty;
 import org.polepos.reporters.Reporter;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Formatter;
@@ -16,8 +18,10 @@ public class SimpleReporter extends Reporter {
     private static final int defaultColumnWidth = 15;
     private static final char defaultColumnSeparator = ',';
 
-    public SimpleReporter()
+    public SimpleReporter( PrintStream out)
     {
+	this.out = out;
+
 	columnWidth = defaultColumnWidth;
 	columnSeparator = defaultColumnSeparator;
 
@@ -25,6 +29,16 @@ public class SimpleReporter extends Reporter {
 	setupProperties = new ArrayList<String>();
 
 	resultCount = 0;
+    }
+
+    public SimpleReporter( String filename) throws IOException
+    {
+	this( new PrintStream( filename));
+    }
+
+    public SimpleReporter()
+    {
+	this( System.out);
     }
 
     public String file()
@@ -43,17 +57,17 @@ public class SimpleReporter extends Reporter {
     
     public void endSeason()
     {
-	System.out.println();
+	out.println();
     }
     
     public void sendToCircuit(Circuit circuit)
     {
         super.sendToCircuit(circuit);
-	System.out.println();
-	System.out.println();
-        System.out.println("Bench: " + circuit.name());
-        System.out.println(circuit.description());
-	System.out.println();
+	out.println();
+	out.println();
+        out.println("Bench: " + circuit.name());
+        out.println(circuit.description());
+	out.println();
 
 	taskNames.clear();
     }
@@ -65,12 +79,12 @@ public class SimpleReporter extends Reporter {
     
     protected void reportTeam(Team team)
     {
-	System.out.print( team.name());
+	out.print( team.name());
     }
     
     protected void reportCar(Car car)
     {
-	System.out.println( " - " + car.name());
+	out.println( " - " + car.name());
     }
 
     public void reportSetups(TurnSetup[] setups)
@@ -86,7 +100,7 @@ public class SimpleReporter extends Reporter {
 
     private void printColumnHeaders()
     {
-	Formatter fmt = new Formatter( System.out);
+	Formatter fmt = new Formatter( out);
 
 	for( String setupProperty : setupProperties)
 	    fmt.format( "%" + columnWidth + "s%c", setupProperty, columnSeparator);
@@ -96,7 +110,7 @@ public class SimpleReporter extends Reporter {
 	    fmt.format( "%" + columnWidth + "s%c", taskNames.get(i) + " (ms)", c);
 	}
 
-	System.out.println();
+	out.println();
     }
 
     protected void beginResults()
@@ -106,7 +120,7 @@ public class SimpleReporter extends Reporter {
 
     public void reportResult(Result result)
     {
-	Formatter fmt = new Formatter( System.out);
+	Formatter fmt = new Formatter( out);
 
 	if ( resultCount == 0) {
 	    for( SetupProperty sp : result.getSetup().properties())
@@ -118,10 +132,12 @@ public class SimpleReporter extends Reporter {
 	fmt.format( "%" + columnWidth + "s%c", result.getTime(), c);
 
 	if (resultCount == taskNames.size() - 1)
-	    System.out.println();
+	    out.println();
 
 	resultCount++;
     }
+
+    private PrintStream out;
 
     private int columnWidth;
     private char columnSeparator;

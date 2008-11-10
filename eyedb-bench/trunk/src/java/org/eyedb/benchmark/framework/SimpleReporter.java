@@ -1,5 +1,7 @@
 package org.eyedb.benchmark.framework;
 
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Formatter;
 
 /**
@@ -11,10 +13,22 @@ public class SimpleReporter implements Reporter {
     private static final int defaultColumnWidth = 10;
     private static final char defaultColumnSeparator = ',';
 
-    public SimpleReporter()
+    public SimpleReporter( PrintStream out)
     {
+	this.out = out;
+
 	columnWidth = defaultColumnWidth;
 	columnSeparator = defaultColumnSeparator;
+    }
+
+    public SimpleReporter( String filename) throws IOException
+    {
+	this( new PrintStream( filename));
+    }
+
+    public SimpleReporter()
+    {
+	this( System.out);
     }
 
     public void setColumnWidth( int width)
@@ -29,35 +43,36 @@ public class SimpleReporter implements Reporter {
 
     public void report( Benchmark benchmark)
     {
-	System.out.println();
-	System.out.println( "Bench: " + benchmark.getName());
-	System.out.println( benchmark.getDescription());
-	System.out.println();
-	System.out.println( benchmark.getRunDescription());
+	out.println();
+	out.println( "Bench: " + benchmark.getName());
+	out.println( benchmark.getDescription());
+	out.println();
+	out.println( benchmark.getRunDescription());
 	
 	reportResult( benchmark.getResult());
 
-	System.out.println();
+	out.println();
     }
 
     private void reportResult( Result result)
     {
- 	Formatter fmt = new Formatter( System.out);
+ 	Formatter fmt = new Formatter( out);
 
 	for (String h : result.getHeaders()) 
  	    fmt.format( "%" + columnWidth + "s%c", h, columnSeparator);
 
-	System.out.println();
+	out.println();
 
 	for ( int i = 0; i < result.getSize(); i++) {
 	    for ( Long l : result.getValues(i)) {
 		fmt.format( "%" + columnWidth + "d%c", l.longValue(), columnSeparator);
 	    }
 
-	    System.out.println();
+	    out.println();
 	}
     }
 
+    private PrintStream out;
     private int columnWidth;
     private char columnSeparator;
 }

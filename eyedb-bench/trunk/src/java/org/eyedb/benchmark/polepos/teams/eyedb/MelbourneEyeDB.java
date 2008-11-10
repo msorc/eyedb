@@ -43,6 +43,8 @@ public class MelbourneEyeDB extends EyeDBDriver implements MelbourneDriver {
     public void read()
     {
         try {
+	    getDatabase().transactionBegin();
+
 	    int count = setup().getSelectCount();
         
 	    for (int i = 0; i < count; i++) {
@@ -53,6 +55,8 @@ public class MelbourneEyeDB extends EyeDBDriver implements MelbourneDriver {
 		    addToCheckSum( p.getPoints());
 		}	       
 	    }
+
+	    getDatabase().transactionCommit();
         }
         catch ( org.eyedb.Exception ex ) {
             ex.printStackTrace();
