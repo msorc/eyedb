@@ -260,7 +260,7 @@ AC_SUBST(POLEPOS_DIR)
 
 AC_ARG_VAR(OPENOFFICEJAVA_DIR,[OpenOffice java directory])
 
-OPENOFFICEJAVA_DIR_DEFAULTS="/usr/share/java/openoffice "
+OPENOFFICEJAVA_DIR_DEFAULTS="/usr/lib/openoffice/program/classes "
 
 if test "$ac_enable_openoffice" = "yes" ; then
    if test x"$OPENOFFICEJAVA_DIR" = x ; then
@@ -283,7 +283,7 @@ if test "$ac_enable_openoffice" = "yes" ; then
    OPENOFFICE_CLASSPATH=""
    if test "$HAVE_OPENOFFICEJAVA" = "yes"; then
    for j in juh.jar jurt.jar unoil.jar unoloader.jar ; do
-      OPENOFFICE_CLASSPATH="$OPENOFFICEJAVA_DIR/$j:$OPENOFFICE_CLASSPATH"
+      OPENOFFICE_CLASSPATH="$OPENOFFICE_CLASSPATH:$OPENOFFICEJAVA_DIR/$j"
    done
    fi
 fi
