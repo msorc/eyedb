@@ -18,8 +18,4 @@ EDIT = sed \
 	$(EDIT) $(srcdir)/$*.sh.in >$*.sh.tmp
 	mv $*.sh.tmp $*.sh
 
-runit.sh: Makefile
-
-bench: runit.sh
-	$(SHELL) runit.sh
 

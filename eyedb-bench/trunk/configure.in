@@ -20,7 +20,7 @@ AC_ARG_ENABLE(cpp,
 # Java
 AC_ARG_ENABLE(java,
 		AS_HELP_STRING([--enable-java],
-				[enable Java code compilation [default=yes]]),,
+				[enable java code compilation [default=yes]]),,
 		ac_enable_java="yes")
 # EyeDB
 AC_ARG_ENABLE(eyedb,
@@ -42,6 +42,11 @@ AC_ARG_ENABLE(polepos,
 		AS_HELP_STRING([--enable-polepos],
 				[enable polepos code compilation [default=yes]]),,
 		ac_enable_polepos="yes")
+# OpenOffice
+AC_ARG_ENABLE(openoffice,
+		AS_HELP_STRING([--enable-openoffice],
+				[enable compilation of openoffice result reporting code [default=yes]]),,
+		ac_enable_openoffice="yes")
 
 
 # ========================================
@@ -250,6 +255,49 @@ AC_SUBST(POLEPOS_DIR)
 
 
 # ========================================
+# OpenOffice result reporting
+# ========================================
+
+AC_ARG_VAR(OPENOFFICEJAVA_DIR,[OpenOffice java directory])
+
+OPENOFFICEJAVA_DIR_DEFAULTS="/usr/share/java/openoffice "
+
+if test "$ac_enable_openoffice" = "yes" ; then
+   if test x"$OPENOFFICEJAVA_DIR" = x ; then
+      AC_MSG_CHECKING(for OpenOffice java directory)
+      OPENOFFICEJAVA_DIR="none"
+      for d in $OPENOFFICEJAVA_DIR_DEFAULTS; do
+      	  if test -f $d/juh.jar ; then
+	     OPENOFFICEJAVA_DIR=$d
+	     break
+	  fi
+      done
+      if test x"$OPENOFFICEJAVA_DIR" = x"none" ; then
+      	 AC_MSG_ERROR(no OpenOffice java installation found)
+      fi
+      AC_MSG_RESULT($OPENOFFICEJAVA_DIR)
+   fi
+
+   AC_CHECK_FILE( $OPENOFFICEJAVA_DIR/juh.jar, HAVE_OPENOFFICEJAVA="yes", HAVE_OPENOFFICEJAVA="no")
+
+   OPENOFFICE_CLASSPATH=""
+   if test "$HAVE_OPENOFFICEJAVA" = "yes"; then
+   for j in juh.jar jurt.jar unoil.jar unoloader.jar ; do
+      OPENOFFICE_CLASSPATH="$OPENOFFICEJAVA_DIR/$j:$OPENOFFICE_CLASSPATH"
+   done
+   fi
+fi
+
+if test "$ac_enable_openoffice" = "yes" -a "$HAVE_OPENOFFICEJAVA" = "yes" ; then
+   COND_OPENOFFICE="yes"
+fi
+AM_CONDITIONAL(COND_OPENOFFICE, test x"$COND_OPENOFFICE" = xyes)
+
+AC_SUBST(OPENOFFICEJAVA_DIR)
+AC_SUBST(OPENOFFICE_CLASSPATH)
+
+
+# ========================================
 # Generate output files
 # ========================================
 AC_CONFIG_LINKS( ${srcdir}/src/cpp/polepos/eyedb/polepos.odl:${srcdir}/src/java/org/eyedb/benchmark/polepos/teams/eyedb/data/data.odl )
@@ -284,6 +332,8 @@ src/java/org/Makefile dnl
 src/java/org/eyedb/Makefile dnl
 src/java/org/eyedb/benchmark/Makefile dnl
 src/java/org/eyedb/benchmark/framework/Makefile dnl
+src/java/org/eyedb/benchmark/framework/reporter/Makefile dnl
+src/java/org/eyedb/benchmark/framework/reporter/openoffice/Makefile dnl
 src/java/org/eyedb/benchmark/polepos/Makefile dnl
 src/java/org/eyedb/benchmark/polepos/teams/Makefile dnl
 src/java/org/eyedb/benchmark/polepos/teams/db4o/Makefile dnl
