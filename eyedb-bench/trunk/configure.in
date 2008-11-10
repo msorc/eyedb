@@ -244,9 +244,9 @@ if test "$ac_enable_polepos" = "yes" ; then
    else
 	AC_CHECK_FILE($POLEPOS_DIR,HAVE_POLEPOS="yes",HAVE_POLEPOS="no")
    fi
-#   AC_CHECK_PROG(ANT,ant)
+   AC_CHECK_PROGS(ANT,ant)
 fi
-if test "$ac_enable_polepos" = "yes" -a "$HAVE_POLEPOS" = "yes" ; then
+if test "$ac_enable_polepos" = "yes" -a "$HAVE_POLEPOS" = "yes" -a x"$ANT" != x ; then
    COND_POLEPOS="yes"
 fi
 AM_CONDITIONAL(COND_POLEPOS, test x"$COND_POLEPOS" = xyes)
@@ -354,3 +354,45 @@ src/java/bench2/eyedb/Makefile dnl
 src/java/bench2/db4o/Makefile dnl
 )
 AC_OUTPUT
+
+
+echo
+echo
+echo "  EyeDB benchmarks suite configured for '${host}'."
+echo
+echo "  EyeDB benchmarks will be compiled with the following options:"
+echo 
+echo "  *** Java benchmarks ***" 
+echo "  Compile Java benchmarks: ${COND_JAVA:-no}"
+echo "  Java compiler: ${JAVAC:-none}"
+echo "  Java compiler flags: ${JAVACFLAGS:-none}"
+echo "  Java virtual machine: ${JAVA:-none}"
+echo "  Jar utility: ${JAR:-none}"
+echo 
+echo "  *** C++ benchmarks ***" 
+echo "  Compile C++ benchmarks: ${COND_CPP:-no}"
+echo "  C++ compiler: ${CXX:-none}"
+echo 
+echo "  *** EyeDB ***" 
+echo "  Compile EyeDB benchmarks: ${COND_EYEDB:-no}"
+echo "  EyeDB installation directory: ${EYEDB_INSTALLDIR:-no}"
+echo 
+echo "  *** db4o ***" 
+echo "  Compile db4o benchmarks: ${COND_DB4O:-no}"
+dnl V=${DB4O_JAR}; while echo $V | grep '\$' > /dev/null 2>&1; do V=$(eval echo $V) ; done
+echo "  db4o jar: ${DB4O_JAR:-no}"
+echo 
+echo "  *** Hibernate ***" 
+echo "  Compile Hibernate benchmarks: ${COND_HIBERNATE:-no}"
+echo "  Hibernate jar: ${HIBERNATE_JAR:-no}"
+echo 
+echo "  *** Poleposition ***" 
+echo "  Compile Poleposition benchmarks: ${COND_POLEPOS:-no}"
+echo "  Ant: ${ANT:-no}"
+echo "  Poleposition directory: ${POLEPOS_DIR:-no}"
+echo 
+echo "  *** OpenOffice ***" 
+echo "  Compile OpenOffice reporting (experimental): ${COND_OPENOFFICE:-no}"
+echo "  OpenOffice java directory: ${OPENOFFICEJAVA_DIR:-no}"
+echo 
+echo ""
