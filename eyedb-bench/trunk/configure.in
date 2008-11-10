@@ -272,19 +272,18 @@ if test "$ac_enable_openoffice" = "yes" ; then
 	     break
 	  fi
       done
-      if test x"$OPENOFFICEJAVA_DIR" = x"none" ; then
-      	 AC_MSG_ERROR(no OpenOffice java installation found)
-      fi
       AC_MSG_RESULT($OPENOFFICEJAVA_DIR)
    fi
 
-   AC_CHECK_FILE( $OPENOFFICEJAVA_DIR/juh.jar, HAVE_OPENOFFICEJAVA="yes", HAVE_OPENOFFICEJAVA="no")
+   if test x"$OPENOFFICEJAVA_DIR" != x"none" ; then
+      AC_CHECK_FILE( $OPENOFFICEJAVA_DIR/juh.jar, HAVE_OPENOFFICEJAVA="yes", HAVE_OPENOFFICEJAVA="no")
 
-   OPENOFFICE_CLASSPATH=""
-   if test "$HAVE_OPENOFFICEJAVA" = "yes"; then
-   for j in juh.jar jurt.jar unoil.jar unoloader.jar ; do
-      OPENOFFICE_CLASSPATH="$OPENOFFICE_CLASSPATH:$OPENOFFICEJAVA_DIR/$j"
-   done
+         OPENOFFICE_CLASSPATH=""
+	 if test "$HAVE_OPENOFFICEJAVA" = "yes"; then
+	    for j in juh.jar jurt.jar unoil.jar unoloader.jar ; do
+	    	OPENOFFICE_CLASSPATH="$OPENOFFICE_CLASSPATH:$OPENOFFICEJAVA_DIR/$j"
+	   done
+	 fi
    fi
 fi
 
