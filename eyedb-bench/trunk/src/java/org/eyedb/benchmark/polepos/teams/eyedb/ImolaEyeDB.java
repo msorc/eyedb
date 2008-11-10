@@ -1,6 +1,8 @@
 package org.eyedb.benchmark.polepos.teams.eyedb;
 
 import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 import org.eyedb.Oid;
 import org.eyedb.benchmark.polepos.teams.eyedb.data.IndexedPilot;
 import org.polepos.circuits.imola.ImolaDriver;
@@ -10,11 +12,13 @@ import org.polepos.framework.TurnSetup;
 
 public class ImolaEyeDB extends EyeDBDriver implements ImolaDriver {
 
-    private Oid[] oids;
+    //    private Oid[] oids;
+    private List<Oid> oids;
 
     public void takeSeatIn(Car car, TurnSetup setup) throws CarMotorFailureException
     {
-	oids = new Oid[setup.getSelectCount()];
+	//	oids = new Oid[setup.getSelectCount()];
+	oids = new ArrayList<Oid>();
 	super.takeSeatIn(car, setup);
     }
 
@@ -50,21 +54,28 @@ public class ImolaEyeDB extends EyeDBDriver implements ImolaDriver {
                 
 	p.store( org.eyedb.RecMode.FullRecurs);
 	
-	if (isCommitPoint(i)) 
+	if (isCommitPoint(i)) {
 	    getDatabase().transactionCommit();
+	    getDatabase().transactionBegin();
+	}
 
 	if ( i < setup().getSelectCount())
-	    oids[i] = p.getOid();
+	    //	    oids[i] = p.getOid();
+	    oids.add( p.getOid());
    }
 
     public void retrieve()
     {
         try {
+	    getDatabase().transactionBegin();
+
 	    for (Oid oid: oids) {
 		IndexedPilot pilot = (IndexedPilot)getDatabase().loadObject( oid);
 
                 addToCheckSum(pilot.getPoints());
 	    }
+
+	    getDatabase().transactionCommit();
         }
         catch ( org.eyedb.Exception ex ) {
             ex.printStackTrace();

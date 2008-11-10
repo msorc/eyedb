@@ -39,3 +39,15 @@ create_db() {
     fi
 }
 
+resize_shm() {
+    PORT=$1
+    DATABASE=$2
+    DATABASE_FILE=`$EYEDB_BINDIR/eyedbadmin database list --port=$PORT $DATABASE | awk '
+BEGIN { t = 0; }
+$0 ~ /Database File/ && t == 0 { t = 1; }
+$0 !~ /Database File/ && t == 1 { dbfile = $1; print $dbfile; t = 0; }
+'`
+    NEWSIZE=132000
+    echo $EYEDB_SBINDIR/eyedbsmtool shmem resize $DATABASE_FILE $NEWSIZE
+    $EYEDB_SBINDIR/eyedbsmtool shmem resize $DATABASE_FILE $NEWSIZE
+}

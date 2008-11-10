@@ -15,26 +15,6 @@ DATABASE=`grep database $PROPERTIES | awk -F = '{print $2}'`
 PORT=`grep tcp_port $PROPERTIES | awk -F = '{print $2}'`
 SCHEMA=${top_srcdir}/src/java/org/eyedb/benchmark/polepos/teams/eyedb/data/data.odl
 
-start_server() {
-    $EYEDB_SBINDIR/eyedbctl start --listen=$PORT --nod
-}
-
-delete_db() {
-    if $EYEDB_BINDIR/eyedbadmin database list --port=$PORT $DATABASE 2>&1 | grep -v 'not found' > /dev/null ; then
-	$EYEDB_BINDIR/eyedbadmin database delete --port=$PORT $DATABASE
-    fi
-}
-
-create_db() {
-    if $EYEDB_BINDIR/eyedbadmin database list --port=$PORT $DATABASE 2>&1 | grep -v 'not found' > /dev/null ; then
-	:
-    else
-	$EYEDB_BINDIR/eyedbadmin database create --port=$PORT $DATABASE
-	$EYEDB_BINDIR/eyedbadmin database defaccess --port=$PORT $DATABASE rw
-	$EYEDB_BINDIR/eyedbodl --port=$PORT --update --database=$DATABASE $SCHEMA
-    fi
-}
-
 build_classpath() {
     CLASSPATH=""
     CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/graph/jfreechart-1.0.0-pre2.jar
@@ -49,16 +29,16 @@ run_benchmark() {
     CLASSPATH=$CLASSPATH $JAVA org.eyedb.benchmark.polepos.RunSeasonEyeDB
 }
 
-stop_server() {
-    $EYEDB_SBINDIR/eyedbctl stop --listen=$PORT 
-}
+. $top_builddir/run/utils/eyedb/functions
 
-stop_server
+read_properties $PROPERTIES
+stop_server $PORT
 set -e
-start_server
-delete_db
-create_db
+start_server $PORT
+delete_db $PORT $DATABASE
+create_db $PORT $DATABASE $SCHEMA
+resize_shm $PORT $DATABASE
 build_classpath
 run_benchmark
-stop_server
+stop_server $PORT
 
