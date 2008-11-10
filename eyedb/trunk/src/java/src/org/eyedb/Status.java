@@ -28,6 +28,7 @@ public class Status {
   int status;
   String str = null;
 
+
   static public final int SE_SUCCESS = 0;
   static public final int SE_ERROR = 1;
   static public final int SE_SYS_ERROR = 2;
@@ -44,70 +45,73 @@ public class Status {
   static public final int SE_DATABASE_CREATION_ERROR = 13;
   static public final int SE_DATABASE_ACCESS_DENIED = 14;
   static public final int SE_DATABASE_OPEN_FAILED = 15;
-  static public final int SE_INVALID_NBDATAFILES = 16;
-  static public final int SE_INVALID_DBFILE = 17;
-  static public final int SE_INVALID_DBFILE_ACCESS = 18;
-  static public final int SE_INVALID_SHMFILE = 19;
-  static public final int SE_INVALID_SHMFILE_ACCESS = 20;
-  static public final int SE_INVALID_OBJMAP_ACCESS = 21;
-  static public final int SE_INVALID_DATAFILE = 22;
-  static public final int SE_INVALID_DMPFILE = 23;
-  static public final int SE_INVALID_DATAFILEMAXSIZE = 24;
-  static public final int SE_INVALID_FILES_COPY = 25;
-  static public final int SE_INVALID_DBFILES_COPY = 26;
-  static public final int SE_INVALID_DATAFILES_COPY = 27;
-  static public final int SE_INVALID_SHMFILES_COPY = 28;
-  static public final int SE_INVALID_OBJMAPFILES_COPY = 29;
-  static public final int SE_DBFILES_IDENTICAL = 30;
-  static public final int SE_DATAFILES_IDENTICAL = 31;
-  static public final int SE_DBFILE_ALREADY_EXISTS = 32;
-  static public final int SE_SHMFILE_ALREADY_EXISTS = 33;
-  static public final int SE_OBJMAPFILE_ALREADY_EXISTS = 34;
-  static public final int SE_DATAFILE_ALREADY_EXISTS = 35;
-  static public final int SE_SIZE_TOO_LARGE = 36;
-  static public final int SE_WRITE_FORBIDDEN = 37;
-  static public final int SE_CONN_RESET_BY_PEER = 38;
-  static public final int SE_LOCK_TIMEOUT = 39;
-  static public final int SE_FATAL_MUTEX_LOCK_TIMEOUT = 40;
-  static public final int SE_BACKEND_INTERRUPTED = 41;
-  static public final int SE_INVALID_TRANSACTION_MODE = 42;
-  static public final int SE_RW_TRANSACTION_NEEDED = 43;
-  static public final int SE_TRANSACTION_NEEDED = 44;
-  static public final int SE_TRANSACTION_LOCKING_FAILED = 45;
-  static public final int SE_TRANSACTION_UNLOCKING_FAILED = 46;
-  static public final int SE_TOO_MANY_TRANSACTIONS = 47;
-  static public final int SE_TRANSACTION_TOO_MANY_NESTED = 48;
-  static public final int SE_DEADLOCK_DETECTED = 49;
-  static public final int SE_INVALID_FLAG = 50;
-  static public final int SE_INVALID_DB_HANDLE = 51;
-  static public final int SE_MAP_ERROR = 52;
-  static public final int SE_TOO_MANY_OBJECTS = 53;
-  static public final int SE_INVALID_OBJECT_SIZE = 54;
-  static public final int SE_NO_DATAFILESPACE_LEFT = 55;
-  static public final int SE_NO_SHMSPACE_LEFT = 56;
-  static public final int SE_INVALID_SIZE = 57;
-  static public final int SE_INVALID_OFFSET = 58;
-  static public final int SE_INVALID_OID = 59;
-  static public final int SE_INVALID_ROOT_ENTRY_SIZE = 60;
-  static public final int SE_INVALID_ROOT_ENTRY_KEY = 61;
-  static public final int SE_INVALID_READ_ACCESS = 62;
-  static public final int SE_INVALID_WRITE_ACCESS = 63;
-  static public final int SE_OBJECT_PROTECTED = 64;
-  static public final int SE_PROTECTION_INVALID_UID = 65;
-  static public final int SE_PROTECTION_DUPLICATE_UID = 66;
-  static public final int SE_PROTECTION_DUPLICATE_NAME = 67;
-  static public final int SE_PROTECTION_NOT_FOUND = 68;
-  static public final int SE_ROOT_ENTRY_EXISTS = 69;
-  static public final int SE_TOO_MANY_ROOT_ENTRIES = 70;
-  static public final int SE_ROOT_ENTRY_NOT_FOUND = 71;
-  static public final int SE_PROT_NAME_TOO_LONG = 72;
-  static public final int SE_NOTIMPLEMENTED = 73;
-  static public final int SE_NO_SETUID_PRIVILEGE = 74;
-  static public final int SE_NOT_YET_IMPLEMENTED = 75;
-  static public final int SE_COMPATIBILITY_ERROR = 76;
-  static public final int SE_INTERNAL_ERROR = 77;
-  static public final int SE_FATAL_ERROR = 78;
-  static public final int SE_N_ERROR = 79;
+  static public final int SE_INVALID_DATAFILE_CNT = 16;
+  static public final int SE_INVALID_DATASPACE_CNT = 17;
+  static public final int SE_INVALID_DATAFILE_CNT_IN_DATASPACE = 18;
+  static public final int SE_INVALID_DATASPACE = 19;
+  static public final int SE_INVALID_DBFILE = 20;
+  static public final int SE_INVALID_DBFILE_ACCESS = 21;
+  static public final int SE_INVALID_SHMFILE = 22;
+  static public final int SE_INVALID_SHMFILE_ACCESS = 23;
+  static public final int SE_INVALID_OBJMAP_ACCESS = 24;
+  static public final int SE_INVALID_DATAFILE = 25;
+  static public final int SE_INVALID_DMPFILE = 26;
+  static public final int SE_INVALID_DATAFILEMAXSIZE = 27;
+  static public final int SE_INVALID_FILES_COPY = 28;
+  static public final int SE_INVALID_DBFILES_COPY = 29;
+  static public final int SE_INVALID_DATAFILES_COPY = 30;
+  static public final int SE_INVALID_SHMFILES_COPY = 31;
+  static public final int SE_INVALID_OBJMAPFILES_COPY = 32;
+  static public final int SE_DBFILES_IDENTICAL = 33;
+  static public final int SE_DATAFILES_IDENTICAL = 34;
+  static public final int SE_DBFILE_ALREADY_EXISTS = 35;
+  static public final int SE_SHMFILE_ALREADY_EXISTS = 36;
+  static public final int SE_OBJMAPFILE_ALREADY_EXISTS = 37;
+  static public final int SE_DATAFILE_ALREADY_EXISTS = 38;
+  static public final int SE_SIZE_TOO_LARGE = 39;
+  static public final int SE_WRITE_FORBIDDEN = 40;
+  static public final int SE_CONN_RESET_BY_PEER = 41;
+  static public final int SE_LOCK_TIMEOUT = 42;
+  static public final int SE_FATAL_MUTEX_LOCK_TIMEOUT = 43;
+  static public final int SE_BACKEND_INTERRUPTED = 44;
+  static public final int SE_INVALID_TRANSACTION_MODE = 45;
+  static public final int SE_RW_TRANSACTION_NEEDED = 46;
+  static public final int SE_TRANSACTION_NEEDED = 47;
+  static public final int SE_TRANSACTION_LOCKING_FAILED = 48;
+  static public final int SE_TRANSACTION_UNLOCKING_FAILED = 49;
+  static public final int SE_TOO_MANY_TRANSACTIONS = 50;
+  static public final int SE_TRANSACTION_TOO_MANY_NESTED = 51;
+  static public final int SE_DEADLOCK_DETECTED = 52;
+  static public final int SE_INVALID_FLAG = 53;
+  static public final int SE_INVALID_DB_HANDLE = 54;
+  static public final int SE_MAP_ERROR = 55;
+  static public final int SE_TOO_MANY_OBJECTS = 56;
+  static public final int SE_INVALID_OBJECT_SIZE = 57;
+  static public final int SE_NO_DATAFILESPACE_LEFT = 58;
+  static public final int SE_NO_SHMSPACE_LEFT = 59;
+  static public final int SE_INVALID_SIZE = 60;
+  static public final int SE_INVALID_OFFSET = 61;
+  static public final int SE_INVALID_OID = 62;
+  static public final int SE_INVALID_ROOT_ENTRY_SIZE = 63;
+  static public final int SE_INVALID_ROOT_ENTRY_KEY = 64;
+  static public final int SE_INVALID_READ_ACCESS = 65;
+  static public final int SE_INVALID_WRITE_ACCESS = 66;
+  static public final int SE_OBJECT_PROTECTED = 67;
+  static public final int SE_PROTECTION_INVALID_UID = 68;
+  static public final int SE_PROTECTION_DUPLICATE_UID = 69;
+  static public final int SE_PROTECTION_DUPLICATE_NAME = 70;
+  static public final int SE_PROTECTION_NOT_FOUND = 71;
+  static public final int SE_ROOT_ENTRY_EXISTS = 72;
+  static public final int SE_TOO_MANY_ROOT_ENTRIES = 73;
+  static public final int SE_ROOT_ENTRY_NOT_FOUND = 74;
+  static public final int SE_PROT_NAME_TOO_LONG = 75;
+  static public final int SE_NOTIMPLEMENTED = 76;
+  static public final int SE_NO_SETUID_PRIVILEGE = 77;
+  static public final int SE_NOT_YET_IMPLEMENTED = 78;
+  static public final int SE_COMPATIBILITY_ERROR = 79;
+  static public final int SE_INTERNAL_ERROR = 80;
+  static public final int SE_FATAL_ERROR = 81;
+  static public final int SE_N_ERROR = 82;
 
   static public final int IDB_SUCCESS = SE_SUCCESS;
   static public final int IDB_ERROR = SE_N_ERROR;
@@ -205,8 +209,7 @@ public class Status {
   private static String se_error = "storage manager: ";
 
   static {
-    errmsg =
-      new String[IDB_N_ERROR];
+    errmsg = new String[IDB_N_ERROR];
 
     errmsg[SE_SUCCESS] =
       se_error + "success";
@@ -250,7 +253,7 @@ public class Status {
     errmsg[SE_DATABASE_OPEN_FAILED] =
       se_error + "database open failed";
 
-    errmsg[SE_INVALID_NBDATAFILES] =
+    errmsg[SE_INVALID_DATAFILE_CNT] =
       se_error + "invalid nbvol";
 
     errmsg[SE_INVALID_DBFILE] =
