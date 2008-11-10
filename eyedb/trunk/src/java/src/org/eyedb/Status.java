@@ -254,7 +254,16 @@ public class Status {
       se_error + "database open failed";
 
     errmsg[SE_INVALID_DATAFILE_CNT] =
-      se_error + "invalid nbvol";
+	se_error + "invalid datafile count";
+
+    errmsg[SE_INVALID_DATASPACE_CNT] =
+	se_error + "invalid dataspace count";
+
+    errmsg[SE_INVALID_DATAFILE_CNT_IN_DATASPACE] =
+	se_error + "invalid datafile count in a dataspace";
+
+    errmsg[SE_INVALID_DATASPACE] =
+	se_error + "invalid dataspace";
 
     errmsg[SE_INVALID_DBFILE] =
       se_error + "invalid database file";
