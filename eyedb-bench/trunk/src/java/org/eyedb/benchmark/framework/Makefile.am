@@ -1,3 +1,5 @@
+SUBDIRS=reporter
+
 packagedir=$(pkglibdir)/java/classes/org/eyedb/benchmark/framework
 
 dist_package_JAVA =\
