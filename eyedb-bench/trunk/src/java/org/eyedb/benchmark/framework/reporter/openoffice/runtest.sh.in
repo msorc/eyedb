@@ -1,0 +1,11 @@
+#!/bin/bash
+JAVA=@JAVA@
+top_builddir=@top_builddir@
+JAVAROOT=@JAVAROOT@
+OPENOFFICE_CLASSPATH=@OPENOFFICE_CLASSPATH@
+
+runjava() {
+    $JAVA -cp $JAVAROOT:$OPENOFFICE_CLASSPATH $1
+}
+
+runjava org.eyedb.benchmark.framework.reporter.openoffice.OpenOfficeReporterTest
