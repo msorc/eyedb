@@ -15,3 +15,18 @@ runit.sh: Makefile
 bench: runit.sh
 	$(SHELL) runit.sh
 
+bahrain: runit.sh
+	$(SHELL) runit.sh bahrain
+
+barcelona: runit.sh
+	$(SHELL) runit.sh barcelona
+
+imola: runit.sh
+	$(SHELL) runit.sh imola
+
+melbourne: runit.sh
+	$(SHELL) runit.sh melbourne
+
+sepang: runit.sh
+	$(SHELL) runit.sh sepang
+
