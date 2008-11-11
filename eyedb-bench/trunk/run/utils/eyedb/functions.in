@@ -48,6 +48,5 @@ $0 ~ /Database File/ && t == 0 { t = 1; }
 $0 !~ /Database File/ && t == 1 { dbfile = $1; print $dbfile; t = 0; }
 '`
     NEWSIZE=132000
-    echo $EYEDB_SBINDIR/eyedbsmtool shmem resize $DATABASE_FILE $NEWSIZE
     $EYEDB_SBINDIR/eyedbsmtool shmem resize $DATABASE_FILE $NEWSIZE
 }
