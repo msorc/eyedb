@@ -1,4 +1,6 @@
-- add profiling flags to C++ compilation
+- add targets to run polepos circuits separately (as in eyedb C++ version), for Java eyedb and db4o
+- add profiling flags to C++ compilation (only benchmarks)
+- add --enable-debug to compilation
 
 - add more detailled report in bench output (implementation, platform)
 
