@@ -30,3 +30,21 @@ melbourne: runit.sh
 sepang: runit.sh
 	$(SHELL) runit.sh sepang
 
+bench-local: runit.sh
+	$(SHELL) runit.sh --local
+
+bahrain-local: runit.sh
+	$(SHELL) runit.sh --local bahrain
+
+barcelona-local: runit.sh
+	$(SHELL) runit.sh --local barcelona
+
+imola-local: runit.sh
+	$(SHELL) runit.sh --local imola
+
+melbourne-local: runit.sh
+	$(SHELL) runit.sh --local melbourne
+
+sepang-local: runit.sh
+	$(SHELL) runit.sh --local sepang
+

@@ -4,15 +4,19 @@ top_srcdir=@top_srcdir@
 SCHEMA=$top_srcdir/src/cpp/polepos/eyedb/polepos.odl
 
 run_benchmark() {
+    if test $# -ge 1 -a $1 = "--local" ; then
+	MODE=-Dmode=local
+	shift
+    fi
     if test $# -eq 1 ; then
 	BENCH=$1
-	$top_builddir/src/cpp/polepos/eyedb/$BENCH --port=$PORT
+	$top_builddir/src/cpp/polepos/eyedb/$BENCH --port=$PORT $MODE
     else
-	$top_builddir/src/cpp/polepos/eyedb/bahrain --port=$PORT
-	$top_builddir/src/cpp/polepos/eyedb/barcelona --port=$PORT
-	$top_builddir/src/cpp/polepos/eyedb/imola --port=$PORT
-	$top_builddir/src/cpp/polepos/eyedb/melbourne --port=$PORT
-	$top_builddir/src/cpp/polepos/eyedb/sepang --port=$PORT
+	$top_builddir/src/cpp/polepos/eyedb/bahrain --port=$PORT $MODE
+	$top_builddir/src/cpp/polepos/eyedb/barcelona --port=$PORT $MODE
+	$top_builddir/src/cpp/polepos/eyedb/imola --port=$PORT $MODE
+	$top_builddir/src/cpp/polepos/eyedb/melbourne --port=$PORT $MODE
+	$top_builddir/src/cpp/polepos/eyedb/sepang --port=$PORT $MODE
     fi
 }
 
