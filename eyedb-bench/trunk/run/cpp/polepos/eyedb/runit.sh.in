@@ -4,11 +4,16 @@ top_srcdir=@top_srcdir@
 SCHEMA=$top_srcdir/src/cpp/polepos/eyedb/polepos.odl
 
 run_benchmark() {
-    $top_builddir/src/cpp/polepos/eyedb/bahrain --port=$PORT
-    $top_builddir/src/cpp/polepos/eyedb/barcelona --port=$PORT
-    $top_builddir/src/cpp/polepos/eyedb/imola --port=$PORT
-    $top_builddir/src/cpp/polepos/eyedb/melbourne --port=$PORT
-    $top_builddir/src/cpp/polepos/eyedb/sepang --port=$PORT
+    if test $# -eq 1 ; then
+	BENCH=$1
+	$top_builddir/src/cpp/polepos/eyedb/$BENCH --port=$PORT
+    else
+	$top_builddir/src/cpp/polepos/eyedb/bahrain --port=$PORT
+	$top_builddir/src/cpp/polepos/eyedb/barcelona --port=$PORT
+	$top_builddir/src/cpp/polepos/eyedb/imola --port=$PORT
+	$top_builddir/src/cpp/polepos/eyedb/melbourne --port=$PORT
+	$top_builddir/src/cpp/polepos/eyedb/sepang --port=$PORT
+    fi
 }
 
 . $top_builddir/run/utils/eyedb/functions
@@ -20,5 +25,5 @@ start_server $PORT
 delete_db $PORT $DATABASE
 create_db $PORT $DATABASE $SCHEMA
 resize_shm $PORT $DATABASE
-run_benchmark
+run_benchmark $*
 stop_server $PORT
