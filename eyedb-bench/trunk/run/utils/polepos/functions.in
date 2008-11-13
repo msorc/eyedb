@@ -1,0 +1,14 @@
+#!/bin/bash
+abs_top_srcdir=@abs_top_srcdir@
+abs_top_builddir=@abs_top_builddir@
+POLEPOS_DIR=@POLEPOS_DIR@
+
+EYEDB_BENCHMARK_JAR=${abs_top_builddir}/src/java/eyedb-benchmark.jar
+
+build_classpath() {
+    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/graph/jfreechart-1.0.0-pre2.jar
+    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/graph/jcommon-1.0.0-pre2.jar
+    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/graph/itext-1.2.jar
+    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/graph/velocity-dep-1.4.jar
+    CLASSPATH=$CLASSPATH:$EYEDB_BENCHMARK_JAR:$POLEPOS_DIR/bin
+}
