@@ -343,6 +343,7 @@ src/java/org/eyedb/benchmark/Makefile dnl
 src/java/org/eyedb/benchmark/framework/Makefile dnl
 src/java/org/eyedb/benchmark/framework/reporter/Makefile dnl
 src/java/org/eyedb/benchmark/framework/reporter/openoffice/Makefile dnl
+src/java/org/eyedb/benchmark/framework/reporter/simple/Makefile dnl
 src/java/org/eyedb/benchmark/polepos/Makefile dnl
 src/java/org/eyedb/benchmark/polepos/teams/Makefile dnl
 src/java/org/eyedb/benchmark/polepos/teams/db4o/Makefile dnl
