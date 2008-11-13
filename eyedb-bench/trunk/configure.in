@@ -17,6 +17,16 @@ AC_ARG_ENABLE(cpp,
 		AS_HELP_STRING([--enable-cpp],
 				[enable C++ code compilation [default=yes]]),,
 		ac_enable_cpp="yes")
+# Debug
+AC_ARG_ENABLE(debug,
+		AS_HELP_STRING([--enable-debug],
+				[compile with debug [default=no]]),,
+		enable_debug="no")
+# Profile
+AC_ARG_ENABLE(profile,
+		AS_HELP_STRING([--enable-profile],
+				[compile with profile [default=no]]),,
+		enable_profile="no")
 # Java
 AC_ARG_ENABLE(java,
 		AS_HELP_STRING([--enable-java],
@@ -52,44 +62,44 @@ AC_ARG_ENABLE(openoffice,
 # ========================================
 # C++ compilation
 # ========================================
-if test "$ac_enable_cpp" = "yes"
-then
-	AC_PROG_CXX
-	AC_PROG_LIBTOOL
+if test "$ac_enable_cpp" = "yes"; then
+   AC_PROG_CXX
+   AC_PROG_LIBTOOL
 fi
 
 if test "$ac_enable_cpp" = "yes" -a x"$CXX" != x ; then
    COND_CPP="yes"
+   
+   if test "$enable_debug" = "yes"
+   then
+	CXXFLAGS="$CXXFLAGS -g"
+   fi
+   if test "x$enable_profile" != "x"
+   then
+	CXXFLAGS="$CXXFLAGS -pg"
+   fi
 fi
 AM_CONDITIONAL(COND_CPP, test x"$COND_CPP" = xyes)
 
 # ========================================
 # JAVA compilation
 # ========================================
-if test "$ac_enable_java" = "yes"
-then
-	# On Mac OS X, if JAVAC is not set, we force it to be javac, because
-	# AC_PROG_JAVAC tests first jikes, which is currently broken on Mac OS X
-	case "$host" in
-	powerpc-apple-darwin*)
-		if test x"$JAVAC" = x ; then export JAVAC=javac ; fi
-		;;
-	esac
-	AC_PROG_JAVAC
-	export CLASSPATH=.
-	AC_PROG_JAVA
-	AC_PATH_PROG(JAR, jar)
-
-	if test "$enable_debug" = "yes"
-	then
-		JAVACFLAGS="$JAVACFLAGS -g"
-	fi
-
+if test "$ac_enable_java" = "yes"; then
+   AC_PROG_JAVAC
+   export CLASSPATH=.
+   AC_PROG_JAVA
+   AC_PATH_PROG(JAR, jar)
 fi
 
 if test "$ac_enable_java" = "yes" -a x"$JAVAC" != x -a x"$JAR" != x ; then
    COND_JAVA="yes"
+
+   if test "$enable_debug" = "yes"
+   then
+	JAVACFLAGS="$JAVACFLAGS -g"
+   fi
 fi
+
 AM_CONDITIONAL(COND_JAVA, test x"$COND_JAVA" = xyes)
 
 AC_SUBST(JAVACFLAGS)
@@ -104,8 +114,7 @@ AC_SUBST(JAVACFLAGS)
 AC_ARG_VAR(EYEDB_INSTALLDIR,[EyeDB installation directory])
 EYEDB_INSTALLDIR_DEFAULTS="/usr $HOME/projects/eyedb/install $HOME/eyedb-install $HOME/eyedb_install"
 
-if test "$ac_enable_eyedb" = "yes"
-then
+if test "$ac_enable_eyedb" = "yes"; then
    if test x"$EYEDB_INSTALLDIR" = x ; then
       AC_MSG_CHECKING(for EyeDB installation directory)
       EYEDB_INSTALLDIR="none"
@@ -372,6 +381,7 @@ echo
 echo "  *** C++ benchmarks ***" 
 echo "  Compile C++ benchmarks: ${COND_CPP:-no}"
 echo "  C++ compiler: ${CXX:-none}"
+echo "  C++ compiler flags: ${CXXFLAGS:-none}"
 echo 
 echo "  *** EyeDB ***" 
 echo "  Compile EyeDB benchmarks: ${COND_EYEDB:-no}"
