@@ -13,6 +13,7 @@ endif
 DIRS_TO_JAR= \
 org/eyedb/benchmark/framework \
 $(OPENOFFICE_SUBDIR) \
+org/eyedb/benchmark/framework/reporter/simple \
 org/eyedb/benchmark/polepos \
 org/eyedb/benchmark/polepos/teams/db4o \
 org/eyedb/benchmark/polepos/teams/eyedb \

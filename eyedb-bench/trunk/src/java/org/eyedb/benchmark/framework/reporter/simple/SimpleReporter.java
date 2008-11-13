@@ -1,8 +1,11 @@
-package org.eyedb.benchmark.framework;
+package org.eyedb.benchmark.framework.reporter.simple;
 
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Formatter;
+import org.eyedb.benchmark.framework.Benchmark;
+import org.eyedb.benchmark.framework.Reporter;
+import org.eyedb.benchmark.framework.Result;
 
 /**
  * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)

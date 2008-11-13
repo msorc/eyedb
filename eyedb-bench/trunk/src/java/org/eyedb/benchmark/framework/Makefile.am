@@ -8,10 +8,11 @@ Properties.java \
 Reporter.java \
 Result.java \
 Run.java \
-SimpleReporter.java \
 StopWatch.java \
 TestStopWatch.java 
 
 
 JAVAROOT=$(top_builddir)/src/java
 CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_srcdir)/src/java
+
+TAGS_DEPENDENCIES=$(dist_package_JAVA)
