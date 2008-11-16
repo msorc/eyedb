@@ -1,0 +1,22 @@
+./configure EYEDB_INSTALLDIR=$HOME/eyedb_install_opt
+
+time eyedboql -d polepos_opt -w -c "for (x in 0<30000) new B4()" --commit
+
+real    0m2.344s
+user    0m0.008s
+sys     0m0.004s
+
+bench("for (x in (select b from B4 as b)) {x.b2;}");
+Elapsed time: 584.489000 ms
+
+
+pwd:
+~/projects/eyedb-bench/src/cpp/polepos/eyedb
+
+~/projects/eyedb-bench/libtool --mode=execute gdb --args barcelona -Dmode=local
+
+pwd
+/home/viara/projects/eyedb-bench/run/cpp/polepos/eyedb
+~/projects/eyedb-bench/libtool --mode=execute gdb --args ~/projects/eyedb-bench/src/cpp/polepos/eyedb/barcelona  -Dmode=local
+
+editer le fichier eyedb.properties pour les nombres d'objets
