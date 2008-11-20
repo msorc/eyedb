@@ -25,10 +25,12 @@ run_benchmark() {
     fi
 }
 
+. $top_builddir/run/utils/common/functions
 . $top_builddir/run/utils/polepos/functions
 . $top_builddir/run/utils/eyedb/functions
 
-read_properties $PROPERTIES
+read_property $PROPERTIES "DATABASE"
+read_property $PROPERTIES "PORT"
 stop_server $PORT
 set -e
 start_server $PORT

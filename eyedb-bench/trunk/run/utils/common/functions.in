@@ -1,0 +1,7 @@
+#!/bin/bash
+
+function read_property() {
+    PROPERTIES=$1
+    PROPERTY=$2
+    eval "$PROPERTY=`grep $PROPERTY $PROPERTIES | awk -F = '{print $2}'`"
+}
