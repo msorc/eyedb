@@ -1,0 +1,41 @@
+#!/bin/bash
+
+function create_mysql_database() {
+    database=$1
+    if test $# -ge 2 ; then
+	MYSQL_ADMIN=$2
+    else
+	MYSQL_ADMIN="root"
+    fi
+    if test $# -ge 3 ; then
+	MYSQL_ADMIN_PASSWORD=$3
+    else
+	MYSQL_ADMIN_PASSWORD=""
+    fi
+
+    mysql --user="$MYSQL_ADMIN" --password="$MYSQL_ADMIN_PASSWORD" mysql <<EOF
+CREATE DATABASE $database;
+GRANT ALL ON $database.* TO '$user'@'localhost' IDENTIFIED BY '$password';
+GRANT ALL ON $database.* TO '$user'@'localhost.localdomain' IDENTIFIED BY '$password';
+FLUSH PRIVILEGES;
+EOF
+}
+
+function drop_mysql_database() {
+    database=$1
+    if test $# -ge 2 ; then
+	MYSQL_ADMIN=$2
+    else
+	MYSQL_ADMIN="root"
+    fi
+    if test $# -ge 3 ; then
+	MYSQL_ADMIN_PASSWORD=$3
+    else
+	MYSQL_ADMIN_PASSWORD=""
+    fi
+
+    mysql --user="$MYSQL_ADMIN" --password="$MYSQL_ADMIN_PASSWORD" mysql <<EOF
+DROP DATABASE $database;
+EOF
+}
+

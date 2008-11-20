@@ -1,5 +1,12 @@
 
-- add more detailled report in bench output (implementation, platform)
+- fix mysql database creation for hibernate
+- complete quicktour, query, delete, Java and C++, for db4o, eyedb and hibernate
+
+- make separate targets for each bench, java or C++, eyedb or db4o: make barcelona, make imola, make barcelona-local etc. [DONE]
+
+- enable bench to have a different properties file, like: make PROPERTIES=file 
+
+- add more detailled report in bench output (machine name, time, uptime, platform...)
 
 - update README
 - add license (GPL?) and copyright information in all files

@@ -328,8 +328,10 @@ run/java/quicktour/Makefile dnl
 run/java/quicktour/db4o/Makefile dnl
 run/java/quicktour/eyedb/Makefile dnl
 run/java/quicktour/hibernate/Makefile dnl
+run/utils/common/functions dnl
 run/utils/db4o/functions dnl
 run/utils/eyedb/functions dnl
+run/utils/hibernate/functions dnl
 run/utils/polepos/functions dnl
 src/Makefile dnl
 src/cpp/Makefile dnl
