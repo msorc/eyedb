@@ -67,13 +67,13 @@ dnl
 AC_DEFUN([AC_PROG_JAVA],[
 AC_REQUIRE([AC_EXEEXT])dnl
 if test x$JAVAPREFIX = x; then
-	test x$JAVA = x && AC_CHECK_PROGS(JAVA, gij$EXEEXT kaffe$EXEEXT java$EXEEXT)
+	test x"$JAVA" = x && AC_CHECK_PROGS(JAVA, java$EXEEXT gij$EXEEXT kaffe$EXEEXT )
 else
-	test x$JAVA = x && AC_CHECK_PROGS(JAVA, gij$EXEEXT kaffe$EXEEXT java$EXEEXT, $JAVAPREFIX)
+	test x"$JAVA" = x && AC_CHECK_PROGS(JAVA, java$EXEEXT gij$EXEEXT kaffe$EXEEXT , $JAVAPREFIX)
 fi
 dnl echo JAVA=$JAVA
 dnl test x$JAVA = x && AC_MSG_ERROR([no acceptable Java virtual machine found in \$PATH])
-if test x$JAVA != x; then
+if test x"$JAVA" != x; then
 	AC_PROG_JAVA_WORKS
 fi
 AC_PROVIDE([$0])dnl
