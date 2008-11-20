@@ -5,7 +5,7 @@ POLEPOS_DIR=@POLEPOS_DIR@
 
 EYEDB_BENCHMARK_JAR=${abs_top_builddir}/src/java/eyedb-benchmark.jar
 
-build_classpath() {
+polepos_build_classpath() {
     CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/graph/jfreechart-1.0.0-pre2.jar
     CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/graph/jcommon-1.0.0-pre2.jar
     CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/graph/itext-1.2.jar

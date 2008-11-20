@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function create_mysql_database() {
+function mysql_create_database() {
     database=$1
     if test $# -ge 2 ; then
 	MYSQL_ADMIN=$2
@@ -21,7 +21,7 @@ FLUSH PRIVILEGES;
 EOF
 }
 
-function drop_mysql_database() {
+function mysql_drop_database() {
     database=$1
     if test $# -ge 2 ; then
 	MYSQL_ADMIN=$2

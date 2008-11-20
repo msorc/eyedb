@@ -15,6 +15,6 @@ run_benchmark() {
 
 . $top_builddir/run/utils/polepos/functions
 
-build_classpath
+polepos_build_classpath
 run_benchmark $*
 
