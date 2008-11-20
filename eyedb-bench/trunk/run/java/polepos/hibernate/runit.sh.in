@@ -1,16 +1,13 @@
 #!/bin/bash
-POLEPOS_DIR=@POLEPOS_DIR@
-JAVA=@JAVA@
+srcdir=@srcdir@
+top_srcdir=@top_srcdir@
 top_builddir=@top_builddir@
+JAVA=@JAVA@
+POLEPOS_DIR=@POLEPOS_DIR@
 
-EYEDB_BENCHMARK_JAR=${top_builddir}/src/java/eyedb-benchmark.jar
+PROPERTIES=${srcdir}/settings/Jdbc.properties
 
-build_classpath() {
-    CLASSPATH=""
-    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/graph/jfreechart-1.0.0-pre2.jar
-    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/graph/jcommon-1.0.0-pre2.jar
-    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/graph/itext-1.2.jar
-    CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/graph/velocity-dep-1.4.jar
+function run_benchmark() {
     CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/hibernate-2.1/cglib-full-2.0.2.jar
     CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/hibernate-2.1/commons-collections-2.1.1.jar
     CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/hibernate-2.1/commons-lang-1.0.1.jar
@@ -24,12 +21,26 @@ build_classpath() {
     CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/hibernate-2.1/xerces-2.4.0.jar
     CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/hibernate-2.1/xml-apis.jar
     CLASSPATH=$CLASSPATH:$POLEPOS_DIR/lib/mysql-connector-java-3.1.6-bin.jar
-    CLASSPATH=$CLASSPATH:$EYEDB_BENCHMARK_JAR:$POLEPOS_DIR/bin
+    if test $# -eq 1 ; then
+	BENCH=$1
+	CLASSPATH=$CLASSPATH $JAVA -Dpolepos.circuits=$BENCH org.eyedb.benchmark.polepos.RunSeasonHibernate
+    else
+	CLASSPATH=$CLASSPATH $JAVA org.eyedb.benchmark.polepos.RunSeasonHibernate
+    fi
 }
 
-run_benchmark() {
-    CLASSPATH=$CLASSPATH $JAVA org.eyedb.benchmark.polepos.RunSeasonHibernate
+function recreate_database() {
+    MYSQL_URL=$1
+    MYSQL_DB=`echo "$MYSQL_URL" | sed -e 's,jdbc:mysql://[a-zA-Z0-9]*/\([a-zA-Z0-9]\),\1,'`
+    mysql_drop_database $MYSQL_DB
+    mysql_create_database $MYSQL_DB
 }
 
-build_classpath
+. $top_builddir/run/utils/common/functions
+. $top_builddir/run/utils/polepos/functions
+. $top_builddir/run/utils/hibernate/functions
+
+read_property $PROPERTIES "mysql.connecturl" "MYSQL_URL"
+recreate_database "$MYSQL_URL"
+polepos_build_classpath
 run_benchmark

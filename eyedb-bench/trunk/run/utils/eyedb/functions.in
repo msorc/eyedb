@@ -2,17 +2,17 @@
 EYEDB_BINDIR=@EYEDB_BINDIR@
 EYEDB_SBINDIR=@EYEDB_SBINDIR@
 
-start_server() {
+eyedb_start_server() {
     PORT=$1
     $EYEDB_SBINDIR/eyedbctl start --listen=$PORT --nod
 }
 
-stop_server() {
+eyedb_stop_server() {
     PORT=$1
     $EYEDB_SBINDIR/eyedbctl stop --listen=$PORT 
 }
 
-delete_db() {
+eyedb_delete_db() {
     PORT=$1
     DATABASE=$2
     if $EYEDB_BINDIR/eyedbadmin database list --port=$PORT $DATABASE 2>&1 | grep -v 'not found' > /dev/null ; then
@@ -20,7 +20,7 @@ delete_db() {
     fi
 }
 
-create_db() {
+eyedb_create_db() {
     PORT=$1
     DATABASE=$2
     SCHEMA=$3
@@ -33,7 +33,7 @@ create_db() {
     fi
 }
 
-resize_shm() {
+eyedb_resize_shm() {
     PORT=$1
     DATABASE=$2
     DATABASE_FILE=`$EYEDB_BINDIR/eyedbadmin database list --port=$PORT $DATABASE | awk '

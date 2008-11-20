@@ -2,6 +2,11 @@
 
 function read_property() {
     PROPERTIES=$1
-    PROPERTY=$2
-    eval "$PROPERTY=`grep $PROPERTY $PROPERTIES | awk -F = '{print $2}'`"
+    PROPERTY_NAME=$2
+    if test $# -ge 3 ; then
+	PROPERTY_VAR=$3
+    else
+	PROPERTY_VAR=$PROPERTY_NAME
+    fi
+    eval "$PROPERTY_VAR=`grep $PROPERTY_NAME $PROPERTIES | awk -F = '{print $2}'`"
 }
