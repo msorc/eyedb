@@ -13,7 +13,6 @@ public abstract class Benchmark {
     {
 	stopWatch = new StopWatch();
 	properties = new Properties();
-	result = new Result();
     }
 
     public abstract String getName();
@@ -30,6 +29,8 @@ public abstract class Benchmark {
 
     public void bench()
     {
+	result = new Result();
+
 	prepare();
 	stopWatch.start();
 	run();

@@ -4,6 +4,7 @@ packagedir=$(pkglibdir)/java/classes/org/eyedb/benchmark/framework
 
 dist_package_JAVA =\
 Benchmark.java \
+Context.java \
 Properties.java \
 Reporter.java \
 Result.java \
