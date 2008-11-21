@@ -1,7 +1,10 @@
 #!/bin/bash
-top_builddir=@top_builddir@
+srcdir=@srcdir@
 top_srcdir=@top_srcdir@
-SCHEMA=$top_srcdir/src/cpp/polepos/eyedb/polepos.odl
+top_builddir=@top_builddir@
+
+PROPERTIES=${srcdir}/eyedb.properties
+SCHEMA=${top_srcdir}/src/cpp/polepos/eyedb/polepos.odl
 
 run_benchmark() {
     if test $# -ge 1 -a $1 = "--local" ; then
