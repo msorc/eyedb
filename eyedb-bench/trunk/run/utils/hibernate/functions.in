@@ -2,6 +2,8 @@
 
 function mysql_create_database() {
     database=$1
+    user=$database
+    password=$database
     if test $# -ge 2 ; then
 	MYSQL_ADMIN=$2
     else
