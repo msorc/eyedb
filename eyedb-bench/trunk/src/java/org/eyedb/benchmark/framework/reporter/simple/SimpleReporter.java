@@ -3,7 +3,9 @@ package org.eyedb.benchmark.framework.reporter.simple;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Formatter;
+import java.util.Map;
 import org.eyedb.benchmark.framework.Benchmark;
+import org.eyedb.benchmark.framework.Context;
 import org.eyedb.benchmark.framework.Reporter;
 import org.eyedb.benchmark.framework.Result;
 
@@ -47,14 +49,24 @@ public class SimpleReporter implements Reporter {
     public void report( Benchmark benchmark)
     {
 	out.println();
-	out.println( "Bench: " + benchmark.getName());
+	out.println( "Benchmark: " + benchmark.getName());
 	out.println( benchmark.getDescription());
 	out.println();
 	out.println( benchmark.getRunDescription());
 	
+	reportContext( benchmark.getContext());
+
 	reportResult( benchmark.getResult());
 
 	out.println();
+    }
+
+    private void reportContext( Context context)
+    {
+	out.println();
+	out.println( "Benchmark context: ");
+	for ( Map.Entry<String,String> entry: context.entrySet())
+	    out.println( entry.getKey() + " : " + entry.getValue());
     }
 
     private void reportResult( Result result)

@@ -61,6 +61,7 @@ abstract public class RunSeason {
 
 	reporters.add( new PlainTextReporter());
 	reporters.add( new SimpleReporter());
+	reporters.add( new AdapterReporter());
 	
 	return reporters;
     }

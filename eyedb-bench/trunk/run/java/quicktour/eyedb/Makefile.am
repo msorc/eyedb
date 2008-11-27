@@ -18,4 +18,6 @@ EDIT = sed \
 	$(EDIT) $(srcdir)/$*.sh.in >$*.sh.tmp
 	mv $*.sh.tmp $*.sh
 
+bench: runit.sh
+	$(SHELL) runit.sh
 

@@ -4,7 +4,7 @@
 
 - add more detailled report in bench output (machine name, time, uptime, platform...)
 
-- enable bench to have a different properties file, like: make PROPERTIES=file [only for benchmark not using the polepos framework]
+- enable bench to have a different properties file, like: make PROPERTIES=file [only for benchmark NOT using the polepos framework]
 
 - complete quicktour, query, delete, Java and C++, for db4o, eyedb and hibernate
 

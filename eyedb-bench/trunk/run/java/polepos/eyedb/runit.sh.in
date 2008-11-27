@@ -22,8 +22,8 @@ run_benchmark() {
 . $top_builddir/run/utils/polepos/functions
 . $top_builddir/run/utils/eyedb/functions
 
-read_property $PROPERTIES "DATABASE"
-read_property $PROPERTIES "PORT"
+read_property $PROPERTIES "database" "DATABASE"
+read_property $PROPERTIES "tcp_port" "PORT"
 eyedb_stop_server $PORT
 set -e
 eyedb_start_server $PORT
