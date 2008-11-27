@@ -50,9 +50,8 @@ public class SimpleReporter implements Reporter {
     {
 	out.println();
 	out.println( "Benchmark: " + benchmark.getName());
-	out.println( benchmark.getDescription());
-	out.println();
-	out.println( benchmark.getRunDescription());
+	out.println( "Description: " + benchmark.getDescription());
+	out.println( "Implementation: " + benchmark.getImplementation());
 	
 	reportContext( benchmark.getContext());
 
@@ -64,14 +63,18 @@ public class SimpleReporter implements Reporter {
     private void reportContext( Context context)
     {
 	out.println();
-	out.println( "Benchmark context: ");
+	out.println( "Context: ");
+
 	for ( Map.Entry<String,String> entry: context.entrySet())
-	    out.println( entry.getKey() + " : " + entry.getValue());
+	    out.println( "  " + entry.getKey() + " : " + entry.getValue());
     }
 
     private void reportResult( Result result)
     {
- 	Formatter fmt = new Formatter( out);
+	out.println();
+	out.println( "Result: ");
+
+	Formatter fmt = new Formatter( out);
 
 	for (String h : result.getHeaders()) 
  	    fmt.format( "%" + columnWidth + "s%c", h, columnSeparator);

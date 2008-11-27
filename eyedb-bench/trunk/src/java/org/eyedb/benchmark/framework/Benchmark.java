@@ -10,6 +10,7 @@ public abstract class Benchmark {
     {
 	stopWatch = new StopWatch();
 	properties = new Properties();
+	result = new Result();
 	context = new Context();
     }
 
@@ -17,7 +18,7 @@ public abstract class Benchmark {
 
     public abstract String getDescription();
 
-    public abstract String getRunDescription();
+    public abstract String getImplementation();
 
     public abstract void prepare();
 

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eyedb.benchmark.framework.Benchmark;
+import org.eyedb.benchmark.framework.reporter.ReporterFactory;
 import org.polepos.framework.Car;
 import org.polepos.framework.Circuit;
 import org.polepos.framework.Result;
@@ -11,6 +12,10 @@ import org.polepos.framework.SetupProperty;
 import org.polepos.framework.Team;
 import org.polepos.framework.TurnSetup;
 import org.polepos.reporters.Reporter;
+
+/**
+ * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)
+ */
 
 public class AdapterReporter extends Reporter {
 
@@ -36,7 +41,7 @@ public class AdapterReporter extends Reporter {
 	    this.name = name;
 	}
 
-	public String getRunDescription()
+	public String getImplementation()
 	{
 	    return runDescription;
 	}
@@ -69,6 +74,8 @@ public class AdapterReporter extends Reporter {
 	setupProperties = new ArrayList<String>();
 
 	resultCount = 0;
+	
+	reporter = ReporterFactory.newInstance().newReporter();
     }
 
     public String file()
@@ -87,18 +94,21 @@ public class AdapterReporter extends Reporter {
     
     public void endSeason()
     {
+	if (benchmark != null)
+	    reporter.report(benchmark);
     }
     
     public void sendToCircuit(Circuit circuit)
     {
         super.sendToCircuit(circuit);
 
-        adapterBenchmark = new AdapterBenchmark();
+        if (benchmark != null)
+            reporter.report( benchmark);
+        
+        benchmark = new AdapterBenchmark();
 
-        adapterBenchmark.setName( circuit.name());
-        adapterBenchmark.setDescription( circuit.description());
-
-        result = new org.eyedb.benchmark.framework.Result();
+        benchmark.setName( circuit.name());
+        benchmark.setDescription( circuit.description());
         
 	taskNames.clear();
     }
@@ -110,13 +120,13 @@ public class AdapterReporter extends Reporter {
     
     protected void reportTeam(Team team)
     {
-	adapterBenchmark.setRunDescription( team.name());
+	benchmark.setRunDescription( team.name());
     }
     
     protected void reportCar(Car car)
     {
-	String s = adapterBenchmark.getRunDescription();
-	adapterBenchmark.setRunDescription( s + " - " + car.name());
+	String s = benchmark.getImplementation();
+	benchmark.setRunDescription( s + " - " + car.name());
     }
 
     public void reportSetups(TurnSetup[] setups)
@@ -133,10 +143,10 @@ public class AdapterReporter extends Reporter {
     private void addColumnHeaders()
     {
 	for( String setupProperty : setupProperties)
-	    result.addHeader(setupProperty);
+	    benchmark.getResult().addHeader(setupProperty);
 
 	for (String taskName: taskNames)
-	    result.addHeader( taskName);
+	    benchmark.getResult().addHeader( taskName);
     }
 
     protected void beginResults()
@@ -148,16 +158,19 @@ public class AdapterReporter extends Reporter {
     {
 	if ( resultCount == 0) {
 	    for( SetupProperty sp : result.getSetup().properties())
-		this.result.addValue(sp.value());
+		benchmark.getResult().addValue(sp.value());
 	}
 
-	this.result.addValue(result.getTime());
+	benchmark.getResult().addValue(result.getTime());
+
+	if (resultCount == taskNames.size() - 1)
+	    benchmark.getResult().next();
 
 	resultCount++;
     }
 
-    private AdapterBenchmark adapterBenchmark;
-    private org.eyedb.benchmark.framework.Result result;
+    private AdapterBenchmark benchmark;
+    private org.eyedb.benchmark.framework.Reporter reporter;
     
     private List<String> taskNames;
     private List<String> setupProperties;

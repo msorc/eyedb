@@ -14,6 +14,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)
+ */
+
 abstract public class RunSeason {
 
     public RunSeason()
@@ -60,7 +64,7 @@ abstract public class RunSeason {
 	List<Reporter> reporters = new ArrayList<Reporter>();
 
 	reporters.add( new PlainTextReporter());
-	reporters.add( new SimpleReporter());
+//	reporters.add( new SimpleReporter());
 	reporters.add( new AdapterReporter());
 	
 	return reporters;
