@@ -1,5 +1,8 @@
 package org.eyedb.benchmark.framework.reporter.openoffice;
 
+import org.eyedb.benchmark.framework.Benchmark;
+import org.eyedb.benchmark.framework.Reporter;
+
 import com.sun.star.container.XNameAccess;
 import com.sun.star.lang.XMultiComponentFactory;
 import com.sun.star.sheet.XSpreadsheet;
@@ -7,10 +10,6 @@ import com.sun.star.sheet.XSpreadsheetDocument;
 import com.sun.star.sheet.XSpreadsheets;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
-
-import org.eyedb.benchmark.framework.Benchmark;
-import org.eyedb.benchmark.framework.Reporter;
-import org.eyedb.benchmark.framework.Result;
 
 /**
  * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)
