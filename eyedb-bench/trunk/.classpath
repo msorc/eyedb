@@ -53,5 +53,10 @@
 	<classpathentry kind="lib" path="dependencies/slf4j/slf4j-1.5.2/slf4j-simple-1.5.2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/home/francois/projects/eyedb/install/lib/eyedb/java/eyedb.jar"/>
+	<classpathentry kind="lib" path="/usr/lib/openoffice/program/classes/juh.jar"/>
+	<classpathentry kind="lib" path="/usr/lib/openoffice/program/classes/jurt.jar"/>
+	<classpathentry kind="lib" path="/usr/lib/openoffice/program/classes/unoil.jar"/>
+	<classpathentry kind="lib" path="/usr/lib/openoffice/program/classes/unoloader.jar"/>
+	<classpathentry kind="lib" path="/usr/lib/openoffice/program/classes/ridl.jar"/>
 	<classpathentry kind="output" path="src/java"/>
 </classpath>
