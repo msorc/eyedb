@@ -9,7 +9,8 @@ import java.util.Collection;
  */
 
 public class Properties extends java.util.Properties {
-
+	static final long serialVersionUID = -2400285034232109403L;
+	 
     public Properties()
     {
 	super( System.getProperties());

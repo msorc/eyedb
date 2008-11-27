@@ -2,7 +2,6 @@ package org.eyedb.benchmark.framework;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -61,7 +60,7 @@ public class Context {
 	return map.entrySet();
     }
 
-    private String getCommandOutput( String command, String regex)
+    private String getCommandOutput( String command, String regex, String replace)
     {
 	try {
 	    Process p = Runtime.getRuntime().exec( command);
@@ -78,7 +77,7 @@ public class Context {
 
 		Matcher m = pat.matcher(input);
 		if (m.matches())
-		    return m.replaceFirst( "$1");
+		    return m.replaceFirst( replace);
 	    } while ( input != null);
 
 	    return "";
@@ -88,6 +87,11 @@ public class Context {
 	}
 
 	return "";
+    }
+
+    private String getCommandOutput( String command, String regex)
+    {
+	return getCommandOutput( command, regex, "$1");
     }
 
     private String getDate()
@@ -114,7 +118,7 @@ public class Context {
 
     private String getMemory()
     {
-	return getCommandOutput( "free -m", "Mem: *([0-9]+) .*") + "MB";
+	return getCommandOutput( "free -m", "Mem: *([0-9]+) .*", "$1 MB");
     }
 
     private String getJava()

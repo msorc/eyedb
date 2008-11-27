@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry excluding="bench1/db4o/|bench1/eyedb/" kind="src" path=""/>
-	<classpathentry kind="src" path="bench1/eyedb"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/home/francois/projects/eyedb/install/lib/eyedb/java/eyedb.jar"/>
-	<classpathentry kind="output" path=""/>
-</classpath>

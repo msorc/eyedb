@@ -1,5 +1,6 @@
 package org.eyedb.benchmark.framework;
 
+
 /**
  * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)
  */
@@ -15,6 +16,9 @@ public class Run {
 	    benchmark.getProperties().load( propertiesFileName);
 
 	    benchmark.bench();
+
+//	    Reporter 
+
 	}
 	catch( Exception e) {
 	    e.printStackTrace();
