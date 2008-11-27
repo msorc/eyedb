@@ -6,11 +6,20 @@ import java.util.Collection;
 import org.eyedb.benchmark.framework.Benchmark;
 import org.eyedb.benchmark.framework.Reporter;
 
-public class DelegateReporter implements Reporter {
+/**
+ * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)
+ */
 
-    public DelegateReporter()
+class DelegateReporter implements Reporter {
+
+    DelegateReporter()
     {
 	this.reporters = new ArrayList<Reporter>();
+    }
+    
+    DelegateReporter( Collection<Reporter> reporters)
+    {
+	this.reporters = new ArrayList<Reporter>( reporters);
     }
 
     public void report(Benchmark benchmark)

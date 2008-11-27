@@ -67,7 +67,7 @@ public class CreateBenchmark extends Benchmark {
 	return "Quicktour objects creation with one-to-many and many-to-many relations with referential integrity check";
     }
 
-    public String getRunDescription()
+    public String getImplementation()
     {
 	return "db4o implementation";
     }
