@@ -1,13 +1,12 @@
 package org.eyedb.benchmark.polepos;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eyedb.benchmark.polepos.teams.db4o.Db4oTeam;
 import org.polepos.circuits.barcelona.Barcelona;
 import org.polepos.framework.Circuit;
 import org.polepos.framework.Team;
-import org.polepos.reporters.Reporter;
-import org.polepos.reporters.PlainTextReporter;
-import org.eyedb.benchmark.polepos.teams.db4o.Db4oTeam;
-import java.util.ArrayList;
-import java.util.List;
 
 public class RunSeasonDb4oMod extends RunSeason {
 

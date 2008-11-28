@@ -1,7 +1,7 @@
 package org.eyedb.benchmark.polepos.teams.db4o;
 
-import org.polepos.framework.CheckSummable;
 import org.polepos.circuits.barcelona.B4;
+
 import com.db4o.ObjectSet;
 import com.db4o.query.Query;
 
