@@ -9,7 +9,7 @@ import java.util.Random;
  * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)
  */
 
-public class CreateBenchmark extends Benchmark {
+public class CreateBenchmark extends HibernateQuicktourBenchmark {
 
     private static final Random random = new Random(System.currentTimeMillis());
 
