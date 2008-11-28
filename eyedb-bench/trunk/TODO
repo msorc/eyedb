@@ -23,7 +23,6 @@ the reporter opens a template, given by name in properties
 pbm: insert headers, location of the script, location of template document
 
 
-
 - implement a HTML reporter ?
 
 problem: compute automatically ratio bench result?... too complicated
