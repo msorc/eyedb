@@ -2,7 +2,7 @@
 - fix mysql database creation for hibernate [DONE]
 - make separate targets for each bench, java or C++, eyedb or db4o: make barcelona, make imola, make barcelona-local etc. [DONE]
 
-- add more detailled report in bench output (machine name, time, uptime, platform...)
+- add more detailled report in bench output (machine name, time, uptime, platform...) [DONE FOR JAVA]
 
 - enable bench to have a different properties file, like: make PROPERTIES=file [only for benchmark NOT using the polepos framework]
 
@@ -11,3 +11,21 @@
 - update README
 - add license (GPL?) and copyright information in all files
 
+------------
+- update ReporterFactory to use properties to load reporter classes
+
+- implement a CSV reporter?
+- implement the openoffice reporter?
+
+all results are reported in the same document, given by name in properties
+the reporter opens a template, given by name in properties
+
+pbm: insert headers, location of the script, location of template document
+
+
+
+- implement a HTML reporter ?
+
+problem: compute automatically ratio bench result?... too complicated
+
+ 
