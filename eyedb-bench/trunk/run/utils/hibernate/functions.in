@@ -41,3 +41,7 @@ DROP DATABASE $database;
 EOF
 }
 
+function mysql_url2database() {
+    URL=$1
+    echo "$URL" | sed -e 's,jdbc:mysql://[a-zA-Z0-9]*/\([a-zA-Z0-9]\),\1,'
+}

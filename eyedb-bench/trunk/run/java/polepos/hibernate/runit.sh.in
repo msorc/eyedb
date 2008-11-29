@@ -29,18 +29,14 @@ function run_benchmark() {
     fi
 }
 
-function recreate_database() {
-    MYSQL_URL=$1
-    MYSQL_DB=`echo "$MYSQL_URL" | sed -e 's,jdbc:mysql://[a-zA-Z0-9]*/\([a-zA-Z0-9]\),\1,'`
-    mysql_drop_database $MYSQL_DB
-    mysql_create_database $MYSQL_DB
-}
-
 . $top_builddir/run/utils/common/functions
 . $top_builddir/run/utils/polepos/functions
 . $top_builddir/run/utils/hibernate/functions
 
 read_property $PROPERTIES "mysql.connecturl" "MYSQL_URL"
-recreate_database "$MYSQL_URL"
+DATABASE=`mysql_url2database $MYSQL_URL`
+mysql_drop_database $DATABASE
+mysql_create_database $DATABASE
+
 polepos_build_classpath
 run_benchmark

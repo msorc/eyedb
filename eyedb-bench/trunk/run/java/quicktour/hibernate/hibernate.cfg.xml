@@ -12,9 +12,12 @@
 
         <!-- Database connection settings -->
         <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
-        <property name="connection.url">jdbc:mysql://localhost/quicktour</property>
-        <property name="connection.username">quicktour</property>
-        <property name="connection.password">quicktour</property>
+
+	<!-- now in hibernate.properties 
+	<property name="connection.url"></property>
+        <property name="connection.username"></property>
+        <property name="connection.password"></property>
+	-->
 
         <!-- JDBC connection pool (use the built-in) -->
         <property name="connection.pool_size">1</property>
