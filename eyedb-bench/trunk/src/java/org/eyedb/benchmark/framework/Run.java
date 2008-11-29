@@ -1,5 +1,7 @@
 package org.eyedb.benchmark.framework;
 
+import org.eyedb.benchmark.framework.reporter.ReporterFactory;
+
 
 /**
  * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)
@@ -17,8 +19,8 @@ public class Run {
 
 	    benchmark.bench();
 
-//	    Reporter 
-
+	    Reporter reporter = ReporterFactory.newInstance().newReporter();
+	    reporter.report( benchmark);
 	}
 	catch( Exception e) {
 	    e.printStackTrace();

@@ -10,121 +10,121 @@ import java.util.Collection;
 
 public class Properties extends java.util.Properties {
 	static final long serialVersionUID = -2400285034232109403L;
-	 
-    public Properties()
-    {
-	super( System.getProperties());
-    }
 
-    public boolean getBooleanProperty( String key)
-    {
-	String value = getProperty( key);
-
-	if (value != null) {
-	    try {
-		return Boolean.getBoolean( value);
-	    }
-	    catch( NumberFormatException e) {
-	    }
+	public Properties()
+	{
+		super( System.getProperties());
 	}
 
-	return false;
-    }
+	public boolean getBooleanProperty( String key)
+	{
+		String value = getProperty( key);
 
-    public boolean getBooleanProperty( String key, boolean defaultValue)
-    {
-	if (getProperty( key) != null)
-	    return getBooleanProperty( key);
+		if (value != null) {
+			try {
+				return Boolean.getBoolean( value);
+			}
+			catch( NumberFormatException e) {
+			}
+		}
 
-	return defaultValue;
-    }
-
-    public int getIntProperty( String key)
-    {
-	String value = getProperty( key);
-
-	if (value != null) {
-	    try {
-		return Integer.parseInt( value);
-	    }
-	    catch( NumberFormatException e) {
-	    }
-	}
-
-	return 0;
-    }
-
-    public int getIntProperty( String key, int defaultValue)
-    {
-	if (getProperty( key) != null)
-	    return getIntProperty( key);
-
-	return defaultValue;
-    }
-
-    public boolean getIntProperty( String key, Collection<Integer> values)
-    {
-	String s = getProperty(key);
-
-	if ( s == null)
-	    return false;
-
-	String[] res = s.split( "[ \t,;]");
-
-	for ( int i = 0; i < res.length; i++) {
-	    try {
-		values.add( new Integer( Integer.parseInt( res[i])));
-	    }
-	    catch (NumberFormatException e) {
 		return false;
-	    }
 	}
 
-	return true;
-    }
+	public boolean getBooleanProperty( String key, boolean defaultValue)
+	{
+		if (getProperty( key) != null)
+			return getBooleanProperty( key);
 
-    public long getLongProperty( String key)
-    {
-	String value = getProperty( key);
-
-	if (value != null) {
-	    try {
-		return Long.parseLong( value);
-	    }
-	    catch( NumberFormatException e) {
-	    }
+		return defaultValue;
 	}
 
-	return 0L;
-    }
+	public int getIntProperty( String key)
+	{
+		String value = getProperty( key);
 
-    public long getLongProperty( String key, long defaultValue)
-    {
-	if (getProperty( key) != null)
-	    return getLongProperty( key);
+		if (value != null) {
+			try {
+				return Integer.parseInt( value);
+			}
+			catch( NumberFormatException e) {
+			}
+		}
 
-	return defaultValue;
-    }
+		return 0;
+	}
 
-    public boolean getStringProperty( String key, Collection<String> values)
-    {
-	String s = getProperty(key);
+	public int getIntProperty( String key, int defaultValue)
+	{
+		if (getProperty( key) != null)
+			return getIntProperty( key);
 
-	if ( s == null)
-	    return false;
+		return defaultValue;
+	}
 
-	String[] res = s.split( "[ \t,;]");
+	public boolean getIntProperty( String key, Collection<Integer> values)
+	{
+		String s = getProperty(key);
 
-	for ( int i = 0; i < res.length; i++)
-	    values.add( res[i]);
+		if ( s == null)
+			return false;
 
-	return true;
-    }
+		String[] res = s.split( "[ \t,;]");
 
-    public void load( String filename) throws IOException
-    {
-	load( new FileInputStream( filename));
-    }
+		for ( int i = 0; i < res.length; i++) {
+			try {
+				values.add( new Integer( Integer.parseInt( res[i])));
+			}
+			catch (NumberFormatException e) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	public long getLongProperty( String key)
+	{
+		String value = getProperty( key);
+
+		if (value != null) {
+			try {
+				return Long.parseLong( value);
+			}
+			catch( NumberFormatException e) {
+			}
+		}
+
+		return 0L;
+	}
+
+	public long getLongProperty( String key, long defaultValue)
+	{
+		if (getProperty( key) != null)
+			return getLongProperty( key);
+
+		return defaultValue;
+	}
+
+	public boolean getStringProperty( String key, Collection<String> values)
+	{
+		String s = getProperty(key);
+
+		if ( s == null)
+			return false;
+
+		String[] res = s.split( "[ \t,;]");
+
+		for ( int i = 0; i < res.length; i++)
+			values.add( res[i]);
+
+		return true;
+	}
+
+	public void load( String filename) throws IOException
+	{
+		load( new FileInputStream( filename));
+	}
 
 }
 

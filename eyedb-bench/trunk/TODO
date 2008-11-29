@@ -8,6 +8,8 @@
 
 - complete quicktour, query, delete, Java and C++, for db4o, eyedb and hibernate
 
+- IMPROVE HANDLING OF MISSING PROPERTIES!!!
+
 - update README
 - add license (GPL?) and copyright information in all files
 

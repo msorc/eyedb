@@ -54,7 +54,11 @@ public class SimpleReporter implements Reporter {
 		out.println( "Implementation: " + benchmark.getImplementation());
 
 		reportContext( benchmark.getContext());
-
+		
+		int w = benchmark.getProperties().getIntProperty("reporter.simple.column_width",-1);
+		if (w > 0)
+			setColumnWidth( w);
+		
 		reportResult( benchmark.getResult());
 
 		out.println();
@@ -76,15 +80,17 @@ public class SimpleReporter implements Reporter {
 
 		Formatter fmt = new Formatter( out);
 
-		for (String h : result.getHeaders()) 
-			fmt.format( "%" + columnWidth + "s%c", h, columnSeparator);
+		if (result.getSize() >= 1) {
+			for ( Result.Value v : result.getValues(0))
+				fmt.format( "%" + columnWidth + "s%c", v.getLabel(), columnSeparator);
 
-		out.println();
+			out.println();
+		}
+		
 
 		for ( int i = 0; i < result.getSize(); i++) {
-			for ( Result.Value v : result.getValues(i)) {
+			for ( Result.Value v : result.getValues(i))
 				fmt.format( "%" + columnWidth + "d%c", v.getValue(), columnSeparator);
-			}
 
 			out.println();
 		}
