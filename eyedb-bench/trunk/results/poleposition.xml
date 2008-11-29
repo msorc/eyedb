@@ -1,0 +1,46 @@
+<?xml version='1.0'?>
+
+<node role="family" label="poleposition">
+  <node role="benchmark" label="Barcelona">
+    <node role="implementation" label="eyedb">
+      <node role="resultset">
+	<node role="context">
+	  <node role="value" label="host">revard</node>
+	  <node role="value" label="cpu">Intel(R) Celeron(R) M processor         1.40GHz</node>
+	  <node role="value" label="uptime">01:46:50 up  5:47,  1 user,  load average: 0.79, 1.45, 1.31</node>
+	  <node role="value" label="java">Sun Microsystems Inc. Java HotSpot(TM) Client VM 1.6.0_03-b05</node>
+	  <node role="value" label="date">29 nov. 2008 01:46:50</node>
+	  <node role="value" label="memory">749 MB</node>
+	</node>
+	<node role="result">
+	  <node role="value" label="selects">100</node>
+	  <node role="value" label="objects">1000</node>
+	  <node role="value" label="write">411</node>
+	  <node role="value" label="read">271</node>
+	  <node role="value" label="query">79</node>
+	  <node role="value" label="remove">660</node>
+	</node>
+	<node role="result">
+	  <node role="value" label="selects">100</node>
+	  <node role="value" label="objects">3000</node>
+	  <node role="value" label="write">1199</node>
+	  <node role="value" label="read">515</node>
+	  <node role="value" label="query">85</node>
+	  <node role="value" label="remove">2065</node>
+	</node>
+      </node>
+    </node>
+  </node>
+  <node role="benchmark" label="Imola">
+    <node role="implementation" label="db4o">
+      <node role="resultset">
+	<node role="result">
+	  <node role="value" label="commitinterval">1000</node>
+	  <node role="value" label="selects">5000</node>
+	  <node role="value" label="objects">10000</node>
+	  <node role="value" label="retrieve (ms)">119</node>
+	</node>
+      </node>
+    </node>
+  </node>
+</node>
