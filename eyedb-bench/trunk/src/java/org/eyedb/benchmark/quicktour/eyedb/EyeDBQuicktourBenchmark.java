@@ -3,6 +3,7 @@ package org.eyedb.benchmark.quicktour.eyedb;
 import org.eyedb.Database;
 import org.eyedb.OQL;
 import org.eyedb.ObjectArray;
+import org.eyedb.Struct;
 import org.eyedb.benchmark.quicktour.QuicktourBenchmark;
 import org.eyedb.benchmark.quicktour.eyedb.quicktour.Course;
 import org.eyedb.benchmark.quicktour.eyedb.quicktour.Student;
@@ -23,7 +24,6 @@ public abstract class EyeDBQuicktourBenchmark extends QuicktourBenchmark {
 	{
 		return database;
 	}
-
 
 	public void prepare()
 	{
@@ -119,8 +119,8 @@ public abstract class EyeDBQuicktourBenchmark extends QuicktourBenchmark {
 				for ( int n = 0; n < nObjectsPerTransaction; n++)
 				{
 					student = new Student( database);
-					student.setFirstName( "Student_"+n+"_firstName");
-					student.setLastName( "Student_"+n);
+					student.setFirstName( "Student_"+count+"_firstName");
+					student.setLastName( "Student_"+count);
 					student.setBeginYear( (short)(getRandom().nextInt( 3) + 1));
 
 					int courseIndex = getRandom().nextInt( courses.length);
@@ -142,27 +142,24 @@ public abstract class EyeDBQuicktourBenchmark extends QuicktourBenchmark {
 		}
 	}
 
-	public void query( int nSelects)
-	{
-	}
-
-	public void remove()
+	private void queryByClass( String className, int nSelects)
 	{
 		try {
 			getDatabase().transactionBegin();
 
-			ObjectArray result = new ObjectArray();
+			for ( int n = 0;  n < nSelects; n++) {
+				String q = "select x from " + className + " as x where x.lastName ~ \"" + n + "\"";
+				OQL query = new OQL( getDatabase(), q);
 
-			OQL query = new OQL( getDatabase(), "select t from Teacher as t");
+				ObjectArray result = new ObjectArray();
+				query.execute( result);
 
-			query.execute( result);
+				int count = result.getCount();
+				Object[] objects = result.getObjects();
 
-			int count = result.getCount();
-			Object[] objects = result.getObjects();
-
-			for (int i = 0; i < count; i++) {
-				Teacher t = (Teacher)objects[i];
-				t.remove();
+				for (int i = 0; i < count; i++) {
+					Struct x = (Struct)objects[i];
+				}
 			}
 
 			getDatabase().transactionCommit();
@@ -170,6 +167,45 @@ public abstract class EyeDBQuicktourBenchmark extends QuicktourBenchmark {
 		catch( org.eyedb.Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void query( int nSelects)
+	{
+		queryByClass( "Teacher", nSelects);
+		queryByClass( "Student", nSelects);
+	}
+
+	private void removeByClass( String className)
+	{
+		try {
+			getDatabase().transactionBegin();
+
+			String q = "select x from " + className + " as x";
+			OQL query = new OQL( getDatabase(), q);
+
+			ObjectArray result = new ObjectArray();
+			query.execute( result);
+
+			int count = result.getCount();
+			Object[] objects = result.getObjects();
+
+			for (int i = 0; i < count; i++) {
+				Struct x = (Struct)objects[i];
+				x.remove();
+			}
+
+			getDatabase().transactionCommit();
+		}
+		catch( org.eyedb.Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void remove()
+	{
+		removeByClass( "Teacher");
+		removeByClass( "Course");
+		removeByClass( "Student");
 	}
 
 	protected org.eyedb.Connection connection;
