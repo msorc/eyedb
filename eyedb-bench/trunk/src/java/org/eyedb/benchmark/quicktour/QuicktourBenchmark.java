@@ -17,11 +17,6 @@ public abstract class QuicktourBenchmark extends Benchmark {
 		random = new Random(System.currentTimeMillis());
 	}
 
-	protected Random getRandom()
-	{
-		return random;
-	}
-
 	public String getName()
 	{
 		return "Quicktour";
@@ -88,6 +83,11 @@ public abstract class QuicktourBenchmark extends Benchmark {
 
 			getResult().next();
 		}
+	}
+
+	protected Random getRandom()
+	{
+		return random;
 	}
 
 	private Random random;
