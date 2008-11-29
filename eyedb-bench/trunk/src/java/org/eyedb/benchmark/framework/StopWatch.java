@@ -1,7 +1,7 @@
 package org.eyedb.benchmark.framework;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)
@@ -9,33 +9,11 @@ import java.util.ArrayList;
 
 public class StopWatch {
 
-	public class Lap {
-		Lap( String label, long time)
-		{
-			this.label = label;
-			this.time = time;
-		}
-
-		long getTime()
-		{
-			return time; 
-		}
-
-		String getLabel()
-		{
-			return label; 
-		}
-
-		private String label;
-		private long time;
-	}
-
-
 	public StopWatch()
 	{
 		running = false;
 		startTime = totalTime = lapTime = 0L;
-		laps = new ArrayList<Lap>();
+		laps = new ArrayList<Result.Value>();
 	}
 
 	public final void start()
@@ -60,7 +38,7 @@ public class StopWatch {
 	{
 		long t = time();
 		long delta = t - lapTime;
-		laps.add( new Lap( name, delta));
+		laps.add( new Result.Value( name, delta));
 		lapTime = t;
 
 		return delta;
@@ -78,24 +56,9 @@ public class StopWatch {
 		return totalTime;
 	}
 
-	public List<Lap> getLaps()
+	public List<Result.Value> getLaps()
 	{
 		return laps;
-	}
-
-	public int getLapCount()
-	{
-		return laps.size();
-	}
-
-	public String getLapLabel( int i)
-	{
-		return laps.get(i).getLabel();
-	}
-
-	public long getLapTime( int i)
-	{
-		return laps.get(i).getTime();
 	}
 
 	private long systemTime()
@@ -112,6 +75,6 @@ public class StopWatch {
 	private long startTime;
 	private long totalTime;
 	private long lapTime;
-	private List<Lap> laps;
+	private List<Result.Value> laps;
 }
 

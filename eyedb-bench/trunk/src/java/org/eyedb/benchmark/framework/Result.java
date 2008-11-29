@@ -1,6 +1,7 @@
 package org.eyedb.benchmark.framework;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -14,6 +15,12 @@ public class Result {
 		{
 			this.label = label;
 			this.value = value;
+		}
+		
+		public Value( Value v)
+		{
+			this.label = v.label;
+			this.value = v.value;
 		}
 
 		public String getLabel()
@@ -32,55 +39,27 @@ public class Result {
 
 	public Result()
 	{
-		headers = new ArrayList<String>();
 		rows = new ArrayList<List<Value>>();
 		rows.add( new ArrayList<Value>());
 		current = 0;
-		lapHeadersAdded = false;
 	}
 
-	public void addHeader( String header)
-	{
-		headers.add( header);
-	}
-
-	public void addValue( String label, long value)
+	public void add( String label, long value)
 	{
 		rows.get(current).add( new Value(label, value));
 	}
 
-	/*
-      @deprecated
-	 */
-	public void addValue( long value)
+	public void add( Collection<Result.Value>  values)
 	{
-		addValue( "", value);
+		for( Value v: values)
+			rows.get(current).add( new Value( v));	
 	}
-
-	public void addLaps( List<StopWatch.Lap> laps)
-	{
-		if (!lapHeadersAdded) {
-			lapHeadersAdded = true;
-
-			for (StopWatch.Lap l : laps) {
-				addHeader( l.getLabel());
-			}
-		}
-
-		for (StopWatch.Lap l : laps) 
-			addValue( l.getTime());
-	}
-
+	
 	public void next()
 	{
 		current++;
 
 		rows.add( new ArrayList<Value>());
-	}
-
-	public List<String> getHeaders()
-	{
-		return headers;
 	}
 
 	public List<Result.Value> getValues( int i)
@@ -93,8 +72,6 @@ public class Result {
 		return current;
 	}
 
-	private List<String> headers;
 	private List<List<Value>> rows;
 	private int current;
-	private boolean lapHeadersAdded;
 }

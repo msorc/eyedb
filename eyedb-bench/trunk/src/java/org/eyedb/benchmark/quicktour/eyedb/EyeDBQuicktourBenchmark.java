@@ -13,7 +13,7 @@ import org.eyedb.benchmark.quicktour.eyedb.quicktour.Teacher;
  * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)
  */
 
-public abstract class EyeDBQuicktourBenchmark extends QuicktourBenchmark {
+public class EyeDBQuicktourBenchmark extends QuicktourBenchmark {
 
 	public String getImplementation()
 	{
