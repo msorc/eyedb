@@ -3,8 +3,7 @@ HIBERNATE_JAR=@HIBERNATE_JAR@
 packagedir=$(pkglibdir)/java/classes/org/eyedb/benchmark/quicktour/hibernate
 
 dist_package_JAVA =\
-Benchmark.java \
-CreateBenchmark.java \
+HibernateCreateBenchmark.java \
 Person.java \
 Student.java \
 Course.java \

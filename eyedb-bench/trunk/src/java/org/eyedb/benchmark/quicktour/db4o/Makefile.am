@@ -3,8 +3,7 @@ DB4O_JAR=@DB4O_JAR@
 packagedir=$(pkglibdir)/java/classes/org/eyedb/benchmark/quicktour/db4o
 
 dist_package_JAVA =\
-Benchmark.java \
-CreateBenchmark.java \
+Db4oQuicktourBenchmark.java \
 Person.java \
 Student.java \
 Course.java \

@@ -8,7 +8,7 @@ import org.eyedb.benchmark.*;
  * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)
  */
 
-public class Db4oBenchLocal extends Benchmark {
+public class Db4oBenchLocal extends Db4oQuicktourBenchmark {
 
     public void prepare()
     {
@@ -24,12 +24,12 @@ public class Db4oBenchLocal extends Benchmark {
 	for (long count = nObjects; count > 0; count -= nObjectsPerTransaction) {
 
 	    for (long i = 0; i < nObjectsPerTransaction; i++) {
-		Person p = new Person();
+/*		Person p = new Person();
 		p.setName("toto" + i);
 		p.setAge((int)(i+1)%42);
 
 		db.set( p);
-	    }
+*/	    }
 
 	    db.commit();
 	}
