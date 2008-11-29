@@ -9,11 +9,32 @@ import java.util.List;
 
 public class Result {
 
+    public static class Value {
+	public Value( String label, long value)
+	{
+	    this.label = label;
+	    this.value = value;
+	}
+
+	public String getLabel()
+	{
+	    return label;
+	}
+
+	public long getValue()
+	{
+	    return value;
+	}
+
+	private String label;
+	private long value;
+    }
+
     public Result()
     {
 	headers = new ArrayList<String>();
-	rows = new ArrayList<List<Long>>();
-	rows.add( new ArrayList<Long>());
+	rows = new ArrayList<List<Value>>();
+	rows.add( new ArrayList<Value>());
 	current = 0;
 	lapHeadersAdded = false;
     }
@@ -23,9 +44,17 @@ public class Result {
 	headers.add( header);
     }
 
+    public void addValue( String label, long value)
+    {
+	rows.get(current).add( new Value(label, value));
+    }
+
+    /*
+      @deprecated
+    */
     public void addValue( long value)
     {
-	rows.get(current).add( new Long(value));
+	addValue( "", value);
     }
 
     public void addLaps( List<StopWatch.Lap> laps)
@@ -34,7 +63,7 @@ public class Result {
 	    lapHeadersAdded = true;
 
 	    for (StopWatch.Lap l : laps) {
-		addHeader( l.getName());
+		addHeader( l.getLabel());
 	    }
 	}
 
@@ -46,7 +75,7 @@ public class Result {
     {
 	current++;
 
-	rows.add( new ArrayList<Long>());
+	rows.add( new ArrayList<Value>());
     }
 
     public List<String> getHeaders()
@@ -54,7 +83,7 @@ public class Result {
 	return headers;
     }
 
-    public List<Long> getValues( int i)
+    public List<Result.Value> getValues( int i)
     {
 	return rows.get(i);
     }
@@ -65,7 +94,7 @@ public class Result {
     }
 
     private List<String> headers;
-    private List<List<Long>> rows;
+    private List<List<Value>> rows;
     private int current;
     private boolean lapHeadersAdded;
 }

@@ -9,109 +9,109 @@ import java.util.ArrayList;
 
 public class StopWatch {
 
-    public class Lap {
-	Lap( String name, long time)
-	{
-	    this.name = name;
-	    this.time = time;
+	public class Lap {
+		Lap( String label, long time)
+		{
+			this.label = label;
+			this.time = time;
+		}
+
+		long getTime()
+		{
+			return time; 
+		}
+
+		String getLabel()
+		{
+			return label; 
+		}
+
+		private String label;
+		private long time;
 	}
 
-	long getTime()
+
+	public StopWatch()
 	{
-	    return time; 
+		running = false;
+		startTime = totalTime = lapTime = 0L;
+		laps = new ArrayList<Lap>();
 	}
 
-	String getName()
+	public final void start()
 	{
-	    return name; 
+		running = true;
+		startTime = systemTime();
+		lapTime = 0;
 	}
 
-	private String name;
-	private long time;
-    }
+	public long stop()
+	{
+		if (running) {
+			running = false;
+			totalTime = time();
+		} else 
+			totalTime = 0;
 
+		return totalTime;
+	}
 
-    public StopWatch()
-    {
-	running = false;
-	startTime = totalTime = lapTime = 0L;
-	laps = new ArrayList<Lap>();
-    }
+	public long lap( String name)
+	{
+		long t = time();
+		long delta = t - lapTime;
+		laps.add( new Lap( name, delta));
+		lapTime = t;
 
-    public final void start()
-    {
-	running = true;
-	startTime = systemTime();
-	lapTime = 0;
-    }
+		return delta;
+	}
 
-    public long stop()
-    {
-	if (running) {
-	    running = false;
-	    totalTime = time();
-	} else 
-	    totalTime = 0;
+	public void reset()
+	{
+		running = false;
+		startTime = totalTime = lapTime = 0L;
+		laps.clear();
+	}
 
-	return totalTime;
-    }
+	public long getTotalTime()
+	{
+		return totalTime;
+	}
 
-    public long lap( String name)
-    {
-	long t = time();
-	long delta = t - lapTime;
-	laps.add( new Lap( name, delta));
-	lapTime = t;
+	public List<Lap> getLaps()
+	{
+		return laps;
+	}
 
-	return delta;
-    }
+	public int getLapCount()
+	{
+		return laps.size();
+	}
 
-    public void reset()
-    {
-	running = false;
-	startTime = totalTime = lapTime = 0L;
-	laps.clear();
-    }
+	public String getLapLabel( int i)
+	{
+		return laps.get(i).getLabel();
+	}
 
-    public long getTotalTime()
-    {
-	return totalTime;
-    }
+	public long getLapTime( int i)
+	{
+		return laps.get(i).getTime();
+	}
 
-    public List<Lap> getLaps()
-    {
-	return laps;
-    }
+	private long systemTime()
+	{
+		return System.currentTimeMillis();
+	}
 
-    public int getLapCount()
-    {
-	return laps.size();
-    }
+	private long time()
+	{
+		return systemTime() - startTime;
+	}
 
-    public String getLapName( int i)
-    {
-	return laps.get(i).getName();
-    }
-
-    public long getLapTime( int i)
-    {
-	return laps.get(i).getTime();
-    }
-
-    private long systemTime()
-    {
-	return System.currentTimeMillis();
-    }
-
-    private long time()
-    {
-	return systemTime() - startTime;
-    }
-
-    private boolean running;
-    private long startTime;
-    private long totalTime;
-    private long lapTime;
-    private List<Lap> laps;
+	private boolean running;
+	private long startTime;
+	private long totalTime;
+	private long lapTime;
+	private List<Lap> laps;
 }
 

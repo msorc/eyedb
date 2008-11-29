@@ -44,7 +44,7 @@ class TestStopWatch {
 	System.out.println( "Total " + w.getTotalTime());
 
 	for ( int i = 0; i < w.getLapCount(); i++)
-	    System.out.println( "lap[" + i + "] " + w.getLapName(i) + " " + w.getLapTime( i));
+	    System.out.println( "lap[" + i + "] " + w.getLapLabel(i) + " " + w.getLapTime( i));
 
 	return r;
     }

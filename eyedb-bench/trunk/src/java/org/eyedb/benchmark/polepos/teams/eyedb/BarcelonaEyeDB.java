@@ -5,91 +5,91 @@ import org.eyedb.benchmark.polepos.teams.eyedb.data.B4;
 import org.polepos.circuits.barcelona.BarcelonaDriver;
 
 public class BarcelonaEyeDB extends EyeDBDriver implements BarcelonaDriver {
-    
-    public void write()
-    {
-        try {
-	    getDatabase().transactionBegin();
-            
-            int count = setup().getObjectCount(); 
 
-            for ( int i = 0; i < count; i++) {
-                B4 b4 = new B4( getDatabase());
+	public void write()
+	{
+		try {
+			getDatabase().transactionBegin();
 
-                b4.setB0( i+1);
-                b4.setB1( i+1);
-                b4.setB2( i+1);
-                b4.setB3( i+1);
-                b4.setB4( i+1);
+			int count = setup().getObjectCount(); 
 
-		b4.store( org.eyedb.RecMode.FullRecurs);
-            }
-            
-            getDatabase().transactionCommit();
-        }
-        catch ( org.eyedb.Exception ex ) {
-            ex.printStackTrace();
-        }
-    }
-    
-    public void read()
-    {
-	try {
-	    getDatabase().transactionBegin();
+			for ( int i = 0; i < count; i++) {
+				B4 b4 = new B4( getDatabase());
 
-	    Iterator it = iterate( "select b from B4 as b");
+				b4.setB0( i+1);
+				b4.setB1( i+1);
+				b4.setB2( i+1);
+				b4.setB3( i+1);
+				b4.setB4( i+1);
 
-	    while (it.hasNext()) {
-		B4 b = (B4)it.next();
-		addToCheckSum( b.getB4());
-	    }
+				b4.store( org.eyedb.RecMode.FullRecurs);
+			}
 
-            getDatabase().transactionCommit();
+			getDatabase().transactionCommit();
+		}
+		catch ( org.eyedb.Exception ex ) {
+			ex.printStackTrace();
+		}
 	}
-	catch( org.eyedb.Exception e) {
-	    e.printStackTrace();
+
+	public void read()
+	{
+		try {
+			getDatabase().transactionBegin();
+
+			Iterator it = iterate( "select b from B4 as b");
+
+			while (it.hasNext()) {
+				B4 b = (B4)it.next();
+				addToCheckSum( b.getB4());
+			}
+
+			getDatabase().transactionCommit();
+		}
+		catch( org.eyedb.Exception e) {
+			e.printStackTrace();
+		}
 	}
-    }
-    
-    public void query()
-    {
-	try {
-	    getDatabase().transactionBegin();
 
-	    int count = setup().getSelectCount();
+	public void query()
+	{
+		try {
+			getDatabase().transactionBegin();
 
-	    for (int i = 0; i < count; i++) {
-		Iterator it = iterate( "select b from B4 as b where b.b2=" + (i+1));
+			int count = setup().getSelectCount();
 
-		while (it.hasNext()) {
-		    B4 b = (B4)it.next();
-		    addToCheckSum( b.getB4());
-		}	       
-	    }
+			for (int i = 0; i < count; i++) {
+				Iterator it = iterate( "select b from B4 as b where b.b2=" + (i+1));
 
-            getDatabase().transactionCommit();
+				while (it.hasNext()) {
+					B4 b = (B4)it.next();
+					addToCheckSum( b.getB4());
+				}	       
+			}
+
+			getDatabase().transactionCommit();
+		}
+		catch( org.eyedb.Exception e) {
+			e.printStackTrace();
+		}
 	}
-	catch( org.eyedb.Exception e) {
-	    e.printStackTrace();
-	}
-    }
-    
-    public void delete()
-    {
-	try {
-	    getDatabase().transactionBegin();
 
-	    Iterator it = iterate( "select b from B4 as b");
-	    while (it.hasNext()) {
-		B4 b = (B4)it.next();
-		b.remove();
-		addToCheckSum( 5);
-	    }
+	public void delete()
+	{
+		try {
+			getDatabase().transactionBegin();
 
-            getDatabase().transactionCommit();
+			Iterator it = iterate( "select b from B4 as b");
+			while (it.hasNext()) {
+				B4 b = (B4)it.next();
+				b.remove();
+				addToCheckSum( 5);
+			}
+
+			getDatabase().transactionCommit();
+		}
+		catch( org.eyedb.Exception e) {
+			e.printStackTrace();
+		}
 	}
-	catch( org.eyedb.Exception e) {
-	    e.printStackTrace();
-	}
-    }
 }
