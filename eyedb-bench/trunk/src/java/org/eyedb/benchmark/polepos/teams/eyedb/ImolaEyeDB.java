@@ -1,8 +1,8 @@
 package org.eyedb.benchmark.polepos.teams.eyedb;
 
-import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eyedb.Oid;
 import org.eyedb.benchmark.polepos.teams.eyedb.data.IndexedPilot;
 import org.polepos.circuits.imola.ImolaDriver;

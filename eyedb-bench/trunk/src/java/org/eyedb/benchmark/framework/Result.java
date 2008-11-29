@@ -9,92 +9,92 @@ import java.util.List;
 
 public class Result {
 
-    public static class Value {
-	public Value( String label, long value)
-	{
-	    this.label = label;
-	    this.value = value;
+	public static class Value {
+		public Value( String label, long value)
+		{
+			this.label = label;
+			this.value = value;
+		}
+
+		public String getLabel()
+		{
+			return label;
+		}
+
+		public long getValue()
+		{
+			return value;
+		}
+
+		private String label;
+		private long value;
 	}
 
-	public String getLabel()
+	public Result()
 	{
-	    return label;
+		headers = new ArrayList<String>();
+		rows = new ArrayList<List<Value>>();
+		rows.add( new ArrayList<Value>());
+		current = 0;
+		lapHeadersAdded = false;
 	}
 
-	public long getValue()
+	public void addHeader( String header)
 	{
-	    return value;
+		headers.add( header);
 	}
 
-	private String label;
-	private long value;
-    }
+	public void addValue( String label, long value)
+	{
+		rows.get(current).add( new Value(label, value));
+	}
 
-    public Result()
-    {
-	headers = new ArrayList<String>();
-	rows = new ArrayList<List<Value>>();
-	rows.add( new ArrayList<Value>());
-	current = 0;
-	lapHeadersAdded = false;
-    }
-
-    public void addHeader( String header)
-    {
-	headers.add( header);
-    }
-
-    public void addValue( String label, long value)
-    {
-	rows.get(current).add( new Value(label, value));
-    }
-
-    /*
+	/*
       @deprecated
-    */
-    public void addValue( long value)
-    {
-	addValue( "", value);
-    }
-
-    public void addLaps( List<StopWatch.Lap> laps)
-    {
-	if (!lapHeadersAdded) {
-	    lapHeadersAdded = true;
-
-	    for (StopWatch.Lap l : laps) {
-		addHeader( l.getLabel());
-	    }
+	 */
+	public void addValue( long value)
+	{
+		addValue( "", value);
 	}
 
-	for (StopWatch.Lap l : laps) 
-	    addValue( l.getTime());
-    }
+	public void addLaps( List<StopWatch.Lap> laps)
+	{
+		if (!lapHeadersAdded) {
+			lapHeadersAdded = true;
 
-    public void next()
-    {
-	current++;
+			for (StopWatch.Lap l : laps) {
+				addHeader( l.getLabel());
+			}
+		}
 
-	rows.add( new ArrayList<Value>());
-    }
+		for (StopWatch.Lap l : laps) 
+			addValue( l.getTime());
+	}
 
-    public List<String> getHeaders()
-    {
-	return headers;
-    }
+	public void next()
+	{
+		current++;
 
-    public List<Result.Value> getValues( int i)
-    {
-	return rows.get(i);
-    }
+		rows.add( new ArrayList<Value>());
+	}
 
-    public int getSize()
-    {
-	return current;
-    }
+	public List<String> getHeaders()
+	{
+		return headers;
+	}
 
-    private List<String> headers;
-    private List<List<Value>> rows;
-    private int current;
-    private boolean lapHeadersAdded;
+	public List<Result.Value> getValues( int i)
+	{
+		return rows.get(i);
+	}
+
+	public int getSize()
+	{
+		return current;
+	}
+
+	private List<String> headers;
+	private List<List<Value>> rows;
+	private int current;
+	private boolean lapHeadersAdded;
 }
