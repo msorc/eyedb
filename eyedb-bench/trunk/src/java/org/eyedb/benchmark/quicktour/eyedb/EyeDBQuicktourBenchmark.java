@@ -1,5 +1,8 @@
 package org.eyedb.benchmark.quicktour.eyedb;
 
+import org.eyedb.Database;
+import org.eyedb.OQL;
+import org.eyedb.ObjectArray;
 import org.eyedb.benchmark.quicktour.QuicktourBenchmark;
 import org.eyedb.benchmark.quicktour.eyedb.quicktour.Course;
 import org.eyedb.benchmark.quicktour.eyedb.quicktour.Student;
@@ -15,6 +18,12 @@ public abstract class EyeDBQuicktourBenchmark extends QuicktourBenchmark {
 	{
 		return "EyeDB Java implementation";
 	}
+
+	protected Database getDatabase()
+	{
+		return database;
+	}
+
 
 	public void prepare()
 	{
@@ -47,12 +56,12 @@ public abstract class EyeDBQuicktourBenchmark extends QuicktourBenchmark {
 
 	public void finish()
 	{
-/*		System.out.println( "org.eyedb.RPClib.read_ms = " + org.eyedb.RPClib.read_ms);
+		/*		System.out.println( "org.eyedb.RPClib.read_ms = " + org.eyedb.RPClib.read_ms);
 		System.out.println( "org.eyedb.RPClib.write_ms = " + org.eyedb.RPClib.write_ms);
 		System.out.println( "org.eyedb.RPClib.write_async_ms = " + org.eyedb.RPClib.write_async_ms);
 		System.out.println( "org.eyedb.RPClib.read_cnt = " + org.eyedb.RPClib.read_cnt);
 		System.out.println( "org.eyedb.RPClib.read_async_cnt = " + org.eyedb.RPClib.read_async_cnt);
-*/
+		 */
 		try {
 			// Close the database
 			database.close();
@@ -139,6 +148,28 @@ public abstract class EyeDBQuicktourBenchmark extends QuicktourBenchmark {
 
 	public void remove()
 	{
+		try {
+			getDatabase().transactionBegin();
+
+			ObjectArray result = new ObjectArray();
+
+			OQL query = new OQL( getDatabase(), "select t from Teacher as t");
+
+			query.execute( result);
+
+			int count = result.getCount();
+			Object[] objects = result.getObjects();
+
+			for (int i = 0; i < count; i++) {
+				Teacher t = (Teacher)objects[i];
+				t.remove();
+			}
+
+			getDatabase().transactionCommit();
+		}
+		catch( org.eyedb.Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	protected org.eyedb.Connection connection;
