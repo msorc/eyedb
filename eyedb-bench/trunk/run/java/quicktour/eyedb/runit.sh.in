@@ -5,7 +5,6 @@ EYEDB_JAR=@EYEDB_JAR@
 JAVA=@JAVA@
 
 EYEDB_BENCHMARK_JAR=${top_builddir}/src/java/eyedb-benchmark.jar
-#BENCHMARK=$1
 BENCHMARK=org.eyedb.benchmark.quicktour.eyedb.EyeDBQuicktourBenchmark
 SCHEMA=${top_srcdir}/src/java/org/eyedb/benchmark/quicktour/eyedb/quicktour/quicktour.odl 
 PROPERTIES=eyedb.properties
