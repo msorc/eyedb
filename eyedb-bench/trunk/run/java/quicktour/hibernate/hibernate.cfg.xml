@@ -26,10 +26,13 @@
         <property name="current_session_context_class">thread</property>
 
         <!-- Disable the second-level cache  -->
-        <property name="cache.provider_class">org.hibernate.cache.NoCacheProvider</property>
+	<property name="cache.provider_class">org.hibernate.cache.NoCacheProvider</property>
+
+	<property name="hibernate.jdbc.batch_size">20</property>
+	<property name="hibernate.jdbc.batch_versioned_data">true</property>
 
         <!-- Echo all executed SQL to stdout -->
-        <property name="show_sql">false</property>
+        <property name="show_sql">true</property>
 
         <!-- Drop and re-create the database schema on startup -->
         <property name="hbm2ddl.auto">create</property>
