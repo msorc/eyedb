@@ -1,43 +1,25 @@
 package org.eyedb.benchmark.quicktour.hibernate;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Student extends Person {
 
-    public Student()
-    {
-	this( "", "");
-    }
+	public Student()
+	{
+		courses = new HashSet<Course>();
+	}
 
-    public Student( String firstName, String lastName)
-    {
-	super( firstName, lastName);
+	public Set<Course> getCourses()
+	{
+		return courses;
+	}
 
-	courses = new HashSet();
-    }
+	public void setCourses( Set<Course> courses)
+	{
+		this.courses = courses;
+	}
 
-    Set getCourses()
-    {
-	return courses;
-    }
-
-    void setCourses( Set courses)
-    {
-	this.courses = courses;
-    }
-
-    public void addCourse( Course course)
-    {
-	courses.add( course);
-	course.getStudents().add( this);
-    }
-
-    public void removeCourse( Course course)
-    {
-	courses.remove( course);
-	course.getStudents().remove( this);
-    }
-
-    private Set courses;
+	private Set<Course> courses;
 }
 

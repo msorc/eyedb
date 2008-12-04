@@ -1,5 +1,6 @@
 package org.eyedb.benchmark.quicktour.hibernate;
 
+import java.io.File;
 import java.util.Iterator;
 
 import org.eyedb.benchmark.quicktour.QuicktourBenchmark;
@@ -21,11 +22,28 @@ public class HibernateQuicktourBenchmark extends QuicktourBenchmark {
 		return "Hibernate Java implementation";
 	}
 
+	private void hack( Configuration cfg)
+	{
+		cfg.setProperty("hibernate.query.substitutions", "true 1, false 0, yes 'Y', no 'N'");
+		cfg.setProperty("hibernate.connection.pool_size", "1");
+		cfg.setProperty("hibernate.proxool.pool_alias", "pool1");
+		cfg.setProperty("hibernate.jdbc.batch_size", "0");
+		cfg.setProperty("hibernate.jdbc.batch_versioned_data", "true");
+		cfg.setProperty("hibernate.jdbc.use_streams_for_binary", "true");
+		cfg.setProperty("hibernate.max_fetch_depth", "1");
+//		cfg.setProperty("hibernate.cache.region_prefix", "hibernate.test");
+		cfg.setProperty("hibernate.cache.use_query_cache", "true");
+//		cfg.setProperty("hibernate.cache.provider_class", "net.sf.hibernate.cache.EhCacheProvider");
+
+		cfg.setProperty("hibernate.proxool.pool_alias", "pool1");
+		cfg.setProperty("hibernate.proxool.pool_alias", "pool1");
+	}
+
 	public void prepare()
 	{
 		try {
 			Configuration configuration = new Configuration();
-			configuration.configure();
+			configuration.configure( new File("hibernate.cfg.xml"));
 
 			String url = getProperties().getProperty( "hibernate.connection.url");
 			configuration.setProperty( "connection.url", url);
@@ -33,6 +51,8 @@ public class HibernateQuicktourBenchmark extends QuicktourBenchmark {
 			configuration.setProperty( "connection.username", username);
 			String password = getProperties().getProperty( "hibernate.connection.password");
 			configuration.setProperty( "connection.password", password);
+
+			hack( configuration);
 
 			sessionFactory = configuration.buildSessionFactory();
 
@@ -56,12 +76,60 @@ public class HibernateQuicktourBenchmark extends QuicktourBenchmark {
 		return session;
 	}
 
+	private Transaction getTransaction()
+	{
+		return transaction;
+	}
+
+	private void setTransaction( Transaction transaction)
+	{
+		this.transaction = transaction;
+	}
+
+	private int getObjectsPerTransaction()
+	{
+		return objectsPerTransaction;
+	}
+
+	private void setObjectsPerTransaction( int objectsPerTransaction)
+	{
+		this.objectsPerTransaction = objectsPerTransaction;
+	}
+
+	private void checkCommit()
+	{
+		objectCount++;
+		System.err.println( "checkCommit(): object count: " + objectCount);
+		if (objectCount >= getObjectsPerTransaction()) {
+			System.err.println( "checkCommit(): committing...");
+			getTransaction().commit();
+			setTransaction( getSession().beginTransaction());
+			objectCount = 0;
+		}
+	}
+
+	private void checkFinalCommit()
+	{
+		System.err.println( "checkFinalCommit(): object count: " + objectCount);
+		if (objectCount != 0) {
+			System.err.println( "checkFinalCommit(): committing...");
+			getTransaction().commit();
+		}
+	}
+
 	private Teacher[] fillTeachers( int nTeachers)
 	{
 		Teacher[] teachers = new Teacher[nTeachers];
 
 		for ( int n = 0; n < nTeachers; n++) {
-			teachers[n] = new Teacher( "Teacher_"+n+"_firstName", "Teacher_"+n);
+			Teacher t = new Teacher();
+			t.setFirstName("Teacher_"+n+"_firstName");
+			t.setLastName("Teacher_"+n);
+			teachers[n] = t;
+
+			getSession().save( t);
+
+			checkCommit();
 		}
 
 		return teachers;
@@ -72,8 +140,15 @@ public class HibernateQuicktourBenchmark extends QuicktourBenchmark {
 		Course courses[] = new Course[ nCourses];
 
 		for ( int n = 0; n < nCourses; n++) {
-			courses[n] = new Course( "Course_"+n, "Description of course "+n);
-			courses[n].setTeacher( teachers[ getRandom().nextInt( teachers.length)]);
+			Course c = new Course();
+			c.setTitle("Course_"+n);
+			c.setDescription("Description of course "+n);
+			c.setTeacher( teachers[ getRandom().nextInt( teachers.length)]);
+			courses[n] = c;
+
+			getSession().save( c);
+
+			checkCommit();
 		}
 
 		return courses;
@@ -81,29 +156,32 @@ public class HibernateQuicktourBenchmark extends QuicktourBenchmark {
 
 	public void create(int nStudents, int nCourses, int nTeachers, int nObjectsPerTransaction)
 	{
+		setObjectsPerTransaction( nObjectsPerTransaction);
+		setTransaction( getSession().beginTransaction());
+
 		Teacher[] teachers = fillTeachers( nTeachers);
 		Course[] courses = fillCourses( nCourses, teachers);
 
-		for (long count = 0; count < nStudents; count += nObjectsPerTransaction) {
-			Student student = null;
+		for (int n = 0; n < nStudents; n++ ) {
+			Student student = new Student();
+			student.setFirstName("Student_"+n+"_firstName");
+			student.setLastName("Student_"+n);
+			//		    student.setBeginYear( (short)(random.nextInt( 3) + 1));
 
-			Transaction tx = getSession().beginTransaction();
-
-			for ( int n = 0; n < nObjectsPerTransaction; n++) {
-				student = new Student( "Student_"+n+"_firstName", "Student_"+n);
-				//		    student.setBeginYear( (short)(random.nextInt( 3) + 1));
-
-				int courseIndex = getRandom().nextInt( courses.length);
-				for ( int c = 0; c < courses.length/3; c++) {
-					student.addCourse( courses[ courseIndex]);
-					courseIndex = (courseIndex + 719518367) % courses.length; // 719518367 is prime
-				}
-
-				getSession().save(student);
+			for ( int c = 0; c < courses.length; c++) {
+				int i = getRandom().nextInt( courses.length);
+				student.getCourses().add( courses[i]);
 			}
 
-			tx.commit();
+			getSession().save(student);
+
+			checkCommit();
 		}
+
+		checkFinalCommit();
+
+		getSession().flush();
+		getSession().clear();
 	}
 
 	private void queryByClass( String className, int nSelects)
@@ -112,13 +190,21 @@ public class HibernateQuicktourBenchmark extends QuicktourBenchmark {
 			Transaction tx = getSession().beginTransaction();
 
 			for ( int n = 0;  n < nSelects; n++) {
-				String s = "from " + className + " as x where x.lastName like '%" + n + "%'";
+				String s = "from " + className + " as x where x.lastName like ?";
 				Query q = getSession().createQuery( s);
+				q.setString( 0, ""+n);
 
-				int count = 0;
-				Iterator it = q.iterate();
-				while(it.hasNext()) 
-					count++;
+				for (Object o: q.list()) {
+					Teacher t = (Teacher)o;
+
+					System.out.println( t);
+					for ( Course c: t.getCourses())
+						System.out.println( c);
+				}
+//				int count = 0;
+//				Iterator it = q.iterate();
+//				while(it.hasNext()) 
+//				count++;
 			}
 
 			tx.commit();
@@ -162,5 +248,8 @@ public class HibernateQuicktourBenchmark extends QuicktourBenchmark {
 
 	private SessionFactory sessionFactory;
 	private Session session;
+	private Transaction transaction;
+	private int objectCount;
+	private int objectsPerTransaction;
 }
 
