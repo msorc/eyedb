@@ -9,7 +9,7 @@
 
     <key column="PERSON_ID"/>
 
-    <set name="courses" table="STUDENT_COURSE" inverse="true">
+    <set name="courses" table="STUDENT_COURSE">
       <key column="PERSON_ID"/>
       <many-to-many column="COURSE_ID" class="org.eyedb.benchmark.quicktour.hibernate.Course"/>
     </set>

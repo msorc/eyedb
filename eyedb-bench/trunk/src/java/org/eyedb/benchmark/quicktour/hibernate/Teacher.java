@@ -6,26 +6,24 @@ public class Teacher extends Person {
 
     public Teacher()
     {
-	this( "", "");
+	courses = new HashSet<Course>();
     }
 
-    public Teacher( String firstName, String lastName)
-    {
-	super( firstName, lastName);
-
-	courses = new HashSet();
-    }
-
-    Set getCourses()
+    public Set<Course> getCourses()
     {
 	return courses;
     }
 
-    void setCourses( Set courses)
+    public void setCourses( Set<Course> courses)
     {
 	this.courses = courses;
     }
 
-    private Set courses;
+    public String toString()
+    {
+	return "Teacher( id:" + getId() + ", firstname:\"" + getFirstName() + "\", name:\"" + getFirstName() + "\")";
+    }
+
+    private Set<Course> courses;
 }
 

@@ -3,13 +3,14 @@ package org.eyedb.benchmark.quicktour.hibernate;
 public class Person {
     public Person()
     {
-	this( "", "");
     }
 
-    public Person( String firstName, String lastName)
-    {
-	this.firstName = firstName;
-	this.lastName = lastName;
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getFirstName()
@@ -32,16 +33,7 @@ public class Person {
 	this.lastName = lastName;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    private void setId(Long id) {
-        this.id = id;
-    }
-
     private Long id;
-
     private String firstName;
     private String lastName;
 }
