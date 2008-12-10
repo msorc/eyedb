@@ -39,7 +39,7 @@ class OptionType {
 public:
   OptionType() { }
   OptionType(const std::string &name) : name(name) { }
-  virtual bool checkValue(const std::string &value, std::ostream &err_os) const = 0;
+  virtual bool checkValue(const std::string &value, const std::string &prog, std::ostream &err_os) const = 0;
 
   virtual const OptionType *clone() const = 0;
   const std::string getName() const {return name;}
@@ -59,7 +59,7 @@ private:
 class OptionStringType : public OptionType {
 public:
   OptionStringType() : OptionType("string") { }
-  virtual bool checkValue(const std::string &value, std::ostream &err_os) const { return true; }
+  virtual bool checkValue(const std::string &value, const std::string &prog, std::ostream &err_os) const { return true; }
 
   virtual const OptionType *clone() const {return new OptionStringType();}
 };
@@ -68,7 +68,7 @@ class OptionIntType : public OptionType {
 public:
   OptionIntType() : OptionType("int") { }
 
-  virtual bool checkValue(const std::string &value, std::ostream &err_os) const;
+  virtual bool checkValue(const std::string &value, const std::string &prog, std::ostream &err_os) const;
 
   int getIntValue(const std::string &value) const;
 
@@ -79,7 +79,7 @@ class OptionBoolType : public OptionType {
 public:
   OptionBoolType() : OptionType("bool") { }
 
-  virtual bool checkValue(const std::string &value, std::ostream &err_os) const;
+  virtual bool checkValue(const std::string &value, const std::string &prog, std::ostream &err_os) const;
   bool getBoolValue(const std::string &value) const;
 
   virtual std::string getDefaultValue() const {return "true";}
@@ -95,7 +95,7 @@ public:
 		   const std::string &defval = "") :
     OptionType(name), choice(choice), defval(defval) { }
 
-  virtual bool checkValue(const std::string &value, std::ostream &err_os) const;
+  virtual bool checkValue(const std::string &value, const std::string &prog, std::ostream &err_os) const;
   virtual std::string getDefaultValue() const {return defval;}
 
   virtual const OptionType *clone() const {
@@ -292,7 +292,7 @@ public:
   typedef std::map<std::string, OptionValue> Map;
   GetOpt::Map &getMap() {return map;}
 
-  bool isset(const std::string& opt) const {return map.find(opt) != map.end();}
+  bool isset(const std::string &opt) const {return map.find(opt) != map.end();}
   const std::string &get(const std::string& opt) const {
     return (*map.find(opt)).second.value;
   }

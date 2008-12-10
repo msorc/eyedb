@@ -1,7 +1,7 @@
 /* 
    EyeDB Object Database Management System
    Copyright (C) 1994-2008 SYSRA
-   
+      
    EyeDB is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
    License as published by the Free Software Foundation; either
@@ -302,12 +302,13 @@ void GetOpt::add(const Option &opt)
 }
 
 bool OptionIntType::checkValue(const std::string &value,
+			       const std::string &prog,
 			       ostream &err_os) const
 {
   const char *s = value.c_str();
   while (*s) {
     if (*s < '0' || *s > '9') {
-      err_os << "invalid integer value " << s << endl;
+      err_os << prog << ": invalid integer value " << s << endl;
       return false;
     }
     s++;
@@ -317,6 +318,7 @@ bool OptionIntType::checkValue(const std::string &value,
 }
 
 bool OptionBoolType::checkValue(const std::string &value,
+				const std::string &prog,
 				ostream &err_os) const
 {
   const char *s = value.c_str();
@@ -329,7 +331,7 @@ bool OptionBoolType::checkValue(const std::string &value,
       !strcasecmp(s, "off"))
     return true;
 
-  err_os << "unexpected boolean value " << s << endl;
+  err_os << prog << ": unexpected boolean value " << s << endl;
   return false;
 }
 
@@ -357,6 +359,7 @@ int OptionIntType::getIntValue(const std::string &value) const
 }
 
 bool OptionChoiceType::checkValue(const std::string &value,
+				  const std::string &prog,
 				  ostream &err_os) const
 {
   std::vector<std::string>::const_iterator begin = choice.begin();
@@ -368,13 +371,13 @@ bool OptionChoiceType::checkValue(const std::string &value,
     ++begin;
   }
 
-  err_os << "invalid value " << value << endl;
+  err_os << prog << ": invalid value " << value << endl;
   return false;
 }
 
 unsigned int GetOpt::add_map(const Option &opt, const std::string &_value)
 {
-  if (!opt.getOptionType().checkValue(_value, err_os))
+  if (!opt.getOptionType().checkValue(_value, prog, err_os))
     return 1;
 
   OptionValue value(opt.getOptionType(), _value);
@@ -386,7 +389,7 @@ unsigned int GetOpt::add_map(const Option &opt, const std::string &_value)
     s[1] = 0;
     if (map.find(s) != map.end()) {
       if (!map[s].def) {
-	err_os << "option -" << s;
+	err_os << prog << ": option -" << s;
 	if (opt.getLongOpt().length())
 	  err_os << "/--" << opt.getLongOpt();
 	err_os << " already set" << endl;
@@ -400,7 +403,7 @@ unsigned int GetOpt::add_map(const Option &opt, const std::string &_value)
   if (s.length()) {
     if (map.find(s) != map.end()) {
       if (!map[s].def) {
-	err_os << "option ";
+	err_os << prog << ": option ";
 	if (opt.getOpt())
 	  err_os << " -" << opt.getOpt() << "/";
 	err_os << "--" << opt.getLongOpt();
@@ -443,7 +446,7 @@ unsigned int GetOpt::check_mandatory()
 	s[0] = opt.getOpt();
 	s[1] = 0;
 	if (map.find(s) == map.end()) {
-	  err_os << "mandatory option -" << opt.getOpt() << " is missing" <<
+	  err_os << prog << ": mandatory option -" << opt.getOpt() << " is missing" <<
 	    endl;
 	  if (opt.getLongOpt().length() > 0)
 	    map[opt.getLongOpt()] = OptionValue();
@@ -460,7 +463,7 @@ unsigned int GetOpt::check_mandatory()
     const Option &opt = (*begin).second;
     if (opt.getFlags() & Option::Mandatory) {
       if (map.find(opt.getLongOpt()) == map.end()) {
-	err_os << "mandatory option -" << opt.getLongOpt() << " is missing" <<
+	err_os << prog << ": mandatory option -" << opt.getLongOpt() << " is missing" <<
 	  endl;
 	error++;
       }
@@ -592,7 +595,7 @@ bool GetOpt::parse(int &argc, char *argv[])
 	found = true;
 	if (opt.getFlags() & Option::MandatoryValue) {
 	  if (!value) {
-	    err_os << "missing value after " <<
+	    err_os << prog << ": missing value after " <<
 	      s << endl;
 	    error++;
 	    ++begin;
@@ -642,7 +645,7 @@ bool GetOpt::parse(int &argc, char *argv[])
 
     if (!found) {
       if (!(flags & SkipUnknownOption)) {
-	err_os << "unknown option " << s << endl;
+	err_os << prog << ": unknown option " << s << endl;
 	error++;
       }
       if (flags & PurgeArgv)
