@@ -293,6 +293,9 @@ public:
   GetOpt::Map &getMap() {return map;}
 
   bool isset(const std::string& opt) const {return map.find(opt) != map.end();}
+  const std::string &get(const std::string& opt) const {
+    return (*map.find(opt)).second.value;
+  }
 
   void adjustMaxLen(const std::string &opt);
   void adjustMaxLen(unsigned int maxlen);
