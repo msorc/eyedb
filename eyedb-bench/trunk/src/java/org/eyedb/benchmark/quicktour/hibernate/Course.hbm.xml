@@ -5,9 +5,9 @@
 
 <hibernate-mapping>
 
-  <class name="org.eyedb.benchmark.quicktour.hibernate.Course" table="COURSE">
+  <class name="org.eyedb.benchmark.quicktour.hibernate.Course" table="course">
 
-    <id name="id" column="COURSE_ID">
+    <id name="id" column="course_id">
       <generator class="native"/>
     </id>
 
@@ -15,11 +15,11 @@
 
     <property name="description"/>
 
-    <many-to-one name="teacher" column="PERSON_ID"/>
+    <many-to-one name="teacher" column="person_id" fetch="join"/>
 
-    <set name="students" table="STUDENT_COURSE" inverse="true">
-      <key column="COURSE_ID"/>
-      <many-to-many column="STUDENT_ID" class="org.eyedb.benchmark.quicktour.hibernate.Student"/>
+    <set name="students" table="student_course" inverse="true">
+      <key column="course_id"/>
+      <many-to-many column="student_id" class="org.eyedb.benchmark.quicktour.hibernate.Student"/>
     </set>
 
   </class>
