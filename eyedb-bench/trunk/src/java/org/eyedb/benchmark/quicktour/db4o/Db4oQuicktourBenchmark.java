@@ -37,13 +37,25 @@ public class Db4oQuicktourBenchmark extends QuicktourBenchmark {
 		client.close();
 	}
 
+	private int getObjectsPerTransaction()
+	{
+		return objectsPerTransaction;
+	}
+
+	private void setObjectsPerTransaction( int objectsPerTransaction)
+	{
+		this.objectsPerTransaction = objectsPerTransaction;
+	}
+
 	private Teacher[] fillTeachers( int nTeachers)
 	{
 		Teacher[] teachers = new Teacher[nTeachers];
 
-		for ( int n = 0; n < nTeachers; n++)
-		{
-			teachers[n] = new Teacher( "Teacher_"+n+"_firstName", "Teacher_"+n);
+		for ( int n = 0; n < nTeachers; n++) {
+			Teacher t = new Teacher();
+			t.setFirstName( "Teacher_"+n+"_firstName");
+			t.setLastName( "Teacher_"+n);
+			teachers[n] = t;
 		}
 
 		return teachers;
@@ -53,10 +65,12 @@ public class Db4oQuicktourBenchmark extends QuicktourBenchmark {
 	{
 		Course courses[] = new Course[ nCourses];
 
-		for ( int n = 0; n < nCourses; n++)
-		{
-			courses[n] = new Course( "Course_"+n, "Description of course "+n);
+		for ( int n = 0; n < nCourses; n++) {
+			Course c = new Course();
+			c.setTitle( "Course_"+n);
+			c.setDescription( "Description of course "+n);
 			courses[n].setTeacher( teachers[ getRandom().nextInt( teachers.length)]);
+			courses[n] = c;
 		}
 
 		return courses;
@@ -68,26 +82,23 @@ public class Db4oQuicktourBenchmark extends QuicktourBenchmark {
 		Teacher[] teachers = fillTeachers( nTeachers);
 		Course[] courses = fillCourses( nCourses, teachers);
 
-		for (long count = 0; count < nStudents; count += nObjectsPerTransaction) {
-			Student student = null;
+		for (int n = 0; n < nStudents; n++ ) {
+		    Student student = new Student();
+		    student.setFirstName("Student_"+n+"_firstName");
+		    student.setLastName("Student_"+n);
+		    //		    student.setBeginYear( (short)(random.nextInt( 3) + 1));
 
-			for ( int n = 0; n < nObjectsPerTransaction; n++)
-			{
-				student = new Student( "Student_"+n+"_firstName", "Student_"+n);
-				//		    student.setBeginYear( (short)(random.nextInt( 3) + 1));
+		    for ( int c = 0; c < courses.length; c++) {
+			int i = getRandom().nextInt( courses.length);
+			student.getCourses().add( courses[i]);
+		    }
 
-				int courseIndex = getRandom().nextInt( courses.length);
-				for ( int c = 0; c < courses.length/3; c++)
-				{
-					student.addCourse( courses[ courseIndex]);
-					courseIndex = (courseIndex + 719518367) % courses.length; // 719518367 is prime
-				}
+		    client.set( student);
 
-				client.set( student);
-			}
-
-			client.commit();
+		    checkCommit();
 		}
+
+		checkFinalCommit();
 	}
 
 	public void query(int nSelects)

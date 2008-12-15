@@ -52,7 +52,7 @@ public class HibernateQuicktourBenchmark extends QuicktourBenchmark {
 			String password = getProperties().getProperty( "hibernate.connection.password");
 			configuration.setProperty( "connection.password", password);
 
-			hack( configuration);
+			//hack( configuration);
 
 			sessionFactory = configuration.buildSessionFactory();
 
@@ -84,16 +84,6 @@ public class HibernateQuicktourBenchmark extends QuicktourBenchmark {
 	private void setTransaction( Transaction transaction)
 	{
 		this.transaction = transaction;
-	}
-
-	private int getObjectsPerTransaction()
-	{
-		return objectsPerTransaction;
-	}
-
-	private void setObjectsPerTransaction( int objectsPerTransaction)
-	{
-		this.objectsPerTransaction = objectsPerTransaction;
 	}
 
 	private void checkCommit()
@@ -249,7 +239,5 @@ public class HibernateQuicktourBenchmark extends QuicktourBenchmark {
 	private SessionFactory sessionFactory;
 	private Session session;
 	private Transaction transaction;
-	private int objectCount;
-	private int objectsPerTransaction;
 }
 
