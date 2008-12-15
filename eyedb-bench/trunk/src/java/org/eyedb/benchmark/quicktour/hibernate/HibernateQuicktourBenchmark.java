@@ -76,26 +76,6 @@ public class HibernateQuicktourBenchmark extends QuicktourBenchmark {
 		return session;
 	}
 
-	private void checkCommit()
-	{
-		objectCount++;
-		System.err.println( "checkCommit(): object count: " + objectCount);
-		if (objectCount >= getObjectsPerTransaction()) {
-			System.err.println( "checkCommit(): committing...");
-			getSession().beginTransaction();
-			objectCount = 0;
-		}
-	}
-
-	private void checkFinalCommit()
-	{
-		System.err.println( "checkFinalCommit(): object count: " + objectCount);
-		if (objectCount != 0) {
-			System.err.println( "checkFinalCommit(): committing...");
-			getTransaction().commit();
-		}
-	}
-
 	private Teacher[] fillTeachers( int nTeachers)
 	{
 		Teacher[] teachers = new Teacher[nTeachers];
@@ -158,8 +138,8 @@ public class HibernateQuicktourBenchmark extends QuicktourBenchmark {
 			getSession().save(student);
 
 			if (n % nObjectsPerTransaction == nObjectsPerTransaction - 1) {
-			    getSession().getTransaction().commit();
-			    getSession().beginTransaction();
+				getSession().getTransaction().commit();
+				getSession().beginTransaction();
 			}
 		}
 
