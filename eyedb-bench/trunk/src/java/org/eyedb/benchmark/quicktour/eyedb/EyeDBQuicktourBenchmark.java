@@ -79,12 +79,15 @@ public class EyeDBQuicktourBenchmark extends QuicktourBenchmark {
 	{
 		Teacher[] teachers = new Teacher[nTeachers];
 
-		for ( int n = 0; n < nTeachers; n++)
-		{
+		database.transactionBegin();
+
+		for ( int n = 0; n < nTeachers; n++) {
 			teachers[n] = new Teacher( database);
 			teachers[n].setFirstName( "Teacher_"+n+"_firstName");
 			teachers[n].setLastName( "Teacher_"+n);
 		}
+
+		database.transactionCommit();
 
 		return teachers;
 	}
@@ -93,48 +96,48 @@ public class EyeDBQuicktourBenchmark extends QuicktourBenchmark {
 	{
 		Course courses[] = new Course[ nCourses];
 
-		for ( int n = 0; n < nCourses; n++)
-		{
+		database.transactionBegin();
+
+		for ( int n = 0; n < nCourses; n++) {
 			courses[n] = new Course( database);
 			courses[n].setTitle( "Course_"+n);
 			courses[n].setDescription("Description of course "+n);
 			courses[n].setTeacher( teachers[ getRandom().nextInt( teachers.length)]);
 		}
 
+		database.transactionCommit();
+
 		return courses;
 	}
 
 	public void create( int nStudents, int nCourses, int nTeachers, int nObjectsPerTransaction)
 	{
-
 		try {
 			Teacher[] teachers = fillTeachers( nTeachers);
 			Course[] courses = fillCourses( nCourses, teachers);
 
-			for (long count = 0; count < nStudents; count += nObjectsPerTransaction) {
-				database.transactionBegin();
+			database.transactionBegin();
 
-				Student student = null;
+			for ( int n = 0; n < nStudents; n++) {
+				Student student = new Student( database);
+				student.setFirstName( "Student_"+n+"_firstName");
+				student.setLastName( "Student_"+n);
+				student.setBeginYear( (short)(getRandom().nextInt( 3) + 1));
 
-				for ( int n = 0; n < nObjectsPerTransaction; n++)
-				{
-					student = new Student( database);
-					student.setFirstName( "Student_"+count+"_firstName");
-					student.setLastName( "Student_"+count);
-					student.setBeginYear( (short)(getRandom().nextInt( 3) + 1));
-
-					int courseIndex = getRandom().nextInt( courses.length);
-					for ( int c = 0; c < courses.length/3; c++)
-					{
-						student.addToCoursesColl( courses[ courseIndex]);
-						courseIndex = (courseIndex + 719518367) % courses.length; // 719518367 is prime
-					}
-
-					student.store(org.eyedb.RecMode.FullRecurs);
+				for ( int c = 0; c < courses.length; c++) {
+				    int i = getRandom().nextInt( courses.length);
+				    student.addToCoursesColl( courses[ i]);
 				}
 
-				database.transactionCommit();
+				student.store(org.eyedb.RecMode.FullRecurs);
+
+				if (n % nObjectsPerTransaction == nObjectsPerTransaction - 1) {
+					database.transactionCommit();
+					database.transactionBegin();
+				}
 			}
+
+			database.transactionCommit();
 		}
 		catch( org.eyedb.Exception e) {
 			e.printStackTrace();

@@ -76,24 +76,13 @@ public class HibernateQuicktourBenchmark extends QuicktourBenchmark {
 		return session;
 	}
 
-	private Transaction getTransaction()
-	{
-		return transaction;
-	}
-
-	private void setTransaction( Transaction transaction)
-	{
-		this.transaction = transaction;
-	}
-
 	private void checkCommit()
 	{
 		objectCount++;
 		System.err.println( "checkCommit(): object count: " + objectCount);
 		if (objectCount >= getObjectsPerTransaction()) {
 			System.err.println( "checkCommit(): committing...");
-			getTransaction().commit();
-			setTransaction( getSession().beginTransaction());
+			getSession().beginTransaction();
 			objectCount = 0;
 		}
 	}
@@ -111,6 +100,8 @@ public class HibernateQuicktourBenchmark extends QuicktourBenchmark {
 	{
 		Teacher[] teachers = new Teacher[nTeachers];
 
+		getSession().beginTransaction();
+
 		for ( int n = 0; n < nTeachers; n++) {
 			Teacher t = new Teacher();
 			t.setFirstName("Teacher_"+n+"_firstName");
@@ -118,9 +109,9 @@ public class HibernateQuicktourBenchmark extends QuicktourBenchmark {
 			teachers[n] = t;
 
 			getSession().save( t);
-
-			checkCommit();
 		}
+
+		getSession().getTransaction().commit();
 
 		return teachers;
 	}
@@ -128,6 +119,8 @@ public class HibernateQuicktourBenchmark extends QuicktourBenchmark {
 	private Course[] fillCourses( int nCourses, Teacher[] teachers)
 	{
 		Course courses[] = new Course[ nCourses];
+
+		getSession().beginTransaction();
 
 		for ( int n = 0; n < nCourses; n++) {
 			Course c = new Course();
@@ -137,20 +130,19 @@ public class HibernateQuicktourBenchmark extends QuicktourBenchmark {
 			courses[n] = c;
 
 			getSession().save( c);
-
-			checkCommit();
 		}
+
+		getSession().getTransaction().commit();
 
 		return courses;
 	}
 
 	public void create(int nStudents, int nCourses, int nTeachers, int nObjectsPerTransaction)
 	{
-		setObjectsPerTransaction( nObjectsPerTransaction);
-		setTransaction( getSession().beginTransaction());
-
 		Teacher[] teachers = fillTeachers( nTeachers);
 		Course[] courses = fillCourses( nCourses, teachers);
+
+		getSession().beginTransaction();
 
 		for (int n = 0; n < nStudents; n++ ) {
 			Student student = new Student();
@@ -165,13 +157,15 @@ public class HibernateQuicktourBenchmark extends QuicktourBenchmark {
 
 			getSession().save(student);
 
-			checkCommit();
+			if (n % nObjectsPerTransaction == nObjectsPerTransaction - 1) {
+			    getSession().getTransaction().commit();
+			    getSession().beginTransaction();
+			}
 		}
 
-		checkFinalCommit();
+		getSession().getTransaction().commit();
 
 		getSession().flush();
-		getSession().clear();
 	}
 
 	private void queryByClass( String className, int nSelects)

@@ -84,20 +84,5 @@ public abstract class QuicktourBenchmark extends Benchmark {
 		return random;
 	}
 
-    protected int getObjectsPerTransaction()
-	{
-		return objectsPerTransaction;
-	}
-
-	protected void setObjectsPerTransaction( int objectsPerTransaction)
-	{
-		this.objectsPerTransaction = objectsPerTransaction;
-	}
-
 	private Random random;
-	private int objectCount;
-	private int objectsPerTransaction;
-	private int courses;
-	private int students;
-	private int teachers;
 }
