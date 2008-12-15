@@ -1,14 +1,18 @@
 #!/bin/bash
+top_builddir=@top_builddir@
 DB4O_JAR=@DB4O_JAR@
 JAVA=@JAVA@
 
-set -e
+EYEDB_BENCHMARK_JAR=${top_builddir}/src/java/eyedb-benchmark.jar
+BENCHMARK=org.eyedb.benchmark.quicktour.db4o.Db4oQuicktourBenchmark
+PROPERTIES=db4o.local.properties
 
 run_benchmark() {
-    CLASSPATH=.:../../eyedb-benchmark.jar:$DB4O_JAR
-    CLASSPATH=$CLASSPATH $JAVA org.eyedb.benchmark.Run Db4oBench1Local db4o.local.properties
+    CLASSPATH=$EYEDB_BENCHMARK_JAR:$DB4O_JAR
+    CLASSPATH=$CLASSPATH $JAVA org.eyedb.benchmark.framework.Run $BENCHMARK $PROPERTIES
 }
 
+set -e
 run_benchmark
 
 

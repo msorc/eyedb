@@ -16,6 +16,6 @@ EDIT = sed \
 runit.sh: Makefile
 runit-local.sh: Makefile
 
-bench: runit.sh
-	$(SHELL) -x runit.sh
+bench: runit-local.sh
+	$(SHELL) -x runit-local.sh
 

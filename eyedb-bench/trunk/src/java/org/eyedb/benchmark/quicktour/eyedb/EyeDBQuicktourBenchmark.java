@@ -27,13 +27,13 @@ public class EyeDBQuicktourBenchmark extends QuicktourBenchmark {
 
 	public void prepare()
 	{
-		String databaseName = getProperties().getProperty( "database");
+		String databaseName = getProperties().getProperty( "eyedb.database");
 
 		String[] args = new String[3];
 		int i = 0;
 		args[i++] = "--user=" + System.getProperty( "user.name");
 		args[i++] = "--dbm=default";
-		args[i++] = "--port=" + getProperties().getProperty( "tcp_port");
+		args[i++] = "--port=" + getProperties().getProperty( "eyedb.tcp_port");
 
 		org.eyedb.Root.init(databaseName, args);
 
