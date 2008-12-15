@@ -16,15 +16,15 @@ public class Db4oQuicktourBenchmark extends QuicktourBenchmark {
 		return "db4o implementation";
 	}
 
-	public void prepare()
+	public void prepareClient()
 	{
-		String host = getProperties().getProperty("host");
-		int port = getProperties().getIntProperty("port");
-		String user = getProperties().getProperty("user");
-		String password = getProperties().getProperty("pass");
+		String host = getProperties().getProperty("db4o.host");
+		int port = getProperties().getIntProperty("db4o.port");
+		String user = getProperties().getProperty("db4o.user");
+		String passwd = getProperties().getProperty("db4o.passwd");
 
 		try {
-			client = Db4o.openClient( host, port, user, password);
+			container = Db4o.openClient( host, port, user, passwd);
 		}
 		catch( Exception e) {
 			e.printStackTrace();
@@ -32,19 +32,16 @@ public class Db4oQuicktourBenchmark extends QuicktourBenchmark {
 		}
 	}
 
+	public void prepare()
+	{
+		String filename = getProperties().getProperty( "db4o.filename");
+
+		container = Db4o.openFile( filename);		
+	}
+
 	public void finish()
 	{
-		client.close();
-	}
-
-	private int getObjectsPerTransaction()
-	{
-		return objectsPerTransaction;
-	}
-
-	private void setObjectsPerTransaction( int objectsPerTransaction)
-	{
-		this.objectsPerTransaction = objectsPerTransaction;
+		container.close();
 	}
 
 	private Teacher[] fillTeachers( int nTeachers)
@@ -83,22 +80,20 @@ public class Db4oQuicktourBenchmark extends QuicktourBenchmark {
 		Course[] courses = fillCourses( nCourses, teachers);
 
 		for (int n = 0; n < nStudents; n++ ) {
-		    Student student = new Student();
-		    student.setFirstName("Student_"+n+"_firstName");
-		    student.setLastName("Student_"+n);
-		    //		    student.setBeginYear( (short)(random.nextInt( 3) + 1));
+			Student student = new Student();
+			student.setFirstName("Student_"+n+"_firstName");
+			student.setLastName("Student_"+n);
+			//		    student.setBeginYear( (short)(random.nextInt( 3) + 1));
 
-		    for ( int c = 0; c < courses.length; c++) {
-			int i = getRandom().nextInt( courses.length);
-			student.getCourses().add( courses[i]);
-		    }
+			for ( int c = 0; c < courses.length; c++) {
+				int i = getRandom().nextInt( courses.length);
+				student.getCourses().add( courses[i]);
+			}
 
-		    client.set( student);
+			container.store( student);
 
-		    checkCommit();
 		}
 
-		checkFinalCommit();
 	}
 
 	public void query(int nSelects)
@@ -109,6 +104,6 @@ public class Db4oQuicktourBenchmark extends QuicktourBenchmark {
 	{
 	}
 
-	protected ObjectContainer client;
+	private ObjectContainer container;
 }
 
