@@ -1,9 +1,35 @@
 body {
   font-family:Verdana, Arial, Helvetica, sans-serif;
-  font-size: 0.9em;
-  margin: 5px 5px 5px 5px ;
+  font-size: 0.8em;
+  margin: 10px 0;
   padding: 0;
-  text-align: center ;
+}
+
+/* container ------------------------------ */
+#container {
+  margin: 0 auto;
+  text-align: left;
+}
+
+#header {
+  height: 75px;
+  margin: 0;
+  padding: 0;
+  background: url('images/eyedb-banner.png') top left no-repeat;
+}
+
+#header h1 {
+  text-indent: -5000px;
+  margin: 0;
+  line-heigth: 0;
+}
+
+#header p {
+  margin: 18px 0 0 105px;
+  font-style: italic;
+  font-weight: bold;
+  font-size: 150%;
+  color: white;
 }
 
 p {
@@ -43,21 +69,6 @@ td {
   width: 0;
   overflow: hidden;
   position: absolute;
-}
-
-#Container {
-/*  width: 770px ; */
- margin: 0 auto ;
- text-align: left ;
-}
-
-#Header {
- width: 766px ;
- height: 75px;
-}
-
-#Header img {
- border: 0px solid ;
 }
 
 #TOC ul {
