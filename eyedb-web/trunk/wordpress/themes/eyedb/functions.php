@@ -179,20 +179,37 @@ function eyedb_widget_download() {
   echo '<li id="download" class="widget widget_downloads"><h2 class="widgettitle">'.__('Download')."</h2>\n";
   echo "<ul>\n";
 
-  $rss_url = 'http://sourceforge.net/export/rss2_projfiles.php?group_id=127988';
+  $eyedb_group_id = 127988;
+  $eyedb_src_package_id = 140123;
+  $eyedb_doc_package_id = 177749;
+
+  $rss_url = "http://sourceforge.net/export/rss2_projfiles.php?group_id=$eyedb_group_id";
   $rss_parser = new RSSParser();
   $item_array = $rss_parser->parse( $rss_url);
 
-  $download_link_prefix = 'http://sourceforge.net/project/showfiles.php?group_id=127988&package_id=140123&release_id=';
+  $download = 'http://sourceforge.net/project/showfiles.php';
   if ($item_array != null) {
+    $src_done = false;
+    $doc_done = false;
     foreach ($item_array as $item)
       {
-	if( ereg( "EyeDB [0-9]+.[0-9]+.[0-9]+", $item->title, $release)) {
-	  ereg( "release_id=([0-9]+)", $item->link, $release_id);
-	  ereg( "[0-9]+.[0-9]+.[0-9]+", $release[0], $release_number);
-	  $download_link = $download_link_prefix.$release_id[1];
-	  printf( "<li><a href=\"%s\">Latest: %s</a></li>\n", $download_link, $release_number[0]);
-	  break;
+	if( !$src_done && ereg( "EyeDB [0-9]+.[0-9]+.[0-9]+", $item->title, $release)) {
+	  ereg( "[0-9]+.[0-9]+.[0-9]+", $release[0], $release_number_a);
+	  ereg( "release_id=([0-9]+)", $item->link, $release_id_a);
+	  $src_release_number = $release_number_a[0];
+	  $src_release_id = $release_id_a[1];
+	  $src_link = "{$download}?group_id={$eyedb_group_id}&package_id={$eyedb_src_package_id}&release_id={$src_release_id}";
+	  printf( "<li><a href=\"%s\">Sources: %s</a></li>\n", $src_link, $src_release_number);
+	  $src_done = true;
+	}
+	if( !$doc_done && ereg( "EyeDB documentation [0-9]+.[0-9]+.[0-9]+", $item->title, $release)) {
+	  ereg( "[0-9]+.[0-9]+.[0-9]+", $release[0], $release_number_a);
+	  ereg( "release_id=([0-9]+)", $item->link, $release_id_a);
+	  $doc_release_number = $release_number_a[0];
+	  $doc_release_id = $release_id_a[1];
+	  $doc_link = "{$download}?group_id={$eyedb_group_id}&package_id={$eyedb_doc_package_id}&release_id={$doc_release_id}";
+	  printf( "<li><a href=\"%s\">Documentation: %s</a></li>\n", $doc_link, $doc_release_number);
+	  $doc_done = true;
 	}
       }
   }
