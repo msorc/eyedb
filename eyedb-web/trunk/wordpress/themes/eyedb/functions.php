@@ -189,29 +189,30 @@ function eyedb_widget_download() {
 
   $download = 'http://sourceforge.net/project/showfiles.php';
   if ($item_array != null) {
-    $src_done = false;
-    $doc_done = false;
-    foreach ($item_array as $item)
-      {
-	if( !$src_done && ereg( "EyeDB [0-9]+.[0-9]+.[0-9]+", $item->title, $release)) {
+
+    foreach ($item_array as $item) {
+	if( ereg( "EyeDB [0-9]+.[0-9]+.[0-9]+", $item->title, $release)) {
 	  ereg( "[0-9]+.[0-9]+.[0-9]+", $release[0], $release_number_a);
 	  ereg( "release_id=([0-9]+)", $item->link, $release_id_a);
 	  $src_release_number = $release_number_a[0];
 	  $src_release_id = $release_id_a[1];
 	  $src_link = "{$download}?group_id={$eyedb_group_id}&package_id={$eyedb_src_package_id}&release_id={$src_release_id}";
 	  printf( "<li><a href=\"%s\">Sources: %s</a></li>\n", $src_link, $src_release_number);
-	  $src_done = true;
+	  break;
 	}
-	if( !$doc_done && ereg( "EyeDB documentation [0-9]+.[0-9]+.[0-9]+", $item->title, $release)) {
+    }
+
+    foreach ($item_array as $item) {
+	if( ereg( "EyeDB documentation [0-9]+.[0-9]+.[0-9]+", $item->title, $release)) {
 	  ereg( "[0-9]+.[0-9]+.[0-9]+", $release[0], $release_number_a);
 	  ereg( "release_id=([0-9]+)", $item->link, $release_id_a);
 	  $doc_release_number = $release_number_a[0];
 	  $doc_release_id = $release_id_a[1];
 	  $doc_link = "{$download}?group_id={$eyedb_group_id}&package_id={$eyedb_doc_package_id}&release_id={$doc_release_id}";
 	  printf( "<li><a href=\"%s\">Documentation: %s</a></li>\n", $doc_link, $doc_release_number);
-	  $doc_done = true;
+	  break;
 	}
-      }
+    }
   }
   
   $download_link = 'http://sourceforge.net/project/showfiles.php?group_id=127988';
