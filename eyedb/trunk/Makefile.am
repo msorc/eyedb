@@ -16,6 +16,21 @@ TAGS:
 
 doc:
 	(cd doc && $(MAKE) $(AM_MAKEFLAGS) all)
+	(cd examples && $(MAKE) $(AM_MAKEFLAGS) all)
+.PHONY: doc
+
+doc-install:
+	(cd doc && $(MAKE) $(AM_MAKEFLAGS) install)
+	(cd examples && $(MAKE) $(AM_MAKEFLAGS) install)
+.PHONY: doc-install
+
+doc-export:
+	(cd doc && $(MAKE) $(AM_MAKEFLAGS) doc-export)
+.PHONY: doc-export
+
+doc-archive:
+	(cd doc && $(MAKE) $(AM_MAKEFLAGS) doc-archive)
+.PHONY: doc-archive
 
 check-ascii:
 	( \
@@ -30,11 +45,5 @@ check-ascii:
 	)
 
 dist-hook: check-ascii
-
-doc-archive:
-	-rm -rf /var/tmp/eyedb-doc-$(EYEDB_VERSION)
-	cp -r $(datadir)/doc/eyedb /var/tmp/eyedb-doc-$(EYEDB_VERSION)
-	tar cvzf eyedb-doc-$(EYEDB_VERSION).tar.gz -C /var/tmp eyedb-doc-$(EYEDB_VERSION)
-	-rm -rf /var/tmp/eyedb-doc-$(EYEDB_VERSION)
 
 AUTOMAKE_OPTIONS=dist-bzip2
