@@ -4,7 +4,7 @@
 <h2><?php echo __('News'); ?></h2>
 <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
 <div class="post">
-<h2 id="post-<?php the_ID(); ?>"><?php the_title(); ?></h2>
+<h3 id="post-<?php the_ID(); ?>"><?php the_title(); ?></h3>
 <div class="entrytext">
 <?php the_content('<p class="serif">Read the rest of this page &raquo;</p>'); ?>
 <?php link_pages('<p><strong>Pages:</strong> ', '</p>', 'number'); ?>
