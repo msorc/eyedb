@@ -1,6 +1,7 @@
 <?php get_header(); ?>
 <?php get_sidebar(); ?>
 <div id="content">
+<h2><?php echo __('News'); ?></h2>
 <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
 <div class="post">
 <h2 id="post-<?php the_ID(); ?>"><?php the_title(); ?></h2>
@@ -11,4 +12,5 @@
 </div>
 <?php endwhile; endif; ?>
 </div> <!-- /content -->
+	
 <?php get_footer(); ?>
