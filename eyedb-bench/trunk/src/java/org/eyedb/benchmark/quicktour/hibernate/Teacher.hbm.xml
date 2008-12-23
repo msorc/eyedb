@@ -9,7 +9,7 @@
 
     <key column="person_id"/>
 
-    <set name="courses" inverse="true fetch="join">
+    <set name="courses" inverse="true" fetch="join">
       <key column="person_id"/>
       <one-to-many class="org.eyedb.benchmark.quicktour.hibernate.Course"/>
     </set>

@@ -181,13 +181,15 @@ AC_SUBST(DB4O_JAR)
 AC_ARG_VAR(HIBERNATE_JAR,[Hibernate jar file])
 AC_ARG_VAR(JDBC_CONNECTOR_JAR,[JDBC connector jar file])
 AC_ARG_VAR(SLF4J_CONNECTOR_JAR,[SLF4J jar file])
+AC_ARG_VAR(LOG4J_DIR,[Log4Java jar directory])
 AC_ARG_VAR(HIBERNATE_LIBDIR,[Hibernate libraries directory])
 
 # To be changed if Hibernate or JDBC version changes
 HIBERNATE_JAR_DEFAULT=dependencies/hibernate/hibernate-distribution-3.3.0.SP1/hibernate3.jar
 JDBC_CONNECTOR_JAR_DEFAULT=dependencies/jdbc/mysql-connector-java-5.1.6/mysql-connector-java-5.1.6-bin.jar
 SLF4J_JAR_DEFAULT=dependencies/slf4j/slf4j-1.5.2/slf4j-simple-1.5.2.jar
-HIBERNATE_LIBDIR_DEFAULT=dependencies/hibernate/hibernate-distribution-3.3.0.SP1/lib/required
+LOG4J_DIR_DEFAULT=dependencies/log4j
+HIBERNATE_LIBDIR_DEFAULT=dependencies/hibernate/hibernate-distribution-3.3.0.SP1/lib
 
 if test "$ac_enable_hibernate" = "yes" ; then
 
@@ -206,7 +208,7 @@ if test "$ac_enable_hibernate" = "yes" ; then
    fi
 
    if test x"$SLF4J_JAR" = x ; then
-	SLF4J_JAR='${top_srcdir}'/$SLF4J_JAR_DEFAULT
+	SLF4J_JAR='${abs_top_srcdir}'/$SLF4J_JAR_DEFAULT
 	HAVE_SLF4J_JAR="yes"
    else
 	AC_CHECK_FILE($SLF4J_JAR,HAVE_SLF4J_JAR="yes",HAVE_SLF4J_JAR="no")
@@ -215,15 +217,26 @@ if test "$ac_enable_hibernate" = "yes" ; then
    HIBERNATE_CLASSPATH=""
    if test x"$HIBERNATE_LIBDIR" = x ; then
 	HIBERNATE_LIBDIR=$HIBERNATE_LIBDIR_DEFAULT
-	for j in "${srcdir}/$HIBERNATE_LIBDIR"/*.jar ; do 
+	for j in `find "${srcdir}/$HIBERNATE_LIBDIR" -name '*.jar'` ; do 
 	    j=`echo $j | sed -e "s+^${srcdir}/++"`
        	    HIBERNATE_CLASSPATH='${abs_top_srcdir}'/$j:$HIBERNATE_CLASSPATH
 	done
    else
-	for j in "$HIBERNATE_LIBDIR"/*.jar ; do 
+	for j in `find "$HIBERNATE_LIBDIR" -name '*.jar'` ; do 
        	    HIBERNATE_CLASSPATH="$j:$HIBERNATE_CLASSPATH"
 	done
    fi
+   if test x"$LOG4J_DIR" = x ; then
+	for j in `find "${srcdir}/$LOG4J_DIR_DEFAULT" -name '*.jar'` ; do
+	    j=`echo $j | sed -e "s+^${srcdir}/++"`
+       	    HIBERNATE_CLASSPATH='${abs_top_srcdir}'/$j:$HIBERNATE_CLASSPATH
+	done
+   else
+	for j in `find "$LOG4J_DIR" -name '*.jar'` ; do 
+       	    HIBERNATE_CLASSPATH="$j:$HIBERNATE_CLASSPATH"
+	done
+   fi
+
    HIBERNATE_CLASSPATH="$HIBERNATE_CLASSPATH:$JDBC_CONNECTOR_JAR:$SLF4J_JAR"
 
 fi
