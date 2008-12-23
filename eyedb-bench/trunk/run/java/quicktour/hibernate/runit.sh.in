@@ -2,8 +2,6 @@
 top_builddir=@top_builddir@
 HIBERNATE_JAR=@HIBERNATE_JAR@
 HIBERNATE_CLASSPATH=@HIBERNATE_CLASSPATH@
-JDBC_CONNECTOR_JAR=@JDBC_CONNECTOR_JAR@
-SLF4J_JAR=@SLF4J_JAR@
 JAVA=@JAVA@
 
 EYEDB_BENCHMARK_JAR=${top_builddir}/src/java/eyedb-benchmark.jar
@@ -11,7 +9,8 @@ BENCHMARK=org.eyedb.benchmark.quicktour.hibernate.HibernateQuicktourBenchmark
 PROPERTIES=hibernate.properties
 
 run_benchmark() {
-    CLASSPATH=$EYEDB_BENCHMARK_JAR:$HIBERNATE_JAR:$HIBERNATE_CLASSPATH:$JDBC_CONNECTOR_JAR:$SLF4J_JAR
+    CLASSPATH=$EYEDB_BENCHMARK_JAR:$HIBERNATE_JAR:$HIBERNATE_CLASSPATH
+    echo $CLASSPATH
     CLASSPATH=$CLASSPATH $JAVA org.eyedb.benchmark.framework.Run $BENCHMARK $PROPERTIES
 }
 
