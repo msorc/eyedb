@@ -6,14 +6,14 @@ import java.util.Set;
 public class Teacher extends Person {
 	public Teacher()
 	{
-		courses = new HashSet();
+		courses = new HashSet<Course>();
 	}
 
-	Set getCourses()
+	Set<Course> getCourses()
 	{
 		return courses;
 	}
 
-	private Set courses;
+	private Set<Course> courses;
 }
 

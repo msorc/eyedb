@@ -8,7 +8,7 @@ public class Course {
 	{
 		title = "";
 		description = "";
-		students = new HashSet();
+		students = new HashSet<Student>();
 	}
 
 	public String getTitle()
@@ -31,21 +31,9 @@ public class Course {
 		this.description = description;
 	}
 
-	Set getStudents()
+	Set<Student> getStudents()
 	{
 		return students;
-	}
-
-	public void addStudent( Student student)
-	{
-		students.add( student);
-		student.getCourses().add( this);
-	}
-
-	public void removeStudent( Student student)
-	{
-		students.remove( student);
-		student.getCourses().remove( this);
 	}
 
 	public Teacher getTeacher()
@@ -55,14 +43,11 @@ public class Course {
 
 	public void setTeacher( Teacher teacher)
 	{
-		if (this.teacher != null)
-			this.teacher.getCourses().remove(this);
 		this.teacher = teacher;
-		teacher.getCourses().add( this);
 	}
 
 	private String title;
 	private String description;
-	private Set students;
+	private Set<Student> students;
 	private Teacher teacher;
 }
