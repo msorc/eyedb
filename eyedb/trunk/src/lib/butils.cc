@@ -28,6 +28,7 @@
 #endif
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <eyedblib/machtypes.h>
 #include <eyedblib/butils.h>
