@@ -35,10 +35,9 @@ using namespace eyedb;
 int oqlparse();
 
  namespace eyedb {
-oqmlStatus *oqmlstatus;
-int oqmlLevel;
-char *oqml_file;
-
+   oqmlStatus *oqmlstatus;
+   int oqmlLevel;
+   char *oqml_file;
  }
 
 static int __line = 1;
@@ -1880,67 +1879,62 @@ struct HashKeyWords {
 
 static HashKeyWords hashKeyWords;
 
-static int
-oqmlGetKeyword(const char *s)
+static int oqmlGetKeyword(const char *s)
 {
   return hashKeyWords.getToken(s);
 }
 
 namespace eyedb {
-const char *
-oqml_error(oqml_Location *loc)
-{
-  if (loc)
-    {
-      if (loc->to >= 0 && loc->from >= 0)
-	{
-	  __soqmlbuf[loc->to] = 0;
-	  if (loc->to == loc->from)
-	    return __soqmlbuf;
+  const char *oqml_error(oqml_Location *loc)
+  {
+    if (loc)
+      {
+	if (loc->to >= 0 && loc->from >= 0)
+	  {
+	    __soqmlbuf[loc->to] = 0;
+	    if (loc->to == loc->from)
+	      return __soqmlbuf;
 
-	  return &__soqmlbuf[loc->from];
-	}
+	    return &__soqmlbuf[loc->from];
+	  }
       
-      return "";
-    }
-  else
-    return __soqmlbuf;
-}
+	return "";
+      }
+    else
+      return __soqmlbuf;
+  }
 
-char *
-oqml_make_error()
-{
-  const char prefix[] = "near `";
-  const char *err = oqml_error();
-  if (err)
-    {
-      char *buf = (char *)malloc(strlen(prefix)+strlen(err)+6);
-      sprintf(buf, "%s%s'", prefix, err);
-      return buf;
-    }
+  char *oqml_make_error()
+  {
+    const char prefix[] = "near `";
+    const char *err = oqml_error();
+    if (err)
+      {
+	char *buf = (char *)malloc(strlen(prefix)+strlen(err)+6);
+	sprintf(buf, "%s%s'", prefix, err);
+	return buf;
+      }
   
-  return strdup("");
-}
+    return strdup("");
+  }
 
-char *
-oqml_make_error(oqml_Location *loc)
-{
+  char *oqml_make_error(oqml_Location *loc)
+  {
 #if 0
-  const char prefix[] = "in `";
-  const char *err = oqml_error(loc);
-  char *buf = new char[strlen(prefix)+strlen(err)+6];
-  sprintf(buf, "%s%s'", prefix, err);
-  return buf;
+    const char prefix[] = "in `";
+    const char *err = oqml_error(loc);
+    char *buf = new char[strlen(prefix)+strlen(err)+6];
+    sprintf(buf, "%s%s'", prefix, err);
+    return buf;
 #else
-  return "";
+    return "";
 #endif
-}
+  }
 }
 
 #define _ESC_(X, Y) case X: *p++ = Y; break
 
-static void
-yypurgestring(unsigned char *s)
+static void yypurgestring(unsigned char *s)
 {
   unsigned char c;
   unsigned char *p = s;
@@ -1975,14 +1969,13 @@ yypurgestring(unsigned char *s)
   *p = 0;
 }
 
-static int
-yyskipcomments()
+static int yyskipcomments()
 {
   int c;
   while ((c = yyinput()) > 0)
     {
       if (c == '\n')
-          __line++;
+	__line++;
       else if (c == '*')
 	{
           for (;;) {
@@ -2005,8 +1998,7 @@ yyskipcomments()
 
 //#define PARSE_TRACE
 
-int
-oqml_push_buf(int level, char *buf)
+int oqml_push_buf(int level, char *buf)
 {
   __line__[level]     = __line;
   __soqmlbuf__[level] = (__soqmlbuf ? strdup(__soqmlbuf) : 0);
@@ -2026,8 +2018,7 @@ oqml_push_buf(int level, char *buf)
   return 0;
 }
 
-static void
-oqml_pop_buf(int level)
+static void oqml_pop_buf(int level)
 {
 #ifdef PARSE_TRACE
   printf("oqml_pop_buf() level #%d #%d line=%d, levelline=%d\n",
@@ -2041,8 +2032,7 @@ oqml_pop_buf(int level)
   __oqmlbuf  = __oqmlbuf__[level];
 }
 
-static void
-oqml_set_buf(char *buf)
+static void oqml_set_buf(char *buf)
 {
 #ifdef PARSE_TRACE
   printf("oqml_set_buf(%s)\n", buf);
@@ -2051,8 +2041,7 @@ oqml_set_buf(char *buf)
   __oqmlbuf = strdup(buf);
 }
 
-static void
-oqml_empty_bufs()
+static void oqml_empty_bufs()
 {
 #ifdef PARSE_TRACE
   printf("oqml_empty_bufs()\n");
@@ -2060,21 +2049,19 @@ oqml_empty_bufs()
 
   for (int i = 0; i < MAXLEVELS; i++)
     {
-       free(__oqmlbuf__[i]);
-       __oqmlbuf__[i] = 0;
+      free(__oqmlbuf__[i]);
+      __oqmlbuf__[i] = 0;
     }
 
   __oqmlbuf = 0;
 }
 
-int
-yywrap()
+int yywrap()
 {
   return 1;
 }
 
-static void
-append(char *& s, int& i, int &len, char c)
+static void append(char *& s, int& i, int &len, char c)
 {
   if (i >= len)
     {
@@ -2084,8 +2071,7 @@ append(char *& s, int& i, int &len, char c)
   s[i++] = c;
 }
 
-static char *
-yygetquotedseq(char sep)
+static char *yygetquotedseq(char sep)
 {
   char *s = 0;
   int i = 0, len = 0;
@@ -2115,65 +2101,63 @@ yygetquotedseq(char sep)
   return s;
 }
 
-static char *
-yytokstr()
+static char *yytokstr()
 {
-   int s_size;
-   unsigned char *s, *p, c;
-   s_size = 32;
-   s = (unsigned char *)malloc(s_size);
+  int s_size;
+  unsigned char *s, *p, c;
+  s_size = 32;
+  s = (unsigned char *)malloc(s_size);
 
-   int n, backslash;
-   for (n = 0, backslash = 0; (c = yyinput()) > 0; n++)
-     {
-       if (c == '\n')
-	 __line++;
-       else if (c == '\\')
-         backslash = 1;
-       else if (c == '"' && !backslash)
-	 break;
-       else
-         backslash = 0;
+  int n, backslash;
+  for (n = 0, backslash = 0; (c = yyinput()) > 0; n++)
+    {
+      if (c == '\n')
+	__line++;
+      else if (c == '\\')
+	backslash = 1;
+      else if (c == '"' && !backslash)
+	break;
+      else
+	backslash = 0;
 
-       if (n >= s_size)
-         {
-           s_size += 32;
-           s = (unsigned char *)realloc(s, s_size);
-         }
+      if (n >= s_size)
+	{
+	  s_size += 32;
+	  s = (unsigned char *)realloc(s, s_size);
+	}
 
-        s[n] = c;
-     }
+      s[n] = c;
+    }
 
-   if (n >= s_size)
-     {
-       s_size += 4;
-       s = (unsigned char *)realloc(s, s_size);
-     }
+  if (n >= s_size)
+    {
+      s_size += 4;
+      s = (unsigned char *)realloc(s, s_size);
+    }
    
-   s[n] = 0;
-   yypurgestring(s);
-   return (char *)s;
+  s[n] = 0;
+  yypurgestring(s);
+  return (char *)s;
 }
 
 /*
-{STRING} {
-	   yylval.s = strdup((const char *)&yytext[1]);
-           yylval.s[strlen(yylval.s)-1] = 0;
-           yypurgestring(yylval.s);
-           return STRING;
-         }
+  {STRING} {
+  yylval.s = strdup((const char *)&yytext[1]);
+  yylval.s[strlen(yylval.s)-1] = 0;
+  yypurgestring(yylval.s);
+  return STRING;
+  }
 
 */
 
-static oqmlNode *
-oqml_forin_realize(char *ident, oqmlNode *from, int op,
-		   oqmlNode *to, oqmlNode *action)
+static oqmlNode *oqml_forin_realize(char *ident, oqmlNode *from, int op,
+				    oqmlNode *to, oqmlNode *action)
 {
   /*
-  oqmlPush *push = new oqmlPush(ident);
-  oqmlPop *pop = new oqmlPop(ident);
-  push->is_statement = oqml_True;
-  pop->is_statement = oqml_True;
+    oqmlPush *push = new oqmlPush(ident);
+    oqmlPop *pop = new oqmlPop(ident);
+    push->is_statement = oqml_True;
+    pop->is_statement = oqml_True;
   */
 
   oqmlIdent *nident = new oqmlIdent(ident);
@@ -2220,8 +2204,7 @@ oqml_forin_realize(char *ident, oqmlNode *from, int op,
   return fordo;
 }
 
-static oqmlNode *
-oqml_assign(oqmlNode *left, int op, oqmlNode *right)
+static oqmlNode *oqml_assign(oqmlNode *left, int op, oqmlNode *right)
 {
   switch(op)
     {
@@ -2263,8 +2246,7 @@ oqml_assign(oqmlNode *left, int op, oqmlNode *right)
     }
 }
 
-static oqml_ArrayLink *
-oqml_make_link(oqmlNode *from, oqmlNode *to)
+static oqml_ArrayLink *oqml_make_link(oqmlNode *from, oqmlNode *to)
 {
   if (from == INFINITE && to == 0)
     return new oqml_ArrayLink(oqml_False);
@@ -2275,8 +2257,7 @@ oqml_make_link(oqmlNode *from, oqmlNode *to)
   return new oqml_ArrayLink(from, to);
 }
 
-static oqmlNode *
-oqml_make_array(oqmlNode *postfix_expr, oqmlNode *from, oqmlNode *to)
+static oqmlNode *oqml_make_array(oqmlNode *postfix_expr, oqmlNode *from, oqmlNode *to)
 {
   if (postfix_expr->asDot())
     {
@@ -2293,8 +2274,7 @@ oqml_make_array(oqmlNode *postfix_expr, oqmlNode *from, oqmlNode *to)
   return array;
 }
 
-static oqmlNode *
-oqml_make_call(oqmlNode *postfix_expr, oqml_List *list)
+static oqmlNode *oqml_make_call(oqmlNode *postfix_expr, oqml_List *list)
 {
   if (postfix_expr->asDot())
     return postfix_expr->asDot()->make_right_call(list);
@@ -2318,107 +2298,105 @@ oqml_make_call(oqmlNode *postfix_expr, oqml_List *list)
 }
 
 namespace eyedb {
-Status
-oqml_realize(Database *db, char *oqmlstr,
-	     Value *&v, LinkedList *mcllist,
-	     oqmlBool compiling)
-{
-  Status status;
-  oqmlAtomList *alist = 0;
-  LinkedList *mcllist_s = OQLBE::getMclList();
+  Status oqml_realize(Database *db, char *oqmlstr,
+		      Value *&v, LinkedList *mcllist,
+		      oqmlBool compiling)
+  {
+    Status status;
+    oqmlAtomList *alist = 0;
+    LinkedList *mcllist_s = OQLBE::getMclList();
 
-  OQLBE::setMclList(mcllist);
+    OQLBE::setMclList(mcllist);
 
-  oqmlStatus *s = oqml_realize(db, oqmlstr, &alist, compiling);
-  if (s)
-    status = Exception::make(IDB_OQL_ERROR, std::string(s->msg));
-  else
-    {
-      status = Success;
-      if (alist && alist->first)
-	v = alist->first->toValue();
-      else
-	v = 0;
-    }
+    oqmlStatus *s = oqml_realize(db, oqmlstr, &alist, compiling);
+    if (s)
+      status = Exception::make(IDB_OQL_ERROR, std::string(s->msg));
+    else
+      {
+	status = Success;
+	if (alist && alist->first)
+	  v = alist->first->toValue();
+	else
+	  v = 0;
+      }
 
-  OQLBE::setMclList(mcllist_s);
-  return status;
-}
+    OQLBE::setMclList(mcllist_s);
+    return status;
+  }
 
-oqmlStatus *
-oqml_realize(Database *db, char *oqmlstr, oqmlAtomList **alist,
-	     oqmlBool compiling)
-{
+  oqmlStatus *oqml_realize(Database *db, char *oqmlstr, oqmlAtomList **alist,
+			   oqmlBool compiling)
+  {
 #ifdef PARSE_TRACE
-  printf("\nSTARTING oqml_realize(%d)\n", oqmlLevel);
+    printf("\nSTARTING oqml_realize(%d)\n", oqmlLevel);
 #endif
 
-  if (oqml_default_db && oqml_default_db->xdb)
-    db = oqml_default_db->xdb;
+    if (oqml_default_db && oqml_default_db->xdb)
+      db = oqml_default_db->xdb;
 
-  if (!oqmlLevel)
-    {
-      delete eyedb::oqmlstatus;
-      eyedb::oqmlstatus = 0;
-      oqml_initialize(db);
-      //IDB_LOG(IDB_LOG_OQL_EXEC, ("before '%s'\n", oqmlstr));
-    }
+    if (!oqmlLevel)
+      {
+	delete eyedb::oqmlstatus;
+	eyedb::oqmlstatus = 0;
+	oqml_initialize(db);
+	//IDB_LOG(IDB_LOG_OQL_EXEC, ("before '%s'\n", oqmlstr));
+      }
 
-  oqml_compiling = compiling;
-  Database *oqmldb_s = oqmldb;
-  oqmlAtomList **oqmllist_s = oqmllist;
-  oqmlStatus *oqmlstatus_s = eyedb::oqmlstatus;
+    oqml_compiling = compiling;
+    Database *oqmldb_s = oqmldb;
+    oqmlAtomList **oqmllist_s = oqmllist;
+    oqmlStatus *oqmlstatus_s = eyedb::oqmlstatus;
 
-  oqmldb = db;
-  oqmllist = alist;
+    oqmldb = db;
+    oqmllist = alist;
 
-  if (!oqmlLevel)
-    {
-      oqmlGarbManager::garbage();
-      oqmlLoopLevel = 0;
-      oqmlBreakLevel = 0;
-      oqml_empty_bufs();
-    }
-  else if (oqmlLevel >= MAXLEVELS-1)
-    return new oqmlStatus("evaluation level is too deep. "
-			  "Maximum allowed is %d.", MAXLEVELS);
+    if (!oqmlLevel)
+      {
+	oqmlGarbManager::garbage();
+	oqmlLoopLevel = 0;
+	oqmlBreakLevel = 0;
+	oqml_empty_bufs();
+      }
+    else if (oqmlLevel >= MAXLEVELS-1)
+      return new oqmlStatus("evaluation level is too deep. "
+			    "Maximum allowed is %d.", MAXLEVELS);
 
-  oqml_push_buf(oqmlLevel, oqmlstr);
-  oqmlLevel++;
-  oqlparse();
-  oqml_pop_buf(oqmlLevel-1);
+    oqml_push_buf(oqmlLevel, oqmlstr);
+    oqmlLevel++;
+    oqlparse();
+    oqml_pop_buf(oqmlLevel-1);
 
-  if (oqmlLevel == 1)
-    for (int i = MAXLEVELS-1; i >= 0 && !eyedb::oqmlstatus; i--)
-      if (__oqmlbuf__[i] && *__oqmlbuf__[i])
-	{       
-	  oqml_set_buf(__oqmlbuf__[i]);
-	  while (__oqmlbuf && *__oqmlbuf && !eyedb::oqmlstatus)
-	    oqlparse();
-	}
+    if (oqmlLevel == 1)
+      for (int i = MAXLEVELS-1; i >= 0 && !eyedb::oqmlstatus; i--)
+	if (__oqmlbuf__[i] && *__oqmlbuf__[i])
+	  {       
+	    oqml_set_buf(__oqmlbuf__[i]);
+	    while (__oqmlbuf && *__oqmlbuf && !eyedb::oqmlstatus)
+	      oqlparse();
+	  }
 
-  oqmlLevel--;
+    oqmlLevel--;
 
-  oqmlStatus *s = eyedb::oqmlstatus;
+    oqmlStatus *s = eyedb::oqmlstatus;
 
-  oqmldb = oqmldb_s;
-  oqmllist = oqmllist_s;
-  eyedb::oqmlstatus = oqmlstatus_s;
+    oqmldb = oqmldb_s;
+    oqmllist = oqmllist_s;
+    eyedb::oqmlstatus = oqmlstatus_s;
 
-  if (oqmlLevel == 0 && !compiling)
-    s = oqml_manage_postactions(db, s, alist);
+    if (oqmlLevel == 0 && !compiling)
+      s = oqml_manage_postactions(db, s, alist);
 
-  /*
-  if (!oqmlLevel)
-    IDB_LOG(IDB_LOG_OQL_EXEC,
-	    ("'%s' done => %s\n", oqmlstr,
-	     (!s ? "successful" : s->msg)));
-	     */
+    /*
+      if (!oqmlLevel)
+      IDB_LOG(IDB_LOG_OQL_EXEC,
+      ("'%s' done => %s\n", oqmlstr,
+      (!s ? "successful" : s->msg)));
+    */
 
 #ifdef PARSE_TRACE
-  printf("ENDING oqml_realize(%d)\n\n", oqmlLevel);
+    printf("ENDING oqml_realize(%d)\n\n", oqmlLevel);
 #endif
 
-  return s;
-}
+    return s;
+  }
 }

@@ -18,7 +18,7 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
+  Author: Eric Viara <viara@sysra.com>
 */
 
 
@@ -32,40 +32,40 @@
 
 namespace eyedb {
 
-Status OQLBEIterator::getStatus() const
-{
-  return status;
-}
+  Status OQLBEIterator::getStatus() const
+  {
+    return status;
+  }
 
-OQLBEIterator::~OQLBEIterator()
-{
-}
+  OQLBEIterator::~OQLBEIterator()
+  {
+  }
 
-OQLBEIteratorOQL::OQLBEIteratorOQL(Database *_db,
-					 DbHandle *_dbh,
-					 const char *qlstr)
-{
-  db = _db;
-  dbh = _dbh;
-  value = 0;
-  cl_list.empty();
+  OQLBEIteratorOQL::OQLBEIteratorOQL(Database *_db,
+				     DbHandle *_dbh,
+				     const char *qlstr)
+  {
+    db = _db;
+    dbh = _dbh;
+    value = 0;
+    cl_list.empty();
 
-  status = oqml_realize(db, (char *)qlstr, value, &cl_list);
-}
+    status = oqml_realize(db, (char *)qlstr, value, &cl_list);
+  }
 
-Status OQLBEIteratorOQL::getResult(Value *_value)
-{
-  if (status) return status;
+  Status OQLBEIteratorOQL::getResult(Value *_value)
+  {
+    if (status) return status;
 
-  if (!value)
-    value = new Value();
+    if (!value)
+      value = new Value();
 
-  *_value = *value;
-  return Success;
-}
+    *_value = *value;
+    return Success;
+  }
 
-OQLBEIteratorOQL::~OQLBEIteratorOQL()
-{
-  delete value;
-}
+  OQLBEIteratorOQL::~OQLBEIteratorOQL()
+  {
+    delete value;
+  }
 }

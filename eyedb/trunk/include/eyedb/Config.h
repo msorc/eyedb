@@ -101,7 +101,7 @@ namespace eyedb {
        @param name
     */
 
-    const char *getValue(const char *name) const;
+    const char *getValue(const char *name, bool expand_vars = true) const;
 
     /**
        Not yet documented.
