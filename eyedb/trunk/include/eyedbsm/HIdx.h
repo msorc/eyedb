@@ -26,6 +26,7 @@
 #define	_eyedbsm_HIdx_
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <eyedblib/machtypes.h>
 #include <eyedbsm/Idx.h>
 #include <vector>

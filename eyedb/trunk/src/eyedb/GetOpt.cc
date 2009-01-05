@@ -21,7 +21,8 @@
    Author: Eric Viara <viara@sysra.com>
 */
 
-
+#include <stdlib.h>
+#include <string.h>
 #include "GetOpt.h"
 
 using namespace std;
