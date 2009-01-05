@@ -18,7 +18,7 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
+  Author: Eric Viara <viara@sysra.com>
 */
 
 
@@ -30,50 +30,46 @@
 
 namespace eyedb {
 
-LinkedList *OQLBE::def_cl_list;
+  LinkedList *OQLBE::def_cl_list;
 
-OQLBE::OQLBE(Database *db, DbHandle *dbh, const char *qstr)
-{
-  qiter = new OQLBEIteratorOQL(db, dbh, qstr);
+  OQLBE::OQLBE(Database *db, DbHandle *dbh, const char *qstr)
+  {
+    qiter = new OQLBEIteratorOQL(db, dbh, qstr);
 
-  status = qiter->getStatus();
+    status = qiter->getStatus();
 
-  if (status == Success)
-    qid = db->getBEQueue()->addOQL(this);
+    if (status == Success)
+      qid = db->getBEQueue()->addOQL(this);
 
-  schema_info = 0;
-}
+    schema_info = 0;
+  }
 
-Status
-OQLBE::getStatus() const
-{
-  return status;
-}
+  Status OQLBE::getStatus() const
+  {
+    return status;
+  }
 
-SchemaInfo *
-OQLBE::getSchemaInfo()
-{
-  if (!schema_info && qiter)
-    schema_info = new SchemaInfo(((OQLBEIteratorOQL *)qiter)->
-				getSchemaInfo());
-  return schema_info;
-}
+  SchemaInfo *OQLBE::getSchemaInfo()
+  {
+    if (!schema_info && qiter)
+      schema_info = new SchemaInfo(((OQLBEIteratorOQL *)qiter)->
+				   getSchemaInfo());
+    return schema_info;
+  }
 
-Status
-OQLBE::getResult(Value *value)
-{
-  IDB_CHECK_INTR();
+  Status OQLBE::getResult(Value *value)
+  {
+    IDB_CHECK_INTR();
 
-  if (qiter)
-    return qiter->getResult(value);
+    if (qiter)
+      return qiter->getResult(value);
 
-  return Success;
-}
+    return Success;
+  }
 
-
-OQLBE::~OQLBE()
-{
-  delete qiter;
-  delete schema_info;
-}
+  OQLBE::~OQLBE()
+  {
+    delete qiter;
+    delete schema_info;
+  }
 }

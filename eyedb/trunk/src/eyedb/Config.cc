@@ -661,12 +661,13 @@ namespace eyedb {
     return *name == '$';
   }
 
-  const char *Config::getValue(const char *name) const
+  const char *Config::getValue(const char *name, bool expand_vars) const
   {
     if (!isBuiltinVar(name) && !isUserVar(name)) {
       const char *s = getenv((std::string("EYEDB") + uppercase(name)).c_str());
-      if (s)
+      if (s) {
 	return s;
+      }
     }
 
     LinkedListCursor c(list);
@@ -674,6 +675,10 @@ namespace eyedb {
 
     while (c.getNext((void *&)item))
       if (!strcasecmp(item->name, name)) {
+	if (!expand_vars) {
+	  return item->value;
+	}
+
 	if (!strchr(item->value, '%')) {
 	  return item->value;
 	}
@@ -743,9 +748,7 @@ namespace eyedb {
 
       if (!_not) {
 	items[n] = *item;
-	if (expand_vars) {
-	  items[n].value = strdup(getValue(item->name));
-	}
+	items[n].value = strdup(getValue(item->name, expand_vars));
 	n++;
       }
     }
