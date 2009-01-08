@@ -438,7 +438,7 @@ namespace eyedbsm {
   ESM_transactionBegin(DbHandle const *dbh,
 		       const TransactionParams *params)
   {
-    if (dbh->vd->flags & STRICT_READ) {
+    if (dbh->vd->flags & NO_SHM_ACCESS) {
       return Success;
     }
 
@@ -669,7 +669,7 @@ do { \
   Status
   ESM_transactionRealize(DbHandle const *dbh, TransState state)
   {
-    if (dbh->vd->flags & STRICT_READ) {
+    if (dbh->vd->flags & NO_SHM_ACCESS) {
       return Success;
     }
 
@@ -1702,7 +1702,7 @@ do { \
   ESM_transactionCreate(DbHandle const *dbh,
 			const TransactionParams *params, XMOffset *off)
   {
-    if (dbh->vd->flags & STRICT_READ) {
+    if (dbh->vd->flags & NO_SHM_ACCESS) {
       return Success;
     }
 
@@ -2204,7 +2204,7 @@ do { \
 			       XMHandle *xmh, TransState state,
 			       Boolean *trs_active)
   {
-    if (dbh->vd->flags & STRICT_READ) {
+    if (dbh->vd->flags & NO_SHM_ACCESS) {
       return Success;
     }
 
@@ -2508,7 +2508,7 @@ do { \
   /*extern "C" */ Status
   DbMutexesRelease(DbDescription *vd, DbShmHeader *shmh, unsigned int xid)
   {
-    if (vd->flags & STRICT_READ) {
+    if (vd->flags & NO_SHM_ACCESS) {
       return Success;
     }
 

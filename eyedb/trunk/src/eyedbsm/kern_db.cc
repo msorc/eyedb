@@ -1180,7 +1180,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 
 
   static Status
-  shmMap(const char *dbfile, size_t size, int shmfd, bool strict_read,
+  shmMap(const char *dbfile, size_t size, int shmfd, bool no_shm_access,
 	 void **pshm_addr, m_Map **pm_shm)
   {
 #undef PR
@@ -1189,7 +1189,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 #ifndef MAP_NORESERVE
 #define MAP_NORESERVE 0
 #endif
-    int flags = strict_read ? PROT_READ : PROT_READ|PROT_WRITE;
+    int flags = no_shm_access ? PROT_READ : PROT_READ|PROT_WRITE;
     for (x = 0; ; x++) {
       if (*pm_shm = m_mmap(0, size, flags,
 			   MAP_NORESERVE|MAP_SHARED, shmfd,
@@ -1228,7 +1228,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
   {
     m_unlock(vd->m_shm);
 
-    if (m_munmap(vd->m_shm, (char *)vd->shm_addr, size))
+    if (m_munmap(vd->m_shm, (char *)vd->shm_addr_b, size))
       return statusMake(MAP_ERROR, PR "shmfile '%s' cannot be unmapped by eyedbsm server", shmfileGet(dbfile));
 
     return Success;
@@ -1260,44 +1260,46 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
   {
     XMHandle *xmh;
     char hostname[256+1];
-    bool strict_read = (vd->flags & STRICT_READ) != 0;
+    bool no_shm_access = (vd->flags & NO_SHM_ACCESS) != 0;
 
 #undef PR
 #define PR "dbOpenPrologue: "
 
-    if (shmh->magic != MAGIC)
-      return statusMake(INVALID_SHMFILE, PR "shm file is not a valid eyedbsm shm file: '%s'", shmfileGet(dbfile));
+    if (shmh) {
+      if (shmh->magic != MAGIC)
+	return statusMake(INVALID_SHMFILE, PR "shm file is not a valid eyedbsm shm file: '%s'", shmfileGet(dbfile));
 
-    gethostname(hostname, sizeof(hostname)-1);
+      gethostname(hostname, sizeof(hostname)-1);
 
-    Mutex *mp = VD2MTX(vd, TRS);
+      Mutex *mp = VD2MTX(vd, TRS);
     
-    DbMutexesLightInit(vd, shmh);
+      DbMutexesLightInit(vd, shmh);
 
-    //MUTEX_LOCK(mp, 0);
-    xmh = XMOpen(((char *)shmh) + SHM_HEADSIZE, vd);
+      //MUTEX_LOCK(mp, 0);
+      xmh = XMOpen(((char *)shmh) + SHM_HEADSIZE, vd);
 
-    if (!xmh) {
-      //MUTEX_UNLOCK(mp, 0);
-      return statusMake(INVALID_SHMFILE, PR "shm file is not a valid eyedbsm shm file: '%s'", shmfileGet(dbfile));
-    }
+      if (!xmh) {
+	//MUTEX_UNLOCK(mp, 0);
+	return statusMake(INVALID_SHMFILE, PR "shm file is not a valid eyedbsm shm file: '%s'", shmfileGet(dbfile));
+      }
 
-    Boolean mustUnlock = True;
-    if (x2h_u32((unsigned int)shmh->hostid) != (unsigned int)gethostid() ||
-	strncmp(shmh->arch, eyedblib::CompileBuiltin::getArch(), sizeof( shmh->arch))) {
-      //MUTEX_UNLOCK(mp, 0);
-      return statusMake(DATABASE_OPEN_FAILED,
-			"cannot open database %s on "
-			"computer %s [architecture %s]: "
-			"database hold by computer %s [architecture %s]",
-			dbfile, hostname, eyedblib::CompileBuiltin::getArch(), shmh->hostname,
-			shmh->arch);
+      Boolean mustUnlock = True;
+      if (x2h_u32((unsigned int)shmh->hostid) != (unsigned int)gethostid() ||
+	  strncmp(shmh->arch, eyedblib::CompileBuiltin::getArch(), sizeof( shmh->arch))) {
+	//MUTEX_UNLOCK(mp, 0);
+	return statusMake(DATABASE_OPEN_FAILED,
+			  "cannot open database %s on "
+			  "computer %s [architecture %s]: "
+			  "database hold by computer %s [architecture %s]",
+			  dbfile, hostname, eyedblib::CompileBuiltin::getArch(), shmh->hostname,
+			  shmh->arch);
+      }
     }
 
     if (backend) {
       *pxid = rpc_getpid();
 
-      if (!strict_read) {
+      if (!no_shm_access) {
 	shmh->stat.total_db_access_cnt = h2x_u32(x2h_u32(shmh->stat.total_db_access_cnt)+1);
 	shmh->stat.current_db_access_cnt = h2x_u32(x2h_u32(shmh->stat.current_db_access_cnt)+1);
       }
@@ -1438,7 +1440,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     int hdfd, shmfd, ompfd, va, fop, i;
     int const opf = (flags & VOLREAD) ? O_RDONLY : O_RDWR;
     int const accflags = (flags & VOLREAD ? R_OK : R_OK|W_OK);
-    bool strict_read = (flags & STRICT_READ) != 0;
+    bool no_shm_access = (flags & NO_SHM_ACCESS) != 0;
     size_t size;
     DbDescription *vd;
     DbHeader *dbh = NULL;
@@ -1469,11 +1471,11 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     utshm("ESM_dbOpen(%s)\n", dbfile);
 #endif
 
-    if (flags == (VOLRW|STRICT_READ)) {
-      return statusMake(INVALID_FLAG, PR "flag cannot be set to VOLRW|STRICT_READ");
+    if (flags == (VOLRW|NO_SHM_ACCESS)) {
+      return statusMake(INVALID_FLAG, PR "flag cannot be set to VOLRW|NO_SHM_ACCESS");
     }
 
-    if (flags != VOLREAD && flags != VOLRW && flags != (VOLREAD|STRICT_READ)) {
+    if (flags != VOLREAD && flags != VOLRW && flags != (VOLREAD|NO_SHM_ACCESS)) {
       return statusMake(INVALID_FLAG, PR "flag is invalid: %u", flags);
     }
 
@@ -1508,7 +1510,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 #endif
 #endif
 
-    if ((shmfd = shmfileOpen(dbfile, strict_read)) < 0) {
+    if ((shmfd = shmfileOpen(dbfile, no_shm_access)) < 0) {
       free(vd);
       return statusMake(INVALID_SHMFILE_ACCESS, PR "shm file '%s'",
 			shmfileGet(dbfile));
@@ -1525,13 +1527,13 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 
     shmsize = fdSizeGet(shmfd);
 
-    if ((se = shmMap(dbfile, shmsize, shmfd, strict_read, (void **)&vd->shm_addr,
+    if ((se = shmMap(dbfile, shmsize, shmfd, no_shm_access, (void **)&vd->shm_addr_b,
 		     &vd->m_shm)) != Success) {
       free(vd);
       return se;
     }
 
-    shm_addr = vd->shm_addr;
+    vd->shm_addr = vd->shm_addr_b;
 
     if (se = checkFileAccess(DATABASE_OPEN_FAILED, "database file", dbfile, accflags)) {
       free(vd);
@@ -1551,7 +1553,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     }
 
 #ifndef HAVE_EYEDBSMD
-    if (!strict_read) {
+    if (!no_shm_access) {
       if (se = db_clean_shm(dbfile, &vd->lkfd, shmfd)) {
 	free(vd);
 	free(dbh);
@@ -1569,6 +1571,8 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
       return statusMake(INVALID_DBFILE, PR "database file '%s' is not a valid eyedbsm database file", dbfile);
     }
 
+    shm_addr = vd->shm_addr;
+
     version = x2h_u32(((DbShmHeader *)shm_addr)->version);
 
     if (pversion && *pversion && version > *pversion) {
@@ -1582,6 +1586,12 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 			"than the EyeDB version (%s): cannot be opened",
 			dbfile, 
 			str_version, str_pversion);
+    }
+
+    vd->version = version;
+
+    if (no_shm_access) {
+      shm_addr = vd->shm_addr = 0;
     }
 
 
@@ -1786,12 +1796,22 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     if (pdblock)
       *pdblock = &((DbShmHeader *)shm_addr)->dblock_W;
 
+#if 1
+    if (pversion)
+      *pversion = version;
+#else
     if (pversion)
       *pversion = x2h_u32(((DbShmHeader *)shm_addr)->version);
+#endif
 
     (*pdbh)->vd->xid = xid;
 
-    (*pdbh)->vd->trs_mh = XMOpen(((char *)shm_addr) + SHM_HEADSIZE, vd);
+    if (no_shm_access) {
+      (*pdbh)->vd->trs_mh = 0;
+    }
+    else {
+      (*pdbh)->vd->trs_mh = XMOpen(((char *)shm_addr) + SHM_HEADSIZE, vd);
+    }
 
     /* 9/1/00: does not support anymore linkmap allocator for a while */
     /*
@@ -1851,17 +1871,17 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
   {
     Status se;
     XMHandle *xmh;
-    bool strict_read = (vd->flags & STRICT_READ) != 0;
+    bool no_shm_access = (vd->flags & NO_SHM_ACCESS) != 0;
 
-    xmh = XMOpen(((char *)shmh) + SHM_HEADSIZE, vd);
+    if (!no_shm_access) {
+      xmh = XMOpen(((char *)shmh) + SHM_HEADSIZE, vd);
 
-    if (!xmh)
-      return statusMake(INVALID_SHMFILE, PR "shm file is not a valid eyedbsm shm file: '%s'", shmfileGet(dbfile));
-
-    IDB_LOG(IDB_LOG_DATABASE, ("dbCloseEpilogue(%s) #1\n", dbfile));
-
-    //MUTEX_LOCK(&shmh->main_mp, xid);
-    if (!strict_read) {
+      if (!xmh)
+	return statusMake(INVALID_SHMFILE, PR "shm file is not a valid eyedbsm shm file: '%s'", shmfileGet(dbfile));
+      
+      IDB_LOG(IDB_LOG_DATABASE, ("dbCloseEpilogue(%s) #1\n", dbfile));
+      
+      //MUTEX_LOCK(&shmh->main_mp, xid);
       shmh->stat.current_db_access_cnt--;
 
       if (se = ESM_transactionsRelease(vd, shmh, dbfile, xid, xmh, 0))
@@ -2117,7 +2137,11 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
   unsigned int
   getDbVersion(void *dbh)
   {
+#if 1
+    return ((DbHandle *)dbh)->vd->version;
+#else
     return x2h_u32(((DbHandle *)dbh)->vd->shm_addr->version);
+#endif
   }
 
   Boolean

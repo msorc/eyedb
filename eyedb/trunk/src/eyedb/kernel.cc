@@ -1723,7 +1723,7 @@ namespace eyedb {
 
     if ((flags & _DBSRead) == _DBSRead) {
       //se_flags = eyedbsm::VOLREAD;
-      se_flags = eyedbsm::VOLREAD|eyedbsm::STRICT_READ;
+      se_flags = eyedbsm::VOLREAD|eyedbsm::NO_SHM_ACCESS;
     }
     else if ((flags & _DBRW) == _DBRW || (flags & _DBRead) == _DBRead) {
       se_flags = eyedbsm::VOLRW;

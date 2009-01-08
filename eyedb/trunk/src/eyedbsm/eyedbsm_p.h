@@ -182,6 +182,7 @@ namespace eyedbsm {
     OpenHints hints;
     Boolean rsuser, suser;
     int uid, uid_ind;
+    unsigned int version;
 
     /* dbs file */
     m_Map *m_dbs;
@@ -190,6 +191,7 @@ namespace eyedbsm {
     /* shmg file */
     m_Map *m_shm;
     DbShmHeader *shm_addr;
+    DbShmHeader *shm_addr_b;
 
     /* omp file */
     m_Map *m_omp;
