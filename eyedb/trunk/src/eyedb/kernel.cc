@@ -1721,14 +1721,17 @@ namespace eyedb {
 
     flags &= ~(_DBOpenLocal);
 
-    if ((flags & _DBSRead) == _DBSRead)
-      se_flags = eyedbsm::VOLREAD;
-    else if ((flags & _DBRW) == _DBRW ||
-	     (flags & _DBRead) == _DBRead)
+    if ((flags & _DBSRead) == _DBSRead) {
+      //se_flags = eyedbsm::VOLREAD;
+      se_flags = eyedbsm::VOLREAD|eyedbsm::STRICT_READ;
+    }
+    else if ((flags & _DBRW) == _DBRW || (flags & _DBRead) == _DBRead) {
       se_flags = eyedbsm::VOLRW;
-    else
+    }
+    else {
       return rpcStatusMake(IDB_INVALID_DBOPEN_FLAG,
-			   "opening flag `%d' is invalid", flags);
+			   "opening flag '%u' is invalid", flags);
+    }
 
     const char *dbfile;
 
