@@ -1180,7 +1180,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 
 
   static Status
-  shmMap(const char *dbfile, size_t size, int shmfd,
+  shmMap(const char *dbfile, size_t size, int shmfd, bool strict_read,
 	 void **pshm_addr, m_Map **pm_shm)
   {
 #undef PR
@@ -1189,8 +1189,9 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 #ifndef MAP_NORESERVE
 #define MAP_NORESERVE 0
 #endif
+    int flags = strict_read ? PROT_READ : PROT_READ|PROT_WRITE;
     for (x = 0; ; x++) {
-      if (*pm_shm = m_mmap(0, size, (PROT_READ|PROT_WRITE),
+      if (*pm_shm = m_mmap(0, size, flags,
 			   MAP_NORESERVE|MAP_SHARED, shmfd,
 			   0, (char **)pshm_addr, shmfileGet(dbfile), 0, 0)) {
 	if (x)
@@ -1237,7 +1238,6 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
   shmMutexRelease(DbDescription *vd, DbShmHeader *shmh, unsigned int xid)
   {
     Status se;
-    /*utshm("shmMutexRelease xid=%d\n", xid);*/
 
     if (xid && (se = DbMutexesRelease(vd, shmh, xid)))
       return se;
@@ -1260,6 +1260,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
   {
     XMHandle *xmh;
     char hostname[256+1];
+    bool strict_read = (vd->flags & STRICT_READ) != 0;
 
 #undef PR
 #define PR "dbOpenPrologue: "
@@ -1296,8 +1297,10 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     if (backend) {
       *pxid = rpc_getpid();
 
-      shmh->stat.total_db_access_cnt = h2x_u32(x2h_u32(shmh->stat.total_db_access_cnt)+1);
-      shmh->stat.current_db_access_cnt = h2x_u32(x2h_u32(shmh->stat.current_db_access_cnt)+1);
+      if (!strict_read) {
+	shmh->stat.total_db_access_cnt = h2x_u32(x2h_u32(shmh->stat.total_db_access_cnt)+1);
+	shmh->stat.current_db_access_cnt = h2x_u32(x2h_u32(shmh->stat.current_db_access_cnt)+1);
+      }
     }
     else {
       *pxid = import_xid;
@@ -1435,6 +1438,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     int hdfd, shmfd, ompfd, va, fop, i;
     int const opf = (flags & VOLREAD) ? O_RDONLY : O_RDWR;
     int const accflags = (flags & VOLREAD ? R_OK : R_OK|W_OK);
+    bool strict_read = (flags & STRICT_READ) != 0;
     size_t size;
     DbDescription *vd;
     DbHeader *dbh = NULL;
@@ -1465,9 +1469,13 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     utshm("ESM_dbOpen(%s)\n", dbfile);
 #endif
 
-    if (flags != VOLREAD &&
-	flags != VOLRW)
-      return statusMake(INVALID_FLAG, PR "flag is invalid: `%d'", flags);
+    if (flags == (VOLRW|STRICT_READ)) {
+      return statusMake(INVALID_FLAG, PR "flag cannot be set to VOLRW|STRICT_READ");
+    }
+
+    if (flags != VOLREAD && flags != VOLRW && flags != (VOLREAD|STRICT_READ)) {
+      return statusMake(INVALID_FLAG, PR "flag is invalid: %u", flags);
+    }
 
     if (se = checkFileAccess(DATABASE_OPEN_FAILED, "shm file", shmfileGet(dbfile), accflags))
       return se;
@@ -1500,7 +1508,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 #endif
 #endif
 
-    if ((shmfd = shmfileOpen(dbfile)) < 0) {
+    if ((shmfd = shmfileOpen(dbfile, strict_read)) < 0) {
       free(vd);
       return statusMake(INVALID_SHMFILE_ACCESS, PR "shm file '%s'",
 			shmfileGet(dbfile));
@@ -1517,7 +1525,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 
     shmsize = fdSizeGet(shmfd);
 
-    if ((se = shmMap(dbfile, shmsize, shmfd, (void **)&vd->shm_addr,
+    if ((se = shmMap(dbfile, shmsize, shmfd, strict_read, (void **)&vd->shm_addr,
 		     &vd->m_shm)) != Success) {
       free(vd);
       return se;
@@ -1543,10 +1551,12 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     }
 
 #ifndef HAVE_EYEDBSMD
-    if (se = db_clean_shm(dbfile, &vd->lkfd, shmfd)) {
-      free(vd);
-      free(dbh);
-      return se;
+    if (!strict_read) {
+      if (se = db_clean_shm(dbfile, &vd->lkfd, shmfd)) {
+	free(vd);
+	free(dbh);
+	return se;
+      }
     }
 #endif
 
@@ -1841,6 +1851,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
   {
     Status se;
     XMHandle *xmh;
+    bool strict_read = (vd->flags & STRICT_READ) != 0;
 
     xmh = XMOpen(((char *)shmh) + SHM_HEADSIZE, vd);
 
@@ -1850,14 +1861,15 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     IDB_LOG(IDB_LOG_DATABASE, ("dbCloseEpilogue(%s) #1\n", dbfile));
 
     //MUTEX_LOCK(&shmh->main_mp, xid);
-    shmh->stat.current_db_access_cnt--;
-    //MUTEX_UNLOCK(&shmh->main_mp, xid);
+    if (!strict_read) {
+      shmh->stat.current_db_access_cnt--;
 
-    if (se = ESM_transactionsRelease(vd, shmh, dbfile, xid, xmh, 0))
-      return se;
+      if (se = ESM_transactionsRelease(vd, shmh, dbfile, xid, xmh, 0))
+	return se;
 
-    if (se = shmMutexRelease(vd, shmh, xid))
-      return se;
+      if (se = shmMutexRelease(vd, shmh, xid))
+	return se;
+    }
 
     IDB_LOG(IDB_LOG_DATABASE, ("dbCloseEpilogue(%s) #2\n", dbfile));
 

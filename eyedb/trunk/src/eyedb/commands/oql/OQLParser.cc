@@ -2239,7 +2239,7 @@ namespace eyedb {
       }
 
     TransactionParams params = eyedb::params;
-#if 1
+#if 0
     printf("params mode %d vs. %d\n", params.trsmode, TransactionParams::getGlobalDefaultTransactionParams().trsmode);
 #endif
 

@@ -380,7 +380,7 @@ static int printDBEntry(Connection &conn, DBEntry *dbentry, DBM_Database *dbm, u
     printf("Database Name\n%s%s\n", LIST_INDENT, dbentry->dbname().c_str());
     printf("Database Identifier\n%s%d\n", LIST_INDENT, dbentry->dbid());
     printf("Database File\n%s%s\n", LIST_INDENT, dbentry->dbfile().c_str());
-    printf("Max Object Count\n%s%d\n", LIST_INDENT, dbdesc->sedbdesc.nbobjs);
+    printf("Max Object Count\n%s%u\n", LIST_INDENT, dbdesc->sedbdesc.nbobjs);
   }
   else {
     if (options & DBNAME_FLG)

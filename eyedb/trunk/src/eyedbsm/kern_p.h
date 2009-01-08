@@ -105,7 +105,7 @@ namespace eyedbsm {
   getFileMaskGroup(mode_t &file_mode, gid_t &file_gid, mode_t file_mask, const char *file_group);
 
   extern int
-  shmfileOpen(const char *dbfile);
+  shmfileOpen(const char *dbfile, bool strict_read);
     
   extern Boolean
   filelockS(int fd);

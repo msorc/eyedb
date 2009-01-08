@@ -110,9 +110,9 @@ namespace eyedbsm {
   }
 
   int
-  shmfileOpen(const char *dbfile)
+  shmfileOpen(const char *dbfile, bool strict_read)
   {
-    int fd = open(shmfileGet(dbfile), O_RDWR);
+    int fd = open(shmfileGet(dbfile), strict_read ? O_RDONLY : O_RDWR);
     // we defined NO_FILE_LOCK because of a problem (?) of lock+mmap on
     // NFS files on solaris 7+
 #ifndef NO_FILE_LOCK

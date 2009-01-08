@@ -438,6 +438,10 @@ namespace eyedbsm {
   ESM_transactionBegin(DbHandle const *dbh,
 		       const TransactionParams *params)
   {
+    if (dbh->vd->flags & STRICT_READ) {
+      return Success;
+    }
+
     TransactionContext *trctx;
     unsigned int xid = dbh->vd->xid;
     DbLock *dblock_W = &dbh->vd->shm_addr->dblock_W;
@@ -665,6 +669,10 @@ do { \
   Status
   ESM_transactionRealize(DbHandle const *dbh, TransState state)
   {
+    if (dbh->vd->flags & STRICT_READ) {
+      return Success;
+    }
+
     TransactionContext *trctx;
     DbLock *dblock_W = &dbh->vd->shm_addr->dblock_W;
     unsigned int xid = dbh->vd->xid;
@@ -1694,6 +1702,10 @@ do { \
   ESM_transactionCreate(DbHandle const *dbh,
 			const TransactionParams *params, XMOffset *off)
   {
+    if (dbh->vd->flags & STRICT_READ) {
+      return Success;
+    }
+
     XMHandle *xmh;
     XMOffset trs_off;
     TransHeader *trshd;
@@ -2192,6 +2204,10 @@ do { \
 			       XMHandle *xmh, TransState state,
 			       Boolean *trs_active)
   {
+    if (dbh->vd->flags & STRICT_READ) {
+      return Success;
+    }
+
     DbShmHeader *shmh = dbh->vd->shm_addr;
     Transaction *trs, *trs_next, *trs_prev;
     TransHeader *trshd;
@@ -2492,6 +2508,10 @@ do { \
   /*extern "C" */ Status
   DbMutexesRelease(DbDescription *vd, DbShmHeader *shmh, unsigned int xid)
   {
+    if (vd->flags & STRICT_READ) {
+      return Success;
+    }
+
     Mutex *mp;
     bool lockX;
 
