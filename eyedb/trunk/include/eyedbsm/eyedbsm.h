@@ -55,7 +55,7 @@ namespace eyedbsm {
   static const unsigned int VOLREAD = 0x100;
   static const unsigned int VOLRW = 0x200;
   static const unsigned int LOCAL = 0x004; 
-  static const unsigned int STRICT_READ = 0x008;
+  static const unsigned int NO_SHM_ACCESS = 0x008;
   static const unsigned int MAX_DBID = ((1 << (Oid_DBID))-1);
   static const unsigned int PROT_NAME = 32;
 
