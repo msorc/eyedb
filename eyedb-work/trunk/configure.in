@@ -28,6 +28,50 @@ then
   CXXFLAGS="$CXXFLAGS -g"
 fi
 
+# 
+# EyeDB pkgconfig 
+# 
+
+EYEDB_PKG_CONFIG_FILE="none"
+# first, using PKG_CONFIG_PATH
+if test x"$PKG_CONFIG_PATH" != x ; then
+   AC_MSG_CHECKING(for EyeDB pkg-config configuration file using PKG_CONFIG_PATH)
+   for d in `echo $PKG_CONFIG_PATH | awk -F: '{for (i=1;i<=NF;i++) print $i}'`; do
+       if test -f $d/eyedb.pc ; then
+       	  EYEDB_PKG_CONFIG_FILE=$d/eyedb.pc
+	  break
+       fi
+   done
+   AC_MSG_RESULT($EYEDB_PKG_CONFIG_FILE)
+fi
+
+# second, using EyeDB installation directory
+AC_ARG_VAR(EYEDB_INSTALLDIR,[EyeDB installation directory])
+EYEDB_INSTALLDIR_DEFAULTS="/usr $HOME/projects/eyedb/install $HOME/eyedb-install $HOME/eyedb_install"
+if test x"$EYEDB_PKG_CONFIG_FILE" = x"none" ; then
+   AC_MSG_CHECKING(for EyeDB pkg-config configuration file using EyeDB install directory)
+   if test x"$EYEDB_INSTALLDIR" = x ; then
+      for d in $EYEDB_INSTALLDIR_DEFAULTS; do
+      	  if test -f $d/lib/pkgconfig/eyedb.pc ; then
+	     EYEDB_PKG_CONFIG_FILE=$d/lib/pkgconfig/eyedb.pc
+	     export PKG_CONFIG_PATH=$d/lib/pkgconfig:$PKG_CONFIG_PATH
+	     break
+	  fi
+      done
+   else
+	if test -f $EYEDB_INSTALLDIR/lib/pkgconfig/eyedb.pc ; then
+	   EYEDB_PKG_CONFIG_FILE=$EYEDB_INSTALLDIR/lib/pkgconfig/eyedb.pc
+	   export PKG_CONFIG_PATH=$EYEDB_INSTALLDIR/lib/pkgconfig:$PKG_CONFIG_PATH
+	fi
+   fi
+
+   AC_MSG_RESULT($EYEDB_PKG_CONFIG_FILE)
+fi
+
+if test x"$EYEDB_PKG_CONFIG_FILE" = x"none" ; then
+   AC_MSG_ERROR(no EyeDB pkg-config configuration file found)
+fi
+
 PKG_CHECK_MODULES(EYEDB, eyedb)
 AC_SUBST(EYEDB_CFLAGS)
 AC_SUBST(EYEDB_LIBS)
