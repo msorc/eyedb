@@ -47,12 +47,18 @@ In top directory, run:
 ./autogen.sh
 ./configure
 
-As configure must know the path to eyedb.pc (the EyeDB pkg-config file), 
+The configure script uses pkg-config for EyeDB compilation flags and libraries.
+The EyeDB pkg-config configuration file is looked for automatically in 
+known places and in most cases, nothing special is required.
+If configure cannot find this configuration file and exit with an error message, 
 you must pass PKG_CONFIG_PATH to configure, for instance with:
-PKG_CONFIG_PATH=$HOME/projects/eyedb_install/lib/pkgconfig ./configure 
+PKG_CONFIG_PATH=$HOME/projects/my_special_eyedb_install/lib/pkgconfig ./configure 
 
 configure supports also standard definitions, for instance:
-PKG_CONFIG_PATH=$HOME/projects/eyedb_install/lib/pkgconfig ./configure CXX=gcc-4.1 JAVAC=/usr/local/java/jdk1.5.0_05/bin/javac JAVA=/usr/local/java/jdk1.5.0_05/bin/java
+./configure CXX=gcc-4.1 JAVAC=$HOME/java/jdk1.5.0_05/bin/javac 
+
+The Java compiler and virtual machines are guessed by configure; javac is 
+tried before gcj.
 
 
 4) Compile
