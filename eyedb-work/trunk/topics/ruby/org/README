@@ -1,0 +1,11 @@
+
+Compilation : 
+
+ruby extconf.rb
+
+make 
+
+
+Test : 
+
+./test.rb 
