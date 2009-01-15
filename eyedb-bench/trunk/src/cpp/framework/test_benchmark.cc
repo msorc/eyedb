@@ -8,7 +8,7 @@ class TestBenchmark: public Benchmark {
 public:
   virtual const char* getName() const { return "Test"; }
   virtual const char* getDescription() const { return "A test benchmark";};
-  virtual const char* getRunDescription() const { return "C++ implementation";};
+  virtual const char* getImplementation() const { return "C++ implementation";};
 
   virtual void prepare() {}
   virtual void run() {}
