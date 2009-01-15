@@ -1,4 +1,4 @@
-SUBDIRS=polepos quicktour
+SUBDIRS=eyedb
 
 bench:
 	for d in $(SUBDIRS) ; do \

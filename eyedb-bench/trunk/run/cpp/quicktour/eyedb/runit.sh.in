@@ -1,0 +1,25 @@
+#!/bin/bash
+srcdir=@srcdir@
+top_srcdir=@top_srcdir@
+top_builddir=@top_builddir@
+
+PROPERTIES=${srcdir}/eyedb.properties
+SCHEMA=${top_srcdir}/src/cpp/quicktour/eyedb/quicktour.odl
+
+run_benchmark() {
+    $top_builddir/src/cpp/quicktour/eyedb/quicktour --port=$PORT $*
+}
+
+. $top_builddir/run/utils/common/functions
+. $top_builddir/run/utils/eyedb/functions
+
+read_property $PROPERTIES "DATABASE"
+read_property $PROPERTIES "PORT"
+stop_server $PORT
+set -e
+start_server $PORT
+delete_db $PORT $DATABASE
+create_db $PORT $DATABASE $SCHEMA
+resize_shm $PORT $DATABASE
+run_benchmark $*
+stop_server $PORT
