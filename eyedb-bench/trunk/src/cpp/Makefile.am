@@ -1,2 +1,3 @@
-SUBDIRS=framework polepos
+SUBDIRS=framework polepos quicktour
+
 
