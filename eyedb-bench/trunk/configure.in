@@ -332,6 +332,8 @@ run/Makefile dnl
 run/cpp/Makefile dnl
 run/cpp/polepos/Makefile dnl
 run/cpp/polepos/eyedb/Makefile dnl
+run/cpp/quicktour/Makefile dnl
+run/cpp/quicktour/eyedb/Makefile dnl
 run/java/Makefile dnl
 run/java/polepos/Makefile dnl
 run/java/polepos/db4o/Makefile dnl
