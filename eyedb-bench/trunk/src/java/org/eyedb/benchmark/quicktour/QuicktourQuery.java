@@ -10,11 +10,10 @@ import org.eyedb.benchmark.framework.Benchmark;
  * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)
  */
 
-public abstract class QuicktourBenchmark extends Benchmark {
+public abstract class QuicktourQuery extends Benchmark {
 
-	public QuicktourBenchmark()
+	public QuicktourQuery()
 	{
-		random = new Random(System.currentTimeMillis());
 	}
 
 	public String getName()
@@ -24,14 +23,10 @@ public abstract class QuicktourBenchmark extends Benchmark {
 
 	public String getDescription()
 	{
-		return "Quicktour benchmark, create, query and delete objects with one-level inheritance, one-to-many and many-to-many relations with referential integrity check";
+		return "Quicktour benchmark, query objects with one-level inheritance, one-to-many and many-to-many relations with referential integrity check";
 	}
 
-	public abstract void create( int nStudents, int nCourses, int nTeachers, int nObjectsPerTransaction);
-
 	public abstract void query( int nSelects);
-
-	public abstract void remove();
 
 	public void run()
 	{
@@ -62,14 +57,8 @@ public abstract class QuicktourBenchmark extends Benchmark {
 
 			getStopWatch().start();
 
-			create( nStudents, nCourses, nTeachers, nObjectsPerTransaction);
-			getStopWatch().lap( "create");
-
 			query( nSelects);
 			getStopWatch().lap( "query");
-
-			remove();
-			getStopWatch().lap( "remove");
 
 			getResult().add( getStopWatch().getLaps());
 
@@ -78,11 +67,4 @@ public abstract class QuicktourBenchmark extends Benchmark {
 			getResult().next();
 		}
 	}
-
-	protected Random getRandom()
-	{
-		return random;
-	}
-
-	private Random random;
 }

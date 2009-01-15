@@ -1,6 +1,6 @@
 package org.eyedb.benchmark.quicktour.db4o;
 
-import org.eyedb.benchmark.quicktour.QuicktourBenchmark;
+import org.eyedb.benchmark.quicktour.Quicktour;
 import com.db4o.Db4o;
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
@@ -11,7 +11,7 @@ import com.db4o.query.Query;
  * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)
  */
 
-public class Db4oQuicktourBenchmark extends QuicktourBenchmark {
+public class Db4oQuicktour extends Quicktour {
 
 	public String getImplementation()
 	{

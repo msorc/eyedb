@@ -8,7 +8,7 @@ import org.eyedb.benchmark.*;
  * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)
  */
 
-public class Db4oBenchLocal extends Db4oQuicktourBenchmark {
+public class Db4oBenchLocal extends Db4oQuicktour {
 
     public void prepare()
     {
