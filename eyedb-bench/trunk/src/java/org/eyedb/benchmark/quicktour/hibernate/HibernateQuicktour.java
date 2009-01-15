@@ -3,7 +3,7 @@ package org.eyedb.benchmark.quicktour.hibernate;
 import java.io.File;
 import java.util.Iterator;
 
-import org.eyedb.benchmark.quicktour.QuicktourBenchmark;
+import org.eyedb.benchmark.quicktour.Quicktour;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -15,7 +15,7 @@ import org.hibernate.cfg.Configuration;
  * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)
  */
 
-public class HibernateQuicktourBenchmark extends QuicktourBenchmark {
+public class HibernateQuicktour extends Quicktour {
 
     public String getImplementation()
     {

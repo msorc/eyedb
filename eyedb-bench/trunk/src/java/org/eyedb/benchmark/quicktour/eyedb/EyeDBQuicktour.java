@@ -4,7 +4,7 @@ import org.eyedb.Database;
 import org.eyedb.OQL;
 import org.eyedb.ObjectArray;
 import org.eyedb.Struct;
-import org.eyedb.benchmark.quicktour.QuicktourBenchmark;
+import org.eyedb.benchmark.quicktour.Quicktour;
 import org.eyedb.benchmark.quicktour.eyedb.quicktour.Course;
 import org.eyedb.benchmark.quicktour.eyedb.quicktour.Student;
 import org.eyedb.benchmark.quicktour.eyedb.quicktour.Teacher;
@@ -13,7 +13,7 @@ import org.eyedb.benchmark.quicktour.eyedb.quicktour.Teacher;
  * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)
  */
 
-public class EyeDBQuicktourBenchmark extends QuicktourBenchmark {
+public class EyeDBQuicktour extends Quicktour {
 
 	public String getImplementation()
 	{
@@ -22,72 +22,35 @@ public class EyeDBQuicktourBenchmark extends QuicktourBenchmark {
 
 	protected Database getDatabase()
 	{
-		return database;
+		return implementation.getDatabase();
 	}
 
 	public void prepare()
 	{
 		String databaseName = getProperties().getProperty( "eyedb.database");
+		int tcpPort = getProperties().getIntProperty( "eyedb.tcp_port");
 
-		String[] args = new String[3];
-		int i = 0;
-		args[i++] = "--user=" + System.getProperty( "user.name");
-		args[i++] = "--dbm=default";
-		args[i++] = "--port=" + getProperties().getProperty( "eyedb.tcp_port");
-
-		org.eyedb.Root.init(databaseName, args);
-
-		try {
-			// Initialize the package
-			org.eyedb.benchmark.quicktour.eyedb.quicktour.Database.init();
-
-			// Open the connection with the backend
-			connection = new org.eyedb.Connection();
-
-			// Open the database
-			database = new org.eyedb.benchmark.quicktour.eyedb.quicktour.Database( databaseName);
-			database.open(connection, org.eyedb.Database.DBRW);
-		}
-		catch(org.eyedb.Exception e) { // Catch any eyedb exception
-			e.printStackTrace();
-			System.exit(1);
-		}
+		implementation = new EyeDBImplementation( databaseName, tcpPort);
 	}
 
 	public void finish()
 	{
-		/*		System.out.println( "org.eyedb.RPClib.read_ms = " + org.eyedb.RPClib.read_ms);
-		System.out.println( "org.eyedb.RPClib.write_ms = " + org.eyedb.RPClib.write_ms);
-		System.out.println( "org.eyedb.RPClib.write_async_ms = " + org.eyedb.RPClib.write_async_ms);
-		System.out.println( "org.eyedb.RPClib.read_cnt = " + org.eyedb.RPClib.read_cnt);
-		System.out.println( "org.eyedb.RPClib.read_async_cnt = " + org.eyedb.RPClib.read_async_cnt);
-		 */
-		try {
-			// Close the database
-			database.close();
-
-			// Close the connection
-			connection.close();
-		}
-		catch(org.eyedb.Exception e) { // Catch any eyedb exception
-			e.printStackTrace();
-			System.exit(1);
-		}
+		implementation.finish();
 	}
 
 	private Teacher[] fillTeachers( int nTeachers) throws org.eyedb.Exception
 	{
 		Teacher[] teachers = new Teacher[nTeachers];
 
-		database.transactionBegin();
+		getDatabase().transactionBegin();
 
 		for ( int n = 0; n < nTeachers; n++) {
-			teachers[n] = new Teacher( database);
+			teachers[n] = new Teacher( getDatabase());
 			teachers[n].setFirstName( "Teacher_"+n+"_firstName");
 			teachers[n].setLastName( "Teacher_"+n);
 		}
 
-		database.transactionCommit();
+		getDatabase().transactionCommit();
 
 		return teachers;
 	}
@@ -96,16 +59,16 @@ public class EyeDBQuicktourBenchmark extends QuicktourBenchmark {
 	{
 		Course courses[] = new Course[ nCourses];
 
-		database.transactionBegin();
+		getDatabase().transactionBegin();
 
 		for ( int n = 0; n < nCourses; n++) {
-			courses[n] = new Course( database);
+			courses[n] = new Course( getDatabase());
 			courses[n].setTitle( "Course_"+n);
 			courses[n].setDescription("Description of course "+n);
 			courses[n].setTeacher( teachers[ getRandom().nextInt( teachers.length)]);
 		}
 
-		database.transactionCommit();
+		getDatabase().transactionCommit();
 
 		return courses;
 	}
@@ -116,10 +79,10 @@ public class EyeDBQuicktourBenchmark extends QuicktourBenchmark {
 			Teacher[] teachers = fillTeachers( nTeachers);
 			Course[] courses = fillCourses( nCourses, teachers);
 
-			database.transactionBegin();
+			getDatabase().transactionBegin();
 
 			for ( int n = 0; n < nStudents; n++) {
-				Student student = new Student( database);
+				Student student = new Student( getDatabase());
 				student.setFirstName( "Student_"+n+"_firstName");
 				student.setLastName( "Student_"+n);
 				student.setBeginYear( (short)(getRandom().nextInt( 3) + 1));
@@ -132,12 +95,12 @@ public class EyeDBQuicktourBenchmark extends QuicktourBenchmark {
 				student.store(org.eyedb.RecMode.FullRecurs);
 
 				if (n % nObjectsPerTransaction == nObjectsPerTransaction - 1) {
-					database.transactionCommit();
-					database.transactionBegin();
+					getDatabase().transactionCommit();
+					getDatabase().transactionBegin();
 				}
 			}
 
-			database.transactionCommit();
+			getDatabase().transactionCommit();
 		}
 		catch( org.eyedb.Exception e) {
 			e.printStackTrace();
@@ -211,6 +174,5 @@ public class EyeDBQuicktourBenchmark extends QuicktourBenchmark {
 		removeByClass( "Student");
 	}
 
-	protected org.eyedb.Connection connection;
-	protected org.eyedb.benchmark.quicktour.eyedb.quicktour.Database database;
+	private EyeDBImplementation implementation;
 }
