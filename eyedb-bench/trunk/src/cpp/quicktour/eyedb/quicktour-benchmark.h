@@ -9,7 +9,15 @@ class QuicktourBenchmark : public eyedb::benchmark::Benchmark {
   void prepare();
   void finish();
 
-  const char* getRunDescription() const;
+  void create( int nStudents, int nCourses, int nTeachers, int nObjectsPerTransaction);
+  void query( int nSelects);
+  void remove();
+
+  void run();
+
+  const char* getName() const { return "Quicktour"; }
+  const char* getDescription() const { return "writes, reads, queries and deletes objects with a 5 level inheritance structure"; }
+  const char* getImplementation() const;
 
   eyedb::Database *getDatabase() { return database; }
 

@@ -20,7 +20,7 @@ void SimpleReporter::report( const Benchmark &benchmark)
   cout << "Bench: " << benchmark.getName() << endl;
   cout << benchmark.getDescription() << endl;
   cout << endl;
-  cout << benchmark.getRunDescription() << endl;
+  cout << benchmark.getImplementation() << endl;
   cout << endl;
 
   reportResult( benchmark.getResult());
