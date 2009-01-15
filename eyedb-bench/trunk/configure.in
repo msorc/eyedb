@@ -322,6 +322,7 @@ AC_SUBST(OPENOFFICE_CLASSPATH)
 # Generate output files
 # ========================================
 AC_CONFIG_LINKS( ${srcdir}/src/cpp/polepos/eyedb/polepos.odl:src/java/org/eyedb/benchmark/polepos/teams/eyedb/data/data.odl )
+AC_CONFIG_LINKS( ${srcdir}/src/cpp/quicktour/eyedb/quicktour.odl:src/java/org/eyedb/benchmark/quicktour/eyedb/quicktour/quicktour.odl )
 
 AC_CONFIG_FILES(
 Makefile dnl
@@ -351,6 +352,8 @@ src/cpp/Makefile dnl
 src/cpp/framework/Makefile dnl
 src/cpp/polepos/Makefile dnl
 src/cpp/polepos/eyedb/Makefile dnl
+src/cpp/quicktour/Makefile dnl
+src/cpp/quicktour/eyedb/Makefile dnl
 src/java/Makefile dnl
 src/java/org/Makefile dnl
 src/java/org/eyedb/Makefile dnl
