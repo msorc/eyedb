@@ -2,12 +2,29 @@
 srcdir=@srcdir@
 top_srcdir=@top_srcdir@
 top_builddir=@top_builddir@
+EYEDB_BINDIR=@EYEDB_BINDIR@
 
 PROPERTIES=${srcdir}/eyedb.properties
 SCHEMA=${top_srcdir}/src/cpp/quicktour/eyedb/quicktour.odl
 
-run_benchmark() {
-    $top_builddir/src/cpp/quicktour/eyedb/quicktour --port=$PORT $*
+update_schema() {
+    CPPOPTIONS=$1
+    $EYEDB_BINDIR/eyedbodl --port=$PORT --update --database=$DATABASE $CPPOPTIONS $SCHEMA
+}
+
+run_one_benchmark() {
+    BENCHMARK=$1
+    CPPOPTIONS=$2
+    shift 2
+
+    eyedb_delete_db $PORT $DATABASE
+    eyedb_create_db $PORT $DATABASE
+
+    update_schema $CPPOPTIONS
+
+    eyedb_resize_shm $PORT $DATABASE
+
+    $top_builddir/src/cpp/quicktour/eyedb/$BENCHMARK --port=$PORT $*
 }
 
 . $top_builddir/run/utils/common/functions
@@ -18,8 +35,9 @@ read_property $PROPERTIES "eyedb.tcp_port" "PORT"
 eyedb_stop_server $PORT
 set -e
 eyedb_start_server $PORT
-eyedb_delete_db $PORT $DATABASE
-eyedb_create_db $PORT $DATABASE $SCHEMA
-eyedb_resize_shm $PORT $DATABASE
-run_benchmark $*
+
+run_one_benchmark quicktour-array --cpp-flags=-DUSE_ARRAY $*
+run_one_benchmark quicktour-collection --cpp-flags="-UUSE_ARRAY -UUSE_INVERSE" $*
+run_one_benchmark quicktour-inverse --cpp-flags=-DUSE_INVERSE $*
+
 eyedb_stop_server $PORT

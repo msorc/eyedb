@@ -28,7 +28,8 @@ eyedb_stop_server $PORT
 set -e
 eyedb_start_server $PORT
 eyedb_delete_db $PORT $DATABASE
-eyedb_create_db $PORT $DATABASE $SCHEMA
+eyedb_create_db $PORT $DATABASE 
+eyedb_update_schema $PORT $DATABASE $SCHEMA
 eyedb_resize_shm $PORT $DATABASE
 polepos_build_classpath
 run_benchmark $*

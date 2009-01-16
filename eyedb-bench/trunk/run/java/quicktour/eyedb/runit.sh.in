@@ -23,7 +23,8 @@ eyedb_stop_server $PORT
 set -e
 eyedb_start_server $PORT
 eyedb_delete_db $PORT $DATABASE
-eyedb_create_db $PORT $DATABASE $SCHEMA
+eyedb_create_db $PORT $DATABASE 
+eyedb_update_schema $PORT $DATABASE $SCHEMA
 run_benchmark
 eyedb_stop_server $PORT
 
