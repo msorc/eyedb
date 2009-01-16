@@ -1,6 +1,5 @@
 #include <vector>
-#include "quicktour.h"
-#include "quicktour-benchmark.h"
+#include "quicktour_benchmark.h"
 
 using namespace std;
 
@@ -32,7 +31,7 @@ void QuicktourBenchmark::prepare()
     else
       flags = eyedb::Database::DBRW;
 
-    database = new quicktourDatabase( conn, dbName.c_str(), flags);
+    database = openDatabase( conn, dbName.c_str(), flags);
   }
   catch ( eyedb::Exception &ex ) {
     ex.print();
@@ -44,88 +43,6 @@ void QuicktourBenchmark::finish()
   try {
     database->close();
     conn->close();
-  }
-  catch ( eyedb::Exception &ex ) {
-    ex.print();
-  }
-}
-
-Teacher** QuicktourBenchmark::fillTeachers( int nTeachers) throw( eyedb::Exception)
-{
-  Teacher **teachers = new Teacher*[nTeachers];
-
-  getDatabase()->transactionBegin();
-
-  for ( int n = 0; n < nTeachers; n++) {
-    teachers[n] = new Teacher( getDatabase());
-
-    char tmp[256];
-    sprintf( tmp, "Teacher_%d_firstName", n);
-    teachers[n]->setFirstName( tmp);
-    sprintf( tmp, "Teacher_%d", n);
-    teachers[n]->setLastName( tmp);
-  }
-
-  getDatabase()->transactionCommit();
-  
-  return teachers;
-}
-
-Course** QuicktourBenchmark::fillCourses( int nCourses, Teacher** teachers, int nTeachers) throw( eyedb::Exception)
-{
-  Course **courses = new Course*[ nCourses];
-
-  getDatabase()->transactionBegin();
-
-  for ( int n = 0; n < nCourses; n++) {
-    courses[n] = new Course( getDatabase());
-
-    char tmp[256];
-    sprintf( tmp, "Course_%d", n);
-    courses[n]->setTitle( tmp);
-    sprintf( tmp, "Description of course %d", n);
-    courses[n]->setDescription( tmp);
-    courses[n]->setTeacher( teachers[ random() % nTeachers]);
-  }
-
-  getDatabase()->transactionCommit();
-
-  return courses;
-}
-
-
-void QuicktourBenchmark::create( int nStudents, int nCourses, int nTeachers, int nObjectsPerTransaction)
-{
-  try {
-    Teacher** teachers = fillTeachers( nTeachers);
-    Course** courses = fillCourses( nCourses, teachers, nTeachers);
-
-    getDatabase()->transactionBegin();
-            
-    for ( int n = 0; n < nStudents; n++) {
-      Student *student = new Student( getDatabase());
-
-      char tmp[256];
-      sprintf( tmp, "Student_%d_firstName", n);
-      student->setFirstName( tmp);
-      sprintf( tmp, "Student_%d", n);
-      student->setLastName( tmp);
-      student->setBeginYear( (short)((random()%3) + 1));
-
-      int i = random();
-      for ( int c = 0; c < nCourses; c++) {
-	student->addToCoursesColl( courses[ (i+c)%nCourses]);
-      }
-
-      student->store( eyedb::FullRecurs);
-      
-      if (n % nObjectsPerTransaction == nObjectsPerTransaction - 1) {
-	getDatabase()->transactionCommit();
-	getDatabase()->transactionBegin();
-      }
-    }
-
-    getDatabase()->transactionCommit();
   }
   catch ( eyedb::Exception &ex ) {
     ex.print();
@@ -245,19 +162,3 @@ void QuicktourBenchmark::run()
   }
 }
 
-int main(int argc, char *argv[])
-{
-  QuicktourBenchmark b;
-  b.getProperties().load( "eyedb.properties");
-  b.getProperties().load( argc, argv);
-
-  quicktour initializer(argc, argv);
-
-  b.bench();
-
-  eyedb::benchmark::SimpleReporter r;
-  int c;
-  b.getProperties().getIntProperty("reporter.simple.column_width", c);
-  r.setColumnWidth( c);
-  r.report(b);
-}
