@@ -87,9 +87,9 @@ public class EyeDBQuicktour extends Quicktour {
 				student.setLastName( "Student_"+n);
 				student.setBeginYear( (short)(getRandom().nextInt( 3) + 1));
 
+				int i = getRandom().nextInt( courses.length);
 				for ( int c = 0; c < courses.length; c++) {
-				    int i = getRandom().nextInt( courses.length);
-				    student.addToCoursesColl( courses[ i]);
+				    student.addToCoursesColl( courses[ (i+c)%nCourses]);
 				}
 
 				student.store(org.eyedb.RecMode.FullRecurs);

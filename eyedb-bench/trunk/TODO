@@ -6,8 +6,10 @@
 --- db4o: queries?
 --- eyedb: add indexes
 --- hibernate: fix query problem
---- separate runs for create/query/remove? problem for remove (the database may contains more objects than the expected count)
+--- separate runs for create/query/remove? big problem for remove (the database may contains more objects than the expected count)
 -- C++: eyedb
+--- with and without referential integrity
+--- with and without collections
 
 - run benchmarks for poleposition and quicktour, add results to svn
 

@@ -9,6 +9,7 @@ class QuicktourBenchmark : public eyedb::benchmark::Benchmark {
   void prepare();
   void finish();
 
+
   void create( int nStudents, int nCourses, int nTeachers, int nObjectsPerTransaction);
   void query( int nSelects);
   void remove();
@@ -16,12 +17,19 @@ class QuicktourBenchmark : public eyedb::benchmark::Benchmark {
   void run();
 
   const char* getName() const { return "Quicktour"; }
-  const char* getDescription() const { return "writes, reads, queries and deletes objects with a 5 level inheritance structure"; }
+  const char* getDescription() const { return "Quicktour benchmark, create, query and delete objects with one-level inheritance, one-to-many and many-to-many relations with referential integrity check"; }
   const char* getImplementation() const;
 
   eyedb::Database *getDatabase() { return database; }
 
 private:
+  Teacher** fillTeachers( int nTeachers) throw( eyedb::Exception);
+  Course** fillCourses( int nCourses, Teacher** teachers, int nTeachers) throw( eyedb::Exception);
+
+  void queryByClass( const char *className, int nSelects);
+
+  void removeByClass( const char *className);
+
   eyedb::Database *database;
   eyedb::Connection *conn;
 };
