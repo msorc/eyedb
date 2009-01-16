@@ -28,11 +28,12 @@ run_benchmark() {
 
 read_property $PROPERTIES "DATABASE"
 read_property $PROPERTIES "PORT"
-stop_server $PORT
+eyedb_stop_server $PORT
 set -e
-start_server $PORT
-delete_db $PORT $DATABASE
-create_db $PORT $DATABASE $SCHEMA
-resize_shm $PORT $DATABASE
+eyedb_start_server $PORT
+eyedb_delete_db $PORT $DATABASE
+eyedb_create_db $PORT $DATABASE 
+eyedb_update_schema $PORT $DATABASE $SCHEMA
+eyedb_resize_shm $PORT $DATABASE
 run_benchmark $*
-stop_server $PORT
+eyedb_stop_server $PORT

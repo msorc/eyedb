@@ -23,14 +23,19 @@ eyedb_delete_db() {
 eyedb_create_db() {
     PORT=$1
     DATABASE=$2
-    SCHEMA=$3
     if $EYEDB_BINDIR/eyedbadmin database list --port=$PORT $DATABASE 2>&1 | grep -v 'not found' > /dev/null ; then
 	:
     else
 	$EYEDB_BINDIR/eyedbadmin database create --port=$PORT $DATABASE
 	$EYEDB_BINDIR/eyedbadmin database defaccess --port=$PORT $DATABASE rw
-	$EYEDB_BINDIR/eyedbodl --port=$PORT --update --database=$DATABASE $SCHEMA
     fi
+}
+
+eyedb_update_schema() {
+    PORT=$1
+    DATABASE=$2
+    SCHEMA=$3
+    $EYEDB_BINDIR/eyedbodl --port=$PORT --update --database=$DATABASE $SCHEMA
 }
 
 eyedb_resize_shm() {
