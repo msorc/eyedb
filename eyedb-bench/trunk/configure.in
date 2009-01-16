@@ -373,6 +373,9 @@ src/java/org/eyedb/benchmark/quicktour/Makefile dnl
 src/java/org/eyedb/benchmark/quicktour/db4o/Makefile dnl
 src/java/org/eyedb/benchmark/quicktour/eyedb/Makefile dnl
 src/java/org/eyedb/benchmark/quicktour/eyedb/quicktour/Makefile dnl
+src/java/org/eyedb/benchmark/quicktour/eyedb/quicktour/array/Makefile dnl
+src/java/org/eyedb/benchmark/quicktour/eyedb/quicktour/collection/Makefile dnl
+src/java/org/eyedb/benchmark/quicktour/eyedb/quicktour/inverse/Makefile dnl
 src/java/org/eyedb/benchmark/quicktour/hibernate/Makefile dnl
 src/java/org/eyedb/benchmark/utils/Makefile dnl
 src/java/org/eyedb/benchmark/utils/db4o/Makefile dnl

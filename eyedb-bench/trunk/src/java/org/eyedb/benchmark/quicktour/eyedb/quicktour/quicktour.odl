@@ -1,9 +1,18 @@
+// define to use referential integrity
 //#define USE_INVERSE
+// define to use arrays instead of collections
+//#define USE_ARRAY
 
 #ifdef USE_INVERSE
-#define RELSHIP(TYPE, ATTR, INV) relationship TYPE ATTR inverse INV
+#define RELATIONSHIP_ONE(TYPE, ATTR, INV) relationship TYPE *ATTR inverse INV
+#define RELATIONSHIP_MANY(TYPE, ATTR, INV) relationship set<TYPE *> ATTR inverse INV
 #else
-#define RELSHIP(TYPE, ATTR, INV) attribute TYPE ATTR
+#define RELATIONSHIP_ONE(TYPE, ATTR, INV) attribute TYPE *ATTR
+#ifdef USE_ARRAY
+#define RELATIONSHIP_MANY(TYPE, ATTR, INV) attribute TYPE *ATTR[]
+#else
+#define RELATIONSHIP_MANY(TYPE, ATTR, INV) attribute set<TYPE *> ATTR
+#endif
 #endif
 
 class Person {
@@ -13,16 +22,16 @@ class Person {
 
 class Student extends Person {
   attribute short beginYear;
-  RELSHIP(set<Course *>, courses, students);
+  RELATIONSHIP_MANY(Course, courses, Course::students);
 };
 
 class Course {
   attribute string title;
   attribute string description;
-  RELSHIP(set<Student *>, students, courses);
-  RELSHIP(Teacher *, teacher, courses);
+  RELATIONSHIP_MANY(Student, students, Student::courses);
+  RELATIONSHIP_ONE(Teacher, teacher, Teacher::courses);
 };
 
 class Teacher extends Person {
-  RELSHIP(set<Course *>, courses, teacher);
+  RELATIONSHIP_MANY(Course, courses, Course::teacher);
 };
