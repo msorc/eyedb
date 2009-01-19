@@ -109,8 +109,10 @@ void QuicktourBenchmarkInverse::create( int nStudents, int nCourses, int nTeache
 int main(int argc, char *argv[])
 {
   QuicktourBenchmarkInverse b;
-  b.getProperties().load( "eyedb.properties");
-  b.getProperties().load( argc, argv);
+  b.getProperties().load( argv[1]);
+  int nargc = argc-2;
+  char **nargv = argv+2;
+  b.getProperties().load( nargc, nargv);
 
   odl_quicktour_inverse initializer(argc, argv);
 

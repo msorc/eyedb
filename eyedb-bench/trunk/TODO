@@ -9,7 +9,7 @@
 --- separate runs for create/query/remove? big problem for remove (the database may contains more objects than the expected count)
 -- C++: eyedb
 --- with and without referential integrity [DONE]
---- with and without collections [DONE]
+--- with and without collections [DONE, but bug in arrays]
 
 - run benchmarks for poleposition and quicktour, add results to svn
 
@@ -19,8 +19,6 @@
 - add license (GPL?) and copyright information in all files
 
 - reporting:
--- update ReporterFactory to use properties to load reporter classes
--- implement a CSV reporter?
--- implement the XML reporter
--- complete the python script to translate XML to OpenOffice
+-- implement a CSV reporter (properties: filename, append)
+
 

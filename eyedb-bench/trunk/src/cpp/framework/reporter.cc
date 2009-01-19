@@ -56,3 +56,49 @@ void SimpleReporter::reportResult( const Result &result)
   }
 }
 
+const char CSVReporter::defaultColumnSeparator = ',';
+
+CSVReporter::CSVReporter() 
+  : columnSeparator( defaultColumnSeparator)
+{
+}
+
+void CSVReporter::report( const Benchmark &benchmark)
+{
+  cout << endl;
+  cout << "\"" << benchmark.getImplementation() << "\"" << endl;
+  cout << endl;
+
+  reportResult( benchmark.getResult());
+
+  cout << endl;
+}
+
+void CSVReporter::reportResult( const Result &result)
+{
+  vector<string>::const_iterator it;
+  int i;
+
+  for ( it = result.getHeaders().begin(), i = 0; it < result.getHeaders().end(); it++ ) {
+    cout << "\"" << *it << "\"";
+    if (i != result.getHeaders().size() - 1)
+      cout << columnSeparator;
+  }
+
+  cout << endl;
+
+  for (int i = 0; i < result.size(); i++) {
+
+    vector<unsigned long>::const_iterator it;
+    int j;
+
+    for ( it = result.getValues(i).begin(), j = 0; it < result.getValues(i).end(); it++ ) {
+      cout << "\"" << *it << "\"";
+      if (i != result.getValues(i).size() - 1)
+	cout << columnSeparator;
+    }
+
+    cout << endl;
+  }
+}
+

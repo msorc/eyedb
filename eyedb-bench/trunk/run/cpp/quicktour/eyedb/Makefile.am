@@ -13,8 +13,8 @@ EDIT = sed \
 runit.sh: Makefile
 
 bench: runit.sh
-	$(SHELL) runit.sh
+	$(SHELL) -x runit.sh
 
 bench-local: runit.sh
-	$(SHELL) runit.sh -Dmode=local
+	$(SHELL) -x runit.sh -Dmode=local
 
