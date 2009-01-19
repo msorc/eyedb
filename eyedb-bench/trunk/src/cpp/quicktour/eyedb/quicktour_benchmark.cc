@@ -21,6 +21,10 @@ void QuicktourBenchmark::prepare()
   string dbName;
   getProperties().getStringProperty( "eyedb.database", dbName);
 
+  int v;
+  if (getProperties().getIntProperty( "verbose", v))
+    cerr << "Opening database: " << dbName << endl;
+
   try {
     conn = new eyedb::Connection( true);
 
@@ -49,6 +53,7 @@ void QuicktourBenchmark::finish()
   }
 }
 
+#if 0
 void QuicktourBenchmark::queryByClass( const char *className, int nSelects)
 {
   try {
@@ -112,6 +117,7 @@ void QuicktourBenchmark::remove()
   removeByClass( "Course");
   removeByClass( "Student");
 }
+#endif
 
 void QuicktourBenchmark::run()
 {
@@ -146,11 +152,13 @@ void QuicktourBenchmark::run()
     create( students[i], courses[i], teachers[i], objectsPerTransaction[i]);
     getStopwatch().lap( "create");
 
+#if 0
     query( selects[i]);
     getStopwatch().lap( "query");
 
     remove();
     getStopwatch().lap( "remove");
+#endif
 
     getStopwatch().stop();
 

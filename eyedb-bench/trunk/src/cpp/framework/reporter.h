@@ -31,6 +31,19 @@ namespace eyedb {
       static const char defaultColumnSeparator;
     };
 
+    class CSVReporter : public Reporter {
+    public:
+      CSVReporter();
+
+      virtual void report( const Benchmark &benchmark);
+
+      void setColumnSeparator( char separator) { columnSeparator = separator; }
+    private:
+      char columnSeparator;
+
+      static const char defaultColumnSeparator;
+    };
+
   };
 };
 

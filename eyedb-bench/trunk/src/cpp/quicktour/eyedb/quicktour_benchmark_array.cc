@@ -122,10 +122,12 @@ void QuicktourBenchmarkArray::create( int nStudents, int nCourses, int nTeachers
 int main(int argc, char *argv[])
 {
   QuicktourBenchmarkArray b;
-  b.getProperties().load( "eyedb.properties.debug");
-  b.getProperties().load( argc, argv);
+  b.getProperties().load( argv[1]);
+  int nargc = argc-2;
+  char **nargv = argv+2;
+  b.getProperties().load( nargc, nargv);
 
-  odl_quicktour_array initializer(argc, argv);
+  odl_quicktour_array initializer(nargc, nargv);
 
   b.bench();
 

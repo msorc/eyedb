@@ -24,7 +24,7 @@ run_one_benchmark() {
 
     eyedb_resize_shm $PORT ${DATABASE}-${BENCHMARK}
 
-    $top_builddir/src/cpp/quicktour/eyedb/quicktour-${BENCHMARK} --port=$PORT $*
+    $top_builddir/src/cpp/quicktour/eyedb/quicktour-${BENCHMARK} eyedb.properties -Deyedb.database=${DATABASE}-${BENCHMARK} --port=$PORT $*
 }
 
 . $top_builddir/run/utils/common/functions
