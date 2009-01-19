@@ -63,9 +63,11 @@ Course** QuicktourBenchmarkCollection::fillCourses( int nCourses) throw( eyedb::
 
 void QuicktourBenchmarkCollection::relationTeacherCourse( Teacher** teachers, int nTeachers, Course** courses, int nCourses) throw( eyedb::Exception)
 {
-  // TODO
-//     Teacher *teacher = teachers[ random() % nTeachers];
-//     courses[n]->setTeacher( teacher);
+  for ( int n = 0; n < nCourses; n++) {
+    Teacher *teacher = teachers[ random() % nTeachers];
+    courses[n]->setTeacher( teacher);
+    teacher->addToCoursesColl( courses[n]);
+  }
 }
 
 void QuicktourBenchmarkCollection::create( int nStudents, int nCourses, int nTeachers, int nObjectsPerTransaction)

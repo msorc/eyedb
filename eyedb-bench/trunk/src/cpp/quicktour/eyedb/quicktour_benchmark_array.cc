@@ -63,11 +63,14 @@ Course** QuicktourBenchmarkArray::fillCourses( int nCourses) throw( eyedb::Excep
 
 void QuicktourBenchmarkArray::relationTeacherCourse( Teacher** teachers, int nTeachers, Course** courses, int nCourses) throw( eyedb::Exception)
 {
-//     Teacher *teacher = teachers[ random() % nTeachers];
-//     courses[n]->setTeacher( teacher);
-//     unsigned int last = teacher->getCoursesCount();
-//     teacher->setCoursesCount( last+1);
-//     teacher->setCourses( last, courses[n]);
+  for ( int n = 0; n < nCourses; n++) {
+    Teacher *teacher = teachers[ random() % nTeachers];
+    courses[n]->setTeacher( teacher);
+
+    unsigned int last = teacher->getCoursesCount();
+    teacher->setCoursesCount( last+1);
+    teacher->setCourses( last, courses[n]);
+  }
 }
 
 void QuicktourBenchmarkArray::create( int nStudents, int nCourses, int nTeachers, int nObjectsPerTransaction)
@@ -78,6 +81,9 @@ void QuicktourBenchmarkArray::create( int nStudents, int nCourses, int nTeachers
     relationTeacherCourse( teachers, nTeachers, courses, nCourses);
 
     getDatabase()->transactionBegin();
+    
+    for (int c = 0; c < nCourses; c++)
+      courses[c]->setStudentsCount( nStudents);
             
     for ( int n = 0; n < nStudents; n++) {
       Student *student = new Student( getDatabase());
@@ -89,11 +95,13 @@ void QuicktourBenchmarkArray::create( int nStudents, int nCourses, int nTeachers
       student->setLastName( tmp);
       student->setBeginYear( (short)((random()%3) + 1));
 
-      int i = random();
+      student->setCoursesCount( nCourses);
+
       for ( int c = 0; c < nCourses; c++) {
-	Course *course = courses[ (i+c)%nCourses];
-	//	student->addToCoursesColl( course);
-	//	course->addToStudentsColl( student);
+	cout << "setting course " << c << " for student " << n << endl;
+
+	student->setCourses( c, courses[c]);
+	courses[c]->setStudents( n, student);
       }
 
       student->store( eyedb::FullRecurs);
@@ -114,7 +122,7 @@ void QuicktourBenchmarkArray::create( int nStudents, int nCourses, int nTeachers
 int main(int argc, char *argv[])
 {
   QuicktourBenchmarkArray b;
-  b.getProperties().load( "eyedb.properties");
+  b.getProperties().load( "eyedb.properties.debug");
   b.getProperties().load( argc, argv);
 
   odl_quicktour_array initializer(argc, argv);
