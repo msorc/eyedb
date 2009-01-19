@@ -3,26 +3,26 @@ EYEDB_BINDIR=@EYEDB_BINDIR@
 EYEDB_SBINDIR=@EYEDB_SBINDIR@
 
 eyedb_start_server() {
-    PORT=$1
+    local PORT=$1
     $EYEDB_SBINDIR/eyedbctl start --listen=$PORT --nod
 }
 
 eyedb_stop_server() {
-    PORT=$1
+    local PORT=$1
     $EYEDB_SBINDIR/eyedbctl stop --listen=$PORT 
 }
 
 eyedb_delete_db() {
-    PORT=$1
-    DATABASE=$2
+    local PORT=$1
+    local DATABASE=$2
     if $EYEDB_BINDIR/eyedbadmin database list --port=$PORT $DATABASE 2>&1 | grep -v 'not found' > /dev/null ; then
 	$EYEDB_BINDIR/eyedbadmin database delete --port=$PORT $DATABASE
     fi
 }
 
 eyedb_create_db() {
-    PORT=$1
-    DATABASE=$2
+    local PORT=$1
+    local DATABASE=$2
     if $EYEDB_BINDIR/eyedbadmin database list --port=$PORT $DATABASE 2>&1 | grep -v 'not found' > /dev/null ; then
 	:
     else
@@ -32,20 +32,20 @@ eyedb_create_db() {
 }
 
 eyedb_update_schema() {
-    PORT=$1
-    DATABASE=$2
-    SCHEMA=$3
+    local PORT=$1
+    local DATABASE=$2
+    local SCHEMA=$3
     $EYEDB_BINDIR/eyedbodl --port=$PORT --update --database=$DATABASE $SCHEMA
 }
 
 eyedb_resize_shm() {
-    PORT=$1
-    DATABASE=$2
-    DATABASE_FILE=`$EYEDB_BINDIR/eyedbadmin database list --port=$PORT $DATABASE | awk '
+    local PORT=$1
+    local DATABASE=$2
+    local DATABASE_FILE=`$EYEDB_BINDIR/eyedbadmin database list --port=$PORT $DATABASE | awk '
 BEGIN { t = 0; }
 $0 ~ /Database File/ && t == 0 { t = 1; }
 $0 !~ /Database File/ && t == 1 { dbfile = $1; print $dbfile; t = 0; }
 '`
-    NEWSIZE=132000
+    local NEWSIZE=132000
     $EYEDB_SBINDIR/eyedbsmtool shmem resize $DATABASE_FILE $NEWSIZE
 }

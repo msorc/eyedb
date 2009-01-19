@@ -8,8 +8,8 @@
 --- hibernate: fix query problem
 --- separate runs for create/query/remove? big problem for remove (the database may contains more objects than the expected count)
 -- C++: eyedb
---- with and without referential integrity
---- with and without collections
+--- with and without referential integrity [DONE]
+--- with and without collections [DONE]
 
 - run benchmarks for poleposition and quicktour, add results to svn
 
