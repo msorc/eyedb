@@ -13,15 +13,6 @@ DefaultReporter::DefaultReporter()
   reporters.push_back( new CSVReporter() );
 }
 
-void DefaultReporter::setProperties( const Properties &properties)
-{
-  vector<Reporter *>::iterator it;
-
-  for ( it = reporters.begin(); it < reporters.end(); it++ ) {
-    (*it)->setProperties( properties);
-  }
-}
-
 void DefaultReporter::report(const Benchmark &benchmark)
 {
   vector<Reporter *>::iterator it;
@@ -37,10 +28,10 @@ const char SimpleReporter::defaultColumnSeparator = ',';
 void SimpleReporter::report( const Benchmark &benchmark)
 {
   int w;
-  if (getProperties().getIntProperty("reporter.simple.column_width", w))
+  if (benchmark.getProperties().getIntProperty("reporter.simple.column_width", w))
     setColumnWidth( w);
   string c;
-  if (getProperties().getStringProperty("reporter.simple.column_separator", c))
+  if (benchmark.getProperties().getStringProperty("reporter.simple.column_separator", c))
     setColumnSeparator( c[0]);
 
   cout << endl;
@@ -88,15 +79,15 @@ const char CSVReporter::defaultColumnSeparator = ',';
 void CSVReporter::report( const Benchmark &benchmark)
 {
   string c;
-  if (getProperties().getStringProperty("reporter.csv.column_separator", c))
+  if (benchmark.getProperties().getStringProperty("reporter.csv.column_separator", c))
     setColumnSeparator( c[0]);
 
   string filename;
-  if (!getProperties().getStringProperty("reporter.csv.filename", filename))
+  if (!benchmark.getProperties().getStringProperty("reporter.csv.filename", filename))
     filename = "/var/tmp/eyedb-benchmark.csv";
 
   bool append;
-  getProperties().getBoolProperty("reporter.csv.append", append);
+  benchmark.getProperties().getBoolProperty("reporter.csv.append", append);
 
   ios_base::openmode mode = ios_base::out;
   if (append)

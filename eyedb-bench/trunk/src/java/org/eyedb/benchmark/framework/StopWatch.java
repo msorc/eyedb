@@ -1,7 +1,9 @@
 package org.eyedb.benchmark.framework;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)
@@ -9,72 +11,75 @@ import java.util.List;
 
 public class StopWatch {
 
-	public StopWatch()
-	{
-		running = false;
-		startTime = totalTime = lapTime = 0L;
-		laps = new ArrayList<Result.Value>();
-	}
+    public StopWatch()
+    {
+	running = false;
+	startTime = totalTime = lapTime = 0L;
+	laps = new ArrayList<Map.Entry<String,Long>>();
+    }
 
-	public final void start()
-	{
-		running = true;
-		startTime = systemTime();
-		lapTime = 0;
-	}
+    public final void start()
+    {
+	running = true;
+	startTime = systemTime();
+	lapTime = 0;
+    }
 
-	public long stop()
-	{
-		if (running) {
-			running = false;
-			totalTime = time();
-		} else 
-			totalTime = 0;
+    public long stop()
+    {
+	if (running) {
+	    running = false;
+	    totalTime = time();
+	} else 
+	    totalTime = 0;
 
-		return totalTime;
-	}
+	return totalTime;
+    }
 
-	public long lap( String name)
-	{
-		long t = time();
-		long delta = t - lapTime;
-		laps.add( new Result.Value( name, delta));
-		lapTime = t;
+    public long lap( String name)
+    {
+	long t = time();
+	long delta = t - lapTime;
 
-		return delta;
-	}
+	Map.Entry e = new AbstractMap.SimpleEntry<String,Long>( name, new Long(delta));
 
-	public void reset()
-	{
-		running = false;
-		startTime = totalTime = lapTime = 0L;
-		laps.clear();
-	}
+	laps.add( e);
+	lapTime = t;
 
-	public long getTotalTime()
-	{
-		return totalTime;
-	}
+	return delta;
+    }
 
-	public List<Result.Value> getLaps()
-	{
-		return laps;
-	}
+    public void reset()
+    {
+	running = false;
+	startTime = totalTime = lapTime = 0L;
+	laps.clear();
+    }
 
-	private long systemTime()
-	{
-		return System.currentTimeMillis();
-	}
+    public long getTotalTime()
+    {
+	return totalTime;
+    }
 
-	private long time()
-	{
-		return systemTime() - startTime;
-	}
+    public List< Map.Entry<String,Long> > getLaps()
+    {
+	return laps;
+    }
 
-	private boolean running;
-	private long startTime;
-	private long totalTime;
-	private long lapTime;
-	private List<Result.Value> laps;
+    private long systemTime()
+    {
+	return System.currentTimeMillis();
+    }
+
+    private long time()
+    {
+	return systemTime() - startTime;
+    }
+
+    private boolean running;
+    private long startTime;
+    private long totalTime;
+    private long lapTime;
+    private List< Map.Entry<String,Long> > laps;
 }
 

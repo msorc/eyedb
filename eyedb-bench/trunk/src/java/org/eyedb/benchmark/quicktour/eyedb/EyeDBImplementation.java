@@ -20,13 +20,13 @@ class EyeDBImplementation {
 
 		try {
 			// Initialize the package
-			org.eyedb.benchmark.quicktour.eyedb.quicktour.Database.init();
+			org.eyedb.benchmark.quicktour.eyedb.quicktour.inverse.Database.init();
 
 			// Open the connection with the backend
 			connection = new org.eyedb.Connection();
 
 			// Open the database
-			database = new org.eyedb.benchmark.quicktour.eyedb.quicktour.Database( databaseName);
+			database = new org.eyedb.benchmark.quicktour.eyedb.quicktour.inverse.Database( databaseName);
 			database.open(connection, org.eyedb.Database.DBRW);
 		}
 		catch(org.eyedb.Exception e) { // Catch any eyedb exception
@@ -62,5 +62,5 @@ class EyeDBImplementation {
 	}
 
 	protected org.eyedb.Connection connection;
-	protected org.eyedb.benchmark.quicktour.eyedb.quicktour.Database database;
+	protected org.eyedb.benchmark.quicktour.eyedb.quicktour.inverse.Database database;
 }

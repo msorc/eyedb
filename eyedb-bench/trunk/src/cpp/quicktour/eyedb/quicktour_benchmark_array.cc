@@ -97,12 +97,14 @@ void QuicktourBenchmarkArray::create( int nStudents, int nCourses, int nTeachers
 
       student->setCoursesCount( nCourses);
 
+#if 0
       for ( int c = 0; c < nCourses; c++) {
 	cout << "setting course " << c << " for student " << n << endl;
 
 	student->setCourses( c, courses[c]);
 	courses[c]->setStudents( n, student);
       }
+#endif
 
       student->store( eyedb::FullRecurs);
       
@@ -121,19 +123,17 @@ void QuicktourBenchmarkArray::create( int nStudents, int nCourses, int nTeachers
 
 int main(int argc, char *argv[])
 {
-  QuicktourBenchmarkArray b;
-  b.getProperties().load( argv[1]);
-  int nargc = argc-2;
-  char **nargv = argv+2;
-  b.getProperties().load( nargc, nargv);
+  eyedb::benchmark::Properties properties;
+  properties.load( argv[1]);
+  properties.load( argc, argv);
 
-  odl_quicktour_array initializer(nargc, nargv);
+  QuicktourBenchmarkArray b;
+  b.setProperties( properties);
+
+  odl_quicktour_array initializer(argc, argv);
 
   b.bench();
 
-  eyedb::benchmark::SimpleReporter r;
-  int c;
-  b.getProperties().getIntProperty("reporter.simple.column_width", c);
-  r.setColumnWidth( c);
+  eyedb::benchmark::DefaultReporter r;
   r.report(b);
 }

@@ -112,9 +112,9 @@ void Melbourne::run()
 
   for (int i = 0; i < objects.size(); i++) {
 
-    getResult().addValue( objects[i]);
-    getResult().addValue( selects[i]);
-    getResult().addValue( commitinterval[i]);
+    getResult().add( objects[i]);
+    getResult().add( selects[i]);
+    getResult().add( commitinterval[i]);
 
     getStopwatch().start();
 
@@ -132,7 +132,7 @@ void Melbourne::run()
 
     getStopwatch().stop();
 
-    getResult().addLaps( getStopwatch().getLaps());
+    getResult().add( getStopwatch().getLaps());
 
     getStopwatch().reset();
 

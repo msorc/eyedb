@@ -19,6 +19,6 @@
 - add license (GPL?) and copyright information in all files
 
 - reporting:
--- implement a CSV reporter (properties: filename, append)
+-- implement a CSV reporter (properties: filename, append) [DONE for C++]
 
 

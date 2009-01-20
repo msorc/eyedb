@@ -110,9 +110,7 @@ int main(int argc, char *argv[])
 {
   eyedb::benchmark::Properties properties;
   properties.load( argv[1]);
-  int nargc = argc-2;
-  char **nargv = argv+2;
-  properties.load( nargc, nargv);
+  properties.load( argc, argv);
 
   QuicktourBenchmarkInverse b;
   b.setProperties( properties);
@@ -122,6 +120,5 @@ int main(int argc, char *argv[])
   b.bench();
 
   eyedb::benchmark::DefaultReporter r;
-  r.setProperties( properties);
   r.report(b);
 }

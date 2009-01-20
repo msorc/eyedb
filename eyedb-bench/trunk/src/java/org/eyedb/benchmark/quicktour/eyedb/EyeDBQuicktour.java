@@ -5,9 +5,9 @@ import org.eyedb.OQL;
 import org.eyedb.ObjectArray;
 import org.eyedb.Struct;
 import org.eyedb.benchmark.quicktour.Quicktour;
-import org.eyedb.benchmark.quicktour.eyedb.quicktour.Course;
-import org.eyedb.benchmark.quicktour.eyedb.quicktour.Student;
-import org.eyedb.benchmark.quicktour.eyedb.quicktour.Teacher;
+import org.eyedb.benchmark.quicktour.eyedb.quicktour.inverse.Course;
+import org.eyedb.benchmark.quicktour.eyedb.quicktour.inverse.Student;
+import org.eyedb.benchmark.quicktour.eyedb.quicktour.inverse.Teacher;
 
 /**
  * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)

@@ -146,11 +146,11 @@ void QuicktourBenchmark::run()
 
   for (int i = 0; i < students.size(); i++) {
 
-    getResult().addValue( students[i]);
-    getResult().addValue( courses[i]);
-    getResult().addValue( teachers[i]);
-    getResult().addValue( objectsPerTransaction[i]);
-    getResult().addValue( selects[i]);
+    getResult().add( students[i]);
+    getResult().add( courses[i]);
+    getResult().add( teachers[i]);
+    getResult().add( objectsPerTransaction[i]);
+    getResult().add( selects[i]);
 
     getStopwatch().start();
 
@@ -167,7 +167,7 @@ void QuicktourBenchmark::run()
 
     getStopwatch().stop();
 
-    getResult().addLaps( getStopwatch().getLaps());
+    getResult().add( getStopwatch().getLaps());
 
     getStopwatch().reset();
 
