@@ -113,19 +113,20 @@ void QuicktourBenchmarkCollection::create( int nStudents, int nCourses, int nTea
 
 int main(int argc, char *argv[])
 {
-  QuicktourBenchmarkCollection b;
-  b.getProperties().load( argv[1]);
+  eyedb::benchmark::Properties properties;
+  properties.load( argv[1]);
   int nargc = argc-2;
   char **nargv = argv+2;
-  b.getProperties().load( nargc, nargv);
+  properties.load( nargc, nargv);
+
+  QuicktourBenchmarkCollection b;
+  b.setProperties( properties);
 
   odl_quicktour_collection initializer(argc, argv);
 
   b.bench();
 
-  eyedb::benchmark::SimpleReporter r;
-  int c;
-  b.getProperties().getIntProperty("reporter.simple.column_width", c);
-  r.setColumnWidth( c);
+  eyedb::benchmark::DefaultReporter r;
+  r.setProperties( properties);
   r.report(b);
 }

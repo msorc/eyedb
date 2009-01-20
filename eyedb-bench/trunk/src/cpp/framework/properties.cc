@@ -8,6 +8,16 @@
 using namespace eyedb::benchmark;
 using namespace std;
 
+Properties &Properties::operator=( const Properties &x)
+{
+  if (&x == this)
+    return *this;
+
+  properties = x.properties;
+
+  return *this;
+}
+
 void Properties::load( const string &filename)
 {
   ifstream infile;
@@ -166,6 +176,23 @@ void Properties::load( int &argc, char **argv)
     else
       i++;
   }
+}
+
+int Properties::getBoolProperty( const std::string &name, bool &value, bool defaultValue) const
+{
+  value = defaultValue;
+
+  map<const string, string>::const_iterator it = properties.find( name);
+
+  if (it == properties.end())
+    return 0;
+
+  istringstream iss(it->second);
+
+  if ( iss >> value && iss.eof())
+    return 1;
+
+  return 0;
 }
 
 int Properties::getIntProperty( const string &name, int &value, int defaultValue) const
