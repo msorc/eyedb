@@ -25,7 +25,7 @@ TOPIC_ODL_FILE = array.odl
 # Example:
 # TOPIC_SCRIPT_FILES = init.sh
 # (this implies that you have a init.sh.in source script)
-TOPIC_SCRIPT_FILES = 
+TOPIC_SCRIPT_FILES = runit.sh
 
 # End of editable part
 # ######################################################################

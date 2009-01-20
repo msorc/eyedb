@@ -11,49 +11,40 @@ class Test {
   int getNA() { return nA; }
   int getNB() { return nB; }
 
-  void prepare();
-  void finish();
-
   eyedb::Database *getDatabase() { return database; }
+
+  void prepare() throw( eyedb::Exception);
+  void finish() throw( eyedb::Exception);
 
   A** fillA() throw( eyedb::Exception);
   B** fillB() throw( eyedb::Exception);
+  void create() throw( eyedb::Exception);
 
 private:
   string dbName;
   int nA;
   int nB;
 
-  eyedb::Database *database;
   eyedb::Connection *conn;
+  eyedb::Database *database;
 };
 
-void Test::prepare()
+void Test::prepare() throw( eyedb::Exception)
 {
   eyedb::Exception::setMode(eyedb::Exception::ExceptionMode);
 
-  try {
-    conn = new eyedb::Connection( true);
+  conn = new eyedb::Connection( true);
 
-    eyedb::Database::OpenFlag flags;
-    flags = eyedb::Database::DBRW;
+   eyedb::Database::OpenFlag flags;
+   flags = eyedb::Database::DBRW;
 
-    database = openDatabase( conn, getDbName().c_str(), flags);
-  }
-  catch ( eyedb::Exception &ex ) {
-    ex.print();
-  }
+   database = new arrayDatabase( conn, getDbName().c_str(), flags);
 }
 
-void Test::finish()
+void Test::finish() throw( eyedb::Exception)
 {
-  try {
-    database->close();
-    conn->close();
-  }
-  catch ( eyedb::Exception &ex ) {
-    ex.print();
-  }
+  database->close();
+  conn->close();
 }
 
 A** Test::fillA() throw( eyedb::Exception)
@@ -94,10 +85,51 @@ B** Test::fillB() throw( eyedb::Exception)
   return bb;
 }
 
-
-
-main()
+void Test::create() throw( eyedb::Exception)
 {
-  Test t( argv[1], 10, 20);
+  A **aa = fillA();
+  B **bb = fillB();
+  int ia, ib;
 
+  getDatabase()->transactionBegin();
+
+  for ( ia = 0; ia < getNA(); ia++)
+    aa[ia]->setBCount( getNB());
+  for ( ib = 0; ib < getNB(); ib++)
+    bb[ib]->setACount( getNA());
+
+  for ( ia = 0; ia < getNA(); ia++) {
+    for ( int ib = 0; ib < getNB(); ib++) {
+      cout << "setting A " << ia << " and B " << ib << endl;
+
+      aa[ia]->setB( ib, bb[ib]);
+      bb[ib]->setA( ia, aa[ia]);
+    }
+
+    aa[ia]->store( eyedb::FullRecurs);
+  }
+
+  getDatabase()->transactionCommit();
+}
+
+int main( int argc, char **argv)
+{
+  array initializer(argc, argv);
+
+  int nA = 5, nB = 5;
+
+  if (argc >= 3)
+    sscanf( argv[2], "%d", &nA);
+  if (argc >= 4)
+    sscanf( argv[3], "%d", &nB);
+
+  try {
+    Test t( argv[1], nA, nB);
+    t.prepare();
+    t.create();
+    t.finish();
+  }
+  catch ( eyedb::Exception &ex ) {
+    ex.print();
+  }
 }
