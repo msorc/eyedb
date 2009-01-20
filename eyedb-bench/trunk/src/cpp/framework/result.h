@@ -24,17 +24,17 @@ namespace eyedb {
 	headers.push_back( header);
       }
 
-      void addValue( unsigned long value)
+      void add( unsigned long value)
       {
 	rows[current].push_back( value);
       }
 
-      void addLaps( const std::vector<Lap> &laps)
+      void add( const std::vector<Lap> &laps)
       {
 	std::vector<Lap>::const_iterator it;
 
 	for ( it= laps.begin() ; it < laps.end(); it++)
-	  addValue( it->second);
+	  add( it->second);
       }
 
       void next()

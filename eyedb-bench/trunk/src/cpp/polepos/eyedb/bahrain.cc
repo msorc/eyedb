@@ -162,10 +162,10 @@ void Bahrain::run()
 
   for (int i = 0; i < objects.size(); i++) {
 
-    getResult().addValue( objects[i]);
-    getResult().addValue( selects[i]);
-    getResult().addValue( updates[i]);
-    getResult().addValue( commitinterval[i]);
+    getResult().add( objects[i]);
+    getResult().add( selects[i]);
+    getResult().add( updates[i]);
+    getResult().add( commitinterval[i]);
 
     getStopwatch().start();
 
@@ -192,7 +192,7 @@ void Bahrain::run()
 
     getStopwatch().stop();
 
-    getResult().addLaps( getStopwatch().getLaps());
+    getResult().add( getStopwatch().getLaps());
 
     getStopwatch().reset();
 

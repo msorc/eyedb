@@ -1,8 +1,8 @@
 package org.eyedb.benchmark.framework;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)
@@ -10,68 +10,55 @@ import java.util.List;
 
 public class Result {
 
-	public static class Value {
-		public Value( String label, long value)
-		{
-			this.label = label;
-			this.value = value;
-		}
-		
-		public Value( Value v)
-		{
-			this.label = v.label;
-			this.value = v.value;
-		}
+    public Result()
+    {
+	headers = new ArrayList<String>();
+	rows = new ArrayList<List<Long>>();
 
-		public String getLabel()
-		{
-			return label;
-		}
+	rows.add( new ArrayList<Long>());
 
-		public long getValue()
-		{
-			return value;
-		}
+	current = 0;
+    }
 
-		private String label;
-		private long value;
-	}
+    public void addHeader( String header)
+    {
+	headers.add( header);
+    }
 
-	public Result()
-	{
-		rows = new ArrayList<List<Value>>();
-		rows.add( new ArrayList<Value>());
-		current = 0;
-	}
+    public void add( long value)
+    {
+	rows.get(current).add( new Long(value));
+    }
 
-	public void add( String label, long value)
-	{
-		rows.get(current).add( new Value(label, value));
-	}
+    public void add( List< Map.Entry<String,Long> > values)
+    {
+	for( Map.Entry<String,Long> e: values)
+	    rows.get(current).add( e.getValue());
+    }
 
-	public void add( Collection<Result.Value>  values)
-	{
-		for( Value v: values)
-			rows.get(current).add( new Value( v));	
-	}
-	
-	public void next()
-	{
-		current++;
+    public void next()
+    {
+	current++;
 
-		rows.add( new ArrayList<Value>());
-	}
+	rows.add( new ArrayList<Long>());
+    }
 
-	public List<Result.Value> getValues( int i)
-	{
-		return rows.get(i);
-	}
+    public List<String> getHeaders()
+    {
+	return headers;
+    }
 
-	public int getSize()
-	{
-		return current;
-	}
+    public List<Long> getValues( int i)
+    {
+	return rows.get(i);
+    }
 
-	private List<List<Value>> rows;
-	private int current;
+    public int getSize()
+    {
+	return current;
+    }
+
+    private List<String> headers;
+    private List<List<Long>> rows;
+    private int current;
 }

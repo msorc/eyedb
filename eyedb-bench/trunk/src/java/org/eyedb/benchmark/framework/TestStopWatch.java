@@ -1,5 +1,7 @@
 package org.eyedb.benchmark.framework;
 
+import java.util.Map;
+
 class TestStopWatch {
 
 	void sleep( int seconds)
@@ -44,8 +46,8 @@ class TestStopWatch {
 		System.out.println( "Total " + w.getTotalTime());
 
 		int count = 0;
-		for (Result.Value v: w.getLaps()) {
-			System.out.println( "lap[" + count + "] " + v.getLabel() + " " + v.getValue());
+		for (Map.Entry<String,Long> v: w.getLaps()) {
+			System.out.println( "lap[" + count + "] " + v.getKey() + " " + v.getValue());
 			count++;
 		}
 

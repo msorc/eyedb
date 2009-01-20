@@ -108,7 +108,7 @@ void Sepang::run()
 
   for (int i = 0; i < depths.size(); i++) {
 
-    getResult().addValue( depths[i]);
+    getResult().add( depths[i]);
 
     getStopwatch().start();
 
@@ -125,7 +125,7 @@ void Sepang::run()
 
     getStopwatch().stop();
 
-    getResult().addLaps( getStopwatch().getLaps());
+    getResult().add( getStopwatch().getLaps());
 
     getStopwatch().reset();
 

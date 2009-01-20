@@ -2,7 +2,7 @@ SUBDIRS=quicktour
 
 packagedir=$(pkglibdir)/java/classes/org/eyedb/benchmark/quicktour/eyedb
 dist_package_JAVA =\
-EyeDBQuicktourBenchmark.java
+EyeDBQuicktour.java
 
 EYEDB_JAR=@EYEDB_JAR@
 JAVAROOT=$(top_builddir)/src/java

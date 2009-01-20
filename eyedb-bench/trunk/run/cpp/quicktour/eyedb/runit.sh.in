@@ -36,8 +36,8 @@ eyedb_stop_server $PORT
 set -e
 eyedb_start_server $PORT
 
-#run_one_benchmark array --cpp-flags=-DUSE_ARRAY $*
 run_one_benchmark collection --cpp-flags="-UUSE_ARRAY -UUSE_INVERSE" $*
 run_one_benchmark inverse --cpp-flags=-DUSE_INVERSE $*
+run_one_benchmark array --cpp-flags=-DUSE_ARRAY $*
 
 eyedb_stop_server $PORT

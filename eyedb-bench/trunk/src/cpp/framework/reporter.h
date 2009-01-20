@@ -14,20 +14,11 @@ namespace eyedb {
     class Reporter {
     public:
       virtual void report( const Benchmark & benchmark)  = 0;
-
-      const Properties &getProperties() const { return properties; }
-      Properties &getProperties() { return properties; }
-      void setProperties( const Properties &properties) { this->properties = properties; }
-
-    private:
-      Properties properties;
     };
 
     class DefaultReporter : public Reporter {
     public:
       DefaultReporter();
-
-      void setProperties( const Properties &properties);
 
       virtual void report( const Benchmark &benchmark);
 

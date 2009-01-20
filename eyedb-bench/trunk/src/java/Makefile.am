@@ -22,7 +22,7 @@ org/eyedb/benchmark/polepos/teams/eyedb/data \
 org/eyedb/benchmark/quicktour \
 org/eyedb/benchmark/quicktour/db4o \
 org/eyedb/benchmark/quicktour/eyedb \
-org/eyedb/benchmark/quicktour/eyedb/quicktour \
+org/eyedb/benchmark/quicktour/eyedb/quicktour/inverse \
 org/eyedb/benchmark/quicktour/hibernate \
 org/eyedb/benchmark/utils/db4o
 

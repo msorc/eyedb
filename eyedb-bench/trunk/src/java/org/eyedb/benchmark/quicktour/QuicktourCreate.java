@@ -43,6 +43,13 @@ public abstract class QuicktourCreate extends Benchmark {
 		getProperties().getIntProperty( "quicktour.objects_per_transaction", objectsPerTransaction);
 		getProperties().getIntProperty( "quicktour.selects", selects);
 
+	getResult().addHeader( "students");
+	getResult().addHeader( "courses");
+	getResult().addHeader( "teachers");
+	getResult().addHeader( "objectsPerTransaction");
+	getResult().addHeader( "selects");
+	getResult().addHeader( "create");
+
 		for ( int i = 0; i < students.size(); i++) {
 			int nStudents = students.get(i).intValue();
 			int nCourses = courses.get(i).intValue();
@@ -50,11 +57,11 @@ public abstract class QuicktourCreate extends Benchmark {
 			int nObjectsPerTransaction = objectsPerTransaction.get(i).intValue();
 			int nSelects = selects.get(i).intValue();
 
-			getResult().add( "students", nStudents);
-			getResult().add( "courses", nCourses);
-			getResult().add( "teachers", nTeachers);
-			getResult().add( "objectsPerTransaction", nObjectsPerTransaction);
-			getResult().add( "selects", nSelects);
+			getResult().add( nStudents);
+			getResult().add( nCourses);
+			getResult().add( nTeachers);
+			getResult().add( nObjectsPerTransaction);
+			getResult().add( nSelects);
 
 			getStopWatch().start();
 

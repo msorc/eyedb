@@ -106,6 +106,16 @@ public class Properties extends java.util.Properties {
 		return defaultValue;
 	}
 
+    public String getStringProperty( String key)
+    {
+	return getProperty(key);
+    }
+
+    public String getStringProperty( String key, String defaultValue)
+    {
+	return getProperty(key, defaultValue);
+    }
+
 	public boolean getStringProperty( String key, Collection<String> values)
 	{
 		String s = getProperty(key);
