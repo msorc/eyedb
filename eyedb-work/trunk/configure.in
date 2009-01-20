@@ -1,0 +1,156 @@
+# 
+# configure.in for eyedb-benchmarks
+# 
+
+AC_INIT(scripts/newtopic)
+
+PACKAGE_NAME=eyedb-work
+PACKAGE_VERSION=0.0.0
+
+AC_CONFIG_MACRO_DIR(m4/java)
+AC_CONFIG_AUX_DIR(config)
+
+AM_INIT_AUTOMAKE(${PACKAGE_NAME}, ${PACKAGE_VERSION})
+
+# Collect enable arguments
+#
+# debug
+AC_ARG_ENABLE(debug,
+		AS_HELP_STRING([--enable-debug],
+				[compile with debug [default=no]]),,
+		enable_debug="no")
+
+AC_PROG_CXX
+AC_PROG_LIBTOOL
+
+if test "$enable_debug" = "yes"
+then
+  CXXFLAGS="$CXXFLAGS -g"
+fi
+
+# 
+# EyeDB pkgconfig 
+# 
+
+EYEDB_PKG_CONFIG_FILE="none"
+# first, using PKG_CONFIG_PATH
+if test x"$PKG_CONFIG_PATH" != x ; then
+   AC_MSG_CHECKING(for EyeDB pkg-config configuration file using PKG_CONFIG_PATH)
+   for d in `echo $PKG_CONFIG_PATH | awk -F: '{for (i=1;i<=NF;i++) print $i}'`; do
+       if test -f $d/eyedb.pc ; then
+       	  EYEDB_PKG_CONFIG_FILE=$d/eyedb.pc
+	  break
+       fi
+   done
+   AC_MSG_RESULT($EYEDB_PKG_CONFIG_FILE)
+fi
+
+# second, using EyeDB installation directory
+AC_ARG_VAR(EYEDB_INSTALLDIR,[EyeDB installation directory])
+EYEDB_INSTALLDIR_DEFAULTS="/usr $HOME/projects/eyedb/install $HOME/eyedb-install $HOME/eyedb_install"
+if test x"$EYEDB_PKG_CONFIG_FILE" = x"none" ; then
+   AC_MSG_CHECKING(for EyeDB pkg-config configuration file using EyeDB install directory)
+   if test x"$EYEDB_INSTALLDIR" = x ; then
+      for d in $EYEDB_INSTALLDIR_DEFAULTS; do
+      	  if test -f $d/lib/pkgconfig/eyedb.pc ; then
+	     EYEDB_PKG_CONFIG_FILE=$d/lib/pkgconfig/eyedb.pc
+	     export PKG_CONFIG_PATH=$d/lib/pkgconfig:$PKG_CONFIG_PATH
+	     break
+	  fi
+      done
+   else
+	if test -f $EYEDB_INSTALLDIR/lib/pkgconfig/eyedb.pc ; then
+	   EYEDB_PKG_CONFIG_FILE=$EYEDB_INSTALLDIR/lib/pkgconfig/eyedb.pc
+	   export PKG_CONFIG_PATH=$EYEDB_INSTALLDIR/lib/pkgconfig:$PKG_CONFIG_PATH
+	fi
+   fi
+
+   AC_MSG_RESULT($EYEDB_PKG_CONFIG_FILE)
+fi
+
+if test x"$EYEDB_PKG_CONFIG_FILE" = x"none" ; then
+   AC_MSG_ERROR(no EyeDB pkg-config configuration file found)
+fi
+
+PKG_CHECK_MODULES(EYEDB, eyedb)
+AC_SUBST(EYEDB_CFLAGS)
+AC_SUBST(EYEDB_LIBS)
+
+AC_MSG_CHECKING([for EyeDB pkgconfig 'libdir' variable])
+EYEDB_LIBDIR=`$PKG_CONFIG --variable=libdir eyedb`
+AC_MSG_RESULT($EYEDB_LIBDIR)
+
+AC_MSG_CHECKING([for EyeDB pkgconfig 'bindir' variable])
+EYEDB_BINDIR=`$PKG_CONFIG --variable=bindir eyedb`
+AC_MSG_RESULT($EYEDB_BINDIR)
+
+AC_SUBST(EYEDB_LIBDIR)
+AC_SUBST(EYEDB_BINDIR)
+
+#
+# Java
+#
+case "$host" in
+powerpc-apple-darwin*)
+	if test x"$JAVAC" = x ; then export JAVAC=javac ; fi
+	;;
+esac
+
+AC_PROG_JAVAC
+export CLASSPATH=.
+AC_PROG_JAVA
+AC_PATH_PROG(JAR, jar)
+
+if test "$enable_debug" = "yes"
+then
+	JAVACFLAGS="$JAVACFLAGS -g"
+fi
+
+
+#
+# Should it be moved to a topic specific configure.in?
+#
+AC_ARG_VAR(JNI_INCLUDE_PATH,[include path for jni.h])
+AC_SUBST(JNI_INCLUDE_PATH)
+AC_ARG_VAR(JAVAH,[Java javah utility to generate header file for native methods])
+AC_SUBST(JAVAH)
+
+# ========================================
+# Generate output files
+# ========================================
+AC_CONFIG_FILES( dnl
+Makefile dnl
+topics/Makefile dnl
+topics/bugs/OQL_1/Makefile dnl
+topics/bugs/OQL_2/Makefile dnl
+topics/bugs/OQL_3/Makefile dnl
+topics/bugs/OQL_4/Makefile dnl
+topics/bugs/array/Makefile dnl
+topics/collections/basic/Makefile dnl
+topics/collections/general/Makefile dnl
+topics/collections/literal/Makefile dnl
+topics/collections/set/Makefile dnl
+topics/dict/Makefile dnl
+topics/dump_restore/Makefile dnl
+topics/eyedbsm/online_backup/Makefile dnl
+topics/java-unix-socket/Makefile dnl
+topics/java-unix-socket/java/Makefile dnl
+topics/java-unix-socket/java/org/Makefile dnl
+topics/java-unix-socket/java/org/eyedb/Makefile dnl
+topics/java-unix-socket/java/org/eyedb/java/Makefile dnl
+topics/java-unix-socket/java/org/eyedb/java/net/Makefile dnl
+topics/java-unix-socket/java/org/eyedb/java/net/unix/Makefile dnl
+topics/java-unix-socket/native/Makefile dnl
+topics/java-unix-socket/test/Makefile dnl
+topics/java-unix-socket/test/echo/Makefile dnl
+topics/index/Makefile dnl
+topics/objgarb/Makefile dnl
+topics/odlplugin/Makefile dnl
+topics/oql/array/Makefile dnl
+topics/php/Makefile dnl
+topics/ruby/Makefile dnl
+topics/schemaflex/Makefile dnl
+topics/union/Makefile dnl
+topics/virtattr/Makefile dnl
+)
+AC_OUTPUT

@@ -1,0 +1,9 @@
+
+class A {
+      attribute B *b[];
+};
+
+class B {
+      attribute A *a[];
+};
+
