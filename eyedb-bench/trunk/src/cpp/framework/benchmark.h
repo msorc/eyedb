@@ -26,6 +26,7 @@ namespace eyedb {
 
       const Properties &getProperties() const { return properties; }
       Properties &getProperties() { return properties; }
+      void setProperties( const Properties &properties) { this->properties = properties; }
 
       const Result &getResult() const { return result; }
       Result &getResult() { return result; }

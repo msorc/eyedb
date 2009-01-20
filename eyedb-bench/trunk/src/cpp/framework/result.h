@@ -12,7 +12,7 @@ namespace eyedb {
     public:
 
       Result()
-	: lapHeadersAdded(false), current(0)
+	: current(0)
       {
 	std::vector<unsigned long> v;
 
@@ -31,15 +31,6 @@ namespace eyedb {
 
       void addLaps( const std::vector<Lap> &laps)
       {
-	if (!lapHeadersAdded) {
-	  lapHeadersAdded = true;
-
-	  std::vector<Lap>::const_iterator it;
-
-	  for ( it= laps.begin() ; it < laps.end(); it++)
-	    addHeader( it->first);
-	}
-
 	std::vector<Lap>::const_iterator it;
 
 	for ( it= laps.begin() ; it < laps.end(); it++)
@@ -75,8 +66,6 @@ namespace eyedb {
       typedef std::vector<unsigned long> vector_of_long;
       std::vector<vector_of_long> rows;
       int current;
-
-      bool lapHeadersAdded;
     };
   };
 };

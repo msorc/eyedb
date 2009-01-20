@@ -1,7 +1,11 @@
 #ifndef _EYEDB_BENCHMARK_REPORTER_
 #define _EYEDB_BENCHMARK_REPORTER_
 
+#include <iostream>
+#include <fstream>
+#include <vector>
 #include "benchmark.h"
+#include "properties.h"
 
 namespace eyedb {
   namespace benchmark {
@@ -10,11 +14,31 @@ namespace eyedb {
     class Reporter {
     public:
       virtual void report( const Benchmark & benchmark)  = 0;
+
+      const Properties &getProperties() const { return properties; }
+      Properties &getProperties() { return properties; }
+      void setProperties( const Properties &properties) { this->properties = properties; }
+
+    private:
+      Properties properties;
     };
+
+    class DefaultReporter : public Reporter {
+    public:
+      DefaultReporter();
+
+      void setProperties( const Properties &properties);
+
+      virtual void report( const Benchmark &benchmark);
+
+    private:
+      std::vector<Reporter *> reporters;
+    };
+
 
     class SimpleReporter : public Reporter {
     public:
-      SimpleReporter();
+      SimpleReporter() : columnWidth( defaultColumnWidth), columnSeparator( defaultColumnSeparator) {}
 
       virtual void report( const Benchmark &benchmark);
 
@@ -33,15 +57,19 @@ namespace eyedb {
 
     class CSVReporter : public Reporter {
     public:
-      CSVReporter();
+      CSVReporter() : columnSeparator( defaultColumnSeparator) {}
 
       virtual void report( const Benchmark &benchmark);
 
       void setColumnSeparator( char separator) { columnSeparator = separator; }
     private:
+      void reportResult( const Result &result);
+
       char columnSeparator;
+      std::ofstream outfile;
 
       static const char defaultColumnSeparator;
+
     };
 
   };

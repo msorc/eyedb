@@ -138,6 +138,11 @@ void QuicktourBenchmark::run()
   getResult().addHeader( "teachers");
   getResult().addHeader( "objectsPerTransaction");
   getResult().addHeader( "selects");
+  getResult().addHeader( "create");
+#if 0
+  getResult().addHeader( "query");
+  getResult().addHeader( "remove");
+#endif
 
   for (int i = 0; i < students.size(); i++) {
 
