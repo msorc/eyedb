@@ -22,7 +22,7 @@ public class Properties extends java.util.Properties {
 
 		if (value != null) {
 			try {
-				return Boolean.getBoolean( value);
+			    return value.equals("true") || value.equals("1");
 			}
 			catch( NumberFormatException e) {
 			}

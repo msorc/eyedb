@@ -180,8 +180,7 @@ int Properties::getBoolProperty( const std::string &name, bool &value, bool defa
 
   istringstream iss(it->second);
 
-  if ( iss >> value && iss.eof())
-    return 1;
+  return it->second == "true" || it->second == "1";
 
   return 0;
 }
