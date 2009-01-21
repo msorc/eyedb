@@ -1,70 +1,17 @@
-# ######################################################################
-# Editable part
-
-# Binaries
-# Example:
-# TOPIC_BINARY_FILES = test1
-TOPIC_BINARY_FILES = testarray
-
-# For each binary listed in $(TOPIC_BINARY_FILES) add the following line:
-# <<BINARY_FILE>>_SOURCES=<<list of all C++ source files>>
-# Example:
-testarray_SOURCES = testarray.cc
-
-# Java files (excluding the .java files generated from odl)
-# Example:
-# TOPIC_JAVA_FILES = Test1.java
-#TOPIC_JAVA_FILES = 
-
-# ODL file (only one file allowed)
-# Example:
-# TOPIC_ODL_FILE = person.odl
-TOPIC_ODL_FILE = array.odl
-
-# Script files
-# Example:
-# TOPIC_SCRIPT_FILES = init.sh
-# (this implies that you have a init.sh.in source script)
-TOPIC_SCRIPT_FILES = runit.sh
-
-# End of editable part
-# ######################################################################
-
-TOPIC = bugs/array
-
-# ######################################################################
-#
-# Common definitions
-#
-TOPIC_ODL_NO_SUFFIX=$(subst .odl,,$(TOPIC_ODL_FILE))
-#BUILT_SOURCES= $(if $(TOPIC_ODL_FILE),$(TOPIC_ODL_NO_SUFFIX).cc $(TOPIC_ODL_NO_SUFFIX).h $(TOPIC_ODL_NO_SUFFIX)/Database.java,)
-BUILT_SOURCES= $(if $(TOPIC_ODL_FILE),$(TOPIC_ODL_NO_SUFFIX).cc $(TOPIC_ODL_NO_SUFFIX).h,)
-OTHER_BUILD_FILES=$(if $(TOPIC_ODL_FILE),$(TOPIC_ODL_NO_SUFFIX)mthbe-skel.cc $(TOPIC_ODL_NO_SUFFIX)mthfe-skel.cc $(TOPIC_ODL_NO_SUFFIX)stubsbe.cc $(TOPIC_ODL_NO_SUFFIX)stubsfe.cc template_$(TOPIC_ODL_NO_SUFFIX).cc Makefile.$(TOPIC_ODL_NO_SUFFIX) $(TOPIC_ODL_NO_SUFFIX)/*.java)
-CLEANFILES=$(BUILT_SOURCES) $(OTHER_BUILD_FILES)
+BUILT_SOURCES= array_odl.cc array_odl.h coll_odl.cc coll_odl.h
+ODL_GENERATED_FILES= $(P_).cc $(P_).h $(P_)mthbe-skel.cc $(P_)mthfe-skel.cc $(P_)stubsbe.cc $(P_)stubsfe.cc template_$(P_).cc Makefile.$(P_)
+ODL_PACKAGES=array_odl coll_odl
+CLEANFILES=$(BUILT_SOURCES) $(foreach P_, $(ODL_PACKAGES), $(ODL_GENERATED_FILES))
 
 #
 # Programs
 #
-noinst_PROGRAMS= $(TOPIC_BINARY_FILES)
+noinst_PROGRAMS= testarray testcoll
 INCLUDES=$(EYEDB_CFLAGS)
-LDADD=$(if $(TOPIC_ODL_FILE),$(TOPIC_ODL_NO_SUFFIX).o,) $(EYEDB_LIBS)
+LDADD=$(EYEDB_LIBS)
 
-#
-# Java classes
-#
-#noinst_JAVA=$(TOPIC_JAVA_FILES)
-EYEDB_JAR=$(EYEDB_LIBDIR)/eyedb/java/eyedb.jar
-JAVAROOT=$(top_builddir)/src/$(TOPIC)
-CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_srcdir)/src/$(TOPIC):$(EYEDB_JAR)
-
-# 
-# ODL -> Java
-#
-EYEDBODLJAVA = $(EYEDB_BINDIR)/eyedbodl --gencode=java
-EYEDBODLJAVA_FLAGS= --no-rootclass 
-
-$(TOPIC_ODL_NO_SUFFIX)/Database.java : $(TOPIC_ODL_FILE)
-	$(EYEDBODLJAVA) $(EYEDBODLJAVA_FLAGS) --package=$(TOPIC_ODL_NO_SUFFIX) $<
+testarray_SOURCES= testarray.cc array_odl.cc
+testcoll_SOURCES= testcoll.cc coll_odl.cc
 
 # 
 # ODL -> C++
@@ -72,13 +19,13 @@ $(TOPIC_ODL_NO_SUFFIX)/Database.java : $(TOPIC_ODL_FILE)
 EYEDBODLCXX = $(EYEDB_BINDIR)/eyedbodl --gencode=C++
 EYEDBODLCXX_FLAGS= 
 
-%.cc %.h : %.odl
-	$(EYEDBODLCXX) $(EYEDBODLCXX_FLAGS) $<
+%_odl.cc %_odl.h : %.odl
+	$(EYEDBODLCXX) $(EYEDBODLCXX_FLAGS) --package=$*_odl $<
 
 #
 # Scripts
 #
-noinst_DATA=$(TOPIC_SCRIPT_FILES)
+noinst_DATA=runit_array.sh runit_coll.sh
 EDIT = sed \
 	-e 's,@EYEDB_BINDIR\@,$(EYEDB_BINDIR),g' \
 	-e 's,@EYEDB_LIBDIR\@,$(EYEDB_BINDIR),g' \
@@ -90,6 +37,5 @@ EDIT = sed \
 	$(EDIT) $(srcdir)/$*.sh.in >$*.sh.tmp
 	mv $*.sh.tmp $*.sh
 
-$(TOPIC_SCRIPT_FILES): Makefile
 
-# ######################################################################
+

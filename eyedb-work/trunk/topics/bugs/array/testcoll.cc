@@ -1,11 +1,11 @@
 #include <string>
-#include "array_odl.h"
+#include "coll_odl.h"
 
 using namespace std;
 
-class TestArray {
+class TestColl {
  public:
-  TestArray( string dbName, int nA, int nB) : dbName( dbName), nA(nA), nB(nB) {}
+  TestColl( string dbName, int nA, int nB) : dbName( dbName), nA(nA), nB(nB) {}
 
   string getDbName() { return dbName; }
   int getNA() { return nA; }
@@ -33,7 +33,7 @@ private:
   eyedb::Database *database;
 };
 
-void TestArray::prepare() throw( eyedb::Exception)
+void TestColl::prepare() throw( eyedb::Exception)
 {
   eyedb::Exception::setMode(eyedb::Exception::ExceptionMode);
 
@@ -42,16 +42,16 @@ void TestArray::prepare() throw( eyedb::Exception)
    eyedb::Database::OpenFlag flags;
    flags = eyedb::Database::DBRW;
 
-   database = new array_odlDatabase( conn, getDbName().c_str(), flags);
+   database = new coll_odlDatabase( conn, getDbName().c_str(), flags);
 }
 
-void TestArray::finish() throw( eyedb::Exception)
+void TestColl::finish() throw( eyedb::Exception)
 {
   database->close();
   conn->close();
 }
 
-void TestArray::fillA() throw( eyedb::Exception)
+void TestColl::fillA() throw( eyedb::Exception)
 {
   aa = new A*[getNA()];
 
@@ -68,7 +68,7 @@ void TestArray::fillA() throw( eyedb::Exception)
   getDatabase()->transactionCommit();
 }
 
-void TestArray::fillB() throw( eyedb::Exception)
+void TestColl::fillB() throw( eyedb::Exception)
 {
   bb = new B*[getNB()];
 
@@ -85,24 +85,18 @@ void TestArray::fillB() throw( eyedb::Exception)
   getDatabase()->transactionCommit();
 }
 
-void TestArray::associate() throw( eyedb::Exception)
+void TestColl::associate() throw( eyedb::Exception)
 {
   int ia, ib;
 
   getDatabase()->transactionBegin();
 
-  // setting the array size for each object
-  for ( ia = 0; ia < getNA(); ia++)
-    aa[ia]->setBCount( getNB());
-  for ( ib = 0; ib < getNB(); ib++)
-    bb[ib]->setACount( getNA());
-
   for ( ia = 0; ia < getNA(); ia++) {
     for ( int ib = 0; ib < getNB(); ib++) {
       cout << "setting A " << ia << " and B " << ib << endl;
 
-      aa[ia]->setB( ib, bb[ib]);
-      bb[ib]->setA( ia, aa[ia]);
+      aa[ia]->addToBColl( bb[ib]);
+      bb[ib]->addToAColl( aa[ia]);
     }
 
     aa[ia]->store( eyedb::FullRecurs);
@@ -111,7 +105,7 @@ void TestArray::associate() throw( eyedb::Exception)
   getDatabase()->transactionCommit();
 }
 
-void TestArray::create() throw( eyedb::Exception)
+void TestColl::create() throw( eyedb::Exception)
 {
   fillA();
   fillB();
@@ -120,7 +114,7 @@ void TestArray::create() throw( eyedb::Exception)
 
 int main( int argc, char **argv)
 {
-  array_odl initializer(argc, argv);
+  coll_odl initializer(argc, argv);
 
   int nA = 5, nB = 5;
 
@@ -130,7 +124,7 @@ int main( int argc, char **argv)
     sscanf( argv[3], "%d", &nB);
 
   try {
-    TestArray t( argv[1], nA, nB);
+    TestColl t( argv[1], nA, nB);
     t.prepare();
     t.create();
     t.finish();

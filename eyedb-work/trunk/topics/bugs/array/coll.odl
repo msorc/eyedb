@@ -1,0 +1,11 @@
+
+class A {
+      attribute string name;
+      attribute set<B *> b;
+};
+
+class B {
+      attribute string name;
+      attribute set<A *> a;
+};
+
