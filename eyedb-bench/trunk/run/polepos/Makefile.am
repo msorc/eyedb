@@ -1,4 +1,4 @@
-SUBDIRS=db4o db4omod eyedb hibernate
+SUBDIRS=java cpp
 
 bench:
 	for d in $(SUBDIRS) ; do \
