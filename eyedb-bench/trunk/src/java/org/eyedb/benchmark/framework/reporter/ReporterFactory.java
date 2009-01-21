@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import org.eyedb.benchmark.framework.Reporter;
 import org.eyedb.benchmark.framework.reporter.simple.SimpleReporter;
+import org.eyedb.benchmark.framework.reporter.csv.CSVReporter;
 
 class DefaultReporterFactory extends ReporterFactory {
 	protected DefaultReporterFactory()
@@ -15,6 +16,7 @@ class DefaultReporterFactory extends ReporterFactory {
 	{
 	    Collection<Reporter> reporters = new ArrayList<Reporter>();
 	    reporters.add( new SimpleReporter());
+	    reporters.add( new CSVReporter());
 	    
 	    return new DelegateReporter(reporters);
 	}
