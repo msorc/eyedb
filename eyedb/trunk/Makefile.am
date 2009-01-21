@@ -6,9 +6,9 @@ endif
 SUBDIRS=src include scripts install pkg-config examples tests $(DOC_SRC_DIR) 
 
 docdir=$(datadir)/doc/$(PACKAGE)
-doc_DATA=AUTHORS COPYING README
+doc_DATA=AUTHORS COPYING COPYING.LESSER README
 
-EXTRA_DIST= AUTHORS COPYING ChangeLog README VERSION autogen.sh
+EXTRA_DIST= AUTHORS COPYING COPYING.LESSER ChangeLog README VERSION autogen.sh
 
 TAGS:
 	find $(top_srcdir) \! -name '*~' \( -name '*.c' -o -name '*.h' -o -name '*.cc' -o -name '*.l' -o -name '*.y' -o -name '*.java' -o -name 'Makefile.am' -o \( -name '*.in' -a \! -name Makefile.in \) \) -print | etags -t -
