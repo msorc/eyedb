@@ -18,6 +18,7 @@
 class Person {
   attribute string firstName;
   attribute string lastName;
+  index<type = hash> on lastName;
 };
 
 class Student extends Person {

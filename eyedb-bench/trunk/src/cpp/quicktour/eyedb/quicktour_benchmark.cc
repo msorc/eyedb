@@ -53,7 +53,6 @@ void QuicktourBenchmark::finish()
   }
 }
 
-#if 0
 void QuicktourBenchmark::queryByClass( const char *className, int nSelects)
 {
   try {
@@ -61,7 +60,7 @@ void QuicktourBenchmark::queryByClass( const char *className, int nSelects)
 
     for ( int n = 0;  n < nSelects; n++) {
       char tmp[256];
-      sprintf( tmp, "select x from %s as x where x.lastName ~ \"%d\"", className, n);
+      sprintf( tmp, "select x from %s as x where x.lastName = \"%s_%d\"", className, className, n);
 
       eyedb::OQL q(getDatabase(), tmp);
       eyedb::ObjectArray arr;
@@ -117,7 +116,6 @@ void QuicktourBenchmark::remove()
   removeByClass( "Course");
   removeByClass( "Student");
 }
-#endif
 
 void QuicktourBenchmark::run()
 {
@@ -139,10 +137,8 @@ void QuicktourBenchmark::run()
   getResult().addHeader( "objectsPerTransaction");
   getResult().addHeader( "selects");
   getResult().addHeader( "create");
-#if 0
   getResult().addHeader( "query");
   getResult().addHeader( "remove");
-#endif
 
   for (int i = 0; i < students.size(); i++) {
 
@@ -157,13 +153,11 @@ void QuicktourBenchmark::run()
     create( students[i], courses[i], teachers[i], objectsPerTransaction[i]);
     getStopwatch().lap( "create");
 
-#if 0
     query( selects[i]);
     getStopwatch().lap( "query");
 
     remove();
     getStopwatch().lap( "remove");
-#endif
 
     getStopwatch().stop();
 
