@@ -7,6 +7,8 @@ EYEDB_BINDIR=@EYEDB_BINDIR@
 PROPERTIES=${srcdir}/eyedb.properties
 SCHEMA=${top_srcdir}/src/cpp/quicktour/eyedb/quicktour.odl
 
+# date "+%Y-%m-%d::%H:%M:%S"
+
 update_schema() {
     CPPOPTIONS=$2
     $EYEDB_BINDIR/eyedbodl --port=$PORT --update --database=$1 $CPPOPTIONS $SCHEMA
