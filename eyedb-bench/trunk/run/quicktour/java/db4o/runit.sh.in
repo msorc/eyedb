@@ -6,9 +6,7 @@ JAVA=@JAVA@
 
 EYEDB_BENCHMARK_JAR=${top_builddir}/src/java/eyedb-benchmark.jar
 
-#BENCHMARK=$1
-#BENCHMARK=CreateBenchmarkLocal
-BENCHMARK=org.eyedb.benchmark.quicktour.db4o.CreateBenchmark
+BENCHMARK=org.eyedb.benchmark.quicktour.db4o.Db4oQuicktour
 CLIENT_PROPERTIES=${srcdir}/db4o.client.properties
 SERVER_PROPERTIES=${srcdir}/db4o.server.properties
 
