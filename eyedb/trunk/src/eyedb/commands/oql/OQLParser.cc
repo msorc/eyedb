@@ -1,20 +1,20 @@
 /* 
    EyeDB Object Database Management System
+   OQL interpreter command-line tool
    Copyright (C) 1994-2008 SYSRA
    
-   EyeDB is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-   
-   EyeDB is distributed in the hope that it will be useful,
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-   
-   You should have received a copy of the GNU Lesser General Public
-   License along with this library; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA 
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /*
@@ -2283,22 +2283,22 @@ namespace eyedb {
   static int
   copyright_command(OQLParser *parser, int argc, char *argv[])
   {
-    printf("EyeDB Object Database Management System\n");
-    printf("Copyright (C) 1994-2008 SYSRA\n");
-    printf("\n");
-    printf("EyeDB is free software; you can redistribute it and/or\n");
-    printf("modify it under the terms of the GNU Lesser General Public\n");
-    printf("License as published by the Free Software Foundation; either\n");
-    printf("version 2.1 of the License, or (at your option) any later version.\n");
-    printf("\n");
-    printf("EyeDB is distributed in the hope that it will be useful,\n");
-    printf("but WITHOUT ANY WARRANTY; without even the implied warranty of\n");
-    printf("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n");
-    printf("Lesser General Public License for more details.\n");
-    printf("\n");
-    printf("You should have received a copy of the GNU Lesser General Public\n");
-    printf("License along with this library; if not, write to the Free Software\n");
-    printf("Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA \n");
+    printf( "EyeDB Object Database Management System\n");
+    printf( "OQL interpreter command-line tool\n");
+    printf( "Copyright (C) 1994-2008 SYSRA\n");
+    printf( "\n");
+    printf( "This program is free software: you can redistribute it and/or modify\n");
+    printf( "it under the terms of the GNU General Public License as published by\n");
+    printf( "the Free Software Foundation, either version 2 of the License, or\n");
+    printf( "(at your option) any later version.\n");
+    printf( "\n");
+    printf( "This program is distributed in the hope that it will be useful,\n");
+    printf( "but WITHOUT ANY WARRANTY; without even the implied warranty of\n");
+    printf( "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n");
+    printf( "GNU General Public License for more details.\n");
+    printf( "\n");
+    printf( "You should have received a copy of the GNU General Public License\n");
+    printf( "along with this program.  If not, see <http://www.gnu.org/licenses/>.\n");
 
     return 1;
   }
