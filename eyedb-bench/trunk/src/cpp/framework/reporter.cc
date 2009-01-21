@@ -97,8 +97,8 @@ void CSVReporter::report( const Benchmark &benchmark)
 
   long pos = outfile.tellp();
 
-  if (pos == 0) {
-    outfile << "\"Bench:\"" << columnSeparator << "\"" << benchmark.getName() << "\"" << endl;
+  if (append && pos == 0) {
+    outfile << "\"Benchmark:\"" << columnSeparator << "\"" << benchmark.getName() << "\"" << endl;
     outfile << "\"" << benchmark.getDescription() << "\"" << endl;
     outfile << endl;
   }

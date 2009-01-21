@@ -4,7 +4,7 @@ else
 OPENOFFICE_SUBDIR=
 endif
 
-SUBDIRS= $(OPENOFFICE_SUBDIR) simple
+SUBDIRS= $(OPENOFFICE_SUBDIR) simple csv
 
 packagedir=$(pkglibdir)/java/classes/org/eyedb/benchmark/framework/reporter
 

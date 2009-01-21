@@ -38,14 +38,6 @@ public class SimpleReporter implements Reporter {
     {
 	out =  System.out;
 	    
-	out.println();
-	out.println( "Benchmark: " + benchmark.getName());
-	out.println( "Description: " + benchmark.getDescription());
-	reportContext( benchmark.getContext());
-		
-	out.println();
-	out.println( "Implementation: " + benchmark.getImplementation());
-
 	int w = benchmark.getProperties().getIntProperty("reporter.simple.column_width",-1);
 	if (w > 0)
 	    setColumnWidth( w);
@@ -55,6 +47,14 @@ public class SimpleReporter implements Reporter {
 	if (c != null)
 	    setColumnSeparator( c.charAt(0));
 		
+	out.println();
+	out.println( "Benchmark: " + benchmark.getName());
+	out.println( "Description: " + benchmark.getDescription());
+	reportContext( benchmark.getContext());
+		
+	out.println();
+	out.println( "Implementation: " + benchmark.getImplementation());
+
 	reportResult( benchmark.getResult());
 
 	out.println();

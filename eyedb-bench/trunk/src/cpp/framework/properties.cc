@@ -129,29 +129,20 @@ void Properties::load( istream &is)
       break;
     case SKIP2:
       if (isblank(c)) {
-      } else if (isalnum(c)) {
+      } else {
 	ungetchar( is, c, pos, line);
 	state = VALUE;
-      } else
-	lexicalError( c, pos, line);
+      } 
       break;
     case VALUE:
-      if (isspace(c)) {
-	ungetchar( is, c, pos, line);
+      if (c == '\n') {
 	properties[name] = value;
 	name.clear();
 	value.clear();
-	state = SKIP3;
+	state = BEGIN;
       } else {
 	value += c;
       }
-      break;
-    case SKIP3:
-      if (isblank(c)) {
-      } else if (c == '\n') {
-	state = BEGIN;
-      } else
-	lexicalError( c, pos, line);
       break;
     }
   }

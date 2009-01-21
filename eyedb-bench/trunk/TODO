@@ -1,5 +1,5 @@
 
-- add more detailled report in bench output (machine name, time, uptime, platform...) [DONE FOR JAVA, TO DO FOR C++]
+- add more detailled report in bench output (machine name, time, uptime, platform...) [DONE FOR JAVA, TO DO FOR C++?]
 
 - complete quicktour:
 -- Java: 
@@ -19,6 +19,6 @@
 - add license (GPL?) and copyright information in all files
 
 - reporting:
--- implement a CSV reporter (properties: filename, append) [DONE for C++]
+-- implement a CSV reporter (properties: filename, append) [DONE]
 
 
