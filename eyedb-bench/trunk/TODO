@@ -4,9 +4,8 @@
 - complete quicktour:
 -- Java: 
 --- db4o: queries?
---- eyedb: add indexes
---- hibernate: fix query problem
---- separate runs for create/query/remove? big problem for remove (the database may contains more objects than the expected count)
+--- eyedb: add indexes [DONE]
+--- hibernate: fix query problem (separate runs for create/query/remove? big problem for remove, the database may contains more objects than the expected count)
 -- C++: eyedb
 --- with and without referential integrity [DONE]
 --- with and without collections [DONE, but bug in arrays]
@@ -17,8 +16,5 @@
 
 - update README
 - add license (GPL?) and copyright information in all files
-
-- reporting:
--- implement a CSV reporter (properties: filename, append) [DONE]
 
 

@@ -178,11 +178,9 @@ int Properties::getBoolProperty( const std::string &name, bool &value, bool defa
   if (it == properties.end())
     return 0;
 
-  istringstream iss(it->second);
+  value = it->second == "true" || it->second == "1";
 
-  return it->second == "true" || it->second == "1";
-
-  return 0;
+  return 1;
 }
 
 int Properties::getIntProperty( const string &name, int &value, int defaultValue) const

@@ -40,18 +40,20 @@ public class CSVReporter implements Reporter {
 
 	boolean append = benchmark.getProperties().getBooleanProperty("reporter.csv.append", false);
 
-	long pos = -1;
+	long size = -1;
 	try {
 	    FileOutputStream fout = new FileOutputStream( filename, append);
 	    out = new PrintStream( fout, true);
-	    pos = fout.getChannel().position();
+	    size = fout.getChannel().size();
 	}
 	catch( IOException e) {
 	    System.err.println( e);
 	    return;
 	}
 
-	if (append && pos == 0) {
+	System.err.println( "append " + append + " size " + size);
+
+	if (!append || size == 0) {
 	    out.println( "\"Benchmark:\"" + columnSeparator + "\"" + benchmark.getName() + "\"");
 	    out.println( "\"" + benchmark.getDescription() + "\"");
 	    out.println();
