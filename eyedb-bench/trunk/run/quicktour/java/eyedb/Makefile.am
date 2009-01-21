@@ -19,5 +19,5 @@ EDIT = sed \
 	mv $*.sh.tmp $*.sh
 
 bench: runit.sh
-	$(SHELL) runit.sh
+	$(SHELL) -x runit.sh
 

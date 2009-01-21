@@ -14,8 +14,8 @@ DIRS_TO_JAR= \
 org/eyedb/benchmark/framework \
 $(OPENOFFICE_SUBDIR) \
 org/eyedb/benchmark/framework/reporter \
-org/eyedb/benchmark/framework/reporter/simple \
 org/eyedb/benchmark/framework/reporter/csv \
+org/eyedb/benchmark/framework/reporter/simple \
 org/eyedb/benchmark/polepos \
 org/eyedb/benchmark/polepos/teams/db4o \
 org/eyedb/benchmark/polepos/teams/eyedb \
@@ -23,6 +23,7 @@ org/eyedb/benchmark/polepos/teams/eyedb/data \
 org/eyedb/benchmark/quicktour \
 org/eyedb/benchmark/quicktour/db4o \
 org/eyedb/benchmark/quicktour/eyedb \
+org/eyedb/benchmark/quicktour/eyedb/quicktour/collection \
 org/eyedb/benchmark/quicktour/eyedb/quicktour/inverse \
 org/eyedb/benchmark/quicktour/hibernate \
 org/eyedb/benchmark/utils/db4o

@@ -21,13 +21,10 @@ public abstract class EyeDBQuicktour extends Quicktour {
     public void finish()
     {
 	try {
-	    // Close the database
 	    database.close();
-
-	    // Close the connection
 	    connection.close();
 	}
-	catch(org.eyedb.Exception e) { // Catch any eyedb exception
+	catch(org.eyedb.Exception e) {
 	    e.printStackTrace();
 	    System.exit(1);
 	}
