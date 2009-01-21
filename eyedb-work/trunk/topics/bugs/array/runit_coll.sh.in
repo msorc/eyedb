@@ -1,0 +1,13 @@
+#!/bin/bash
+EYEDB_BINDIR=@EYEDB_BINDIR@
+
+DATABASE=testcoll
+NA=10
+NB=10
+
+$EYEDB_BINDIR/eyedbadmin database delete $DATABASE
+$EYEDB_BINDIR/eyedbadmin database create $DATABASE
+$EYEDB_BINDIR/eyedbodl -d $DATABASE -u coll.odl
+./testcoll $DATABASE $NA $NB
+
+
