@@ -23,8 +23,17 @@ Language). Programming interfaces for C++ (native), Java (native),
 Python (using SWIG) are provided, allowing to access databases in the
 programming language of your choice.
 
-EyeDB is distributed under the GNU Lesser General Public. Refer to
-file COPYING to get the license.
+
+Licensing
+---------
+
+EyeDB is distributed under the GNU Lesser General Public License,
+except the OQL interpreter command-line tool. Refer to file
+COPYING.LESSER for full text of the license.
+
+The EyeDB OQL interpreter command-line tool is distributed under the
+GNU General Public License. Refer to file COPYING for full text of the
+license.
 
 
 Compiling EyeDB
