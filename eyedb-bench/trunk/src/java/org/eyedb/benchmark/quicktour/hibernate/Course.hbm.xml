@@ -17,9 +17,9 @@
 
     <many-to-one name="teacher" column="person_id" fetch="join"/>
 
-    <set name="students" table="student_course" inverse="true">
+    <set name="students" inverse="true" table="student_course">
       <key column="course_id"/>
-      <many-to-many column="student_id" class="org.eyedb.benchmark.quicktour.hibernate.Student"/>
+      <many-to-many column="person_id" class="org.eyedb.benchmark.quicktour.hibernate.Student"/>
     </set>
 
   </class>
