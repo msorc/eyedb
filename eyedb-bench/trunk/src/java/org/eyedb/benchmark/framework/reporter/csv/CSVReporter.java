@@ -51,8 +51,6 @@ public class CSVReporter implements Reporter {
 	    return;
 	}
 
-	System.err.println( "append " + append + " size " + size);
-
 	if (!append || size == 0) {
 	    out.println( "\"Benchmark:\"" + columnSeparator + "\"" + benchmark.getName() + "\"");
 	    out.println( "\"" + benchmark.getDescription() + "\"");
