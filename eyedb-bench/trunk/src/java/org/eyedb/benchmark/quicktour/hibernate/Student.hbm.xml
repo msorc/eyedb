@@ -9,6 +9,8 @@
 
     <key column="person_id"/>
 
+    <property name="beginYear"/>
+
     <set name="courses" table="student_course">
       <key column="person_id"/>
       <many-to-many column="course_id" class="org.eyedb.benchmark.quicktour.hibernate.Course"/>

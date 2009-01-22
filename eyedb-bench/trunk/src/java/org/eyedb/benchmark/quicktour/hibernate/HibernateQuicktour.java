@@ -46,11 +46,11 @@ public class HibernateQuicktour extends Quicktour {
 	    configuration.configure( new File("hibernate.cfg.xml"));
 
 	    String url = getProperties().getProperty( "hibernate.connection.url");
-	    configuration.setProperty( "connection.url", url);
+	    configuration.setProperty( "hibernate.connection.url", url);
 	    String username = getProperties().getProperty( "hibernate.connection.username");
-	    configuration.setProperty( "connection.username", username);
+	    configuration.setProperty( "hibernate.connection.username", username);
 	    String password = getProperties().getProperty( "hibernate.connection.password");
-	    configuration.setProperty( "connection.password", password);
+	    configuration.setProperty( "hibernate.connection.password", password);
 
 	    //hack( configuration);
 
@@ -103,13 +103,12 @@ public class HibernateQuicktour extends Quicktour {
 	getSession().beginTransaction();
 
 	for ( int n = 0; n < nCourses; n++) {
-	    Course c = new Course();
-	    c.setTitle("Course_"+n);
-	    c.setDescription("Description of course "+n);
-	    c.setTeacher( teachers[ getRandom().nextInt( teachers.length)]);
-	    courses[n] = c;
+	    courses[n] = new Course();
+	    courses[n].setTitle("Course_"+n);
+	    courses[n].setDescription("Description of course "+n);
+	    courses[n].setTeacher( teachers[ getRandom().nextInt( teachers.length)]);
 
-	    getSession().save( c);
+	    getSession().save( courses[n]);
 	}
 
 	getSession().getTransaction().commit();
@@ -128,17 +127,20 @@ public class HibernateQuicktour extends Quicktour {
 	    Student student = new Student();
 	    student.setFirstName("Student_"+n+"_firstName");
 	    student.setLastName("Student_"+n);
-	    //		    student.setBeginYear( (short)(random.nextInt( 3) + 1));
+	    student.setBeginYear( (short)(getRandom().nextInt( 3) + 1));
 
+	    int i = getRandom().nextInt( courses.length);
 	    for ( int c = 0; c < courses.length; c++) {
-		int i = getRandom().nextInt( courses.length);
-		student.getCourses().add( courses[i]);
+		Course course = courses[ (i+c)%nCourses];
+		student.getCourses().add( course);
 	    }
 
 	    getSession().save(student);
 
 	    if (n % nObjectsPerTransaction == nObjectsPerTransaction - 1) {
 		getSession().getTransaction().commit();
+		getSession().flush();
+		getSession().clear();
 		getSession().beginTransaction();
 	    }
 	}

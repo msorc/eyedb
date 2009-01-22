@@ -10,7 +10,6 @@ PROPERTIES=hibernate.properties
 
 run_benchmark() {
     CLASSPATH=$EYEDB_BENCHMARK_JAR:$HIBERNATE_JAR:$HIBERNATE_CLASSPATH
-    echo $CLASSPATH
     CLASSPATH=$CLASSPATH $JAVA org.eyedb.benchmark.framework.Run $BENCHMARK $PROPERTIES
 }
 
