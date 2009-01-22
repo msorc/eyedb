@@ -168,7 +168,7 @@ public class HibernateQuicktour extends Quicktour {
 		q.setString( 0, className + "_" + n);
 
 		for (Object o: q.list()) {
-		    System.out.println( o);
+//		    System.out.println( o);
 		}
 		//				int count = 0;
 		//				Iterator it = q.iterate();
