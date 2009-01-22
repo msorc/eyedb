@@ -5,21 +5,32 @@ import java.util.Set;
 
 public class Student extends Person {
 
-	public Student()
-	{
-		courses = new HashSet<Course>();
-	}
+    public Student()
+    {
+	courses = new HashSet<Course>();
+    }
 
-	public Set<Course> getCourses()
-	{
-		return courses;
-	}
+    public short getBeginYear()
+    {
+        return beginYear;
+    }
 
-	public void setCourses( Set<Course> courses)
-	{
-		this.courses = courses;
-	}
+    public void setBeginYear(short beginYear)
+    {
+        this.beginYear = beginYear;
+    }
 
-	private Set<Course> courses;
+    public Set<Course> getCourses()
+    {
+	return courses;
+    }
+
+    public void setCourses( Set<Course> courses)
+    {
+	this.courses = courses;
+    }
+
+    private short beginYear;
+    private Set<Course> courses;
 }
 

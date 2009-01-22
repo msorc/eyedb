@@ -2,9 +2,9 @@ package org.eyedb.benchmark.quicktour.eyedb;
 
 import org.eyedb.Connection;
 import org.eyedb.Database;
-import org.eyedb.benchmark.quicktour.eyedb.quicktour.collection.Course;
-import org.eyedb.benchmark.quicktour.eyedb.quicktour.collection.Student;
-import org.eyedb.benchmark.quicktour.eyedb.quicktour.collection.Teacher;
+import org.eyedb.benchmark.quicktour.eyedb.collection.Course;
+import org.eyedb.benchmark.quicktour.eyedb.collection.Student;
+import org.eyedb.benchmark.quicktour.eyedb.collection.Teacher;
 
 /**
  * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)
@@ -32,13 +32,13 @@ public class EyeDBQuicktourCollection extends EyeDBQuicktour {
 
 	try {
 	    // Initialize the package
-	    org.eyedb.benchmark.quicktour.eyedb.quicktour.collection.Database.init();
+	    org.eyedb.benchmark.quicktour.eyedb.collection.Database.init();
 
 	    // Open the connection with the backend
 	    connection = new org.eyedb.Connection();
 
 	    // Open the database
-	    database = new org.eyedb.benchmark.quicktour.eyedb.quicktour.collection.Database( databaseName);
+	    database = new org.eyedb.benchmark.quicktour.eyedb.collection.Database( databaseName);
 	    database.open(connection, org.eyedb.Database.DBRW);
 	}
 	catch(org.eyedb.Exception e) {

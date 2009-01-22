@@ -2,9 +2,9 @@ package org.eyedb.benchmark.quicktour.eyedb;
 
 import org.eyedb.Connection;
 import org.eyedb.Database;
-import org.eyedb.benchmark.quicktour.eyedb.quicktour.inverse.Course;
-import org.eyedb.benchmark.quicktour.eyedb.quicktour.inverse.Student;
-import org.eyedb.benchmark.quicktour.eyedb.quicktour.inverse.Teacher;
+import org.eyedb.benchmark.quicktour.eyedb.inverse.Course;
+import org.eyedb.benchmark.quicktour.eyedb.inverse.Student;
+import org.eyedb.benchmark.quicktour.eyedb.inverse.Teacher;
 
 /**
  * @author Fran&ccedil;ois D&eacute;chelle (francois@dechelle.net)
@@ -32,13 +32,13 @@ public class EyeDBQuicktourInverse extends EyeDBQuicktour {
 
 	try {
 	    // Initialize the package
-	    org.eyedb.benchmark.quicktour.eyedb.quicktour.inverse.Database.init();
+	    org.eyedb.benchmark.quicktour.eyedb.inverse.Database.init();
 
 	    // Open the connection with the backend
 	    connection = new org.eyedb.Connection();
 
 	    // Open the database
-	    database = new org.eyedb.benchmark.quicktour.eyedb.quicktour.inverse.Database( databaseName);
+	    database = new org.eyedb.benchmark.quicktour.eyedb.inverse.Database( databaseName);
 	    database.open(connection, org.eyedb.Database.DBRW);
 	}
 	catch(org.eyedb.Exception e) {
@@ -57,6 +57,8 @@ public class EyeDBQuicktourInverse extends EyeDBQuicktour {
 	    teachers[n] = new Teacher( getDatabase());
 	    teachers[n].setFirstName( "Teacher_"+n+"_firstName");
 	    teachers[n].setLastName( "Teacher_"+n);
+
+	    teachers[n].store(org.eyedb.RecMode.FullRecurs);
 	}
 
 	getDatabase().transactionCommit();
@@ -75,6 +77,8 @@ public class EyeDBQuicktourInverse extends EyeDBQuicktour {
 	    courses[n].setTitle( "Course_"+n);
 	    courses[n].setDescription("Description of course "+n);
 	    courses[n].setTeacher( teachers[ getRandom().nextInt( teachers.length)]);
+
+	    courses[n].store(org.eyedb.RecMode.FullRecurs);
 	}
 
 	getDatabase().transactionCommit();
@@ -98,7 +102,8 @@ public class EyeDBQuicktourInverse extends EyeDBQuicktour {
 
 		int i = getRandom().nextInt( courses.length);
 		for ( int c = 0; c < courses.length; c++) {
-		    student.addToCoursesColl( courses[ (i+c)%nCourses]);
+		    Course course = courses[ (i+c)%nCourses];
+		    student.addToCoursesColl( course);
 		}
 
 		student.store(org.eyedb.RecMode.FullRecurs);

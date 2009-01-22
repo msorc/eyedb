@@ -1,14 +1,14 @@
-packagedir= $(pkglibdir)/java/classes/org/eyedb/benchmark/quicktour/eyedb/quicktour/inverse
+packagedir= $(pkglibdir)/java/classes/org/eyedb/benchmark/quicktour/eyedb/collection
 dist_package_JAVA= $(JAVA_ODL_FILES) 
 JAVAROOT= $(top_builddir)/src/java
 EYEDB_JAR=@EYEDB_JAR@
 CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_srcdir)/src/java:$(EYEDB_JAR)
 
 EYEDB_BINDIR=@EYEDB_BINDIR@
-ODL_PACKAGE= org.eyedb.benchmark.quicktour.eyedb.quicktour.inverse
+ODL_PACKAGE= org.eyedb.benchmark.quicktour.eyedb.collection
 EYEDBODLJAVA= $(EYEDB_BINDIR)/eyedbodl
-CPPFLAGS=--cpp-flags=-DUSE_INVERSE
-EYEDBODLJAVAFLAGS= $(CPPFLAGS) --gencode=java --no-rootclass --package=$(ODL_PACKAGE) --output-dir=. 
+CPPFLAGS=--cpp-flags="-UUSE_ARRAY -UUSE_INVERSE"
+EYEDBODLJAVAFLAGS= $(CPPFLAGS) --gencode=java --no-rootclass --package=$(ODL_PACKAGE) --output-dir=.
 JAVA_ODL_FILES= \
 Course.java \
 Database.java \
@@ -17,7 +17,7 @@ set_class_Course_ref.java \
 set_class_Student_ref.java \
 Student.java \
 Teacher.java 
-ODL_FILE=$(top_srcdir)/src/java/org/eyedb/benchmark/quicktour/eyedb/quicktour/quicktour.odl
+ODL_FILE=$(top_srcdir)/src/java/org/eyedb/benchmark/quicktour/eyedb/quicktour.odl
 
 BUILT_SOURCES= $(JAVA_ODL_FILES)
 
