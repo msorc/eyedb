@@ -52,7 +52,7 @@ public class HibernateQuicktour extends Quicktour {
 	    String password = getProperties().getProperty( "hibernate.connection.password");
 	    configuration.setProperty( "hibernate.connection.password", password);
 
-	    //hack( configuration);
+	    hack( configuration);
 
 	    sessionFactory = configuration.buildSessionFactory();
 
@@ -124,6 +124,9 @@ public class HibernateQuicktour extends Quicktour {
 	getSession().beginTransaction();
 
 	for (int n = 0; n < nStudents; n++ ) {
+
+//	    System.err.println("Creating student " + n);
+	    
 	    Student student = new Student();
 	    student.setFirstName("Student_"+n+"_firstName");
 	    student.setLastName("Student_"+n);
@@ -131,13 +134,17 @@ public class HibernateQuicktour extends Quicktour {
 
 	    int i = getRandom().nextInt( courses.length);
 	    for ( int c = 0; c < courses.length; c++) {
+//		System.err.println("Associating with course " + c);
+
 		Course course = courses[ (i+c)%nCourses];
+		course.getStudents().add( student);
 		student.getCourses().add( course);
 	    }
 
 	    getSession().save(student);
 
 	    if (n % nObjectsPerTransaction == nObjectsPerTransaction - 1) {
+//		System.err.println( "Committing transaction for " + nObjectsPerTransaction + " objects");
 		getSession().getTransaction().commit();
 		getSession().flush();
 		getSession().clear();
@@ -156,9 +163,9 @@ public class HibernateQuicktour extends Quicktour {
 	    getSession().beginTransaction();
 
 	    for ( int n = 0;  n < nSelects; n++) {
-		String s = "from " + className + " as x where x.lastName like ?";
+		String s = "from " + className + " as x where x.lastName = ?";
 		Query q = getSession().createQuery( s);
-		q.setString( 0, ""+n);
+		q.setString( 0, className + "_" + n);
 
 		for (Object o: q.list()) {
 		    System.out.println( o);
