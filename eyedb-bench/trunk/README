@@ -4,50 +4,62 @@ EyeDB benchmark suite
 François Déchelle (francois@dechelle.net)
 
 
-configure flags
-===============
+Compiling
+---------
 
-EyeDB flags:
-other variables:
-JAVA   Java virtual machine
-JAVAC  Java compiler
-JAR    Java archiver
+Run:
+./autogen.sh
+./configure
+make
 
+configure script takes the following options:
+  --enable-cpp            enable C++ code compilation default=yes
+  --enable-debug          compile with debug default=no
+  --enable-profile        compile with profile default=no
+  --enable-java           enable java code compilation default=yes
+  --enable-eyedb          enable EyeDB code compilation default=yes
+  --enable-db4o           enable db4o code compilation default=yes
+  --enable-hibernate      enable hibernate code compilation default=yes
+  --enable-polepos        enable polepos code compilation default=yes
 
-EyeDB
-=====
+configure script can be passed the following variables:
+  EYEDB_INSTALLDIR        EyeDB installation directory
+  DB4O_JAR                DB4O jar file
+  HIBERNATE_JAR           Hibernate jar file
+  JDBC_CONNECTOR_JAR      JDBC connector jar file
+  SLF4J_CONNECTOR_JAR     SLF4J jar file
+  LOG4J_DIR               Log4Java jar directory
+  HIBERNATE_LIBDIR        Hibernate libraries directory
+  POLEPOS_DIR             Poleposition benchmarks source directory
+  OPENOFFICEJAVA_DIR      OpenOffice java directory
 
-To run the EyeDB part:
-cd src/java/quicktour/eyedb
-./runit.sh CreateBenchmark  # to run the objects creation benchmark
-
-you can edit src/java/quicktour/eyedb/eyedb.properties to set the 
-benchmark parameters.
-
-
-db4o
-====
-
-To run the db4o part:
-- first launch the server:
-cd src/java/common/db4o
-./start-server.sh
-- then launch the benchmark client:
-cd src/java/quicktour/db4o
-./runit.sh CreateBenchmark  # to run the objects creation benchmark
-- to stop the server:
-cd src/java/common/db4o
-./stop-server.sh
-
-you can edit src/java/quicktour/eyedb/db4o.client.properties to set the 
-benchmark parameters.
+Using these variables is most of the time not necessary:
+- the configure script looks for EyeDB installation directory in standard places
+(currently /usr $HOME/projects/eyedb/install $HOME/eyedb-install $HOME/eyedb_install)
+- db4o and Hibernate binary distributions are included in the source tree and used
+by default
 
 
-hibernate
-=========
+Running
+-------
 
-To run the hibernate part:
-cd src/java/quicktour/hibernate
-./runit.sh CreateBenchmark  # to run the objects creation benchmark
+The run/ sub-directory contains the configuration files, property files... that are
+needed to run a bench, and a script that runs the bench itself, usually named runit.sh.
 
-To run the hibernate part, you must first check that your JDBC driver works.
+These scripts are configured by the configure script.
+
+Running a bench is done by running the command:
+make bench
+in the directory associated with the bench (for instance run/quicktour/java/eyedb for
+the EyeDB Java implementation of the quicktour benchmark).
+
+The scripts take care of all the house-keeping needed to run the bench (starting server, 
+creating databases...).
+
+
+Bench reporting
+---------------
+
+Bench results are reported:
+- on standard output
+- in a CSV file, the name of the file being given in the properties file of the bench.

@@ -4,17 +4,15 @@
 - complete quicktour:
 -- Java: 
 --- db4o: queries?
---- eyedb: add indexes [DONE]
---- hibernate: fix query problem (separate runs for create/query/remove? big problem for remove, the database may contains more objects than the expected count)
+--- hibernate: add indexes
 -- C++: eyedb
 --- with and without referential integrity [DONE]
 --- with and without collections [DONE, but bug in arrays]
 
-- run benchmarks for poleposition and quicktour, add results to svn
+- re-run benchmarks for poleposition, add results to svn
 
 - improve handling of missing properties
 
-- update README
 - add license (GPL?) and copyright information in all files
 
 

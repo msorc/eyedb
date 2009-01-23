@@ -55,8 +55,8 @@ AC_ARG_ENABLE(polepos,
 # OpenOffice
 AC_ARG_ENABLE(openoffice,
 		AS_HELP_STRING([--enable-openoffice],
-				[enable compilation of openoffice result reporting code [default=yes]]),,
-		ac_enable_openoffice="yes")
+				[enable compilation of openoffice result reporting code [default=no]]),,
+		ac_enable_openoffice="no")
 
 
 # ========================================
