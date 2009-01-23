@@ -172,6 +172,7 @@ void DBSListCmd::init()
   opts.push_back(HELP_OPT);
   opts.push_back(Option(DBNAME_OPT, OptionBoolType(), 0, OptionDesc("Lists database names")));
   opts.push_back(Option(DBID_OPT, OptionBoolType(), 0, OptionDesc("Lists database identifier")));
+  opts.push_back(Option(DBFILE_OPT, OptionBoolType(), 0, OptionDesc("Lists database file")));
   opts.push_back(Option(MAXOBJCNT_OPT, OptionBoolType(), 0, OptionDesc("Lists database max object count")));
   opts.push_back(Option(DATAFILES_OPT, OptionBoolType(), 0, OptionDesc("Lists database datafiles")));
   opts.push_back(Option(DEFACCESS_OPT, OptionBoolType(), 0, OptionDesc("Lists database default access")));
