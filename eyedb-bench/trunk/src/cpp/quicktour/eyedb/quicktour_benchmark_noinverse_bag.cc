@@ -1,9 +1,9 @@
-#include "odl_quicktour_array.h"
+#include "odl_quicktour_noinverse_bag.h"
 #include "quicktour_benchmark.h"
 
 using namespace std;
 
-class QuicktourBenchmarkArray : public QuicktourBenchmark {
+class QuicktourBenchmarkNoInverseBag : public QuicktourBenchmark {
 public:
   const char* getImplementation() const;
 
@@ -16,9 +16,9 @@ protected:
   void relationTeacherCourse( Teacher** teachers, int nTeachers, Course** courses, int nCourses) throw( eyedb::Exception);
 };
 
-const char* QuicktourBenchmarkArray::getImplementation() const
+const char* QuicktourBenchmarkNoInverseBag::getImplementation() const
 {
-  string info = "EyeDB C++ implementation using arrays";
+  string info = "EyeDB C++ implementation using bags and no referential integrity";
 
   string mode;
   if (getProperties().getStringProperty( "mode", mode) && mode == "local")
@@ -27,12 +27,12 @@ const char* QuicktourBenchmarkArray::getImplementation() const
   return info.c_str();
 }
 
-eyedb::Database *QuicktourBenchmarkArray::openDatabase( eyedb::Connection *conn, const char *dbName, eyedb::Database::OpenFlag flags) throw( eyedb::Exception)
+eyedb::Database *QuicktourBenchmarkNoInverseBag::openDatabase( eyedb::Connection *conn, const char *dbName, eyedb::Database::OpenFlag flags) throw( eyedb::Exception)
 {
-  return new odl_quicktour_arrayDatabase( conn, dbName, flags);
+  return new odl_quicktour_noinverse_bagDatabase( conn, dbName, flags);
 }
 
-Teacher** QuicktourBenchmarkArray::fillTeachers( int nTeachers) throw( eyedb::Exception)
+Teacher** QuicktourBenchmarkNoInverseBag::fillTeachers( int nTeachers) throw( eyedb::Exception)
 {
   Teacher **teachers = new Teacher*[nTeachers];
 
@@ -53,7 +53,7 @@ Teacher** QuicktourBenchmarkArray::fillTeachers( int nTeachers) throw( eyedb::Ex
   return teachers;
 }
 
-Course** QuicktourBenchmarkArray::fillCourses( int nCourses) throw( eyedb::Exception)
+Course** QuicktourBenchmarkNoInverseBag::fillCourses( int nCourses) throw( eyedb::Exception)
 {
   Course **courses = new Course*[ nCourses];
 
@@ -74,19 +74,16 @@ Course** QuicktourBenchmarkArray::fillCourses( int nCourses) throw( eyedb::Excep
   return courses;
 }
 
-void QuicktourBenchmarkArray::relationTeacherCourse( Teacher** teachers, int nTeachers, Course** courses, int nCourses) throw( eyedb::Exception)
+void QuicktourBenchmarkNoInverseBag::relationTeacherCourse( Teacher** teachers, int nTeachers, Course** courses, int nCourses) throw( eyedb::Exception)
 {
   for ( int n = 0; n < nCourses; n++) {
     Teacher *teacher = teachers[ random() % nTeachers];
     courses[n]->setTeacher( teacher);
-
-    unsigned int last = teacher->getCoursesCount();
-    teacher->setCoursesCount( last+1);
-    teacher->setCourses( last, courses[n]);
+    teacher->addToCoursesColl( courses[n]);
   }
 }
 
-void QuicktourBenchmarkArray::create( int nStudents, int nCourses, int nTeachers, int nObjectsPerTransaction)
+void QuicktourBenchmarkNoInverseBag::create( int nStudents, int nCourses, int nTeachers, int nObjectsPerTransaction)
 {
   try {
     Teacher** teachers = fillTeachers( nTeachers);
@@ -94,9 +91,6 @@ void QuicktourBenchmarkArray::create( int nStudents, int nCourses, int nTeachers
     relationTeacherCourse( teachers, nTeachers, courses, nCourses);
 
     getDatabase()->transactionBegin();
-    
-    for (int c = 0; c < nCourses; c++)
-      courses[c]->setStudentsCount( nStudents);
             
     for ( int n = 0; n < nStudents; n++) {
       Student *student = new Student( getDatabase());
@@ -108,16 +102,12 @@ void QuicktourBenchmarkArray::create( int nStudents, int nCourses, int nTeachers
       student->setLastName( tmp);
       student->setBeginYear( (short)((random()%3) + 1));
 
-      student->setCoursesCount( nCourses);
-
-#if 0
+      int i = random();
       for ( int c = 0; c < nCourses; c++) {
-	cout << "setting course " << c << " for student " << n << endl;
-
-	student->setCourses( c, courses[c]);
-	courses[c]->setStudents( n, student);
+	Course *course = courses[ (i+c)%nCourses];
+	student->addToCoursesColl( course);
+	course->addToStudentsColl( student);
       }
-#endif
 
       student->store( eyedb::FullRecurs);
       
@@ -140,10 +130,10 @@ int main(int argc, char *argv[])
   properties.load( argv[1]);
   properties.load( argc, argv);
 
-  QuicktourBenchmarkArray b;
+  QuicktourBenchmarkNoInverseBag b;
   b.setProperties( properties);
 
-  odl_quicktour_array initializer(argc, argv);
+  odl_quicktour_noinverse_bag initializer(argc, argv);
 
   b.bench();
 

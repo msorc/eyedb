@@ -1,11 +1,24 @@
-#include "odl_quicktour_collection.h"
+#include "odl_quicktour_noinverse_set.h"
 #include "quicktour_benchmark.h"
 
 using namespace std;
 
-const char* QuicktourBenchmarkCollection::getImplementation() const
+class QuicktourBenchmarkNoInverseSet : public QuicktourBenchmark {
+public:
+  const char* getImplementation() const;
+
+  void create( int nStudents, int nCourses, int nTeachers, int nObjectsPerTransaction);
+protected:
+  eyedb::Database *openDatabase( eyedb::Connection *conn, const char *dbName, eyedb::Database::OpenFlag flags) throw( eyedb::Exception);
+
+  Teacher** fillTeachers( int nTeachers) throw( eyedb::Exception);
+  Course** fillCourses( int nCourses) throw( eyedb::Exception);
+  void relationTeacherCourse( Teacher** teachers, int nTeachers, Course** courses, int nCourses) throw( eyedb::Exception);
+};
+
+const char* QuicktourBenchmarkNoInverseSet::getImplementation() const
 {
-  string info = "EyeDB C++ implementation using collections";
+  string info = "EyeDB C++ implementation using sets and no referential integrity";
 
   string mode;
   if (getProperties().getStringProperty( "mode", mode) && mode == "local")
@@ -14,12 +27,12 @@ const char* QuicktourBenchmarkCollection::getImplementation() const
   return info.c_str();
 }
 
-eyedb::Database *QuicktourBenchmarkCollection::openDatabase( eyedb::Connection *conn, const char *dbName, eyedb::Database::OpenFlag flags) throw( eyedb::Exception)
+eyedb::Database *QuicktourBenchmarkNoInverseSet::openDatabase( eyedb::Connection *conn, const char *dbName, eyedb::Database::OpenFlag flags) throw( eyedb::Exception)
 {
-  return new odl_quicktour_collectionDatabase( conn, dbName, flags);
+  return new odl_quicktour_noinverse_setDatabase( conn, dbName, flags);
 }
 
-Teacher** QuicktourBenchmarkCollection::fillTeachers( int nTeachers) throw( eyedb::Exception)
+Teacher** QuicktourBenchmarkNoInverseSet::fillTeachers( int nTeachers) throw( eyedb::Exception)
 {
   Teacher **teachers = new Teacher*[nTeachers];
 
@@ -40,7 +53,7 @@ Teacher** QuicktourBenchmarkCollection::fillTeachers( int nTeachers) throw( eyed
   return teachers;
 }
 
-Course** QuicktourBenchmarkCollection::fillCourses( int nCourses) throw( eyedb::Exception)
+Course** QuicktourBenchmarkNoInverseSet::fillCourses( int nCourses) throw( eyedb::Exception)
 {
   Course **courses = new Course*[ nCourses];
 
@@ -61,7 +74,7 @@ Course** QuicktourBenchmarkCollection::fillCourses( int nCourses) throw( eyedb::
   return courses;
 }
 
-void QuicktourBenchmarkCollection::relationTeacherCourse( Teacher** teachers, int nTeachers, Course** courses, int nCourses) throw( eyedb::Exception)
+void QuicktourBenchmarkNoInverseSet::relationTeacherCourse( Teacher** teachers, int nTeachers, Course** courses, int nCourses) throw( eyedb::Exception)
 {
   for ( int n = 0; n < nCourses; n++) {
     Teacher *teacher = teachers[ random() % nTeachers];
@@ -70,7 +83,7 @@ void QuicktourBenchmarkCollection::relationTeacherCourse( Teacher** teachers, in
   }
 }
 
-void QuicktourBenchmarkCollection::create( int nStudents, int nCourses, int nTeachers, int nObjectsPerTransaction)
+void QuicktourBenchmarkNoInverseSet::create( int nStudents, int nCourses, int nTeachers, int nObjectsPerTransaction)
 {
   try {
     Teacher** teachers = fillTeachers( nTeachers);
@@ -117,10 +130,10 @@ int main(int argc, char *argv[])
   properties.load( argv[1]);
   properties.load( argc, argv);
 
-  QuicktourBenchmarkCollection b;
+  QuicktourBenchmarkNoInverseSet b;
   b.setProperties( properties);
 
-  odl_quicktour_collection initializer(argc, argv);
+  odl_quicktour_noinverse_set initializer(argc, argv);
 
   b.bench();
 
