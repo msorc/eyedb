@@ -21,3 +21,4 @@ EDIT = sed \
 bench: runit.sh
 	$(SHELL) -x runit.sh
 
+CLEANFILES=$(noinst_DATA)
