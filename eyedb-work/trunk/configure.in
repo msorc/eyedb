@@ -32,6 +32,11 @@ fi
 # EyeDB pkgconfig 
 # 
 
+AC_PATH_PROG(X_PKGCONFIG,pkg-config)
+if test x"" = x ; then
+   AC_MSG_ERROR(you must have pkg-config to compile EyeDB work)
+fi
+
 EYEDB_PKG_CONFIG_FILE="none"
 # first, using PKG_CONFIG_PATH
 if test x"$PKG_CONFIG_PATH" != x ; then

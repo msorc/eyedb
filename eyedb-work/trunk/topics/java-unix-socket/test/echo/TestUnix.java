@@ -1,65 +1,29 @@
 class TestUnix {
-    class UnixClientThread extends Thread {
-	UnixClientThread( String path, int size) throws Exception
-	{
-	    this.client = new UnixClient(path);
-	    this.size = size;
-	}
-
-	public void run()
-	{
-	    try {
-		client.run( size);
-	    }
-	    catch( Exception e) {
-		e.printStackTrace();
-	    }
-	}
-
-	private UnixClient client;
-	private int size;
-    }
-
-    class UnixServerThread extends Thread {
-	UnixServerThread( String path, int size) throws Exception
-	{
-	    this.server = new UnixServer(path);
-	    this.size = size;
-	}
-
-	public void run()
-	{
-	    try {
-		server.run( size);
-	    }
-	    catch( Exception e) {
-		e.printStackTrace();
-	    }
-	}
-
-	private UnixServer server;
-	private int size;
-    }
-
-    TestUnix( String path)
+    public static void main( String[] args)
     {
+	String path = args[0];
+	int n = 10000;
+
 	try {
-	    Thread serverThread = new UnixServerThread( path, 1000);
-	    serverThread.start();
+	    n = Integer.parseInt( args[1]);
+	}
+	catch (NumberFormatException e) {
+	    System.out.println( e);
+	    System.exit(1);
+	}
 
-	    Thread clientThread = new UnixClientThread( path, 1000);
-	    clientThread.start();
+	try {
+	    Server server = new UnixServer( path, n);
+	    server.start();
 
-	    serverThread.join();
-	    clientThread.join();
+	    Client client = new UnixClient( path, n);
+	    client.start();
+
+	    server.join();
+	    client.join();
 	}
 	catch( Exception e) {
 	    e.printStackTrace();
 	}
-    }
-
-    public static void main( String[] args)
-    {
-	new TestUnix( args[0]);
     }
 }
