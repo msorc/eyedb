@@ -19,3 +19,4 @@ runit-local.sh: Makefile
 bench: runit-local.sh
 	$(SHELL) -x runit-local.sh
 
+CLEANFILES=$(noinst_DATA)

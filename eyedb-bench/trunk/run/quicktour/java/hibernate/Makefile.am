@@ -24,4 +24,6 @@ runit.sh: Makefile
 bench: runit.sh
 	$(SHELL) runit.sh
 
+CLEANFILES=$(noinst_DATA)
+
 EXTRA_DIST=hibernate.properties

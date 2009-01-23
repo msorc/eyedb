@@ -9,13 +9,18 @@ import org.eyedb.benchmark.framework.reporter.ReporterFactory;
 
 public class Run {
 
-    public Run( String benchmarkClassName, String propertiesFileName)
+    public Run( String[] args)
     {
 	try {
+	    String benchmarkClassName = args[0];
+
 	    Class benchmarkClass = Class.forName( benchmarkClassName);
 	    Benchmark benchmark = (Benchmark)benchmarkClass.newInstance();
 
+	    String propertiesFileName = (args.length >= 2) ? args[1] : null;
+
 	    benchmark.getProperties().load( propertiesFileName);
+	    benchmark.getProperties().load( args);
 
 	    benchmark.bench();
 
@@ -30,8 +35,6 @@ public class Run {
 
     public static void main( String[] args)
     {
-	String propertiesFileName = (args.length >= 2) ? args[1] : null;
-
-	new Run( args[0], propertiesFileName);
+	new Run( args);
     }
 }
