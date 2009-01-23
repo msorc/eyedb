@@ -2,16 +2,21 @@
 //#define USE_INVERSE
 // define to use arrays instead of collections
 //#define USE_ARRAY
+// define for collections type (set or bag)
+//#define COLLECTION_TYPE set
+#ifndef COLLECTION_TYPE
+#define COLLECTION_TYPE set
+#endif
 
 #ifdef USE_INVERSE
 #define RELATIONSHIP_ONE(TYPE, ATTR, INV) relationship TYPE *ATTR inverse INV
-#define RELATIONSHIP_MANY(TYPE, ATTR, INV) relationship set<TYPE *> ATTR inverse INV
+#define RELATIONSHIP_MANY(TYPE, ATTR, INV) relationship COLLECTION_TYPE<TYPE *> ATTR inverse INV
 #else
 #define RELATIONSHIP_ONE(TYPE, ATTR, INV) attribute TYPE *ATTR
 #ifdef USE_ARRAY
 #define RELATIONSHIP_MANY(TYPE, ATTR, INV) attribute TYPE *ATTR[]
 #else
-#define RELATIONSHIP_MANY(TYPE, ATTR, INV) attribute set<TYPE *> ATTR
+#define RELATIONSHIP_MANY(TYPE, ATTR, INV) attribute COLLECTION_TYPE<TYPE *> ATTR
 #endif
 #endif
 

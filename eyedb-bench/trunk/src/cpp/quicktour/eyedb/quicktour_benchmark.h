@@ -41,43 +41,4 @@ private:
   eyedb::Connection *conn;
 };
 
-class QuicktourBenchmarkArray : public QuicktourBenchmark {
-public:
-  const char* getImplementation() const;
-
-  void create( int nStudents, int nCourses, int nTeachers, int nObjectsPerTransaction);
-protected:
-  eyedb::Database *openDatabase( eyedb::Connection *conn, const char *dbName, eyedb::Database::OpenFlag flags) throw( eyedb::Exception);
-
-  Teacher** fillTeachers( int nTeachers) throw( eyedb::Exception);
-  Course** fillCourses( int nCourses) throw( eyedb::Exception);
-  void relationTeacherCourse( Teacher** teachers, int nTeachers, Course** courses, int nCourses) throw( eyedb::Exception);
-};
-
-class QuicktourBenchmarkCollection : public QuicktourBenchmark {
-public:
-  const char* getImplementation() const;
-
-  void create( int nStudents, int nCourses, int nTeachers, int nObjectsPerTransaction);
-protected:
-  eyedb::Database *openDatabase( eyedb::Connection *conn, const char *dbName, eyedb::Database::OpenFlag flags) throw( eyedb::Exception);
-
-  Teacher** fillTeachers( int nTeachers) throw( eyedb::Exception);
-  Course** fillCourses( int nCourses) throw( eyedb::Exception);
-  void relationTeacherCourse( Teacher** teachers, int nTeachers, Course** courses, int nCourses) throw( eyedb::Exception);
-};
-
-class QuicktourBenchmarkInverse : public QuicktourBenchmark {
-public:
-  const char* getImplementation() const;
-
-  void create( int nStudents, int nCourses, int nTeachers, int nObjectsPerTransaction);
-protected:
-  eyedb::Database *openDatabase( eyedb::Connection *conn, const char *dbName, eyedb::Database::OpenFlag flags) throw( eyedb::Exception);
-
-  Teacher** fillTeachers( int nTeachers) throw( eyedb::Exception);
-  Course** fillCourses( int nCourses) throw( eyedb::Exception);
-  void relationTeacherCourse( Teacher** teachers, int nTeachers, Course** courses, int nCourses) throw( eyedb::Exception);
-};
-
 #endif
