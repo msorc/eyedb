@@ -361,37 +361,54 @@ namespace eyedbsm {
     if (s) return s;
 
     /* check newmaxsize */
-    if ((s = checkVolMaxSize(newmaxsize)))
+    if ((s = checkVolMaxSize(newmaxsize))) {
       return s;
+    }
 
     DatafileDesc _dfd = h->dat(datid);
     DatafileDesc *dfd = &_dfd;
     MapHeader *xmp = dfd->mp();
     x2h_prologue(xmp, mp);
-    unsigned int nslots;
+    unsigned long long nslots_l;
 
     /* nslots number */
-    if (mp->mtype() == BitmapType)
-      {
+    if (mp->mtype() == BitmapType) {
 	unsigned int sizeslot = mp->sizeslot();
-	nslots = KB2SLOT(newmaxsize, mp->pow2());
+	nslots_l = KB2SLOT(newmaxsize, mp->pow2());
       }
-    else
-      nslots = ((unsigned long long)(newmaxsize)*ONE_K)/32;
+    else {
+      nslots_l = ((unsigned long long)(newmaxsize)*ONE_K)/32;
+    }
+
+#if 0
+    std::cout << "nslots_l: " << nslots_l << " (unsigned int)" << (unsigned int)nslots_l <<
+      " pow2: " << mp->pow2() << " newmaxsize: " << newmaxsize << '\n';
+    std::cout << "lastbusy: " <<  mp->u_bmh_slot_lastbusy() << '\n';
+#endif
+
+    if (s = checkDatafileSize(nslots_l, dfd->file(), mp->sizeslot(), newmaxsize)) {
+      return s;
+    }
 
     /*
-      if (nslots >= (unsigned long long)MAX_SLOTS)
-      return statusMake(SIZE_TOO_LARGE, 
-      "maximum slots `%d' exceeded", MAX_SLOTS);
+    if (nslots_l >= ~0U) {
+      return statusMake(SIZE_TOO_LARGE,
+			"datafile %s (slotsize %u) maximum size is too large: "
+			"%llu MB, maximum allowed size is %u MB",
+			dfd->file(),
+			mp->sizeslot(),
+			newmaxsize/ONE_K, SLOT2KB(((unsigned long long)~0U)-1, mp->sizeslot())/ONE_K);
+    }
     */
 
-    if (nslots < mp->u_bmh_slot_lastbusy())
+    unsigned int nslots = (unsigned int)nslots_l;
+    if (nslots < mp->u_bmh_slot_lastbusy()) {
       return statusMake(INVALID_DATAFILEMAXSIZE,
-			"datafile '%s' is partially used: "
-			"size can be reduced to a minimum of "
-			"'%d' Kbytes or size maybe extended.",
+			"datafile %s is partially used: "
+			"size can be reduced to a size of %u MB",
 			dfd->file(),
-			SLOT2KB(mp->u_bmh_slot_lastbusy(), mp->sizeslot()));
+			SLOT2KB(mp->u_bmh_slot_lastbusy(), mp->sizeslot())/ONE_K);
+    }
 
     // should not !!!
     // LASTNSBLKALLOC(dbh, datid) = 0;

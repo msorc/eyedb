@@ -7438,47 +7438,54 @@ AttrIndirectVarDim::realize(Database *db, Object *_o,
 
   dd = typmod.pdims * size;
 
-  for (int j = 0; j < dd; j++)
-    {
-      Status status;
-      Object *o;
+  for (int j = 0; j < dd; j++) {
+    Status status;
+    Object *o;
 
-      mcp(&o, vdata + (j * idr_item_vsize), sizeof(Object *));
+    mcp(&o, vdata + (j * idr_item_vsize), sizeof(Object *));
 
-      if (o && rcm->isAgregRecurs(this, j, o))
-	{
-	  status = o->setDatabase(db);
-	  if (status != Success)
-	    return status;
+    if (o && rcm->isAgregRecurs(this, j, o)) {
+      status = o->setDatabase(db);
+      if (status) {
+	return status;
+      }
 
-	  if (o->asCollection())
-	    attrCollManage(this, o->asCollection(), _o);
+      if (o->asCollection()) {
+	attrCollManage(this, o->asCollection(), _o);
+      }
 
-	  status = o->realize(rcm);
+      status = o->realize(rcm);
 
-	  if (status == Success)
-	    status = agr->setItemOid(this, &o->getOid(), 1, j);
+      if (status == Success) {
+	status = agr->setItemOid(this, &o->getOid(), 1, j);
+      }
 
-	  if (status)
-	    return status;
-	}
-      else if (!o)
-	{
-	  if (card)
-	    {
-	      status = cardManage(db, agr, j);
-	      if (status)
-		return status;
-	    }
-
-	  if (inv_spec.oid_cl.isValid())
-	    {
-	      status = inverseManage(db, agr, j);
-	      if (status)
-		return status;
-	    }
-	}
+      if (status) {
+	return status;
+      }
     }
+    else if (o && o->getOid().isValid()) {
+      status = agr->setItemOid(this, &o->getOid(), 1, j);
+	
+      if (status) {
+	return status;
+      }
+    }
+    else if (!o) {
+      if (card) {
+	status = cardManage(db, agr, j);
+	if (status)
+	  return status;
+      }
+	
+      if (inv_spec.oid_cl.isValid()) {
+	status = inverseManage(db, agr, j);
+	if (status) {
+	  return status;
+	}
+      }
+    }
+  }
 
   return update(db, cloid, objoid, agr, idx_ctx);
 }

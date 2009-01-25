@@ -182,12 +182,12 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 
     if (ndat <= 0)
       return statusMake(INVALID_DATAFILE_CNT,
-			"%sinvalid volume files number: `%d'",
+			"%sinvalid datafile number: `%d'",
 			pr, ndat);
 
     if (ndat >= MAX_DATAFILES)
       return statusMake(INVALID_DATAFILE_CNT,
-			"%svolume files number too large: `%d'", pr, ndat);
+			"%sdatafile number too large: `%d'", pr, ndat);
 
     return Success;
   }
@@ -235,13 +235,28 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     return Success;
   }
 
-  Status
-  checkDatafile(const char *pr, const char *dbfile, DbHeader *dbh,
-		const DbCreateDescription *dbc,
-		int i, DBFD *dbfd,
-		mode_t file_mode, gid_t file_gid,
-		Boolean can_be_null,
-		Boolean *is_null, Boolean out_place)
+  Status checkDatafileSize(unsigned long long nslots_l,
+			   const char *datfile, unsigned int sizeslot,
+			   unsigned long long newmaxsize)
+  {
+    if (nslots_l >= ~0U) {
+      return statusMake(SIZE_TOO_LARGE,
+			"datafile %s (slotsize %u) maximum size is too large: "
+			"%llu MB, maximum allowed size is %u MB",
+			datfile,
+			sizeslot,
+			newmaxsize/ONE_K, SLOT2KB(((unsigned long long)~0U)-1, sizeslot)/ONE_K);
+    }
+
+    return Success;
+  }
+
+  Status checkDatafile(const char *pr, const char *dbfile, DbHeader *dbh,
+		       const DbCreateDescription *dbc,
+		       int i, DBFD *dbfd,
+		       mode_t file_mode, gid_t file_gid,
+		       Boolean can_be_null,
+		       Boolean *is_null, Boolean out_place)
   {
     if (!*dbc->dat[i].file) {
       if (can_be_null) {
@@ -288,7 +303,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
       pop_dir(pwd);
       close(dbfd->fd_dat[i]);
       return statusMake(INVALID_DATAFILE,
-			"%svolume file already exists: '%s'",
+			"%sdatafile already exists: '%s'",
 			pr, dbc->dat[i].file);
     }
 
@@ -310,7 +325,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 	0) {
       pop_dir(pwd);
       return statusMake(INVALID_DATAFILE, 
-			"%scannot create volume file: '%s' [%s]",
+			"%scannot create datafile: '%s' [%s]",
 			pr, dbc->dat[i].file, strerror(errno));
     }
   
@@ -324,7 +339,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     }
   
     if (status = syscheck(pr, close(dbfd->fd_dat[i]),
-			  "closing volume file: '%s'",
+			  "closing datafile: '%s'",
 			  dbc->dat[i].file)) {
       unlink(dmpfile);
       unlink(dbc->dat[i].file);
@@ -394,13 +409,22 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     xmp->sizeslot() = sizeslot;
     xmp->mtype() = mtype;
     xmp->sizeslot() = dbc->dat[i].sizeslot;
-    if (mtype == BitmapType)
-      xmp->nslots() = 
-	KB2SLOT(dbc->dat[i].maxsize, xmp->pow2());
-    else
-      xmp->nslots() = 
-	((unsigned long long)(dbc->dat[i].maxsize)*ONE_K)/32;
+    unsigned long long nslots_l;
+    if (mtype == BitmapType) {
+      nslots_l = KB2SLOT(dbc->dat[i].maxsize, xmp->pow2());
+    }
+    else {
+      nslots_l = ((unsigned long long)(dbc->dat[i].maxsize)*ONE_K)/32;
+    }
 
+    if (status = checkDatafileSize(nslots_l, dbc->dat[i].file, xmp->sizeslot(), dbc->dat[i].maxsize)) {
+      unlink(dmpfile);
+      unlink(dbc->dat[i].file);
+      pop_dir(pwd);
+      return status;
+    }
+
+    xmp->nslots() = (unsigned int)nslots_l;
     /*
       if (xmp->nslots >= (unsigned long long)MAX_SLOTS) {
       unlink(dmpfile);
@@ -993,7 +1017,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     unsigned int ndat = x2h_u32(_dbh.__ndat());
     if (dbc->ndat != ndat)
       return statusMake(INVALID_DATAFILE_CNT,
-			"%s: different volume files number: `%d' vs. `%d'",
+			"%s: different datafiles number: `%d' vs. `%d'",
 			fname, dbc->ndat, ndat);
 
     for (i = 0; i < dbc->ndat; i++) {
@@ -1003,7 +1027,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
       else if (dbc->dat[i].maxsize != maxsize)
 	return statusMake(INVALID_MAXSIZE,
 			  "%s: different maximum size: `%d' vs. `%d' "
-			  "on volume file #%d",
+			  "on datafile #%d",
 			  fname, dbc->dat[i].maxsize,
 			  maxsize, i);
     }
@@ -1696,7 +1720,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
       return se;
     }
   
-    /* open all volume files */
+    /* open all datafiles */
     for (i = 0; i < dbh->__ndat(); i++) {
       vd->dmd[i].file = strdup(dbh->dat(i).file());
       if (!*dbh->dat(i).file()) {
@@ -1705,7 +1729,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
       }
     
       Status status;
-      if (se = checkFileAccess(DATABASE_OPEN_FAILED, "volume file", dbh->dat(i).file(), accflags)) {
+      if (se = checkFileAccess(DATABASE_OPEN_FAILED, "datafile", dbh->dat(i).file(), accflags)) {
 	delete dbh;
 	free(vd);
 	pop_dir(pwd);

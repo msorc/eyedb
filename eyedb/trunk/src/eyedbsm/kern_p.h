@@ -91,6 +91,11 @@ namespace eyedbsm {
   checkVolMaxSize(unsigned maxsize);
 
   extern Status
+  checkDatafileSize(unsigned long long nslots_l,
+		    const char *datfile, unsigned int sizeslot,
+		    unsigned long long newmaxsize);
+
+  extern Status
   checkDatafile(const char *pr, const char *dbfile, DbHeader *dbh,
 		const DbCreateDescription *dbc,
 		int i, DBFD *dbfd, mode_t file_mode, gid_t file_gid,
