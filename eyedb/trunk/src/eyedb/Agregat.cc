@@ -54,10 +54,21 @@ Status Agregat::checkAgreg(const Attribute *agreg) const
 Status Agregat::setItemOid(const Attribute *agreg, const Oid *poid, int nb, int from)
 {
   Status status;
+#if 1
+  Oid roid;
+  status = agreg->getOid(this, &roid, nb, from);
+  if (status) {
+    return status;
+  }
+  if (roid == *poid) {
+    return Success;
+  }
+#endif
   status = agreg->setOid(this, poid, nb, from);
 
-  if (status == Success)
+  if (status == Success) {
     modify = True;
+  }
 
   return status;
 }
@@ -66,8 +77,9 @@ Status Agregat::getItemOid(const Attribute *agreg, Oid *poid, int nb, int from) 
 {
   Status status = checkAgreg(agreg);
 
-  if (status)
+  if (status) {
     return status;
+  }
 
   return agreg->getOid(this, poid, nb, from);
 }

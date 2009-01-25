@@ -128,7 +128,7 @@ int DTFCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 
   unsigned int size = DEFAULT_DTFSIZE * ONE_K;
   if (map.find(SIZE_OPT) != map.end())
-    size = atoi(map[SIZE_OPT].value.c_str());
+    size = atoi(map[SIZE_OPT].value.c_str()) * ONE_K;
 
   unsigned int slotsize = DEFAULT_DTFSZSLOT;
   if (map.find(SLOTSIZE_OPT) != map.end())
