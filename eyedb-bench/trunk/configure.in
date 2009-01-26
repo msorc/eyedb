@@ -74,7 +74,7 @@ if test "$ac_enable_cpp" = "yes" -a x"$CXX" != x ; then
    then
 	CXXFLAGS="$CXXFLAGS -g"
    fi
-   if test "x$enable_profile" != "x"
+   if test "$enable_profile" = "yes"
    then
 	CXXFLAGS="$CXXFLAGS -pg"
    fi
@@ -333,6 +333,7 @@ run/polepos/Makefile dnl
 run/polepos/cpp/Makefile dnl
 run/polepos/cpp/eyedb/Makefile dnl
 run/polepos/java/Makefile dnl
+run/polepos/java/dummy/Makefile dnl
 run/polepos/java/db4o/Makefile dnl
 run/polepos/java/eyedb/Makefile dnl
 run/polepos/java/hibernate/Makefile dnl
