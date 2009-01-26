@@ -15,11 +15,14 @@ $0 !~ /Database File/ && t == 1 { dbfile = $1; print $dbfile; t = 0; }
 }
 
 DATABASE=`grep eyedb.database $PROPERTIES | awk -F = '{print $2}'`
+PORT=`grep eyedb.tcp_port $PROPERTIES | awk -F = '{print $2}'`
 
-$EYEDB_BINDIR/eyedbadmin database delete $DATABASE
-$EYEDB_BINDIR/eyedbadmin database create $DATABASE
-$EYEDB_BINDIR/eyedbodl -d $DATABASE -u quicktour.odl
+$EYEDB_SBINDIR/eyedbctl start --listen=$PORT --nod
+$EYEDB_BINDIR/eyedbadmin database delete --port=$PORT $DATABASE
+$EYEDB_BINDIR/eyedbadmin database create --port=$PORT $DATABASE
+$EYEDB_BINDIR/eyedbodl --port=$PORT -d $DATABASE -u quicktour.odl
 eyedb_resize_shm $DATABASE
-./quicktour-inverse $PROPERTIES
+./quicktour-inverse $PROPERTIES --port=$PORT
+$EYEDB_SBINDIR/eyedbctl stop --listen=$PORT
 
 
