@@ -1,4 +1,5 @@
 bindir=@bindir@
+sbindir=@sbindir@
 eyedb_arch_libs=@EYEDB_ARCH_LIBS@
 includedir=@includedir@
 libdir=@libdir@

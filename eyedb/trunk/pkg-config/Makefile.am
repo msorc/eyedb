@@ -3,6 +3,7 @@ pkgconfig_DATA= eyedb.pc
 
 EDIT = sed \
         -e 's,@bindir\@,$(bindir),g' \
+        -e 's,@sbindir\@,$(sbindir),g' \
         -e 's,@EYEDB_ARCH_LIBS\@,$(EYEDB_ARCH_LIBS),g' \
         -e 's,@includedir\@,$(includedir),g' \
         -e 's,@libdir\@,$(libdir),g' \
