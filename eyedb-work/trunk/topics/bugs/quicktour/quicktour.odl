@@ -1,0 +1,43 @@
+// define to use referential integrity
+//#define USE_INVERSE
+// define to use arrays instead of collections
+//#define USE_ARRAY
+// define for collections type (set or bag)
+//#define COLLECTION_TYPE set
+#ifndef COLLECTION_TYPE
+#define COLLECTION_TYPE set
+#endif
+
+#ifdef USE_INVERSE
+#define RELATIONSHIP_ONE(TYPE, ATTR, INV) relationship TYPE *ATTR inverse INV
+#define RELATIONSHIP_MANY(TYPE, ATTR, INV) relationship COLLECTION_TYPE<TYPE *> ATTR inverse INV
+#else
+#define RELATIONSHIP_ONE(TYPE, ATTR, INV) attribute TYPE *ATTR
+#ifdef USE_ARRAY
+#define RELATIONSHIP_MANY(TYPE, ATTR, INV) attribute TYPE *ATTR[]
+#else
+#define RELATIONSHIP_MANY(TYPE, ATTR, INV) attribute COLLECTION_TYPE<TYPE *> ATTR
+#endif
+#endif
+
+class Person {
+  attribute string firstName;
+  attribute string lastName;
+  index<type = hash> on lastName;
+};
+
+class Student extends Person {
+  attribute short beginYear;
+  RELATIONSHIP_MANY(Course, courses, Course::students);
+};
+
+class Course {
+  attribute string title;
+  attribute string description;
+  RELATIONSHIP_MANY(Student, students, Student::courses);
+  RELATIONSHIP_ONE(Teacher, teacher, Teacher::courses);
+};
+
+class Teacher extends Person {
+  RELATIONSHIP_MANY(Course, courses, Course::teacher);
+};

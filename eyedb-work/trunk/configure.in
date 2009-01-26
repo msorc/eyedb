@@ -89,8 +89,13 @@ AC_MSG_CHECKING([for EyeDB pkgconfig 'bindir' variable])
 EYEDB_BINDIR=`$PKG_CONFIG --variable=bindir eyedb`
 AC_MSG_RESULT($EYEDB_BINDIR)
 
+AC_MSG_CHECKING([for EyeDB pkgconfig 'sbindir' variable])
+EYEDB_SBINDIR=`$PKG_CONFIG --variable=sbindir eyedb`
+AC_MSG_RESULT($EYEDB_SBINDIR)
+
 AC_SUBST(EYEDB_LIBDIR)
 AC_SUBST(EYEDB_BINDIR)
+AC_SUBST(EYEDB_SBINDIR)
 
 #
 # Java
@@ -131,6 +136,7 @@ topics/bugs/OQL_2/Makefile dnl
 topics/bugs/OQL_3/Makefile dnl
 topics/bugs/OQL_4/Makefile dnl
 topics/bugs/array/Makefile dnl
+topics/bugs/quicktour/Makefile dnl
 topics/collections/basic/Makefile dnl
 topics/collections/general/Makefile dnl
 topics/collections/literal/Makefile dnl
