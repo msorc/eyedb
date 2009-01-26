@@ -1,0 +1,25 @@
+#!/bin/bash
+EYEDB_BINDIR=@EYEDB_BINDIR@
+EYEDB_SBINDIR=@EYEDB_SBINDIR@
+PROPERTIES=eyedb.properties
+
+eyedb_resize_shm() {
+    local DATABASE=$1
+    local DATABASE_FILE=`$EYEDB_BINDIR/eyedbadmin database list $DATABASE | awk '
+BEGIN { t = 0; }
+$0 ~ /Database File/ && t == 0 { t = 1; }
+$0 !~ /Database File/ && t == 1 { dbfile = $1; print $dbfile; t = 0; }
+'`
+    local NEWSIZE=132000
+    $EYEDB_SBINDIR/eyedbsmtool shmem resize $DATABASE_FILE $NEWSIZE
+}
+
+DATABASE=`grep eyedb.database $PROPERTIES | awk -F = '{print $2}'`
+
+$EYEDB_BINDIR/eyedbadmin database delete $DATABASE
+$EYEDB_BINDIR/eyedbadmin database create $DATABASE
+$EYEDB_BINDIR/eyedbodl -d $DATABASE -u quicktour.odl
+eyedb_resize_shm $DATABASE
+./quicktour-inverse $PROPERTIES
+
+
