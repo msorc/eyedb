@@ -38,12 +38,14 @@ void SimpleReporter::report( const Benchmark &benchmark)
   cout << "Bench: " << benchmark.getName() << endl;
   cout << benchmark.getDescription() << endl;
   cout << endl;
-  cout << benchmark.getImplementation() << endl;
-  cout << endl;
 
-  reportResult( benchmark.getResult());
-
-  cout << endl;
+  const char *implementation = benchmark.getImplementation();
+  if (implementation != 0) {
+    cout << benchmark.getImplementation() << endl;
+    cout << endl;
+    reportResult( benchmark.getResult());
+    cout << endl;
+  }
 }
 
 void SimpleReporter::reportResult( const Result &result)
@@ -87,7 +89,7 @@ void CSVReporter::report( const Benchmark &benchmark)
     filename = "/var/tmp/eyedb-benchmark.csv";
 
   bool append;
-  benchmark.getProperties().getBoolProperty("reporter.csv.append", append);
+  benchmark.getProperties().getBoolProperty("reporter.csv.append", append, false);
 
   ios_base::openmode mode = ios_base::out;
   if (append)
@@ -95,19 +97,27 @@ void CSVReporter::report( const Benchmark &benchmark)
 
   outfile.open(filename.c_str(), mode);
 
-  long pos = outfile.tellp();
-
-  if (!append || pos == 0) {
+  bool description;
+  benchmark.getProperties().getBoolProperty("reporter.csv.description", description, false);
+  if (description) {
     outfile << "\"Benchmark:\"" << columnSeparator << "\"" << benchmark.getName() << "\"" << endl;
     outfile << "\"" << benchmark.getDescription() << "\"" << endl;
     outfile << endl;
   }
 
-  outfile << "\"" << benchmark.getImplementation() << "\"" << endl;
-
-  reportResult( benchmark.getResult());
-
-  outfile << endl;
+//   bool context;
+//   benchmark.getProperties().getBooleanProperty("reporter.csv.context", context, false);
+//   if (context) {
+//     reportContext( benchmark.getContext());
+//     out.println();
+//   }
+		
+  const char *implementation = benchmark.getImplementation();
+  if (implementation != 0) {
+    outfile << "\"" << implementation << "\"" << endl;
+    reportResult( benchmark.getResult());
+    outfile << endl;
+  }
 
   outfile.close();
 }

@@ -50,14 +50,15 @@ public class SimpleReporter implements Reporter {
 	out.println();
 	out.println( "Benchmark: " + benchmark.getName());
 	out.println( "Description: " + benchmark.getDescription());
-	reportContext( benchmark.getContext());
-		
+	//	reportContext( benchmark.getContext());
 	out.println();
-	out.println( "Implementation: " + benchmark.getImplementation());
 
-	reportResult( benchmark.getResult());
-
-	out.println();
+	String implementation = benchmark.getImplementation();
+	if (implementation != null) {
+	    out.println( "Implementation: " + benchmark.getImplementation());
+	    reportResult( benchmark.getResult());
+	    out.println();
+	}
     }
 
     private void reportContext( Context context)

@@ -21,6 +21,7 @@ org/eyedb/benchmark/polepos/teams/db4o \
 org/eyedb/benchmark/polepos/teams/eyedb \
 org/eyedb/benchmark/polepos/teams/eyedb/data \
 org/eyedb/benchmark/quicktour \
+org/eyedb/benchmark/quicktour/dummy \
 org/eyedb/benchmark/quicktour/db4o \
 org/eyedb/benchmark/quicktour/eyedb \
 org/eyedb/benchmark/quicktour/eyedb/collection \
