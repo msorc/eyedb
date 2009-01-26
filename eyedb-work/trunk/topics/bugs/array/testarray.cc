@@ -40,7 +40,7 @@ void TestArray::prepare() throw( eyedb::Exception)
   conn = new eyedb::Connection( true);
 
    eyedb::Database::OpenFlag flags;
-   flags = eyedb::Database::DBRW;
+   flags = eyedb::Database::DBRWLocal;
 
    database = new array_odlDatabase( conn, getDbName().c_str(), flags);
 }
@@ -105,7 +105,20 @@ void TestArray::associate() throw( eyedb::Exception)
       bb[ib]->setA( ia, aa[ia]);
     }
 
+#define FULLRECURS
+
+#ifdef FULLRECURS
+    cout << "storing A " << ia << " full recurs..." << endl;
     aa[ia]->store( eyedb::FullRecurs);
+#else
+    cout << "storing A " << ia << " no recurs..." << endl;
+    aa[ia]->store(eyedb::NoRecurs);
+    cout << "-> " << aa[ia]->getOid() << endl;
+    for ( int ib = 0; ib < getNB(); ib++) {
+      bb[ib]->store(eyedb::NoRecurs);
+    }
+    aa[ia]->store(eyedb::NoRecurs);
+#endif
   }
 
   getDatabase()->transactionCommit();
