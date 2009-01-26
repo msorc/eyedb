@@ -116,7 +116,7 @@ fi
 if test "x$enable_optimize" != "x"; then
   CXXFLAGS="$CXXFLAGS $enable_optimize"
 fi
-if test "x$enable_profile" != "x"; then
+if test "$enable_profile" = "yes"; then
    if test x"$ac_cv_cxx_compiler_gnu" = x"yes"; then
       CXXFLAGS="$CXXFLAGS -pg"
       LDFLAGS="$LDFLAGS -pg"
@@ -700,6 +700,7 @@ echo "  EyeDB temporary files will be in: $V"
 echo "  C++ compiler: ${CXX:-none}"
 echo "  C++ compiler flags: ${CXXFLAGS:-none}"
 echo "  Compile with debug: ${enable_debug:-no}"
+echo "  Compile with profile: ${enable_profile:-no}"
 echo "  Compile with optimization: ${enable_optimize:-no}"
 echo "  Semaphore policy: ${ac_semaphore_policy}"
 V=$(if test x"$ac_cv_check_readline" = x"yes"; then echo "readline"; elif test x"$ac_cv_check_editline" = x"yes"; then echo "editline"; else echo "none" ; fi)
