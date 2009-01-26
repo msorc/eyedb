@@ -18,3 +18,5 @@ bench: runit.sh
 bench-local: runit.sh
 	$(SHELL) -x runit.sh -Dmode=local
 
+bug: runit-bug.sh
+	$(SHELL) -x runit-bug.sh

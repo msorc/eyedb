@@ -1,0 +1,12 @@
+eyedb.database=quicktour-bug
+eyedb.tcp_port=6240
+
+quicktour.students=10,30
+quicktour.teachers=5,10
+quicktour.courses=10,20
+quicktour.objects_per_transaction=5,10
+quicktour.selects=5,10
+
+quicktour.verbose=true
+
+reporter.simple.column_width=22

@@ -36,10 +36,15 @@ void QuicktourBenchmark::prepare()
       flags = eyedb::Database::DBRW;
 
     database = openDatabase( conn, dbName.c_str(), flags);
+
   }
   catch ( eyedb::Exception &ex ) {
     ex.print();
   }
+
+#ifdef LOOKING_FOR_BUG
+  getProperties().getBoolProperty( "quicktour.verbose", verbose, false);
+#endif
 }
 
 void QuicktourBenchmark::finish()
@@ -87,7 +92,6 @@ void QuicktourBenchmark::query( int nSelects)
 
 void QuicktourBenchmark::removeByClass( const char *className)
 {
-  //  cout << "removing " << className << endl;
   try {
     getDatabase()->transactionBegin();
             
@@ -102,6 +106,10 @@ void QuicktourBenchmark::removeByClass( const char *className)
     for (int i = 0; i < arr.getCount(); i++) {
       eyedb::Object *o = arr[i];
       o->remove();
+#ifdef LOOKING_FOR_BUG
+      if (verbose)
+	cout << "removed object " << i << " of class " << className << endl;
+#endif
     }
 
     getDatabase()->transactionCommit();

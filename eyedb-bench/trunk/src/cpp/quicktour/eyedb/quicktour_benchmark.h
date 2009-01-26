@@ -39,6 +39,10 @@ private:
 
   eyedb::Database *database;
   eyedb::Connection *conn;
+
+#ifdef LOOKING_FOR_BUG
+  bool verbose;
+#endif
 };
 
 #endif
