@@ -41,6 +41,6 @@ eyedb_start_server $PORT
 run_one_benchmark noinverse-set --cpp-flags="-UUSE_ARRAY -UUSE_INVERSE -DCOLLECTION_TYPE=set" $*
 run_one_benchmark noinverse-bag --cpp-flags="-UUSE_ARRAY -UUSE_INVERSE -DCOLLECTION_TYPE=bag" $*
 run_one_benchmark inverse --cpp-flags=-DUSE_INVERSE $*
-#run_one_benchmark array --cpp-flags=-DUSE_ARRAY $*
+run_one_benchmark array --cpp-flags=-DUSE_ARRAY $*
 
 eyedb_stop_server $PORT

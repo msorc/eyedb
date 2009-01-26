@@ -1,10 +1,13 @@
 noinst_PROGRAMS= quicktour-array quicktour-noinverse-set quicktour-noinverse-bag quicktour-inverse
+#noinst_PROGRAMS= quicktour-inverse
 
 ODL_PACKAGES=\
 odl_quicktour_array \
 odl_quicktour_noinverse_set \
 odl_quicktour_noinverse_bag \
 odl_quicktour_inverse
+# ODL_PACKAGES=\
+# odl_quicktour_inverse
 
 nodist_quicktour_array_SOURCES= \
 quicktour_benchmark.cc \
@@ -41,6 +44,9 @@ odl_quicktour_noinverse_bag.cc \
 odl_quicktour_noinverse_bag.h \
 odl_quicktour_inverse.cc \
 odl_quicktour_inverse.h 
+# BUILT_SOURCES= \
+# odl_quicktour_inverse.cc \
+# odl_quicktour_inverse.h 
 
 odl_quicktour_array.cc odl_quicktour_array.h : quicktour.odl
 	$(EYEDBODL) $(EYEDBODLCXXFLAGS) --package=odl_quicktour_array --cpp-flags=-DUSE_ARRAY $<

@@ -87,6 +87,7 @@ void QuicktourBenchmark::query( int nSelects)
 
 void QuicktourBenchmark::removeByClass( const char *className)
 {
+  //  cout << "removing " << className << endl;
   try {
     getDatabase()->transactionBegin();
             
