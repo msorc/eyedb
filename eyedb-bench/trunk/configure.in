@@ -340,6 +340,7 @@ run/quicktour/Makefile dnl
 run/quicktour/cpp/Makefile dnl
 run/quicktour/cpp/eyedb/Makefile dnl
 run/quicktour/java/Makefile dnl
+run/quicktour/java/dummy/Makefile dnl
 run/quicktour/java/db4o/Makefile dnl
 run/quicktour/java/eyedb/Makefile dnl
 run/quicktour/java/hibernate/Makefile dnl
@@ -370,6 +371,7 @@ src/java/org/eyedb/benchmark/polepos/teams/db4o/Makefile dnl
 src/java/org/eyedb/benchmark/polepos/teams/eyedb/Makefile dnl
 src/java/org/eyedb/benchmark/polepos/teams/eyedb/data/Makefile dnl
 src/java/org/eyedb/benchmark/quicktour/Makefile dnl
+src/java/org/eyedb/benchmark/quicktour/dummy/Makefile dnl
 src/java/org/eyedb/benchmark/quicktour/db4o/Makefile dnl
 src/java/org/eyedb/benchmark/quicktour/eyedb/Makefile dnl
 src/java/org/eyedb/benchmark/quicktour/eyedb/array/Makefile dnl
