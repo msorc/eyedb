@@ -40,7 +40,7 @@ void TestColl::prepare() throw( eyedb::Exception)
   conn = new eyedb::Connection( true);
 
    eyedb::Database::OpenFlag flags;
-   flags = eyedb::Database::DBRW;
+   flags = eyedb::Database::DBRWLocal;
 
    database = new coll_odlDatabase( conn, getDbName().c_str(), flags);
 }
