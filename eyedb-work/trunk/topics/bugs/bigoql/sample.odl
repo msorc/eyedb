@@ -1,52 +1,21 @@
 #ifdef USE_INVERSE
-#define RELATIONSHIP(TYPE, ATTR, INV) relationship TYPE ATTR inverse INV
+#define RELATIONSHIP_MANY(TYPE, ATTR, INV) relationship TYPE ATTR inverse INV
 #else
 #define RELATIONSHIP(TYPE, ATTR, INV) attribute TYPE ATTR
-#define RELATIONSHIP_MANY(TYPE, ATTR, INV) attribute COLLECTION_TYPE<TYPE *> ATTR
 #endif
 
 class Packet {
    string name;
 
-   RELATIONSHIP(set<Record*>,records,Record::packet);
+#if 0
+   RELATIONSHIP_MANY(set<Record*>,records,Record::packet);
+#endif
 };
 
 class Record {
    string name;
-   constraint<notnull> on name;
-   index on name;
 
+#if 0
    RELATIONSHIP(Packet *,packet,Packet::records);
-
-   RELATIONSHIP(bag<base_field*>,fields,record);
-
-   Status status[];
-
+#endif
 };
-
-enum Status {
-  good = 0x01,
-  not_so_good = 0x02
-};
-
-class base_field {
-   ID id;
-   RELATIONSHIP(Record*,record,Record::fields);
-};
-
-enum ID {
-  ID1 = 1,
-  ID2 = 2,
-  ID3 = 3,
-  ID4 = 4
-};
-
-enum derived_field_type {
-  TYPE1 = 1,
-  TYPE2 = 2
-};
-
-class derived_field extends base_field {
-  derived_field_type derivedFieldType;
-};	    
-
