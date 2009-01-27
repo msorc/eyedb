@@ -18,8 +18,10 @@ public:
 
 private:
   Packet *createPacket( int n) throw( eyedb::Exception);
+#if 0
   Record *createRecord() throw( eyedb::Exception);
   base_field *createDerived_field() throw( eyedb::Exception);
+#endif
 
   eyedb::Database *getDatabase() { return database; }
   eyedb::benchmark::Properties &getProperties() { return properties; }
@@ -59,6 +61,7 @@ Packet *InsertPacket::createPacket( int n) throw( eyedb::Exception)
   sprintf( tmp, "Packet_%d", n);
   packet->setName( tmp);
 
+#if 0
   int nRecordsPerPacket;
   getProperties().getIntProperty( "nRecordsPerPacket", nRecordsPerPacket);
 
@@ -70,10 +73,12 @@ Packet *InsertPacket::createPacket( int n) throw( eyedb::Exception)
     record->setPacket( packet);
 #endif
   }
+#endif
 
   return packet;
 }
 
+#if 0
 Record *InsertPacket::createRecord() throw( eyedb::Exception)
 {
   Record *record = new Record( getDatabase());
@@ -101,7 +106,9 @@ Record *InsertPacket::createRecord() throw( eyedb::Exception)
 
   return record;
 }
+#endif
 
+#if 0
 base_field *InsertPacket::createDerived_field() throw( eyedb::Exception)
 {
   derived_field *field = new derived_field( getDatabase());
@@ -111,6 +118,7 @@ base_field *InsertPacket::createDerived_field() throw( eyedb::Exception)
 
   return field;
 }
+#endif
 
 void InsertPacket::run() throw( eyedb::Exception)
 {
@@ -130,7 +138,7 @@ void InsertPacket::run() throw( eyedb::Exception)
     if (n % nPacketsPerTransaction == nPacketsPerTransaction - 1) {
       getDatabase()->transactionCommit();
 
-      cout << "Commiting " << nPacketsPerTransaction <<  " packets" << endl;
+      cout << "Committed " << (n+1) <<  " packets" << endl;
 
       getDatabase()->transactionBegin();
     }
