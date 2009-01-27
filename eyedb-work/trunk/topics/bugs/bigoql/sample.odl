@@ -1,0 +1,56 @@
+class Packet {
+//   date*  day;
+//   constraint<notnull> on day;
+//   index on day;
+
+   string name;
+
+   relationship set<Record*> records inverse Record::packet;
+};
+
+class Record {
+   string name;
+   constraint<notnull> on name;
+   index on name;
+
+   relationship bag<base_field*> field inverse record;
+
+   Status status[];
+
+   relationship Packet *packet inverse Packet::records;
+};
+
+enum Status {
+  good = 0x01,
+  not_so_good = 0x02
+};
+
+class base_field {
+   ID id;
+   relationship Record* record inverse field;
+};
+
+enum ID {
+  one = 1,
+  two = 2,
+  three = 3,
+  four = 4
+};
+
+enum Vegetable {
+  potatoe = 1,
+  carrot = 2
+};
+
+class vegetable_field extends base_field {
+  Vegetable vegetable_type;
+};	    
+
+enum Meat {
+  beef = 1,
+  pork = 2
+};
+
+class meat_field extends base_field {
+  Meat meat_type;
+};	    

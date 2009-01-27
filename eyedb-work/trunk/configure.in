@@ -136,6 +136,7 @@ topics/bugs/OQL_2/Makefile dnl
 topics/bugs/OQL_3/Makefile dnl
 topics/bugs/OQL_4/Makefile dnl
 topics/bugs/array/Makefile dnl
+topics/bugs/bigoql/Makefile dnl
 topics/bugs/quicktour/Makefile dnl
 topics/collections/basic/Makefile dnl
 topics/collections/general/Makefile dnl
@@ -144,6 +145,7 @@ topics/collections/set/Makefile dnl
 topics/dict/Makefile dnl
 topics/dump_restore/Makefile dnl
 topics/eyedbsm/online_backup/Makefile dnl
+topics/index/Makefile dnl
 topics/java-unix-socket/Makefile dnl
 topics/java-unix-socket/java/Makefile dnl
 topics/java-unix-socket/java/org/Makefile dnl
@@ -154,7 +156,6 @@ topics/java-unix-socket/java/org/eyedb/java/net/unix/Makefile dnl
 topics/java-unix-socket/native/Makefile dnl
 topics/java-unix-socket/test/Makefile dnl
 topics/java-unix-socket/test/echo/Makefile dnl
-topics/index/Makefile dnl
 topics/objgarb/Makefile dnl
 topics/odlplugin/Makefile dnl
 topics/oql/array/Makefile dnl

@@ -58,13 +58,13 @@ update_configure_in() {
     FILE=$TOPDIR/configure.in
     awk '
 BEGIN {topic = "'$TOPIC'";  in_ac_output = 0; s = "'$TOPICROOT'/" topic "/Makefile"; a[s] = s; }
-in_ac_output == 0 && ! ($1 ~ /AC_OUTPUT/) { print; }
-in_ac_output == 0 && $1 ~ /AC_OUTPUT/ { print; in_ac_output = 1; }
-in_ac_output == 1 && ! ($1 ~ /)/) && ! ($1 ~ /AC_OUTPUT/) && NF > 0 { a[$1] = $1; }
-in_ac_output == 1 && $1 ~ /)/ { 
-   n = asort(a); for (i = 1; i <= n; i++) print( a[i]);
+in_ac_config_files == 0 && ! ($1 ~ /AC_CONFIG_FILES/) { print; }
+in_ac_config_files == 0 && $1 ~ /AC_CONFIG_FILES/ { print; in_ac_config_files = 1; }
+in_ac_config_files == 1 && ! ($1 ~ /)/) && ! ($1 ~ /AC_CONFIG_FILES/) && NF > 0 { a[$1] = $1; }
+in_ac_config_files == 1 && $1 ~ /)/ { 
+   n = asort(a); for (i = 1; i <= n; i++) printf( "%s dnl\n", a[i]);
    print( ")");
-   in_ac_output = 0;
+   in_ac_config_files = 0;
 }
 ' $FILE > $FILE.out
     mv $FILE.out $FILE
