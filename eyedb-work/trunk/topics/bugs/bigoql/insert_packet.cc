@@ -1,16 +1,14 @@
 #include <string>
+#include "properties.h"
 #include "odl_sample.h"
 
 using namespace std;
 
 class InsertPacket {
 public:
-  InsertPacket( string dbName, int nPackets, int nRecordsPerPacket, int nPacketsPerTransaction)
-    : dbName(dbName), 
-      nPackets(nPackets), 
-      nRecordsPerPacket(nRecordsPerPacket), 
-      nPacketsPerTransaction(nPacketsPerTransaction)
+  InsertPacket( const char *propertiesFile)
   {
+    properties.load( propertiesFile);
   }
 
   void prepare() throw( eyedb::Exception);
@@ -20,19 +18,16 @@ public:
 
 private:
   Packet *createPacket( int n) throw( eyedb::Exception);
-  Record *createRecord( int n) throw( eyedb::Exception);
-  base_field *createVegetable_field() throw( eyedb::Exception);
-  base_field *createMeat_field() throw( eyedb::Exception);
+  Record *createRecord() throw( eyedb::Exception);
+  base_field *createDerived_field() throw( eyedb::Exception);
 
   eyedb::Database *getDatabase() { return database; }
+  eyedb::benchmark::Properties &getProperties() { return properties; }
 
   eyedb::Connection *conn;
   eyedb::Database *database;
 
-  string dbName;
-  int nPackets;
-  int nRecordsPerPacket;
-  int nPacketsPerTransaction;
+  eyedb::benchmark::Properties properties;
 };
 
 void InsertPacket::prepare() throw( eyedb::Exception)
@@ -43,6 +38,9 @@ void InsertPacket::prepare() throw( eyedb::Exception)
 
   eyedb::Database::OpenFlag flags;
   flags = eyedb::Database::DBRWLocal;
+
+  string dbName;
+  getProperties().getStringProperty( "eyedb.database", dbName);
 
   database = new odl_sampleDatabase( conn, dbName.c_str(), flags);
 }
@@ -57,24 +55,26 @@ Packet *InsertPacket::createPacket( int n) throw( eyedb::Exception)
 {
   Packet *packet = new Packet( getDatabase());
 
-  //packet->setDay( ?);
-
   char tmp[512];
   sprintf( tmp, "Packet_%d", n);
   packet->setName( tmp);
 
+  int nRecordsPerPacket;
+  getProperties().getIntProperty( "nRecordsPerPacket", nRecordsPerPacket);
+
   for (int n = 0; n < nRecordsPerPacket; n++) {
-    Record *record = createRecord( n);
+    Record *record = createRecord();
 
     packet->addToRecordsColl( record);
+#ifndef USE_INVERSE
+    record->setPacket( packet);
+#endif
   }
 
   return packet;
 }
 
-#define nStatusPerRecord 3
-
-Record *InsertPacket::createRecord( int n) throw( eyedb::Exception)
+Record *InsertPacket::createRecord() throw( eyedb::Exception)
 {
   Record *record = new Record( getDatabase());
 
@@ -82,8 +82,18 @@ Record *InsertPacket::createRecord( int n) throw( eyedb::Exception)
   sprintf( tmp, "Record_%d", random());
   record->setName( tmp);
 
-  record->addToFieldColl( createVegetable_field());
-  record->addToFieldColl( createMeat_field());
+  int nFieldsPerRecord;
+  getProperties().getIntProperty( "nFieldsPerRecord", nFieldsPerRecord);
+  for ( int i = 0; i < nFieldsPerRecord; i++) {
+    base_field *field = createDerived_field();
+    record->addToFieldsColl( field);
+#ifndef USE_INVERSE
+    field->setRecord( record);
+#endif
+  }
+
+  int nStatusPerRecord;
+  getProperties().getIntProperty( "nStatusPerRecord", nStatusPerRecord);
 
   record->setStatusCount( nStatusPerRecord);
   for ( int i = 0; i < nStatusPerRecord; i++)
@@ -92,22 +102,12 @@ Record *InsertPacket::createRecord( int n) throw( eyedb::Exception)
   return record;
 }
 
-base_field *InsertPacket::createVegetable_field() throw( eyedb::Exception)
+base_field *InsertPacket::createDerived_field() throw( eyedb::Exception)
 {
-  vegetable_field *field = new vegetable_field( getDatabase());
+  derived_field *field = new derived_field( getDatabase());
 
-  field->setId( one);
-  field->setVegetableType( potatoe);
-
-  return field;
-}
-
-base_field *InsertPacket::createMeat_field() throw( eyedb::Exception)
-{
-  meat_field *field = new meat_field( getDatabase());
-
-  field->setId( two);
-  field->setMeatType( beef);
+  field->setId( ID2);
+  field->setDerivedFieldType( TYPE1);
 
   return field;
 }
@@ -116,6 +116,12 @@ void InsertPacket::run() throw( eyedb::Exception)
 {
   getDatabase()->transactionBegin();
 
+  int nPackets;
+  int nPacketsPerTransaction;
+
+  getProperties().getIntProperty( "nPackets", nPackets);
+  getProperties().getIntProperty( "nPacketsPerTransaction", nPacketsPerTransaction);
+
   for ( int n = 0; n < nPackets; n++) {
     Packet *packet = createPacket( n);
 
@@ -123,6 +129,9 @@ void InsertPacket::run() throw( eyedb::Exception)
       
     if (n % nPacketsPerTransaction == nPacketsPerTransaction - 1) {
       getDatabase()->transactionCommit();
+
+      cout << "Commiting " << nPacketsPerTransaction <<  " packets" << endl;
+
       getDatabase()->transactionBegin();
     }
   }
@@ -134,19 +143,13 @@ int main( int argc, char **argv)
 {
   odl_sample initializer(argc, argv);
 
-  if (argc < 5) {
-    cerr << "Usage: " << argv[0] << " database nPackets nRecordsPerPacket nPacketsPerTransaction" << endl;
+  if (argc < 2) {
+    cerr << "Usage: " << argv[0] << " PROPERTIES_FILE" << endl;
     exit(1);
   }
 
-  string dbName = argv[1];
-  int nPackets, nRecordsPerPacket, nPacketsPerTransaction;
-  sscanf( argv[2], "%d", &nPackets);
-  sscanf( argv[3], "%d", &nRecordsPerPacket);
-  sscanf( argv[4], "%d", &nPacketsPerTransaction);
-
   try {
-    InsertPacket ip( dbName, nPackets, nRecordsPerPacket, nPacketsPerTransaction);
+    InsertPacket ip( argv[1]);
     ip.prepare();
     ip.run();
     ip.finish();
