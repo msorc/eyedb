@@ -1,11 +1,14 @@
-class Packet {
-//   date*  day;
-//   constraint<notnull> on day;
-//   index on day;
+#ifdef USE_INVERSE
+#define RELATIONSHIP(TYPE, ATTR, INV) relationship TYPE ATTR inverse INV
+#else
+#define RELATIONSHIP(TYPE, ATTR, INV) attribute TYPE ATTR
+#define RELATIONSHIP_MANY(TYPE, ATTR, INV) attribute COLLECTION_TYPE<TYPE *> ATTR
+#endif
 
+class Packet {
    string name;
 
-   relationship set<Record*> records inverse Record::packet;
+   RELATIONSHIP(set<Record*>,records,Record::packet);
 };
 
 class Record {
@@ -13,11 +16,12 @@ class Record {
    constraint<notnull> on name;
    index on name;
 
-   relationship bag<base_field*> field inverse record;
+   RELATIONSHIP(Packet *,packet,Packet::records);
+
+   RELATIONSHIP(bag<base_field*>,fields,record);
 
    Status status[];
 
-   relationship Packet *packet inverse Packet::records;
 };
 
 enum Status {
@@ -27,30 +31,22 @@ enum Status {
 
 class base_field {
    ID id;
-   relationship Record* record inverse field;
+   RELATIONSHIP(Record*,record,Record::fields);
 };
 
 enum ID {
-  one = 1,
-  two = 2,
-  three = 3,
-  four = 4
+  ID1 = 1,
+  ID2 = 2,
+  ID3 = 3,
+  ID4 = 4
 };
 
-enum Vegetable {
-  potatoe = 1,
-  carrot = 2
+enum derived_field_type {
+  TYPE1 = 1,
+  TYPE2 = 2
 };
 
-class vegetable_field extends base_field {
-  Vegetable vegetable_type;
+class derived_field extends base_field {
+  derived_field_type derivedFieldType;
 };	    
 
-enum Meat {
-  beef = 1,
-  pork = 2
-};
-
-class meat_field extends base_field {
-  Meat meat_type;
-};	    

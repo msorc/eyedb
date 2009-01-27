@@ -2,29 +2,31 @@
 EYEDB_BINDIR=@EYEDB_BINDIR@
 EYEDB_SBINDIR=@EYEDB_SBINDIR@
 
+PROPERTIES=bigoql.properties
+PORT=/var/tmp/foo
 SCHEMA=sample.odl
-DATABASE=bigoql
-nPackets=1000
-nRecordsPerPacket=10
-nPacketsPerTransaction=100
+TRANSACTION_SHMEM_SIZE=512000
 
 eyedb_resize_shm() {
     local DATABASE=$1
-    local DATABASE_FILE=`$EYEDB_BINDIR/eyedbadmin database list $DATABASE | awk '
+    local DATABASE_FILE=`$EYEDB_BINDIR/eyedbadmin database list --port=$PORT $DATABASE | awk '
 BEGIN { t = 0; }
 $0 ~ /Database File/ && t == 0 { t = 1; }
 $0 !~ /Database File/ && t == 1 { dbfile = $1; print $dbfile; t = 0; }
 '`
-    local NEWSIZE=132000
-    $EYEDB_SBINDIR/eyedbsmtool shmem resize $DATABASE_FILE $NEWSIZE
+    $EYEDB_SBINDIR/eyedbsmtool shmem resize $DATABASE_FILE $TRANSACTION_SHMEM_SIZE
 }
 
-$EYEDB_SBINDIR/eyedbctl start --nod
-$EYEDB_BINDIR/eyedbadmin database delete $DATABASE
-$EYEDB_BINDIR/eyedbadmin database create $DATABASE
-$EYEDB_BINDIR/eyedbodl -d $DATABASE -u $SCHEMA
+DATABASE=`grep eyedb.database $PROPERTIES | awk -F = '{print $2}'`
+
+$EYEDB_SBINDIR/eyedbctl start --nod --listen=$PORT
+$EYEDB_BINDIR/eyedbadmin database delete --port=$PORT $DATABASE
+$EYEDB_BINDIR/eyedbadmin database create --port=$PORT --max-object-count=1000000000 $DATABASE
+$EYEDB_BINDIR/eyedbodl -d $DATABASE -u $SCHEMA --port=$PORT 
 eyedb_resize_shm $DATABASE
 
-./insert_packet $DATABASE $nPackets $nRecordsPerPacket $nPacketsPerTransaction
+./insert_packet $PROPERTIES --port=$PORT 
 
-$EYEDB_SBINDIR/eyedbctl stop
+$EYEDB_BINDIR/eyedboql --port=$PORT -d $DATABASE -c 'count(select Record)'
+
+$EYEDB_SBINDIR/eyedbctl stop --listen=$PORT 
