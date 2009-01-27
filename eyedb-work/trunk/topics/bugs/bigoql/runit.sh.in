@@ -1,0 +1,30 @@
+#!/bin/bash
+EYEDB_BINDIR=@EYEDB_BINDIR@
+EYEDB_SBINDIR=@EYEDB_SBINDIR@
+
+SCHEMA=sample.odl
+DATABASE=bigoql
+nPackets=1000
+nRecordsPerPacket=10
+nPacketsPerTransaction=100
+
+eyedb_resize_shm() {
+    local DATABASE=$1
+    local DATABASE_FILE=`$EYEDB_BINDIR/eyedbadmin database list $DATABASE | awk '
+BEGIN { t = 0; }
+$0 ~ /Database File/ && t == 0 { t = 1; }
+$0 !~ /Database File/ && t == 1 { dbfile = $1; print $dbfile; t = 0; }
+'`
+    local NEWSIZE=132000
+    $EYEDB_SBINDIR/eyedbsmtool shmem resize $DATABASE_FILE $NEWSIZE
+}
+
+$EYEDB_SBINDIR/eyedbctl start --nod
+$EYEDB_BINDIR/eyedbadmin database delete $DATABASE
+$EYEDB_BINDIR/eyedbadmin database create $DATABASE
+$EYEDB_BINDIR/eyedbodl -d $DATABASE -u $SCHEMA
+eyedb_resize_shm $DATABASE
+
+./insert_packet $DATABASE $nPackets $nRecordsPerPacket $nPacketsPerTransaction
+
+$EYEDB_SBINDIR/eyedbctl stop
