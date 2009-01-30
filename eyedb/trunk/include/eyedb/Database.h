@@ -1073,6 +1073,8 @@ namespace eyedb {
     Status execOQL(ValueArray &, const char *fmt, ...);
     */
 
+    static void operator delete(void *);
+
     // ----------------------------------------------------------------------
     // Database Protected Part
     // ----------------------------------------------------------------------

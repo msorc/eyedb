@@ -2640,4 +2640,7 @@ if ((mode) !=  NoDBAccessMode && \
     mark_created.erase(mark_created.begin(), mark_created.end());
   }
 
+  void Database::operator delete(void *o)
+  {
+  }
 }
