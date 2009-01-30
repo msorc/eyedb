@@ -107,15 +107,23 @@ void Imola::run()
 
 int main(int argc, char *argv[])
 {
-  Imola b;
-  b.getProperties().load( "eyedb.properties");
-  b.getProperties().load( argc, argv);
+  try {
+    Imola b;
+    b.getProperties().load( "eyedb.properties");
+    b.getProperties().load( argc, argv);
+    
+    polepos initializer(argc, argv);
+    
+    b.bench();
+    
+    eyedb::benchmark::SimpleReporter r;
+    r.setColumnWidth( 25);
+    r.report(b);
+  }
+  catch ( eyedb::Exception &ex ) {
+    ex.print();
+    return 1;
+  }
 
-  polepos initializer(argc, argv);
-
-  b.bench();
-
-  eyedb::benchmark::SimpleReporter r;
-  r.setColumnWidth( 25);
-  r.report(b);
+  return 0;
 }
