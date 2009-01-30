@@ -130,6 +130,8 @@ void InsertPacket::run() throw( eyedb::Exception)
   getProperties().getIntProperty( "nPackets", nPackets);
   getProperties().getIntProperty( "nPacketsPerTransaction", nPacketsPerTransaction);
 
+  time_t t0;
+  time(&t0);
   for ( int n = 0; n < nPackets; n++) {
     Packet *packet = createPacket( n);
 
@@ -138,10 +140,14 @@ void InsertPacket::run() throw( eyedb::Exception)
     if (n % nPacketsPerTransaction == nPacketsPerTransaction - 1) {
       getDatabase()->transactionCommit();
 
-      cout << "Committed " << (n+1) <<  " packets" << endl;
+      time_t t1;
+      time(&t1);
+      cout << "Committed " << (n+1) <<  " packets " << (t1-t0) << " seconds" << endl;
 
+      t0 = t1;
       getDatabase()->transactionBegin();
     }
+    packet->release();
   }
 
   getDatabase()->transactionCommit();
