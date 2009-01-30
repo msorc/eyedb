@@ -7,6 +7,7 @@
 class Packet {
    string name;
 
+//   index on name;
 #if 0
    RELATIONSHIP_MANY(set<Record*>,records,Record::packet);
 #endif
