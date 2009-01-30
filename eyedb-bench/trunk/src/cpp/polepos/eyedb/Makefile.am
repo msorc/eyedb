@@ -1,4 +1,4 @@
-noinst_PROGRAMS= barcelona bahrain imola melbourne sepang
+bin_PROGRAMS= barcelona bahrain imola melbourne sepang
 
 nodist_barcelona_SOURCES= polepos.cc polepos-benchmark.cc barcelona.cc
 

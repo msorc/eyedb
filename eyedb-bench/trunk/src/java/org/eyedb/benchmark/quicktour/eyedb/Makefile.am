@@ -8,6 +8,6 @@ EyeDBQuicktourInverse.java
 
 EYEDB_JAR=@EYEDB_JAR@
 JAVAROOT=$(top_builddir)/src/java
-CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_builddir)/src/java:$(EYEDB_JAR)
+CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_srcdir)/src/java:$(EYEDB_JAR)
 
 EXTRA_DIST= quicktour.odl

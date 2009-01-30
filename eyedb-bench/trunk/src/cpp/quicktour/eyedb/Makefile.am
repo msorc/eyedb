@@ -1,4 +1,4 @@
-noinst_PROGRAMS= quicktour-array quicktour-noinverse-set quicktour-noinverse-bag quicktour-inverse
+bin_PROGRAMS= quicktour-array quicktour-noinverse-set quicktour-noinverse-bag quicktour-inverse
 
 ODL_PACKAGES=\
 odl_quicktour_array \
