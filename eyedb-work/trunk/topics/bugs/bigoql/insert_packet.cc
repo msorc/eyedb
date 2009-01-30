@@ -136,7 +136,9 @@ void InsertPacket::run() throw( eyedb::Exception)
     Packet *packet = createPacket( n);
 
     packet->store( eyedb::FullRecurs);
-      
+     
+    packet->release();
+
     if (n % nPacketsPerTransaction == nPacketsPerTransaction - 1) {
       getDatabase()->transactionCommit();
 
