@@ -34,7 +34,8 @@ void PoleposBenchmark::prepare()
     database = new poleposDatabase( conn, dbName.c_str(), flags);
   }
   catch ( eyedb::Exception &ex ) {
-    ex.print();
+    //ex.print();
+    throw;
   }
 }
 

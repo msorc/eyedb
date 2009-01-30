@@ -1,5 +1,6 @@
 #include <sstream>
 #include <vector>
+#define private public
 #include "polepos.h"
 #include "barcelona.h"
 
@@ -146,14 +147,22 @@ void Barcelona::run()
 
 int main(int argc, char *argv[])
 {
-  Barcelona b;
-  b.getProperties().load( "eyedb.properties");
-  b.getProperties().load( argc, argv);
+  try {
+    Barcelona b;
+    b.getProperties().load( "eyedb.properties");
+    b.getProperties().load( argc, argv);
 
-  polepos initializer(argc, argv);
+    polepos initializer(argc, argv);
 
-  b.bench();
+    b.bench();
 
-  eyedb::benchmark::SimpleReporter r;
-  r.report(b);
+    eyedb::benchmark::SimpleReporter r;
+    r.report(b);
+  }
+  catch ( eyedb::Exception &ex ) {
+    ex.print();
+    return 1;
+  }
+
+  return 0;
 }

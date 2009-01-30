@@ -142,15 +142,23 @@ void Melbourne::run()
 
 int main(int argc, char *argv[])
 {
-  Melbourne b;
-  b.getProperties().load( "eyedb.properties");
-  b.getProperties().load( argc, argv);
+  try {
+    Melbourne b;
+    b.getProperties().load( "eyedb.properties");
+    b.getProperties().load( argc, argv);
 
-  polepos initializer(argc, argv);
+    polepos initializer(argc, argv);
 
-  b.bench();
+    b.bench();
 
-  eyedb::benchmark::SimpleReporter r;
-  r.setColumnWidth( 16);
-  r.report(b);
+    eyedb::benchmark::SimpleReporter r;
+    r.setColumnWidth( 16);
+    r.report(b);
+  }
+  catch ( eyedb::Exception &ex ) {
+    ex.print();
+    return 1;
+  }
+
+  return 0;
 }
