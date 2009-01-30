@@ -149,6 +149,9 @@ AC_SUBST(EYEDB_INCLUDEDIR)
 AC_SUBST(EYEDB_LIBDIR)
 AC_SUBST(EYEDB_JAR)
 
+AC_CONFIG_LINKS( src/cpp/polepos/eyedb/polepos.odl:src/java/org/eyedb/benchmark/polepos/teams/eyedb/data/data.odl )
+AC_CONFIG_LINKS( src/cpp/quicktour/eyedb/quicktour.odl:src/java/org/eyedb/benchmark/quicktour/eyedb/quicktour.odl )
+
 # ========================================
 # db4o
 # ========================================
@@ -257,7 +260,8 @@ AC_SUBST(HIBERNATE_CLASSPATH)
 AC_ARG_VAR(POLEPOS_DIR,[Poleposition benchmarks source directory])
 
 # To be changed if Poleposition version changes
-POLEPOS_DIR_DEFAULT=dependencies/poleposition/src/polepos-oct-27-2008
+POLEPOS_VERSION=oct-27-2008
+POLEPOS_DIR_DEFAULT=dependencies/poleposition/src/polepos-${POLEPOS_VERSION}
 
 if test "$ac_enable_polepos" = "yes" ; then
    if test x"$POLEPOS_DIR" = x ; then
@@ -274,6 +278,7 @@ fi
 AM_CONDITIONAL(COND_POLEPOS, test x"$COND_POLEPOS" = xyes)
 
 AC_SUBST(POLEPOS_DIR)
+AC_SUBST(POLEPOS_VERSION)
 
 
 # ========================================
@@ -321,8 +326,6 @@ AC_SUBST(OPENOFFICE_CLASSPATH)
 # ========================================
 # Generate output files
 # ========================================
-AC_CONFIG_LINKS( ${srcdir}/src/cpp/polepos/eyedb/polepos.odl:src/java/org/eyedb/benchmark/polepos/teams/eyedb/data/data.odl )
-AC_CONFIG_LINKS( ${srcdir}/src/cpp/quicktour/eyedb/quicktour.odl:src/java/org/eyedb/benchmark/quicktour/eyedb/quicktour.odl )
 
 AC_CONFIG_FILES(
 Makefile dnl

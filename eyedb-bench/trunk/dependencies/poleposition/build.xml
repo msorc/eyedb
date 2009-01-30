@@ -1,0 +1,41 @@
+<project name="poleposition" default="compile">
+
+  <path id="poleposition_classpath">
+    <fileset dir="${srcdir}/lib">
+      <include name="db4o-6.3-java5.jar" />			
+    </fileset>
+    <fileset dir="${srcdir}/lib">
+      <include name="**/*.jar" />
+    </fileset>
+  </path>
+
+  <target name="clean">
+    <delete dir="bin" />
+  </target>
+  
+  <target name="compile" description="compiles the Poleposition sources">
+    <mkdir dir="bin" />
+    <copy todir=".">
+      <fileset dir="${srcdir}/src">
+	<include name="mckoi.conf" />
+      </fileset>
+    </copy>
+    <copy todir="bin">
+      <fileset dir="${srcdir}/src">
+	<include name="**/**" />
+	<exclude name="**/*.java" />
+      </fileset>
+    </copy>
+    <javac destdir="bin">
+      <src path="${srcdir}/src" />
+      <classpath refid="poleposition_classpath" />
+    </javac>
+  </target>
+
+  <target name="jar">
+    <jar destfile="poleposition.jar"
+	 basedir="bin"
+	 includes="**/*.class"/>
+  </target>
+  
+</project>

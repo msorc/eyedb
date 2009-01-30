@@ -5,7 +5,7 @@ top_builddir=@top_builddir@
 EYEDB_BINDIR=@EYEDB_BINDIR@
 
 PROPERTIES=${srcdir}/eyedb.properties
-SCHEMA=${top_srcdir}/src/cpp/quicktour/eyedb/quicktour.odl
+SCHEMA=${top_builddir}/src/cpp/quicktour/eyedb/quicktour.odl
 
 # date "+%Y-%m-%d::%H:%M:%S"
 
