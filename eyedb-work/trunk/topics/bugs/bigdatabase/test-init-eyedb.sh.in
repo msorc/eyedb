@@ -7,7 +7,8 @@ DATABASE_NAME=stocks
 DATABASE_DIR=$1
 DATABASE_MAX_OBJECT_COUNT=1000000000
 DATABASE_DATAFILE_SIZE=16000
-DATABASE_DATAFILE_COUNT=12
+#DATABASE_DATAFILE_COUNT=12
+DATABASE_DATAFILE_COUNT=15
 
 function stop_eyedb()
 {
@@ -24,6 +25,7 @@ function start_eyedb()
 function create_database()
 {
     echo "Create Database"
+    $EYEDB_BINDIR/eyedbadmin database delete $DATABASE_NAME
     $EYEDB_BINDIR/eyedbadmin database create --dbfile=$DATABASE_DIR/$DATABASE_NAME-0.dbs  --filedir=$DATABASE_DIR --max-object-count=$DATABASE_MAX_OBJECT_COUNT $DATABASE_NAME
 }
 
@@ -46,11 +48,11 @@ function resize_database()
     DATASPACE_ARG=""
     while test $COUNT -le $DATABASE_DATAFILE_COUNT ; do
 	$EYEDB_BINDIR/eyedbadmin datafile create --size=$DATABASE_DATAFILE_SIZE $DATABASE_NAME $DATABASE_DIR/$DATABASE_NAME-$COUNT.dat
-	COUNT=`expr $COUNT + 1`
 	DATASPACE_ARG="$DATASPACE_ARG $COUNT"
+	COUNT=`expr $COUNT + 1`
     done
 
-    $EYEDB_BINDIR/eyedbadmin dataspace create $DATABASE_NAME $DATABASE_NAME $DATASPACE_CMD
+    $EYEDB_BINDIR/eyedbadmin dataspace create $DATABASE_NAME $DATABASE_NAME $DATASPACE_ARG
     $EYEDB_BINDIR/eyedbadmin dataspace setdef $DATABASE_NAME $DATABASE_NAME
 }
 
