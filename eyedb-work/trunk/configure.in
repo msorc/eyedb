@@ -136,6 +136,7 @@ topics/bugs/OQL_2/Makefile dnl
 topics/bugs/OQL_3/Makefile dnl
 topics/bugs/OQL_4/Makefile dnl
 topics/bugs/array/Makefile dnl
+topics/bugs/bigdatabase/Makefile dnl
 topics/bugs/bigoql/Makefile dnl
 topics/bugs/quicktour/Makefile dnl
 topics/collections/basic/Makefile dnl

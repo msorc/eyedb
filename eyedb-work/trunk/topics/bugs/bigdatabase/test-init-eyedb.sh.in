@@ -1,0 +1,73 @@
+#!/bin/bash
+
+EYEDB_BINDIR=@EYEDB_BINDIR@
+EYEDB_SBINDIR=@EYEDB_SBINDIR@
+
+DATABASE_NAME=stocks
+DATABASE_DIR=$1
+DATABASE_MAX_OBJECT_COUNT=1000000000
+DATABASE_DATAFILE_SIZE=16000
+DATABASE_DATAFILE_COUNT=12
+
+function stop_eyedb()
+{
+    echo "Stoping EyeDB"
+    $EYEDB_SBINDIR/eyedbctl stop -f 
+}
+
+function start_eyedb()
+{
+    echo "Start EyeDB"
+    $EYEDB_SBINDIR/eyedbctl start
+}
+
+function create_database()
+{
+    echo "Create Database"
+    $EYEDB_BINDIR/eyedbadmin database create --dbfile=$DATABASE_DIR/$DATABASE_NAME-0.dbs  --filedir=$DATABASE_DIR --max-object-count=$DATABASE_MAX_OBJECT_COUNT $DATABASE_NAME
+}
+
+function create_users()
+{
+    echo "Create Users"
+    $EYEDB_BINDIR/eyedbadmin user add --unix n o
+    $EYEDB_BINDIR/eyedbadmin user sysaccess n superuser
+    $EYEDB_BINDIR/eyedbadmin user dbaccess n $DATABASE_NAME rwx
+}
+
+function resize_database()
+{
+    echo
+    echo "Resize Database"
+
+    $EYEDB_BINDIR/eyedbadmin datafile resize $DATABASE_NAME 0 $DATABASE_DATAFILE_SIZE 
+
+    COUNT=1
+    DATASPACE_ARG=""
+    while test $COUNT -le $DATABASE_DATAFILE_COUNT ; do
+	$EYEDB_BINDIR/eyedbadmin datafile create --size=$DATABASE_DATAFILE_SIZE $DATABASE_NAME $DATABASE_DIR/$DATABASE_NAME-$COUNT.dat
+	COUNT=`expr $COUNT + 1`
+	DATASPACE_ARG="$DATASPACE_ARG $COUNT"
+    done
+
+    $EYEDB_BINDIR/eyedbadmin dataspace create $DATABASE_NAME $DATABASE_NAME $DATASPACE_CMD
+    $EYEDB_BINDIR/eyedbadmin dataspace setdef $DATABASE_NAME $DATABASE_NAME
+}
+
+function resize_shm()
+{
+    echo "Shared Memory 512MB"
+    $EYEDB_SBINDIR/eyedbsmtool shmem resize $DATABASE_DIR/$DATABASE_NAME-0.dbs 512000
+}
+
+function update_schema()
+{
+    echo "Set /home/XMan/$DATABASE_NAME.odl"
+    $EYEDB_BINDIR:eyedbodl --update --database=$DATABASE_NAME $DATABASE_NAME.odl
+}
+
+stop_eyedb
+start_eyedb
+create_database
+resize_database
+stop_eyedb
