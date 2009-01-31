@@ -21,10 +21,15 @@ function start_eyedb()
     $EYEDB_SBINDIR/eyedbctl start
 }
 
+function delete_database()
+{
+    echo "Delete Database"
+    $EYEDB_BINDIR/eyedbadmin database delete $DATABASE_NAME
+}
+
 function create_database()
 {
     echo "Create Database"
-    $EYEDB_BINDIR/eyedbadmin database delete $DATABASE_NAME
     $EYEDB_BINDIR/eyedbadmin database create --dbfile=$DATABASE_DIR/$DATABASE_NAME-0.dbs  --filedir=$DATABASE_DIR --max-object-count=$DATABASE_MAX_OBJECT_COUNT $DATABASE_NAME
 }
 
@@ -69,6 +74,8 @@ function update_schema()
 
 stop_eyedb
 start_eyedb
+delete_database
+set -e
 create_database
 resize_database
 stop_eyedb
