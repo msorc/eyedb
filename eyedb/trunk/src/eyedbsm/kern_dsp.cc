@@ -137,10 +137,11 @@ ESM_dspCreateRealize(DbHandle const *dbh, const char *op,
 		    short dspid, const char *dataspace,
 		    const char **datfiles, unsigned int datfile_cnt)
 {
-  if (datfile_cnt >= MAX_DAT_PER_DSP)
+  if (datfile_cnt >= MAX_DAT_PER_DSP) {
     return statusMake(INVALID_DATAFILE_CNT_IN_DATASPACE,
-			 "%s too many datafiles in dataspace: `%d'", op,
-			 datfile_cnt);
+		      "%s too many datafiles in dataspace: %u, maximum is %u",
+		      op, datfile_cnt, MAX_DAT_PER_DSP);
+  }
 
   short *datid = new short[datfile_cnt];
   DbHeader _dbh(DBSADDR(dbh));

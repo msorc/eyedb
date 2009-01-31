@@ -38,9 +38,9 @@ namespace eyedbsm {
 
   static const unsigned int MAX_ROOT_KEY = 16;
   static const unsigned int MAX_ROOT_DATA = 64;
-  static const unsigned int MAX_DATAFILES = 512;
+  static const unsigned int MAX_DATAFILES = 1024; //  EV: 2009-01-31: old value was 512 
   static const unsigned int MAX_DATASPACES = 512;
-  static const unsigned int MAX_DAT_PER_DSP = 32;
+  static const unsigned int MAX_DAT_PER_DSP = 256; // EV: 2009-01-31: old value was 32 
 
   static const unsigned int Oid_DBID = 10;
   static const unsigned int Oid_UNIQUE = 22;
