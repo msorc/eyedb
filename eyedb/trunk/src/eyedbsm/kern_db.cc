@@ -182,13 +182,13 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 
     if (ndat <= 0)
       return statusMake(INVALID_DATAFILE_CNT,
-			"%sinvalid datafile number: `%d'",
+			"%sinvalid datafile number: %d",
 			pr, ndat);
 
     if (ndat >= MAX_DATAFILES)
       return statusMake(INVALID_DATAFILE_CNT,
-			"%sdatafile number too large: `%d'", pr, ndat);
-
+			"%sdatafile number too large: %d, maximum is %u", pr, ndat, MAX_DATAFILES);
+    
     return Success;
   }
     
