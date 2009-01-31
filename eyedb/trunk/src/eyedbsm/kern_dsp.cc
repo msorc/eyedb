@@ -139,7 +139,7 @@ ESM_dspCreateRealize(DbHandle const *dbh, const char *op,
 {
   if (datfile_cnt >= MAX_DAT_PER_DSP) {
     return statusMake(INVALID_DATAFILE_CNT_IN_DATASPACE,
-		      "%s too many datafiles in dataspace: %u, maximum is %u",
+		      "%stoo many datafiles in dataspace: %u, maximum is %u",
 		      op, datfile_cnt, MAX_DAT_PER_DSP);
   }
 
