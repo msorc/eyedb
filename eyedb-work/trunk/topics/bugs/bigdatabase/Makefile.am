@@ -1,7 +1,9 @@
 # default value
 # best way is to pass it to make as in:
-# make run DATABASE_DIR=/data1/ddd
+# make run DATABASE_DIR=/data2/dechelle 
 DATABASE_DIR=/var/tmp
+DATAFILE_COUNT=150
+DATAFILE_SIZE=65000
 
 TOPIC_SCRIPT_FILES = test-init-eyedb.sh
 
@@ -21,4 +23,4 @@ EDIT = sed \
 $(TOPIC_SCRIPT_FILES): Makefile
 
 run: test-init-eyedb.sh
-	$(SHELL) -x test-init-eyedb.sh $(DATABASE_DIR)
+	$(SHELL) -x test-init-eyedb.sh $(DATABASE_DIR) $(DATAFILE_COUNT) $(DATAFILE_SIZE)
