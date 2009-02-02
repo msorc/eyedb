@@ -4,6 +4,15 @@ usage() {
     echo "Usage: `basename $0` {<topic>}"
 }
 
+check_gnu_awk() {
+    if awk --version 2>&1 | grep 'GNU Awk' > /dev/null ; then
+	:
+    else
+	echo "awk is not GNU awk; you must install GNU awk to run this script"
+	exit 1
+    fi
+}
+
 backup_file_aux() {
     if [ $2 -ge 2 ] ; then return 0; fi
     if [ -f $1.backup ] ; then backup_file_aux $1.backup `expr $2 + 1` ; fi
@@ -97,6 +106,7 @@ generate_topic() {
 }
 
 if [ $# -eq 0 ] ; then usage $*; exit 2; fi
+check_gnu_awk
 
 TOPDIR=`dirname $0`/..
 TOPDIR=`(cd $TOPDIR; pwd)`
