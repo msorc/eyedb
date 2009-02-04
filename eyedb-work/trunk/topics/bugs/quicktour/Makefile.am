@@ -7,11 +7,10 @@ nodist_quicktour_inverse_SOURCES= \
 quicktour_benchmark.cc \
 quicktour_benchmark_inverse.cc \
 odl_quicktour_inverse.cc \
-properties.cc \
 benchmark.cc 
 
-INCLUDES=$(EYEDB_CFLAGS)
-LDADD=$(EYEDB_LIBS)
+INCLUDES=$(EYEDB_CFLAGS) -I$(top_srcdir)/topics/utils
+LDADD=$(EYEDB_LIBS) $(top_builddir)/topics/utils/libeyedbworkutils.a
 
 EYEDBODL= $(EYEDB_BINDIR)/eyedbodl
 EYEDBODLCXXFLAGS= --gencode=C++ 
