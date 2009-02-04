@@ -1,6 +1,6 @@
-lib_LTLIBRARIES= libeyedbbenchmark.la
+noinst_LIBRARIES= libeyedbbenchmark.a
 
-libeyedbbenchmark_la_SOURCES= \
+libeyedbbenchmark_a_SOURCES= \
 benchmark.cc \
 properties.cc \
 reporter.cc \
