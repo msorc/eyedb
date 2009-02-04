@@ -16,6 +16,7 @@ $(OPENOFFICE_SUBDIR) \
 org/eyedb/benchmark/framework/reporter \
 org/eyedb/benchmark/framework/reporter/csv \
 org/eyedb/benchmark/framework/reporter/simple \
+org/eyedb/benchmark/petshop/eyedb \
 org/eyedb/benchmark/polepos \
 org/eyedb/benchmark/polepos/teams/db4o \
 org/eyedb/benchmark/polepos/teams/eyedb \
