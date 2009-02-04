@@ -1,4 +1,5 @@
 SUBDIRS=\
+utils \
 bugs/array \
 bugs/bigdatabase \
 bugs/bigoql \

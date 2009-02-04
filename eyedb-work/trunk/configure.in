@@ -172,6 +172,7 @@ topics/php/Makefile dnl
 topics/ruby/Makefile dnl
 topics/schemaflex/Makefile dnl
 topics/union/Makefile dnl
+topics/utils/Makefile dnl
 topics/virtattr/Makefile dnl
 )
 AC_OUTPUT
