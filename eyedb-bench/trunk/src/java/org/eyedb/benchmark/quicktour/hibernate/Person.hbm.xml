@@ -11,7 +11,7 @@
       <generator class="native"/>
     </id>
 
-    <property name="firstName"/>
+    <property name="firstName" index="firstName_idx"/>
 
     <property name="lastName"/>
 
