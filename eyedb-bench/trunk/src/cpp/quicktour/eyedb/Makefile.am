@@ -29,7 +29,7 @@ AM_CPPFLAGS=-DLOOKING_FOR_BUG
 EYEDB_INCLUDEDIR=@EYEDB_INCLUDEDIR@
 INCLUDES=-I$(EYEDB_INCLUDEDIR) -I$(top_srcdir)/src/cpp
 EYEDB_LIBDIR=@EYEDB_LIBDIR@
-LDADD=-L$(EYEDB_LIBDIR) -leyedb -leyedbrpcfe -leyedbsm -leyedbutils -lpthread $(top_builddir)/src/cpp/framework/libeyedbbenchmark.la
+LDADD=-L$(EYEDB_LIBDIR) -leyedb -leyedbrpcfe -leyedbsm -leyedbutils -lpthread $(top_builddir)/src/cpp/framework/libeyedbbenchmark.a
 
 EYEDB_BINDIR=@EYEDB_BINDIR@
 EYEDBODL= $(EYEDB_BINDIR)/eyedbodl
