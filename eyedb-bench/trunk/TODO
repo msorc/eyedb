@@ -1,13 +1,8 @@
 
-- add more detailled report in bench output (machine name, time, uptime, platform...) [DONE FOR JAVA, TO DO FOR C++?]
-
 - complete quicktour:
 -- Java: 
 --- db4o: queries?
 --- hibernate: add indexes
--- C++: eyedb
---- with and without referential integrity [DONE]
---- with and without collections [DONE, but bug in arrays]
 
 - re-run benchmarks for poleposition, add results to svn
 

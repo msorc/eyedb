@@ -1,0 +1,133 @@
+class PersonInfo {
+	string status;
+	string addr1;
+	string addr2;
+	string city;
+	string state;
+	string zip;
+	string phone;
+};
+
+class Supplier extends PersonInfo {
+	string name;
+
+	constraint <unique> on name;
+	index on name;
+	relationship set<Item *> items inverse supplier;
+};
+
+class Account extends PersonInfo {
+	string username;
+	string password;
+	string email;
+	string firstname;
+	string lastname;
+	string country;
+	string langpref;
+	boolean mylistopt;
+	boolean banneropt;
+	string bannername;
+	
+	constraint <unique> on username;
+	index on username;
+	relationship BannerData *favcategory inverse accounts;
+	relationship set <Order *> orders inverse account;
+};
+
+class Item {
+	string itemid;
+	float listprice;
+	float unitcost;
+	int qty;
+	string status;
+	string attr1;
+	string attr2;
+	string attr3;
+	string attr4;
+	string attr5;
+
+	constraint <unique> on itemid;
+	index on itemid;
+	relationship Product *product inverse items;
+	relationship Supplier *supplier inverse items;
+	relationship set<LineItem *> lineitems inverse item;
+};
+
+class Order {
+	string orderid;
+	string orderdate;
+	string shipaddr1;
+	string shipaddr2;
+	string shipcity;
+	string shipstate;
+	string shipzip;
+	string shipcountry;
+	string billaddr1;
+	string billaddr2;
+	string billcity;
+	string billstate;
+	string billzip;
+	string billcountry;
+	string courier;
+	float totalprice;
+	string billtofirstname;
+	string billtolastname;
+	string shiptofirstname;
+	string shiptolastname;
+	string creditcard;
+	string exprdate;
+	string cardtype;
+	string locale;
+	
+	constraint <unique> on orderid;
+	index on orderid;
+	relationship set<LineItem *> lineitems inverse order;
+	relationship Account *account inverse orders;
+};
+
+class Product {
+	string productid;
+	string name;
+	string descn;
+	
+	constraint <unique> on productid;
+	index on productid;
+	relationship Category *category inverse products;
+	relationship set<Item *> items inverse product;
+};
+
+class LineItem {
+	int linenum;
+	int quantity;
+	float unitprice;
+
+	constraint <unique> on linenum;
+	index on linenum;
+	relationship Order *order inverse lineitems;
+	relationship Item *item inverse lineitems;
+};
+
+class BannerData {
+	string bannername;
+
+	relationship set<Account *> accounts inverse favcategory;
+	relationship Category *category inverse bannerdata;
+};
+
+class Category {
+	string name;
+	string descn;
+
+	constraint <unique> on name;
+	index on name;
+	relationship set<Product *> products inverse category;
+	relationship BannerData *bannerdata inverse category;
+};
+
+class Sequence {
+	string name;
+	int nextid;
+	
+	index on name;
+	constraint <unique> on name;
+};

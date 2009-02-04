@@ -1,0 +1,137 @@
+/****************************************************************
+ * Classe contenant les bannières pour chaque categories.
+ ****************************************************************/
+class BannerData {
+	string bannername;
+
+	relationship set<UserAccount *> useraccounts inverse favcategory;
+};
+
+/****************************************************************
+ * Classe contenant les détails sur chaques catégories.
+ ****************************************************************/
+class Category {
+	string name;
+
+	relationship set<Product *> products inverse category;
+};
+
+/****************************************************************
+ * Classe référençant tous les items du site (animaux, vendeurs, etc..).
+ ****************************************************************/
+class Item {
+	float listprice;
+	float unitcost;
+	int qty;
+
+	relationship Product *product inverse items;
+	relationship Supplier *supplier inverse items;
+	relationship set<LineItem *> lineitems inverse item;
+};
+
+/****************************************************************
+ * Classe contenant les suivis entre les commandes et les items.
+ ****************************************************************/ 
+class LineItem {
+	int linenum;
+	int quantity;
+	float unitprice;
+
+	relationship Orders *order inverse lineitem;
+	relationship Item *item inverse lineitems;
+};
+
+/****************************************************************
+ * Classe contenant les commandes.
+ ****************************************************************/
+class Orders {
+	date orderdate;
+	string shiptofirstname;
+	string shiptolastname;
+	string shiptoaddress1;
+	string shiptoaddress2;
+	string shiptocity;
+	string shiptostate;
+	string shiptozip;
+	string shiptocountry;
+	string shiptophonenumber;
+	string billtofirstname;
+	string billtolastname;
+	string billtoaddress1;
+	string billtoaddress2;
+	string billtocity;
+	string billtostate;
+	string billtopostalcode;
+	string billtocountry;
+	string billtophonenumber;
+	float totalprice;
+	string cardtype;
+	string cardnumber;
+	string cardexpiremonth;
+	string cardexpireyear;
+	string locale;
+
+	relationship LineItem *lineitem inverse order;
+	relationship UserAccount *useraccount inverse order;
+};
+
+
+/****************************************************************
+ * Classe contenant les produits du magasin.
+ ****************************************************************/
+class Product {
+	string img;
+
+	relationship Category *category inverse products;
+	relationship set<Item *> items inverse product;
+	relationship ProductDetails *productdetails inverse product;
+};
+
+/****************************************************************
+ * Classe contenant les détails des produits (description, nom, etc...).
+ ****************************************************************/
+class ProductDetails {
+	string name;
+	string descn;
+
+	relationship Product *product inverse productdetails;
+};
+
+/****************************************************************
+ * Superclasse contenant les information sur une personne type (adresse, ville, etc...).
+ ****************************************************************/
+class PersonInfo {
+	string status;
+	string addr1;
+	string addr2;
+	string city;
+	string state;
+	string zip;
+	string phone;
+};
+
+/****************************************************************
+ * Classe contenant les fournisseurs.
+ ****************************************************************/
+class Supplier extends PersonInfo {
+	string name;
+
+	relationship set<Item *> items inverse supplier;
+};
+
+/****************************************************************
+ * Classe contenant les comptes utilisateurs.
+ ****************************************************************/
+class UserAccount extends PersonInfo {
+	string pwd;
+	string email;
+	string firstname;
+	string lastname;
+	string country;
+	string langpref;
+	int mylistopt;
+	int banneropt;
+
+	relationship Orders *order inverse useraccount;
+	relationship BannerData *favcategory inverse useraccounts;
+};
