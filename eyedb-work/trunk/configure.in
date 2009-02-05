@@ -165,6 +165,11 @@ topics/java-unix-socket/java/org/eyedb/java/net/unix/Makefile dnl
 topics/java-unix-socket/native/Makefile dnl
 topics/java-unix-socket/test/Makefile dnl
 topics/java-unix-socket/test/echo/Makefile dnl
+topics/jodl/Makefile dnl
+topics/jodl/src/Makefile dnl
+topics/jodl/src/org/Makefile dnl
+topics/jodl/src/org/eyedb/Makefile dnl
+topics/jodl/src/org/eyedb/jodl/Makefile dnl
 topics/objgarb/Makefile dnl
 topics/odlplugin/Makefile dnl
 topics/oql/array/Makefile dnl
