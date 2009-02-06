@@ -1,0 +1,10 @@
+
+class C {
+  int c;
+  bag<C *> bag_c;
+  C *arr_c[];
+};
+
+class B {
+  int b;
+};
