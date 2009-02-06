@@ -1,11 +1,13 @@
 #!/bin/bash
+srcdir=@srcdir@
+top_srcdir=@top_srcdir@
 top_builddir=@top_builddir@
 DB4O_JAR=@DB4O_JAR@
 JAVA=@JAVA@
 
 EYEDB_BENCHMARK_JAR=${top_builddir}/src/java/eyedb-benchmark.jar
 BENCHMARK=org.eyedb.benchmark.quicktour.db4o.Db4oQuicktour
-PROPERTIES=db4o.local.properties
+PROPERTIES=${srcdir}/db4o.local.properties
 
 run_benchmark() {
     CLASSPATH=$EYEDB_BENCHMARK_JAR:$DB4O_JAR

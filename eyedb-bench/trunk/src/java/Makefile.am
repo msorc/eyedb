@@ -30,6 +30,7 @@ org/eyedb/benchmark/quicktour/hibernate \
 org/eyedb/benchmark/utils/db4o
 
 OTHER_FILES_TO_JAR= \
+org/eyedb/benchmark/quicktour/hibernate/hibernate.cfg.xml \
 org/eyedb/benchmark/quicktour/hibernate/Course.hbm.xml \
 org/eyedb/benchmark/quicktour/hibernate/Person.hbm.xml \
 org/eyedb/benchmark/quicktour/hibernate/Student.hbm.xml \

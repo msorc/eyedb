@@ -43,7 +43,7 @@ public class HibernateQuicktour extends Quicktour {
     {
 	try {
 	    Configuration configuration = new Configuration();
-	    configuration.configure( new File("hibernate.cfg.xml"));
+	    configuration.configure( "org/eyedb/benchmark/quicktour/hibernate/hibernate.cfg.xml");
 
 	    String url = getProperties().getProperty( "hibernate.connection.url");
 	    configuration.setProperty( "hibernate.connection.url", url);
