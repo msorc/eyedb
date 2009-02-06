@@ -292,11 +292,9 @@ Status Agregat::realize(const RecMode *rcm)
 
   state |= Realizing;
 
-#if 1
   if (db->isRealized(this)) {
     return Success;
   }
-#endif
 
   if (!oid.isValid()) {
     status = create_realize(False);
@@ -331,23 +329,23 @@ Status Agregat::realize(const RecMode *rcm)
 
   // added the 17/05/99 because of cache incohency
   //if (status && isDirty())
-  if (status) // changed the 2/05/99 because of index incoherency
-    {
-      int err = status->getStatus();
-      if (err != IDB_UNIQUE_CONSTRAINT_ERROR &&
-	  err != IDB_UNIQUE_COMP_CONSTRAINT_ERROR &&
-	  err != IDB_NOTNULL_CONSTRAINT_ERROR &&
-	  err != IDB_NOTNULL_COMP_CONSTRAINT_ERROR) {
-	db->setIncoherency();
-	db->uncacheObject(this);
-	std::string str = status->getString();
-	status = Exception::make(status->getStatus(),
-				 str + ": the current transaction must "
-				 "be aborted");
-      }
+  if (status) { // changed the 2/05/99 because of index incoherency
+    int err = status->getStatus();
+    if (err != IDB_UNIQUE_CONSTRAINT_ERROR &&
+	err != IDB_UNIQUE_COMP_CONSTRAINT_ERROR &&
+	err != IDB_NOTNULL_CONSTRAINT_ERROR &&
+	err != IDB_NOTNULL_COMP_CONSTRAINT_ERROR) {
+      db->setIncoherency();
+      db->uncacheObject(this);
+      std::string str = status->getString();
+      status = Exception::make(status->getStatus(),
+			       str + ": the current transaction must "
+			       "be aborted");
     }
-  else if (creating)
+  }
+  else if (creating) {
     db->cacheObject(this);
+  }
 
   state &= ~Realizing;
 

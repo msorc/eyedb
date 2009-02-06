@@ -7271,7 +7271,7 @@ AttrIndirectVarDim::getTValue(Database *db, const Oid &objoid,
     }
   
 #ifdef E_XDR_1
-  printf("IVD::getTValue() ??\n");
+  //printf("IVD::getTValue() ??\n");
   for (int i = 0; i < nb; i++) {
     Oid tmp_oid;
     eyedbsm::x2h_oid(tmp_oid.getOid(), pdata+i*sizeof(Oid));
