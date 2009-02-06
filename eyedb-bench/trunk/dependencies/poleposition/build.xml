@@ -32,7 +32,7 @@
     </javac>
   </target>
 
-  <target name="jar">
+  <target name="jar" depends="compile">
     <jar destfile="poleposition.jar"
 	 basedir="bin"
 	 includes="**/*.class"/>
