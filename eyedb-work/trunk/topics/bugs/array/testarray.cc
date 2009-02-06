@@ -106,7 +106,9 @@ void TestArray::associate() throw( eyedb::Exception)
     }
 
 #define FULLRECURS
+//#define DEFERRED
 
+#ifndef DEFERRED
 #ifdef FULLRECURS
     cout << "storing A " << ia << " full recurs..." << endl;
     aa[ia]->store( eyedb::FullRecurs);
@@ -119,8 +121,15 @@ void TestArray::associate() throw( eyedb::Exception)
     }
     aa[ia]->store(eyedb::NoRecurs);
 #endif
+#endif
   }
 
+#ifdef DEFERRED
+  for ( ia = 0; ia < getNA(); ia++) {
+    cout << "storing deferred A " << ia << " full recurs..." << endl;
+    aa[ia]->store( eyedb::FullRecurs);
+  }
+#endif
   getDatabase()->transactionCommit();
 }
 
