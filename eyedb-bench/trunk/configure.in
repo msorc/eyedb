@@ -268,7 +268,7 @@ POLEPOS_DIR_DEFAULT=dependencies/poleposition/src/polepos-${POLEPOS_VERSION}
 
 if test "$ac_enable_polepos" = "yes" ; then
    if test x"$POLEPOS_DIR" = x ; then
-	POLEPOS_DIR='${abs_top_srcdir}'/$POLEPOS_DIR_DEFAULT
+	POLEPOS_DIR='${abs_top_builddir}'/$POLEPOS_DIR_DEFAULT
 	HAVE_POLEPOS="yes"
    else
 	AC_CHECK_FILE($POLEPOS_DIR,HAVE_POLEPOS="yes",HAVE_POLEPOS="no")
