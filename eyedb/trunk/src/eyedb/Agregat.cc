@@ -51,7 +51,7 @@ Status Agregat::checkAgreg(const Attribute *agreg) const
   return Success;
 }
 
-Status Agregat::setItemOid(const Attribute *agreg, const Oid *poid, int nb, int from)
+  Status Agregat::setItemOid(const Attribute *agreg, const Oid *poid, int nb, int from, Bool check_class)
 {
   Status status;
 #if 1
@@ -64,7 +64,7 @@ Status Agregat::setItemOid(const Attribute *agreg, const Oid *poid, int nb, int 
     return Success;
   }
 #endif
-  status = agreg->setOid(this, poid, nb, from);
+  status = agreg->setOid(this, poid, nb, from, check_class);
 
   if (status == Success) {
     modify = True;
@@ -257,11 +257,26 @@ Status Agregat::update()
   return update_realize(False);
 }
 
+  //#define REALIZE_TRACE
+#ifdef REALIZE_TRACE
+static std::string INDENT = "";
+#endif
+
 Status Agregat::realize(const RecMode *rcm)
 {
   //printf("Agregat::realize(%p %s)\n", this, getClass()->getName());
-  if (state & Realizing)
+  if (state & Realizing) {
+#ifdef REALIZE_TRACE
+    printf("%s[Agregat is realizing(%p: %s)]\n", (INDENT + "  ").c_str(), this, getClass()->getName());
+#endif
     return Success;
+  }
+
+#ifdef REALIZE_TRACE
+  std::string s_indent = INDENT;
+  INDENT += "  ";
+  printf("%sAgregat::realize(%p: %s)\n", INDENT.c_str(), this, getClass()->getName());
+#endif
 
   CHK_OBJ(this);
 
@@ -277,42 +292,42 @@ Status Agregat::realize(const RecMode *rcm)
 
   state |= Realizing;
 
-  if (!oid.isValid())
-    {
-      status = create_realize(False);
-      creating = True;
-    }
-  else
-    {
-      status = update_realize(True);
-      creating = False;
-    }
+#if 1
+  if (db->isRealized(this)) {
+    return Success;
+  }
+#endif
 
-  if (!status)
-    {
-      AttrIdxContext idx_ctx;
-      status = realizePerform(getClass()->getOid(), getOid(), idx_ctx, rcm);
+  if (!oid.isValid()) {
+    status = create_realize(False);
+    creating = True;
+  }
+  else {
+    status = update_realize(True);
+    creating = False;
+  }
 
-      if (!status)
-	{
-	  if (creating)
-	    {
-	      status = StatusMake
-		(objectCreate(db->getDbHandle(), getDataspaceID(),
-			      idr->getIDR(), oid.getOid()));
-	      if (!status)
-		modify = False;
-	    }
-	  else if (modify)
-	    {
-	      status = StatusMake
-		(objectWrite(db->getDbHandle(),
-			     idr->getIDR(), oid.getOid()));
-	      if (!status)
-		modify = False;
-	    }
-	}
+  if (!status) {
+    AttrIdxContext idx_ctx;
+    status = realizePerform(getClass()->getOid(), getOid(), idx_ctx, rcm);
+
+    if (!status) {
+      if (creating) {
+	status = StatusMake
+	  (objectCreate(db->getDbHandle(), getDataspaceID(),
+			idr->getIDR(), oid.getOid()));
+	if (!status)
+	  modify = False;
+      }
+      else if (modify) {
+	status = StatusMake
+	  (objectWrite(db->getDbHandle(),
+		       idr->getIDR(), oid.getOid()));
+	if (!status)
+	  modify = False;
+      }
     }
+  }
 
   // added the 17/05/99 because of cache incohency
   //if (status && isDirty())
@@ -322,20 +337,25 @@ Status Agregat::realize(const RecMode *rcm)
       if (err != IDB_UNIQUE_CONSTRAINT_ERROR &&
 	  err != IDB_UNIQUE_COMP_CONSTRAINT_ERROR &&
 	  err != IDB_NOTNULL_CONSTRAINT_ERROR &&
-	  err != IDB_NOTNULL_COMP_CONSTRAINT_ERROR)
-	{
-	  db->setIncoherency();
-	  db->uncacheObject(this);
-	  std::string str = status->getString();
-	  status = Exception::make(status->getStatus(),
-				   str + ": the current transaction must "
-				   "be aborted");
-	}
+	  err != IDB_NOTNULL_COMP_CONSTRAINT_ERROR) {
+	db->setIncoherency();
+	db->uncacheObject(this);
+	std::string str = status->getString();
+	status = Exception::make(status->getStatus(),
+				 str + ": the current transaction must "
+				 "be aborted");
+      }
     }
   else if (creating)
     db->cacheObject(this);
 
   state &= ~Realizing;
+
+  db->setRealized(this);
+
+#ifdef REALIZE_TRACE
+  INDENT = s_indent;
+#endif
   return status;
 }
 

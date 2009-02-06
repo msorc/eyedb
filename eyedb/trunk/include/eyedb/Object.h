@@ -307,24 +307,6 @@ namespace eyedb {
 
     /**
        Not yet documented
-       @return
-    */
-    virtual Status create() = 0;
-    /**
-       Not yet documented
-       @return
-    */
-    virtual Status update() = 0;
-
-    /**
-       Not yet documented
-       @param recmode
-       @return
-    */
-    virtual Status realize(const RecMode *recmode = RecMode::NoRecurs);
-
-    /**
-       Not yet documented
        @param recmode
        @return
     */
@@ -335,9 +317,7 @@ namespace eyedb {
        @param recmode
        @return
     */
-    Status store(const RecMode *recmode = RecMode::NoRecurs) {
-      return realize(recmode);
-    }
+    Status store(const RecMode *recmode = RecMode::NoRecurs);
 
     /**
        Not yet documented
@@ -1034,6 +1014,10 @@ namespace eyedb {
     // Object Restricted Access (conceptually private)
     // ----------------------------------------------------------------------
   public:
+    virtual Status create() = 0;
+    virtual Status update() = 0;
+    virtual Status realize(const RecMode *recmode = RecMode::NoRecurs);
+
     short getDataspaceID() const;
     virtual void touch();
     Bool isApplyingTrigger() const {return applyingTrigger;}

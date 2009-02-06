@@ -358,14 +358,27 @@ namespace eyedb {
     return Success;
   }
 
+  Status Object::store(const RecMode *recmode)
+  {
+    bool realizeBlock = db && recmode != RecMode::NoRecurs;
+    if (realizeBlock) {
+      db->beginRealize();
+    }
+
+    Status s = realize(recmode);
+    if (realizeBlock) {
+      db->endRealize();
+    }
+    return s;
+  }
+
   void Object::setUnrealizable(Bool _unrealizable)
   {
     unrealizable = _unrealizable;
-    if (unrealizable)
-      {
-	db = 0;
-	setOid(*getInvalidOid());
-      }
+    if (unrealizable) {
+      db = 0;
+      setOid(*getInvalidOid());
+    }
   }
 
   /*
