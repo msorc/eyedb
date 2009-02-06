@@ -1164,6 +1164,8 @@ namespace eyedb {
     Datafile **datafiles;
     unsigned int dataspace_cnt;
     Dataspace **dataspaces;
+    std::map<Object *, bool> realizedMap;
+    bool useMap;
     void make_dat_dsp(const DbCreateDescription &dbdesc);
     void garbage_dat_dsp();
     const Datafile **get_datafiles(const eyedbsm::Dataspace *dsp);
@@ -1178,6 +1180,13 @@ namespace eyedb {
     static void _release();
     Status set(ConnHandle *, int, int, DbHandle *,
 	       rpcDB_LocalDBContext *, const Oid *, unsigned int);
+
+    void beginRealize();
+    bool isRealized(Object *o) const {
+      return useMap && realizedMap.find(o) != realizedMap.end();
+    }
+    void setRealized(Object *o) {if (useMap) {realizedMap[o] = true;}}
+    void endRealize();
 
     void cacheObject(Object *);
     void uncacheObject(Object *);

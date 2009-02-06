@@ -3408,28 +3408,34 @@ namespace eyedb {
     return Success;
   }
 
+  static const char *NO_CLASS_CHECK = getenv("NO_CLASS_CHECK");
+
   Status
   Class::isObjectOfClass(const Object *o, Bool *is, Bool issub) const
   {
+    if (NO_CLASS_CHECK) {
+      *is = True;
+      return Success;
+    }
+
     /* if multi-database, be laxist for now! */
 #if 0
-    if (o->getOid().getDbid() != db->getDbid())
-      {
-	*is = True;
-	printf("multi database object %s : class '%s'\n",
-	       o->getOid().getString(), o->getClass()->getName());
-	return Success;
-      }
+    if (o->getOid().getDbid() != db->getDbid()) {
+      *is = True;
+      printf("multi database object %s : class '%s'\n",
+	     o->getOid().getString(), o->getClass()->getName());
+      return Success;
+    }
 #endif
 
-    if (UnreadableObject::isUnreadableObject(o))
-      {
-	*is = True;
-	return Success;
-      }
+    if (UnreadableObject::isUnreadableObject(o)) {
+      *is = True;
+      return Success;
+    }
 
-    if (issub)
+    if (issub) {
       return isSuperClassOf(o->getClass(), is);
+    }
 
     *is = compare(o->getClass());
     return Success;
@@ -3439,6 +3445,11 @@ namespace eyedb {
   Class::isObjectOfClass(const Oid *o_oid, Bool *is, Bool issub,
 			 Class **po_class) const
   {
+    if (NO_CLASS_CHECK) {
+      *is = True;
+      return Success;
+    }
+
     Status status;
     Class *o_class;
 
@@ -3449,11 +3460,10 @@ namespace eyedb {
 
     status = db->getObjectClass(*o_oid, o_class);
 
-    if (UnreadableObject::isUnreadableObject(o_class))
-      {
-	*is = True;
-	return Success;
-      }
+    if (UnreadableObject::isUnreadableObject(o_class)) {
+      *is = True;
+      return Success;
+    }
 
     if (status)
       return status;

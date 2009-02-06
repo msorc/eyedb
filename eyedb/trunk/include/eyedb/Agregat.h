@@ -117,7 +117,7 @@ namespace eyedb {
        @param from
        @return
     */
-    Status setItemOid(const Attribute* agreg, const Oid * poid, int nb=1, int from=0);
+    Status setItemOid(const Attribute* agreg, const Oid * poid, int nb=1, int from=0, Bool check_class = True);
 
     /**
        Not yet documented.

@@ -4829,7 +4829,7 @@ Status AttrIndirect::realize(Database *db, Object *_o,
 	  status = o->realize(rcm);
 	  
 	  if (status == Success)
-	    status = agr->setItemOid(this, &o->getOid(), 1, j);
+	    status = agr->setItemOid(this, &o->getOid(), 1, j, False);
 
 	  if (status)
 	    return status;
@@ -7111,13 +7111,15 @@ Status AttrIndirectVarDim::setOid(Object *agr, const Oid *oid, int nb, int from,
 
     status = cls->isObjectOfClass(oid, &is, True, &o_class);
       
-    if (status)
+    if (status) {
       return status;
+    }
 
-    if (!is)
+    if (!is) {
       return Exception::make(IDB_ATTRIBUTE_ERROR,
-				"waiting for object of class '%s', got object of class '%s'",
-				cls->getName(), o_class->getName());
+			     "waiting for object of class '%s', got object of class '%s'",
+			     cls->getName(), o_class->getName());
+    }
   }
 
     
@@ -7457,7 +7459,7 @@ AttrIndirectVarDim::realize(Database *db, Object *_o,
       status = o->realize(rcm);
 
       if (status == Success) {
-	status = agr->setItemOid(this, &o->getOid(), 1, j);
+	status = agr->setItemOid(this, &o->getOid(), 1, j, False);
       }
 
       if (status) {
@@ -7465,7 +7467,7 @@ AttrIndirectVarDim::realize(Database *db, Object *_o,
       }
     }
     else if (o && o->getOid().isValid()) {
-      status = agr->setItemOid(this, &o->getOid(), 1, j);
+      status = agr->setItemOid(this, &o->getOid(), 1, j, False);
 	
       if (status) {
 	return status;

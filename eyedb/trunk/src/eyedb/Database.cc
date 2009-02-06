@@ -155,6 +155,8 @@ namespace eyedb {
     dataspace_cnt = 0;
     dataspaces = 0;
 
+    useMap = false;
+
     _user   = (char *)0;
     _passwd = (char *)0;
     consapp_cnt = 0;
@@ -2638,6 +2640,15 @@ if ((mode) !=  NoDBAccessMode && \
   void Database::markCreatedEmpty()
   {
     mark_created.erase(mark_created.begin(), mark_created.end());
+  }
+
+  void Database::beginRealize() {
+    realizedMap.clear();
+    useMap = true;
+  }
+
+  void Database::endRealize() {
+    useMap = false;
   }
 
   void Database::operator delete(void *o)
