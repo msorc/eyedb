@@ -217,11 +217,10 @@ namespace eyedb {
 
     if (tlist == oid_list)
       item = new CollItem(coll, *(Oid *)v, id, st);
-    else if (tlist == obj_list)
-      {
-	item = new CollItem(coll, (const Object *)v, id, st);
-	ObjectPeer::incrRefCount((Object *)v);
-      }
+    else if (tlist == obj_list) {
+      item = new CollItem(coll, (const Object *)v, id, st);
+      ObjectPeer::incrRefCount((Object *)v);
+    }
     else if (tlist == data_list)
       item = new CollItem(coll, (Data)v, id, st);
     else if (tlist == value_list)
@@ -459,12 +458,11 @@ namespace eyedb {
     int i;
     CollItem *item;
 
-    while (c.getNext((void* &)item))
-      {
-	if (item->getObject())
-	  ((Object *)item->getObject())->release();
-	delete item;
-      }
+    while (c.getNext((void* &)item)) {
+      if (item->getObject())
+	((Object *)item->getObject())->release();
+      delete item;
+    }
 
     delete list;
 
