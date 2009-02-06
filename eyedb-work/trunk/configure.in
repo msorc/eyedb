@@ -172,6 +172,7 @@ topics/jodl/src/org/eyedb/Makefile dnl
 topics/jodl/src/org/eyedb/jodl/Makefile dnl
 topics/objgarb/Makefile dnl
 topics/odlplugin/Makefile dnl
+topics/optim/create/Makefile dnl
 topics/oql/array/Makefile dnl
 topics/php/Makefile dnl
 topics/ruby/Makefile dnl

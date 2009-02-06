@@ -405,12 +405,10 @@ main(int argc, char *argv[])
   // initializing the person package
   schema::init();
 
-  if (argc != 2)
-    {
-      fprintf(stderr, "usage: %s <dbname>\n",
-	      argv[0]);
-      return 1;
-    }
+  if (argc != 2) {
+    fprintf(stderr, "usage: %s <dbname>\n", argv[0]);
+    return 1;
+  }
 
   const char *dbname = argv[1];
 
