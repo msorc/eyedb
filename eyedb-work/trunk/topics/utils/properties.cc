@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
+#include <string.h>
 #include "properties.h"
 
 using namespace eyedb::benchmark;
