@@ -174,8 +174,6 @@ topics/objgarb/Makefile dnl
 topics/odlplugin/Makefile dnl
 topics/optim/create/Makefile dnl
 topics/oql/array/Makefile dnl
-topics/php/Makefile dnl
-topics/ruby/Makefile dnl
 topics/schemaflex/Makefile dnl
 topics/union/Makefile dnl
 topics/utils/Makefile dnl
