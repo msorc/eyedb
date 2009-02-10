@@ -1,1 +1,0 @@
-$TEXINPUTS = '.::@abs_srcdir@:';
