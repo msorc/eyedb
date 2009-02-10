@@ -23,10 +23,8 @@ MANPAGES_DIR=
 endif
 
 if COND_LATEX
-MANUAL_DIR= manual
 MANUAL_EXPORT_DIR= manual/pdf
 else
-MANUAL_DIR= 
 MANUAL_EXPORT_DIR= 
 endif
 
@@ -36,9 +34,15 @@ else
 HTML_MANUAL_EXPORT_DIR= 
 endif
 
+if COND_DBLATEX
+MANUAL_EXPORT_DIR= manual/pdf
+else
+MANUAL_EXPORT_DIR= 
+endif
+
 EXAMPLES_EXPORT_DIR=examples
 
-SUBDIRS=$(DOXYGEN_DIR) $(JAVADOC_DIR) $(MANPAGES_DIR) $(MANUAL_DIR) images release-notes
+SUBDIRS=$(DOXYGEN_DIR) $(JAVADOC_DIR) $(MANPAGES_DIR) manual images release-notes
 DIST_SUBDIRS=doxygen javadoc manpages manual images release-notes
 
 htmldir=$(datadir)/doc/$(PACKAGE)
