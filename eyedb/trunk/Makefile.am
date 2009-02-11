@@ -5,6 +5,8 @@ DOC_SRC_DIR=
 endif
 SUBDIRS=src include scripts install pkg-config examples tests $(DOC_SRC_DIR) 
 
+ACLOCAL_AMFLAGS=-I m4/java -I m4/swig -I m4/python -I m4/extras
+
 docdir=$(datadir)/doc/$(PACKAGE)
 doc_DATA=AUTHORS COPYING COPYING.LESSER README
 
