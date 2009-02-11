@@ -20,6 +20,11 @@ AC_SUBST(EYEDB_NUMVERSION)
 
 AM_INIT_AUTOMAKE(${PACKAGE_NAME}, ${PACKAGE_VERSION})
 
+#AC_CONFIG_MACRO_DIR(m4/java)
+#AC_CONFIG_MACRO_DIR(m4/swig)
+#AC_CONFIG_MACRO_DIR(m4/python)
+#AC_CONFIG_MACRO_DIR(m4/extras)
+
 #
 # Checks for command line flags
 #
@@ -764,4 +769,5 @@ echo "  Generate LaTEX PDF manual: ${COND_LATEX:-no}"
 echo "  Generate LaTEX HTML manual: ${COND_LATEX2HTML:-no}"
 echo "  Generate Docbook PDF manual: ${COND_DBLATEX:-no}"
 echo "  Generate Docbook HTML manual: ${COND_DOCBOOK_HTML:-no}"
-echo ""
+echo
+
