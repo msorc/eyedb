@@ -7,6 +7,6 @@ manual_DATA=$(PDF_PREFIX)$(MANUAL).pdf
 XSL_PARAMS = $(top_srcdir)/doc/manual/docbook-common/params.xsl
 DBLATEXFLAGS = -p $(XSL_PARAMS)
 
-EyeDBInstallation.pdf: installation.xml
+$(PDF_PREFIX)$(MANUAL).pdf: installation.xml
 	$(DBLATEX) $(DBLATEXFLAGS) -o $@ $<
 
