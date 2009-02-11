@@ -1,4 +1,4 @@
-MANUAL=Admin
+MANUAL=Administration
 
 LATEX= TEXINPUTS=.:$(srcdir):$(top_srcdir)/doc/manual/latex-common:$(top_builddir)/doc/manual/latex-common: @LATEX@
 LATEX_INPUTS=$(top_srcdir)/doc/manual/latex-common/start.tex $(top_srcdir)/doc/manual/latex-common/title.tex $(top_builddir)/doc/manual/latex-common/version.tex
