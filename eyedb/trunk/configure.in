@@ -434,9 +434,11 @@ COND_JAVADOC="yes"
 fi
 AM_CONDITIONAL(COND_JAVADOC, test x"$COND_JAVADOC" = xyes)
 
-# Docbook manpages
+# Docbook documentation
 # Look for xsltproc
 AC_PATH_PROG(XSLTPROC, xsltproc)
+
+# Docbook manpages
 # Look for XSL stylesheet
 AC_MSG_CHECKING(for Docbook manpages XSL stylesheet)
 MANPAGES_XSL_STYLESHEET_LOCATIONS="/usr/share/sgml/docbook/xsl-stylesheets/manpages /usr/share/xml/docbook/stylesheet/nwalsh/manpages"
@@ -454,7 +456,31 @@ COND_DOCBOOK_MANPAGES="yes"
 fi
 AM_CONDITIONAL(COND_DOCBOOK_MANPAGES, test x"$COND_DOCBOOK_MANPAGES" = xyes)
 
-# Manuals
+# Docbook manuals: HTML output
+AC_MSG_CHECKING(for Docbook HTML XSL stylesheet)
+HTML_XSL_STYLESHEET_LOCATIONS="/usr/share/sgml/docbook/xsl-stylesheets/manpages /usr/share/xml/docbook/stylesheet/nwalsh/html"
+for d in $HTML_XSL_STYLESHEET_LOCATIONS ; do
+    if test -f $d/docbook.xsl ; then
+       HTML_XSL_STYLESHEET_DIR=$d
+       break
+    fi
+done
+AC_MSG_RESULT($HTML_XSL_STYLESHEET_DIR/docbook.xsl)
+AC_SUBST(HTML_XSL_STYLESHEET_DIR)
+
+if test x"$XSLTPROC" != x -a x"$HTML_XSL_STYLESHEET_DIR" != x ; then
+COND_DOCBOOK_HTML="yes"
+fi
+AM_CONDITIONAL(COND_DOCBOOK_HTML, test x"$COND_DOCBOOK_HTML" = xyes)
+
+# Docbook manuals: PDF output
+AC_PATH_PROG(DBLATEX, dblatex)
+if test x"$DBLATEX" != x ; then
+   COND_DBLATEX="yes"
+fi
+AM_CONDITIONAL(COND_DBLATEX, test x"$COND_DBLATEX" = xyes)
+
+# Latex manuals
 AC_PATH_PROG(LATEX, latex)
 AC_PATH_PROG(DVIPS, dvips)
 AC_PATH_PROG(PS2PDF, ps2pdf)
@@ -468,12 +494,6 @@ if test x"$LATEX2HTML" != x ; then
    COND_LATEX2HTML="yes"
 fi
 AM_CONDITIONAL(COND_LATEX2HTML, test x"$COND_LATEX2HTML" = xyes)
-
-AC_PATH_PROG(DBLATEX, dblatex)
-if test x"$LATEX" != x ; then
-   COND_DBLATEX="yes"
-fi
-AM_CONDITIONAL(COND_DBLATEX, test x"$COND_DBLATEX" = xyes)
 
 # ========================================
 # Examples building
@@ -536,6 +556,7 @@ doc/javadoc/Makefile dnl
 doc/manpages/Makefile dnl
 doc/manual/Makefile dnl
 doc/manual/administration/Makefile dnl
+doc/manual/administration.old/Makefile dnl
 doc/manual/cpp-programming/Makefile dnl
 doc/manual/getting-started/Makefile dnl
 doc/manual/installation/Makefile dnl
@@ -739,7 +760,8 @@ echo "  Generate documentation: ${COND_DOC:-no}"
 echo "  Generate doxygen C++ api documentation: ${COND_DOXYGEN:-no}"
 echo "  Generate javadoc Java api documentation: ${COND_JAVADOC:-no}"
 echo "  Generate Docbook man pages: ${COND_DOCBOOK_MANPAGES:-no}"
-echo "  Generate LaTEX manual: ${COND_LATEX:-no}"
-echo "  Generate html LaTEX manual: ${COND_LATEX2HTML:-no}"
-echo "  Generate Docbook manual: ${COND_DBLATEX:-no}"
+echo "  Generate LaTEX PDF manual: ${COND_LATEX:-no}"
+echo "  Generate LaTEX HTML manual: ${COND_LATEX2HTML:-no}"
+echo "  Generate Docbook PDF manual: ${COND_DBLATEX:-no}"
+echo "  Generate Docbook HTML manual: ${COND_DOCBOOK_HTML:-no}"
 echo ""
