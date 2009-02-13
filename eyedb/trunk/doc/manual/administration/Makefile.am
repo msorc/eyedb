@@ -1,6 +1,6 @@
 MANUAL=Administration
 PDF_PREFIX=EyeDB
-MANUAL_XML_FILES=database.xml server.xml user.xml
+MANUAL_XML_FILES=introduction.xml database.xml server.xml user.xml
 
 if COND_DBLATEX
 pdfmanualdir=$(datadir)/doc/$(PACKAGE)/manual/pdf
