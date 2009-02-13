@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN" "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN" "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd"
+[
+<!ENTITY eyedb "EyeDB">
+]
+>
 
 <book>
   <title>EyeDB Administration Guide</title>
@@ -8,19 +12,70 @@
     <title>Database advanced administration</title>
 
     <section>
-      <title>Multi-volumes databases</title>
+      <title>&eyedb; databases architecture</title>
     </section>
 
     <section>
-      <title>Managing datafiles</title>
+      <title>Large databases</title>
+    </section>
+
+    <section>
+      <title>Adjusting database parameters</title>
     </section>
 
     <section>
       <title>Managing dataspaces</title>
+
+      <section>
+	<title>Creating, updating and deleting dataspaces</title>
+      </section>
+
+      <section>
+	<title>Listing and renaming dataspaces</title>
+      </section>
+
+      <section>
+	<title>Setting current dataspace and current datafile</title>
+      </section>
+
+    </section>
+
+    <section>
+      <title>Managing datafiles</title>
+
+      <section>
+	<title>Creating and deleting datafiles</title>
+      </section>
+
+      <section>
+	<title>Listing, renaming and moving datafiles</title>
+      </section>
+
+      <section>
+	<title>Resizing and defragmenting datafiles</title>
+      </section>
+
     </section>
 
     <section>
       <title>Managing indexes</title>
+
+      <section>
+	<title>Creating and deleting indexes</title>
+      </section>
+
+      <section>
+	<title>Listing, updating and moving indexes</title>
+      </section>
+
+      <section>
+	<title>Getting statistics on indexes, simulating index performances</title>
+      </section>
+
+      <section>
+	<title>Getting and setting index dataspace</title>
+      </section>
+
     </section>
 
   </chapter>

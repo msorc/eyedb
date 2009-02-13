@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN" "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN" "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd"
+[
+<!ENTITY eyedb "EyeDB">
+]
+>
 
 <book>
   <title>EyeDB Administration Guide</title>
@@ -9,18 +13,53 @@
 
     <section>
       <title>Starting and stopping the server</title>
+
+      <section>
+	<title>Starting &eyedb; server</title>
+      </section>
+
+      <section>
+	<title>Stopping &eyedb; server</title>
+      </section>
+
     </section>
 
     <section>
       <title>Getting server information</title>
+
+      <section>
+	<title>Getting &eyedb; server status</title>
+      </section>
+
+      <section>
+	<title>Configuring &eyedb; server logging</title>
+      </section>
+
     </section>
 
     <section>
       <title>Server configuration</title>
+
+      <section>
+	<title>Server configuration file</title>
+      </section>
+
+      <section>
+	<title>Server configuration variables</title>
+      </section>
+
+      <section>
+	<title>Environment variables</title>
+      </section>
+
     </section>
 
     <section>
       <title>Network access server configuration</title>
+    </section>
+
+    <section>
+      <title>The <command>eyedbctl</command> command</title>
     </section>
 
   </chapter>
