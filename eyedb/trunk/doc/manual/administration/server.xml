@@ -12,6 +12,10 @@
     <title>Server administration</title>
 
     <section>
+      <title>The <command>eyedbctl</command> command</title>
+    </section>
+
+    <section>
       <title>Starting and stopping the server</title>
 
       <section>
@@ -57,10 +61,6 @@
 
     <section>
       <title>Network access server configuration</title>
-    </section>
-
-    <section>
-      <title>The <command>eyedbctl</command> command</title>
     </section>
 
   </chapter>

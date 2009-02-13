@@ -42,5 +42,9 @@ CMDCLASS_GETOPT(DBSCopyCmd, "copy");
 CMDCLASS_GETOPT(DBSDefAccessCmd, "defaccess");
 CMDCLASS_GETOPT(DBSExportCmd, "export");
 CMDCLASS_GETOPT(DBSImportCmd, "import");
+CMDCLASS_GETOPT(DBSSetObjCountCmd, "setobjcount");
+CMDCLASS_GETOPT(DBSGetObjCountCmd, "getobjcount");
+CMDCLASS_GETOPT(DBSSetLogSizeCmd, "setlogsize");
+CMDCLASS_GETOPT(DBSGetLogSizeCmd, "getlogsize");
 
 #endif
