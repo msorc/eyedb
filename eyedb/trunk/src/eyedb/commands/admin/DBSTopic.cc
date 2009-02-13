@@ -55,6 +55,11 @@ DBSTopic::DBSTopic() : Topic("database")
 
   addCommand(new DBSExportCmd(this));
   addCommand(new DBSImportCmd(this));
+
+  addCommand( new DBSSetObjCountCmd(this));
+  addCommand( new DBSGetObjCountCmd(this));
+  addCommand( new DBSSetLogSizeCmd(this));
+  addCommand( new DBSGetLogSizeCmd(this));
 }
 
 
@@ -1128,4 +1133,199 @@ int DBSImportCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   conn.open();
 
   return databaseImport(conn, dbname, filename, filedir, mthdir, listOnly);
+}
+
+
+// eyedbadmin database setobjcount DATABASE COUNT
+//
+// DBSSetObjCountCmd
+//
+void DBSSetObjCountCmd::init()
+{
+  std::vector<Option> opts;
+
+  opts.push_back(HELP_OPT);
+
+  getopt = new GetOpt(getExtName(), opts);
+}
+
+int DBSSetObjCountCmd::usage()
+{
+  getopt->usage("", "");
+  std::cerr << " DBNAME COUNT\n";
+  return 1;
+}
+
+int DBSSetObjCountCmd::help()
+{
+  stdhelp();
+  getopt->displayOpt("DBNAME", "Database");
+  getopt->displayOpt("COUNT", "Object count");
+  return 1;
+}
+
+int DBSSetObjCountCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+{
+  if (! getopt->parse(PROGNAME, argv))
+    return usage();
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end())
+    return help();
+
+  if (argv.size() != 2) {
+    return usage();
+  }
+
+  const char *dbname = argv[0].c_str();
+
+//   conn.open();
+
+  return 0;
+}
+
+// eyedbadmin database getobjcount DATABASE
+//
+// DBSGetObjCountCmd
+//
+void DBSGetObjCountCmd::init()
+{
+  std::vector<Option> opts;
+
+  opts.push_back(HELP_OPT);
+
+  getopt = new GetOpt(getExtName(), opts);
+}
+
+int DBSGetObjCountCmd::usage()
+{
+  getopt->usage("", "");
+  std::cerr << " DBNAME\n";
+  return 1;
+}
+
+int DBSGetObjCountCmd::help()
+{
+  stdhelp();
+  getopt->displayOpt("DBNAME", "Database");
+  return 1;
+}
+
+int DBSGetObjCountCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+{
+  if (! getopt->parse(PROGNAME, argv))
+    return usage();
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end())
+    return help();
+
+  if (argv.size() != 2) {
+    return usage();
+  }
+
+  const char *dbname = argv[0].c_str();
+
+//   conn.open();
+
+  return 0;
+}
+
+// eyedbadmin database setlogsize DATABASE SIZE_MB
+//
+// DBSSetLogSizeCmd
+//
+void DBSSetLogSizeCmd::init()
+{
+  std::vector<Option> opts;
+
+  opts.push_back(HELP_OPT);
+
+  getopt = new GetOpt(getExtName(), opts);
+}
+
+int DBSSetLogSizeCmd::usage()
+{
+  getopt->usage("", "");
+  std::cerr << " DBNAME COUNT\n";
+  return 1;
+}
+
+int DBSSetLogSizeCmd::help()
+{
+  stdhelp();
+  getopt->displayOpt("DBNAME", "Database");
+  getopt->displayOpt("SIZE_MB", "Log size in Mb");
+  return 1;
+}
+
+int DBSSetLogSizeCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+{
+  if (! getopt->parse(PROGNAME, argv))
+    return usage();
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end())
+    return help();
+
+  if (argv.size() != 2) {
+    return usage();
+  }
+
+  const char *dbname = argv[0].c_str();
+
+//   conn.open();
+
+  return 0;
+}
+
+// eyedbadmin database getlogsize DATABASE 
+//
+// DBSGetLogSizeCmd
+//
+void DBSGetLogSizeCmd::init()
+{
+  std::vector<Option> opts;
+
+  opts.push_back(HELP_OPT);
+
+  getopt = new GetOpt(getExtName(), opts);
+}
+
+int DBSGetLogSizeCmd::usage()
+{
+  getopt->usage("", "");
+  std::cerr << " DBNAME\n";
+  return 1;
+}
+
+int DBSGetLogSizeCmd::help()
+{
+  stdhelp();
+  getopt->displayOpt("DBNAME", "Database");
+  return 1;
+}
+
+int DBSGetLogSizeCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+{
+  if (! getopt->parse(PROGNAME, argv))
+    return usage();
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end())
+    return help();
+
+  if (argv.size() != 2) {
+    return usage();
+  }
+
+  const char *dbname = argv[0].c_str();
+
+//   conn.open();
+
+  return 0;
 }
