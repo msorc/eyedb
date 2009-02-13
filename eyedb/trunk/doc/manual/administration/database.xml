@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN" "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN" "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd"
+[
+<!ENTITY eyedb "EyeDB">
+]
+>
 
 <book>
   <title>EyeDB Administration Guide</title>
@@ -9,14 +13,53 @@
 
     <section>
       <title>Creating and deleting a database</title>
+
+      <section>
+	<title>Creating a database</title>
+      </section>
+
+      <section>
+	<title>Deleting a database</title>
+      </section>
+
+      <section>
+	<title>Listing databases</title>
+      </section>
+
+      <section>
+	<title>Setting database default access rights</title>
+      </section>
+
     </section>
 
     <section>
       <title>Renaming, copying and moving a database</title>
+
+      <section>
+	<title>Renaming a database</title>
+      </section>
+
+      <section>
+	<title>Copying a database</title>
+      </section>
+
+      <section>
+	<title>Moving a database</title>
+      </section>
+
     </section>
 
     <section>
       <title>Exporting and importing a database</title>
+
+      <section>
+	<title>Exporting a database</title>
+      </section>
+
+      <section>
+	<title>Importing a database</title>
+      </section>
+
     </section>
 
   </chapter>

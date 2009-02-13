@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN" "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN" "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd"
+[
+<!ENTITY eyedb "EyeDB">
+]
+>
 
 <book>
   <title>EyeDB Administration Guide</title>
@@ -9,14 +13,45 @@
 
     <section>
       <title>The different user types</title>
+
     </section>
 
     <section>
       <title>Managing users</title>
+
+      <section>
+	<title>Adding a user</title>
+      </section>
+
+      <section>
+	<title>Deleting a user</title>
+      </section>
+
+      <section>
+	<title>Setting user password</title>
+      </section>
+
+      <section>
+	<title>Listing users</title>
+      </section>
+
     </section>
 
     <section>
       <title>Managing user access rights</title>
+
+      <section>
+	<title>The different access rights</title>
+      </section>
+
+      <section>
+	<title>Setting system access rights</title>
+      </section>
+
+      <section>
+	<title>Setting database access rights</title>
+      </section>
+
     </section>
 
   </chapter>

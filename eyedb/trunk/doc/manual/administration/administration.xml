@@ -4,6 +4,8 @@
 <book>
   <title>EyeDB Administration Guide</title>
 
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="introduction.xml" xpointer="introduction"/>
+
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="server.xml" xpointer="server"/>
 
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="database.xml" xpointer="database"/>
@@ -11,8 +13,6 @@
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="user.xml" xpointer="user"/>
 
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="database_advanced.xml" xpointer="database_advanced"/>
-
-  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="storage_manager.xml" xpointer="storage_manager"/>
 
   <index>
     <title>Index</title>
