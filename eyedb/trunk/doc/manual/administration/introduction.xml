@@ -47,17 +47,115 @@
 	The &eyedbadmin; command is used for most of the &eyedb; administration operations. It is installed in <filename class="directory">/usr/bin</filename> for standard &eyedb; installations.
       </para>
 
-      <para>
-	The &eyedbadmin; command has the following syntax:
-	<cmdsynopsis>
-	  &eyedbadmin;<arg choice="plain">topic</arg><arg choice="plain">command</arg><arg choice="plain" rep="repeat">options</arg>
-	</cmdsynopsis>
-	where topic is one of the subsystem adressed by the command (database, user, index...) and command the command relative to this subsystem.
-      </para>
+      <section>
+	<title>&eyedbadmin; command syntax</title>
 
-      <para>
-	Help on the &eyedbadmin; command ...
-      </para>
+	<para>
+	  The &eyedbadmin; command has the following syntax:
+	  <cmdsynopsis>
+	    &eyedbadmin;<arg choice="plain"><replaceable>topic</replaceable></arg><arg choice="plain"><replaceable>command</replaceable></arg><arg choice="plain" rep="repeat">options</arg>
+	  </cmdsynopsis>
+	  where <cmdsynopsis><arg choice="plain"><replaceable>topic</replaceable></arg></cmdsynopsis> is one of the subsystem adressed by the command (database, user, index...) 
+	  and <cmdsynopsis><arg choice="plain"><replaceable>command</replaceable></arg></cmdsynopsis> is the command relative to this subsystem.
+	</para>
+
+	<para>
+	  Help on the &eyedbadmin; command can be obtained with the <command>help</command> command for general help (<xref linkend="eyedbadmin-help"/>) or <command><replaceable>topic</replaceable> help</command> (<xref linkend="eyedbadmin-help-topic"/>):
+	</para>
+
+	<example id="eyedbadmin-help">
+	  <title>&eyedbadmin; help</title>
+	  <screen><userinput>eyedbadmin help</userinput>
+eyedbadmin usage:
+  eyedbadmin --help
+  eyedbadmin --help-eyedb-options
+  eyedbadmin TOPIC --help
+  eyedbadmin TOPIC COMMAND --help
+  eyedbadmin TOPIC COMMAND OPTIONS
+
+where TOPIC is one of the following:
+  database | db
+  datafile | dtf
+  dataspace | dsp
+  user | usr
+  index | idx	
+	  </screen>
+	</example>
+
+	<example id="eyedbadmin-help-topic">
+	  <title>&eyedbadmin; help on topic</title>
+	  <screen><userinput>eyedbadmin database help</userinput>
+eyedbadmin database usage:
+
+  eyedbadmin database --help
+  eyedbadmin database COMMAND OPTIONS
+
+where COMMAND is one of the following:
+  create
+  delete
+  list
+  move
+  copy
+  rename
+  defaccess
+  export
+  import
+  setobjcount
+  getobjcount
+  setlogsize
+  getlogsize
+</screen>
+	</example>
+      </section>
+
+      <section>
+	<title>&eyedbadmin; standard options</title>
+
+	<para>
+	  &eyedbadmin; accepts a list of options shared by all the topics, described in <xref linkend="eyedbadmin-help-options"/>.
+	</para>
+
+	<example id="eyedbadmin-help-options">
+	  <title>&eyedbadmin; help on topic</title>
+	  <screen><userinput>eyedbadmin --help-eyedb-options</userinput>
+Common Options:
+  -U USER|@, --user=USER|@          User name
+  -P [PASSWD], --passwd[=PASSWD]    Password
+  --host=HOST                       eyedbd host
+  --port=PORT                       eyedbd port
+  --inet                            Use the tcp_port variable if port is not set
+  --dbm=DBMFILE                     EYEDBDBM database file
+  --conf=CONFFILE                   Client Configuration file
+  --server-conf=CONFFILE            Server Configuration file (used for local opening)
+  --default-file-mask=MASK          Default file mask
+  --default-file-group=GROUP        Default file group
+  --maximum-server-memory-size=SIZE Maximum server memory size (in Mb)
+  --logdev=LOGFILE                  Output log file
+  --logmask=MASK                    Output log mask
+  --logdate=on|off                  Control date display in output log
+  --logtimer=on|off                 Control timer display in output log
+  --logpid=on|off                   Control pid display in output log
+  --logprog=on|off                  Control progname display in output log
+  --error-policy=VALUE              Control error policy: status|exception|abort|stop|echo
+  --trans-def-mag=MAGORDER          Default transaction magnitude order
+  --arch                            Display the client architecture
+  -v, --version                     Display the version
+  --help-logmask                    Display logmask usage
+  --help-eyedb-options              Display this message
+	  </screen>
+	</example>
+
+	<para>
+	  The following options are the most usefull:
+	  <itemizedlist>
+	    <listitem><para><cmdsynopsis><arg choice="plain">--user=<replaceable>user</replaceable></arg></cmdsynopsis>: specifies the user name for &eyedb; authentication; if user is "@", then the Unix user name is used</para></listitem>
+	    <listitem><para><cmdsynopsis><arg choice="plain">--passwd=<replaceable>passwd</replaceable></arg></cmdsynopsis>: specifies the user password for &eyedb; authentication</para></listitem>
+	    <listitem><para><cmdsynopsis><arg choice="plain">--host=<replaceable>host</replaceable></arg></cmdsynopsis>: specifies the host name of the machine running the &eyedb; server</para></listitem>
+	    <listitem><para><cmdsynopsis><arg choice="plain">--port=<replaceable>port</replaceable></arg></cmdsynopsis>: specifies the TCP port number for a TCP connection to the &eyedb; server</para></listitem>
+	  </itemizedlist>
+	</para>
+
+      </section>
 
     </section>
 
