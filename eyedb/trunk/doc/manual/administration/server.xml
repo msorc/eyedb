@@ -2,6 +2,7 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN" "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd"
 [
 <!ENTITY eyedb "EyeDB">
+<!ENTITY eyedbctl "<command>eyedbctl</command>">
 ]
 >
 
@@ -11,10 +12,68 @@
   <chapter id="server">
     <title>Server administration</title>
 
+    <para>
+      The first step in &eyedb; administration adresses the server administration: as all existing database management systems, &eyedb; adopts a client/server architecture to provide databases integrity and concurrent accesses. Every database operation requires that a server is up and running; this chapter explains how to start and stop the server, get its status and manage its configuration.
+    </para>
+
+
     <section>
-      <title>The <command>eyedbctl</command> command</title>
+      <title>The &eyedbctl; command</title>
 
       <para>
+	The &eyedb; server is started, stopped and examined using the &eyedbctl; command. This command is installed in <filename class="directory">/usr/sbin</filename> for standard &eyedb; installations.
+      </para>
+
+      <para>
+	The &eyedbctl; command has the following syntax:
+	<cmdsynopsis>
+	  &eyedbctl;<arg choice="plain"><replaceable>command</replaceable></arg><arg choice="plain" rep="repeat">options</arg>
+	</cmdsynopsis>
+	where <cmdsynopsis><arg choice="plain"><replaceable>command</replaceable></arg></cmdsynopsis> is one of the subsystem adressed by the command (database, user, index...) 
+	and <cmdsynopsis><arg choice="plain"><replaceable>command</replaceable></arg></cmdsynopsis> is the command relative to this subsystem.
+      </para>
+
+      <example id="eyedbctl-help">
+	<title>&eyedbctl; help</title>
+	<screen><userinput>eyedbctl --help</userinput>
+	eyedbctl -h
+	usage: eyedbctl [-h|--help|-v|--version] [start|stop|status] [-f] [--creating-dbm] [-U USER|@|--user=USER|@] [-P [PASSWD]|--passwd[=PASSWD]] [--listen=[HOST:]PORT] [--granted-dbm=DBMFILES] [--default-dbm=DBMFILE] [--conf=CONFFILE] [--server-conf=CONFFILE] [--default-file-mask=MASK] [--default-file-group=GROUP] [--maximum-server-memory-size=SIZE] [--logdev=LOGFILE] [--logmask=MASK] [--logdate=on|off] [--logtimer=on|off] [--logpid=on|off] [--logprog=on|off] [--error-policy=VALUE] [--trans-def-mag=MAGORDER] [--arch] [-v|--version] [--help-logmask] [--help-eyedb-options]
+
+	Program Options:
+	start [-f]     Launch the server. Set -f to force launch
+	stop [-f]      Stop the server. Set -f to force stop
+	status         Display status on the running server
+	--creating-dbm Bootstrap option for DBM database creation
+	-U USER|@, --user=USER|@          User name
+	-P [PASSWD], --passwd[=PASSWD]    Password
+	--listen=[HOST:]PORT              listen host and ports
+	--granted-dbm=DBMFILES            Granted EYEDBDBM database files
+	--default-dbm=DBMFILE             Default EYEDBDBM database file
+	--conf=CONFFILE                   Client Configuration file
+	--server-conf=CONFFILE            Server Configuration file
+	--default-file-mask=MASK          Default file mask
+	--default-file-group=GROUP        Default file group
+	--maximum-server-memory-size=SIZE Maximum server memory size (in Mb)
+	--logdev=LOGFILE                  Output log file
+	--logmask=MASK                    Output log mask
+	--logdate=on|off                  Control date display in output log
+	--logtimer=on|off                 Control timer display in output log
+	--logpid=on|off                   Control pid display in output log
+	--logprog=on|off                  Control progname display in output log
+	--error-policy=VALUE              Control error policy: status|exception|abort|stop|echo
+	--trans-def-mag=MAGORDER          Default transaction magnitude order
+	--arch                            Display the client architecture
+	-v, --version                     Display the version
+	--help-logmask                    Display logmask usage
+	--help-eyedb-options              Display this message
+	</screen>
+      </example>
+
+      <para>
+	The following options are the most usefull:
+	<itemizedlist>
+	  <listitem><para><cmdsynopsis><arg choice="plain">--user=<replaceable>user</replaceable></arg></cmdsynopsis>: specifies the user name for &eyedb; authentication; if user is "@", then the Unix user name is used</para></listitem>
+	</itemizedlist>
       </para>
 
     </section>
