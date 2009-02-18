@@ -16,31 +16,6 @@
     </section>
 
     <section>
-      <title>Large databases</title>
-    </section>
-
-    <section>
-      <title>Adjusting database parameters</title>
-    </section>
-
-    <section>
-      <title>Managing dataspaces</title>
-
-      <section>
-	<title>Creating, updating and deleting dataspaces</title>
-      </section>
-
-      <section>
-	<title>Listing and renaming dataspaces</title>
-      </section>
-
-      <section>
-	<title>Setting current dataspace and current datafile</title>
-      </section>
-
-    </section>
-
-    <section>
       <title>Managing datafiles</title>
 
       <section>
@@ -58,22 +33,18 @@
     </section>
 
     <section>
-      <title>Managing indexes</title>
+      <title>Managing dataspaces</title>
 
       <section>
-	<title>Creating and deleting indexes</title>
+	<title>Creating, updating and deleting dataspaces</title>
       </section>
 
       <section>
-	<title>Listing, updating and moving indexes</title>
+	<title>Listing and renaming dataspaces</title>
       </section>
 
       <section>
-	<title>Getting statistics on indexes, simulating index performances</title>
-      </section>
-
-      <section>
-	<title>Getting and setting index dataspace</title>
+	<title>Setting current dataspace and current datafile</title>
       </section>
 
     </section>

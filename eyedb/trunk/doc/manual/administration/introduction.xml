@@ -2,6 +2,7 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN" "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd"
 [
 <!ENTITY eyedb "EyeDB">
+<!ENTITY eyedbadmin "<command>eyedbadmin</command>">
 ]
 >
 
@@ -14,10 +15,49 @@
     <section>
       <title>Administration of the &eyedb; object database management system</title>
 
+      <para>
+	As for every database management system, using &eyedb; implies some administration operations, ranging from the simplest ones, such as creating or deleting a database, to the most advanced, such as managing objects and indexes locations for improved performances.
+      </para>
+
+      <para>
+	This manual describes in details all &eyedb; administration operations and include the following topics:
+	<itemizedlist>
+	  <listitem><para>server administration: how to start and stop the server, get its status, configure it...</para></listitem>
+	  <listitem><para>database administration: creating and deleting databases, renaming, moving, exporting databases...</para></listitem>
+	  <listitem><para>user administration: adding and deleting users, managing user rights...</para></listitem>
+	  <listitem><para>advanded database administration: managing data partitionning</para></listitem>
+	  <listitem><para>database tuning: how to create large databases, managing indexes, collections and data locations for better performance</para></listitem>
+	</itemizedlist>
+      </para>
+
+      <para>
+	This manual is directed to a large audience, ranging from regular users experimenting with &eyedb; to database administrators managing large databases. The first three chapters (server, database and user administration) are usefull for every &eyedb; users; the last two chapters (advanced administration and tuning) are directed to advanced &eyedb; users who want to understand in-depth databases organisation and tune their &eyedb; installation for large databases and increased performances.
+      </para>
+
+      <para>
+	Most of the &eyedb; administration operations are performed using the &eyedbadmin; command. This command will be described briefly in the next section.
+      </para>
+
     </section>
 
     <section>
-      <title>The <command>eyedbadmin</command> command</title>
+      <title>The &eyedbadmin; command</title>
+
+      <para>
+	The &eyedbadmin; command is used for most of the &eyedb; administration operations. It is installed in <filename class="directory">/usr/bin</filename> for standard &eyedb; installations.
+      </para>
+
+      <para>
+	The &eyedbadmin; command has the following syntax:
+	<cmdsynopsis>
+	  &eyedbadmin;<arg choice="plain">topic</arg><arg choice="plain">command</arg><arg choice="plain" rep="repeat">options</arg>
+	</cmdsynopsis>
+	where topic is one of the subsystem adressed by the command (database, user, index...) and command the command relative to this subsystem.
+      </para>
+
+      <para>
+	Help on the &eyedbadmin; command ...
+      </para>
 
     </section>
 
