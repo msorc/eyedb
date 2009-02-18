@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN" "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd"
+[
+<!ENTITY eyedb "EyeDB">
+]
+>
+
+<book>
+  <title>EyeDB Administration Guide</title>
+
+  <chapter id="database_tuning">
+    <title>Database tuning</title>
+
+    <section>
+      <title>Creating large databases</title>
+
+      <section>
+	<title>Databases and system limits</title>
+      </section>
+
+      <section>
+	<title>Tuning the host system</title>
+      </section>
+      
+      <section>
+	<title>Creating multi-volumes databases using datafiles and dataspaces</title>
+      </section>
+
+    </section>
+
+    <section>
+      <title>Managing indexes</title>
+
+      <section>
+	<title>Where to use indexes?</title>
+      </section>
+
+      <section>
+	<title>Creating and deleting indexes</title>
+      </section>
+
+      <section>
+	<title>Listing, updating and moving indexes</title>
+      </section>
+
+      <section>
+	<title>Getting statistics on indexes, simulating index performances</title>
+      </section>
+
+      <section>
+	<title>Getting and setting index dataspace</title>
+      </section>
+
+    </section>
+
+    <section>
+      <title>Managing collections</title>
+      
+      <section>
+	<title>EyeDB collection implementations</title>
+      </section>
+
+      <section>
+	<title>Setting and updating a collection implementation</title>
+      </section>
+
+      <section>
+	<title>Listing and simulating collections, getting statistics on collections</title>
+      </section>
+
+    </section>
+
+    <section>
+      <title>Managing locations</title>
+      
+      <section>
+	<title>What is a location in EyeDB?</title>
+      </section>
+
+      <section>
+	<title>Managing instances locations</title>
+      </section>
+
+      <section>
+	<title>Managing attributes locations</title>
+      </section>
+
+      <section>
+	<title>Managing collections locations</title>
+      </section>
+
+      <section>
+	<title>Managing indexes locations</title>
+      </section>
+
+    </section>
+
+  </chapter>
+
+</book>
