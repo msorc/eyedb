@@ -13,6 +13,10 @@
 
     <section>
       <title>The <command>eyedbctl</command> command</title>
+
+      <para>
+      </para>
+
     </section>
 
     <section>
@@ -20,10 +24,18 @@
 
       <section>
 	<title>Starting &eyedb; server</title>
+
+	<para>
+	</para>
+
       </section>
 
       <section>
 	<title>Stopping &eyedb; server</title>
+
+	<para>
+	</para>
+
       </section>
 
     </section>
@@ -34,10 +46,17 @@
       <section>
 	<title>Getting &eyedb; server status</title>
 
+	<para>
+	</para>
+
       </section>
 
       <section>
 	<title>Configuring &eyedb; server logging</title>
+
+	<para>
+	</para>
+
       </section>
 
     </section>
@@ -47,20 +66,36 @@
 
       <section>
 	<title>Server configuration file</title>
+
+	<para>
+	</para>
+
       </section>
 
       <section>
 	<title>Server configuration variables</title>
+
+	<para>
+	</para>
+
       </section>
 
       <section>
 	<title>Environment variables</title>
+
+	<para>
+	</para>
+
       </section>
 
     </section>
 
     <section>
       <title>Network access server configuration</title>
+
+      <para>
+      </para>
+
     </section>
 
   </chapter>
