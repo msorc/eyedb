@@ -20,10 +20,7 @@ AC_SUBST(EYEDB_NUMVERSION)
 
 AM_INIT_AUTOMAKE(${PACKAGE_NAME}, ${PACKAGE_VERSION})
 
-#AC_CONFIG_MACRO_DIR(m4/java)
-#AC_CONFIG_MACRO_DIR(m4/swig)
-#AC_CONFIG_MACRO_DIR(m4/python)
-#AC_CONFIG_MACRO_DIR(m4/extras)
+## AC_CONFIG_MACRO_DIR([m4/java m4/swig m4/python m4/extras])
 
 #
 # Checks for command line flags
