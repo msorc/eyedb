@@ -12,9 +12,9 @@ doc_DATA=AUTHORS COPYING COPYING.LESSER README
 
 EXTRA_DIST= AUTHORS COPYING COPYING.LESSER ChangeLog README VERSION autogen.sh
 
-TAGS:
-	find $(top_srcdir) \! -name '*~' \( -name '*.c' -o -name '*.h' -o -name '*.cc' -o -name '*.l' -o -name '*.y' -o -name '*.java' -o -name 'Makefile.am' -o \( -name '*.in' -a \! -name Makefile.in \) \) -print | etags -t -
-.PHONY: TAGS
+# TAGS:
+# 	find $(top_srcdir) \! -name '*~' \( -name '*.c' -o -name '*.h' -o -name '*.cc' -o -name '*.l' -o -name '*.y' -o -name '*.java' -o -name 'Makefile.am' -o \( -name '*.in' -a \! -name Makefile.in \) \) -print | etags -t -
+# .PHONY: TAGS
 
 doc:
 	(cd doc && $(MAKE) $(AM_MAKEFLAGS) all)

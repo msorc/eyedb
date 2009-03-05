@@ -35,10 +35,49 @@
       <para>
 	The following options are the most usefull:
 	<itemizedlist>
-	  <listitem><para><cmdsynopsis><arg choice="plain">--listen=<arg choice="opt"><replaceable>hostname:</replaceable></arg><arg choice="plain"><replaceable>port</replaceable></arg></arg></cmdsynopsis>: specifies the host and port the server is listening on.</para></listitem>
-	  <listitem><para><cmdsynopsis><arg choice="plain">--access-file=<replaceable>file</replaceable></arg></cmdsynopsis>: specifies the server access file for network configuration (see <xref linkend="server_network_access_configuration"/>)</para></listitem>
-	  <listitem><para><cmdsynopsis><arg choice="plain">--server-conf=<replaceable>file</replaceable></arg></cmdsynopsis>: specifies the server configuration file (see <xref linkend="server_configuration_file"/>)</para></listitem>
-	  <listitem><para><cmdsynopsis><arg choice="plain">--nod</arg></cmdsynopsis>: no daemon mode, do not close file descriptors 0, 1 and 2</para></listitem>
+	  <listitem>
+	    <para id="eyedbctl_listen" xreflabel="eyedbctl --listen option">
+	      <cmdsynopsis>
+		<arg choice="plain">
+		  --listen=
+		  <arg choice="plain" rep="repeat">
+		    <group>
+		      <arg choice="plain">
+			<arg choice="opt"><replaceable>hostname:</replaceable></arg>
+			<arg choice="plain"><replaceable>port</replaceable></arg>
+		      </arg>
+		      <arg choice="plain">
+			<replaceable>unix socket name</replaceable>
+		      </arg>
+		    </group>
+		    ,
+		  </arg>
+		</arg>
+	      </cmdsynopsis>
+	      specifies the port the server is listening on. This port can be either a TCP port, specified by a hostname (defaults to "localhost") and a TCP port number, or a Unix socket, specified by a file name.
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      <cmdsynopsis>
+		<arg choice="plain">--access-file=<replaceable>file</replaceable></arg>
+		</cmdsynopsis> specifies the server access file for network configuration (see <xref linkend="server_network_access_configuration"/>)
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      <cmdsynopsis>
+		<arg choice="plain">--server-conf=<replaceable>file</replaceable></arg>
+		</cmdsynopsis> specifies the server configuration file (see <xref linkend="server_configuration_file"/>)
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      <cmdsynopsis>
+		<arg choice="plain">--nod</arg>
+		</cmdsynopsis> no daemon mode, do not close file descriptors 0, 1 band 2
+	    </para>
+	  </listitem>
 	</itemizedlist>
       </para>
 
@@ -65,7 +104,7 @@ Starting EyeDB Server
  Version      V2.8.8
  Compiled     Feb 14 2009 00:16:45
  Architecture i686-pc-linux-gnu
- Program Pid  10386
+ Program Pid  19433
 	  </screen>
 	</example>
 
@@ -80,13 +119,21 @@ Starting EyeDB Server
 	<para>
 	  The listening ports can be set:
 	  <itemizedlist>
-	    <listitem><para>using &eyedbctl; command options</para></listitem>
-	    <listitem><para>using server configuration file (see <xref linkend="server_configuratin_file"/>)</para></listitem>
+	    <listitem><para>using &eyedbctl; command options --listen (see <xref linkend="eyedbctl_listen"/>)</para></listitem>
+	    <listitem><para>using server configuration file (see <xref linkend="server_configuration_file"/>)</para></listitem>
 	  </itemizedlist>
 	</para>
 
-	<para>
-	</para>
+	<example id="eyedbctl-start--listen">
+	  <title>&eyedbctl; start with --listen option</title>
+	  <screen><userinput>eyedbctl start --listen=localhost:10000,/var/tmp/eyedb-socket</userinput>
+Starting EyeDB Server
+ Version      V2.8.8
+ Compiled     Feb 14 2009 00:16:45
+ Architecture i686-pc-linux-gnu
+ Program Pid  19560
+	  </screen>
+	</example>
 
       </section>
 
@@ -94,7 +141,32 @@ Starting EyeDB Server
 	<title>Stopping &eyedb; server</title>
 
 	<para>
+	  The &eyedb; server is stopped using the following command:
+	  <cmdsynopsis>
+	    &eyedbctl;<arg choice="plain">stop</arg><arg choice="plain" rep="repeat"><replaceable>options</replaceable></arg>
+	  </cmdsynopsis>	  
 	</para>
+
+	<example id="eyedbctl-stop">
+	  <title>&eyedbctl; stop</title>
+	  <screen><userinput>eyedbctl stop</userinput>
+Killing EyeDB Server Pid 19433
+	  </screen>
+	</example>
+
+	<para>
+	  If the server was started with the <command>--listen</command> option to set the listening port, the <emphasis>same</emphasis> option must be passed to <command>eyedbctl</command> when stopping the server.
+	</para>
+
+	<example id="eyedbctl-stop--listen">
+	  <title>&eyedbctl; stop with --listen option</title>
+	  <screen>
+<userinput>eyedbctl stop</userinput>
+No EyeDB Server is running on localhost:6240
+<userinput>eyedbctl stop --listen=localhost:10000,/var/tmp/eyedb-socket</userinput>
+Killing EyeDB Server Pid 19560
+	  </screen>
+	</example>
 
       </section>
 
