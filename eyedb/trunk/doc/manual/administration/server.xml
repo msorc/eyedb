@@ -29,60 +29,61 @@
 	<cmdsynopsis>
 	  &eyedbctl;<arg choice="plain"><replaceable>command</replaceable></arg><arg choice="plain" rep="repeat">options</arg>
 	</cmdsynopsis>
-	where <cmdsynopsis><arg choice="plain"><replaceable>command</replaceable></arg></cmdsynopsis> is one of the subsystem adressed by the command (database, user, index...) 
-	and <cmdsynopsis><arg choice="plain"><replaceable>command</replaceable></arg></cmdsynopsis> is the command relative to this subsystem.
+	where <cmdsynopsis><arg choice="plain"><replaceable>command</replaceable></arg></cmdsynopsis> is one of <command>start</command>, <command>stop</command> or <command>status</command>.
       </para>
-
-      <example id="eyedbctl-help">
-	<title>&eyedbctl; help</title>
-	<screen><userinput>eyedbctl --help</userinput>
-	eyedbctl -h
-	usage: eyedbctl [-h|--help|-v|--version] [start|stop|status] [-f] [--creating-dbm] [-U USER|@|--user=USER|@] [-P [PASSWD]|--passwd[=PASSWD]] [--listen=[HOST:]PORT] [--granted-dbm=DBMFILES] [--default-dbm=DBMFILE] [--conf=CONFFILE] [--server-conf=CONFFILE] [--default-file-mask=MASK] [--default-file-group=GROUP] [--maximum-server-memory-size=SIZE] [--logdev=LOGFILE] [--logmask=MASK] [--logdate=on|off] [--logtimer=on|off] [--logpid=on|off] [--logprog=on|off] [--error-policy=VALUE] [--trans-def-mag=MAGORDER] [--arch] [-v|--version] [--help-logmask] [--help-eyedb-options]
-
-	Program Options:
-	start [-f]     Launch the server. Set -f to force launch
-	stop [-f]      Stop the server. Set -f to force stop
-	status         Display status on the running server
-	--creating-dbm Bootstrap option for DBM database creation
-	-U USER|@, --user=USER|@          User name
-	-P [PASSWD], --passwd[=PASSWD]    Password
-	--listen=[HOST:]PORT              listen host and ports
-	--granted-dbm=DBMFILES            Granted EYEDBDBM database files
-	--default-dbm=DBMFILE             Default EYEDBDBM database file
-	--conf=CONFFILE                   Client Configuration file
-	--server-conf=CONFFILE            Server Configuration file
-	--default-file-mask=MASK          Default file mask
-	--default-file-group=GROUP        Default file group
-	--maximum-server-memory-size=SIZE Maximum server memory size (in Mb)
-	--logdev=LOGFILE                  Output log file
-	--logmask=MASK                    Output log mask
-	--logdate=on|off                  Control date display in output log
-	--logtimer=on|off                 Control timer display in output log
-	--logpid=on|off                   Control pid display in output log
-	--logprog=on|off                  Control progname display in output log
-	--error-policy=VALUE              Control error policy: status|exception|abort|stop|echo
-	--trans-def-mag=MAGORDER          Default transaction magnitude order
-	--arch                            Display the client architecture
-	-v, --version                     Display the version
-	--help-logmask                    Display logmask usage
-	--help-eyedb-options              Display this message
-	</screen>
-      </example>
 
       <para>
 	The following options are the most usefull:
 	<itemizedlist>
-	  <listitem><para><cmdsynopsis><arg choice="plain">--user=<replaceable>user</replaceable></arg></cmdsynopsis>: specifies the user name for &eyedb; authentication; if user is "@", then the Unix user name is used</para></listitem>
+	  <listitem><para><cmdsynopsis><arg choice="plain">--listen=<arg choice="opt"><replaceable>hostname:</replaceable></arg><arg choice="plain"><replaceable>port</replaceable></arg></arg></cmdsynopsis>: specifies the host and port the server is listening on.</para></listitem>
+	  <listitem><para><cmdsynopsis><arg choice="plain">--access-file=<replaceable>file</replaceable></arg></cmdsynopsis>: specifies the server access file for network configuration (see <xref linkend="server_network_access_configuration"/>)</para></listitem>
+	  <listitem><para><cmdsynopsis><arg choice="plain">--server-conf=<replaceable>file</replaceable></arg></cmdsynopsis>: specifies the server configuration file (see <xref linkend="server_configuration_file"/>)</para></listitem>
+	  <listitem><para><cmdsynopsis><arg choice="plain">--nod</arg></cmdsynopsis>: no daemon mode, do not close file descriptors 0, 1 and 2</para></listitem>
 	</itemizedlist>
       </para>
 
     </section>
+
 
     <section>
       <title>Starting and stopping the server</title>
 
       <section>
 	<title>Starting &eyedb; server</title>
+
+	<para>
+	  The &eyedb; server is started using the following command:
+	  <cmdsynopsis>
+	    &eyedbctl;<arg choice="plain">start</arg><arg choice="plain" rep="repeat"><replaceable>options</replaceable></arg>
+	  </cmdsynopsis>	  
+	</para>
+
+	<example id="eyedbctl-start">
+	  <title>&eyedbctl; start</title>
+	  <screen><userinput>eyedbctl start</userinput>
+Starting EyeDB Server
+ Version      V2.8.8
+ Compiled     Feb 14 2009 00:16:45
+ Architecture i686-pc-linux-gnu
+ Program Pid  10386
+	  </screen>
+	</example>
+
+	<para>
+	  By default, the &eyedb; server listens to incoming client connections on 2 ports:
+	  <itemizedlist>
+	    <listitem><para>a TCP/IP socket bound to port 6240</para></listitem>
+	    <listitem><para>a Unix socket bound to file name <filename>/var/lib/eyedb/pipes/eyedbd</filename> for standard installation,  or <filename>PREFIX/var/lib/eyedb/pipes/eyedbd</filename> where <filename>PREFIX</filename> is the installation prefix that has been set during configuration</para></listitem>
+	  </itemizedlist>
+	</para>
+
+	<para>
+	  The listening ports can be set:
+	  <itemizedlist>
+	    <listitem><para>using &eyedbctl; command options</para></listitem>
+	    <listitem><para>using server configuration file (see <xref linkend="server_configuratin_file"/>)</para></listitem>
+	  </itemizedlist>
+	</para>
 
 	<para>
 	</para>
@@ -123,7 +124,7 @@
     <section>
       <title>Server configuration</title>
 
-      <section>
+      <section id="server_configuration_file">
 	<title>Server configuration file</title>
 
 	<para>
@@ -149,7 +150,7 @@
 
     </section>
 
-    <section>
+    <section id="server_network_access_configuration">
       <title>Network access server configuration</title>
 
       <para>
