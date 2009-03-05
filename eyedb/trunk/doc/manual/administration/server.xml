@@ -179,7 +179,94 @@ Killing EyeDB Server Pid 19560
 	<title>Getting &eyedb; server status</title>
 
 	<para>
+	  The &eyedb; server status can be obtained using the following command:
+	  <cmdsynopsis>
+	    &eyedbctl;<arg choice="plain">status</arg><arg choice="plain" rep="repeat"><replaceable>options</replaceable></arg>
+	  </cmdsynopsis>	  
+	  This command will print on its standard output informations about the &eyedb; server currently running: server PID and user, version, listening ports and list of connected clients.
 	</para>
+
+	<example id="eyedbctl-status">
+	  <title>&eyedbctl; status</title>
+	  <screen>
+<userinput>eyedbctl status</userinput>
+
+EyeDB Server running since Thu Mar  5 16:08:45 2009
+
+  Version       V2.8.8
+  Date          Feb 14 2009 00:16:45
+  Architecture  i686-pc-linux-gnu
+  Program Pid   19433
+  Running Under francois
+
+  Listening on  localhost:6240
+                localhost:/home/francois/projects/eyedb/install/var/lib/eyedb/pipes/eyedbd
+  Datafile Directory /home/francois/projects/eyedb/install/var/lib/eyedb/db
+
+  No Clients connected.
+	  </screen>
+	</example>
+
+
+	<para>
+	  Same as for stopping server, if the server was started with the <command>--listen</command> option to set the listening port, the <emphasis>same</emphasis> option must be passed to <command>eyedbctl</command> when getting server status.
+	</para>
+
+	<example id="eyedbctl-status--listen">
+	  <title>&eyedbctl; status with --listen option</title>
+	  <screen>
+<userinput>eyedbctl status --listen=localhost:10000,/var/tmp/eyedb-socket</userinput>
+EyeDB Server running since Thu Mar  5 16:09:07 2009
+
+  Version       V2.8.8
+  Date          Feb 14 2009 00:16:45
+  Architecture  i686-pc-linux-gnu
+  Program Pid   19560
+  Running Under francois
+
+  Listening on  localhost:10000
+                localhost:/var/tmp/eyedb-socket
+  Datafile Directory /home/francois/projects/eyedb/install/var/lib/eyedb/db
+
+  No Clients connected.
+	  </screen>
+	</example>
+
+	<para>
+	  If clients are connected, the server status will show the list of connected clients, giving for each client a list of open databases.
+	</para>
+
+	<example id="eyedb-status-clients">
+	  <title>&eyedbctl; status with connected clients</title>
+	  <screen>
+<userinput>eyedbctl status</userinput>
+EyeDB Server running since Thu Mar  5 16:46:55 2009
+
+  Version       V2.8.8
+  Date          Feb 14 2009 00:16:45
+  Architecture  i686-pc-linux-gnu
+  Program Pid   20332
+  Running Under francois
+
+  Listening on  localhost:6240
+                localhost:/home/francois/projects/eyedb/install/var/lib/eyedb/pipes/eyedbd
+  Datafile Directory /home/francois/projects/eyedb/install/var/lib/eyedb/db
+
+  1 Client connected
+
+Client #0
+  Connected on Thu Mar  5 16:53:01 2009
+  Host:Port    localhost:/home/francois/projects/eyedb/install/var/lib/eyedb/pipes/eyedb
+  User Name    francois
+  Program Name eyedboql
+  Client Pid   20377
+  EyeDB Server Pid 20378
+  Open Databases 'EYEDBDBM' [mode=sread/local]
+                   'EYEDBDBM' [mode=sread/local]
+                   'EYEDBDBM' [mode=sread/local]
+                   'test' [mode=sread] [userauth=francois]
+	  </screen>
+	</example>
 
       </section>
 
