@@ -36,7 +36,7 @@
 	The following options are the most usefull:
 	<itemizedlist>
 	  <listitem>
-	    <para id="eyedbctl_listen" xreflabel="eyedbctl --listen option">
+	    <para id="eyedbctl-listen" xreflabel="eyedbctl --listen option">
 	      <cmdsynopsis>
 		<arg choice="plain">
 		  --listen=
@@ -61,14 +61,14 @@
 	    <para>
 	      <cmdsynopsis>
 		<arg choice="plain">--access-file=<replaceable>file</replaceable></arg>
-		</cmdsynopsis> specifies the server access file for network configuration (see <xref linkend="server_network_access_configuration"/>)
+		</cmdsynopsis> specifies the server access file for network configuration (see <xref linkend="server-network-access-file"/>)
 	    </para>
 	  </listitem>
 	  <listitem>
 	    <para>
 	      <cmdsynopsis>
 		<arg choice="plain">--server-conf=<replaceable>file</replaceable></arg>
-		</cmdsynopsis> specifies the server configuration file (see <xref linkend="server_configuration_file"/>)
+		</cmdsynopsis> specifies the server configuration file (see <xref linkend="server-configuration-file"/>)
 	    </para>
 	  </listitem>
 	  <listitem>
@@ -119,8 +119,8 @@ Starting EyeDB Server
 	<para>
 	  The listening ports can be set:
 	  <itemizedlist>
-	    <listitem><para>using &eyedbctl; command options --listen (see <xref linkend="eyedbctl_listen"/>)</para></listitem>
-	    <listitem><para>using server configuration file (see <xref linkend="server_configuration_file"/>)</para></listitem>
+	    <listitem><para>using &eyedbctl; command options --listen (see <xref linkend="eyedbctl-listen"/>)</para></listitem>
+	    <listitem><para>using server configuration file (see <xref linkend="server-configuration-file"/>)</para></listitem>
 	  </itemizedlist>
 	</para>
 
@@ -301,7 +301,7 @@ Client #0
 		<cmdsynopsis>
 		  <arg choice="plain">--logmask=<replaceable>mask</replaceable></arg>
 		</cmdsynopsis>
-		specifies log mask (see <xref linkend="eyedbctl_log_mask"/> for log mask values)
+		specifies log mask (see <xref linkend="eyedbctl-log-mask"/> for log mask values)
 	      </para>
 	    </listitem>
 	    <listitem>
@@ -339,7 +339,7 @@ Client #0
 	  </itemizedlist>
 	</para>
 
-	<para id="eyedbctl_log_mask" xreflabel="log mask values">
+	<para id="eyedbctl-log-mask" xreflabel="log mask values">
 	  Log mask is either an hexadecimal number or a combination of symbols prefixed by + (to enable the corresponding log) or - (to disable the corresponding log). The list of allowed symbols can be obtained by running <command>eyedbctl start --logmask=help</command>. For instance, specifying <command>--logmask=+server+connection</command> will log all server and connection events.
 	</para>
 
@@ -400,7 +400,7 @@ Thu Mar  5 19:19:04 2009 [thread 7522#-1564058736] eyedbd : close connection fd=
 	</itemizedlist>
       </para>
 
-      <section id="server_configuration_file">
+      <section id="server-configuration-file">
 	<title>Server configuration file</title>
 
 	<para>
@@ -687,11 +687,56 @@ oqlpath = /home/francois/projects/eyedb/install/lib/eyedb/oql
 
     </section>
 
-    <section id="server_network_access_configuration">
-      <title>Network access server configuration</title>
+    <section id="server-network-access-file">
+      <title>Server network access file</title>
 
       <para>
+	When a &eyedb; client command or application attempts to connect to the &eyedb; server using a TCP connection, an <emphasis>access file</emphasis> is used to determine wheter the connection is authorized.
       </para>
+
+      <para>
+	The location of the network access file is given by the <varname>access_file</varname> configuration switch, that can be specified either as a configuration variable in a configuration file or as an environment variable.
+      </para>
+
+      <para>
+	The syntax of this access file is the following:
+	<itemizedlist>
+	  <listitem><para>comments: all characters following a # are skipped</para></listitem>
+	  <listitem>
+	    <para>
+	      access rule, composed of an IP address or subnet mask <varname>address</varname>, followed by a list of user authorizations, where a user authorization can be:
+	      <itemizedlist>
+		<listitem><para>a &eyedb; user name: the designated user is authorized to connect to the &eyedb; server from the machine identified by <varname>address</varname></para></listitem>
+		<listitem><para>a &eyedb; user name prefixed by the ! character: the designated user is <emphasis>not</emphasis> authorized to connect to the &eyedb; server from the machine identified by <varname>address</varname></para></listitem>
+		<listitem><para>a &eyedb; user name prefixed by the = character: the designated user will be used for any connection opened from the machine identified by <varname>address</varname> if no authentication is provided</para></listitem>
+		<listitem><para>a + character: any &eyedb; user is authorized to connect from the machine identified by <varname>address</varname></para></listitem>
+	      </itemizedlist>
+	    </para>
+	  </listitem>
+	</itemizedlist>
+      </para>
+
+      <para>
+	<xref linkend="server-network-access-file-example"/> gives an example of a &eyedb; server network access file.
+      </para>
+
+
+      <example id="server-network-access-file-example">
+	<title>&eyedb; server network access file</title>
+	<programlisting>
+# All users are authorized from domain localdomain:
+.localdomain       +
+
+# Any user, except user 'eyedbroot', are authorized from machine r2.somewhere.org:
+r2.somewhere.org   + !eyedbroot
+
+# User 'joe' is authorized from domain ircam.fr:
+.ircam.fr          joe
+
+# Users 'tom' and 'guest' are authorized from subnet mask 192.168.1.0; if no authenticatino is provided, user 'guest' is used:
+192.168.1.0        tom =guest
+	  </programlisting>
+	</example>
 
     </section>
 
