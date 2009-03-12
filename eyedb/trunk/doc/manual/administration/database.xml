@@ -2,6 +2,7 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN" "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd"
 [
 <!ENTITY eyedb "EyeDB">
+<!ENTITY eyedbadmin "<command>eyedbadmin</command>">
 ]
 >
 
@@ -10,12 +11,67 @@
 
   <chapter id="database">
     <title>Database administration</title>
+    
+    <para>
+      This chapter covers the database administration commands used for:
+      <itemizedlist>
+	<listitem><para>creating and deleting databases</para></listitem>
+	<listitem><para>getting information on databases</para></listitem>
+	<listitem><para>moving, copying, renaming databases</para></listitem>
+	<listitem><para>importing and exporting databases</para></listitem>
+      </itemizedlist>
+    </para>
+
+    <para>
+      All these operations are performed using the &eyedbadmin; command and its <command>database</command> topic.
+    </para>
 
     <section>
       <title>Creating and deleting a database</title>
 
       <section>
 	<title>Creating a database</title>
+
+	<para>
+	  Creating a database is done using the &eyedbadmin; create:
+	  <cmdsynopsis>&eyedbadmin;<arg choice="plain">database create</arg><arg choice="plain" rep="repeat">options</arg><arg choice="plain"><replaceable>database</replaceable></arg></cmdsynopsis>
+	</para>
+
+      <para>
+	Options are:
+	<itemizedlist>
+	  <listitem>
+	    <para>
+	      <cmdsynopsis>
+		<arg choice="plain">--dbfile=<replaceable>file</replaceable></arg>
+		</cmdsynopsis> specifies the database file
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      <cmdsynopsis>
+		<arg choice="plain">--filedir=<replaceable>directory</replaceable></arg>
+		</cmdsynopsis> specifies the directory that will contains the database data files
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      <cmdsynopsis>
+		<arg choice="plain">--max-object-count=<replaceable>count</replaceable></arg>
+		</cmdsynopsis> specifies the maximum number of objects that can be store in the database
+	    </para>
+	  </listitem>
+	</itemizedlist>
+      </para>
+
+
+      <example id="eyedbadmin-database-create">
+	  <title>&eyedbadmin; database create</title>
+	  <screen>
+	    <userinput>eyedbadmin database create test1</userinput>
+	  </screen>
+      </example>
+
       </section>
 
       <section>
