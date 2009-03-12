@@ -155,7 +155,7 @@ Killing EyeDB Server Pid 19433
 	</example>
 
 	<para>
-	  If the server was started with the <command>--listen</command> option to set the listening port, the <emphasis>same</emphasis> option must be passed to <command>eyedbctl</command> when stopping the server.
+	  If the server was started with the <command>--listen</command> option to set the listening port, the <emphasis>same</emphasis> option must be passed to &eyedbctl; when stopping the server.
 	</para>
 
 	<example id="eyedbctl-stop--listen">
@@ -174,6 +174,14 @@ Killing EyeDB Server Pid 19560
 
     <section>
       <title>Getting server information</title>
+
+      <para>
+	Once &eyedb; server has been launched, information can be obtained on server status (server uptime, listening ports, clients...) using &eyedbctl;.
+      </para>
+
+      <para>
+	Independently from server status, the &eyedb; server can be launched with logging option, that allows to trace precisely all server actions (client connections, transactions...).
+      </para>
 
       <section>
 	<title>Getting &eyedb; server status</title>
@@ -209,7 +217,7 @@ EyeDB Server running since Thu Mar  5 16:08:45 2009
 
 
 	<para>
-	  Same as for stopping server, if the server was started with the <command>--listen</command> option to set the listening port, the <emphasis>same</emphasis> option must be passed to <command>eyedbctl</command> when getting server status.
+	  Same as for stopping server, if the server was started with the <command>--listen</command> option to set the listening port, the <emphasis>same</emphasis> option must be passed to &eyedbctl; when getting server status.
 	</para>
 
 	<example id="eyedbctl-status--listen">
@@ -336,7 +344,7 @@ Client #0
 	</para>
 
 	<para>
-	  <xref linkend="log-mask-example"/> shows an example of launching &eyedb; server with logging enabled, running an &eyedb; command and examining the log file (here <filename>/var/tmp/eyedbd.log</filename>) with the <command>tail</command>.
+	  <xref linkend="log-mask-example"/> shows an example of launching &eyedb; server with logging enabled, running an &eyedb; command (here: <command>eyedbadmin</command>) and examining the log file (here <filename>/var/tmp/eyedbd.log</filename>) with the <command>tail</command>.
 	</para>
 
 	<example id="log-mask-example">
@@ -378,10 +386,24 @@ Thu Mar  5 19:19:04 2009 [thread 7522#-1564058736] eyedbd : close connection fd=
     <section>
       <title>Server configuration</title>
 
+      <para>
+	The &eyedb; server can be configured in several ways: 
+	<itemizedlist>
+	  <listitem><para>using &eyedbctl; options</para></listitem>
+	  <listitem><para>using server configuration file</para></listitem>
+	  <listitem><para>using environment variables</para></listitem>
+	</itemizedlist>
+      </para>
+
+      <para>
+	These two latter configuration methods are described in next sections.
+      </para>
+
       <section id="server_configuration_file">
 	<title>Server configuration file</title>
 
 	<para>
+
 	</para>
 
       </section>
