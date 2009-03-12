@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN" "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 
-<book>
-  <title>EyeDB Administration Guide</title>
+<book lang="en">
+  <title>
+    <phrase>
+      EyeDB Administration Guide
+    </phrase>
+  </title>
 
   <bookinfo>
     <author>
