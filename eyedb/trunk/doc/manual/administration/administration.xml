@@ -7,7 +7,6 @@
       EyeDB Administration Guide
     </phrase>
   </title>
-
   <bookinfo>
     <author>
       <firstname>François</firstname>
@@ -30,6 +29,19 @@
       </para>
     </legalnotice>
   </bookinfo>
+
+  <dedication>
+    <note>
+      <title>TODO</title>
+    <para>
+      <itemizedlist>
+	<listitem><para>complete list of standard options of eyedbadmin</para></listitem>
+	<listitem><para>document standard options of eyedbadmin</para></listitem>
+	<listitem><para>make list of eyedbadmin shortcuts</para></listitem>
+      </itemizedlist>
+    </para>
+    </note>
+  </dedication>
 
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="introduction.xml" xpointer="introduction"/>
 

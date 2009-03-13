@@ -33,7 +33,7 @@
 	<title>Creating a database</title>
 
 	<para>
-	  Creating a database is done using the &eyedbadmin; create:
+	  Creating a database is done using the &eyedbadmin; command:
 	  <cmdsynopsis>&eyedbadmin;<arg choice="plain">database create</arg><arg choice="plain" rep="repeat">options</arg><arg choice="plain"><replaceable>database</replaceable></arg></cmdsynopsis>
 	</para>
 
@@ -95,10 +95,182 @@ total 1504
 
       <section>
 	<title>Deleting a database</title>
+
+	<para>
+	  Deleting a database is done using the &eyedbadmin; command:
+	  <cmdsynopsis>&eyedbadmin;<arg choice="plain">database delete</arg><arg choice="plain" rep="repeat"><replaceable>database</replaceable></arg></cmdsynopsis>
+	</para>
+
+	<para>
+	  This command has no options (except the &eyedbadmin; command standard options).
+	</para>
+
+	<example id="eyedbadmin-database-delete">
+	  <title>&eyedbadmin; database delete</title>
+	  <screen>
+# delete database 'test1'
+<userinput>eyedbadmin database delete test1</userinput>
+	  </screen>
+	</example>
+
       </section>
 
       <section>
 	<title>Listing databases</title>
+
+	<para>
+	  Obtaining a list of existing databases or obtaining information on a specific database is done using the &eyedbadmin; command:
+	  <cmdsynopsis>&eyedbadmin;<arg choice="plain">database list</arg><arg choice="plain" rep="repeat">options</arg><arg choice="plain" rep="repeat"><arg choice="opt">~</arg><replaceable>database</replaceable></arg></cmdsynopsis>
+	</para>
+
+	<para>
+	  Options are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<cmdsynopsis><arg choice="plain">--help</arg></cmdsynopsis>
+		displays the current help
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis><arg choice="plain">--dbname</arg></cmdsynopsis>
+		lists database names
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis><arg choice="plain">--dbid</arg></cmdsynopsis>
+		lists database identifier
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis><arg choice="plain">--dbfile</arg></cmdsynopsis>
+		lists database file
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis><arg choice="plain">--max-object-count</arg></cmdsynopsis>
+		lists database max object count
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis><arg choice="plain">--datafiles</arg></cmdsynopsis>
+		lists database datafiles
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis><arg choice="plain">--defaccess</arg></cmdsynopsis>
+		lists database default access
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis><arg choice="plain">--useraccess</arg></cmdsynopsis>
+		lists user database accesses
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis><arg choice="plain">--stats</arg></cmdsynopsis>
+		lists database statistics
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis><arg choice="plain">--all</arg></cmdsynopsis>
+		lists all database info
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+
+	<para>
+	  Command arguments are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<cmdsynopsis><arg choice="plain" rep="repeat"><arg choice="opt">~</arg><replaceable>database</replaceable></arg></cmdsynopsis>
+		database(s) to list (~ means regular expression)
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+
+	<para>
+	  <xref linkend="eyedbadmin-database-list"/> shows several examples of database listing.
+	</para>
+
+	<example id="eyedbadmin-database-list">
+	  <title>&eyedbadmin; database list</title>
+	  <screen>
+# list all databases
+<userinput>eyedbadmin database list</userinput>
+Database Name
+  test
+Database Identifier
+  2
+Database File
+  /home/francois/projects/eyedb/install/var/lib/eyedb/db/test.dbs
+Max Object Count
+  10000000
+Datafiles
+  Datafile #0
+    Name      DEFAULT
+    Dataspace #0
+    File      test.dat
+    Maxsize   ~2048Mb
+    Slotsize  16b
+    Server Access read/write
+Default Access
+  NO_DBACCESS_MODE
+Database Access
+  User Name  francois
+  Access Mode ADMIN_DBACCESS_MODE
+Database Name
+  EYEDBDBM
+....
+### output truncated for readability
+# list only database names
+<userinput>eyedbadmin database list --dbname</userinput>
+test
+EYEDBDBM
+test3
+test2
+# list non existing database
+<userinput>eyedbadmin database list --dbname foo</userinput>
+Database 'foo' not found
+# list statistics for a given database
+<userinput>eyedbadmin database list --stats test</userinput>
+Statistics
+  Maximum Object Number 10000000
+  Object Number         2574
+  Maximum Slot Count    134217728
+  Busy Slot Count       532202
+  Maximum Size          2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+  Busy Slot Size        8515232b, ~8315Kb, ~8Mb
+  Disk Size Used        76007288b, ~74225Kb, ~72Mb
+  Disk Block Size Used  10452992b, ~10208Kb, ~10Mb
+  Used                  0.40%
+# list with regular expression (note shell quoting)
+<userinput>eyedbadmin database list --dbname '~test*'</userinput>
+test
+test3
+test2
+# list with another regular expression (note shell quoting)
+<userinput>eyedbadmin database list --dbname --dbfile '~test[0-9]'</userinput>
+test3
+/var/tmp/test3/test3.dbs
+test2
+/var/tmp/test2.dbs
+	  </screen>
+	</example>
+
+
       </section>
 
       <section>
