@@ -256,6 +256,9 @@ Statistics
   Disk Size Used        76007288b, ~74225Kb, ~72Mb
   Disk Block Size Used  10452992b, ~10208Kb, ~10Mb
   Used                  0.40%
+# list database default access right
+<userinput>eyedbadmin database list --defaccess test</userinput>
+NO_DBACCESS_MODE
 # list with regular expression (note shell quoting)
 <userinput>eyedbadmin database list --dbname '~test*'</userinput>
 test
@@ -275,6 +278,56 @@ test2
 
       <section>
 	<title>Setting database default access rights</title>
+	
+	<para>
+	  Database access rights are defined at two levels:
+	  <itemizedlist>
+	    <listitem><para>default database access, applying for all &eyedb; users</para></listitem>
+	    <listitem><para>per user database access, applying only for specified user</para></listitem>
+	  </itemizedlist>
+	</para>
+
+	<para>
+	  Setting default access right is done use the &eyedbadmin; command:
+	  <cmdsynopsis>&eyedbadmin;<arg choice="plain">database defaccess</arg><arg choice="plain"><replaceable>database</replaceable></arg><arg choice="plain"><replaceable>mode</replaceable></arg></cmdsynopsis>
+	</para>
+
+	<para>
+	  Allowed values for <replaceable>mode</replaceable> are:
+	  <itemizedlist>
+	    <listitem><para><command>r</command>: read-only</para></listitem>
+	    <listitem><para><command>rw</command>: read/write</para></listitem>
+	    <listitem><para><command>rx</command>: read/execute</para></listitem>
+	    <listitem><para><command>rwx</command>: read/write/execute</para></listitem>
+	    <listitem><para><command>admin</command>: administrate</para></listitem>
+	    <listitem><para><command>no</command>: access forbiden</para></listitem>
+	  </itemizedlist>
+	</para>
+
+	<example id="eyedbadmin-database-defaccess">
+	  <title>&eyedbadmin; database defaccess</title>
+	  <screen>
+# list database default access right
+<userinput>eyedbadmin database list --defaccess test</userinput>
+NO_DBACCESS_MODE
+# set default access right to read-only
+<userinput>eyedbadmin database defaccess test r</userinput>
+# list database default access right
+<userinput>eyedbadmin database list --defaccess test</userinput>
+READ_DBACCESS_MODE
+# set default access right to read/write
+<userinput>eyedbadmin database defaccess test rw</userinput>
+# list database default access right
+<userinput>eyedbadmin database list --defaccess test</userinput>
+READ_WRITE_DBACCESS_MODE
+	  </screen>
+	</example>
+
+	<note>
+	  <para>Only an &eyedb; user that has the <command>admin</command> database access for a given database can set a default database access for this database. The user that has created the database has automatically the <command>admin</command> database access.
+	  </para>
+	</note>
+
       </section>
 
     </section>
