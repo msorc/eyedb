@@ -37,40 +37,59 @@
 	  <cmdsynopsis>&eyedbadmin;<arg choice="plain">database create</arg><arg choice="plain" rep="repeat">options</arg><arg choice="plain"><replaceable>database</replaceable></arg></cmdsynopsis>
 	</para>
 
-      <para>
-	Options are:
-	<itemizedlist>
-	  <listitem>
-	    <para>
-	      <cmdsynopsis>
-		<arg choice="plain">--dbfile=<replaceable>file</replaceable></arg>
-		</cmdsynopsis> specifies the database file
-	    </para>
-	  </listitem>
-	  <listitem>
-	    <para>
-	      <cmdsynopsis>
-		<arg choice="plain">--filedir=<replaceable>directory</replaceable></arg>
-		</cmdsynopsis> specifies the directory that will contains the database data files
-	    </para>
-	  </listitem>
-	  <listitem>
-	    <para>
-	      <cmdsynopsis>
-		<arg choice="plain">--max-object-count=<replaceable>count</replaceable></arg>
-		</cmdsynopsis> specifies the maximum number of objects that can be store in the database
-	    </para>
-	  </listitem>
-	</itemizedlist>
-      </para>
+	<para>
+	  Options are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="plain">--dbfile=<replaceable>file</replaceable></arg>
+		  </cmdsynopsis> specifies the database file (a file, usually with <filename>.dbs</filename> extension, that stores the database structure. If path is not absolute, the file will be created in 
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="plain">--filedir=<replaceable>directory</replaceable></arg>
+		  </cmdsynopsis> specifies the directory that will contains the database data files
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="plain">--max-object-count=<replaceable>count</replaceable></arg>
+		  </cmdsynopsis> specifies the maximum number of objects that can be store in the database
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
 
 
-      <example id="eyedbadmin-database-create">
+	<example id="eyedbadmin-database-create">
 	  <title>&eyedbadmin; database create</title>
 	  <screen>
-	    <userinput>eyedbadmin database create test1</userinput>
+# create database 'test1'
+<userinput>eyedbadmin database create test1</userinput>
+# create database 'test2' giving the database file
+<userinput>eyedbadmin database create --dbfile=/var/tmp/test2.dbs test2</userinput>
+<userinput>ls -l /var/tmp/test2.dbs</userinput>
+-rw------- 1 francois francois 250696 2009-03-13 11:55 /var/tmp/test2.dbs
+# create database 'test3' giving the database files directory
+<userinput>mkdir /var/tmp/test3</userinput>
+<userinput>eyedbadmin database create --filedir=/var/tmp/test3 test3</userinput>
+<userinput>ls -l /var/tmp/test3</userinput>
+total 1504
+-rw------- 1 francois francois  8471424 2009-03-13 11:57 test3.dat
+-rw------- 1 francois francois   250696 2009-03-13 11:57 test3.dbs
+-rw------- 1 francois francois    70000 2009-03-13 11:57 test3.dmp
+-rw------- 1 francois francois        0 2009-03-13 11:57 test3.lck
+-rw------- 1 francois francois    61440 2009-03-13 11:57 test3.omp
+-rw------- 1 francois francois 67108864 2009-03-13 11:57 test3.shm
 	  </screen>
-      </example>
+	</example>
+
+	<para>
+	</para>
 
       </section>
 
