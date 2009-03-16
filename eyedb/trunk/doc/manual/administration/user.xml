@@ -2,6 +2,7 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN" "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd"
 [
 <!ENTITY eyedb "EyeDB">
+<!ENTITY eyedbadmin "<command>eyedbadmin</command>">
 ]
 >
 
@@ -11,8 +12,34 @@
   <chapter id="user">
     <title>User administration</title>
 
+    <para>
+      As any other DBMS, &eyedb; provides the concept of <emphasis>user</emphasis> that is the basis for rights management: database read or write access, database administration...
+    </para>
+
     <section>
       <title>The different user types</title>
+
+      <para>
+	An &eyedb; user is identified by:
+	<itemizedlist>
+	  <listitem><para>a name</para></listitem>
+	  <listitem><para>an optional password</para></listitem>
+	  <listitem><para>a user identifier, managed by &eyedb; and for internal use only</para></listitem>
+	</itemizedlist>
+      </para>
+
+      <para>
+	&eyedb; users can have the following types:
+	<itemizedlist>
+	  <listitem><para><emphasis>eyedb</emphasis> user type (the default type): users of this type are not mapped to Unix users and can use &eyedb; password authentication only</para></listitem>
+	  <listitem><para><emphasis>unix</emphasis>: users of this type are mapped to Unix standard users (a Unix user of the same name must exist) and can use &eyedb; password authentication or &eyebd; Unix identification</para></listitem>
+	  <listitem><para><emphasis>strict unix</emphasis>: users of this type are mapped to Unix standard users, and can use only &eyedb; Unix authentication</para></listitem>
+	</itemizedlist>
+      </para>
+
+      <para>
+	The &eyedb; Unix authentication is a mode of authentication that can be used only when using a named pipe connection between the &eyedb; client and the &eyebd; server; this authentication does not require a password and uses a safe challenge-based authentication supported by the Unix operating system.
+      </para>
 
     </section>
 
@@ -21,18 +48,75 @@
 
       <section>
 	<title>Adding a user</title>
+
+	<para>
+	  Creating a database is done using the &eyedbadmin; command:
+	  <cmdsynopsis>
+	    &eyedbadmin;
+	    <arg choice="plain">user add</arg>
+	    <arg choice="plain" rep="repeat">options</arg>
+	    <arg choice="opt"><replaceable>user</replaceable></arg>
+	    <arg choice="opt"><replaceable>password</replaceable></arg>
+	  </cmdsynopsis>
+	</para>
+
+	<para>
+	  Options are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="opt">
+		    <group>
+		      <arg choice="plain">--unix</arg>
+		      <arg choice="plain">--strict-unix</arg>
+		    </group>
+		  </arg>
+		</cmdsynopsis>
+		specify the user type, if unix or strict-unix type
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+
+	<para>
+	  Command arguments are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="opt">user</arg>
+		</cmdsynopsis>
+		user name, if not unix or strict-unix type (
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+
       </section>
 
       <section>
 	<title>Deleting a user</title>
+
+	<para>
+	</para>
+
       </section>
 
       <section>
 	<title>Setting user password</title>
+
+	<para>
+	</para>
+
       </section>
 
       <section>
 	<title>Listing users</title>
+
+	<para>
+	</para>
+
       </section>
 
     </section>
@@ -42,14 +126,26 @@
 
       <section>
 	<title>The different access rights</title>
+
+	<para>
+	</para>
+
       </section>
 
       <section>
 	<title>Setting system access rights</title>
+
+	<para>
+	</para>
+
       </section>
 
       <section>
 	<title>Setting database access rights</title>
+
+	<para>
+	</para>
+
       </section>
 
     </section>
