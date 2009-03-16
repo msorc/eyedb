@@ -22,7 +22,7 @@
 	<title>Creating and deleting datafiles</title>
       </section>
 
-      <section>
+      <section id="eyedbadmin-datafile-rename">
 	<title>Listing, renaming and moving datafiles</title>
       </section>
 
