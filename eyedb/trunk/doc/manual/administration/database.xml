@@ -689,6 +689,10 @@ Default Access
     <section>
       <title>Exporting and importing a database</title>
 
+      <para>
+	Database export and import is used to make a backup of a database.
+      </para>
+
       <section>
 	<title>Exporting a database</title>
 
