@@ -2,6 +2,7 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN" "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd"
 [
 <!ENTITY eyedb "EyeDB">
+<!ENTITY eyedbadmin "<command>eyedbadmin</command>">
 ]
 >
 
@@ -13,6 +14,62 @@
 
     <section>
       <title>&eyedb; databases architecture</title>
+
+      <para>
+	<itemizedlist>
+	  <listitem><para>a database is composed of dataspaces (at least one) and each dataspace is composed of datafiles.</para></listitem>
+	  <listitem><para>a datafile is a physical file while a dataspace is a logical unit used to gather datafiles.</para>
+	  </listitem>
+	</itemizedlist>
+      </para>
+
+      <para>
+	When you create a database with no options:
+	<itemizedlist>
+	  <listitem><para>a datafile named DEFAULT, whose file is DBNAME.dat, and size is 2Gb  is automatically created</para></listitem>
+	  <listitem><para>a dataspace named DEFAULT is automatically created, this dataspace contains the previous datafile</para></listitem>
+	</itemizedlist>
+      </para>
+
+      <para>
+	Then you can add datafiles and dataspaces at any time as follows:
+      </para>
+
+      <example id="eyedbadmin-datafile-create">
+	<title>&eyedbadmin; datafile create</title>
+	<screen>
+# creating 4 datafiles 300Gb size
+eyedbadmin datafile create --size=300000 foo foo0.dat
+eyedbadmin datafile create --size=300000 foo foo1.dat
+eyedbadmin datafile create --size=300000 foo foo2.dat
+eyedbadmin datafile create --size=300000 foo foo3.dat
+	</screen>
+      </example>
+
+      <example id="eyedbadmin-dataspace-create">
+	<title>&eyedbadmin; dataspace create</title>
+	<screen>
+# creating a dataspace gathering those 4 datafiles
+eyedbadmin dataspace create foo DSP1 1 2 3
+	</screen>
+      </example>
+
+      <para>
+=> your database is  about 1,2 Tb large
+You can list the two dataspaces (the DEFAULT one and DSP1) as follows:
+      </para>
+
+      <example id="eyedbadmin-dataspace-list">
+	<title>&eyedbadmin; dataspace list</title>
+	<screen>
+eyedbadmin dataspace list foo
+	</screen>
+      </example>
+
+      <para>
+You can also resize existing datafiles, move them, delete them (if they contains no data) and update dataspaces.
+      </para>
+
     </section>
 
     <section>
@@ -20,14 +77,72 @@
 
       <section>
 	<title>Creating and deleting datafiles</title>
+
+	<para>
+	  ... is done using the &eyedbadmin; command:
+	  <cmdsynopsis>
+	    &eyedbadmin;
+	    <command>...</command>
+	    <arg choice="opt">options</arg>
+	    <arg choice="req"><replaceable>arg</replaceable></arg>
+	  </cmdsynopsis>
+	</para>
+
+	<para>
+	  Options are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="plain">--option=<replaceable>arg</replaceable></arg>
+		</cmdsynopsis>
+		option comment
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+
+	<para>
+	  Command arguments are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><replaceable>arg</replaceable></arg>
+		</cmdsynopsis>
+		argument comment
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+
+
       </section>
 
       <section id="eyedbadmin-datafile-rename">
 	<title>Listing, renaming and moving datafiles</title>
+
+	<para>
+	  ... is done using the &eyedbadmin; command:
+	  <cmdsynopsis>
+	    &eyedbadmin;
+	    <command>...</command>
+	    <arg choice="opt">options</arg>
+	    <arg choice="req"><replaceable>arg</replaceable></arg>
+	  </cmdsynopsis>
+	</para>
+
+	<para>
+	</para>
+
       </section>
 
       <section>
 	<title>Resizing and defragmenting datafiles</title>
+
+	<para>
+	</para>
+
       </section>
 
     </section>
@@ -37,14 +152,26 @@
 
       <section>
 	<title>Creating, updating and deleting dataspaces</title>
+
+	<para>
+	</para>
+
       </section>
 
       <section>
 	<title>Listing and renaming dataspaces</title>
+
+	<para>
+	</para>
+
       </section>
 
       <section>
 	<title>Setting current dataspace and current datafile</title>
+
+	<para>
+	</para>
+
       </section>
 
     </section>
