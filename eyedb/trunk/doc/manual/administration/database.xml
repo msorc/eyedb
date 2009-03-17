@@ -713,4 +713,10 @@ Default Access
 
   </chapter>
 
+<!--
+;;; Local Variables: ***
+;;; eval: (load-file "emacs-macro") ***
+;;; End: ***
+-->
+
 </book>

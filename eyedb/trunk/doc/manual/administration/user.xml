@@ -99,13 +99,12 @@
 	  </itemizedlist>
 	</para>
 
-
-	<example id="eyedbadmin-">
-	  <title>&eyedbadmin; </title>
+	<example id="eyedbadmin-user-add">
+	  <title>&eyedbadmin; user add</title>
 	  <screen>
+
 	  </screen>
 	</example>
-
 
       </section>
 
@@ -171,5 +170,6 @@
 ;;; eval: (load-file "emacs-macro") ***
 ;;; End: ***
 -->
+
 </book>
 

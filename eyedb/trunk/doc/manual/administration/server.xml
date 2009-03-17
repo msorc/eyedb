@@ -750,4 +750,10 @@ r2.somewhere.org   + !eyedbroot
 
   </chapter>
 
+<!--
+;;; Local Variables: ***
+;;; eval: (load-file "emacs-macro") ***
+;;; End: ***
+-->
+
 </book>
