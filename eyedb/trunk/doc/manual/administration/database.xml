@@ -36,8 +36,8 @@
 	  Creating a database is done using the &eyedbadmin; command:
 	  <cmdsynopsis>
 	    &eyedbadmin;
-	    <arg choice="plain">database create</arg>
-	    <arg choice="plain" rep="repeat">options</arg>
+	    <command>database create</command>
+	    <arg choice="opt" rep="repeat">options</arg>
 	    <arg choice="plain"><replaceable>database</replaceable></arg>
 	  </cmdsynopsis>
 	</para>
@@ -137,8 +137,8 @@ total 1504
 	  Obtaining a list of existing databases or obtaining information on a specific database is done using the &eyedbadmin; command:
 	  <cmdsynopsis>
 	    &eyedbadmin;
-	    <arg choice="plain">database list</arg>
-	    <arg choice="plain" rep="repeat">options</arg>
+	    <command>database list</command>
+	    <arg choice="opt" rep="repeat">options</arg>
 	    <arg choice="plain" rep="repeat"><arg choice="opt">~</arg><replaceable>database</replaceable></arg>
 	  </cmdsynopsis>
 	</para>
@@ -478,8 +478,8 @@ Database Access
 	  Copying a database is done using the &eyedbadmin; command:
 	  <cmdsynopsis>
 	    &eyedbadmin;
-	    <arg choice="plain">database copy</arg>
-	    <arg choice="plain" rep="repeat">options</arg>
+	    <command>database copy</command>
+	    <arg choice="opt" rep="repeat">options</arg>
 	    <arg choice="plain"><replaceable>database</replaceable>
 	    </arg><arg choice="plain"><replaceable>new_database</replaceable></arg>
 	  </cmdsynopsis>
@@ -591,8 +591,8 @@ Default Access
 	  Moving a database is done using the &eyedbadmin; command:
 	  <cmdsynopsis>
 	    &eyedbadmin;
-	    <arg choice="plain">database move</arg>
-	    <arg choice="plain" rep="repeat">options</arg>
+	    <command>database move</command>
+	    <arg choice="opt" rep="repeat">options</arg>
 	    <arg choice="plain"><replaceable>database</replaceable></arg>
 	  </cmdsynopsis>
 	</para>

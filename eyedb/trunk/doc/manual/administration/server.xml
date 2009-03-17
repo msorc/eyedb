@@ -27,9 +27,11 @@
       <para>
 	The &eyedbctl; command has the following syntax:
 	<cmdsynopsis>
-	  &eyedbctl;<arg choice="plain"><replaceable>command</replaceable></arg><arg choice="plain" rep="repeat">options</arg>
+	  &eyedbctl;
+	  <arg choice="plain"><replaceable>command</replaceable></arg>
+	  <arg choice="opt" rep="repeat">options</arg>
 	</cmdsynopsis>
-	where <cmdsynopsis><arg choice="plain"><replaceable>command</replaceable></arg></cmdsynopsis> is one of <command>start</command>, <command>stop</command> or <command>status</command>.
+	where <command>command</command> is one of <command>start</command>, <command>stop</command> or <command>status</command>.
       </para>
 
       <para>
@@ -93,7 +95,9 @@
 	<para>
 	  The &eyedb; server is started using the following command:
 	  <cmdsynopsis>
-	    &eyedbctl;<arg choice="plain">start</arg><arg choice="plain" rep="repeat"><replaceable>options</replaceable></arg>
+	    &eyedbctl;
+	    <command>start</command>
+	    <arg choice="opt" rep="repeat">options</arg>
 	  </cmdsynopsis>	  
 	</para>
 
@@ -143,7 +147,9 @@ Starting EyeDB Server
 	<para>
 	  The &eyedb; server is stopped using the following command:
 	  <cmdsynopsis>
-	    &eyedbctl;<arg choice="plain">stop</arg><arg choice="plain" rep="repeat"><replaceable>options</replaceable></arg>
+	    &eyedbctl;
+	    <command>stop</command>
+	    <arg choice="opt" rep="repeat">options</arg>
 	  </cmdsynopsis>	  
 	</para>
 
@@ -189,7 +195,9 @@ Killing EyeDB Server Pid 19560
 	<para>
 	  The &eyedb; server status can be obtained using the following command:
 	  <cmdsynopsis>
-	    &eyedbctl;<arg choice="plain">status</arg><arg choice="plain" rep="repeat"><replaceable>options</replaceable></arg>
+	    &eyedbctl;
+	    <command>status</command>
+	    <arg choice="opt" rep="repeat">options</arg>
 	  </cmdsynopsis>	  
 	  This command will print on its standard output informations about the &eyedb; server currently running: server PID and user, version, listening ports and list of connected clients.
 	</para>
