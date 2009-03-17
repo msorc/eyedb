@@ -690,14 +690,50 @@ Default Access
       <title>Exporting and importing a database</title>
 
       <para>
-	Database export and import is used to make a backup of a database.
+	Database export and import is used to make a copy of a database content in a single file. It can be used to backup a database or to copy a database between computers that do not share file systems.
       </para>
 
       <section>
 	<title>Exporting a database</title>
 
 	<para>
+	  Exporting a database is done using the &eyedbadmin; command:
+	  <cmdsynopsis>
+	    &eyedbadmin;
+	    <command>database export</command>
+	    <arg choice="req"><replaceable>database</replaceable></arg>
+	    <arg choice="req"><replaceable>file</replaceable></arg>
+	  </cmdsynopsis>
 	</para>
+
+	<para>
+	  Command arguments are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><replaceable>database</replaceable></arg>
+		</cmdsynopsis>
+		name of database to export
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><replaceable>file</replaceable></arg>
+		</cmdsynopsis>
+		file for export (- means export to standard output)
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+
+	<example id="eyedbadmin-database-export">
+	  <title>&eyedbadmin; database export</title>
+	  <screen>
+<userinput>eyedbadmin database export test2 /var/tmp/test2.dump</userinput>
+	  </screen>
+	</example>
 
       </section>
 
@@ -705,7 +741,75 @@ Default Access
 	<title>Importing a database</title>
 
 	<para>
+	  Importing a database is done using the &eyedbadmin; command:
+	  <cmdsynopsis>
+	    &eyedbadmin;
+	    <command>database import</command>
+	    <arg choice="opt" rep="repeat">options</arg>
+	    <arg choice="req"><replaceable>database</replaceable></arg>
+	    <arg choice="req"><replaceable>file</replaceable></arg>
+	  </cmdsynopsis>
 	</para>
+
+	<para>
+	  Options are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="plain">--filedir=<replaceable>directory</replaceable></arg>
+		</cmdsynopsis>
+		specifies the directory that will contains the database files
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="plain">--mthdir=<replaceable>directory</replaceable></arg>
+		</cmdsynopsis>
+		specifies the directory that will contains the database methods
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="plain">--list</arg>
+		</cmdsynopsis>
+		list only, do not import
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+
+	<para>
+	  Command arguments are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><replaceable>database</replaceable></arg>
+		</cmdsynopsis>
+		name of database to import
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><replaceable>file</replaceable></arg>
+		</cmdsynopsis>
+		file for import (- means import from standard output)
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+
+	<example id="eyedbadmin-database-import">
+	  <title>&eyedbadmin; database import</title>
+	  <screen>
+<userinput>eyedbadmin database import test2 /var/tmp/test2.dump</userinput>
+	  </screen>
+	</example>
+
 
       </section>
 
