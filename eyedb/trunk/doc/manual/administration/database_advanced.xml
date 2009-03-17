@@ -79,12 +79,13 @@ You can also resize existing datafiles, move them, delete them (if they contains
 	<title>Creating and deleting datafiles</title>
 
 	<para>
-	  ... is done using the &eyedbadmin; command:
+	  Creating a datafile is done using the &eyedbadmin; command:
 	  <cmdsynopsis>
 	    &eyedbadmin;
-	    <command>...</command>
+	    <command>datafile create</command>
 	    <arg choice="opt">options</arg>
-	    <arg choice="req"><replaceable>arg</replaceable></arg>
+	    <arg choice="req"><replaceable>database</replaceable></arg>
+	    <arg choice="req"><replaceable>datafile</replaceable></arg>
 	  </cmdsynopsis>
 	</para>
 
@@ -94,7 +95,39 @@ You can also resize existing datafiles, move them, delete them (if they contains
 	    <listitem>
 	      <para>
 		<cmdsynopsis>
-		  <arg choice="plain">--option=<replaceable>arg</replaceable></arg>
+		  <arg choice="plain">--filedir=<replaceable>directory</replaceable></arg>
+		</cmdsynopsis>
+		option comment
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="plain">--name=<replaceable>name</replaceable></arg>
+		</cmdsynopsis>
+		option comment
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="plain">--size=<replaceable>size</replaceable></arg>
+		</cmdsynopsis>
+		option comment
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="plain">--slotsize=<replaceable>slotsize</replaceable></arg>
+		</cmdsynopsis>
+		option comment
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="plain">--physical</arg>
 		</cmdsynopsis>
 		option comment
 	      </para>
@@ -108,9 +141,17 @@ You can also resize existing datafiles, move them, delete them (if they contains
 	    <listitem>
 	      <para>
 		<cmdsynopsis>
-		  <arg choice="req"><replaceable>arg</replaceable></arg>
+		  <arg choice="req"><replaceable>database</replaceable></arg>
 		</cmdsynopsis>
-		argument comment
+		the database to which the datafile will be attached
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><replaceable>datafile</replaceable></arg>
+		</cmdsynopsis>
+		the datafile name (.dat file name extension is recommended)
 	      </para>
 	    </listitem>
 	  </itemizedlist>
