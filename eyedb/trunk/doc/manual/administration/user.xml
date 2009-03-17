@@ -168,7 +168,7 @@
 
 <!--
 ;;; Local Variables: ***
-;;; eval: '(load-file "emacs-macro") ***
+;;; eval: (load-file "emacs-macro") ***
 ;;; End: ***
 -->
 </book>
