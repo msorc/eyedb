@@ -50,7 +50,7 @@
 	<title>Adding a user</title>
 
 	<para>
-	  Creating a database is done using the &eyedbadmin; command:
+	  Adding user is done using the &eyedbadmin; command:
 	  <cmdsynopsis>
 	    &eyedbadmin;
 	    <command>user add</command>
@@ -100,6 +100,11 @@
 	</para>
 
 
+	<example id="eyedbadmin-">
+	  <title>&eyedbadmin; </title>
+	  <screen>
+	  </screen>
+	</example>
 
 
       </section>
@@ -161,4 +166,10 @@
 
   </chapter>
 
+<!--
+;;; Local Variables: ***
+;;; eval: '(load-file "emacs-macro") ***
+;;; End: ***
+-->
 </book>
+
