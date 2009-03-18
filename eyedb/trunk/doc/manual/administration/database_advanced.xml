@@ -11,6 +11,14 @@
 
   <chapter id="database_advanced">
     <title>Database advanced administration</title>
+    
+    <para>
+      This chapter explains &eyedb; databases advanced administration, namely the <emphasis>datafiles</emphasis> and <emphasis>dataspaces</emphasis> concepts that allow to create multi-volumes large &eyedb; databases.
+    </para>
+
+    <para>
+      The first section describes &eyedb; databases architecture; the following sections deal with datafiles and dataspaces management commands.
+    </para>
 
     <section>
       <title>&eyedb; databases architecture</title>
@@ -26,7 +34,7 @@
       <para>
 	When you create a database with no options:
 	<itemizedlist>
-	  <listitem><para>a datafile named DEFAULT, whose file is DBNAME.dat, and size is 2Gb  is automatically created</para></listitem>
+	  <listitem><para>a datafile named DEFAULT, whose file is DBNAME.dat, and size is 2Gb is automatically created</para></listitem>
 	  <listitem><para>a dataspace named DEFAULT is automatically created, this dataspace contains the previous datafile</para></listitem>
 	</itemizedlist>
       </para>
@@ -35,36 +43,10 @@
 	Then you can add datafiles and dataspaces at any time as follows:
       </para>
 
-      <example id="eyedbadmin-datafile-create">
-	<title>&eyedbadmin; datafile create</title>
-	<screen>
-# creating 4 datafiles 300Gb size
-eyedbadmin datafile create --size=300000 foo foo0.dat
-eyedbadmin datafile create --size=300000 foo foo1.dat
-eyedbadmin datafile create --size=300000 foo foo2.dat
-eyedbadmin datafile create --size=300000 foo foo3.dat
-	</screen>
-      </example>
-
-      <example id="eyedbadmin-dataspace-create">
-	<title>&eyedbadmin; dataspace create</title>
-	<screen>
-# creating a dataspace gathering those 4 datafiles
-eyedbadmin dataspace create foo DSP1 1 2 3
-	</screen>
-      </example>
-
       <para>
 => your database is  about 1,2 Tb large
 You can list the two dataspaces (the DEFAULT one and DSP1) as follows:
       </para>
-
-      <example id="eyedbadmin-dataspace-list">
-	<title>&eyedbadmin; dataspace list</title>
-	<screen>
-eyedbadmin dataspace list foo
-	</screen>
-      </example>
 
       <para>
 You can also resize existing datafiles, move them, delete them (if they contains no data) and update dataspaces.
@@ -75,8 +57,12 @@ You can also resize existing datafiles, move them, delete them (if they contains
     <section>
       <title>Managing datafiles</title>
 
+      <para>
+	This section describes how to manage datafiles: create, list and delete datafiles, renaming, moving, resizing and defragmenting datafiles.
+      </para>
+
       <section>
-	<title>Creating and deleting datafiles</title>
+	<title>Creating, listing and deleting datafiles</title>
 
 	<para>
 	  Creating a datafile is done using the &eyedbadmin; command:
@@ -157,11 +143,60 @@ You can also resize existing datafiles, move them, delete them (if they contains
 	  </itemizedlist>
 	</para>
 
+	<example id="eyedbadmin-datafile-create">
+	  <title>&eyedbadmin; datafile create</title>
+	  <screen>
+	    # creating 4 datafiles 300Gb size
+	    eyedbadmin datafile create --size=300000 foo foo0.dat
+	    eyedbadmin datafile create --size=300000 foo foo1.dat
+	    eyedbadmin datafile create --size=300000 foo foo2.dat
+	    eyedbadmin datafile create --size=300000 foo foo3.dat
+	  </screen>
+	</example>
+
+	<para>
+	  Deleting a datafile is done using the &eyedbadmin; command:
+	  <cmdsynopsis>
+	    &eyedbadmin;
+	    <command>datafile delete</command>
+	    <arg choice="req"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
+	  </cmdsynopsis>
+	</para>
+
+	
+	<para>
+	  Command arguments are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><replaceable>database</replaceable></arg>
+		</cmdsynopsis>
+		the database to which the datafile will be attached
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
+		</cmdsynopsis>
+		the datafile to be deleted, that can be specified either by its id (a number) or by its name
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+
+	<example id="eyedbadmin-datafile-delete">
+	  <title>&eyedbadmin; datafile delete</title>
+	  <screen>
+	  </screen>
+	</example>
+
 
       </section>
 
       <section id="eyedbadmin-datafile-rename">
-	<title>Listing, renaming and moving datafiles</title>
+	<title>renaming and moving datafiles</title>
 
 	<para>
 	  ... is done using the &eyedbadmin; command:
@@ -173,8 +208,12 @@ You can also resize existing datafiles, move them, delete them (if they contains
 	  </cmdsynopsis>
 	</para>
 
-	<para>
-	</para>
+      <example id="eyedbadmin-dataspace-list">
+	<title>&eyedbadmin; dataspace list</title>
+	<screen>
+eyedbadmin dataspace list foo
+	</screen>
+      </example>
 
       </section>
 
@@ -194,8 +233,13 @@ You can also resize existing datafiles, move them, delete them (if they contains
       <section>
 	<title>Creating, updating and deleting dataspaces</title>
 
-	<para>
-	</para>
+	<example id="eyedbadmin-dataspace-create">
+	  <title>&eyedbadmin; dataspace create</title>
+	  <screen>
+# creating a dataspace gathering those 4 datafiles
+eyedbadmin dataspace create foo DSP1 1 2 3
+	  </screen>
+	</example>
 
       </section>
 
