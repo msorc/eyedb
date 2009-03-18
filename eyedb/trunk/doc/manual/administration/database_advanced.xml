@@ -155,6 +155,68 @@ You can also resize existing datafiles, move them, delete them (if they contains
 	</example>
 
 	<para>
+	  The list of the datafiles associated with a database can be obtained using the &eyedbadmin; command:
+	  <cmdsynopsis>
+	    &eyedbadmin;
+	    <command>datafile list</command>
+	    <arg choice="opt">options</arg>
+	    <arg choice="req"><replaceable>database</replaceable></arg>
+	    <arg choice="req"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
+	  </cmdsynopsis>
+	</para>
+
+	<para>
+	  Options are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="plain">--all</arg>
+		</cmdsynopsis>
+		list all informations about datafile
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="plain">--stats</arg>
+		</cmdsynopsis>
+		list only statistics on datafile
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+
+	<para>
+	  Command arguments are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><replaceable>database</replaceable></arg>
+		</cmdsynopsis>
+		the database to which the datafile belongs
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
+		</cmdsynopsis>
+		the datafile to be deleted, that can be specified either by its id (a number) or by its name
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+
+	<example id="eyedbadmin-datafile-list">
+	  <title>&eyedbadmin; datafile list</title>
+	  <screen>
+	  </screen>
+	</example>
+
+
+	<para>
 	  Deleting a datafile is done using the &eyedbadmin; command:
 	  <cmdsynopsis>
 	    &eyedbadmin;
@@ -172,7 +234,7 @@ You can also resize existing datafiles, move them, delete them (if they contains
 		<cmdsynopsis>
 		  <arg choice="req"><replaceable>database</replaceable></arg>
 		</cmdsynopsis>
-		the database to which the datafile will be attached
+		the database to which the datafile belongs
 	      </para>
 	    </listitem>
 	    <listitem>
