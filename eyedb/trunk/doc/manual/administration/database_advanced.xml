@@ -24,32 +24,23 @@
       <title>&eyedb; databases architecture</title>
 
       <para>
+	&eyedb; databases organisation is based on two concepts:
 	<itemizedlist>
-	  <listitem><para>a database is composed of dataspaces (at least one) and each dataspace is composed of datafiles.</para></listitem>
-	  <listitem><para>a datafile is a physical file while a dataspace is a logical unit used to gather datafiles.</para>
-	  </listitem>
+	  <listitem><para><emphasis>dataspaces</emphasis>: logical organization units for organizing where classes, objects, indexes...  will be located</para></listitem>
+	  <listitem><para><emphasis>datafiles</emphasis>: physical files where data are stored</para></listitem>
 	</itemizedlist>
       </para>
 
       <para>
-	When you create a database with no options:
-	<itemizedlist>
-	  <listitem><para>a datafile named DEFAULT, whose file is DBNAME.dat, and size is 2Gb is automatically created</para></listitem>
-	  <listitem><para>a dataspace named DEFAULT is automatically created, this dataspace contains the previous datafile</para></listitem>
-	</itemizedlist>
+	A database is composed of several dataspaces (at least one). When creating a database with no options, a dataspace named DEFAULT is automaticaly created.
       </para>
 
       <para>
-	Then you can add datafiles and dataspaces at any time as follows:
+	A datafile is always associated to a <emphasis>single</emphasis> dataspace, whilst a dataspace can contain several datafiles (up to 32 datafiles currently). When creating a database with no options, a datafile named DEFAULT, whose filename is &lt;&lt;database_name&gt;&gt;.dat and size is 2 Gb, is automaticaly created; this datafile is associated with the default dataspace.
       </para>
 
       <para>
-=> your database is  about 1,2 Tb large
-You can list the two dataspaces (the DEFAULT one and DSP1) as follows:
-      </para>
-
-      <para>
-You can also resize existing datafiles, move them, delete them (if they contains no data) and update dataspaces.
+	After database creation, new datafiles and dataspaces can be added at any time using the commands described in this section. Datafiles can be resized, moved, deleted and updated. Dataspaces can be deleted, renamed and updated.
       </para>
 
     </section>
@@ -60,6 +51,22 @@ You can also resize existing datafiles, move them, delete them (if they contains
       <para>
 	This section describes how to manage datafiles: create, list and delete datafiles, renaming, moving, resizing and defragmenting datafiles.
       </para>
+
+      <para>
+	A datafile is identified by:
+	<itemizedlist>
+	  <listitem><para>an id (a number)</para></listitem>
+	  <listitem><para>a name, that can be used in place of the id to identify the datafile</para></listitem>
+	  <listitem><para>a file name, that is the operating system file name</para></listitem>
+	</itemizedlist>
+      </para>
+
+      <note id="note-datafile-name" xreflabel="Note">
+	<title>Datafile name and file name</title>
+	<para>
+	  The datafile name and its file name are two different things: the file name is simply the operating system file name, as in <filename>/var/tmp/foo.dat</filename> and the name is an identifier known by &eyedb; that can be used to identify the datafile as in <varname>FOO</varname>.
+	</para>
+      </note>
 
       <section>
 	<title>Creating, listing and deleting datafiles</title>
@@ -83,7 +90,7 @@ You can also resize existing datafiles, move them, delete them (if they contains
 		<cmdsynopsis>
 		  <arg choice="plain">--filedir=<replaceable>directory</replaceable></arg>
 		</cmdsynopsis>
-		option comment
+		datafile directory
 	      </para>
 	    </listitem>
 	    <listitem>
@@ -91,7 +98,7 @@ You can also resize existing datafiles, move them, delete them (if they contains
 		<cmdsynopsis>
 		  <arg choice="plain">--name=<replaceable>name</replaceable></arg>
 		</cmdsynopsis>
-		option comment
+		datafile name (see <xref linkend="note-datafile-name"/>)
 	      </para>
 	    </listitem>
 	    <listitem>
@@ -99,7 +106,7 @@ You can also resize existing datafiles, move them, delete them (if they contains
 		<cmdsynopsis>
 		  <arg choice="plain">--size=<replaceable>size</replaceable></arg>
 		</cmdsynopsis>
-		option comment
+		datafile size in Mbytes
 	      </para>
 	    </listitem>
 	    <listitem>
@@ -107,7 +114,7 @@ You can also resize existing datafiles, move them, delete them (if they contains
 		<cmdsynopsis>
 		  <arg choice="plain">--slotsize=<replaceable>slotsize</replaceable></arg>
 		</cmdsynopsis>
-		option comment
+		the allocation slot size in bytes
 	      </para>
 	    </listitem>
 	    <listitem>
@@ -115,7 +122,7 @@ You can also resize existing datafiles, move them, delete them (if they contains
 		<cmdsynopsis>
 		  <arg choice="plain">--physical</arg>
 		</cmdsynopsis>
-		option comment
+		to specify that this datafile will contain physical Oids (see <xref linkend="database_tuning"/>)
 	      </para>
 	    </listitem>
 	  </itemizedlist>
@@ -146,11 +153,18 @@ You can also resize existing datafiles, move them, delete them (if they contains
 	<example id="eyedbadmin-datafile-create">
 	  <title>&eyedbadmin; datafile create</title>
 	  <screen>
-	    # creating 4 datafiles 300Gb size
-	    eyedbadmin datafile create --size=300000 foo foo0.dat
-	    eyedbadmin datafile create --size=300000 foo foo1.dat
-	    eyedbadmin datafile create --size=300000 foo foo2.dat
-	    eyedbadmin datafile create --size=300000 foo foo3.dat
+## create a datafile
+<userinput>eyedbadmin datafile create test3 data1.dat</userinput>
+## create a datafile with a name
+<userinput>eyedbadmin datafile create --name=DATA2 test3 data2.dat</userinput>
+## create a datafile with a size of 30 Gb and a directory
+<userinput>eyedbadmin datafile create --filedir=/var/tmp --size=30000 test3 data3.dat</userinput>
+## list the database
+<userinput>eyedbadmin database list --datafiles test3</userinput>
+test3.dat
+data1.dat
+data2.dat
+/var/tmp/data3.dat
 	  </screen>
 	</example>
 
@@ -161,7 +175,7 @@ You can also resize existing datafiles, move them, delete them (if they contains
 	    <command>datafile list</command>
 	    <arg choice="opt">options</arg>
 	    <arg choice="req"><replaceable>database</replaceable></arg>
-	    <arg choice="req"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
+	    <arg choice="req" rep="repeat"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
 	  </cmdsynopsis>
 	</para>
 
@@ -201,9 +215,9 @@ You can also resize existing datafiles, move them, delete them (if they contains
 	    <listitem>
 	      <para>
 		<cmdsynopsis>
-		  <arg choice="req"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
+		  <arg choice="req" rep="repeat"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
 		</cmdsynopsis>
-		the datafile to be deleted, that can be specified either by its id (a number) or by its name
+		the datafiles to be listed, that can be specified either by its id (a number) or by its name
 	      </para>
 	    </listitem>
 	  </itemizedlist>
@@ -212,6 +226,48 @@ You can also resize existing datafiles, move them, delete them (if they contains
 	<example id="eyedbadmin-datafile-list">
 	  <title>&eyedbadmin; datafile list</title>
 	  <screen>
+## List
+<userinput>eyedbadmin datafile list --all test3</userinput>
+Datafile #0
+  Name      DEFAULT
+  Dataspace #0 DEFAULT
+  File      test3.dat
+  Maxsize   2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+  Slotsize  16
+  Oid Type  Logical
+
+  Object Number        2561
+  Total Busy Size      8439065b, ~8241Kb, ~8Mb
+  Average Size         3295b, ~3Kb
+
+... output deleted
+
+Datafile #1
+  Name      &lt;unnamed&gt;
+  File      data1.dat
+  Maxsize   2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+  Slotsize  16
+  Oid Type  Logical
+
+... output deleted
+
+Datafile #2
+  Name      DATA2
+  File      data2.dat
+  Maxsize   2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+  Slotsize  16
+  Oid Type  Logical
+
+... output deleted
+
+Datafile #3
+  Name      &lt;unnamed&gt;
+  File      /var/tmp/data3.dat
+  Maxsize   31457280000b, ~30720000Kb, ~30000Mb, ~29Gb
+  Slotsize  16
+  Oid Type  Logical
+
+... output deleted
 	  </screen>
 	</example>
 
@@ -224,7 +280,6 @@ You can also resize existing datafiles, move them, delete them (if they contains
 	    <arg choice="req"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
 	  </cmdsynopsis>
 	</para>
-
 	
 	<para>
 	  Command arguments are:
@@ -251,6 +306,27 @@ You can also resize existing datafiles, move them, delete them (if they contains
 	<example id="eyedbadmin-datafile-delete">
 	  <title>&eyedbadmin; datafile delete</title>
 	  <screen>
+<userinput>eyedbadmin datafile delete test3 1</userinput>
+<userinput>eyedbadmin datafile delete test3 DATA2</userinput>
+<userinput>eyedbadmin datafile list test3</userinput>
+Datafile #0
+  Name      DEFAULT
+  Dataspace #0 DEFAULT
+  File      test3.dat
+  Maxsize   2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+  Slotsize  16
+  Oid Type  Logical
+
+... output deleted
+
+Datafile #3
+  Name      &lt;unnamed&gt;
+  File      /var/tmp/data3.dat
+  Maxsize   31457280000b, ~30720000Kb, ~30000Mb, ~29Gb
+  Slotsize  16
+  Oid Type  Logical
+
+... output deleted
 	  </screen>
 	</example>
 
@@ -258,7 +334,7 @@ You can also resize existing datafiles, move them, delete them (if they contains
       </section>
 
       <section id="eyedbadmin-datafile-rename">
-	<title>renaming and moving datafiles</title>
+	<title>Renaming and moving datafiles</title>
 
 	<para>
 	  ... is done using the &eyedbadmin; command:
