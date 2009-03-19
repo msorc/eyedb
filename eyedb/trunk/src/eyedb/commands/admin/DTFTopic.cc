@@ -476,8 +476,6 @@ int DTFDefragmentCmd::perform(eyedb::Connection &conn, std::vector<std::string> 
   
   datafile->defragment();
 
-  db->transactionCommit();
-
   return 0;
 }
 

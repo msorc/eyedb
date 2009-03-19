@@ -7172,7 +7172,8 @@ do { \
 
     eyedbsm::Status s = eyedbsm::dspUpdate(dbh->sedbh,
 					   str_convert((long)dspid).c_str(),
-					   datids, datafile_cnt);
+					   datids, datafile_cnt,
+					   flags, orphan_dspid);
     if (xdatids)
       free(datids);
 

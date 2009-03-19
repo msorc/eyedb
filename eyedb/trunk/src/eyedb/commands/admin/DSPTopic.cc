@@ -59,7 +59,7 @@ void DSPCreateCmd::init()
 int DSPCreateCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " DBNAME DSPNAME DATID|DATNAME...\n";
+  std::cerr << " DBNAME DSPNAME [DATID|DATNAME...]\n";
   return 1;
 }
 
@@ -84,7 +84,7 @@ int DSPCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   if (map.find("help") != map.end())
     return help();
 
-  if (argv.size() < 3)
+  if (argv.size() < 2)
     return usage();
 
   const char *dbname = argv[0].c_str();
@@ -189,7 +189,7 @@ void DSPUpdateCmd::init()
 int DSPUpdateCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " DBNAME DSPNAME DATID|DATNAME...\n";
+  std::cerr << " DBNAME DSPNAME [DATID|DATNAME...]\n";
   return 1;
 }
 
@@ -214,7 +214,7 @@ int DSPUpdateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   if (map.find("help") != map.end())
     return help();
 
-  if (argv.size() < 3)
+  if (argv.size() < 2)
     return usage();
 
   const char *dbname = argv[0].c_str();
@@ -246,8 +246,6 @@ int DSPUpdateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
       orphan_dspid = orphan_dataspace->getId();
     }
   }
-
-  printf("orphan_dspid = %d\n", orphan_dspid);
 
   dataspace->update(datafiles, count, 0, orphan_dspid);
   
