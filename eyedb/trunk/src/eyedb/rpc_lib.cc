@@ -1894,7 +1894,7 @@ namespace eyedb {
   rpc_RpcDescription *
   makeUPDATE_DATASPACE(void)
   {
-    rpc_RpcDescription *rd = rpc_newRpcDescription(IDB_UPDATE_DATASPACE, 4);
+    rpc_RpcDescription *rd = rpc_newRpcDescription(IDB_UPDATE_DATASPACE, 6);
     int n = 0;
 
     rd->args[n].type = rpc_Int32Type; /* dbh */
@@ -1902,6 +1902,10 @@ namespace eyedb {
     rd->args[n].type = rpc_Int32Type; /* dspid */
     rd->args[n++].send_rcv = rpc_Send;
     rd->args[n].type = rpc_DataType; /* datids */
+    rd->args[n++].send_rcv = rpc_Send;
+    rd->args[n].type = rpc_Int16Type; /* flags */
+    rd->args[n++].send_rcv = rpc_Send;
+    rd->args[n].type = rpc_Int16Type; /* dspid */
     rd->args[n++].send_rcv = rpc_Send;
 
     makeSTATUS(rd, n);
@@ -2078,6 +2082,66 @@ namespace eyedb {
     rd->args[n].type = rpc_Int32Type; /* type */
     rd->args[n++].send_rcv = (rpc_SendRcv)(rpc_Send|rpc_Rcv);
     rd->args[n].type = rpc_DataType; /* msg */
+    rd->args[n++].send_rcv = rpc_Rcv;
+
+    makeSTATUS(rd, n);
+    return rd;
+  }
+
+  rpc_RpcDescription *
+  makeSET_MAXOBJCOUNT(void)
+  {
+    rpc_RpcDescription *rd = rpc_newRpcDescription(IDB_SET_MAXOBJCOUNT, 3);
+    int n = 0;
+
+    rd->args[n].type = rpc_Int32Type; /* dbh */
+    rd->args[n++].send_rcv = rpc_Send;
+    rd->args[n].type = rpc_Int32Type; /* obj_cnt */
+    rd->args[n++].send_rcv = rpc_Send;
+
+    makeSTATUS(rd, n);
+    return rd;
+  }
+
+  rpc_RpcDescription *
+  makeGET_MAXOBJCOUNT(void)
+  {
+    rpc_RpcDescription *rd = rpc_newRpcDescription(IDB_GET_MAXOBJCOUNT, 3);
+    int n = 0;
+
+    rd->args[n].type = rpc_Int32Type; /* dbh */
+    rd->args[n++].send_rcv = rpc_Send;
+    rd->args[n].type = rpc_Int32Type; /* obj_cnt */
+    rd->args[n++].send_rcv = rpc_Rcv;
+
+    makeSTATUS(rd, n);
+    return rd;
+  }
+
+  rpc_RpcDescription *
+  makeSET_LOGSIZE(void)
+  {
+    rpc_RpcDescription *rd = rpc_newRpcDescription(IDB_SET_LOGSIZE, 3);
+    int n = 0;
+
+    rd->args[n].type = rpc_Int32Type; /* dbh */
+    rd->args[n++].send_rcv = rpc_Send;
+    rd->args[n].type = rpc_Int32Type; /* size */
+    rd->args[n++].send_rcv = rpc_Send;
+
+    makeSTATUS(rd, n);
+    return rd;
+  }
+
+  rpc_RpcDescription *
+  makeGET_LOGSIZE(void)
+  {
+    rpc_RpcDescription *rd = rpc_newRpcDescription(IDB_GET_LOGSIZE, 3);
+    int n = 0;
+
+    rd->args[n].type = rpc_Int32Type; /* dbh */
+    rd->args[n++].send_rcv = rpc_Send;
+    rd->args[n].type = rpc_Int32Type; /* size */
     rd->args[n++].send_rcv = rpc_Rcv;
 
     makeSTATUS(rd, n);

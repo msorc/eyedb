@@ -215,12 +215,12 @@ function rpc_fe_get(type, name)
 
 function makeRpcLib_h_1(i)
 {
-	printf("  IDB_%s,\n", rpc_name[i]);
+	printf("    IDB_%s,\n", rpc_name[i]);
 }
 
 function makeRpcLib_h_2(i)
 {
-	printf("  *make%s(void),\n", rpc_name[i]);
+	printf("    *make%s(void),\n", rpc_name[i]);
 }
 
 function makeRpcLib_c(i)
@@ -288,7 +288,7 @@ function makeFE_c(i)
 	}
 	printf(")\n{\n");
 	printf("  if (DBH_IS_LOCAL(dbh))\n");
-	printf("    return IDB_%s(dbh->u.dbh", name[i]);
+	printf("    return IDB_%s((DbHandle *)dbh->u.dbh", name[i]);
 	for (j = 1 ; j < nargs[i]; j++)
 	{
 		printf(", ");
@@ -302,10 +302,9 @@ function makeFE_c(i)
 		  printf("%s", arg_name[i j]);
 	}
 	printf(");\n");
-	printf("  else\n");
-	printf("   {\n");
-	printf("      ClientArg ua[IDB_MAXARGS], *pua = ua;\n");
-	printf("      int r, offset;\n");
+	printf("  else {\n");
+	printf("    ClientArg ua[IDB_MAXARGS], *pua = ua;\n");
+	printf("    int r, offset;\n");
 
 	for (j = 0 ; j < nargs[i]; j++)
 	{
@@ -313,21 +312,21 @@ function makeFE_c(i)
 			rpc_fe_data(i, j);
 		else if (arg_inout[i j] == "IN" || arg_inout[i j] == "INOUT")
 		{
-			printf("      pua++->a_%s = %s;\n", \
+			printf("    pua++->a_%s = %s;\n", \
 			rpc_get_type(arg_type[i j]), \
 			rpc_fe_get(arg_type[i j], arg_name[i j]));;
 		}
 		else
-			printf("      pua++;\n");
+			printf("    pua++;\n");
 	}
-	printf("\n      RPC_RPCMAKE(%s->ch->ch, %s_RPC, ua);\n\n",
+	printf("\n    RPC_RPCMAKE(%s->ch->ch, %s_RPC, ua);\n\n",
 			arg_name[i 0], rpc_name[i]);
 
 	for (j = 0 ; j < nargs[i]; j++)
 	{
 		if (arg_inout[i j] == "OUT" || arg_inout[i j] == "INOUT")
 		{
-			printf("      *%s = ua[%d].a_%s;\n", \
+			printf("    *%s = ua[%d].a_%s;\n", \
                         arg_name[i j], j,\
 			rpc_get_type(arg_type[i j]), \
 			rpc_fe_get(arg_type[i j]));
@@ -335,9 +334,9 @@ function makeFE_c(i)
 	}
 
 	printf("\n");
-	printf("      status_copy(status_r, ua[%d].a_status);\n", nargs[i]);
-	printf("      STATUS_RETURN(status_r);\n");
-	printf("    }\n");
+	printf("    status_copy(status_r, ua[%d].a_status);\n", nargs[i]);
+	printf("    STATUS_RETURN(status_r);\n");
+	printf("  }\n");
 	printf("}\n\n");
 }
 
@@ -394,7 +393,7 @@ function make_BE_c(i)
 	printf("  rpcDB_DbHandleClientInfo *dcinfo = rpcDB_clientDbhGet(clientid, ua[0].a_int);\n");
 	printf("\n");
 	printf("  if (dcinfo)\n");
-	printf("    status = %s(dcinfo->dbh", name[i]);
+	printf("    status = IDB_%s((DbHandle *)dcinfo->dbh", name[i]);
 	for (j = 1; j < nargs[i]; j++)
 	{
 		printf(", ");
@@ -441,10 +440,10 @@ function make_KERN_cc(i)
 }
 
 END {
-	printf("\n/* rpc_lib.h, near line 111 */\n\n");
+	printf("\n/* rpc_lib.h, near line 176 */\n\n");
 	for (i = 0; i < nfun; i++)
 		makeRpcLib_h_1(i);
-	printf("\n/* rpc_lib.h, near line 243 */\n\n");
+	printf("\n/* rpc_lib.h, near line 328 */\n\n");
 	for (i = 0; i < nfun; i++)
 		makeRpcLib_h_2(i);
 	printf("\n/* rpc_lib.cc */\n\n");

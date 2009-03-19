@@ -167,7 +167,12 @@ namespace eyedb {
     *UPDATE_DATASPACE_RPC,
     *DELETE_DATASPACE_RPC,
     *RENAME_DATASPACE_RPC,
-    *GET_SERVER_OUTOFBAND_DATA_RPC;
+    *GET_SERVER_OUTOFBAND_DATA_RPC,
+
+    *SET_MAXOBJCOUNT_RPC,
+    *GET_MAXOBJCOUNT_RPC,
+    *SET_LOGSIZE_RPC,
+    *GET_LOGSIZE_RPC;
 
   rpc_ArgType
   rpcDB_LocalDBContextType,
@@ -531,6 +536,18 @@ namespace eyedb {
 
     GET_SERVER_OUTOFBAND_DATA_RPC =
       rpc_makeUserClientFunction(client, makeGET_SERVER_OUTOFBAND_DATA());
+
+    SET_MAXOBJCOUNT_RPC =
+      rpc_makeUserClientFunction(client, makeSET_MAXOBJCOUNT());
+
+    GET_MAXOBJCOUNT_RPC =
+      rpc_makeUserClientFunction(client, makeGET_MAXOBJCOUNT());
+
+    SET_LOGSIZE_RPC =
+      rpc_makeUserClientFunction(client, makeSET_LOGSIZE());
+
+    GET_LOGSIZE_RPC =
+      rpc_makeUserClientFunction(client, makeGET_LOGSIZE());
 
     /* declare arg size */
     rpc_setClientArgSize(client, sizeof(ClientArg));

@@ -172,7 +172,12 @@ namespace eyedb {
     IDB_DELETE_DATASPACE,
     IDB_RENAME_DATASPACE,
 
-    IDB_GET_SERVER_OUTOFBAND_DATA
+    IDB_GET_SERVER_OUTOFBAND_DATA,
+
+    IDB_SET_MAXOBJCOUNT,
+    IDB_GET_MAXOBJCOUNT,
+    IDB_SET_LOGSIZE,
+    IDB_GET_LOGSIZE
   };
 
   struct ConnHandle {
@@ -325,7 +330,11 @@ namespace eyedb {
     *makeCOLLECTION_SIMUL_IMPLSTATS(void),
     *makeINDEX_GET_IMPL(void),
     *makeCOLLECTION_GET_IMPL(void),
-    *makeGET_SERVER_OUTOFBAND_DATA(void);
+    *makeGET_SERVER_OUTOFBAND_DATA(void),
+    *makeSET_MAXOBJCOUNT(void),
+    *makeGET_MAXOBJCOUNT(void),
+    *makeSET_LOGSIZE(void),
+    *makeGET_LOGSIZE(void);
 
   extern rpc_ArgType
   rpcDB_LocalDBContextType,

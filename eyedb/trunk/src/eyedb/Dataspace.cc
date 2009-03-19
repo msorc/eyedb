@@ -50,10 +50,10 @@ namespace eyedb {
   }
 
   Status
-  Dataspace::update(const Datafile **datafiles, unsigned int datafile_cnt) const
+  Dataspace::update(const Datafile **datafiles, unsigned int datafile_cnt, short flags, short orphan_dspid) const
   {
     char **datids = makeDatid(datafiles, datafile_cnt);
-    RPCStatus rpc_status = updateDataspace(db->getDbHandle(), id, datids, datafile_cnt);
+    RPCStatus rpc_status = updateDataspace(db->getDbHandle(), id, datids, datafile_cnt, flags, orphan_dspid);
     freeDatid(datids, datafile_cnt);
     return StatusMake(rpc_status);
   }

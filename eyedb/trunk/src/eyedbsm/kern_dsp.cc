@@ -143,9 +143,54 @@ ESM_dspCreateRealize(DbHandle const *dbh, const char *op,
 		      op, datfile_cnt, MAX_DAT_PER_DSP);
   }
 
-  short *datid = new short[datfile_cnt];
   DbHeader _dbh(DBSADDR(dbh));
   DatType dtype;
+
+#if 1
+  int ndat = x2h_u32(_dbh.__ndat());
+  for (short i = 0; i < ndat; i++) {
+    short did = i;
+    if (isDatValid(dbh, did)) {
+      short xdspid = getDataspace(&_dbh, did);
+      if (xdspid == dspid) {
+	bool found = false;
+	for (int n = 0; n < datfile_cnt; n++) {
+	  short did2;
+	  Status s = ESM_datCheck(dbh, datfiles[n], &did2, &xdspid);
+	  if (s) {
+	    return s;
+	  }
+
+	  if (did2 == did) {
+	    found = true;
+	    break;
+	  }
+	}
+
+	if (!found) {
+	  DatafileDesc _dfd = _dbh.dat(did);
+	  DatafileDesc *dfd = &_dfd;
+	  MapHeader *xmp = dfd->mp();
+	  x2h_prologue(xmp, mp);
+	  //if (mp->u_bmh_slot_lastbusy()) {
+	  if (true) {
+	    const char *datname = _dbh.dat(did).name();
+	    char sdatid[8];
+	    sprintf(sdatid, "%d", did);
+	    //printf("LASTBUSY %u\n", mp->u_bmh_slot_lastbusy());
+	    return statusMake(INVALID_DATASPACE, "busy datafile %s cannot be "
+			      "untied from dataspace %s", 
+			      (*datname ? datname : sdatid),
+			      _dbh.dsp(dspid).name());
+	  }
+	}
+      }
+    }
+  }
+#endif
+
+  short *datid = new short[datfile_cnt];
+
   for (int i = 0; i < datfile_cnt; i++) {
     short xdspid;
     Status s = ESM_datCheck(dbh, datfiles[i], &datid[i], &xdspid);
@@ -155,10 +200,13 @@ ESM_dspCreateRealize(DbHandle const *dbh, const char *op,
     }
 
     if (xdspid != DefaultDspid && xdspid != dspid) {
+      short did = datid[i];
+      const char *datname = _dbh.dat(did).name();
       delete [] datid;
       return statusMake(INVALID_DATASPACE, "datafile %s is already "
 			   "tied to the dataspace %s",
-			   datfiles[i], _dbh.dsp(xdspid).name());
+			(*datname ? datname : datfiles[i]),
+			_dbh.dsp(xdspid).name());
     }
 
     if (!i)
@@ -174,10 +222,8 @@ ESM_dspCreateRealize(DbHandle const *dbh, const char *op,
   strcpy(dsp.name(), dataspace);
   dsp.__cur() = 0;
   dsp.__ndat() = h2x_u32(datfile_cnt);
-  //memcpy(dsp->__datid, datid, sizeof(short) * datfile_cnt);
   for (int i = 0; i < datfile_cnt; i++) {
     dsp.__datid(i) = h2x_16(datid[i]);
-    //DBSADDR(dbh)->dat[datid[i]].__dspid = h2x_16(dspid);
     setDataspace(&_dbh, datid[i], dspid);
   }
 

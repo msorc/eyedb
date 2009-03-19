@@ -170,7 +170,12 @@ namespace eyedb {
     *UPDATE_DATASPACE_SERV_RPC,
     *DELETE_DATASPACE_SERV_RPC,
     *RENAME_DATASPACE_SERV_RPC,
-    *GET_SERVER_OUTOFBAND_DATA_SERV_RPC;
+    *GET_SERVER_OUTOFBAND_DATA_SERV_RPC,
+
+    *SET_MAXOBJCOUNT_RPC,
+    *GET_MAXOBJCOUNT_RPC,
+    *SET_LOGSIZE_RPC,
+    *GET_LOGSIZE_RPC;
 
   static rpc_Server *server;
 
@@ -612,6 +617,18 @@ namespace eyedb {
 
     GET_SERVER_OUTOFBAND_DATA_SERV_RPC =
       rpc_makeUserServerFunction(server, makeGET_SERVER_OUTOFBAND_DATA(), GET_SERVER_OUTOFBAND_DATA_realize);
+
+    SET_MAXOBJCOUNT_RPC =
+      rpc_makeUserServerFunction(server, makeSET_MAXOBJCOUNT(), SET_MAXOBJCOUNT_realize);
+
+    GET_MAXOBJCOUNT_RPC =
+      rpc_makeUserServerFunction(server, makeGET_MAXOBJCOUNT(), GET_MAXOBJCOUNT_realize);
+
+    SET_LOGSIZE_RPC =
+      rpc_makeUserServerFunction(server, makeSET_LOGSIZE(), SET_LOGSIZE_realize);
+
+    GET_LOGSIZE_RPC =
+      rpc_makeUserServerFunction(server, makeGET_LOGSIZE(), GET_LOGSIZE_realize);
 
     /* declare arg size */
     rpc_setServerArgSize(server, sizeof(ServerArg));

@@ -260,7 +260,7 @@ printDatafiles(Connection &conn, DBEntry *dbentry, Bool datafiles,
     printf("%sDatafile #%d\n", LIST_INDENT, i);
     if (*s->dat[i].name)
       printf("%s  Name      %s\n", LIST_INDENT, s->dat[i].name);
-    if (s->dat[i].dspid >= 0)
+    if (s->dat[i].dspid != eyedbsm::DefaultDspid)
       printf("%s  Dataspace #%d\n", LIST_INDENT, s->dat[i].dspid);
     printf("%s  File      %s\n", LIST_INDENT, s->dat[i].file);
     printf("%s  Maxsize   ~%dMb\n", LIST_INDENT, s->dat[i].maxsize/1024);

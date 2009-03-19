@@ -1036,6 +1036,30 @@ namespace eyedb {
     */
     Bool isStoreOnCommit() const {return store_on_commit;}
 
+    /**
+       Not yet documented
+       @param max_obj_cnt
+    */
+    Status setMaxObjectCount(unsigned int max_obj_cnt);
+
+    /**
+       Not yet documented
+       @param max_obj_cnt
+    */
+    Status getMaxObjectCount(unsigned int& max_obj_cnt);
+
+    /**
+       Not yet documented
+       @param logsize
+    */
+    Status setLogSize(unsigned int logize);
+
+    /**
+       Not yet documented
+       @param logsize
+    */
+    Status getLogSize(unsigned int& logize);
+
     // deprecated
     Status loadObject(const Oid *, Object **,
 		      const RecMode * = RecMode::NoRecurs);

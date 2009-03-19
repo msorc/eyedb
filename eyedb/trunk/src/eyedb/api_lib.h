@@ -177,8 +177,12 @@ namespace eyedb {
     *UPDATE_DATASPACE_RPC,
     *DELETE_DATASPACE_RPC,
     *RENAME_DATASPACE_RPC,
-    *GET_SERVER_OUTOFBAND_DATA_RPC;
+    *GET_SERVER_OUTOFBAND_DATA_RPC,
 
+    *SET_MAXOBJCOUNT_RPC,
+    *GET_MAXOBJCOUNT_RPC,
+    *SET_LOGSIZE_RPC,
+    *GET_LOGSIZE_RPC;
 #endif
 
   extern rpc_Client *
@@ -564,7 +568,7 @@ namespace eyedb {
   createDataspace(DbHandle *, const char *, void *, unsigned int);
 
   extern RPCStatus
-  updateDataspace(DbHandle *, int, void *, unsigned int);
+  updateDataspace(DbHandle *, int, void *, unsigned int, int, int);
 
   extern RPCStatus
   deleteDataspace(DbHandle *, int);
@@ -575,6 +579,18 @@ namespace eyedb {
   extern RPCStatus
   getServerOutOfBandData(ConnHandle *, int *, Data *,
 			     unsigned int *);
+
+  extern RPCStatus
+  setMaxObjCount(DbHandle *, int);
+
+  extern RPCStatus
+  getMaxObjCount(DbHandle *, int *);
+
+  extern RPCStatus
+  setLogSize(DbHandle *, int);
+
+  extern RPCStatus
+  getLogSize(DbHandle *, int *);
 
   /* misc */
   extern RPCStatus

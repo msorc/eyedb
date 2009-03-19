@@ -2856,7 +2856,7 @@ dspupdate_realize(Database *db, const Dataspace *dataspace,
     CHECK(s);
   }
 
-  s = dataspace->update(datafiles, cnt);
+  s = dataspace->update(datafiles, cnt, 0, 0);
   CHECK(s);
   return 0;
 }
