@@ -48,5 +48,6 @@ static const unsigned int ONE_K = 1024;
 static const unsigned int DEFAULT_DTFSIZE = 2048;
 static const unsigned int DEFAULT_DTFSZSLOT = 16;
 static const char DEFAULT_DTFNAME[] = "DEFAULT";
-static const unsigned int DEFAULT_MAXOBJCNT = 10000000;
+static const unsigned int MAXOBJCNT_DEF = 10000000U;
+static const unsigned int MAXOBJCNT_MAX = ~0U - 1U;
 

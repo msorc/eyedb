@@ -803,38 +803,35 @@ namespace eyedbsm {
 	  return statusMake(INVALID_OFFSET, "%soffset is negative: `%d'", pre, start);
 	if (length < 0)
 	  return statusMake(INVALID_SIZE, "%ssize is negative: `%d'", pre, length);
-	if (!CHECK_NS_OID(dbh, oidloc.ns, oidloc.datid, oid))
-	  {
-	    /*
-	      printf("INVALID OID oidloc = 0x%x %d [nx=%d]\n",
-	      oidloc.ns, oidloc.datid, oid->nx);
-	      if (oidloc.datid >= 0)
-	      printf("... lastslot %d %d %d\n",
-	      x2h_u32(DBSADDR(dbh)->dat[oidloc.datid].__lastslot),
-	      OIDDBIDGET(oid), (dbh)->vd->dbid);
-	    */
+	if (!CHECK_NS_OID(dbh, oidloc.ns, oidloc.datid, oid)) {
+	  /*
+	    printf("INVALID OID oidloc = 0x%x %d [nx=%d]\n",
+	    oidloc.ns, oidloc.datid, oid->nx);
+	    if (oidloc.datid >= 0)
+	    printf("... lastslot %d %d %d\n",
+	    x2h_u32(DBSADDR(dbh)->dat[oidloc.datid].__lastslot),
+	    OIDDBIDGET(oid), (dbh)->vd->dbid);
+	  */
 #ifdef ESM_POST_RECOVERY
-	    /* all this is !!NULL!! */
-	    if (post_recovery)
-	      {
-		if (length)
-		  memset(object, 0, length);
+	  /* all this is !!NULL!! */
+	  if (post_recovery) {
+	    if (length)
+	      memset(object, 0, length);
 
-		if (post_recovery != 2)
-		  {
-		    utlog("EyeDB Recovery System: %sinvalid oid '%s'", pre, getOidString(oid));
-		    fprintf(stderr, "EyeDB Recovery System: %sinvalid oid '%s'", pre, getOidString(oid));
-		  }
-		return Success;
-	      }
+	    if (post_recovery != 2) {
+	      utlog("EyeDB Recovery System: %sinvalid oid '%s'", pre, getOidString(oid));
+	      fprintf(stderr, "EyeDB Recovery System: %sinvalid oid '%s'", pre, getOidString(oid));
+	    }
+	    return Success;
+	  }
 #endif
 #if 0
-	    Oid xoid;
-	    x2h_oid(&xoid, oid);
-	    printf("INVALID: %s\n", getOidString(&xoid));
+	  Oid xoid;
+	  x2h_oid(&xoid, oid);
+	  printf("INVALID: %s\n", getOidString(&xoid));
 #endif
-	    return statusMake(INVALID_OID, "%sinvalid oid '%s'", pre, getOidString(oid));
-	  }
+	  return statusMake(INVALID_OID, "%sinvalid oid '%s'", pre, getOidString(oid));
+	}
 
 	lop = makeTOP(lockmode, op, se);
 	if (se) return se;
@@ -843,12 +840,11 @@ namespace eyedbsm {
 	  return se;
       }
 
-    if (!(pobjh = oid2objh_(oid, oidloc.ns, oidloc.datid, dbh, &pobjh, &hdl0, &up, &oid2addr_failed)))
-      {
-	if (oid2addr_failed)
-	  return statusMake(FATAL_ERROR, "%sfailed to map segment for oid '%s'", pre, getOidString(oid));
-	return statusMake(INVALID_OID, "%sinvalid oid '%s'", pre, getOidString(oid));
-      }
+    if (!(pobjh = oid2objh_(oid, oidloc.ns, oidloc.datid, dbh, &pobjh, &hdl0, &up, &oid2addr_failed))) {
+      if (oid2addr_failed)
+	return statusMake(FATAL_ERROR, "%sfailed to map segment for oid '%s'", pre, getOidString(oid));
+      return statusMake(INVALID_OID, "%sinvalid oid '%s'", pre, getOidString(oid));
+    }
 
     if (!length && start) {
       hdl_release(&hdl0);
@@ -864,142 +860,137 @@ namespace eyedbsm {
     last_objsize = size;
     */
     // 17/05/02: replaced by a parameter
-    if (psize) *psize = size;
+    if (psize) {
+      *psize = size;
+    }
 
-    if (length != 0 && (start + length > size))
-      {
-	hdl_release(&hdl0);
-	return statusMake(INVALID_SIZE, "%sobject size exceeded: `%d', object size is `%d' [%s]", pre, start+length, size, getOidString(oid));
+    if (length != 0 && (start + length > size)) {
+      hdl_release(&hdl0);
+      return statusMake(INVALID_SIZE, "%saccessing object %s, offset %u, length %u: object size exceeded, object size is %u", pre, getOidString(oid), start, length, size);
+    }
+    else {
+      char *addr, *dbaddr = 0, *traddr = 0;
+      MapHeader t_mp = DAT2MP(dbh, oidloc.datid);
+      MapHeader *mp = &t_mp;
+      unsigned int pow2 = x2h_u32(mp->pow2());
+      unsigned int sizeslot = x2h_u32(mp->sizeslot());
+      const Protection *prot;
+      
+      length = ((length == 0) ? size : length);
+      
+      immediate = (opmode != OPGrowingPhase || opsync);
+
+      if (immediate || op == OREAD) {
+	/*
+	  faire un test pour voir si:
+	  - ce range a deja ete mappé
+	*/
+	int l = length + sizeof(ObjectHeader) + start;
+	int l1 = l >> pow2;
+
+	if (!up || (oidloc.ns+l1+1) < up) {
+	  dbaddr = ((char *)pobjh) + sizeof(ObjectHeader);
+	  must_release = 0;
+	  /*printf("already in range [ns = %d, l/sizeslot %d, up %d]\n",
+	    ns, l/sizeslot, up);*/
+	}
+	else {
+	  dbaddr = oid2addr_(oidloc.ns, oidloc.datid, dbh, l, &dbaddr, &hdl1, 0) +
+	    sizeof(ObjectHeader);
+	  /*printf("not in range [ns = %d, l/sizeslot %d, up %d]\n",
+	    ns, l/sizeslot, up); */
+	}
       }
-    else
-      {
-	char *addr, *dbaddr = 0, *traddr = 0;
-	MapHeader t_mp = DAT2MP(dbh, oidloc.datid);
-	MapHeader *mp = &t_mp;
-	unsigned int pow2 = x2h_u32(mp->pow2());
-	unsigned int sizeslot = x2h_u32(mp->sizeslot());
-	const Protection *prot;
-      
-	length = ((length == 0) ? size : length);
-      
-	immediate = (opmode != OPGrowingPhase || opsync);
 
-	if (immediate || op == OREAD)
-	  {
-	    /*
-	      faire un test pour voir si:
-	      - ce range a deja ete mappé
-	    */
-	    int l = length + sizeof(ObjectHeader) + start;
-	    int l1 = l >> pow2;
-
-	    if (!up || (oidloc.ns+l1+1) < up)
-	      {
-		dbaddr = ((char *)pobjh) + sizeof(ObjectHeader);
-		must_release = 0;
-		/*printf("already in range [ns = %d, l/sizeslot %d, up %d]\n",
-		  ns, l/sizeslot, up);*/
-	      }
-	    else
-	      {
-		dbaddr = oid2addr_(oidloc.ns, oidloc.datid, dbh, l, &dbaddr, &hdl1, 0) +
-		  sizeof(ObjectHeader);
-		/*printf("not in range [ns = %d, l/sizeslot %d, up %d]\n",
-		  ns, l/sizeslot, up); */
-	      }
-	  }
-
-	if (!immediate)
-	  {
-	    traddr = ESM_trobjDataGet(dbh, tro, size);
-	    if (!traddr) {
-	      hdl_release(&hdl0);
-	      if (must_release && (immediate || op == OREAD))
-		hdl_release(&hdl1);
-	      return statusMake(NO_SHMSPACE_LEFT, "for object size %d",
-				size);
-	    }
-	  }
+      if (!immediate) {
+	traddr = ESM_trobjDataGet(dbh, tro, size);
+	if (!traddr) {
+	  hdl_release(&hdl0);
+	  if (must_release && (immediate || op == OREAD))
+	    hdl_release(&hdl1);
+	  return statusMake(NO_SHMSPACE_LEFT, "for object size %d",
+			    size);
+	}
+      }
       
-	addr = (immediate ? dbaddr : traddr);
+      addr = (immediate ? dbaddr : traddr);
 
-	/* protection check */
-	prot = protGet(dbh, (tro && tro->prot_oid_set ? &tro->prot_oid :
-			     &pobjh->prot_oid), getUid(dbh));
+      /* protection check */
+      prot = protGet(dbh, (tro && tro->prot_oid_set ? &tro->prot_oid :
+			   &pobjh->prot_oid), getUid(dbh));
       
-	switch(op)
-	  {
-	  case OWRITE:
-	    if (prot->w == WriteAll || (start + length) <= (int)prot->w) {
-	      if (data)
-		rpc_socketRead(data->fd, addr, length);
-	      else
-		ESM_trobjDataWrite(addr, (const char *)object, start, length, opmode, opsync);
+      switch(op) {
+      case OWRITE:
+	if (prot->w == WriteAll || (start + length) <= (int)prot->w) {
+	  if (data)
+	    rpc_socketRead(data->fd, addr, length);
+	  else
+	    ESM_trobjDataWrite(addr, (const char *)object, start, length, opmode, opsync);
 	      
-	      //MSYNC((caddr_t)ROUND_PAGE(addr), ROUND_UP_PAGE(length), MS_ASYNC);	
-	      status = Success;
-	    }
-	    else
-	      status = statusMake(OBJECT_PROTECTED, "%sobject '%s' is protected", pre, getOidString(oid));
-	    ESM_REGISTER(dbh, WriteOP, ESM_addToRegisterWrite(dbh, oid, start, length));
-	    break;
+	  //MSYNC((caddr_t)ROUND_PAGE(addr), ROUND_UP_PAGE(length), MS_ASYNC);	
+	  status = Success;
+	}
+	else
+	  status = statusMake(OBJECT_PROTECTED, "%sobject '%s' is protected", pre, getOidString(oid));
+	ESM_REGISTER(dbh, WriteOP, ESM_addToRegisterWrite(dbh, oid, start, length));
+	break;
 	  
-	  case OREAD:
-	    if (prot->r == ReadAll || (start + length) <= (int)prot->r) {
-	      if (data) {
-		if (length <= data->buff_size) {
-		  memcpy(data->data, addr, length);
-		  data->status = rpc_BuffUsed;
-		}
-		else {
-		  data->data = addr;
-		  data->status = rpc_PermDataUsed;
-		}
-	      
-		data->size = length;
-		status = Success;
-	      }
-	      else
-		status = ESM_trobjDataRead((char *)object, addr, dbaddr, start,
-					   length, opsync, nocopy);
-
-	      ESM_REGISTER(dbh, ReadOP, ESM_addToRegisterRead(dbh, oid, start, length));
+      case OREAD:
+	if (prot->r == ReadAll || (start + length) <= (int)prot->r) {
+	  if (data) {
+	    if (length <= data->buff_size) {
+	      memcpy(data->data, addr, length);
+	      data->status = rpc_BuffUsed;
 	    }
 	    else {
-#ifdef TRACE
-	      printf("protected '%d %d'\n", pobjh->prot_oid.ns,
-		     pobjh->prot_oid.unique);
-#endif
-	      status = statusMake(OBJECT_PROTECTED, "%sobject is protected: '%s'", pre, getOidString(oid));
+	      data->data = addr;
+	      data->status = rpc_PermDataUsed;
 	    }
-	    break;
-	  
-	  case PWRITE:
-	    if (immediate)
-	      memcpy(&pobjh->prot_oid, object, sizeof(Oid));
-	    else
-	      ESM_transactionObjectProtSet(tro, (Oid *)object);
+	      
+	    data->size = length;
 	    status = Success;
-	    break;
-	  
-	  case PREAD:
-	    memcpy(object, &pobjh->prot_oid, sizeof(Oid));
-	    status = Success;
-	    break;
-
-	  default:
-	    status = statusMake(ERROR, "internal error: "
-				"unexpected object operation: %x", op);
-	    break;
 	  }
-      
-	hdl_release(&hdl0);
+	  else
+	    status = ESM_trobjDataRead((char *)object, addr, dbaddr, start,
+				       length, opsync, nocopy);
 
-	if (must_release && (immediate || op == OREAD))
-	  hdl_release(&hdl1);
-      
-	return status;
+	  ESM_REGISTER(dbh, ReadOP, ESM_addToRegisterRead(dbh, oid, start, length));
+	}
+	else {
+#ifdef TRACE
+	  printf("protected '%d %d'\n", pobjh->prot_oid.ns,
+		 pobjh->prot_oid.unique);
+#endif
+	  status = statusMake(OBJECT_PROTECTED, "%sobject is protected: '%s'", pre, getOidString(oid));
+	}
+	break;
+	  
+      case PWRITE:
+	if (immediate)
+	  memcpy(&pobjh->prot_oid, object, sizeof(Oid));
+	else
+	  ESM_transactionObjectProtSet(tro, (Oid *)object);
+	status = Success;
+	break;
+	  
+      case PREAD:
+	memcpy(object, &pobjh->prot_oid, sizeof(Oid));
+	status = Success;
+	break;
+
+      default:
+	status = statusMake(ERROR, "internal error: "
+			    "unexpected object operation: %x", op);
+	break;
       }
+      
+      hdl_release(&hdl0);
+
+      if (must_release && (immediate || op == OREAD))
+	hdl_release(&hdl1);
+      
+      return status;
+    }
   }
 
   /*

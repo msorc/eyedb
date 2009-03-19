@@ -1198,16 +1198,15 @@ namespace eyedb {
   IDB_checkAuth(const char *&userauth, Bool &need_passwd, Bool &superuser)
   {
     const char *u;
-    if (!(u = getUserAuth(userauth, need_passwd, superuser)))
-      {
-	if (*userauth)
-	  return rpcStatusMake(IDB_INSUFFICIENT_PRIVILEGES,
-			       "access denied for user '%s'",
-			       userauth);
-
+    if (!(u = getUserAuth(userauth, need_passwd, superuser))) {
+      if (*userauth)
 	return rpcStatusMake(IDB_INSUFFICIENT_PRIVILEGES,
-			     "access denied for unspecified user");
-      }
+			     "access denied for user '%s'",
+			     userauth);
+
+      return rpcStatusMake(IDB_INSUFFICIENT_PRIVILEGES,
+			   "access denied for unspecified user");
+    }
 
     userauth = u;
     return RPCSuccess;
@@ -1249,11 +1248,10 @@ namespace eyedb {
 					  msg))
       return rpcStatusMake(status);
 
-    if (justCheck && !sysaccess)
-      {
-	*justCheck = False;
-	return RPCSuccess;
-      }
+    if (justCheck && !sysaccess) {
+      *justCheck = False;
+      return RPCSuccess;
+    }
 
     dbm->transactionBegin();
     /* check that if in case of need_passwd is false, user is really an
@@ -1262,50 +1260,44 @@ namespace eyedb {
     if (!need_passwd && (sysaccess->user()->type() == EyeDBUser))
       need_passwd = True;
 
-    if (need_passwd)
-      {
-	if (sysaccess->user()->type() == StrictUnixUser)
-	  {
-	    sysaccess->release();
-	    dbm->transactionCommit();
-	    return rpcStatusMake(IDB_AUTHENTICATION_FAILED,
-				 "user '%s' can be used only in a "
-				 "strict unix authentication mode",
-				 userauth);
-	  }
-
-	const char *pwd = sysaccess->user()->passwd().c_str();
-	if (pwd && strcmp(pwd, crypt(passwdauth, salt)))
-	  {
-	    if (justCheck)
-	      {
-		*justCheck = False;
-		status = Success;
-	      }
-	    else
-	      status = Exception::make(IDB_AUTHENTICATION_FAILED,
-				       "user '%s': %s: invalid password",
-				       userauth, msg);
-	    sysaccess->release();
-	    dbm->transactionCommit();
-	    return rpcStatusMake(status);
-	  }
+    if (need_passwd) {
+      if (sysaccess->user()->type() == StrictUnixUser) {
+	sysaccess->release();
+	dbm->transactionCommit();
+	return rpcStatusMake(IDB_AUTHENTICATION_FAILED,
+			     "user '%s' can be used only in a "
+			     "strict unix authentication mode",
+			     userauth);
       }
 
-    if ((sysmode & sysaccess->mode()) != sysmode)
-      {
-	if (justCheck)
-	  {
-	    *justCheck = False;
-	    status = Success;
-	  }
+      const char *pwd = sysaccess->user()->passwd().c_str();
+      if (pwd && strcmp(pwd, crypt(passwdauth, salt))) {
+	if (justCheck) {
+	  *justCheck = False;
+	  status = Success;
+	}
 	else
-	  status = Exception::make(IDB_INSUFFICIENT_PRIVILEGES,
-				   "user '%s': %s", userauth, msg);
+	  status = Exception::make(IDB_AUTHENTICATION_FAILED,
+				   "user '%s': %s: invalid password",
+				   userauth, msg);
 	sysaccess->release();
 	dbm->transactionCommit();
 	return rpcStatusMake(status);
       }
+    }
+
+    if ((sysmode & sysaccess->mode()) != sysmode) {
+      if (justCheck) {
+	*justCheck = False;
+	status = Success;
+      }
+      else
+	status = Exception::make(IDB_INSUFFICIENT_PRIVILEGES,
+				   "user '%s': %s", userauth, msg);
+      sysaccess->release();
+      dbm->transactionCommit();
+      return rpcStatusMake(status);
+    }
 
     if (justCheck)
       *justCheck = True;

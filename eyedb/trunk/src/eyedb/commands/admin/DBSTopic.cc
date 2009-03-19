@@ -143,10 +143,17 @@ int DBSCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   d->dbid     = 0;
 
   if (map.find(MAXOBJCNT_OPT) != map.end()) {
+    unsigned long long l = ~0ULL;
+    sscanf(map[MAXOBJCNT_OPT].value.c_str(), "%lld", &l);
+    if (l >= MAXOBJCNT_MAX) {
+      std::cerr << PROGNAME << ": maximum object count is too large '" << map[MAXOBJCNT_OPT].value.c_str() << "', maximum allowed is '" << MAXOBJCNT_MAX << "'\n";
+      return 1;
+    }
     d->nbobjs = atoi(map[MAXOBJCNT_OPT].value.c_str());
   }
-  else
-    d->nbobjs = DEFAULT_MAXOBJCNT;
+  else {
+    d->nbobjs = MAXOBJCNT_DEF;
+  }
 
   d->ndat = 1;
   eyedbsm::Datafile *dat = &d->dat[0];
@@ -902,7 +909,7 @@ int DBSCopyCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
   db->getInfo(&conn, 0, 0, &oldDesc);
 
   if (oldDesc.sedbdesc.ndat > 1 && map.find(FILEDIR_OPT) == map.end()) {
-    std::cerr << PROGNAME << ": error: when copying a database with more than one datafile, option --filedir is mandatory\n";
+    std::cerr << PROGNAME << ": error when copying a database with more than one datafile, option --filedir is mandatory\n";
     return 1;
   }
 
