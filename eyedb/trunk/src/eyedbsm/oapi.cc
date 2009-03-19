@@ -392,7 +392,7 @@ namespace eyedbsm {
   Status Database::dspUpdate(const char *dataspace,
 			     const char **datfiles, unsigned int datfile_cnt)
   {
-    return eyedbsm::dspUpdate(dbh, dataspace, datfiles, datfile_cnt);
+    return eyedbsm::dspUpdate(dbh, dataspace, datfiles, datfile_cnt, 0, DefaultDspid);
   }
 
 

@@ -551,7 +551,8 @@ namespace eyedbsm {
 	      const char **datfiles, unsigned int datfile_cnt),
 
     dspUpdate(DbHandle const *dbh, const char *dataspace,
-	      const char **datfiles, unsigned int datfile_cnt),
+	      const char **datfiles, unsigned int datfile_cnt,
+	      short flags, short orphan_dspid),
 
     dspDelete(DbHandle const *dbh, const char *dataspace),
     dspRename(DbHandle const *dbh, const char *dataspace,

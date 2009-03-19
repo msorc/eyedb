@@ -692,11 +692,13 @@ return (((S).err == SUCCESS) ? Success : &(S))
 
   Status
   dspUpdate(DbHandle const *dbh, const char *dataspace,
-	    const char **datfiles, unsigned int datfile_cnt)
+	    const char **datfiles, unsigned int datfile_cnt,
+	    short flags, short orphan_dspid)
   {
     if (!dbh->tr_cnt)
       return statusMake(TRANSACTION_NEEDED, "dspUpdate");
-    return ESM_dspUpdate((DbHandle *)dbh, dataspace, datfiles, datfile_cnt);
+    return ESM_dspUpdate((DbHandle *)dbh, dataspace, datfiles, datfile_cnt,
+			 flags, orphan_dspid);
   }
 
   Status

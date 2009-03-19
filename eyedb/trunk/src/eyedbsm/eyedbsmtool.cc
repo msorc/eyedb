@@ -1037,7 +1037,7 @@ dataspace_update_realize(int argc, char *argv[])
   OPEN(argv[0], VOLRW);
   BEGIN_X(s);
 
-  s = dspUpdate(dbh, argv[1], (const char **)&argv[2], argc-2);
+  s = dspUpdate(dbh, argv[1], (const char **)&argv[2], argc-2, 0, DefaultDspid);
   END(s, "dataspace update");
 }
 
