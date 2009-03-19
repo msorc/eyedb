@@ -315,27 +315,25 @@ str_sys_mode(SysAccessMode sysmode)
   if (sysmode == NoSysAccessMode)
     return "NO_SYSACCESS_MODE";
 
+  if (sysmode == DBCreateSysAccessMode)
+    return "DBCREATE_SYSACCESS_MODE";
+
+  if (sysmode == AddUserSysAccessMode)
+    return "ADDUSER_SYSACCESS_MODE";
+
+  if (sysmode == DeleteUserSysAccessMode)
+    return "DELUSER_SYSACCESS_MODE";
+
+  if (sysmode == SetUserPasswdSysAccessMode)
+    return "SETUSERPASSWORD_SYSACCESS_MODE";
+
   if (sysmode == AdminSysAccessMode)
     return "ADMIN_SYSACCESS_MODE";
 
   if (sysmode == SuperUserSysAccessMode)
     return "SUPERUSER_SYSACCESS_MODE";
 
-  const char *concat;
-  *sysstr = 0;
-
-  concat = "";
-
-  XC(DBCreateSysAccessMode, "DB_CREATE_SYSACCESS_MODE",
-     sysmode, sysstr, concat);
-  XC(AddUserSysAccessMode, "ADD_USER_SYSACCESS_MODE",
-     sysmode, sysstr, concat);
-  XC(DeleteUserSysAccessMode, "DELETE_USER_SYSACCESS_MODE",
-     sysmode, sysstr, concat);
-  XC(SetUserPasswdSysAccessMode, "SET_USER_PASSWD_SYSACCESS_MODE",
-     sysmode, sysstr, concat);
-
-  return sysstr;
+  return "<unknown sysaccess mode>";
 }
 
 static const char *
@@ -567,7 +565,7 @@ void USRSysAccessCmd::init()
 int USRSysAccessCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " USER ['+' combination of] dbcreate|adduser|deleteuser|setuserpasswd|admin|superuser|no\n";
+  std::cerr << " USER dbcreate|adduser|deleteuser|setuserpasswd|admin|superuser|no\n";
   return 1;
 }
 
@@ -575,7 +573,7 @@ int USRSysAccessCmd::help()
 {
   stdhelp();
   getopt->displayOpt("USER", "User name");
-  getopt->displayOpt("MODE", "['+' combination of] dbcreate|adduser|deleteuser|setuserpasswd|admin|superuser|no");
+  getopt->displayOpt("MODE", "dbcreate|adduser|deleteuser|setuserpasswd|admin|superuser|no");
 
   return 1;
 }
@@ -597,7 +595,26 @@ int USRSysAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
   }
 
   const char *username = argv[0].c_str();
-  int sysmode = 0;
+  int sysmode;
+#if 1
+  const char *p = argv[1].c_str();
+  if (!strcmp(p, "dbcreate"))
+    sysmode = DBCreateSysAccessMode;
+  else if (!strcmp(p, "adduser"))
+    sysmode = AddUserSysAccessMode;
+  else if (!strcmp(p, "deleteuser"))
+    sysmode = DeleteUserSysAccessMode;
+  else if (!strcmp(p, "setuserpasswd"))
+    sysmode = SetUserPasswdSysAccessMode;
+  else if (!strcmp(p, "superuser"))
+    sysmode = SuperUserSysAccessMode;
+  else if (!strcmp(p, "admin"))
+    sysmode = AdminSysAccessMode;
+  else if (!strcmp(p, "no"))
+    sysmode = NoSysAccessMode;
+  else
+    return usage();
+#else
   char *p = strdup(argv[1].c_str());
   
   for (;;)
@@ -627,6 +644,7 @@ int USRSysAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
 	break;
       p = q+1;
     }
+#endif
 
   char userauth[32];
   char passwdauth[10];
