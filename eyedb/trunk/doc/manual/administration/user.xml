@@ -473,7 +473,17 @@ sysaccess : NO_SYSACCESS_MODE
 	    &eyedbadmin;
 	    <command>user sysaccess</command>
 	    <arg choice="req"><replaceable>user</replaceable></arg>
-	    <arg choice="req"><replaceable>access</replaceable></arg>
+	    <arg choice="req">
+	      <group>
+		<arg choice="plain">dbcreate</arg>
+		<arg choice="plain">adduser</arg>
+		<arg choice="plain">deleteuser</arg>
+		<arg choice="plain">setuserpasswd</arg>
+		<arg choice="plain">admin</arg>
+		<arg choice="plain">superuser</arg>
+		<arg choice="plain">no</arg>
+	      </group>
+	    </arg>
 	  </cmdsynopsis>
 	</para>
 
@@ -491,20 +501,19 @@ sysaccess : NO_SYSACCESS_MODE
 	    <listitem>
 	      <para>
 		<cmdsynopsis>
-		  <arg choice="req"><replaceable>access</replaceable></arg>
+		  <arg choice="req">
+		    <group>
+		      <arg choice="plain">dbcreate</arg>
+		      <arg choice="plain">adduser</arg>
+		      <arg choice="plain">deleteuser</arg>
+		      <arg choice="plain">setuserpasswd</arg>
+		      <arg choice="plain">admin</arg>
+		      <arg choice="plain">superuser</arg>
+		      <arg choice="plain">no</arg>
+		    </group>
+		  </arg>
 		</cmdsynopsis>
-		system access right, that can be a combination of the following values (multiple values are separated by character '+'):
-		<cmdsynopsis>
-		  <group>
-		    <arg choice="plain">dbcreate</arg>
-		    <arg choice="plain">adduser</arg>
-		    <arg choice="plain">deleteuser</arg>
-		    <arg choice="plain">setuserpasswd</arg>
-		    <arg choice="plain">admin</arg>
-		    <arg choice="plain">superuser</arg>
-		    <arg choice="plain">no</arg>
-		  </group>
-		</cmdsynopsis>
+		system access right
 	      </para>
 	    </listitem>
 	  </itemizedlist>
