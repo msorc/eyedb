@@ -61,9 +61,9 @@
 	</itemizedlist>
       </para>
 
-      <note id="note-datafile-name" xreflabel="Note">
+      <note>
 	<title>Datafile name and file name</title>
-	<para>
+	<para id="note-datafile-name" xreflabel="Note">
 	  The datafile name and its file name are two different things: the file name is simply the operating system file name, as in <filename>/var/tmp/foo.dat</filename> and the name is an identifier known by &eyedb; that can be used to identify the datafile as in <varname>FOO</varname>.
 	</para>
       </note>
@@ -217,7 +217,7 @@ data2.dat
 		<cmdsynopsis>
 		  <arg choice="req" rep="repeat"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
 		</cmdsynopsis>
-		the datafiles to be listed, that can be specified either by its id (a number) or by its name
+		the datafiles to be listed, that can be specified either by its id or by its name
 	      </para>
 	    </listitem>
 	  </itemizedlist>
@@ -297,7 +297,7 @@ Datafile #3
 		<cmdsynopsis>
 		  <arg choice="req"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
 		</cmdsynopsis>
-		the datafile to be deleted, that can be specified either by its id (a number) or by its name
+		the datafile to be deleted, that can be specified either by its id or by its name
 	      </para>
 	    </listitem>
 	  </itemizedlist>
@@ -306,8 +306,11 @@ Datafile #3
 	<example id="eyedbadmin-datafile-delete">
 	  <title>&eyedbadmin; datafile delete</title>
 	  <screen>
+## Delete datafile by id
 <userinput>eyedbadmin datafile delete test3 1</userinput>
+## Delete datafile by name
 <userinput>eyedbadmin datafile delete test3 DATA2</userinput>
+## List
 <userinput>eyedbadmin datafile list test3</userinput>
 Datafile #0
   Name      DEFAULT
@@ -333,25 +336,133 @@ Datafile #3
 
       </section>
 
-      <section id="eyedbadmin-datafile-rename">
+      <section id="eyedbadmin-datafile-rename-move">
 	<title>Renaming and moving datafiles</title>
 
 	<para>
-	  ... is done using the &eyedbadmin; command:
+	  A datafile has a name (see <xref linkend="note-datafile-name"/>); changing this name is done using the &eyedbadmin; command:
 	  <cmdsynopsis>
 	    &eyedbadmin;
-	    <command>...</command>
-	    <arg choice="opt">options</arg>
-	    <arg choice="req"><replaceable>arg</replaceable></arg>
+	    <command>datafile rename</command>
+	    <arg choice="req"><replaceable>database</replaceable></arg>
+	    <arg choice="req"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
+	    <arg choice="req"><replaceable>new_name</replaceable></arg>
 	  </cmdsynopsis>
 	</para>
 
-      <example id="eyedbadmin-dataspace-list">
-	<title>&eyedbadmin; dataspace list</title>
+      <example id="eyedbadmin-datafile-rename">
+	<title>&eyedbadmin; datafile rename</title>
 	<screen>
-eyedbadmin dataspace list foo
+## Rename datafile
+<userinput>eyedbadmin datafile rename test3 3 DATA3</userinput>
+## List
+<userinput>eyedbadmin datafile list test3</userinput>
+Datafile #0
+  Name      DEFAULT
+  Dataspace #0 DEFAULT
+  File      test3.dat
+  Maxsize   2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+  Slotsize  16
+  Oid Type  Logical
+
+... output deleted
+
+Datafile #3
+  Name      DATA3
+  File      /var/tmp/data3.dat
+  Maxsize   31457280000b, ~30720000Kb, ~30000Mb, ~29Gb
+  Slotsize  16
+  Oid Type  Logical
+
+... output deleted
 	</screen>
       </example>
+
+      <para>
+	Moving a datafile is done using the &eyedbadmin; command:
+	<cmdsynopsis>
+	  &eyedbadmin;
+	  <command>datafile move</command>
+	  <arg choice="opt">options</arg>
+	  <arg choice="req"><replaceable>database</replaceable></arg>
+	  <arg choice="req"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
+	  <arg choice="req"><replaceable>new_datafile</replaceable></arg>
+	</cmdsynopsis>
+      </para>
+
+	<para>
+	  Options are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="plain">--filedir=<replaceable>directory</replaceable></arg>
+		</cmdsynopsis>
+		datafile directory
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+
+	<para>
+	  Command arguments are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><replaceable>database</replaceable></arg>
+		</cmdsynopsis>
+		the database to which the datafile belongs
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
+		</cmdsynopsis>
+		the datafile to be moved, that can be specified either by its id or by its name
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><replaceable>datafile</replaceable></arg>
+		</cmdsynopsis>
+		the new datafile file name (.dat file name extension is recommended)
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+
+	<example id="eyedbadmin-datafile-move">
+	  <title>&eyedbadmin; datafile move</title>
+	  <screen>
+## Create destination directory
+<userinput>mkdir /var/tmp/test3</userinput>
+## Move datafile
+<userinput>eyedbadmin datafile move --filedir=/var/tmp/test3 test3 DATA3 newdata3.dat</userinput>
+## List
+<userinput>eyedbadmin datafile list test3</userinput>
+Datafile #0
+  Name      DEFAULT
+  Dataspace #0 DEFAULT
+  File      test3.dat
+  Maxsize   2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+  Slotsize  16
+  Oid Type  Logical
+
+... output deleted
+
+Datafile #3
+  Name      DATA3
+  File      /var/tmp/test3/newdata3.dat
+  Maxsize   31457280000b, ~30720000Kb, ~30000Mb, ~29Gb
+  Slotsize  16
+  Oid Type  Logical
+
+... output deleted
+	  </screen>
+	</example>
 
       </section>
 
@@ -359,7 +470,114 @@ eyedbadmin dataspace list foo
 	<title>Resizing and defragmenting datafiles</title>
 
 	<para>
+	  Datafile size is set at creation time; once created, the size of a datafile can be changed using the &eyedbadmin; command:
+	  <cmdsynopsis>
+	    &eyedbadmin;
+	    <command>datafile resize</command>
+	  <arg choice="req"><replaceable>database</replaceable></arg>
+	  <arg choice="req"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
+	  <arg choice="req"><replaceable>new_size</replaceable></arg>
+	  </cmdsynopsis>
 	</para>
+
+	<para>
+	  Command arguments are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><replaceable>database</replaceable></arg>
+		</cmdsynopsis>
+		the database to which the datafile belongs
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
+		</cmdsynopsis>
+		the datafile to be resized, that can be specified either by its id or by its name
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><replaceable>new_size</replaceable></arg>
+		</cmdsynopsis>
+		the new datafile size, in Mbytes
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+	
+	<example id="eyedbadmin-datafile-resize">
+	  <title>&eyedbadmin; datafile resize</title>
+	  <screen>
+## List
+<userinput>eyedbadmin datafile list test3 DATA3</userinput>
+Datafile #3
+  Name      DATA3
+  File      /var/tmp/test3/newdata3.dat
+  Maxsize   31457280000b, ~30720000Kb, ~30000Mb, ~29Gb
+  Slotsize  16
+  Oid Type  Logical
+
+... output deleted
+## Set new size to 40Gb
+<userinput>eyedbadmin datafile resize test3 DATA3 40000</userinput>
+## List
+<userinput>eyedbadmin datafile list test3 DATA3</userinput>
+Datafile #3
+  Name      DATA3
+  File      /var/tmp/test3/newdata3.dat
+  Maxsize   41943040000b, ~40960000Kb, ~40000Mb, ~39Gb
+  Slotsize  16
+  Oid Type  Logical
+
+... output deleted
+	  </screen>
+	</example>
+
+<!--
+	<para>
+	  Datafiles can become fragmented because of object deletion; the allocator used inside datafile is a bitmap allocator for better efficiency, but as a consequence there can be holes in the datafile that can impact performance. Defragmenting can be done using the &eyedbadmin; command:
+	  <cmdsynopsis>
+	    &eyedbadmin;
+	    <command>datafile defragment</command>
+	  <arg choice="req"><replaceable>database</replaceable></arg>
+	  <arg choice="req"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
+	  </cmdsynopsis>
+	</para>
+
+	<para>
+	  Command arguments are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><replaceable>database</replaceable></arg>
+		</cmdsynopsis>
+		the database to which the datafile belongs
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
+		</cmdsynopsis>
+		the datafile to be defragmented, that can be specified either by its id or by its name
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+	
+	<example id="eyedbadmin-datafile-defragment">
+	  <title>&eyedbadmin; datafile defragment</title>
+	  <screen>
+...
+	  </screen>
+	</example>
+-->
 
       </section>
 
