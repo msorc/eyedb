@@ -1,3 +1,4 @@
+#include <string.h>
 #include <ctype.h>
 #include <iostream>
 #include <fstream>
