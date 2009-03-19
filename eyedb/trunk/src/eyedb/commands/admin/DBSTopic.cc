@@ -252,6 +252,10 @@ printDatafiles(Connection &conn, DBEntry *dbentry, Bool datafiles,
   const eyedbsm::DbCreateDescription *s = &dbdesc->sedbdesc;
 
   for (int i = 0; i < s->ndat; i++) {
+    if (!*s->dat[i].file) {
+      continue;
+    }
+
     if (datafiles) {
       printf("%s\n", s->dat[i].file);
       continue;
