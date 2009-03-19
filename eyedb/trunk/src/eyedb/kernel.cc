@@ -7158,7 +7158,8 @@ do { \
 
   RPCStatus
   IDB_updateDataspace(DbHandle * dbh, int dspid,  void *ydatids,
-		      unsigned int datafile_cnt, void *xdatids)
+		      unsigned int datafile_cnt, void *xdatids,
+		      int flags, int orphan_dspid)
   {
     CHECK_WRITE((Database *)dbh->db);
     lock_data((Data *)&ydatids, xdatids);
@@ -8070,6 +8071,33 @@ do { \
       }
       server_data_mt.unlock();
     }
+  }
+
+  RPCStatus
+  IDB_setMaxObjCount(DbHandle * dbh, int obj_cnt)
+  {
+    return RPCSuccess;
+  }
+
+
+  RPCStatus
+  IDB_getMaxObjCount(DbHandle * dbh, int * obj_cnt)
+  {
+    return RPCSuccess;
+  }
+
+
+  RPCStatus
+  IDB_setLogSize(DbHandle * dbh, int size)
+  {
+    return RPCSuccess;
+  }
+
+
+  RPCStatus
+  IDB_getLogSize(DbHandle * dbh, int * size)
+  {
+    return RPCSuccess;
   }
 
   // moved from p.h

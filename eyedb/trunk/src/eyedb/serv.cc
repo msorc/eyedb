@@ -1925,12 +1925,12 @@ namespace eyedb {
 
     if (dcinfo)
       status = IDB_updateDataspace((DbHandle *)dcinfo->dbh, ua[1].a_int,
-				   (void *)ua[2].a_data.data, 0,
-				   &ua[2].a_data);
+				   (void *)ua[2].a_data.data, 0, &ua[2].a_data,
+				   ua[3].a_int, ua[4].a_int);
     else
       status = RPCInvalidDbId;
 
-    RPC_STATUS_MAKE(status, ua, 3);
+    RPC_STATUS_MAKE(status, ua, 5);
   }
 
   void
@@ -1961,6 +1961,66 @@ namespace eyedb {
       status = RPCInvalidDbId;
 
     RPC_STATUS_MAKE(status, ua, 3);
+  }
+
+  void
+  SET_MAXOBJCOUNT_realize(rpc_ClientId clientid, void *xua)
+  {
+    ServerArg *ua = (ServerArg *)xua;
+    RPCStatus status;
+    rpcDB_DbHandleClientInfo *dcinfo = rpcDB_clientDbhGet(clientid, ua[0].a_int);
+
+    if (dcinfo)
+      status = IDB_setMaxObjCount((DbHandle *)dcinfo->dbh, ua[1].a_int);
+    else
+      status = RPCInvalidDbId;
+
+    RPC_STATUS_MAKE(status, ua, 2);
+  }
+
+  void
+  GET_MAXOBJCOUNT_realize(rpc_ClientId clientid, void *xua)
+  {
+    ServerArg *ua = (ServerArg *)xua;
+    RPCStatus status;
+    rpcDB_DbHandleClientInfo *dcinfo = rpcDB_clientDbhGet(clientid, ua[0].a_int);
+
+    if (dcinfo)
+      status = IDB_getMaxObjCount((DbHandle *)dcinfo->dbh, &ua[1].a_int);
+    else
+      status = RPCInvalidDbId;
+
+    RPC_STATUS_MAKE(status, ua, 2);
+  }
+
+  void
+  SET_LOGSIZE_realize(rpc_ClientId clientid, void *xua)
+  {
+    ServerArg *ua = (ServerArg *)xua;
+    RPCStatus status;
+    rpcDB_DbHandleClientInfo *dcinfo = rpcDB_clientDbhGet(clientid, ua[0].a_int);
+
+    if (dcinfo)
+      status = IDB_setLogSize((DbHandle *)dcinfo->dbh, ua[1].a_int);
+    else
+      status = RPCInvalidDbId;
+
+    RPC_STATUS_MAKE(status, ua, 2);
+  }
+
+  void
+  GET_LOGSIZE_realize(rpc_ClientId clientid, void *xua)
+  {
+    ServerArg *ua = (ServerArg *)xua;
+    RPCStatus status;
+    rpcDB_DbHandleClientInfo *dcinfo = rpcDB_clientDbhGet(clientid, ua[0].a_int);
+
+    if (dcinfo)
+      status = IDB_getLogSize((DbHandle *)dcinfo->dbh, &ua[1].a_int);
+    else
+      status = RPCInvalidDbId;
+
+    RPC_STATUS_MAKE(status, ua, 2);
   }
 
   void

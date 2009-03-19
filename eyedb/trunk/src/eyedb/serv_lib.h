@@ -173,7 +173,12 @@ namespace eyedb {
     *UPDATE_DATASPACE_SERV_RPC,
     *DELETE_DATASPACE_SERV_RPC,
     *RENAME_DATASPACE_SERV_RPC,
-    *GET_SERVER_OUTOFBAND_DATA_SERV_RPC;
+    *GET_SERVER_OUTOFBAND_DATA_SERV_RPC,
+
+    *SET_MAXOBJCOUNT_RPC,
+    *GET_MAXOBJCOUNT_RPC,
+    *SET_LOGSIZE_RPC,
+    *GET_LOGSIZE_RPC;
 
   extern rpc_Server *
   rpcBeInit(void);
@@ -513,6 +518,18 @@ namespace eyedb {
 
   extern void
   GET_SERVER_OUTOFBAND_DATA_realize(rpc_ClientId, void *);
+
+  extern void
+  SET_MAXOBJCOUNT_realize(rpc_ClientId, void *);
+
+  extern void
+  GET_MAXOBJCOUNT_realize(rpc_ClientId, void *);
+
+  extern void
+  SET_LOGSIZE_realize(rpc_ClientId, void *);
+
+  extern void
+  GET_LOGSIZE_realize(rpc_ClientId, void *);
 
   extern void
   setSePort(const char *);

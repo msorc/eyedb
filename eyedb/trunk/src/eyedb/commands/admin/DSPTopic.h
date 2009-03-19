@@ -32,6 +32,7 @@ class DSPTopic : public Topic {
 };
 
 CMDCLASS_GETOPT(DSPCreateCmd, "create");
+CMDCLASS_GETOPT(DSPAddCmd, "add");
 CMDCLASS_GETOPT(DSPUpdateCmd, "update");
 CMDCLASS_GETOPT(DSPDeleteCmd, "delete");
 CMDCLASS_GETOPT(DSPRenameCmd, "rename");

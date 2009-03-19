@@ -427,7 +427,7 @@ namespace eyedb {
   IDB_createDataspace(DbHandle *, const char *, void *, unsigned int, void *);
 
   extern RPCStatus
-  IDB_updateDataspace(DbHandle *, int, void *, unsigned int, void *);
+  IDB_updateDataspace(DbHandle *, int, void *, unsigned int, void *, int, int);
 
   extern RPCStatus
   IDB_deleteDataspace(DbHandle *, int);
@@ -438,6 +438,18 @@ namespace eyedb {
   extern RPCStatus
   IDB_getServerOutOfBandData(ConnHandle *, int *, Data *,
 			     unsigned int *size, void *);
+
+  extern RPCStatus
+  IDB_setMaxObjCount(DbHandle *, int);
+  
+  extern RPCStatus
+  IDB_getMaxObjCount(DbHandle *, int *);
+
+  extern RPCStatus
+  IDB_setLogSize(DbHandle *, int);
+  
+  extern RPCStatus
+  IDB_getLogSize(DbHandle *, int *);
 
   /* back end */
 

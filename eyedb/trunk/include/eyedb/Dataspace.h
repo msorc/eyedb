@@ -110,7 +110,7 @@ namespace eyedb {
        @param datafile_cnt
        @return
     */
-    Status update(const Datafile **datafiles, unsigned int datafile_cnt) const;
+    Status update(const Datafile **datafiles, unsigned int datafile_cnt, short flags, short orphan_dspid) const;
 
     static const short DefaultDspid;
 

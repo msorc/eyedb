@@ -40,6 +40,7 @@ static const std::string SIZE_OPT = "size";
 static const std::string SLOTSIZE_OPT = "slotsize";
 static const std::string STATS_OPT = "stats";
 static const std::string USERACCESS_OPT = "useraccess";
+static const std::string MIGRATEORPHAN_OPT = "migrate-orphan";
 
 static const std::string DBS_EXT = ".dbs";
 static const std::string DTF_EXT = ".dat";
