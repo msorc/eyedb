@@ -1052,13 +1052,13 @@ namespace eyedb {
        Not yet documented
        @param logsize
     */
-    Status setLogSize(unsigned int logize);
+    Status setLogSize(unsigned int logsize);
 
     /**
        Not yet documented
        @param logsize
     */
-    Status getLogSize(unsigned int& logize);
+    Status getLogSize(unsigned int& logsize);
 
     // deprecated
     Status loadObject(const Oid *, Object **,

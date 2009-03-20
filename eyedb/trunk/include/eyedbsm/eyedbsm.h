@@ -565,6 +565,7 @@ namespace eyedbsm {
 		 const char *datfile),
     dspGetCurDat(DbHandle const *dbh, const char *dataspace, short *datid),
 
+    objectNumberGet(DbHandle const *dbh, Oid::NX *maxobjs),
     objectNumberSet(DbHandle const *dbh, Oid::NX maxobjs),
 
     protectionCreate(DbHandle const *dbh,

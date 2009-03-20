@@ -8077,16 +8077,18 @@ do { \
   RPCStatus
   IDB_setMaxObjCount(DbHandle * dbh, int obj_cnt)
   {
-    return RPCSuccess;
+    eyedbsm::Status s = eyedbsm::objectNumberSet(dbh->sedbh, (eyedbsm::Oid::NX)obj_cnt);
+    return rpcStatusMake_se(s);
   }
-
 
   RPCStatus
   IDB_getMaxObjCount(DbHandle * dbh, int * obj_cnt)
   {
-    return RPCSuccess;
+    eyedbsm::Oid::NX esm_obj_cnt;
+    eyedbsm::Status s = eyedbsm::objectNumberGet(dbh->sedbh, &esm_obj_cnt);
+    *obj_cnt = esm_obj_cnt;
+    return rpcStatusMake_se(s);
   }
-
 
   RPCStatus
   IDB_setLogSize(DbHandle * dbh, int size)

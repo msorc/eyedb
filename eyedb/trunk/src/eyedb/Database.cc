@@ -2517,6 +2517,50 @@ if ((mode) !=  NoDBAccessMode && \
     return Success;
   }
 
+  Status
+  Database::setMaxObjectCount(unsigned int max_obj_cnt)
+  {
+    RPCStatus rpc_status = eyedb::setMaxObjCount(dbh, max_obj_cnt);
+    if (rpc_status)
+      return StatusMake(rpc_status);
+
+    return Success;
+  }
+
+  Status
+  Database::getMaxObjectCount(unsigned int& max_obj_cnt)
+  {
+    int obj_cnt = 0;
+    RPCStatus rpc_status = eyedb::getMaxObjCount(dbh, &obj_cnt);
+    if (rpc_status)
+      return StatusMake(rpc_status);
+
+    max_obj_cnt = obj_cnt;
+    return Success;
+  }
+
+  Status
+  Database::setLogSize(unsigned int logsize)
+  {
+    RPCStatus rpc_status = eyedb::setLogSize(dbh, logsize);
+    if (rpc_status)
+      return StatusMake(rpc_status);
+
+    return Success;
+  }
+
+  Status
+  Database::getLogSize(unsigned int& logsize)
+  {
+    int ilogsize = 0;
+    RPCStatus rpc_status = eyedb::getLogSize(dbh, &ilogsize);
+    if (rpc_status)
+      return StatusMake(rpc_status);
+
+    logsize = ilogsize;
+    return Success;
+  }
+
   eyedbsm::Oid *
   oidArrayToOids(const OidArray &oid_arr, unsigned int &cnt)
   {
