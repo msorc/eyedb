@@ -153,18 +153,18 @@
 	<example id="eyedbadmin-datafile-create">
 	  <title>&eyedbadmin; datafile create</title>
 	  <screen>
-## create a datafile
-<userinput>eyedbadmin datafile create test3 data1.dat</userinput>
-## create a datafile with a name
-<userinput>eyedbadmin datafile create --name=DATA2 test3 data2.dat</userinput>
-## create a datafile with a size of 30 Gb and a directory
-<userinput>eyedbadmin datafile create --filedir=/var/tmp --size=30000 test3 data3.dat</userinput>
-## list the database
-<userinput>eyedbadmin database list --datafiles test3</userinput>
-test3.dat
-data1.dat
-data2.dat
-/var/tmp/data3.dat
+	    ## create a datafile
+	    <userinput>eyedbadmin datafile create test3 data1.dat</userinput>
+	    ## create a datafile with a name
+	    <userinput>eyedbadmin datafile create --name=DATA2 test3 data2.dat</userinput>
+	    ## create a datafile with a size of 30 Gb and a directory
+	    <userinput>eyedbadmin datafile create --filedir=/var/tmp --size=30000 test3 data3.dat</userinput>
+	    ## list the database
+	    <userinput>eyedbadmin database list --datafiles test3</userinput>
+	    test3.dat
+	    data1.dat
+	    data2.dat
+	    /var/tmp/data3.dat
 	  </screen>
 	</example>
 
@@ -226,48 +226,48 @@ data2.dat
 	<example id="eyedbadmin-datafile-list">
 	  <title>&eyedbadmin; datafile list</title>
 	  <screen>
-## List
-<userinput>eyedbadmin datafile list --all test3</userinput>
-Datafile #0
-  Name      DEFAULT
-  Dataspace #0 DEFAULT
-  File      test3.dat
-  Maxsize   2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
-  Slotsize  16
-  Oid Type  Logical
+	    ## List
+	    <userinput>eyedbadmin datafile list --all test3</userinput>
+	    Datafile #0
+	    Name      DEFAULT
+	    Dataspace #0 DEFAULT
+	    File      test3.dat
+	    Maxsize   2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+	    Slotsize  16
+	    Oid Type  Logical
 
-  Object Number        2561
-  Total Busy Size      8439065b, ~8241Kb, ~8Mb
-  Average Size         3295b, ~3Kb
+	    Object Number        2561
+	    Total Busy Size      8439065b, ~8241Kb, ~8Mb
+	    Average Size         3295b, ~3Kb
 
-... output deleted
+	    ... output deleted
 
-Datafile #1
-  Name      &lt;unnamed&gt;
-  File      data1.dat
-  Maxsize   2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
-  Slotsize  16
-  Oid Type  Logical
+	    Datafile #1
+	    Name      &lt;unnamed&gt;
+	    File      data1.dat
+	    Maxsize   2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+	    Slotsize  16
+	    Oid Type  Logical
 
-... output deleted
+	    ... output deleted
 
-Datafile #2
-  Name      DATA2
-  File      data2.dat
-  Maxsize   2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
-  Slotsize  16
-  Oid Type  Logical
+	    Datafile #2
+	    Name      DATA2
+	    File      data2.dat
+	    Maxsize   2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+	    Slotsize  16
+	    Oid Type  Logical
 
-... output deleted
+	    ... output deleted
 
-Datafile #3
-  Name      &lt;unnamed&gt;
-  File      /var/tmp/data3.dat
-  Maxsize   31457280000b, ~30720000Kb, ~30000Mb, ~29Gb
-  Slotsize  16
-  Oid Type  Logical
+	    Datafile #3
+	    Name      &lt;unnamed&gt;
+	    File      /var/tmp/data3.dat
+	    Maxsize   31457280000b, ~30720000Kb, ~30000Mb, ~29Gb
+	    Slotsize  16
+	    Oid Type  Logical
 
-... output deleted
+	    ... output deleted
 	  </screen>
 	</example>
 
@@ -306,30 +306,30 @@ Datafile #3
 	<example id="eyedbadmin-datafile-delete">
 	  <title>&eyedbadmin; datafile delete</title>
 	  <screen>
-## Delete datafile by id
-<userinput>eyedbadmin datafile delete test3 1</userinput>
-## Delete datafile by name
-<userinput>eyedbadmin datafile delete test3 DATA2</userinput>
-## List
-<userinput>eyedbadmin datafile list test3</userinput>
-Datafile #0
-  Name      DEFAULT
-  Dataspace #0 DEFAULT
-  File      test3.dat
-  Maxsize   2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
-  Slotsize  16
-  Oid Type  Logical
+	    ## Delete datafile by id
+	    <userinput>eyedbadmin datafile delete test3 1</userinput>
+	    ## Delete datafile by name
+	    <userinput>eyedbadmin datafile delete test3 DATA2</userinput>
+	    ## List
+	    <userinput>eyedbadmin datafile list test3</userinput>
+	    Datafile #0
+	    Name      DEFAULT
+	    Dataspace #0 DEFAULT
+	    File      test3.dat
+	    Maxsize   2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+	    Slotsize  16
+	    Oid Type  Logical
 
-... output deleted
+	    ... output deleted
 
-Datafile #3
-  Name      &lt;unnamed&gt;
-  File      /var/tmp/data3.dat
-  Maxsize   31457280000b, ~30720000Kb, ~30000Mb, ~29Gb
-  Slotsize  16
-  Oid Type  Logical
+	    Datafile #3
+	    Name      &lt;unnamed&gt;
+	    File      /var/tmp/data3.dat
+	    Maxsize   31457280000b, ~30720000Kb, ~30000Mb, ~29Gb
+	    Slotsize  16
+	    Oid Type  Logical
 
-... output deleted
+	    ... output deleted
 	  </screen>
 	</example>
 
@@ -350,45 +350,45 @@ Datafile #3
 	  </cmdsynopsis>
 	</para>
 
-      <example id="eyedbadmin-datafile-rename">
-	<title>&eyedbadmin; datafile rename</title>
-	<screen>
-## Rename datafile
-<userinput>eyedbadmin datafile rename test3 3 DATA3</userinput>
-## List
-<userinput>eyedbadmin datafile list test3</userinput>
-Datafile #0
-  Name      DEFAULT
-  Dataspace #0 DEFAULT
-  File      test3.dat
-  Maxsize   2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
-  Slotsize  16
-  Oid Type  Logical
+	<example id="eyedbadmin-datafile-rename">
+	  <title>&eyedbadmin; datafile rename</title>
+	  <screen>
+	    ## Rename datafile
+	    <userinput>eyedbadmin datafile rename test3 3 DATA3</userinput>
+	    ## List
+	    <userinput>eyedbadmin datafile list test3</userinput>
+	    Datafile #0
+	    Name      DEFAULT
+	    Dataspace #0 DEFAULT
+	    File      test3.dat
+	    Maxsize   2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+	    Slotsize  16
+	    Oid Type  Logical
 
-... output deleted
+	    ... output deleted
 
-Datafile #3
-  Name      DATA3
-  File      /var/tmp/data3.dat
-  Maxsize   31457280000b, ~30720000Kb, ~30000Mb, ~29Gb
-  Slotsize  16
-  Oid Type  Logical
+	    Datafile #3
+	    Name      DATA3
+	    File      /var/tmp/data3.dat
+	    Maxsize   31457280000b, ~30720000Kb, ~30000Mb, ~29Gb
+	    Slotsize  16
+	    Oid Type  Logical
 
-... output deleted
-	</screen>
-      </example>
+	    ... output deleted
+	  </screen>
+	</example>
 
-      <para>
-	Moving a datafile is done using the &eyedbadmin; command:
-	<cmdsynopsis>
-	  &eyedbadmin;
-	  <command>datafile move</command>
-	  <arg choice="opt">options</arg>
-	  <arg choice="req"><replaceable>database</replaceable></arg>
-	  <arg choice="req"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
-	  <arg choice="req"><replaceable>new_datafile</replaceable></arg>
-	</cmdsynopsis>
-      </para>
+	<para>
+	  Moving a datafile is done using the &eyedbadmin; command:
+	  <cmdsynopsis>
+	    &eyedbadmin;
+	    <command>datafile move</command>
+	    <arg choice="opt">options</arg>
+	    <arg choice="req"><replaceable>database</replaceable></arg>
+	    <arg choice="req"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
+	    <arg choice="req"><replaceable>new_datafile</replaceable></arg>
+	  </cmdsynopsis>
+	</para>
 
 	<para>
 	  Options are:
@@ -437,30 +437,30 @@ Datafile #3
 	<example id="eyedbadmin-datafile-move">
 	  <title>&eyedbadmin; datafile move</title>
 	  <screen>
-## Create destination directory
-<userinput>mkdir /var/tmp/test3</userinput>
-## Move datafile
-<userinput>eyedbadmin datafile move --filedir=/var/tmp/test3 test3 DATA3 newdata3.dat</userinput>
-## List
-<userinput>eyedbadmin datafile list test3</userinput>
-Datafile #0
-  Name      DEFAULT
-  Dataspace #0 DEFAULT
-  File      test3.dat
-  Maxsize   2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
-  Slotsize  16
-  Oid Type  Logical
+	    ## Create destination directory
+	    <userinput>mkdir /var/tmp/test3</userinput>
+	    ## Move datafile
+	    <userinput>eyedbadmin datafile move --filedir=/var/tmp/test3 test3 DATA3 newdata3.dat</userinput>
+	    ## List
+	    <userinput>eyedbadmin datafile list test3</userinput>
+	    Datafile #0
+	    Name      DEFAULT
+	    Dataspace #0 DEFAULT
+	    File      test3.dat
+	    Maxsize   2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+	    Slotsize  16
+	    Oid Type  Logical
 
-... output deleted
+	    ... output deleted
 
-Datafile #3
-  Name      DATA3
-  File      /var/tmp/test3/newdata3.dat
-  Maxsize   31457280000b, ~30720000Kb, ~30000Mb, ~29Gb
-  Slotsize  16
-  Oid Type  Logical
+	    Datafile #3
+	    Name      DATA3
+	    File      /var/tmp/test3/newdata3.dat
+	    Maxsize   31457280000b, ~30720000Kb, ~30000Mb, ~29Gb
+	    Slotsize  16
+	    Oid Type  Logical
 
-... output deleted
+	    ... output deleted
 	  </screen>
 	</example>
 
@@ -474,9 +474,9 @@ Datafile #3
 	  <cmdsynopsis>
 	    &eyedbadmin;
 	    <command>datafile resize</command>
-	  <arg choice="req"><replaceable>database</replaceable></arg>
-	  <arg choice="req"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
-	  <arg choice="req"><replaceable>new_size</replaceable></arg>
+	    <arg choice="req"><replaceable>database</replaceable></arg>
+	    <arg choice="req"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
+	    <arg choice="req"><replaceable>new_size</replaceable></arg>
 	  </cmdsynopsis>
 	</para>
 
@@ -513,71 +513,71 @@ Datafile #3
 	<example id="eyedbadmin-datafile-resize">
 	  <title>&eyedbadmin; datafile resize</title>
 	  <screen>
-## List
-<userinput>eyedbadmin datafile list test3 DATA3</userinput>
-Datafile #3
-  Name      DATA3
-  File      /var/tmp/test3/newdata3.dat
-  Maxsize   31457280000b, ~30720000Kb, ~30000Mb, ~29Gb
-  Slotsize  16
-  Oid Type  Logical
+	    ## List
+	    <userinput>eyedbadmin datafile list test3 DATA3</userinput>
+	    Datafile #3
+	    Name      DATA3
+	    File      /var/tmp/test3/newdata3.dat
+	    Maxsize   31457280000b, ~30720000Kb, ~30000Mb, ~29Gb
+	    Slotsize  16
+	    Oid Type  Logical
 
-... output deleted
-## Set new size to 40Gb
-<userinput>eyedbadmin datafile resize test3 DATA3 40000</userinput>
-## List
-<userinput>eyedbadmin datafile list test3 DATA3</userinput>
-Datafile #3
-  Name      DATA3
-  File      /var/tmp/test3/newdata3.dat
-  Maxsize   41943040000b, ~40960000Kb, ~40000Mb, ~39Gb
-  Slotsize  16
-  Oid Type  Logical
+	    ... output deleted
+	    ## Set new size to 40Gb
+	    <userinput>eyedbadmin datafile resize test3 DATA3 40000</userinput>
+	    ## List
+	    <userinput>eyedbadmin datafile list test3 DATA3</userinput>
+	    Datafile #3
+	    Name      DATA3
+	    File      /var/tmp/test3/newdata3.dat
+	    Maxsize   41943040000b, ~40960000Kb, ~40000Mb, ~39Gb
+	    Slotsize  16
+	    Oid Type  Logical
 
-... output deleted
+	    ... output deleted
 	  </screen>
 	</example>
 
-<!--
-	<para>
-	  Datafiles can become fragmented because of object deletion; the allocator used inside datafile is a bitmap allocator for better efficiency, but as a consequence there can be holes in the datafile that can impact performance. Defragmenting can be done using the &eyedbadmin; command:
-	  <cmdsynopsis>
+	<!--
+	    <para>
+	    Datafiles can become fragmented because of object deletion; the allocator used inside datafile is a bitmap allocator for better efficiency, but as a consequence there can be holes in the datafile that can impact performance. Defragmenting can be done using the &eyedbadmin; command:
+	    <cmdsynopsis>
 	    &eyedbadmin;
 	    <command>datafile defragment</command>
-	  <arg choice="req"><replaceable>database</replaceable></arg>
-	  <arg choice="req"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
-	  </cmdsynopsis>
-	</para>
+	    <arg choice="req"><replaceable>database</replaceable></arg>
+	    <arg choice="req"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
+	    </cmdsynopsis>
+	    </para>
 
-	<para>
-	  Command arguments are:
-	  <itemizedlist>
-	    <listitem>
-	      <para>
-		<cmdsynopsis>
-		  <arg choice="req"><replaceable>database</replaceable></arg>
-		</cmdsynopsis>
-		the database to which the datafile belongs
-	      </para>
-	    </listitem>
-	    <listitem>
-	      <para>
-		<cmdsynopsis>
-		  <arg choice="req"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
-		</cmdsynopsis>
-		the datafile to be defragmented, that can be specified either by its id or by its name
-	      </para>
-	    </listitem>
-	  </itemizedlist>
-	</para>
-	
-	<example id="eyedbadmin-datafile-defragment">
-	  <title>&eyedbadmin; datafile defragment</title>
-	  <screen>
+<para>
+Command arguments are:
+<itemizedlist>
+<listitem>
+<para>
+<cmdsynopsis>
+<arg choice="req"><replaceable>database</replaceable></arg>
+</cmdsynopsis>
+the database to which the datafile belongs
+</para>
+</listitem>
+<listitem>
+<para>
+<cmdsynopsis>
+<arg choice="req"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
+</cmdsynopsis>
+the datafile to be defragmented, that can be specified either by its id or by its name
+</para>
+</listitem>
+</itemizedlist>
+</para>
+
+<example id="eyedbadmin-datafile-defragment">
+<title>&eyedbadmin; datafile defragment</title>
+<screen>
 ...
-	  </screen>
-	</example>
--->
+</screen>
+</example>
+	-->
 
       </section>
 
@@ -641,11 +641,11 @@ Datafile #3
 	<example id="eyedbadmin-dataspace-create">
 	  <title>&eyedbadmin; dataspace create</title>
 	  <screen>
-## create 2 datafiles
-<userinput>eyedbadmin datafile create test4 data1.dat</userinput>
-<userinput>eyedbadmin datafile create test4 data2.dat</userinput>
-## create a dataspace, attaching the 2 datafiles to this dataspace
-<userinput>eyedbadmin dataspace create test4 DSP1 1 2</userinput>
+	    ## create 2 datafiles
+	    <userinput>eyedbadmin datafile create test4 data1.dat</userinput>
+	    <userinput>eyedbadmin datafile create test4 data2.dat</userinput>
+	    ## create a dataspace, attaching the 2 datafiles to this dataspace
+	    <userinput>eyedbadmin dataspace create test4 DSP1 1 2</userinput>
 	  </screen>
 	</example>
 
@@ -684,28 +684,28 @@ Datafile #3
 	<example id="eyedbadmin-dataspace-list">
 	  <title>&eyedbadmin; dataspace list</title>
 	  <screen>
-## List all the dataspaces of database 'test4'
-<userinput>eyedbadmin dataspace list test4</userinput>
-Dataspace #0
-Name DEFAULT
-   Datafile #0
-     Name     DEFAULT
-     File     test4.dat
-     Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
-     Slotsize 16
-     Oid Type Logical
-Dataspace #1
-Name DSP1
-   Datafile #1
-     File     data1.dat
-     Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
-     Slotsize 16
-     Oid Type Logical
-   Datafile #2
-     File     data2.dat
-     Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
-     Slotsize 16
-     Oid Type Logical
+	    ## List all the dataspaces of database 'test4'
+	    <userinput>eyedbadmin dataspace list test4</userinput>
+	    Dataspace #0
+	    Name DEFAULT
+	    Datafile #0
+	    Name     DEFAULT
+	    File     test4.dat
+	    Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+	    Slotsize 16
+	    Oid Type Logical
+	    Dataspace #1
+	    Name DSP1
+	    Datafile #1
+	    File     data1.dat
+	    Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+	    Slotsize 16
+	    Oid Type Logical
+	    Datafile #2
+	    File     data2.dat
+	    Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+	    Slotsize 16
+	    Oid Type Logical
 	  </screen>
 	</example>
 
@@ -744,18 +744,18 @@ Name DSP1
 	<example id="eyedbadmin-dataspace-delete">
 	  <title>&eyedbadmin; dataspace delete</title>
 	  <screen>
-## delete dataspace named 'NEWDSP1'
-<userinput>eyedbadmin dataspace delete test4 NEWDSP1</userinput>
-## list all dataspaces
-<userinput>eyedbadmin dataspace list test4</userinput>
-Dataspace #0
-Name DEFAULT
-   Datafile #0
-     Name     DEFAULT
-     File     test4.dat
-     Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
-     Slotsize 16
-     Oid Type Logical
+	    ## delete dataspace named 'NEWDSP1'
+	    <userinput>eyedbadmin dataspace delete test4 NEWDSP1</userinput>
+	    ## list all dataspaces
+	    <userinput>eyedbadmin dataspace list test4</userinput>
+	    Dataspace #0
+	    Name DEFAULT
+	    Datafile #0
+	    Name     DEFAULT
+	    File     test4.dat
+	    Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+	    Slotsize 16
+	    Oid Type Logical
 	  </screen>
 	</example>
 
@@ -808,51 +808,51 @@ Name DEFAULT
 	<example id="eyedbadmin-dataspace-update">
 	  <title>&eyedbadmin; dataspace update</title>
 	  <screen>
-## create 2 more datafiles
-<userinput>eyedbadmin datafile create test4 data3.dat</userinput>
-<userinput>eyedbadmin datafile create test4 data4.dat</userinput>
-## update the dataspace, attaching the 4 datafiles to the dataspace
-<userinput>eyedbadmin dataspace update test4 DSP1 1 2 3 4</userinput>
-## list the updated dataspace
-<userinput>eyedbadmin dataspace list test4 DSP1</userinput>
-Dataspace #1
-Name DSP1
-   Datafile #1
-     File     data1.dat
-     Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
-     Slotsize 16
-     Oid Type Logical
-   Datafile #2
-     File     data2.dat
-     Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
-     Slotsize 16
-     Oid Type Logical
-   Datafile #3
-     File     data3.dat
-     Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
-     Slotsize 16
-     Oid Type Logical
-   Datafile #4
-     File     data4.dat
-     Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
-     Slotsize 16
-     Oid Type Logical
-## update dataspace, leaving only the last 2 datafiles
-<userinput>eyedbadmin dataspace update test4 DSP1 3 4</userinput>
-## list updated dataspace
-<userinput>eyedbadmin dataspace list test4 DSP1</userinput>
-Dataspace #1
-Name NEWDSP1
-   Datafile #3
-     File     data3.dat
-     Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
-     Slotsize 16
-     Oid Type Logical
-   Datafile #4
-     File     data4.dat
-     Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
-     Slotsize 16
-     Oid Type Logical
+	    ## create 2 more datafiles
+	    <userinput>eyedbadmin datafile create test4 data3.dat</userinput>
+	    <userinput>eyedbadmin datafile create test4 data4.dat</userinput>
+	    ## update the dataspace, attaching the 4 datafiles to the dataspace
+	    <userinput>eyedbadmin dataspace update test4 DSP1 1 2 3 4</userinput>
+	    ## list the updated dataspace
+	    <userinput>eyedbadmin dataspace list test4 DSP1</userinput>
+	    Dataspace #1
+	    Name DSP1
+	    Datafile #1
+	    File     data1.dat
+	    Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+	    Slotsize 16
+	    Oid Type Logical
+	    Datafile #2
+	    File     data2.dat
+	    Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+	    Slotsize 16
+	    Oid Type Logical
+	    Datafile #3
+	    File     data3.dat
+	    Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+	    Slotsize 16
+	    Oid Type Logical
+	    Datafile #4
+	    File     data4.dat
+	    Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+	    Slotsize 16
+	    Oid Type Logical
+	    ## update dataspace, leaving only the last 2 datafiles
+	    <userinput>eyedbadmin dataspace update test4 DSP1 3 4</userinput>
+	    ## list updated dataspace
+	    <userinput>eyedbadmin dataspace list test4 DSP1</userinput>
+	    Dataspace #1
+	    Name NEWDSP1
+	    Datafile #3
+	    File     data3.dat
+	    Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+	    Slotsize 16
+	    Oid Type Logical
+	    Datafile #4
+	    File     data4.dat
+	    Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+	    Slotsize 16
+	    Oid Type Logical
 	  </screen>
 	</example>
 
@@ -900,22 +900,22 @@ Name NEWDSP1
 	<example id="eyedbadmin-dataspace-rename">
 	  <title>&eyedbadmin; dataspace rename</title>
 	  <screen>
-## rename dataspace
-eyedbadmin dataspace rename test4 DSP1 NEWDSP1
-## list renamed dataspace
-eyedbadmin dataspace list test4 NEWDSP1
-Dataspace #1
-Name NEWDSP1
-   Datafile #3
-     File     data3.dat
-     Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
-     Slotsize 16
-     Oid Type Logical
-   Datafile #4
-     File     data4.dat
-     Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
-     Slotsize 16
-     Oid Type Logical
+	    ## rename dataspace
+	    eyedbadmin dataspace rename test4 DSP1 NEWDSP1
+	    ## list renamed dataspace
+	    eyedbadmin dataspace list test4 NEWDSP1
+	    Dataspace #1
+	    Name NEWDSP1
+	    Datafile #3
+	    File     data3.dat
+	    Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+	    Slotsize 16
+	    Oid Type Logical
+	    Datafile #4
+	    File     data4.dat
+	    Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+	    Slotsize 16
+	    Oid Type Logical
 	  </screen>
 	</example>
 
@@ -971,14 +971,14 @@ Name NEWDSP1
 	<example id="eyedbadmin-dataspace-getcurdat">
 	  <title>&eyedbadmin; dataspace getcurdat</title>
 	  <screen>
-<userinput>eyedbadmin dataspace getcurdat test4 DSP1</userinput>
-Datafile #1
-  Name      &lt;unnamed&gt;
-  Dataspace #1 DSP1
-  File      data1.dat
-  Maxsize   2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
-  Slotsize  16
-  Oid Type  Logical
+	    <userinput>eyedbadmin dataspace getcurdat test4 DSP1</userinput>
+	    Datafile #1
+	    Name      &lt;unnamed&gt;
+	    Dataspace #1 DSP1
+	    File      data1.dat
+	    Maxsize   2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+	    Slotsize  16
+	    Oid Type  Logical
 	  </screen>
 	</example>
 
@@ -1026,18 +1026,138 @@ Datafile #1
 	<example id="eyedbadmin-dataspace-setcurdat">
 	  <title>&eyedbadmin; dataspace setcurdat</title>
 	  <screen>
-<userinput>eyedbadmin dataspace setcurdat test4 DSP1 3</userinput>
-<userinput>eyedbadmin dataspace getcurdat test4 DSP1</userinput>
-Datafile #3
-  Name      &lt;unnamed&gt;
-  Dataspace #1 DSP1
-  File      data3.dat
-  Maxsize   2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
-  Slotsize  16
-  Oid Type  Logical
-francois@revard$ 
+	    <userinput>eyedbadmin dataspace setcurdat test4 DSP1 3</userinput>
+	    <userinput>eyedbadmin dataspace getcurdat test4 DSP1</userinput>
+	    Datafile #3
+	    Name      &lt;unnamed&gt;
+	    Dataspace #1 DSP1
+	    File      data3.dat
+	    Maxsize   2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+	    Slotsize  16
+	    Oid Type  Logical
+	    francois@revard$ 
 	  </screen>
 	</example>
+
+	<section>
+	  <title>Getting and setting default dataspace for a database</title>
+
+	  <para>
+	    A database maintains an internal pointer to a <emphasis>default</emphasis> dataspace; this default dataspace will be used when inserting data that do not have an associated dataspace <xref linkend="managing-locations"/>.
+	  </para>
+
+	  <para>
+	    Using &eyedbadmin;, it is possible to examine and set the pointer to the default dataspace for a database.
+	  </para>
+
+	  <note>
+	    <title>Getting and setting default dataspace</title>
+	    <para>
+	      Getting and setting default dataspace is done using the <emphasis>database</emphasis> topic of the &eyedbadmin; command <xref linkend="eyedbadmin-command-syntax"/>, because the default dataspace is a property of the <emphasis>database</emphasis> and not of a particular dataspace.
+	    </para>
+	  </note>
+
+	  <para>
+	    Examining the default dataspace is done using the &eyedbadmin; command:
+	    <cmdsynopsis>
+	      &eyedbadmin;
+	      <command>database getdefdsp</command>
+	      <arg choice="req"><replaceable>database</replaceable></arg>
+	    </cmdsynopsis>
+	  </para>
+
+	  <para>
+	    Command arguments are:
+	    <itemizedlist>
+	      <listitem>
+		<para>
+		  <cmdsynopsis>
+		    <arg choice="req"><replaceable>database</replaceable></arg>
+		  </cmdsynopsis>
+		  the database
+		</para>
+	      </listitem>
+	    </itemizedlist>
+	  </para>
+
+	  <example id="eyedbadmin-database-getdefdsp">
+	    <title>&eyedbadmin; database getdefdsp</title>
+	    <screen>
+<userinput>eyedbadmin database getdefdsp test4</userinput>
+Dataspace #0
+Name DEFAULT
+   Datafile #0
+     Name     DEFAULT
+     File     test4.dat
+     Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+     Slotsize 16
+     Oid Type Logical
+	    </screen>
+	  </example>
+
+	  <para>
+	    Setting the default dataspace is done using the &eyedbadmin; command:
+	    <cmdsynopsis>
+	      &eyedbadmin;
+	      <command>database setdefdsp</command>
+	      <arg choice="req"><replaceable>database</replaceable></arg>
+	      <arg choice="req"><replaceable>dataspace</replaceable></arg>
+	    </cmdsynopsis>
+	  </para>
+
+	  <para>
+	    Command arguments are:
+	    <itemizedlist>
+	      <listitem>
+		<para>
+		  <cmdsynopsis>
+		    <arg choice="req"><replaceable>database</replaceable></arg>
+		  </cmdsynopsis>
+		  the database
+		</para>
+	      </listitem>
+	      <listitem>
+		<para>
+		  <cmdsynopsis>
+		    <arg choice="req"><replaceable>dataspace</replaceable></arg>
+		  </cmdsynopsis>
+		  the name of the dataspace that must become the default dataspace
+		</para>
+	      </listitem>
+	    </itemizedlist>
+	  </para>
+
+	  <example id="eyedbadmin-database-setdefdsp">
+	    <title>&eyedbadmin; database setdefdsp</title>
+	    <screen>
+<userinput>eyedbadmin database setdefdsp test4 DSP1</userinput>
+<userinput>eyedbadmin database getdefdsp test4</userinput>
+Dataspace #1
+Name DSP1
+   Datafile #1
+     File     data1.dat
+     Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+     Slotsize 16
+     Oid Type Logical
+   Datafile #2
+     File     data2.dat
+     Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+     Slotsize 16
+     Oid Type Logical
+   Datafile #3
+     File     data3.dat
+     Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+     Slotsize 16
+     Oid Type Logical
+   Datafile #4
+     File     data4.dat
+     Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+     Slotsize 16
+     Oid Type Logical
+	    </screen>
+	  </example>
+
+	</section>
 
       </section>
 
@@ -1045,10 +1165,10 @@ francois@revard$
 
   </chapter>
 
-<!--
-;;; Local Variables: ***
-;;; eval: (load-file "emacs-macro") ***
-;;; End: ***
--->
+  <!--
+      ;;; Local Variables: ***
+      ;;; eval: (load-file "emacs-macro") ***
+      ;;; End: ***
+  -->
 
 </book>

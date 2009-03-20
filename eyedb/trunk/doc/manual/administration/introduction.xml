@@ -47,7 +47,7 @@
 	The &eyedbadmin; command is used for most of the &eyedb; administration operations. It is installed in <filename class="directory">/usr/bin</filename> for standard &eyedb; installations.
       </para>
 
-      <section>
+      <section id="eyedbadmin-command-syntax">
 	<title>&eyedbadmin; command syntax</title>
 
 	<para>
