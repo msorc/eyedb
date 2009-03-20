@@ -591,10 +591,10 @@ Datafile #3
       </para>
 
       <section>
-	<title>Creating, listing, updating, renaming and deleting dataspaces</title>
+	<title>Creating, listing, and deleting dataspaces</title>
 
 	<para>
-	  This section explains how to create, update and delete dataspaces. When creating or updating a dataspace, the list of datafiles contained in this dataspace must be specified; datafiles must therefore have been created before, refer to <xref linkend="managing-datafiles"/> for explainations on datafiles management.
+	  This section explains how to create, listing and delete dataspaces. When creating or updating a dataspace, the list of datafiles contained in this dataspace must be specified; datafiles must therefore have been created before, refer to <xref linkend="managing-datafiles"/> for explainations on datafiles management.
 	</para>
 
 	<para>
@@ -708,6 +708,61 @@ Name DSP1
      Oid Type Logical
 	  </screen>
 	</example>
+
+	<para>
+	  Deleting a dataspace is done using the &eyedbadmin; command:
+	  <cmdsynopsis>
+	    &eyedbadmin;
+	    <command>delete</command>
+	    <arg choice="req"><replaceable>database</replaceable></arg>
+	    <arg choice="req"><replaceable>dataspace</replaceable></arg>
+	  </cmdsynopsis>
+	</para>
+
+	<para>
+	  Command arguments are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><replaceable>database</replaceable></arg>
+		</cmdsynopsis>
+		the database
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><replaceable>dataspace</replaceable></arg>
+		</cmdsynopsis>
+		the name of the dataspace
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+
+	<example id="eyedbadmin-dataspace-delete">
+	  <title>&eyedbadmin; dataspace delete</title>
+	  <screen>
+## delete dataspace named 'NEWDSP1'
+<userinput>eyedbadmin dataspace delete test4 NEWDSP1</userinput>
+## list all dataspaces
+<userinput>eyedbadmin dataspace list test4</userinput>
+Dataspace #0
+Name DEFAULT
+   Datafile #0
+     Name     DEFAULT
+     File     test4.dat
+     Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+     Slotsize 16
+     Oid Type Logical
+	  </screen>
+	</example>
+
+      </section>
+
+      <section>
+	<title>Updating and renaming dataspaces</title>
 
 	<para>
 	  Updating a dataspace is done using the &eyedbadmin; command:
@@ -864,11 +919,28 @@ Name NEWDSP1
 	  </screen>
 	</example>
 
+      </section>
+
+      <section>
+	<title>Getting and setting current datafile</title>
+
 	<para>
-	  Deleting a dataspace is done using the &eyedbadmin; command:
+	  A dataspace maintains an internal pointer to its <emphasis>current</emphasis> datafile, i.e. the datafile in which new data will be stored when creating an object, an index that hits into this dataspace.
+	</para>
+
+	<para>
+	  When a datafile is full, the pointer to the current datafile is moved to the next datafile in the dataspace that has space left for insertion. If all datafiles in the dataspace are full, then the insertion ends with an error.
+	</para>
+
+	<para>
+	  Using &eyedbadmin;, it is possible to examine and set the pointer to the current datafile. 
+	</para>
+
+	<para>
+	  Examining the current datafile is done using the &eyedbadmin; command:
 	  <cmdsynopsis>
 	    &eyedbadmin;
-	    <command>delete</command>
+	    <command>dataspace getcurdat</command>
 	    <arg choice="req"><replaceable>database</replaceable></arg>
 	    <arg choice="req"><replaceable>dataspace</replaceable></arg>
 	  </cmdsynopsis>
@@ -896,31 +968,76 @@ Name NEWDSP1
 	  </itemizedlist>
 	</para>
 
-	<example id="eyedbadmin-dataspace-delete">
-	  <title>&eyedbadmin; dataspace delete</title>
+	<example id="eyedbadmin-dataspace-getcurdat">
+	  <title>&eyedbadmin; dataspace getcurdat</title>
 	  <screen>
-## delete dataspace named 'NEWDSP1'
-<userinput>eyedbadmin dataspace delete test4 NEWDSP1</userinput>
-## list all dataspaces
-<userinput>eyedbadmin dataspace list test4</userinput>
-Dataspace #0
-Name DEFAULT
-   Datafile #0
-     Name     DEFAULT
-     File     test4.dat
-     Maxsize  2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
-     Slotsize 16
-     Oid Type Logical
+<userinput>eyedbadmin dataspace getcurdat test4 DSP1</userinput>
+Datafile #1
+  Name      &lt;unnamed&gt;
+  Dataspace #1 DSP1
+  File      data1.dat
+  Maxsize   2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+  Slotsize  16
+  Oid Type  Logical
 	  </screen>
 	</example>
 
-      </section>
-
-      <section>
-	<title>Setting current dataspace and current datafile</title>
+	<para>
+	  Setting the current datafile is done using the &eyedbadmin; command:
+	  <cmdsynopsis>
+	    &eyedbadmin;
+	    <command>dataspace setcurdat</command>
+	    <arg choice="req"><replaceable>database</replaceable></arg>
+	    <arg choice="req"><replaceable>dataspace</replaceable></arg>
+	    <arg choice="req" rep="repeat"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
+	  </cmdsynopsis>
+	</para>
 
 	<para>
+	  Command arguments are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><replaceable>database</replaceable></arg>
+		</cmdsynopsis>
+		the database
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><replaceable>dataspace</replaceable></arg>
+		</cmdsynopsis>
+		the name of the dataspace
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req" rep="repeat"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
+		</cmdsynopsis>
+		the datafiles to be attached to the dataspace, that can be specified either by its id or by its name
+	      </para>
+	    </listitem>
+	  </itemizedlist>
 	</para>
+
+	<example id="eyedbadmin-dataspace-setcurdat">
+	  <title>&eyedbadmin; dataspace setcurdat</title>
+	  <screen>
+<userinput>eyedbadmin dataspace setcurdat test4 DSP1 3</userinput>
+<userinput>eyedbadmin dataspace getcurdat test4 DSP1</userinput>
+Datafile #3
+  Name      &lt;unnamed&gt;
+  Dataspace #1 DSP1
+  File      data3.dat
+  Maxsize   2147483648b, ~2097152Kb, ~2048Mb, ~2Gb
+  Slotsize  16
+  Oid Type  Logical
+francois@revard$ 
+	  </screen>
+	</example>
 
       </section>
 
