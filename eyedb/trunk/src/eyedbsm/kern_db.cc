@@ -567,7 +567,7 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     dbh.__lastidxbusy() = 0;
     dbh.__curidxbusy() = 0;
     dbh.__dbid() = dbid;
-    dbh.__guest_uid() = INVALID_UID;
+    dbh.__guest_uid() = (short)INVALID_UID;
     dbh.__nbobjs() = nbobjs;
 
     dbh.state() = OPENING_STATE;
@@ -2143,6 +2143,86 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 
     *maxobjs = x2h_u32(_dbh.__nbobjs());
 
+    return Success;
+  }
+
+#define MINSHMSIZE   0x400000U
+// 1. must be detected by configure
+// 2. the amount of memory may be detected by configure also
+//#define HAVE_WIDE_MEMORY_MAPPED
+#undef HAVE_WIDE_MEMORY_MAPPED
+
+#ifdef HAVE_WIDE_MEMORY_MAPPED
+#define MAXSHMSIZE 0x120000000U
+#else
+#define MAXSHMSIZE 0x40000000U
+#endif
+
+  Status
+  shmSizeGet(DbHandle const *dbh, int *shmsize)
+  {
+    struct stat stat;
+
+    int shmfd = shmfileOpen(dbh->dbfile, true);
+    if (shmfd < 0 || fstat(shmfd, &stat) < 0) {
+      return statusMake(INVALID_DBFILE_ACCESS,
+			"cannot open shm file for writing: '%s'",
+			shmfileGet(dbh->dbfile));
+    }
+
+    *shmsize = (int)(stat.st_size/ONE_K);
+    return Success;
+  }
+
+  Status
+  shmSizeSet(DbHandle const *dbh, int shmsize)
+  {
+    shmsize *= ONE_K;
+
+    DbShmHeader dbhshm;
+
+    int shmfd = shmfileOpen(dbh->dbfile, false);
+#ifndef NO_FILE_LOCK
+    if (!filelockX(shmfd)) {
+      return statusMake(ERROR,
+			"shmSizeSet: cannot change shm size "
+			"when clients are connected.");
+    }
+#endif
+
+    if (shmsize < MINSHMSIZE) {
+      return statusMake(ERROR, "logsize %d MB is too small (minimum is %d MB)",
+			shmsize/ONE_M, MINSHMSIZE/ONE_M);
+    }
+
+    if (shmsize > MAXSHMSIZE) {
+      return statusMake(ERROR, "logsize %d MB too large (maximum is %d MB)",
+			shmsize/ONE_M, MAXSHMSIZE/ONE_M);
+    }
+
+    if (read(shmfd, &dbhshm, sizeof(dbhshm)) < 0) {
+      return statusMake(ERROR, "cannot read shmfile '%s'", shmfileGet(dbh->dbfile));
+    }
+
+    if (dbhshm.magic != MAGIC)
+      return statusMake(ERROR, "shmfile '%s' is not a valid eyedb shmfile\n",
+			shmfileGet(dbh->dbfile));
+
+    if (dbhshm.trs_hdr.tr_cnt) {
+      /* seems to be in used: must check for active transactions */
+      return statusMake(ERROR, "shmfile %s is currently in use, cannot be resized", shmfileGet(dbh->dbfile));
+    }
+
+    if (ftruncate(shmfd, shmsize)) {
+      return statusMake(ERROR, "ftruncate(\"%s\", %u) returns: '%s'\n",
+			shmfileGet(dbh->dbfile), shmsize, strerror(errno));
+    }
+    
+    ESM_DbInitialize(dbh->vd, dbh->vd->shm_addr_b, shmsize);
+    
+#ifndef NO_FILE_LOCK
+    ut_file_unlock(shmfd);
+#endif
     return Success;
   }
 

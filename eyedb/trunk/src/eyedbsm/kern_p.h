@@ -428,6 +428,7 @@ namespace eyedbsm {
   extern Boolean cleanup;
 
 #define ONE_K 1024
+#define ONE_M (1024*1024)
 #define BITS_PER_BYTE 8
 #define IDBH "database handle is invalid"
   /*#define DBH2MP(dbh) (&(dbh)->vd->dbhead->mp)*/

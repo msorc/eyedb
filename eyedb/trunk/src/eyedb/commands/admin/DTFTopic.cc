@@ -377,7 +377,7 @@ int DTFResizeCmd::help()
   getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("DATID", "Datafile id");
   getopt->displayOpt("DATNAME", "Datafile name");
-  getopt->displayOpt("NEWSIZE", "New size (in Mb)");
+  getopt->displayOpt("NEWSIZE", "New size (in MB)");
   return 1;
 }
 

@@ -771,11 +771,11 @@ namespace eyedb {
     unsigned int sz;
 
     sz = _sz;
-    std::string s = str_convert((long)sz) + "b";
+    std::string s = str_convert((long)sz) + "B";
     sz = _sz / ONE_K;
 
     if (sz) {
-      s += std::string(", ~") + str_convert((long)sz) + "Kb";
+      s += std::string(", ~") + str_convert((long)sz) + "KB";
 
       sz = _sz / ONE_M;
       if (sz) {
@@ -783,7 +783,7 @@ namespace eyedb {
 	sz2 = (sz+1) * ONE_M;
 	if ((sz2 - _sz) < (_sz - sz1))
 	  sz = sz+1;
-	s += std::string(", ~") + str_convert((long)sz) + "Mb";
+	s += std::string(", ~") + str_convert((long)sz) + "MB";
       }
     }
 

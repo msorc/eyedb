@@ -8093,14 +8093,16 @@ do { \
   RPCStatus
   IDB_setLogSize(DbHandle * dbh, int size)
   {
-    return RPCSuccess;
+    eyedbsm::Status s = eyedbsm::shmSizeSet(dbh->sedbh, size);
+    return rpcStatusMake_se(s);
   }
 
 
   RPCStatus
   IDB_getLogSize(DbHandle * dbh, int * size)
   {
-    return RPCSuccess;
+    eyedbsm::Status s = eyedbsm::shmSizeGet(dbh->sedbh, size);
+    return rpcStatusMake_se(s);
   }
 
   // moved from p.h

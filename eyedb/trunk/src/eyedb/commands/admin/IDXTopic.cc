@@ -955,7 +955,7 @@ int IDXMoveCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
   for (int i = 0; i < obj_arr.getCount(); i++) {
     Index *idx = (Index *)obj_arr[i];
     idx->move(dataspace);
-    //     idx->move(dataspace, collapse);
+    //     idx->move(dataspace, defragment);
   }
 
   db->transactionCommit();
@@ -1212,6 +1212,10 @@ int IDXGetlocaCmd::perform(eyedb::Connection &conn, std::vector<std::string> &ar
     locaOpt = true;
     statsOpt = true;
   }    
+
+  if (!locaOpt && !statsOpt) {
+    locaOpt = true;
+  }
 
   conn.open();
 
