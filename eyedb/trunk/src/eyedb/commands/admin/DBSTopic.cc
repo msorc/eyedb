@@ -53,11 +53,14 @@ DBSTopic::DBSTopic() : Topic("database")
 
   addCommand(new DBSDefAccessCmd(this));
 
+  addCommand(new DBSSetDefDspCmd(this));
+  addCommand(new DBSGetDefDspCmd(this));
+
   addCommand(new DBSExportCmd(this));
   addCommand(new DBSImportCmd(this));
 
-  addCommand( new DBSSetObjCountCmd(this));
-  addCommand( new DBSGetObjCountCmd(this));
+  addCommand( new DBSSetMaxObjCountCmd(this));
+  addCommand( new DBSGetMaxObjCountCmd(this));
   addCommand( new DBSSetLogSizeCmd(this));
   addCommand( new DBSGetLogSizeCmd(this));
 }
@@ -267,7 +270,7 @@ printDatafiles(Connection &conn, DBEntry *dbentry, Bool datafiles,
     if (s->dat[i].dspid != eyedbsm::DefaultDspid)
       printf("%s  Dataspace #%d\n", LIST_INDENT, s->dat[i].dspid);
     printf("%s  File      %s\n", LIST_INDENT, s->dat[i].file);
-    printf("%s  Maxsize   ~%dMb\n", LIST_INDENT, s->dat[i].maxsize/1024);
+    printf("%s  Maxsize   ~%lldMb\n", LIST_INDENT, s->dat[i].maxsize/1024);
     printf("%s  Slotsize  %db\n", LIST_INDENT, s->dat[i].sizeslot);
     printf("%s  Server Access ", LIST_INDENT);
     if (s->dat[i].extflags == R_OK)
@@ -410,7 +413,7 @@ static int printDBEntry(Connection &conn, DBEntry *dbentry, DBM_Database *dbm, u
       printf("%s\n", dbentry->dbfile().c_str());
     
     if (options & MAXOBJCNT_FLG)
-      printf("%llu\n", dbdesc->sedbdesc.nbobjs);
+      printf("%u\n", dbdesc->sedbdesc.nbobjs);
   }
 
   if ((options & ALL_FLG) || (options & DATAFILES_FLG))
@@ -1023,6 +1026,118 @@ int DBSDefAccessCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
   return 0;
 }
 
+// DBSSetDefDspCmd 
+void DBSSetDefDspCmd::init()
+{
+  std::vector<Option> opts;
+  opts.push_back(HELP_OPT);
+  getopt = new GetOpt(getExtName(), opts);
+}
+
+int DBSSetDefDspCmd::usage()
+{
+  getopt->usage("", "");
+  std::cerr << " DBNAME DSPNAME\n";
+  return 1;
+}
+
+int DBSSetDefDspCmd::help()
+{
+  getopt->adjustMaxLen("DSPNAME");
+  stdhelp();
+  getopt->displayOpt("DBNAME", "Database name");
+  getopt->displayOpt("DSPNAME", "Dataspace name");
+  return 1;
+}
+
+int DBSSetDefDspCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+{
+  if (! getopt->parse(PROGNAME, argv))
+    return usage();
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end())
+    return help();
+
+  if (argv.size() < 2)
+    return usage();
+
+  const char *dbname = argv[0].c_str();
+  const char *dspname = argv[1].c_str();
+
+  conn.open();
+
+  Database *db = new Database(dbname);
+
+  db->open(&conn, Database::DBRW);
+  
+  db->transactionBeginExclusive();
+  
+  const Dataspace *dataspace = 0;
+  db->getDataspace(dspname, dataspace);
+  
+  db->setDefaultDataspace(dataspace);
+  
+  db->transactionCommit();
+
+  return 0;
+}
+
+// DBSGetDefDspCmd 
+void DBSGetDefDspCmd::init()
+{
+  std::vector<Option> opts;
+  opts.push_back(HELP_OPT);
+  getopt = new GetOpt(getExtName(), opts);
+}
+
+int DBSGetDefDspCmd::usage()
+{
+  getopt->usage("", "");
+  std::cerr << " DBNAME\n";
+  return 1;
+}
+
+int DBSGetDefDspCmd::help()
+{
+  stdhelp();
+  getopt->displayOpt("DBNAME", "Database name");
+  return 1;
+}
+
+int DBSGetDefDspCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+{
+  if (! getopt->parse(PROGNAME, argv))
+    return usage();
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end())
+    return help();
+
+  if (argv.size() < 1)
+    return usage();
+
+  const char *dbname = argv[0].c_str();
+
+  conn.open();
+
+  Database *db = new Database(dbname);
+
+  db->open(&conn, Database::DBRW);
+  
+  db->transactionBeginExclusive();
+  
+  const Dataspace *dataspace;
+  db->getDefaultDataspace(dataspace);
+  std::cout << *dataspace;
+
+  db->transactionCommit();
+
+  return 0;
+}
+
 //
 // DBSExportCmd
 //
@@ -1147,11 +1262,11 @@ int DBSImportCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
 }
 
 
-// eyedbadmin database setobjcount DATABASE COUNT
+// eyedbadmin database setmaxobjcount DATABASE COUNT
 //
-// DBSSetObjCountCmd
+// DBSSetMaxObjCountCmd
 //
-void DBSSetObjCountCmd::init()
+void DBSSetMaxObjCountCmd::init()
 {
   std::vector<Option> opts;
 
@@ -1160,22 +1275,22 @@ void DBSSetObjCountCmd::init()
   getopt = new GetOpt(getExtName(), opts);
 }
 
-int DBSSetObjCountCmd::usage()
+int DBSSetMaxObjCountCmd::usage()
 {
   getopt->usage("", "");
   std::cerr << " DBNAME COUNT\n";
   return 1;
 }
 
-int DBSSetObjCountCmd::help()
+int DBSSetMaxObjCountCmd::help()
 {
   stdhelp();
   getopt->displayOpt("DBNAME", "Database");
-  getopt->displayOpt("COUNT", "Object count");
+  getopt->displayOpt("COUNT", "Maximum object count");
   return 1;
 }
 
-int DBSSetObjCountCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+int DBSSetMaxObjCountCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
   if (! getopt->parse(PROGNAME, argv))
     return usage();
@@ -1189,18 +1304,33 @@ int DBSSetObjCountCmd::perform(eyedb::Connection &conn, std::vector<std::string>
     return usage();
   }
 
-  const char *dbname = argv[0].c_str();
+  conn.open();
 
-//   conn.open();
+  const char *dbname = argv[0].c_str();
+  const char *maxobjcount_str = argv[1].c_str();
+
+  if (!eyedblib::is_number(maxobjcount_str))
+    return usage();
+
+  Database *db = new Database(dbname);
+
+  db->open(&conn, Database::DBRW);
+  
+  db->transactionBegin();
+
+  unsigned int maxobjcount = atoi(maxobjcount_str);
+  db->setMaxObjectCount(maxobjcount);
+
+  db->transactionCommit();
 
   return 0;
 }
 
-// eyedbadmin database getobjcount DATABASE
+// eyedbadmin database getmaxobjcount DATABASE
 //
-// DBSGetObjCountCmd
+// DBSGetMaxObjCountCmd
 //
-void DBSGetObjCountCmd::init()
+void DBSGetMaxObjCountCmd::init()
 {
   std::vector<Option> opts;
 
@@ -1209,21 +1339,21 @@ void DBSGetObjCountCmd::init()
   getopt = new GetOpt(getExtName(), opts);
 }
 
-int DBSGetObjCountCmd::usage()
+int DBSGetMaxObjCountCmd::usage()
 {
   getopt->usage("", "");
   std::cerr << " DBNAME\n";
   return 1;
 }
 
-int DBSGetObjCountCmd::help()
+int DBSGetMaxObjCountCmd::help()
 {
   stdhelp();
   getopt->displayOpt("DBNAME", "Database");
   return 1;
 }
 
-int DBSGetObjCountCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+int DBSGetMaxObjCountCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
   if (! getopt->parse(PROGNAME, argv))
     return usage();
@@ -1233,13 +1363,25 @@ int DBSGetObjCountCmd::perform(eyedb::Connection &conn, std::vector<std::string>
   if (map.find("help") != map.end())
     return help();
 
-  if (argv.size() != 2) {
+  if (argv.size() != 1) {
     return usage();
   }
 
-  const char *dbname = argv[0].c_str();
+  conn.open();
 
-//   conn.open();
+  const char *dbname = argv[0].c_str();
+  Database *db = new Database(dbname);
+
+  db->open(&conn, Database::DBRead);
+  
+  db->transactionBegin();
+
+  unsigned int maxobjcount;
+  db->getMaxObjectCount(maxobjcount);
+
+  std::cout << "Maximum object count: " << maxobjcount << std::endl;
+
+  db->transactionCommit();
 
   return 0;
 }
@@ -1286,9 +1428,24 @@ int DBSSetLogSizeCmd::perform(eyedb::Connection &conn, std::vector<std::string> 
     return usage();
   }
 
-  const char *dbname = argv[0].c_str();
+  conn.open();
 
-//   conn.open();
+  const char *dbname = argv[0].c_str();
+  const char *logsize_str = argv[1].c_str();
+
+  if (!eyedblib::is_number(logsize_str))
+    return usage();
+
+  Database *db = new Database(dbname);
+
+  db->open(&conn, Database::DBRW);
+  
+  db->transactionBegin();
+
+  unsigned int logsize = atoi(logsize_str);
+  db->setLogSize(logsize);
+
+  db->transactionCommit();
 
   return 0;
 }
@@ -1330,13 +1487,25 @@ int DBSGetLogSizeCmd::perform(eyedb::Connection &conn, std::vector<std::string> 
   if (map.find("help") != map.end())
     return help();
 
-  if (argv.size() != 2) {
+  if (argv.size() != 1) {
     return usage();
   }
 
-  const char *dbname = argv[0].c_str();
+  conn.open();
 
-//   conn.open();
+  const char *dbname = argv[0].c_str();
+  Database *db = new Database(dbname);
+
+  db->open(&conn, Database::DBRead);
+  
+  db->transactionBegin();
+
+  unsigned int logsize;
+  db->getLogSize(logsize);
+
+  std::cout << "Log size: " << logsize << " Mb" << std::endl;
+
+  db->transactionCommit();
 
   return 0;
 }

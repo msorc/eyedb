@@ -2131,20 +2131,17 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
 			"when clients are connected.");
 #endif
 
-    /*
-      if (maxobjs >= ESM_SOFT_MAX_OBJS)
-      return statusMake(ERROR, "objectNumberSet: too many objects. "
-      "Maximum number is %d", ESM_SOFT_MAX_OBJS);
-    */
-
-    /*
-      #ifndef LASTIDXBLKALLOC
-      if (truncate(objmapfileGet(dbh->dbfile), OIDMAP_SIZE(maxobjs)) < 0)
-      return statusMake(ERROR, "objectNumberSet: unexpected error reported by ftruncate on map file '%s': %s", objmapfileGet(dbh->dbfile), strerror(errno));
-      #endif
-    */
-
     _dbh.__nbobjs() = h2x_u32(maxobjs);
+
+    return Success;
+  }
+
+  Status
+  objectNumberGet(DbHandle const *dbh, Oid::NX *maxobjs)
+  {
+    DbHeader _dbh(DBSADDR(dbh));
+
+    *maxobjs = x2h_u32(_dbh.__nbobjs());
 
     return Success;
   }

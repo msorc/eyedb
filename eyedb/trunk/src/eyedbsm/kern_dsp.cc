@@ -195,6 +195,10 @@ namespace eyedbsm {
 
     std::vector<short>::size_type size = datid_v.size();
     if (orphan_dspid != DefaultDspid && size != 0) {
+      if (orphan_dspid == dspid) {
+	return statusMake(INVALID_DATASPACE, "datafiles cannot be migrated to their own dataspace %s", _dbh.dsp(dspid).name());
+      }
+
       DataspaceDesc dsp = _dbh.dsp(orphan_dspid);
       unsigned int ndat = x2h_u32(dsp.__ndat());
       dsp.__ndat() = h2x_u32(ndat + size);
@@ -266,12 +270,24 @@ namespace eyedbsm {
     if (!flags) {
       dsp.__cur() = 0;
     }
-    dsp.__ndat() = h2x_u32(ndat + datfile_cnt);
 
+    int dat_cnt = 0;
     for (int i = 0; i < datfile_cnt; i++) {
-      dsp.__datid(ndat+i) = h2x_16(datid[i]);
-      setDataspace(&_dbh, datid[i], dspid);
+      short xdatid = h2x_16(datid[i]);
+      bool found = false;
+      for (int n = 0; n < ndat+dat_cnt; n++) {
+	if (dsp.__datid(n) == xdatid) {
+	  found = true;
+	  break;
+	}
+      }
+      if (!found) {
+	dsp.__datid(ndat+dat_cnt) = xdatid;
+	setDataspace(&_dbh, datid[i], dspid);
+	dat_cnt++;
+      }
     }
+    dsp.__ndat() = h2x_u32(ndat + dat_cnt);
 
     unsigned int ndsp = x2h_32(_dbh.__ndsp());
     if (dspid == ndsp) {

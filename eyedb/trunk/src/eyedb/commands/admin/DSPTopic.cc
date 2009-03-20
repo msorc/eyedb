@@ -42,8 +42,6 @@ DSPTopic::DSPTopic() : Topic("dataspace")
   addCommand(new DSPDeleteCmd(this));
   addCommand(new DSPRenameCmd(this));
   addCommand(new DSPListCmd(this));
-  addCommand(new DSPSetDefCmd(this));
-  addCommand(new DSPGetDefCmd(this));
   addCommand(new DSPSetCurDatCmd(this));
   addCommand(new DSPGetCurDatCmd(this));
 }
@@ -434,118 +432,6 @@ int DSPListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
       }
     }
   }
-
-  return 0;
-}
-
-// DSPSetDefCmd 
-void DSPSetDefCmd::init()
-{
-  std::vector<Option> opts;
-  opts.push_back(HELP_OPT);
-  getopt = new GetOpt(getExtName(), opts);
-}
-
-int DSPSetDefCmd::usage()
-{
-  getopt->usage("", "");
-  std::cerr << " DBNAME DSPNAME\n";
-  return 1;
-}
-
-int DSPSetDefCmd::help()
-{
-  getopt->adjustMaxLen("DSPNAME");
-  stdhelp();
-  getopt->displayOpt("DBNAME", "Database name");
-  getopt->displayOpt("DSPNAME", "Dataspace name");
-  return 1;
-}
-
-int DSPSetDefCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
-{
-  if (! getopt->parse(PROGNAME, argv))
-    return usage();
-
-  GetOpt::Map &map = getopt->getMap();
-
-  if (map.find("help") != map.end())
-    return help();
-
-  if (argv.size() < 2)
-    return usage();
-
-  const char *dbname = argv[0].c_str();
-  const char *dspname = argv[1].c_str();
-
-  conn.open();
-
-  Database *db = new Database(dbname);
-
-  db->open(&conn, Database::DBRW);
-  
-  db->transactionBeginExclusive();
-  
-  const Dataspace *dataspace = 0;
-  db->getDataspace(dspname, dataspace);
-  
-  db->setDefaultDataspace(dataspace);
-  
-  db->transactionCommit();
-
-  return 0;
-}
-
-// DSPGetDefCmd 
-void DSPGetDefCmd::init()
-{
-  std::vector<Option> opts;
-  opts.push_back(HELP_OPT);
-  getopt = new GetOpt(getExtName(), opts);
-}
-
-int DSPGetDefCmd::usage()
-{
-  getopt->usage("", "");
-  std::cerr << " DBNAME\n";
-  return 1;
-}
-
-int DSPGetDefCmd::help()
-{
-  stdhelp();
-  getopt->displayOpt("DBNAME", "Database name");
-  return 1;
-}
-
-int DSPGetDefCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
-{
-  if (! getopt->parse(PROGNAME, argv))
-    return usage();
-
-  GetOpt::Map &map = getopt->getMap();
-
-  if (map.find("help") != map.end())
-    return help();
-
-  if (argv.size() < 1)
-    return usage();
-
-  const char *dbname = argv[0].c_str();
-
-  conn.open();
-
-  Database *db = new Database(dbname);
-
-  db->open(&conn, Database::DBRW);
-  
-  db->transactionBeginExclusive();
-  
-  const Dataspace *dataspace;
-  db->getDefaultDataspace(dataspace);
-  cout << *dataspace;
-
-  db->transactionCommit();
 
   return 0;
 }

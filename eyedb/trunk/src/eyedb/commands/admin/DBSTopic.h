@@ -40,10 +40,12 @@ CMDCLASS_GETOPT(DBSRenameCmd, "rename");
 CMDCLASS_GETOPT(DBSMoveCmd, "move");
 CMDCLASS_GETOPT(DBSCopyCmd, "copy");
 CMDCLASS_GETOPT(DBSDefAccessCmd, "defaccess");
+CMDCLASS_GETOPT(DBSSetDefDspCmd, "setdefdsp");
+CMDCLASS_GETOPT(DBSGetDefDspCmd, "getdefdsp");
 CMDCLASS_GETOPT(DBSExportCmd, "export");
 CMDCLASS_GETOPT(DBSImportCmd, "import");
-CMDCLASS_GETOPT(DBSSetObjCountCmd, "setobjcount");
-CMDCLASS_GETOPT(DBSGetObjCountCmd, "getobjcount");
+CMDCLASS_GETOPT(DBSSetMaxObjCountCmd, "setmaxobjcount");
+CMDCLASS_GETOPT(DBSGetMaxObjCountCmd, "getmaxobjcount");
 CMDCLASS_GETOPT(DBSSetLogSizeCmd, "setlogsize");
 CMDCLASS_GETOPT(DBSGetLogSizeCmd, "getlogsize");
 
