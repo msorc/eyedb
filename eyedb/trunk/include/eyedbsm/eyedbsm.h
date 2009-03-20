@@ -568,6 +568,9 @@ namespace eyedbsm {
     objectNumberGet(DbHandle const *dbh, Oid::NX *maxobjs),
     objectNumberSet(DbHandle const *dbh, Oid::NX maxobjs),
 
+    shmSizeGet(DbHandle const *dbh, int *shmsize),
+    shmSizeSet(DbHandle const *dbh, int shmsize),
+
     protectionCreate(DbHandle const *dbh,
 		     ProtectionDescription const *desc,
 		     Oid *oid),

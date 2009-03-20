@@ -270,7 +270,7 @@ printDatafiles(Connection &conn, DBEntry *dbentry, Bool datafiles,
     if (s->dat[i].dspid != eyedbsm::DefaultDspid)
       printf("%s  Dataspace #%d\n", LIST_INDENT, s->dat[i].dspid);
     printf("%s  File      %s\n", LIST_INDENT, s->dat[i].file);
-    printf("%s  Maxsize   ~%lldMb\n", LIST_INDENT, s->dat[i].maxsize/1024);
+    printf("%s  Maxsize   ~%lldMB\n", LIST_INDENT, s->dat[i].maxsize/1024);
     printf("%s  Slotsize  %db\n", LIST_INDENT, s->dat[i].sizeslot);
     printf("%s  Server Access ", LIST_INDENT);
     if (s->dat[i].extflags == R_OK)
@@ -1316,7 +1316,7 @@ int DBSSetMaxObjCountCmd::perform(eyedb::Connection &conn, std::vector<std::stri
 
   db->open(&conn, Database::DBRW);
   
-  db->transactionBegin();
+  db->transactionBeginExclusive();
 
   unsigned int maxobjcount = atoi(maxobjcount_str);
   db->setMaxObjectCount(maxobjcount);
@@ -1410,7 +1410,7 @@ int DBSSetLogSizeCmd::help()
 {
   stdhelp();
   getopt->displayOpt("DBNAME", "Database");
-  getopt->displayOpt("SIZE_MB", "Log size in Mb");
+  getopt->displayOpt("SIZE_MB", "Log size in MB");
   return 1;
 }
 
@@ -1440,12 +1440,10 @@ int DBSSetLogSizeCmd::perform(eyedb::Connection &conn, std::vector<std::string> 
 
   db->open(&conn, Database::DBRW);
   
-  db->transactionBegin();
+  //db->transactionBeginExclusive();
 
-  unsigned int logsize = atoi(logsize_str);
+  unsigned int logsize = atoi(logsize_str) * 1024;
   db->setLogSize(logsize);
-
-  db->transactionCommit();
 
   return 0;
 }
@@ -1503,7 +1501,7 @@ int DBSGetLogSizeCmd::perform(eyedb::Connection &conn, std::vector<std::string> 
   unsigned int logsize;
   db->getLogSize(logsize);
 
-  std::cout << "Log size: " << logsize << " Mb" << std::endl;
+  std::cout << "Log size: " << (logsize/ONE_K) << " MB" << std::endl;
 
   db->transactionCommit();
 

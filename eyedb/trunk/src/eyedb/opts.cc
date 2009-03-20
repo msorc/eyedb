@@ -279,7 +279,7 @@ do { \
     
     opts[opt_cnt++] = 
       Option(prefix + maximum_server_memory_size_opt, OptionIntType(), Option::MandatoryValue,
-	     OptionDesc("Maximum server memory size (in Mb)",
+	     OptionDesc("Maximum server memory size (in MB)",
 			"SIZE"));
     
     opts[opt_cnt++] = 

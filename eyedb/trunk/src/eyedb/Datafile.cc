@@ -106,7 +106,7 @@ namespace eyedb {
 	    sz2 = (sz+1) * ONE_M;
 	    if ((sz2 - _sz) < (_sz - sz1))
 	      sz = sz+1;
-	    os << ", ~" << sz << "Mb";
+	    os << ", ~" << sz << "MB";
 
 	    sz = _sz / ONE_G;
 	    if (sz) {
@@ -114,7 +114,7 @@ namespace eyedb {
 	      sz2 = (sz+1) * ONE_G;
 	      if ((sz2 - _sz) < (_sz - sz1))
 		sz = sz+1;
-	      os << ", ~" << sz << "Gb";
+	      os << ", ~" << sz << "GB";
 	      /*
 		printf("\n{_sz %llu, sz %llu, sz1 %llu, sz2 %llu, "
 		"(sz2 - _sz) %llu, (sz1 - _sz) %llu}\n",
