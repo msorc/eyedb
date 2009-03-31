@@ -1,0 +1,49 @@
+
+eyedbadmin collection update DATABASE COLLECTION hash|btree [HINTS]
+eyedbadmin collection simulate [--full] [--format=FORMAT] DATABASE COLLECTION hash|btree [HINTS]
+eyedbadmin collection list DATABASE COLLECTION...
+eyedbadmin collection stats [--full] [--format=FORMAT] DATABASE COLLECTION...
+eyedbadmin collection setdefimpl DATABASE ATTRIBUTE_PATH hash|btree [HINTS] [propagate=on|off]
+eyedbadmin collection getdefimpl DATABASE [CLASSNAME|ATTRIBUTE_PATH]...
+
+Location:
+X eyedbadmin database getdefdsp [--help] DATABASE
+X eyedbadmin database setdefdsp [--help] DATABASE DATASPACE
+
+X eyedbadmin index getdefdsp [--help] DATABASE INDEX
+X eyedbadmin index setdefdsp [--help] DATABASE INDEX DATASPACE
+X eyedbadmin index move [--defragment] DATABASE INDEX DATASPACE
+(note: --defragment not implemented)
+
+#eyedbloca getidxloca --stats|--loca|--all <dbname> <idx name>
+X eyedbadmin index getloca [--stats] [--loca] DATABASE INDEX
+
+eyedbadmin collection getdefdsp DATABASE COLLECTION
+eyedbadmin collection setdefdsp DATABASE COLLECTION DATASPACE
+#eyedbloca getcollloca <dbname> --stats|--loca|--all <name>|<oid>
+eyedbadmin collection getloca [--stats] [--loca] DATABASE COLLECTION
+
+#eyedbloca getdefinstdsp <dbname> <class name>
+eyedbadmin class getdefdsp DATABASE CLASS
+
+#eyedbloca setdefinstdsp <dbname> <class name> <dest dataspace>
+eyedbadmin class setdefdsp DATABASE CLASS DATASPACE
+
+#eyedbloca getinstloca --stats|--loca|--all [--subclasses] <dbname> <class name>
+eyedbadmin class getloca [--stats] [--loca] [--subclasses] DATABASE CLASS
+
+#eyedbloca mvinst <dbname> [--subclasses] <class name> <dest dataspace>
+eyedbadmin class move [--subclasses] DATABASE CLASS DATASPACE
+
+#eyedbloca getobjloca --stats|--loca|--all <dbname> <oql construct>
+eyedbadmin object getloca [--stats] [--loca] DBNAME OQL
+
+#eyedbloca mvobj <dbname> <oql construct> <dest dataspace>
+eyedbadmin object move DATABASE OQL DATASPACE
+
+#eyedbloca getdefattrdsp <dbname> <class>::<attr>
+eyedbadmin attribute getdefdsp DATABASE CLASS::ATTRIBUTE
+
+#eyedbloca setdefattrdsp <dbname> <class>::<attr> <dest dataspace>
+eyedbadmin attribute setdefdsp DATABASE CLASS::ATTRIBUTE DATASPACE
+
