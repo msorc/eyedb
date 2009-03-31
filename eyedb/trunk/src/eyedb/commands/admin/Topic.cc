@@ -29,8 +29,9 @@
 #include "DTFTopic.h"
 #include "USRTopic.h"
 #include "IDXTopic.h"
-#include "CLSTopic.h"
 #include "COLTopic.h"
+
+#include "CLSTopic.h"
 #include "ATRTopic.h"
 #include "OBJTopic.h"
 #include "CNSTopic.h"
@@ -49,6 +50,7 @@ TopicSet::TopicSet()
   addTopic(new DSPTopic());
   addTopic(new USRTopic());
   addTopic(new IDXTopic());
+  addTopic(new COLTopic());
 
   // not yet implemented
   //addTopic(new CLSTopic());

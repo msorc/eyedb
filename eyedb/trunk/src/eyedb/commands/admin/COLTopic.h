@@ -33,16 +33,18 @@ public:
   COLTopic();
 };
 
-CMDCLASS(COLGetDefDSPCmd, "getdefdsp");
-CMDCLASS(COLSetDefDSPCmd, "setdefdsp");
-CMDCLASS(COLGetElemLocaCmd, "getelemloca");
-CMDCLASS(COLMoveElemsCmd, "moveelems");
+CMDCLASS_GETOPT(COLUpdateCmd, "update");
+CMDCLASS_GETOPT(COLSimulateCmd, "simulate");
+CMDCLASS_GETOPT(COLListCmd, "list");
+CMDCLASS_GETOPT(COLStatsCmd, "stats");
 
-CMDCLASS(COLSetDefImplCmd, "setdefimpl");
-CMDCLASS(COLGetDefImplCmd, "getdefimpl");
-CMDCLASS(COLListImplCmd, "listimpl");
-CMDCLASS(COLUpdateImplCmd, "updateimpl");
-CMDCLASS(COLSimulImplCmd, "simulimpl");
-CMDCLASS(COLImplStatsCmd, "implstats");
+CMDCLASS_GETOPT(COLGetDefDSPCmd, "getdefdsp");
+CMDCLASS_GETOPT(COLSetDefDSPCmd, "setdefdsp");
+
+CMDCLASS_GETOPT(COLSetDefImplCmd, "setdefimpl");
+CMDCLASS_GETOPT(COLGetDefImplCmd, "getdefimpl");
+
+CMDCLASS_GETOPT(COLGetLocaCmd, "getloca");
+CMDCLASS_GETOPT(COLSetLocaCmd, "setloca");
 
 #endif
