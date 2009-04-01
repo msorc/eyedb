@@ -314,7 +314,7 @@ namespace eyedb {
     idr->setIDR((Size)0);
     Data data = 0;
     offset = IDB_CLASS_IMPL_TYPE;
-    Status s = IndexImpl::code(data, offset, alloc_size, *idximpl);
+    Status s = IndexImpl::code(data, offset, alloc_size, idximpl);
     if (s) return s;
 
     offset = IDB_CLASS_MTYPE;
@@ -607,7 +607,7 @@ namespace eyedb {
       int32_code (&data, &offset, &alloc_size, (eyedblib::int32 *)&mag_order);
     */
     offset = IDB_CLASS_IMPL_TYPE;
-    status = IndexImpl::code(data, offset, alloc_size, *idximpl);
+    status = IndexImpl::code(data, offset, alloc_size, idximpl);
     if (status) return status;
 
     offset = IDB_CLASS_MTYPE;

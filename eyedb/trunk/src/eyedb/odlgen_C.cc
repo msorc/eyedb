@@ -396,7 +396,7 @@ do { \
       ((CollectionClass *)cls)->getCollClass(&_isref, &_dim);
     GenCodeHints::OpType acctype = (GenCodeHints::OpType)xacctype;
     const char *etc = (acctype == GenCodeHints::tAddItemToColl ?
-		       ", const eyedb::IndexImpl *idximpl" : "");
+		       ", const eyedb::CollImpl *collimpl" : "");
     const char *accmth = (acctype == GenCodeHints::tAddItemToColl ? "insert" : "suppress");
     const char *oclassname = _isref ?
       className(cl, True) : className(cl, False);
@@ -539,8 +539,9 @@ do { \
     if (acctype == GenCodeHints::tAddItemToColl)
       {
 	fprintf(fd, "%s   {\n", ctx->get());
+	// TBD: 2009-03-31: must have impl_type as parameter (or CollImpl)
 	fprintf(fd, "%s     _coll = new %s(db, \"\", "
-		"db->getSchema()->getClass(\"%s\"), %s, idximpl);\n",
+		"db->getSchema()->getClass(\"%s\"), %s, collimpl);\n",
 		ctx->get(), classname,
 		cl->getAliasName(), (_isref ? "eyedb::True" : make_int(_dim)));
 	//fprintf(fd, "%s     _coll->setMagOrder(mag_order);\n", ctx->get());
@@ -2222,7 +2223,7 @@ do { \
 	fprintf(fdh, "%seyedb::Status %s(%s", ctxH->get(),
 		ATTRNAME_1(name, (ordered ? GenCodeHints::tSetItemInColl : GenCodeHints::tAddItemToColl), hints), where);
 	dimArgsGen(fdh, ndims);
-	fprintf(fdh, "%s%s%s%s, const eyedb::IndexImpl * = 0);\n", comma,
+	fprintf(fdh, "%s%s%s%s, const eyedb::CollImpl * = 0);\n", comma,
 		oclassname, (_isref || !cl->asBasicClass() ? getPtrRet() : " "),
 		(!*where ? ", eyedb::Bool noDup = eyedb::False" : ""));
 
@@ -2267,7 +2268,7 @@ do { \
 	fprintf(fdh, "%seyedb::Status %s(%s", ctxH->get(),
 		ATTRNAME_1(name, (ordered ? GenCodeHints::tSetItemInColl : GenCodeHints::tAddItemToColl), hints), where);
 	dimArgsGen(fdh, ndims);
-	fprintf(fdh, "%sconst eyedb::Oid &, const eyedb::IndexImpl * = 0);\n",
+	fprintf(fdh, "%sconst eyedb::Oid &, const eyedb::CollImpl * = 0);\n",
 		comma);
 	fprintf(fdh, "%seyedb::Status %s(", ctxH->get(),
 		ATTRNAME_1(name, (ordered ? GenCodeHints::tUnsetItemInColl : GenCodeHints::tRmvItemFromColl), hints));
@@ -2830,8 +2831,11 @@ do { \
 	fprintf(fd, "%scomp = new eyedb::CollAttrImpl(db, cls, \"%s\", %s, dataspace, %s, %d",
 		ctx->get(), collimpl->getAttrpath().c_str(),
 		IDBBOOL_STR(collimpl->getPropagate()),
-		(collimpl->getIdxtype() == IndexImpl::Hash ?
-		 "eyedb::IndexImpl::Hash" : "eyedb::IndexImpl::BTree"),
+		(collimpl->getImplType() == IndexImpl::Hash ?
+		 "eyedb::CollAttrImpl::HashIndex" :
+		 (collimpl->getImplType() == CollAttrImpl::NoIndex ?
+		  "eyedb::CollAttrImpl::NoIndex" :
+		  "eyedb::CollAttrImpl::BTreeIndex")),
 		collimpl->getKeyCountOrDegree());
       
 	if (collimpl->getHashMethod())

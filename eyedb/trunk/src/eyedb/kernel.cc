@@ -212,11 +212,13 @@ namespace eyedb {
     IDB_protectionWrite(DbHandle *dbh, Data idr, ObjectHeader *hdr,
 			const eyedbsm::Oid *oid, void *xdata),
     IDB_protectionDelete(DbHandle *dbh, Data idr, ObjectHeader *hdr,
-			 const eyedbsm::Oid *oid),
+			 const eyedbsm::Oid *oid);
+  /*
     IDB_collClassCreate(DbHandle *, short dspid, Data, const eyedbsm::Oid *,
 			const char *, int),
     IDB_collClassUpdate(DbHandle *, Data, const eyedbsm::Oid *, 
 			const char *, Bool insert);
+  */
 
   static LinkedList *db_list;
 
@@ -3977,7 +3979,8 @@ namespace eyedb {
 
     IndexImpl *idximpl;
     offset = IDB_COLL_OFF_IMPL_BEGIN;
-    IndexImpl::decode(db, idr, offset, idximpl);
+    int impl_type;
+    IndexImpl::decode(db, idr, offset, idximpl, &impl_type);
 
     Oid inv_oid;
     eyedblib::int16 inv_item;
@@ -4011,7 +4014,7 @@ namespace eyedb {
     printf("idximpl->getType() %d %d\n", idximpl->getType(), IndexImpl::BTree);
     */
 
-    if (idximpl->getType() == IndexImpl::BTree) {
+    if (impl_type == CollAttrImpl::BTreeIndex) {
       eyedbsm::BIdx::KeyType ktypes;
 
       ktypes.type   = eyedbsm::Idx::tUnsignedChar;
@@ -4022,7 +4025,7 @@ namespace eyedb {
 			       idximpl->getDegree());
       idx1->asBIdx()->open();
     }
-    else {
+    else if (impl_type == CollAttrImpl::HashIndex) {
       eyedbsm::Idx::KeyType ktype;
       if (coll_hidx_oid) {
 	ktype.type = eyedbsm::Idx::tOid;
@@ -4040,6 +4043,12 @@ namespace eyedb {
 			       impl_hints, impl_hints_cnt);
       idx1->asHIdx()->open();
     }
+    else if (impl_type == CollAttrImpl::NoIndex) {
+      return rpcStatusMake(IDB_ERROR, "collection: noindex implementation is not yet supported");
+    }
+    else {
+      return rpcStatusMake(IDB_ERROR, "collection: unknown implementation %d", impl_type);
+    }
 
     idx1_oid = idx1->oid();
 
@@ -4054,38 +4063,16 @@ namespace eyedb {
     if (eyedb_is_type(*hdr, _CollList_Type) ||
 	eyedb_is_type(*hdr, _CollArray_Type)) {
 
-#ifdef COLLBE_BTREE
-      if (1) {
-#else
-	//if (idximpl->getType() == IndexImpl::BTree)
-#endif
-	eyedbsm::BIdx::KeyType ktypes;
+      eyedbsm::BIdx::KeyType ktypes;
       
-	// EV: changed 14/12/01
-	ktypes.type   = eyedbsm::Idx::tInt32;
-	ktypes.count  = 1;
-	ktypes.offset = 0;
+      // EV: changed 14/12/01
+      ktypes.type   = eyedbsm::Idx::tInt32;
+      ktypes.count  = 1;
+      ktypes.offset = 0;
 	  
 
-#ifdef COLLBE_BTREE
-	idx2 = new eyedbsm::BIdx(dbh->sedbh, item_size, &ktypes, dspid);
-#else
-	idx2 = new eyedbsm::BIdx(dbh->sedbh, item_size, &ktypes, dspid,
-				 idximpl->getDegree());
-#endif
-	idx2->asBIdx()->open();
-      }
-      else {
-	eyedbsm::Idx::KeyType ktype;
-	ktype.type = eyedbsm::Idx::tInt32;
-	ktype.count = 1;
-	ktype.offset = 0;
-	unsigned int impl_hints_cnt;
-	const int *impl_hints = idximpl->getImplHints(impl_hints_cnt);
-	idx2 = new eyedbsm::HIdx(dbh->sedbh, ktype, item_size, dspid, 0,
-				 idximpl->getKeycount(), impl_hints, impl_hints_cnt);
-	idx2->asHIdx()->open();
-      }
+      idx2 = new eyedbsm::BIdx(dbh->sedbh, item_size, &ktypes, dspid);
+      idx2->asBIdx()->open();
 
       idx2_oid = idx2->oid();
       
@@ -5272,12 +5259,12 @@ namespace eyedb {
   /* classes functions */
   static RPCStatus
   IDB_makeColl(DbHandle *dbh, Data idr, const eyedbsm::Oid *oid,
-	       const char *name, const IndexImpl *idximpl,
+	       const char *name, const CollImpl *collimpl,
 	       Offset offset, Bool lock)
   {
     CHECK_WRITE((Database *)dbh->db);
 
-    CollSet *coll = CollectionPeer::collSet(name, idximpl);
+    CollSet *coll = CollectionPeer::collSet(name, collimpl);
     Status status;
     eyedbsm::Oid colloid;
 
@@ -5333,7 +5320,7 @@ namespace eyedb {
 
   static RPCStatus
   IDB_collClassCreate(DbHandle *dbh, Data idr, const eyedbsm::Oid *oid,
-		      const char *name, const IndexImpl *idximpl)
+		      const char *name, const CollImpl *collimpl)
   {
     RPCStatus rpc_status;
     char tok[256];
@@ -5344,7 +5331,7 @@ namespace eyedb {
     if (!extent_oid.isValid())
       {
 	sprintf(tok, "%s::extent", name);
-	rpc_status = IDB_makeColl(dbh, idr, oid, tok, idximpl,
+	rpc_status = IDB_makeColl(dbh, idr, oid, tok, collimpl,
 				  IDB_CLASS_EXTENT, True);
 	if (rpc_status)
 	  return rpc_status;
@@ -5568,7 +5555,8 @@ namespace eyedb {
       //printf("ClassCreate(%s, %s)\n", name, Oid(oid).toString());
       offset = IDB_CLASS_IMPL_TYPE;
       IndexImpl *idximpl = 0;
-      Status status = IndexImpl::decode(db, idr, offset, idximpl);
+      int impl_type;
+      Status status = IndexImpl::decode(db, idr, offset, idximpl, &impl_type);
       if (status) return rpcStatusMake(status);
       /*
 	printf("decoding idximpl for class %s: %s\n", name,
@@ -5580,8 +5568,11 @@ namespace eyedb {
 	int32_decode(idr, &offset, &mag_order);
       */
     
-      rpc_status = IDB_collClassCreate(dbh, idr, oid, name, idximpl);
+      CollImpl *collimpl = new CollImpl((CollAttrImpl::Type)impl_type, idximpl);
+      rpc_status = IDB_collClassCreate(dbh, idr, oid, name, collimpl);
     
+      collimpl->release();
+
       if (rpc_status != RPCSuccess)
 	return rpc_status;
 

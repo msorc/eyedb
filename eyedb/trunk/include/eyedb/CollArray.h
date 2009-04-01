@@ -47,11 +47,11 @@ namespace eyedb {
        @param n
        @param mc
        @param isref
-       @param idximpl
+       @param collimpl
     */
     CollArray(Database *db, const char *n, Class *mc = NULL,
 	      Bool isref = True,
-	      const IndexImpl *idximpl = 0);
+	      const CollImpl *collimpl = 0);
 
     /**
        Not yet documented
@@ -59,10 +59,10 @@ namespace eyedb {
        @param n
        @param mc
        @param dim
-       @param idximpl
+       @param collimpl
     */
     CollArray(Database *db, const char *n, Class *mc, int dim,
-	      const IndexImpl *idximpl = 0);
+	      const CollImpl *collimpl = 0);
 
     /**
        Not yet documented
@@ -171,10 +171,10 @@ namespace eyedb {
 			Bool full = False, const char *indent = "");
     Status getImplStats(IndexStats *&, IndexStats *&);
 
-    Status simulate(const IndexImpl &, std::string &, std::string &,
+    Status simulate(const CollImpl &, std::string &, std::string &,
 		    Bool dspImpl = True, Bool full = False,
 		    const char *indent = "");
-    Status simulate(const IndexImpl &, IndexStats *&, IndexStats *&);
+    Status simulate(const CollImpl &, IndexStats *&, IndexStats *&);
 
     virtual void garbage();
 
@@ -188,7 +188,7 @@ namespace eyedb {
     const char *getClassName() const;
     CollArray(const char *, Class *,
 	      const Oid&, const Oid&, int,
-	      int, int,  const IndexImpl *, Object *,
+	      int, int, const CollImpl *, Object *,
 	      Bool, Bool, Data, Size);
     friend class CollectionPeer;
 
@@ -197,9 +197,9 @@ namespace eyedb {
     // ----------------------------------------------------------------------
   public:
     CollArray(const char *, Class * = NULL, Bool = True,
-	      const IndexImpl * = 0);
+	      const CollImpl * = 0);
     CollArray(const char *, Class *, int,
-	      const IndexImpl * = 0);
+	      const CollImpl * = 0);
 
     Status insert_p(const Oid &item_oid, Bool noDup = False);
     Status insert_p(const Object *item_o, Bool noDup = False);

@@ -218,10 +218,12 @@ namespace eyedb {
     IndexImpl& operator=(const IndexImpl &);
 
   public: // restricted access
+    static const int UNKNOWN_IMPL_TYPE;
+    static const int NOINDEX_IMPL_TYPE;
     static Status decode(Database *, Data, Offset &,
-			 IndexImpl *&);
+			 IndexImpl *&, int *rimpl_type = 0);
     static Status code(Data &, Offset &, Size &,
-		       const IndexImpl &);
+		       const IndexImpl *, int impl_type = UNKNOWN_IMPL_TYPE);
     void setHashMethod(BEMethod_C *);
     void setDataspace(const Dataspace *_d) {dataspace = _d;}
   };

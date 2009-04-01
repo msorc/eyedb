@@ -47,10 +47,10 @@ namespace eyedb {
        @param n
        @param mc
        @param isref
-       @param idximpl
+       @param collimpl
     */
     CollBag(Database *db, const char *n, Class *mc = NULL,
-	    Bool isref = True, const IndexImpl *idximpl = 0);
+	    Bool isref = True,  const CollImpl *collimpl = 0);
 
     /**
        Not yet documented
@@ -58,10 +58,10 @@ namespace eyedb {
        @param n
        @param mc
        @param dim
-       @param idximpl
+       @param collimpl
     */
     CollBag(Database *db, const char *n, Class *mc, int dim,
-	    const IndexImpl *idximpl = 0);
+	     const CollImpl *collimpl = 0);
 
     /**
        Not yet documented
@@ -103,7 +103,7 @@ namespace eyedb {
     const char *getClassName() const;
     CollBag(const char *, Class *,
 	    const Oid&, const Oid&, int,
-	    int, int, const IndexImpl *, Object *, Bool, Bool,
+	    int, int, const CollImpl *, Object *, Bool, Bool,
 	    Data, Size);
     friend class CollectionPeer;
 
@@ -112,9 +112,9 @@ namespace eyedb {
     // ----------------------------------------------------------------------
   public:
     CollBag(const char *, Class * = NULL, Bool = True,
-	    const IndexImpl * = 0);
+	    const CollImpl * = 0);
     CollBag(const char *, Class *, int,
-	    const IndexImpl * = 0);
+	    const CollImpl * = 0);
 
     Status insert_p(const Oid &item_oid, Bool noDup = False);
     Status insert_p(const Object *item_o, Bool noDup = False);

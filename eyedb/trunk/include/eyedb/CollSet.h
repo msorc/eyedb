@@ -47,11 +47,11 @@ namespace eyedb {
        @param n
        @param mc
        @param isref
-       @param idximpl
+       @param collimpl
     */
     CollSet(Database *db, const char *n, Class *mc = NULL,
 	    Bool isref = True,
-	    const IndexImpl *idximpl = 0);
+	    const CollImpl *collimpl = 0);
 
     /**
        Not yet documented
@@ -59,10 +59,10 @@ namespace eyedb {
        @param n
        @param mc
        @param dim
-       @param idximpl
+       @param collimpl
     */
     CollSet(Database *db, const char *n, Class *mc, int dim,
-	    const IndexImpl *idximpl = 0);
+	    const CollImpl *collimpl = 0);
 
     /**
        Not yet documented
@@ -106,7 +106,7 @@ namespace eyedb {
     const char *getClassName() const;
     CollSet(const char *, Class *,
 	    const Oid&, const Oid&, int,
-	    int, int, const IndexImpl *,
+	    int, int, const CollImpl *,
 	    Object *, Bool, Bool, Data, Size);
     friend class CollectionPeer;
 
@@ -115,9 +115,9 @@ namespace eyedb {
     // ----------------------------------------------------------------------
   public:
     CollSet(const char *, Class * = NULL, Bool = True,
-	    const IndexImpl * = 0);
+	    const CollImpl * = 0);
     CollSet(const char *, Class *, int,
-	    const IndexImpl * = 0);
+	    const CollImpl * = 0);
 
     Status insert_p(const Oid &item_oid, Bool noDup = False);
     Status insert_p(const Object *item_o, Bool noDup = False);

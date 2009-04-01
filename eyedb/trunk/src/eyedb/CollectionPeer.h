@@ -30,29 +30,29 @@ namespace eyedb {
   struct CollectionPeer {
 
     static int coherent, added, removed;
-    static CollSet *collSet(const char *, const IndexImpl *);
+    static CollSet *collSet(const char *, const CollImpl *);
     static CollSet *collSet(const char *, Class *, 
 			    const Oid&, const Oid&,
 			    int, int, int,
-			    const IndexImpl *, Object *,
+			    const CollImpl *, Object *,
 			    Bool, Bool, Data, Size);
-    static CollBag *collBag(const char *, const IndexImpl *);
+    static CollBag *collBag(const char *, const CollImpl *);
     static CollBag *collBag(const char *, Class *, 
 			    const Oid&, const Oid&,
 			    int, int, int,
-			    const IndexImpl *, Object *,
+			    const CollImpl *, Object *,
 			    Bool, Bool, Data, Size);
-    static CollList *collList(const char *, const IndexImpl *);
+    static CollList *collList(const char *, const CollImpl *);
     static CollList *collList(const char *, Class *, 
 			      const Oid&, const Oid&,
 			      int, int, int,
-			      const IndexImpl *, Object *,
+			      const CollImpl *, Object *,
 			      Bool, Bool, Data, Size);
-    static CollArray *collArray(const char *, const IndexImpl *);
+    static CollArray *collArray(const char *, const CollImpl *);
     static CollArray *collArray(const char *, Class *, 
 				const Oid&, const Oid&,
 				int, int, int,
-				const IndexImpl *, Object *,
+				const CollImpl *, Object *,
 				Bool, Bool, Data, Size);
     static void setLock(Collection *, Bool);
     static void setInvOid(Collection *, const Oid&, int);

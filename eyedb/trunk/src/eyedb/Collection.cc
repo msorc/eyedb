@@ -18,7 +18,7 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
+  Author: Eric Viara <viara@sysra.com>
 */
 
 
@@ -64,22 +64,41 @@ namespace eyedb {
 
   //#define COLLTRACE
 
+  static int COLLIMPL_DEFAULT = (int)CollAttrImpl::HashIndex;
+
   const Size Collection::defaultSize = (Size)-1;
 
   //
   // Collection init method
   //
 
-  static inline IndexImpl *
-  getDefaultIndexImpl()
+  static inline IndexImpl *getDefaultIndexImpl()
   {
     static IndexImpl *defIndexImpl;
-    if (!defIndexImpl)
+    if (!defIndexImpl) {
       defIndexImpl = new IndexImpl(IndexImpl::Hash, 0, 0, 0, 0, 0);
+    }
     return defIndexImpl;
   }
 
-  void Collection::_init(const IndexImpl *_idximpl)
+  static inline CollImpl *getDefaultCollImpl(int impl_type)
+  {
+    static CollImpl *defCollImpl_noindex;
+    static CollImpl *defCollImpl_hashindex;
+    if (impl_type == CollAttrImpl::NoIndex) {
+      if (!defCollImpl_noindex) {
+	defCollImpl_noindex = new CollImpl(CollAttrImpl::NoIndex);
+      }
+      return defCollImpl_noindex;
+    }
+
+    if (!defCollImpl_hashindex) {
+      defCollImpl_hashindex = new CollImpl(CollAttrImpl::HashIndex, getDefaultIndexImpl());
+    }
+    return defCollImpl_hashindex;
+  }
+
+  void Collection::_init(const CollImpl *_collimpl)
   {
     if (isref || !coll_class)
       item_size = sizeof(Oid);
@@ -96,11 +115,11 @@ namespace eyedb {
 			       name, item_size, COLL_SIZE_MAX);
     else
 #endif
-    if (item_size == 0)
-      status = Exception::make(IDB_COLLECTION_ITEM_SIZE_UNKNOWN,
-			       "collection '%s'", name);
-    else
-      status = Success;
+      if (item_size == 0)
+	status = Exception::make(IDB_COLLECTION_ITEM_SIZE_UNKNOWN,
+				 "collection '%s'", name);
+      else
+	status = Success;
 
     Exception::setMode(mode);
 
@@ -113,10 +132,11 @@ namespace eyedb {
     read_cache_state_oid = read_cache_state_value = read_cache_state_object = coherent;
     read_cache_state_index = False;
     locked = False;
-    if (!_idximpl)
-      _idximpl = getDefaultIndexImpl();
+    if (!_collimpl) {
+      _collimpl = getDefaultCollImpl(COLLIMPL_DEFAULT);
+    }
 
-    idximpl = _idximpl->clone();
+    collimpl = _collimpl->clone();
     isStringColl();
     card = NULL;
     card_oid.invalidate();
@@ -137,31 +157,19 @@ namespace eyedb {
 #endif
   }
 
-  void
-  Collection::unvalidReadCache()
+  void Collection::unvalidReadCache()
   {
     read_cache_state_oid = read_cache_state_object = read_cache_state_value = modified;
     read_cache_state_index = False;
   }
 
-#define DEFMAGORDER 4
-  static int
-  getMagorder(const IndexImpl *idximpl)
-  {
-    if (idximpl)
-      return idximpl->getMagorder(DEFMAGORDER);
-    return DEFMAGORDER;
-  }
-
-  void
-  Collection::create_cache()
+  void Collection::create_cache()
   {
     if (!cache)
       cache = new ValueCache(this);
   }
 
-  void
-  Collection::isStringColl()
+  void Collection::isStringColl()
   {
     if (!strcmp(coll_class->getName(), char_class_name) && dim > 1)
       string_coll = True;
@@ -250,8 +258,7 @@ namespace eyedb {
     return item_data;
   }
 
-  Status
-  Collection::realizeInverse(const Oid& _inv_oid, int _inv_item)
+  Status Collection::realizeInverse(const Oid& _inv_oid, int _inv_item)
   {
     setInverse(_inv_oid, _inv_item);
 
@@ -294,8 +301,7 @@ namespace eyedb {
     return StatusMake(IDB_COLLECTION_ERROR, rpc_status);
   }
 
-  void
-  Collection::setInverse(const Oid& _inv_oid, int _inv_item)
+  void Collection::setInverse(const Oid& _inv_oid, int _inv_item)
   {
     //  printf("Collection::setInverse(%s)\n", _inv_oid.toString());
     inv_oid = _inv_oid;
@@ -347,7 +353,7 @@ namespace eyedb {
 			 const Oid& _idx2_oid,
 			 int icnt,
 			 int _bottom, int _top,
-			 const IndexImpl *_idximpl,
+			 const CollImpl *_collimpl,
 			 Object *_card, Bool _is_literal, Bool _is_pure_literal,
 			 Data _idx_data, Size _idx_data_size) :
     Instance()
@@ -376,9 +382,11 @@ namespace eyedb {
 
     locked = False;
 
-    if (!_idximpl)
-      _idximpl = getDefaultIndexImpl();
-    idximpl = _idximpl->clone();
+    if (!_collimpl) {
+      _collimpl = getDefaultCollImpl(COLLIMPL_DEFAULT);
+    }
+
+    collimpl = _collimpl->clone();
     cache = 0;
 
     unvalidReadCache();
@@ -411,7 +419,7 @@ namespace eyedb {
   }
 
   void Collection::make(const char *n, Class *mc, Bool _isref,
-			const IndexImpl *_idximpl)
+			const CollImpl *_collimpl)
   {
     name = strdup(n);
     p_items_cnt = 0;
@@ -422,11 +430,11 @@ namespace eyedb {
 
     status = Success;
 
-    _init(_idximpl);
+    _init(_collimpl);
   }
 
   void Collection::make(const char *n, Class *mc, int _dim,
-			const IndexImpl *_idximpl)
+			const CollImpl *_collimpl)
   {
     name = strdup(n);
     p_items_cnt = 0;
@@ -444,19 +452,19 @@ namespace eyedb {
 
     status = Success;
 
-    _init(_idximpl);
+    _init(_collimpl);
   }
 
   Collection::Collection(const char *n, Class *mc, Bool _isref,
-			 const IndexImpl *_idximpl) : Instance()
+			 const CollImpl *_collimpl) : Instance()
   {
-    make(n, mc, _isref, _idximpl);
+    make(n, mc, _isref, _collimpl);
   }
 
   Collection::Collection(const char *n, Class *mc, int _dim,
-			 const IndexImpl *_idximpl) : Instance()
+			 const CollImpl *_collimpl) : Instance()
   {
-    make(n, mc, _dim, _idximpl);
+    make(n, mc, _dim, _collimpl);
   }
 
   Collection::Collection(const Collection &coll) : Instance(coll)
@@ -467,7 +475,7 @@ namespace eyedb {
     idx_data_size = 0;
     memset(&read_cache, 0, sizeof(ReadCache));
     status = Success;
-    idximpl = 0;
+    collimpl = 0;
     *this = coll;
   }
 
@@ -487,13 +495,12 @@ namespace eyedb {
   }
 #endif
 
-  void
-  Collection::setImplementation(const IndexImpl *_idximpl)
+  void Collection::setImplementation(const CollImpl *_collimpl)
   {
-    if (!idximpl->compare(_idximpl)) {
-      if (idximpl)
-	idximpl->release();
-      idximpl = _idximpl->clone();
+    if (!collimpl->compare(_collimpl)) {
+      if (collimpl)
+	collimpl->release();
+      collimpl = _collimpl->clone();
 #ifdef NEW_MASTER_OBJ
       if (is_literal && getMasterObject(true))
 	getMasterObject(true)->touch();
@@ -527,7 +534,7 @@ namespace eyedb {
     cl_oid = coll.cl_oid;
   
     locked = coll.locked;
-    idximpl = coll.idximpl->clone();
+    collimpl = coll.collimpl->clone();
     inv_oid = coll.inv_oid;
     inv_item = coll.inv_item;
   
@@ -766,8 +773,7 @@ namespace eyedb {
     return Success;
   }
 
-  Status
-  Collection::releaseMasterObject()
+  Status Collection::releaseMasterObject()
   {
     Status s = loadLiteral();
     if (s)
@@ -990,8 +996,7 @@ namespace eyedb {
 			   v.getStringType());
   }
 
-  std::string
-  Collection::getStringType() const
+  std::string Collection::getStringType() const
   {
     string s = coll_class->getName();
     if (isref)
@@ -1001,8 +1006,7 @@ namespace eyedb {
     return s;
   }
 
-  Status
-  Collection::insert(const Value &v, Bool noDup)
+  Status Collection::insert(const Value &v, Bool noDup)
   {
     Status s = check(v, IDB_COLLECTION_INSERT_ERROR);
     if (s)
@@ -1023,8 +1027,7 @@ namespace eyedb {
     return insert_p(data, noDup, size);
   }
 
-  Status
-  Collection::suppress(const Value &v, Bool checkFirst)
+  Status Collection::suppress(const Value &v, Bool checkFirst)
   {
     Status s = check(v, IDB_COLLECTION_SUPPRESS_ERROR);
     if (s)
@@ -1106,8 +1109,8 @@ namespace eyedb {
     RPCStatus rpc_status;
 
     if ((rpc_status = collectionGetByOid(db->getDbHandle(),
-					     getOidC().getOid(),
-					     item_oid.getOid(), &found, &ind)) ==
+					 getOidC().getOid(),
+					 item_oid.getOid(), &found, &ind)) ==
 	RPCSuccess)
       {
 	if (!found)
@@ -1215,8 +1218,8 @@ namespace eyedb {
     RPCStatus rpc_status;
 
     if ((rpc_status = collectionGetByOid(db->getDbHandle(),
-					     getOidC().getOid(),
-					     item_oid.getOid(), &found, &ind)) ==
+					 getOidC().getOid(),
+					 item_oid.getOid(), &found, &ind)) ==
 	RPCSuccess)
       {
 	if (!found)
@@ -1352,7 +1355,7 @@ namespace eyedb {
     RPCStatus rpc_status;
 
     rpc_status = collectionGetByOid(db->getDbHandle(), getOidC().getOid(),
-					item_oid.getOid(), &f, &ind);
+				    item_oid.getOid(), &f, &ind);
     //  printf("Collection::isIn_p #2 -> %d\n", f);
     found = (f ? True : False);
     if (found && where) *where = ind;
@@ -1403,7 +1406,7 @@ namespace eyedb {
     RPCStatus rpc_status;
 
     rpc_status = collectionGetByOid(db->getDbHandle(), getOidC().getOid(),
-					item_oid.getOid(), &f, &ind);
+				    item_oid.getOid(), &f, &ind);
 
     found = (f ? True : False);
     if (found && where) *where = ind;
@@ -1444,8 +1447,8 @@ namespace eyedb {
     RPCStatus rpc_status;
 
     rpc_status = collectionGetByValue(db->getDbHandle(),
-					  getOidC().getOid(), item_data,
-					  item_size, &f, &ind);
+				      getOidC().getOid(), item_data,
+				      item_size, &f, &ind);
 
     found = (f ? True : False);
     if (found && where) *where = ind;
@@ -1486,16 +1489,14 @@ namespace eyedb {
     return v_items_cnt;
   }
 
-  int
-  Collection::getBottom() const
+  int Collection::getBottom() const
   {
     if (!is_complete)
       (void)const_cast<Collection *>(this)->loadDeferred();
     return bottom;
   }
 
-  int
-  Collection::getTop() const
+  int Collection::getTop() const
   {
     if (!is_complete)
       (void)const_cast<Collection *>(this)->loadDeferred();
@@ -1524,8 +1525,8 @@ namespace eyedb {
     emptyReadCache();
     free(idx_data);
     Instance::garbage();
-    if (idximpl)
-      idximpl->release();
+    if (collimpl)
+      collimpl->release();
   }
 
   Collection::~Collection()
@@ -1548,8 +1549,7 @@ namespace eyedb {
     return create_realize(NoRecurs);
   }
 
-  void
-  Collection::cardCode(Data &data, Offset &offset, Size &alloc_size)
+  void Collection::cardCode(Data &data, Offset &offset, Size &alloc_size)
   {
     //  printf("collection_realize(card_code = %s)\n", card_oid.toString());
     if (card_oid.isValid())
@@ -1561,8 +1561,7 @@ namespace eyedb {
     oid_code(&data, &offset, &alloc_size, getInvalidOid());
   }
 
-  Object *
-  Collection::cardDecode(Database *db, Data temp, Offset &offset)
+  Object *Collection::cardDecode(Database *db, Data temp, Offset &offset)
   {
     eyedbsm::Oid xoid;
 
@@ -1588,16 +1587,14 @@ namespace eyedb {
     return card;
   }
 
-  Status
-  Collection::codeIndexImpl(Data &data, Offset &offset,
-			    Size &alloc_size)
+  Status Collection::codeCollImpl(Data &data, Offset &offset,
+				   Size &alloc_size)
   {
-    return IndexImpl::code(data, offset, alloc_size, *idximpl);
+    return IndexImpl::code(data, offset, alloc_size, collimpl->getIndexImpl(), collimpl->getType());
   }
 
-  Status
-  Collection::getImplStats(std::string &xstats, Bool dspImpl, Bool full,
-			   const char *indent)
+  Status Collection::getImplStats(std::string &xstats, Bool dspImpl, Bool full,
+				  const char *indent)
   {
     IndexStats *stats;
     Status s = getImplStats(stats);
@@ -1607,17 +1604,18 @@ namespace eyedb {
     return Success;
   }
 
-  void
-  Collection::completeImplStats(IndexStats *stats) const
+  void Collection::completeImplStats(IndexStats *stats) const
   {
-    if (idximpl->getDataspace())
-      stats->idximpl->setDataspace(idximpl->getDataspace());
-    if (idximpl->getHashMethod())
-      stats->idximpl->setHashMethod(idximpl->getHashMethod());
+    const IndexImpl *idximpl = collimpl->getIndexImpl();
+    if (idximpl) {
+      if (idximpl->getDataspace())
+	stats->idximpl->setDataspace(idximpl->getDataspace());
+      if (idximpl->getHashMethod())
+	stats->idximpl->setHashMethod(idximpl->getHashMethod());
+    }
   }
 
-  Status
-  Collection::getIdxOid(Oid &idx1oid, Oid &idx2oid) const
+  Status Collection::getIdxOid(Oid &idx1oid, Oid &idx2oid) const
   {
     idx1oid = idx1_oid;
     idx2oid = idx2_oid;
@@ -1636,8 +1634,7 @@ namespace eyedb {
     return Success;
   }
 
-  Status
-  Collection::getImplStats(IndexStats *&stats)
+  Status Collection::getImplStats(IndexStats *&stats)
   {
     Oid idx1oid, idx2oid;
     Status s = getIdxOid(idx1oid, idx2oid);
@@ -1645,8 +1642,8 @@ namespace eyedb {
 
     if (idx1oid.isValid()) {
       RPCStatus rpc_status =
-	collectionGetImplStats(db->getDbHandle(), idximpl->getType(),
-				   idx1oid.getOid(), (Data *)&stats);
+	collectionGetImplStats(db->getDbHandle(), collimpl->getType(),
+			       idx1oid.getOid(), (Data *)&stats);
       if (rpc_status)
 	return StatusMake(rpc_status);
       completeImplStats(stats);
@@ -1657,20 +1654,18 @@ namespace eyedb {
     return Success;
   }
 
-  Status
-  Collection::simulate(const IndexImpl &_idximpl, std::string &xstats,
-		       Bool dspImpl, Bool full, const char *indent)
+  Status Collection::simulate(const CollImpl &_collimpl, std::string &xstats,
+			      Bool dspImpl, Bool full, const char *indent)
   {
     IndexStats *stats;
-    Status s = simulate(_idximpl, stats);
+    Status s = simulate(_collimpl, stats);
     if (s) return s;
     xstats = (stats ? stats->toString(dspImpl, full, indent) : std::string(""));
     delete stats;
     return Success;
   }
 
-  Status
-  Collection::simulate(const IndexImpl &_idximpl, IndexStats *&stats)
+  Status Collection::simulate(const CollImpl &_collimpl, IndexStats *&stats)
   {
     Oid idx1oid, idx2oid;
     Status s = getIdxOid(idx1oid, idx2oid);
@@ -1680,12 +1675,12 @@ namespace eyedb {
       Data data;
       Offset offset = 0;
       Size size = 0;
-      Status s = IndexImpl::code(data, offset, size, _idximpl);
+      Status s = IndexImpl::code(data, offset, size, _collimpl.getIndexImpl());
       if (s) return s;
       RPCStatus rpc_status =
-	collectionSimulImplStats(db->getDbHandle(), _idximpl.getType(),
-				     idx1oid.getOid(), data, size,
-				     (Data *)&stats);
+	collectionSimulImplStats(db->getDbHandle(), _collimpl.getType(),
+				 idx1oid.getOid(), data, size,
+				 (Data *)&stats);
       return StatusMake(rpc_status);
     }
 
@@ -1710,7 +1705,7 @@ namespace eyedb {
     eyedblib::int16 kk = (eyedblib::int16)item_size;
     int16_code (&data, &offset, &alloc_size, &kk);
 
-    Status s = codeIndexImpl(data, offset, alloc_size);
+    Status s = codeCollImpl(data, offset, alloc_size);
     if (s)
       return s;
 
@@ -1800,7 +1795,7 @@ namespace eyedb {
     eyedblib::int16 kk = (eyedblib::int16)item_size;
     int16_code (&data, &offset, &alloc_size, &kk);
 
-    s = codeIndexImpl(data, offset, alloc_size);
+    s = codeCollImpl(data, offset, alloc_size);
     if (s) return s;
 
     /* null oid */
@@ -1970,7 +1965,7 @@ namespace eyedb {
     short c = (implModified ? IDB_COLL_IMPL_CHANGED : IDB_COLL_IMPL_UNCHANGED);
     int16_code(&temp, &offset, &alloc_size, &c);
     if (implModified) {
-      _status = IndexImpl::code(temp, offset, alloc_size, *idximpl);
+      _status = IndexImpl::code(temp, offset, alloc_size, collimpl->getIndexImpl(), collimpl->getType());
       if (_status)
 	return _status;
     }
@@ -2012,7 +2007,7 @@ namespace eyedb {
 #ifdef COLL_OPTIM_CREATE
     if (is_literal && !CACHE_LIST_COUNT(cache) && !implModified) {
       //if (!getCount() || literal_oid.isValid())
-	return Success;
+      return Success;
     }
 #endif
 
@@ -2206,14 +2201,22 @@ namespace eyedb {
 	    if (isLiteral())
 	      fprintf(fd, "%sliteral_oid = %s;\n", indent_str, getOidC().toString());
 
-	    fprintf(fd, "%sidxtype = '%s';\n", indent_str,
-		    idximpl->getType() == IndexImpl::BTree ?
-		    "BTree" : "Hash");
+	    if (collimpl->getType() == CollAttrImpl::NoIndex) {
+	      fprintf(fd, "%sidxtype = 'noindex';\n", indent_str);
+	    }
+	    else if (collimpl->getType() == CollAttrImpl::HashIndex) {
+	      fprintf(fd, "%sidxtype = 'hasindex';\n", indent_str);
+	    }
+	    else if (collimpl->getType() == CollAttrImpl::BTreeIndex) {
+	      fprintf(fd, "%sidxtype = 'btreeindex';\n", indent_str);
+	    }
 
-	    std::string hints = idximpl->getHintsString();
-	    if (hints.size())
-	      fprintf(fd, "%shints = \"%s\";\n", indent_str,
-		      hints.c_str());
+	    if (collimpl->getIndexImpl()) {
+	      std::string hints = collimpl->getIndexImpl()->getHintsString();
+	      if (hints.size())
+		fprintf(fd, "%shints = \"%s\";\n", indent_str,
+			hints.c_str());
+	    }
 
 	    if (idx1_oid.isValid())
 	      fprintf(fd, "%sidx1oid = %s;\n", indent_str,
@@ -2404,8 +2407,7 @@ namespace eyedb {
     return Success;
   }
 
-  Status
-  Collection::getObjElementsRealize(const RecMode *rcm)
+  Status Collection::getObjElementsRealize(const RecMode *rcm)
   {
     if (!isref) {
       return Exception::make(IDB_COLLECTION_ERROR,
@@ -2453,21 +2455,6 @@ namespace eyedb {
 
     ObjectList *obj_list = read_cache.obj_arr->toList();
 
-#if 0
-#ifdef TRY_GETELEMS_GC
-    // 31/10/06: see above
-    {
-      Object *oo;
-      ObjectListCursor c(obj_list);
-
-      while (c.getNext(oo)) {
-	oo->incrRefCount();
-	printf("incrRefCount #1 %p %d\n", oo, oo->getRefCount());
-      }
-    }
-#endif
-#endif
-
     if (cache) {
       ValueCache::IdMapIterator begin = cache->getIdMap().begin();
       ValueCache::IdMapIterator end = cache->getIdMap().end();
@@ -2495,19 +2482,11 @@ namespace eyedb {
 
 	int s = item->getState();
 
-#ifdef NEW_GET_ELEMENTS
 	if (s == removed)
 	  obj_list->suppressObject(item_o);
 	else if (s == added) {
 	  obj_list->insertObjectLast(item_o);
 	  item_o->incrRefCount();
-#else
-	if (s == removed)
-	  obj_list->suppressObject(item_o);
-	else if (s == added) {
-	  obj_list->insertObjectLast(item_o);
-	  item_o->incrRefCount();
-#endif
 	}
 
 	++begin;
@@ -2520,37 +2499,11 @@ namespace eyedb {
 #endif
     delete read_cache.obj_arr;
 
-    /*
-#ifdef TRY_GETELEMS_GC
-    {
-      Object *oo;
-      ObjectListCursor c(obj_list);
-
-      while (c.getNext(oo)) {
-	printf("refCount #3 %p %d\n", oo, oo->getRefCount());
-      }
-    }
-#endif
-    */
-
     read_cache.obj_arr = obj_list->toArray();
 #ifdef TRY_GETELEMS_GC
     read_cache.obj_arr->setAutoGarbage(true);
     read_cache.obj_arr->setMustRelease(false);
 #endif
-
-    /*
-#ifdef TRY_GETELEMS_GC
-    {
-      Object *oo;
-      ObjectListCursor c(obj_list);
-
-      while (c.getNext(oo)) {
-	printf("refCount #4 %p %d\n", oo, oo->getRefCount());
-      }
-    }
-#endif
-    */
 
     delete obj_list;
 
@@ -2558,8 +2511,8 @@ namespace eyedb {
     return Success;
   }
 
-  void
-  Collection::emptyReadCache()
+
+  void Collection::emptyReadCache()
   {
     // WARNING DISCONNECTED the 20/01/00 because of a memory bug!
     /*
@@ -2584,16 +2537,16 @@ namespace eyedb {
     unvalidReadCache();
   }
 
-#define CONVERT(VALUE_ARRAY, TYPE, OFF) \
-do { \
-  for (int i = (OFF); i < (VALUE_ARRAY)->value_cnt; i += (OFF)+1) \
-    { \
-      Value v = (VALUE_ARRAY)->values[i]; \
-      TYPE k; \
-      memcpy(&k, v.data, sizeof(TYPE)); \
-      (VALUE_ARRAY)->values[i].set(k); \
-    } \
-} while(0)
+#define CONVERT(VALUE_ARRAY, TYPE, OFF)					\
+  do {									\
+    for (int i = (OFF); i < (VALUE_ARRAY)->value_cnt; i += (OFF)+1)	\
+      {									\
+	Value v = (VALUE_ARRAY)->values[i];				\
+	TYPE k;								\
+	memcpy(&k, v.data, sizeof(TYPE));				\
+	(VALUE_ARRAY)->values[i].set(k);				\
+      }									\
+  } while(0)
 
   static int
   value_index_cmp (const void *x1, const void *x2)
@@ -2603,15 +2556,13 @@ do { \
     return v1->i - v2->i;
   }
 
-  static void
-  sortValues(ValueArray &value_array)
+  static void sortValues(ValueArray &value_array)
   {
     qsort(value_array.getValues(), value_array.getCount()/2, 2*sizeof(Value),
 	  value_index_cmp);
   }
 
-  Status
-  Collection::getElements(ValueArray &value_array, Bool index) const
+  Status Collection::getElements(ValueArray &value_array, Bool index) const
   {
     if (status)
       return Exception::make(status);
@@ -2662,10 +2613,10 @@ do { \
 	read_cache_state_index == index) {
       assert(CACHE_LIST_COUNT(cache) == 0);
       /*
-      int idx = (index ? 1 : 0);
-      for (int i = idx; i < read_cache.val_arr->value_cnt; i += idx+1)
+	int idx = (index ? 1 : 0);
+	for (int i = idx; i < read_cache.val_arr->value_cnt; i += idx+1)
 	if (read_cache.val_arr->values[i].type == Value::tObject)
-	  read_cache.val_arr->values[i].o->incrRefCount();
+	read_cache.val_arr->values[i].o->incrRefCount();
       */
       return Success;
     }
@@ -2691,7 +2642,6 @@ do { \
 	ValueCache::IdMapIterator begin = cache->getIdMap().begin();
 	ValueCache::IdMapIterator end = cache->getIdMap().end();
 
-#ifdef NEW_GET_ELEMENTS
 	while (begin != end) {
 	  item = (*begin).second;
 	  const Value &item_value = item->getValue();
@@ -2699,9 +2649,9 @@ do { \
 	  int s = item->getState();
 	  if (s == removed) {
 	    /*
-	    if (index)
+	      if (index)
 	      value_list->suppressValue(Value((int)(*begin).first));
-	    value_list->suppressValue(item_value);
+	      value_list->suppressValue(item_value);
 	    */
 	    if (index)
 	      value_list->suppressPairValues(Value((int)(*begin).first),
@@ -2716,22 +2666,6 @@ do { \
 	      value_list->insertValueLast(Value((int)(*begin).first));
 	    value_list->insertValueLast(item_value);
 	  }
-#else
-	while (begin != end) {
-	  item = (*begin).second;
-	  const Value &item_value = item->getValue();
-	  
-	  int s = item->getState();
-	  if (s == removed)
-	    value_list->suppressValue(item_value);
-	  else if (s == added) {
-	    if (!value_list->exists(item_value)) {
-	      if (item_value.type == Value::tObject)
-		item_value.o->incrRefCount();
-	      value_list->insertValueLast(item_value);
-	    }
-	  }
-#endif
 	  ++begin;
 	}
       }
@@ -2755,9 +2689,9 @@ do { \
 
     if (isref) {
       /*
-      for (int i = idx; i < read_cache.val_arr->value_cnt; i += idx+1)
+	for (int i = idx; i < read_cache.val_arr->value_cnt; i += idx+1)
 	if (read_cache.val_arr->values[i].type == Value::tObject)
-	  read_cache.val_arr->values[i].o->incrRefCount();
+	read_cache.val_arr->values[i].o->incrRefCount();
       */
       return Success;
     }
@@ -2771,7 +2705,7 @@ do { \
     for (int i = idx; i < value_cnt; i += idx+1) {
       makeValue(const_cast<Value&>((*read_cache.val_arr)[i])); // makeValue(read_cache.val_arr->values[i]);
       /*
-      if (read_cache.val_arr->values[i].type == Value::tObject)
+	if (read_cache.val_arr->values[i].type == Value::tObject)
 	read_cache.val_arr->values[i].o->incrRefCount();
       */
     }
@@ -2877,11 +2811,10 @@ do { \
     return StatusMake(IDB_COLLECTION_ERROR, rpc_status);
   }
 
-  Status
-  Collection::cache_compile(Offset &offset,
-			    Size &alloc_size,
-			    unsigned char **ptemp,
-			    const RecMode *rcm)
+  Status Collection::cache_compile(Offset &offset,
+				   Size &alloc_size,
+				   unsigned char **ptemp,
+				   const RecMode *rcm)
   {
     Status _status;
 
@@ -2983,10 +2916,9 @@ do { \
     return Success;
   }
 
-  Status
-  collectionMake(Database *db, const Oid *oid, Object **o,
-		     const RecMode *rcm, const ObjectHeader *hdr,
-		     Data idr, LockMode lockmode, const Class *_class)
+  Status collectionMake(Database *db, const Oid *oid, Object **o,
+			const RecMode *rcm, const ObjectHeader *hdr,
+			Data idr, LockMode lockmode, const Class *_class)
   {
     RPCStatus rpc_status;
     Data temp;
@@ -3010,7 +2942,7 @@ do { \
 	object_header_code_head(temp, hdr);
       
 	rpc_status = objectRead(db->getDbHandle(), temp, 0, 0, oid->getOid(),
-				    0, lockmode, 0);
+				0, lockmode, 0);
       }
     else
       {
@@ -3033,11 +2965,13 @@ do { \
     Data idx_data = 0;
     Size idx_data_size = 0;
     IndexImpl *idximpl = 0;
+    int impl_type = 0;
+    CollImpl *collimpl = 0;
 
     if (ObjectPeer::isRemoved(*hdr)) {
       locked = 0;
       card = NULL;
-      idximpl = 0;
+      collimpl = 0;
       items_cnt = bottom = top = 0;
       name = "";
     }
@@ -3050,8 +2984,10 @@ do { \
       eyedblib::int16 kk;
       int16_decode (temp, &offset, &kk);
 
-      Status s = IndexImpl::decode(db, temp, offset, idximpl);
+      Status s = IndexImpl::decode(db, temp, offset, idximpl, &impl_type);
       if (s) return s;
+
+      collimpl = new CollImpl((CollAttrImpl::Type)impl_type, idximpl);
 
       oid_decode (temp, &offset, idx1_oid.getOid());
       oid_decode (temp, &offset, idx2_oid.getOid());
@@ -3089,33 +3025,32 @@ do { \
     if (eyedb_is_type(*hdr, _CollSet_Type))
       *o = (Object *)CollectionPeer::collSet
 	(name, (Class *)_class, idx1_oid, idx2_oid, items_cnt,
-	 bottom, top, idximpl, card, is_literal, is_pure_literal, idx_data, idx_data_size);
+	 bottom, top, collimpl, card, is_literal, is_pure_literal, idx_data, idx_data_size);
 
     else if (eyedb_is_type(*hdr, _CollBag_Type))
       *o = (Object *)CollectionPeer::collBag
 	(name, (Class *)_class, idx1_oid, idx2_oid, items_cnt,
-	 bottom, top, idximpl, card, is_literal, is_pure_literal, idx_data, idx_data_size);
+	 bottom, top, collimpl, card, is_literal, is_pure_literal, idx_data, idx_data_size);
 
     else if (eyedb_is_type(*hdr, _CollList_Type))
       *o = (Object *)CollectionPeer::collList
 	(name, (Class *)_class, idx1_oid, idx2_oid, items_cnt,
-	 bottom, top, idximpl, card, is_literal, is_pure_literal, idx_data, idx_data_size);
+	 bottom, top, collimpl, card, is_literal, is_pure_literal, idx_data, idx_data_size);
 
     else if (eyedb_is_type(*hdr, _CollArray_Type))
       *o = (Object *)CollectionPeer::collArray
 	(name, (Class *)_class, idx1_oid, idx2_oid, items_cnt,
-	 bottom, top, idximpl, card, is_literal, is_pure_literal, idx_data, idx_data_size);
-
+	 bottom, top, collimpl, card, is_literal, is_pure_literal, idx_data, idx_data_size);
     else {
-      if (idximpl)
-	idximpl->release();
+      if (collimpl)
+	collimpl->release();
       return Exception::make(IDB_INTERNAL_ERROR, "invalid collection type: "
 			     "%p", hdr->type);
     }
 
 
-    if (idximpl)
-      idximpl->release();
+    if (collimpl)
+      collimpl->release();
     CollectionPeer::setLock((Collection *)*o, (Bool)locked);
 
     if (is_literal)
@@ -3130,33 +3065,37 @@ do { \
     return Success;
   }
 
-  Status
-  Collection::getImplementation(IndexImpl *&_idximpl, Bool remote) const
+  Status Collection::getImplementation(CollImpl *&_collimpl, Bool remote) const
   {
     if (!remote) {
       if (is_literal) {
 	Status s = const_cast<Collection *>(this)->loadDeferred();
 	if (s) return s;
       }
-      _idximpl = idximpl->clone();
+      _collimpl = collimpl->clone();
       return Success;
     }
 
-    _idximpl = 0;
+    _collimpl = 0;
 
     Oid idx1oid, idx2oid;
     Status s = getIdxOid(idx1oid, idx2oid);
     if (s) return s;
 
     if (idx1oid.isValid()) {
+      // TBD 2009-03-31
+      IndexImpl *idximpl = 0;
       RPCStatus rpc_status =
 	collectionGetImplementation(db->getDbHandle(),
-					idximpl->getType(),
-					idx1oid.getOid(), (Data *)&_idximpl);
+				    collimpl->getType(),
+				    idx1oid.getOid(), (Data *)&idximpl);
       if (rpc_status)
 	return StatusMake(rpc_status);
     
-      _idximpl->setHashMethod(idximpl->getHashMethod());
+      if (collimpl->getIndexImpl()) {
+	idximpl->setHashMethod(collimpl->getIndexImpl()->getHashMethod());
+      }
+      _collimpl = new CollImpl(collimpl->getType(), idximpl);
     }
 
     return Success;
@@ -3234,9 +3173,11 @@ do { \
     v_items_cnt = o->v_items_cnt;
     inverse_valid = o->inverse_valid;
     if (!implModified) {
-      if (idximpl)
-	idximpl->release();
-      idximpl = o->idximpl->clone();
+      if (collimpl)
+	collimpl->release();
+      if (o->collimpl) {
+	collimpl = o->collimpl->clone();
+      }
     }
     /*
       printf("literalMake idr=%p o_idr=%p refcnt=%d o_refcnt=%d\n",
@@ -3250,11 +3191,10 @@ do { \
   // literal collections because of inverse implementation.
   //
 
-  Status
-  Collection::realizePerform(const Oid& cloid,
-			     const Oid& objoid,
-			     AttrIdxContext &idx_ctx,
-			     const RecMode *rcm)
+  Status Collection::realizePerform(const Oid& cloid,
+				    const Oid& objoid,
+				    AttrIdxContext &idx_ctx,
+				    const RecMode *rcm)
   {
     assert(is_literal);
 
@@ -3301,10 +3241,9 @@ do { \
     return Success;
   }
 
-  Status
-  Collection::loadPerform(const Oid&, LockMode lockmode,
-			  AttrIdxContext &idx_ctx,
-			  const RecMode *rcm)
+  Status Collection::loadPerform(const Oid&, LockMode lockmode,
+				 AttrIdxContext &idx_ctx,
+				 const RecMode *rcm)
   {
     Offset offset = IDB_OBJ_HEAD_SIZE;
     oid_decode(idr->getIDR(), &offset, literal_oid.getOid());
@@ -3379,11 +3318,10 @@ do { \
     return Success;
   }
 
-  Status
-  Collection::removePerform(const Oid& cloid, 
-			    const Oid& objoid,
-			    AttrIdxContext &idx_ctx,
-			    const RecMode *rcm)
+  Status Collection::removePerform(const Oid& cloid, 
+				   const Oid& objoid,
+				   AttrIdxContext &idx_ctx,
+				   const RecMode *rcm)
   {
 #ifdef COLLTRACE
     printf("Collection::removePerform(%p, %s) should remove only if pure_literal %d %d\n", this,
@@ -3424,12 +3362,11 @@ do { \
     return Success;
   }
 
-  Status
-  Collection::postRealizePerform(const Oid& cloid,
-				 const Oid& objoid,
-				 AttrIdxContext &idx_ctx,
-				 Bool &mustTouch,
-				 const RecMode *rcm)
+  Status Collection::postRealizePerform(const Oid& cloid,
+					const Oid& objoid,
+					AttrIdxContext &idx_ctx,
+					Bool &mustTouch,
+					const RecMode *rcm)
   {
     mustTouch = False;
     if (!getOidC().isValid())
@@ -3520,8 +3457,7 @@ do { \
     return s;
   }
 
-  Status
-  Collection::moveElements(const Dataspace *dataspace)
+  Status Collection::moveElements(const Dataspace *dataspace)
   {
     OidArray oid_arr;
     Status s = getElements(oid_arr);
@@ -3531,15 +3467,14 @@ do { \
     return db->moveObjects(oid_arr, dataspace);
   }
 
-  Status
-  Collection::getDefaultDataspace(const Dataspace *&dataspace) const
+  Status Collection::getDefaultDataspace(const Dataspace *&dataspace) const
   {
     RPCStatus rpc_status;
     if (idx1_oid.isValid()) {
       int dspid;
       rpc_status = getDefaultIndexDataspace(db->getDbHandle(),
-						idx1_oid.getOid(),
-						1, &dspid);
+					    idx1_oid.getOid(),
+					    1, &dspid);
 
       if (rpc_status) return StatusMake(rpc_status);
       return db->getDataspace(dspid, dataspace);
@@ -3549,22 +3484,21 @@ do { \
     return Success;
   }
 
-  Status
-  Collection::setDefaultDataspace(const Dataspace *dataspace)
+  Status Collection::setDefaultDataspace(const Dataspace *dataspace)
   {
     RPCStatus rpc_status;
     if (idx1_oid.isValid()) {
       rpc_status = setDefaultIndexDataspace(db->getDbHandle(),
-						idx1_oid.getOid(),
-						1, dataspace->getId());
+					    idx1_oid.getOid(),
+					    1, dataspace->getId());
 
       if (rpc_status) return StatusMake(rpc_status);
     }
 
     if (idx2_oid.isValid()) {
       rpc_status = setDefaultIndexDataspace(db->getDbHandle(),
-						idx2_oid.getOid(),
-						1, dataspace->getId());
+					    idx2_oid.getOid(),
+					    1, dataspace->getId());
 
       if (rpc_status) return StatusMake(rpc_status);
     }
@@ -3575,5 +3509,16 @@ do { \
   Bool Collection::isPartiallyStored() const
   {
     return (cache != 0 && cache->size() > 0) ? True : False;
+  }
+
+  CollImpl *CollImpl::clone() const
+  {
+    IndexImpl *_idximpl = 0;
+
+    if (idximpl) {
+      _idximpl = idximpl->clone();
+    }
+
+    return new CollImpl(impl_type, _idximpl);
   }
 }

@@ -37,7 +37,7 @@ namespace eyedb {
   class ValueCache;
   class CollectionPeer;
   class CardinalityDescription;
-  class IndexImpl;
+  class CollImpl;
 
   /**
      Not yet documented.
@@ -176,17 +176,17 @@ namespace eyedb {
 
     /**
        Not yet documented
-       @param idximpl
+       @param collimpl
     */
-    void setImplementation(const IndexImpl *idximpl);
+    void setImplementation(const CollImpl *collimpl);
 
     /**
        Not yet documented
-       @param idximpl
+       @param collimpl
        @param remote
        @return
     */
-    Status getImplementation(IndexImpl *&idximpl, Bool remote = False) const;
+    Status getImplementation(CollImpl *&collimpl, Bool remote = False) const;
 
     /**
        Not yet documented
@@ -208,24 +208,24 @@ namespace eyedb {
 
     /**
        Not yet documented
-       @param idximpl
+       @param collimpl
        @param xstats
        @param dspImpl
        @param full
        @param indent
        @return
     */
-    Status simulate(const IndexImpl &idximpl, std::string &xstats,
+    Status simulate(const CollImpl &collimpl, std::string &xstats,
 		    Bool dspImpl = True, Bool full = False,
 		    const char *indent = "");
 
     /**
        Not yet documented
-       @param idximpl
+       @param collimpl
        @param stats
        @return
     */
-    Status simulate(const IndexImpl &idximpl, IndexStats *&stats);
+    Status simulate(const CollImpl &collimpl, IndexStats *&stats);
 
     /**
        Not yet documented
@@ -340,7 +340,7 @@ namespace eyedb {
     Oid cl_oid;
 
     Bool locked;
-    IndexImpl *idximpl;
+    CollImpl *collimpl;
     Oid inv_oid;
     eyedblib::int16 inv_item;
 
@@ -373,8 +373,8 @@ namespace eyedb {
     void decode(Data) const;
 
     Collection(const char *, Class * = NULL, Bool = True,
-	       const IndexImpl * = 0);
-    Collection(const char *, Class *, int, const IndexImpl * = 0);
+	       const CollImpl * = 0);
+    Collection(const char *, Class *, int, const CollImpl * = 0);
 
     Status check(const Oid&, const Class *, Error) const;
     Status check(const Oid&, Error) const;
@@ -391,10 +391,10 @@ namespace eyedb {
 
     Collection(const char *, Class *,
 	       const Oid&, const Oid&, int, int,
-	       int, const IndexImpl *,
+	       int, const CollImpl *,
 	       Object *, Bool, Bool, Data, Size);
-    void make(const char *, Class *, Bool, const IndexImpl *);
-    void make(const char *, Class *, int, const IndexImpl *);
+    void make(const char *, Class *, Bool, const CollImpl *);
+    void make(const char *, Class *, int, const CollImpl *);
     Status getOidElementsRealize();
     Status getObjElementsRealize(const RecMode * = RecMode::NoRecurs);
     Status getValElementsRealize(Bool index = False);
@@ -408,12 +408,12 @@ namespace eyedb {
     Bool read_cache_state_index;
     Bool inverse_valid;
     virtual Status cache_compile(Offset &, Size&, unsigned char **, const RecMode *);
-    void _init(const IndexImpl *);
+    void _init(const CollImpl *);
     Status init_idr();
     virtual const char *getClassName() const = 0;
     friend class CollectionPeer;
 
-    Status codeIndexImpl(Data &, Offset &, Size &);
+    Status codeCollImpl(Data &, Offset &, Size &);
     Status setValue(Data);
     Status getValue(Data*) const;
     void cardCode(Data &, Offset &offset, Size &alloc_size);

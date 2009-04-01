@@ -424,7 +424,7 @@ namespace eyedb {
     alloc_size = 0;
     Data data = 0;
     offset = IDB_CLASS_IMPL_TYPE;
-    Status s = IndexImpl::code(data, offset, alloc_size, *idximpl);
+    Status s = IndexImpl::code(data, offset, alloc_size, idximpl);
     if (s) return s;
 
     offset = IDB_CLASS_MTYPE;

@@ -117,6 +117,7 @@
 #include <eyedb/ServerConfig.h>
 #include <eyedb/GenHashTable.h>
 
+#include <eyedb/CollImpl.h>
 #include <eyedb/DBM.h>
 #include <eyedb/syscls.h>
 #include <eyedb/utils.h>

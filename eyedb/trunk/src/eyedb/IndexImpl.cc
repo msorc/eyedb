@@ -29,6 +29,9 @@
 
 namespace eyedb {
 
+  const int IndexImpl::UNKNOWN_IMPL_TYPE = 0; // CollAttrImpl::Unknown
+  const int IndexImpl::NOINDEX_IMPL_TYPE = 3; // CollAttrImpl::NoIndex
+
   struct KeyValue {
     const char *key;
     const char *value;
@@ -651,22 +654,25 @@ namespace eyedb {
 
 
   Status
-  IndexImpl::code(Data &data, Offset &offset,
-		  Size &alloc_size,
-		  const IndexImpl &idximpl)
+  IndexImpl::code(Data &data, Offset &offset, Size &alloc_size,
+		  const IndexImpl *idximpl, int impl_type)
   {
+    if (!idximpl && impl_type != NOINDEX_IMPL_TYPE) {
+      return Exception::make(IDB_ERROR, "invalid null index implementation");
+    }
+
     static eyedblib::int32 zero = 0;
-    char idxtype = idximpl.getType();
+    char idxtype = (idximpl ? idximpl->getType() : NOINDEX_IMPL_TYPE);
     char_code (&data, &offset, &alloc_size, &idxtype);
-    short dspid = (idximpl.dataspace ? idximpl.dataspace->getId() :
+    short dspid = (idximpl && idximpl->dataspace ? idximpl->dataspace->getId() :
 		   Dataspace::DefaultDspid);
     int16_code (&data, &offset, &alloc_size, &dspid);
 
-    if (idximpl.getType() == IndexImpl::Hash) {
-      eyedblib::int32 x = idximpl.getKeycount();
+    if (idxtype == IndexImpl::Hash) {
+      eyedblib::int32 x = idximpl->getKeycount();
       int32_code (&data, &offset, &alloc_size, &x);
-      if (idximpl.getHashMethod()) {
-	const Oid &xoid = idximpl.getHashMethod()->getOid();
+      if (idximpl->getHashMethod()) {
+	const Oid &xoid = idximpl->getHashMethod()->getOid();
 	if (!xoid.isValid())
 	  return Exception::make(IDB_ERROR, "while coding collection, "
 				 "non persistent hash method found");
@@ -676,14 +682,19 @@ namespace eyedb {
       else
 	oid_code (&data, &offset, &alloc_size, Oid::nullOid.getOid());
     }
-    else {
-      eyedblib::int32 x = idximpl.getDegree();
+    else if (idxtype == IndexImpl::BTree) {
+      eyedblib::int32 x = idximpl->getDegree();
       int32_code (&data, &offset, &alloc_size, &x);
       oid_code (&data, &offset, &alloc_size, Oid::nullOid.getOid());
     }
-  
-    unsigned int impl_hints_cnt;
-    const int *impl_hints = idximpl.getImplHints(impl_hints_cnt);
+    else if (idxtype == 0) {
+      eyedblib::int32 x = 0;
+      int32_code (&data, &offset, &alloc_size, &x);
+      oid_code (&data, &offset, &alloc_size, Oid::nullOid.getOid());
+    }
+
+    unsigned int impl_hints_cnt = 0;
+    const int *impl_hints = (idximpl ? idximpl->getImplHints(impl_hints_cnt) : 0);
     assert(impl_hints_cnt <= IDB_MAX_HINTS_CNT);
     for (int i = 0; i < impl_hints_cnt; i++)
       int32_code (&data, &offset, &alloc_size, &impl_hints[i]);
@@ -702,7 +713,7 @@ namespace eyedb {
 
   Status
   IndexImpl::decode(Database *db, Data data,
-		    Offset &offset, IndexImpl *&idximpl)
+		    Offset &offset, IndexImpl *&idximpl, int *rimpl_type)
   {
     IndexImpl::Type impl_type;
     eyedblib::int32 implinfo;
@@ -733,8 +744,17 @@ namespace eyedb {
     for (int i = 0; i < IDB_MAX_HINTS_CNT; i++)
       int32_decode (data, &offset, &impl_hints[i]);
 
-    idximpl = new IndexImpl(impl_type, dataspace, implinfo, mth, impl_hints,
-			    IDB_MAX_HINTS_CNT);
+    if (impl_type == IndexImpl::Hash || impl_type == IndexImpl::BTree) {
+      idximpl = new IndexImpl(impl_type, dataspace, implinfo, mth, impl_hints,
+			      IDB_MAX_HINTS_CNT);
+    }
+    else if (impl_type != NOINDEX_IMPL_TYPE) {
+      return Exception::make(IDB_ERROR, "unknown index type implementation %d", impl_type);
+    }
+
+    if (rimpl_type) {
+      *rimpl_type = impl_type;
+    }
     return Success;
   }
 

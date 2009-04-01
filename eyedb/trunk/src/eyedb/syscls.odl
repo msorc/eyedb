@@ -257,16 +257,23 @@ enum index_type [IndexType] {
     };
 
 class collection_attribute_implementation [CollAttrImpl] extends attribute_component {
-  int idxtype;
+  int impl_type;
   short dspid;
   int key_count_or_degree;
   be_method_C *hash_method;
   int impl_hints[];
 
   %C++{
+    enum Type {
+      Unknown = 0,
+      HashIndex = 1,
+      BTreeIndex = 2,
+      NoIndex = 3
+    };
+
     CollAttrImpl(Database *, Class *, const char *attrpath,
 		 Bool propagate, const Dataspace * = 0,
-		 IndexImpl::Type = IndexImpl::Hash,
+		 Type impl_type = HashIndex,
 		 int key_count_or_degree = 0,
 		 BEMethod_C * = 0,
 		 const int *impl_hints = 0, int impl_hints_cnt = 0);
@@ -276,9 +283,9 @@ class collection_attribute_implementation [CollAttrImpl] extends attribute_compo
     Status makeDataspace(Database *db, const Dataspace *&) const;
     static Status make(Database *, Class *, const char *attrpath,
 		       Bool propagate,
-		       IndexImpl::Type, const char *hints,
+		       Type impl_type, const char *hints,
 		       CollAttrImpl *&);
-    Status getImplementation(Database *, const IndexImpl *&);
+    Status getImplementation(Database *, const CollImpl *&);
     virtual AttributeComponent *xclone(Database *, const Class *);
     Status realize(const RecMode* = NoRecurs);
     Status remove(const RecMode* = NoRecurs);
@@ -292,7 +299,7 @@ class collection_attribute_implementation [CollAttrImpl] extends attribute_compo
     void userGarbage();
 
     const Dataspace *dsp;
-    IndexImpl *idximpl;
+    CollImpl *collimpl;
     %}
 };
 

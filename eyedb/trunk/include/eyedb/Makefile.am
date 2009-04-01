@@ -23,6 +23,7 @@ CollBag.h \
 CollectionClass.h \
 Collection.h \
 CollectionIterator.h \
+CollImpl.h \
 CollListClass.h \
 CollList.h \
 CollSetClass.h \
