@@ -1217,7 +1217,7 @@ namespace eyedb {
     Data data;
     Offset offset = 0;
     Size size = 0;
-    Status s = IndexImpl::code(data, offset, size, idximpl);
+    Status s = IndexImpl::code(data, offset, size, &idximpl);
     if (s) return s;
 
     RPCStatus rpc_status =
@@ -2139,7 +2139,7 @@ namespace eyedb {
 			     const char *attrpath,
 			     Bool propagate,
 			     const Dataspace *dataspace,
-			     IndexImpl::Type idxtype,
+			     CollAttrImpl::Type impl_type,
 			     int key_count_or_degree,
 			     BEMethod_C *mth,
 			     const int *impl_hints,
@@ -2150,7 +2150,7 @@ namespace eyedb {
     db = _db;
     setClassOwner(cls);
     setAttrpath(attrpath);
-    setIdxtype(idxtype);
+    setImplType(impl_type);
     setKeyCountOrDegree(key_count_or_degree);
     setPropagate(propagate);
     if (dataspace)
@@ -2171,19 +2171,24 @@ namespace eyedb {
     db = _db;
     setClassOwner(cls);
     setAttrpath(attrpath);
-    setIdxtype(idximpl->getType());
-    setKeyCountOrDegree(idximpl->getKeycount());
+    if (idximpl) {
+      setImplType(idximpl->getType());
+      setKeyCountOrDegree(idximpl->getKeycount());
+      setHashMethod(idximpl->getHashMethod());
+      if (idximpl->getDataspace())
+	setDspid(idximpl->getDataspace()->getId());
+      unsigned int impl_hints_cnt;
+      const int *impl_hints = idximpl->getImplHints(impl_hints_cnt);
+      
+      for (int i = 0; i < impl_hints_cnt; i++)
+	setImplHints(i, impl_hints[i]);
+    }
+    else {
+      setImplType(NoIndex);
+    }
+
     setPropagate(propagate);
-    setHashMethod(idximpl->getHashMethod());
-    if (idximpl->getDataspace())
-      setDspid(idximpl->getDataspace()->getId());
     setName(genName());
-
-    unsigned int impl_hints_cnt;
-    const int *impl_hints = idximpl->getImplHints(impl_hints_cnt);
-
-    for (int i = 0; i < impl_hints_cnt; i++)
-      setImplHints(i, impl_hints[i]);
   }
 
   Status
@@ -2199,14 +2204,21 @@ namespace eyedb {
 
   Status
   CollAttrImpl::make(Database *db, Class *cls, const char *attrpath,
-		     Bool propagate, IndexImpl::Type type,
+		     Bool propagate, CollAttrImpl::Type impl_type,
 		     const char *hints, CollAttrImpl *&impl)
   {
     impl = 0;
     IndexImpl *idximpl;
-    //printf("making collattrimp %s '%s'\n", attrpath, hints);
-    Status s = IndexImpl::make(db, type, hints, idximpl);
-    if (s) return s;
+    if (impl_type == HashIndex || impl_type == BTreeIndex) {
+      Status s = IndexImpl::make(db, (IndexImpl::Type)impl_type, hints, idximpl);
+      if (s) return s;
+    }
+    else {
+      if (hints) {
+	return Exception::make(IDB_ERROR, "no hints for no indexed collections");
+      }
+      idximpl = NULL;
+    }
 
     impl = new CollAttrImpl(db, cls, attrpath, propagate, idximpl);
     return Success;
@@ -2228,7 +2240,7 @@ namespace eyedb {
     std::string str = makeAttrpath(cls);
     return new CollAttrImpl(db, (Class *)cls, str.c_str(),
 			    getPropagate(),
-			    dataspace, (IndexImpl::Type)getIdxtype(),
+			    dataspace, (Type)getImplType(),
 			    getKeyCountOrDegree(),
 			    getHashMethod(), impl_hints, impl_hints_cnt);
   }
@@ -2269,7 +2281,7 @@ namespace eyedb {
   Status
   CollAttrImpl::s_trace(FILE *fd, Bool, unsigned int flags) const
   {
-    int idxtype = getIdxtype();
+    int idxtype = getImplType();
     fprintf(fd, "implementation<type = %s", idxtype == IndexImpl::Hash ?
 	    "hash" : "btree");
     Bool hints = False;
@@ -2352,45 +2364,50 @@ namespace eyedb {
 
   Status
   CollAttrImpl::getImplementation(Database *db,
-				  const IndexImpl *&_idximpl)
+				  const CollImpl *&_collimpl)
 
   {
-    if (!idximpl) {
-      const Dataspace *dataspace;
-      Status s = makeDataspace(db, dataspace);
-      if (s) return s;
-
-      unsigned int impl_hints_cnt = getImplHintsCount();
-      int impl_hints[eyedbsm::HIdxImplHintsCount];
-      memset(impl_hints, 0, sizeof(int) * eyedbsm::HIdxImplHintsCount);
-      for (int i = 0; i < impl_hints_cnt; i++)
-	impl_hints[i] = getImplHints(i);
-      idximpl = new IndexImpl((IndexImpl::Type)getIdxtype(),
-			      dataspace, getKeyCountOrDegree(),
-			      getHashMethod(), impl_hints,
-			      impl_hints_cnt);
+    CollAttrImpl::Type impl_type = (CollAttrImpl::Type)getImplType();
+    const IndexImpl *idximpl = 0;
+    if (!collimpl) {
+      if (impl_type == HashIndex || impl_type == BTreeIndex) {
+	const Dataspace *dataspace;
+	Status s = makeDataspace(db, dataspace);
+	if (s) return s;
+	
+	unsigned int impl_hints_cnt = getImplHintsCount();
+	int impl_hints[eyedbsm::HIdxImplHintsCount];
+	memset(impl_hints, 0, sizeof(int) * eyedbsm::HIdxImplHintsCount);
+	for (int i = 0; i < impl_hints_cnt; i++)
+	  impl_hints[i] = getImplHints(i);
+	idximpl = new IndexImpl((IndexImpl::Type)impl_type,
+				dataspace, getKeyCountOrDegree(),
+				getHashMethod(), impl_hints,
+				impl_hints_cnt);
+      }
+      collimpl = new CollImpl(impl_type, idximpl);
     }
 
-    _idximpl = idximpl;
+    _collimpl = collimpl;
     return Success;
   }
 
   void CollAttrImpl::userInitialize()
   {
-    idximpl = 0;
+    collimpl = 0;
     dsp = 0;
   }
 
   void CollAttrImpl::userCopy(const Object &)
   {
-    idximpl = 0;
+    collimpl = 0;
     dsp = 0;
   }
 
   void CollAttrImpl::userGarbage()
   {
-    if (idximpl)
-      idximpl->release();
+    if (collimpl)
+      collimpl->release();
     dsp = 0;
   }
 }

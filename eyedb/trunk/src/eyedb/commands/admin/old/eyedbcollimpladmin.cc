@@ -401,7 +401,7 @@ collimpl_update_realize(int argc, char *argv[])
     LinkedListCursor c(list);
     Collection *coll;
     while (c.getNext((void *&)coll)) {
-      coll->setImplementation(idximpl);
+      coll->setImplementation(new CollImpl(CollAttrImpl::Unknown, idximpl)); // 0: must be correct implementation 2009-03-31
       s = coll->store();
       CHECK(s);
     }
@@ -426,12 +426,14 @@ collimpl_list_realize(int argc, char *argv[])
     LinkedListCursor c(list);
     Collection *coll;
     for (int n = 0; c.getNext((void *&)coll); n++) {
-      IndexImpl *idximpl;
-      Status s = coll->getImplementation(idximpl, True);
+      CollImpl *collimpl;
+      Status s = coll->getImplementation(collimpl, True);
       CHECK(s);
       if (n) fprintf(stdout, "\n");
       collection_trace(coll);
-      fprintf(stdout, idximpl->toString("  ").c_str());
+      if (collimpl->getIndexImpl()) {
+	fprintf(stdout, collimpl->getIndexImpl()->toString("  ").c_str());
+      }
     }
   }
 
@@ -489,13 +491,14 @@ collimpl_simulate_realize(int argc, char *argv[])
 
     LinkedListCursor c(list);
     Collection *coll;
+    CollImpl *collimpl = new CollImpl((CollAttrImpl::Type)idximpl->getType(), idximpl);
     for (; c.getNext((void *&)coll); nn++) {
       if (fmt && idximpl->getType() == IndexImpl::Hash) {
 	IndexStats *stats1, *stats2 = 0;
 	if (coll->asCollArray())
-	  s = coll->asCollArray()->simulate(*idximpl, stats1, stats2);
+	  s = coll->asCollArray()->simulate(*collimpl, stats1, stats2);
 	else
-	  s = coll->simulate(*idximpl, stats1);
+	  s = coll->simulate(*collimpl, stats1);
 	CHECK(s);
 	if (nn) fprintf(stdout, "\n");
 	s = stats1->asHashIndexStats()->printEntries(fmt);
@@ -510,10 +513,10 @@ collimpl_simulate_realize(int argc, char *argv[])
       else {
 	std::string stats1, stats2;
 	if (coll->asCollArray())
-	  s = coll->asCollArray()->simulate(*idximpl, stats1, stats2,
+	  s = coll->asCollArray()->simulate(*collimpl, stats1, stats2,
 					    True, full, "  ");
 	else
-	  s = coll->simulate(*idximpl, stats1, True, full, "  ");
+	  s = coll->simulate(*collimpl, stats1, True, full, "  ");
 	CHECK(s);
 	if (nn) fprintf(stdout, "\n");
 	collection_trace(coll);
@@ -565,10 +568,10 @@ collimpl_stats_realize(int argc, char *argv[])
     LinkedListCursor c(list);
     Collection *coll;
     for (; c.getNext((void *&)coll); nn++) {
-      IndexImpl *_idximpl;
-      s = coll->getImplementation(_idximpl);
+      CollImpl *_collimpl = 0;
+      s = coll->getImplementation(_collimpl);
       CHECK(s);
-      if (fmt && _idximpl->getType() == IndexImpl::Hash) {
+      if (fmt && _collimpl->getIndexImpl()->getType() == IndexImpl::Hash) {
 	IndexStats *stats1, *stats2 = 0;
 	if (coll->asCollArray())
 	  s = coll->asCollArray()->getImplStats(stats1, stats2);
@@ -599,8 +602,8 @@ collimpl_stats_realize(int argc, char *argv[])
 	if (stats2.size())
 	  fprintf(stdout, stats2.c_str());
       }
-      if (_idximpl)
-	_idximpl->release();
+      if (_collimpl)
+	_collimpl->release();
     }
   }
 
@@ -623,16 +626,18 @@ collimpl_getdef_realize(int argc, char *argv[])
 
     if (list.getCount()) {
       LinkedListCursor c(list);
-      CollAttrImpl *collimpl;
+      CollAttrImpl *collattrimpl;
       
-      for (; c.getNext((void *&)collimpl); nn++) {
+      for (; c.getNext((void *&)collattrimpl); nn++) {
 	if (nn) fprintf(stdout, "\n");
 	fprintf(stdout, "Default implementation on %s:\n",
-		collimpl->getAttrpath().c_str());
-	const IndexImpl *idximpl;
-	Status s = collimpl->getImplementation(db, idximpl);
+		collattrimpl->getAttrpath().c_str());
+	const CollImpl *collimpl = 0;
+	Status s = collattrimpl->getImplementation(db, collimpl);
 	CHECK(s);
-	fprintf(stdout, idximpl->toString("  ").c_str());
+	if (collimpl->getIndexImpl()) {
+	  fprintf(stdout, collimpl->getIndexImpl()->toString("  ").c_str());
+	}
       }
     }
     else if (strchr(info, '.')) {
@@ -706,7 +711,7 @@ collimpl_setdef_realize(int argc, char *argv[])
     collimpl = new CollAttrImpl
       (db, const_cast<Class *>(cls), attrpath,
        propag, idximpl->getDataspace(),
-       idximpl->getType(),
+       (CollAttrImpl::Type)idximpl->getType(),
        idximpl->getType() == IndexImpl::Hash ?
        idximpl->getKeycount() : idximpl->getDegree(),
        idximpl->getHashMethod(),

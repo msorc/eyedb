@@ -148,7 +148,9 @@ called_from[ \t]*=[ \t]*Java {
     {
       if (!strcmp(_YYTEXT_, "backend"))
 	return SERVER;
-      if (!strcmp(_YYTEXT_, "btree") || !strcmp(_YYTEXT_, "btreeindex"))
+      if (!strcmp(_YYTEXT_, "btreeindex"))
+	return BTREEINDEX;
+      if (!strcmp(_YYTEXT_, "btree"))
 	return BTREE;
     }
   else if (c == 'c')
@@ -179,7 +181,9 @@ called_from[ \t]*=[ \t]*Java {
     }
   else if (c == 'h')
     {
-      if (!strcmp(_YYTEXT_, "hash") || !strcmp(_YYTEXT_, "hashindex"))
+      if (!strcmp(_YYTEXT_, "hashindex"))
+	return HASHINDEX;
+      if (!strcmp(_YYTEXT_, "hash"))
 	return HASH;				
       if (!strcmp(_YYTEXT_, "hints"))
 	return HINTS;
@@ -216,6 +220,8 @@ called_from[ \t]*=[ \t]*Java {
     }
   else if (c == 'n')
     {
+      if (!strcmp(_YYTEXT_, "noindex"))
+	return NOINDEX;
       if (!strcmp(_YYTEXT_, "notnull"))
 	return NOTNULL;			
       if (!strcmp(_YYTEXT_, "notempty"))

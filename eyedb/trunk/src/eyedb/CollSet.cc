@@ -45,13 +45,13 @@ namespace eyedb {
 		   const Oid& _idx2_oid,
 		   int icnt,
 		   int _bottom, int _top,
-		   const IndexImpl *_idximpl,
+		   const CollImpl *_collimpl,
 		   Object *_card,
 		   Bool _is_literal,
 		   Bool _is_pure_literal,
 		   Data _idx_data, Size _idx_data_size)
     : Collection(n, _class, _idx1_oid, _idx2_oid, icnt,
-		 _bottom, _top, _idximpl, _card, _is_literal, _is_pure_literal, _idx_data,
+		 _bottom, _top, _collimpl, _card, _is_literal, _is_pure_literal, _idx_data,
 		 _idx_data_size)
   {
     init();
@@ -59,29 +59,29 @@ namespace eyedb {
   }
 
   CollSet::CollSet(const char *n, Class *_coll_class, Bool _isref,
-		   const IndexImpl *_idximpl) :
-    Collection(n, _coll_class, _isref, _idximpl)
+		   const CollImpl *_collimpl) :
+    Collection(n, _coll_class, _isref, _collimpl)
   {
     init();
   }
 
   CollSet::CollSet(const char *n, Class *_coll_class, int _dim,
-		   const IndexImpl *_idximpl) :
-    Collection(n, _coll_class, _dim, _idximpl)
+		   const CollImpl *_collimpl) :
+    Collection(n, _coll_class, _dim, _collimpl)
   {
     init();
   }
 
-  CollSet::CollSet(Database *_db, const char *n, Class *_coll_class, Bool _isref, const IndexImpl *_idximpl) 
-    : Collection(n, _coll_class, _isref, _idximpl)
+  CollSet::CollSet(Database *_db, const char *n, Class *_coll_class, Bool _isref, const CollImpl *_collimpl) 
+    : Collection(n, _coll_class, _isref, _collimpl)
   {
     init();
     if (!status)
       status = setDatabase(_db);
   }
 
-  CollSet::CollSet(Database *_db, const char *n, Class *_coll_class, int _dim, const IndexImpl *_idximpl) :
-    Collection(n, _coll_class, _dim, _idximpl)
+  CollSet::CollSet(Database *_db, const char *n, Class *_coll_class, int _dim, const CollImpl *_collimpl) :
+    Collection(n, _coll_class, _dim, _collimpl)
   {
     init();
     if (!status)

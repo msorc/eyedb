@@ -45,35 +45,35 @@ namespace eyedb {
 		   const Oid& _idx2_oid,
 		   int icnt,
 		   int _bottom, int _top,
-		   const IndexImpl *_idximpl,
+		   const CollImpl *_collimpl,
 		   Object *_card,
 		   Bool _is_literal,
 		   Bool _is_pure_literal,
 		   Data _idx_data, Size _idx_data_size)
     : Collection(n, _class, _idx1_oid, _idx2_oid, icnt, 
-		 _bottom, _top, _idximpl, _card, _is_literal, _is_pure_literal, _idx_data, _idx_data_size)
+		 _bottom, _top, _collimpl, _card, _is_literal, _is_pure_literal, _idx_data, _idx_data_size)
   {
     init();
     setClass(_class);
   }
 
   CollBag::CollBag(const char *n, Class *mc, Bool _isref,
-		   const IndexImpl *_idximpl) :
-    Collection(n, mc, _isref, _idximpl)
+		   const CollImpl *_collimpl) :
+    Collection(n, mc, _isref, _collimpl)
   {
     init();
   }
 
   CollBag::CollBag(const char *n, Class *mc, int _dim,
-		   const IndexImpl *_idximpl) :
-    Collection(n, mc, _dim, _idximpl)
+		   const CollImpl *_collimpl) :
+    Collection(n, mc, _dim, _collimpl)
   {
     init();
   }
 
   CollBag::CollBag(Database *_db, const char *n, Class *mc,
-		   Bool _isref, const IndexImpl *_idximpl) :
-    Collection(n, mc, _isref, _idximpl)
+		   Bool _isref, const CollImpl *_collimpl) :
+    Collection(n, mc, _isref, _collimpl)
   {
     init();
     if (!status)
@@ -81,8 +81,8 @@ namespace eyedb {
   }
 
   CollBag::CollBag(Database *_db, const char *n, Class *mc,
-		   int _dim, const IndexImpl *_idximpl) :
-    Collection(n, mc, _dim, _idximpl)
+		   int _dim, const CollImpl *_collimpl) :
+    Collection(n, mc, _dim, _collimpl)
   {
     init();
     if (!status)

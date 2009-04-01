@@ -100,17 +100,18 @@ namespace eyedb {
 
   extern const char *odl_get_typname(const char *);
 
-  class odlIndexSpec;
+  class odlIndexImplSpec;
+  class odlCollImplSpec;
   class odlImplementation;
 
   class odlClassSpec {
 
   public:
     char *classname, *parentname, *aliasname;
-    odlIndexSpec *index_spec;
+    odlCollImplSpec *coll_impl_spec;
 
     odlClassSpec(const char *_classname, const char *_parentname,
-		 const char *_aliasname, odlIndexSpec *_index_spec);
+		 const char *_aliasname, odlCollImplSpec *_coll_impl_spec);
 
     ~odlClassSpec() {
       free(classname);
@@ -141,8 +142,10 @@ namespace eyedb {
   class odlConstraint;
   class odlUnique;
   class odlNotnull;
-  class odlIndexSpec;
-  class odlIndexSpecItem;
+  class odlIndexImplSpec;
+  class odlIndexImplSpecItem;
+  class odlCollImplSpec;
+  class odlCollImplSpecItem;
 
   typedef odl_temp_link<int>           odlArrayItemLink;
   typedef odl_temp_list<int>           odlArrayList;
@@ -359,98 +362,125 @@ namespace eyedb {
     virtual odlAttrComponent *clone() {abort(); return 0;}
   };
 
+  struct odlCollImplSpecItem {
+    enum Type {
+      UndefType,
+      HashIndex,
+      BTreeIndex,
+      NoIndex
+    } type;
+    char *hints;
+
+    void init() {
+      type = UndefType;
+      hints = 0;
+    }
+  };
+
+  struct odlCollImplSpec {
+    unsigned int item_alloc, item_cnt;
+    odlCollImplSpecItem *items;
+
+    odlCollImplSpec() {
+      item_alloc = item_cnt = 0;
+      items = 0;
+    }
+
+    void add(const odlCollImplSpecItem &item) {
+      if (item_cnt >= item_alloc) {
+	item_alloc += 4;
+	items = (odlCollImplSpecItem *)realloc(items, item_alloc * sizeof(odlCollImplSpecItem));
+      }
+      items[item_cnt++] = item;
+    }
+
+    int make_class_prologue(const char *clsname,
+			    odlCollImplSpecItem::Type &type,
+			    char *&hints) const;
+    int make_attr_prologue(const char *attrpath,
+			   odlCollImplSpecItem::Type &type,
+			   char *&hints, const Attribute *) const;
+    int make_prologue(Bool isclass, const char *attrpath,
+		      odlCollImplSpecItem::Type &type,
+		      char *&hints, const Attribute *) const;
+    ~odlCollImplSpec() {
+      free(items);
+    }
+  };
+
   struct odlImplementation : public odlAttrComponent {
 
-    odlIndexSpec *index_spec;
+    odlCollImplSpec *coll_impl_spec;
 
-    odlImplementation(const char *_attrpath, odlIndexSpec *_index_spec,
+    odlImplementation(const char *_attrpath, odlCollImplSpec *_coll_impl_spec,
 		      odlBool propag = odlTrue) :
-      odlAttrComponent(_attrpath, propag), index_spec(_index_spec) {}
+      odlAttrComponent(_attrpath, propag), coll_impl_spec(_coll_impl_spec) {}
 
     virtual odlImplementation *asImplementation() {return this;}
     AttributeComponent *make_realize(Database *, Schema *m, Class *cls, const Attribute *);
     odlBool similar(odlAttrComponent *,
 		    const Class *, const Class *);
-    virtual odlAttrComponent *clone() {odlAttrComponent *comp = new odlImplementation(attrpath, index_spec); comp->isCloned = odlTrue; return comp;}
+    virtual odlAttrComponent *clone() {odlAttrComponent *comp = new odlImplementation(attrpath, coll_impl_spec); comp->isCloned = odlTrue; return comp;}
   };
 
-  struct odlIndexSpecItem {
+  struct odlIndexImplSpecItem {
     enum Type {
       UndefType,
       Hash,
       BTree
     } type;
     char *hints;
-    /*
-      enum Propagate {
-      UndefPropag,
-      On,
-      Off
-      } propag;
-    */
 
     void init() {
       type = UndefType;
       hints = 0;
-      //propag = UndefPropag;
     }
   };
 
-  struct odlIndexSpec {
+  struct odlIndexImplSpec {
     unsigned int item_alloc, item_cnt;
-    odlIndexSpecItem *items;
+    odlIndexImplSpecItem *items;
 
-    odlIndexSpec() {
+    odlIndexImplSpec() {
       item_alloc = item_cnt = 0;
       items = 0;
     }
 
-    void add(const odlIndexSpecItem &item) {
+    void add(const odlIndexImplSpecItem &item) {
       if (item_cnt >= item_alloc) {
 	item_alloc += 4;
-	items = (odlIndexSpecItem *)realloc(items, item_alloc * sizeof(odlIndexSpecItem));
+	items = (odlIndexImplSpecItem *)realloc(items, item_alloc * sizeof(odlIndexImplSpecItem));
       }
       items[item_cnt++] = item;
     }
 
-    int make_class_prologue(const char *clsname,
-			    odlIndexSpecItem::Type &type,
-			    char *&hints) const;
-    int make_attr_prologue(const char *attrpath,
-			   odlIndexSpecItem::Type &type,
-			   char *&hints, const Attribute *) const;
-    int make_prologue(Bool isclass, const char *attrpath,
-		      odlIndexSpecItem::Type &type,
+    int make_prologue(const char *attrpath,
+		      odlIndexImplSpecItem::Type &type,
 		      char *&hints, const Attribute *) const;
-    ~odlIndexSpec() {
+    ~odlIndexImplSpec() {
       free(items);
     }
   };
 
   struct odlIndex : public odlAttrComponent {
-    odlIndexSpec *index_spec;
-    odlIndexSpec *index_spec_in;
+    odlIndexImplSpec *index_impl_spec;
+    odlIndexImplSpec *index_impl_spec_in;
 
-    odlIndex(const char *_attrpath, odlIndexSpec *_index_spec = 0,
+    odlIndex(const char *_attrpath, odlIndexImplSpec *_index_impl_spec = 0,
 	     odlBool propag = odlTrue) :
-      odlAttrComponent(_attrpath, propag), index_spec(_index_spec),
-      index_spec_in(_index_spec) {}
+      odlAttrComponent(_attrpath, propag), index_impl_spec(_index_impl_spec),
+      index_impl_spec_in(_index_impl_spec) {}
 
     static Status findIndex(Schema *m, Index *&idx_obj);
 
     virtual void retype(odlBool isCollOrIsRef) {
     }
 
-    /*
-      int make_prologue(odlIndexSpecItem::Type &type,
-      char *&hints, Bool is_string);
-    */
-
     AttributeComponent *make_realize(Database *, Schema *m, Class *cls, const Attribute *);
     odlBool similar(odlAttrComponent *,
 		    const Class *, const Class *);
     virtual odlIndex   *asIndex()   {return this;}
-    virtual odlAttrComponent *clone() {odlAttrComponent *comp = new odlIndex(attrpath, index_spec);  comp->isCloned = odlTrue; return comp;}
+    virtual odlAttrComponent *clone() {odlAttrComponent *comp = new odlIndex(attrpath, index_impl_spec);  comp->isCloned = odlTrue; return comp;}
   };
 
   struct odlConstraint : public odlAttrComponent {
@@ -701,7 +731,7 @@ namespace eyedb {
     char *parentname;
     odlDeclRootList *decl_list;
     Class *parent;
-    odlIndexSpec *index_spec;
+    odlCollImplSpec *coll_impl_spec;
     static LinkedList declared_list;
 
   public:
@@ -714,7 +744,7 @@ namespace eyedb {
       agrspec = _agrspec;
       parentname = (spec->parentname ? strdup(spec->parentname) :
 		    (superclass ? superclass->name : 0));
-      index_spec = spec->index_spec;
+      coll_impl_spec = spec->coll_impl_spec;
       decl_list = _decl_list;
 
       class_count++;

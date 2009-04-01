@@ -1999,10 +1999,18 @@ __method__OUT_void_setLiteralObject_collection(eyedb::Database *_db, eyedb::FEMe
   __method__OUT_string_getImplementation_collection__IN_bool(Database *_db, FEMethod_C *_m, Object *_o, const Bool local, char * &retarg)
   {
     Collection *coll = (Collection *)_o;
-    IndexImpl *idximpl;
-    Status s = coll->getImplementation(idximpl, local);
+    CollImpl *collimpl;
+    Status s = coll->getImplementation(collimpl, local);
     if (s) return s;
-    retarg = idximpl ? strdup(idximpl->toString().c_str()) : 0;
+    if (collimpl->getIndexImpl()) {
+      retarg = strdup(collimpl->getIndexImpl()->toString().c_str());
+    }
+    else if (collimpl->getType() == CollAttrImpl::NoIndex) {
+      retarg = strdup("noindex");
+    }
+    else {
+      retarg = strdup("<unknown>");
+    }
     return Success;
   }
 
@@ -2015,14 +2023,17 @@ __method__OUT_void_setLiteralObject_collection(eyedb::Database *_db, eyedb::FEMe
   {
     Status s;
     Collection *coll = (Collection *)_o;
-    IndexImpl *idximpl;
+    IndexImpl *idximpl = 0;
 
     s = getIndexImpl(_db, idxtype, hints, idximpl);
     if (s) return s;
 
     std::string stats;
-    s = coll->simulate(*idximpl, stats, True, full);
+    CollImpl *collimpl = new CollImpl((CollAttrImpl::Type)idxtype, idximpl);
+    s = coll->simulate(*collimpl, stats, True, full);
     if (s) return s;
+    collimpl->release();
+    idximpl->release();
     retarg = strdup(stats.c_str());
     return Success;
   }
@@ -2037,13 +2048,21 @@ __method__OUT_void_setLiteralObject_collection(eyedb::Database *_db, eyedb::FEMe
     Status s;
     Collection *coll = (Collection *)_o;
 
-    IndexImpl *idximpl;
-    s = getIndexImpl(_db, idxtype, hints, idximpl);
-    if (s) return s;
+    IndexImpl *idximpl = 0;
+    if (idxtype == CollAttrImpl::HashIndex || idxtype == CollAttrImpl::BTreeIndex) {
+      s = getIndexImpl(_db, idxtype, hints, idximpl);
+      if (s) return s;
+    }
+      
+    CollImpl *collimpl = new CollImpl((CollAttrImpl::Type)idxtype, idximpl);
+    coll->setImplementation(collimpl);
 
-    coll->setImplementation(idximpl);
-    if (idximpl)
+    if (idximpl) {
       idximpl->release();
+    }
+
+    collimpl->release();
+
     if (coll->isLiteral())
       return coll->getMasterObject(true)->store();
     return coll->store();

@@ -178,11 +178,11 @@ namespace eyedb {
 	const Attribute *oattr = ocls->getAttribute(attrs[i]->getName());
 	if (oattr) {
 	  /*
-	  printf("%s::%s attr_comp_set_oid %s -> %s\n",
-		 oattr->getAttrCompSetOid().toString(),
-		 attrs[i]->getAttrCompSetOid().toString(),
-		 attrs[i]->getDynClassOwner()->getName(),
-		 attrs[i]->getName());
+	    printf("%s::%s attr_comp_set_oid %s -> %s\n",
+	    oattr->getAttrCompSetOid().toString(),
+	    attrs[i]->getAttrCompSetOid().toString(),
+	    attrs[i]->getDynClassOwner()->getName(),
+	    attrs[i]->getName());
 	  */
 	  attrs[i]->setAttrCompSetOid(oattr->getAttrCompSetOid());
 	}
@@ -548,7 +548,7 @@ namespace eyedb {
 #define SWAP_CLSNAMES
 
   odlClassSpec::odlClassSpec(const char *_aliasname, const char *_parentname,
-			     const char *_classname, odlIndexSpec *_index_spec)
+			     const char *_classname, odlCollImplSpec *_coll_impl_spec)
   {
     if (getenv("SYSTEM_UPDATE"))
       {
@@ -567,7 +567,7 @@ namespace eyedb {
       }
 
     parentname = (_parentname ? strdup(_parentname) : 0);
-    index_spec = _index_spec;
+    coll_impl_spec = _coll_impl_spec;
   }
 
   static void
@@ -672,43 +672,43 @@ namespace eyedb {
 	cls = new Class(cls->getName(), cls->getParent());
     }
     else if (agrspec == odl_NativeClass) {
-	cls = m->getClass(name);
-	if (!cls)
-	  odl_add_error("cannot find native class '%s'\n", name);
-	else if (!cls->isSystem())
-	  odl_add_error("class '%s' is not native\n",
-			name);
-	else if (aliasname && strcmp(aliasname, name))
-	  odl_add_error("cannot set an alias name on the native"
-			" class '%s'\n", name);
-	else {
-	  /*
-	    odlDeclRootLink *l = decl_list->first;
-	    while (l) {
-	    if (!l->x->asExecSpec()) {
-	    odl_add_error("native class '%s' can include "
-	    " only methods or triggers.\n", name);
-	    break;
-	    }
-	    l = l->next;
-	    }
-	  */
-	}
+      cls = m->getClass(name);
+      if (!cls)
+	odl_add_error("cannot find native class '%s'\n", name);
+      else if (!cls->isSystem())
+	odl_add_error("class '%s' is not native\n",
+		      name);
+      else if (aliasname && strcmp(aliasname, name))
+	odl_add_error("cannot set an alias name on the native"
+		      " class '%s'\n", name);
+      else {
+	/*
+	  odlDeclRootLink *l = decl_list->first;
+	  while (l) {
+	  if (!l->x->asExecSpec()) {
+	  odl_add_error("native class '%s' can include "
+	  " only methods or triggers.\n", name);
+	  break;
+	  }
+	  l = l->next;
+	  }
+	*/
+      }
 
 #if 0
-	if (!odl_error) {
-	  printf("NATIVE CLASS %s %s -> %p [system=%d] ", cls->getName(),
-		 cls->isSystem() ? "system" : "user", cls, system);
-	}
-#endif
-	if (!odl_error) {
-	  cls = new Class(cls->getName(), cls->getParent());
-	  cls->setUserData(odlGENCOMP, AnyUserData);
-	  ClassPeer::setMType(cls, Class::System);
-	  if (db)
-	    cls->setDatabase(db);
-	}
+      if (!odl_error) {
+	printf("NATIVE CLASS %s %s -> %p [system=%d] ", cls->getName(),
+	       cls->isSystem() ? "system" : "user", cls, system);
       }
+#endif
+      if (!odl_error) {
+	cls = new Class(cls->getName(), cls->getParent());
+	cls->setUserData(odlGENCOMP, AnyUserData);
+	ClassPeer::setMType(cls, Class::System);
+	if (db)
+	  cls->setDatabase(db);
+      }
+    }
     else {
       cls = new UnionClass(makeName(name, prefix), parent);
       cls->setUserData(odlGENCODE, AnyUserData);
@@ -799,16 +799,23 @@ namespace eyedb {
     if (cls)
       cls->setUserData(odlSELF, this);
 
-    if (cls && index_spec) {
-      //printf("class %s has an implementation\n", cls->getName());
-      odlIndexSpecItem::Type type;
+    if (cls && coll_impl_spec) {
+      // TBD: Index -> Coll
+      odlCollImplSpecItem::Type type;
       char *hints;
-      if (!index_spec->make_class_prologue(cls->getName(), type, hints))
+      if (!coll_impl_spec->make_class_prologue(cls->getName(), type, hints))
 	return 1;
+
+      if (type != odlCollImplSpecItem::HashIndex &&
+	  type != odlCollImplSpecItem::BTreeIndex) {
+	odl_add_error("class %s: extent implementation '%s' must be an hashindex or a btreeindex", cls->getName());
+	return 1;
+
+      }
       IndexImpl *idximpl;
       Status s = IndexImpl::make
 	((db ? db : odl_get_dummy_db(m)),
-	 (type == odlIndexSpecItem::Hash ? IndexImpl::Hash :
+	 (type == odlCollImplSpecItem::HashIndex ? IndexImpl::Hash :
 	  IndexImpl::BTree), hints, idximpl);
       if (!s) {
 	if (cls->getOid().isValid()) {
@@ -1410,42 +1417,36 @@ namespace eyedb {
     }
   }
 
-  int
-  odlIndexSpec::make_class_prologue(const char *clsname,
-				    odlIndexSpecItem::Type &type,
-				    char *&hints) const
+  int odlCollImplSpec::make_class_prologue(const char *clsname,
+					   odlCollImplSpecItem::Type &type,
+					   char *&hints) const
   {
     return make_prologue(True, clsname, type, hints, 0);
   }
 
-  int
-  odlIndexSpec::make_attr_prologue(const char *attrpath,
-				   odlIndexSpecItem::Type &type,
-				   char *&hints, const Attribute *attr) const
-  {
+  int odlCollImplSpec::make_attr_prologue(const char *attrpath,
+					  odlCollImplSpecItem::Type &type,
+					  char *&hints, const Attribute *attr) const {
     return make_prologue(False, attrpath, type, hints, attr);
   }
 
-  int
-  odlIndexSpec::make_prologue(Bool isclass, const char *name,
-			      odlIndexSpecItem::Type &type,
-			      char *&hints, 
-			      const Attribute *attr) const
-  {
-    odlIndexSpecItem::Type undefType = odlIndexSpecItem::UndefType;
+  int odlCollImplSpec::make_prologue(Bool isclass, const char *name,
+				     odlCollImplSpecItem::Type &type,
+				     char *&hints, const Attribute *attr) const {
+    odlCollImplSpecItem::Type undefType = odlCollImplSpecItem::UndefType;
 
     type = undefType;
     hints = 0;
 
     for (int i = 0; i < item_cnt; i++) {
-      odlIndexSpecItem *item = &items[i];
+      odlCollImplSpecItem *item = &items[i];
       if (item->type != undefType) {
 	if (type != undefType) {
 	  if (isclass)
-	    odl_add_error("class implementation'%s': index type is "
+	    odl_add_error("class implementation'%s': collection type is "
 			  "defined twice", name);
 	  else
-	    odl_add_error("attribute '%s': index type is defined twice",
+	    odl_add_error("attribute '%s': collection type is defined twice",
 			  name);
 	  return 0;
 	}
@@ -1454,10 +1455,10 @@ namespace eyedb {
       else if (item->hints) {
 	if (hints) {
 	  if (isclass)
-	    odl_add_error("class implementation '%s': index hints are "
+	    odl_add_error("class implementation '%s': collection hints are "
 			  "defined twice", name);
 	  else
-	    odl_add_error("attribute '%s': index hints are defined twice",
+	    odl_add_error("attribute '%s': collection hints are defined twice",
 			  name);
 	  return 0;
 	}
@@ -1466,14 +1467,61 @@ namespace eyedb {
     }
 
     if (type == undefType) {
-      if (isclass)
-	type = odlIndexSpecItem::Hash;
+      if (isclass) {
+	type = odlCollImplSpecItem::HashIndex;
+      }
+      else {
+	type = odlCollImplSpecItem::NoIndex;
+      }
+      /*
       else if (attr &&
 	       (attr->isString() || attr->isIndirect() ||
 		attr->getClass()->asCollectionClass())) // what about enums
-	type = odlIndexSpecItem::Hash;
+	type = odlCollImplSpecItem::HashIndex;
       else
-	type = odlIndexSpecItem::BTree;
+	type = odlCollImplSpecItem::BTreeIndex;
+      */
+    }
+
+    return 1;
+  }
+
+  int
+  odlIndexImplSpec::make_prologue(const char *name,
+				  odlIndexImplSpecItem::Type &type,
+				  char *&hints, 
+				  const Attribute *attr) const
+  {
+    odlIndexImplSpecItem::Type undefType = odlIndexImplSpecItem::UndefType;
+
+    type = undefType;
+    hints = 0;
+
+    for (int i = 0; i < item_cnt; i++) {
+      odlIndexImplSpecItem *item = &items[i];
+      if (item->type != undefType) {
+	if (type != undefType) {
+	  odl_add_error("attribute '%s': index type is defined twice",
+			name);
+	  return 0;
+	}
+	type = item->type;
+      }
+      else if (item->hints) {
+	if (hints) {
+	  odl_add_error("attribute '%s': index hints are defined twice", name);
+	  return 0;
+	}
+	hints = item->hints;
+      }
+    }
+
+    if (type == undefType) {
+      if (attr && (attr->isString() || attr->isIndirect() ||
+		   attr->getClass()->asCollectionClass())) // what about enums
+	type = odlIndexImplSpecItem::Hash;
+      else
+	type = odlIndexImplSpecItem::BTree;
     }
 
     return 1;
@@ -1563,11 +1611,11 @@ namespace eyedb {
   odlIndex::make_realize(Database *db, Schema *m, Class *cls,
 			 const Attribute *attr)
   {
-    odlIndexSpecItem::Type type;
+    odlIndexImplSpecItem::Type type;
     char *hints;
 
-    if (index_spec) {
-      if (!index_spec->make_attr_prologue(attrpath, type, hints, attr))
+    if (index_impl_spec) {
+      if (!index_impl_spec->make_prologue(attrpath, type, hints, attr))
 	return 0;
     }
     else {
@@ -1575,9 +1623,9 @@ namespace eyedb {
       if (attr &&
 	  (attr->isString() || attr->isIndirect() ||
 	   attr->getClass()->asCollectionClass())) // what about enums
-	type = odlIndexSpecItem::Hash;
+	type = odlIndexImplSpecItem::Hash;
       else
-	type = odlIndexSpecItem::BTree;
+	type = odlIndexImplSpecItem::BTree;
     }
 
     Bool hasDB = IDBBOOL(db);
@@ -1587,7 +1635,7 @@ namespace eyedb {
 
     Index *idx;
     Status s;
-    if (type == odlIndexSpecItem::Hash)
+    if (type == odlIndexImplSpecItem::Hash)
       s = HashIndex::make(db,
 			  const_cast<Class *>(cls), attrpath,
 			  IDBBOOL(propagate), attr->isString(), hints,
@@ -1610,17 +1658,18 @@ namespace eyedb {
   odlImplementation::make_realize(Database *db, Schema *m, Class *cls,
 				  const Attribute *attr)
   {
-    //printf("odlImplementation::make_realize(%s)\n", attrpath);
-    odlIndexSpecItem::Type type;
+    // TBD: Index -> Coll
+    odlCollImplSpecItem::Type type;
     char *hints;
 
-    if (index_spec) {
-      if (!index_spec->make_attr_prologue(attrpath, type, hints, attr))
+    if (coll_impl_spec) {
+      if (!coll_impl_spec->make_attr_prologue(attrpath, type, hints, attr))
 	return 0;
     }
     else {
       hints = 0;
-      type = odlIndexSpecItem::Hash;
+      //type = odlCollImplSpecItem::HashIndex;
+      type = odlCollImplSpecItem::NoIndex;
     }
 
     Bool hasDB = IDBBOOL(db);
@@ -1628,11 +1677,25 @@ namespace eyedb {
       db = odl_get_dummy_db(m);
 
     CollAttrImpl *impl;
+    CollAttrImpl::Type impltype;
+
+    if (type == odlCollImplSpecItem::HashIndex) {
+      impltype = CollAttrImpl::HashIndex;
+    }
+    else if (type == odlCollImplSpecItem::BTreeIndex) {
+      impltype = CollAttrImpl::BTreeIndex;
+    }
+    else if (type == odlCollImplSpecItem::NoIndex) {
+      impltype = CollAttrImpl::NoIndex;
+    }
+    else {
+      odl_add_error("unknown implementation type for attribute %s", attrpath);
+      return 0;
+    }
+
     Status s = CollAttrImpl::make
       (db, const_cast<Class *>(cls), attrpath, IDBBOOL(propagate),
-       (type == odlIndexSpecItem::Hash ? IndexImpl::Hash :
-	IndexImpl::BTree),
-       hints, (CollAttrImpl *&)impl);
+       impltype, hints, (CollAttrImpl *&)impl);
   
     if (s) { 
       odl_add_error(s);
@@ -1777,13 +1840,13 @@ namespace eyedb {
 	    Exception::setMode(mode);
 	  
 	    /*
-	    if (!coll_spec->isref) {
+	      if (!coll_spec->isref) {
 	      odl_add_error("'%s<%s> %s%s': only collection of objects are "
-			    "supported\n",
-			    coll_spec->collname, cl->getName(),
-			    (item->isref ? "*" : ""), item->attrname);
+	      "supported\n",
+	      coll_spec->collname, cl->getName(),
+	      (item->isref ? "*" : ""), item->attrname);
 	      return;
-	    }
+	      }
 	    */
 
 	    status = mcoll->asCollectionClass()->getStatus();
@@ -2342,15 +2405,15 @@ namespace eyedb {
     return 0;
   }
 
-#define COMPLETE(CLS) \
-  if ((CLS)->isPartiallyLoaded()) \
-    { \
-      Status s = m->manageClassDeferred((Class *)CLS); \
-      if (s) \
-	{ \
-	  odl_add_error(s); \
-	  return; \
-	} \
+#define COMPLETE(CLS)					\
+  if ((CLS)->isPartiallyLoaded())			\
+    {							\
+      Status s = m->manageClassDeferred((Class *)CLS);	\
+      if (s)						\
+	{						\
+	  odl_add_error(s);				\
+	  return;					\
+	}						\
     }
 
 #ifdef NEW_REORDER

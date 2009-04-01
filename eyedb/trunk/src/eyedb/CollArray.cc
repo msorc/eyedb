@@ -54,35 +54,35 @@ namespace eyedb {
 		       const Oid& _idx2_oid,
 		       int icnt,
 		       int _bottom, int _top,
-		       const IndexImpl *_idximpl,
+		       const CollImpl *_collimpl,
 		       Object *_card,
 		       Bool _is_literal,
 		       Bool _is_pure_literal,
 		       Data _idx_data, Size _idx_data_size)
     : Collection(n, _class, _idx1_oid, _idx2_oid, icnt,
-		 _bottom, _top, _idximpl, _card, _is_literal, _is_pure_literal, _idx_data, _idx_data_size)
+		 _bottom, _top, _collimpl, _card, _is_literal, _is_pure_literal, _idx_data, _idx_data_size)
   {
     init();
     setClass(_class);
   }
 
   CollArray::CollArray(const char *n, Class *mc, Bool _isref,
-		       const IndexImpl *_idximpl) :
-    Collection(n, mc, _isref, _idximpl)
+		       const CollImpl *_collimpl) :
+    Collection(n, mc, _isref, _collimpl)
   {
     init();
   }
 
   CollArray::CollArray(const char *n, Class *mc, int _dim,
-		       const IndexImpl *_idximpl) :
-    Collection(n, mc, _dim, _idximpl)
+		       const CollImpl *_collimpl) :
+    Collection(n, mc, _dim, _collimpl)
   {
     init();
   }
 
   CollArray::CollArray(Database *_db, const char *n, Class *mc,
-		       Bool _isref, const IndexImpl *_idximpl) :
-    Collection(n, mc, _isref, _idximpl)
+		       Bool _isref, const CollImpl *_collimpl) :
+    Collection(n, mc, _isref, _collimpl)
   {
     init();
     if (!status)
@@ -90,8 +90,8 @@ namespace eyedb {
   }
 
   CollArray::CollArray(Database *_db, const char *n, Class *mc,
-		       int _dim, const IndexImpl *_idximpl ) :
-    Collection(n, mc, _dim, _idximpl)
+		       int _dim, const CollImpl *_collimpl ) :
+    Collection(n, mc, _dim, _collimpl)
   {
     init();
     if (!status)
@@ -774,7 +774,7 @@ namespace eyedb {
       Oid xoid = idxoids[n];
       if (xoid.isValid()) {
 	rpc_status = collectionGetImplStats
-	  (db->getDbHandle(), idximpl->getType(),
+	  (db->getDbHandle(), collimpl->getType(),
 	   xoid.getOid(), (Data *)stats[n]);
 	if (rpc_status) return StatusMake(rpc_status);
 	completeImplStats(*stats[n]);
@@ -785,12 +785,12 @@ namespace eyedb {
   }
 
   Status
-  CollArray::simulate(const IndexImpl &_idximpl,
+  CollArray::simulate(const CollImpl &_collimpl,
 		      std::string &xstats1, std::string &xstats2,
 		      Bool dspImpl, Bool full, const char *indent)
   {
     IndexStats *stats1, *stats2;
-    Status s = simulate(_idximpl, stats1, stats2);
+    Status s = simulate(_collimpl, stats1, stats2);
     if (s) return s;
     xstats1 = (stats1 ? stats1->toString(dspImpl, full, indent) : std::string(""));
     xstats2 = (stats2 ? stats2->toString(dspImpl, full, indent) : std::string(""));
@@ -800,7 +800,7 @@ namespace eyedb {
   }
 
   Status
-  CollArray::simulate(const IndexImpl &_idximpl,
+  CollArray::simulate(const CollImpl &_collimpl,
 		      IndexStats *&stats1, IndexStats *&stats2)
   {
     Oid idx1oid, idx2oid;
@@ -817,10 +817,10 @@ namespace eyedb {
 	Data data;
 	Offset offset = 0;
 	Size size = 0;
-	Status s = IndexImpl::code(data, offset, size, _idximpl);
+	Status s = IndexImpl::code(data, offset, size, _collimpl.getIndexImpl(), _collimpl.getType());
 	if (s) return s;
 	rpc_status =
-	  collectionSimulImplStats(db->getDbHandle(), _idximpl.getType(),
+	  collectionSimulImplStats(db->getDbHandle(), _collimpl.getType(),
 				       xoid.getOid(), data, size,
 				       (Data *)*stats[n]);
 	if (rpc_status)

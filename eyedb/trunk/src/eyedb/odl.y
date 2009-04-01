@@ -174,8 +174,11 @@ extern void yyerror(const char *);
   odlEnumItem *enum_item;
   odlEnumList *enum_list;
 
-  odlIndexSpec *index_spec;
-  odlIndexSpecItem index_spec_item;
+  odlIndexImplSpec *index_impl_spec;
+  odlIndexImplSpecItem index_impl_spec_item;
+
+  odlCollImplSpec *coll_impl_spec;
+  odlCollImplSpecItem coll_impl_spec_item;
 
   odlMethodHints mth_hints;
 }
@@ -189,7 +192,7 @@ extern void yyerror(const char *);
 %token METHOD UNIQUE SCOPE EXTENDS EXTREF ATTRIBUTE CPLUSPLUS RELSHIP PROPAGATE
 %token CALLED_FROM_OQL CALLED_FROM_ANY CALLED_FROM_C CALLED_FROM_JAVA
 %token SERVER CLIENT OUT INOUT STATIC INSTMETHOD CLASSMETHOD NATIVE
-%token BTREE HASH IMPLEMENTATION NIL TYPE HINTS
+%token BTREE HASH BTREEINDEX HASHINDEX NOINDEX IMPLEMENTATION NIL TYPE HINTS
 %token REMOVED RENAMED_FROM CONVERT_METHOD MIGRATED_FROM EXTENDED
 %token <s> OQL_QUOTED_SEQ 
 /*%token OQL*/
@@ -214,8 +217,10 @@ extern void yyerror(const char *);
 %type <arg>       arg
 %type <i> in_out
 %type <impl> implementation
-%type <index_spec> index_spec class_implementation
-%type <index_spec_item> index_spec_item
+%type <index_impl_spec> index_impl_spec
+%type <index_impl_spec_item> index_impl_spec_item
+%type <coll_impl_spec> coll_impl_spec class_implementation
+%type <coll_impl_spec_item> coll_impl_spec_item
 %type <upd_hint> update_hint
 
 %token SHIFT_L SHIFT_R SUP_EQ INF_EQ
@@ -512,7 +517,7 @@ decl_item_x : decl_item update_hint
   $$ = new odlIndex($3);
   free($3);
 }
-| INDEX '<' index_spec '>' ON attr_path
+| INDEX '<' index_impl_spec '>' ON attr_path
 {
   $$ = new odlIndex($6, $3);
   free($6);
@@ -522,12 +527,12 @@ decl_item_x : decl_item update_hint
   $$ = new odlIndex($6, 0, $3);
   free($6);
 }
-| INDEX '<' index_spec ',' propagate '>' ON attr_path
+| INDEX '<' index_impl_spec ',' propagate '>' ON attr_path
 {
   $$ = new odlIndex($8, $3, $5);
   free($8);
 }
-| INDEX '<' propagate ',' index_spec '>' ON attr_path
+| INDEX '<' propagate ',' index_impl_spec '>' ON attr_path
 {
   $$ = new odlIndex($8, $5, $3);
   free($8);
@@ -556,74 +561,115 @@ decl_item_x : decl_item update_hint
 }
 ;
 
-class_implementation: '(' IMPLEMENTATION '<' index_spec '>' ')'
+index_impl_spec : index_impl_spec_item
 {
-  $$ = $4;
-}
-;
-
-implementation : IMPLEMENTATION '<' index_spec '>' ON attr_path
-{
-  $$ = new odlImplementation($6, $3);
-  free($6);
-}
-| IMPLEMENTATION '<' index_spec ',' propagate '>' ON attr_path
-{
-  $$ = new odlImplementation($8, $3, $5);
-  free($8);
-}
-| IMPLEMENTATION '<' propagate ',' index_spec '>' ON attr_path
-{
-  $$ = new odlImplementation($8, $5, $3);
-  free($8);
-}
-;
-
-index_spec : index_spec_item
-{
-  $$ = new odlIndexSpec();
+  $$ = new odlIndexImplSpec();
   $$->add($1);
 }
-| index_spec ',' index_spec_item
+| index_impl_spec ',' index_impl_spec_item
 {
   $1->add($3);
   $$ = $1;
 }
 ;
 
-index_spec_item : HASH
+index_impl_spec_item : HASH
 {
   $$.init();
-  $$.type = odlIndexSpecItem::Hash;
+  $$.type = odlIndexImplSpecItem::Hash;
 }
 | BTREE
 {
   $$.init();
-  $$.type = odlIndexSpecItem::BTree;
+  $$.type = odlIndexImplSpecItem::BTree;
 }
 | TYPE '=' HASH
 {
   $$.init();
-  $$.type = odlIndexSpecItem::Hash;
+  $$.type = odlIndexImplSpecItem::Hash;
 }
 | TYPE '=' BTREE
 {
   $$.init();
-  $$.type = odlIndexSpecItem::BTree;
+  $$.type = odlIndexImplSpecItem::BTree;
 }
 | HINTS '=' string
 {
   $$.init();
   $$.hints = $3;
 }
-/*
-| propagate
+;
+
+class_implementation: '(' IMPLEMENTATION '<' coll_impl_spec '>' ')'
+{
+  $$ = $4;
+}
+;
+
+implementation : IMPLEMENTATION '<' coll_impl_spec '>' ON attr_path
+{
+  $$ = new odlImplementation($6, $3);
+  free($6);
+}
+| IMPLEMENTATION '<' coll_impl_spec ',' propagate '>' ON attr_path
+{
+  $$ = new odlImplementation($8, $3, $5);
+  free($8);
+}
+| IMPLEMENTATION '<' propagate ',' coll_impl_spec '>' ON attr_path
+{
+  $$ = new odlImplementation($8, $5, $3);
+  free($8);
+}
+;
+
+coll_impl_spec : coll_impl_spec_item
+{
+  $$ = new odlCollImplSpec();
+  $$->add($1);
+}
+| coll_impl_spec ',' coll_impl_spec_item
+{
+  $1->add($3);
+  $$ = $1;
+}
+;
+
+coll_impl_spec_item : HASHINDEX
 {
   $$.init();
-  $$.propag = $1 ? odlIndexSpecItem::On : odlIndexSpecItem::Off;
-  $$ = $1;
-};
-*/
+  $$.type = odlCollImplSpecItem::HashIndex;
+}
+| BTREEINDEX
+{
+  $$.init();
+  $$.type = odlCollImplSpecItem::BTreeIndex;
+}
+| NOINDEX
+{
+  $$.init();
+  $$.type = odlCollImplSpecItem::NoIndex;
+}
+| TYPE '=' HASHINDEX
+{
+  $$.init();
+  $$.type = odlCollImplSpecItem::HashIndex;
+}
+| TYPE '=' BTREEINDEX
+{
+  $$.init();
+  $$.type = odlCollImplSpecItem::BTreeIndex;
+}
+| TYPE '=' NOINDEX
+{
+  $$.init();
+  $$.type = odlCollImplSpecItem::NoIndex;
+}
+| HINTS '=' string
+{
+  $$.init();
+  $$.hints = $3;
+}
 ;
 
 propagate : PROPAGATE '=' ON

@@ -1878,7 +1878,7 @@ namespace eyedb {
     Data data = 0;
 
     offset = IDB_CLASS_IMPL_TYPE;
-    s = IndexImpl::code(data, offset, alloc_size, *idximpl);
+    s = IndexImpl::code(data, offset, alloc_size, idximpl);
     if (s) return s;
 
     offset = IDB_CLASS_MTYPE;

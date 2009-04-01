@@ -378,7 +378,7 @@ Status BasicClass::create()
   int32_code (&data, &offset, &alloc_size, (eyedblib::int32 *)&mag_order);
   */
   offset = IDB_CLASS_IMPL_TYPE;
-  status = IndexImpl::code(data, offset, alloc_size, *idximpl);
+  status = IndexImpl::code(data, offset, alloc_size, idximpl);
   if (status) return status;
 
   offset = IDB_CLASS_MTYPE;
