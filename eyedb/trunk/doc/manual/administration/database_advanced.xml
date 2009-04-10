@@ -13,7 +13,10 @@
     <title>Database advanced administration</title>
     
     <para>
-      This chapter explains &eyedb; databases advanced administration, namely the <emphasis>datafiles</emphasis> and <emphasis>dataspaces</emphasis> concepts that allow to create multi-volumes large &eyedb; databases.
+      This chapter explains &eyedb; databases advanced administration,
+      namely the <emphasis>datafiles</emphasis> and
+      <emphasis>dataspaces</emphasis> concepts that allow to create
+      multi-volumes large &eyedb; databases.
     </para>
 
     <para>
@@ -583,7 +586,7 @@ the datafile to be defragmented, that can be specified either by its id or by it
 
     </section>
 
-    <section>
+    <section id="managing-dataspaces">
       <title>Managing dataspaces</title>
 
       <para>

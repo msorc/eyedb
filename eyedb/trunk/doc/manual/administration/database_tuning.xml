@@ -2,6 +2,7 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN" "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd"
 [
 <!ENTITY eyedb "EyeDB">
+<!ENTITY eyedbadmin "<command>eyedbadmin</command>">
 ]
 >
 
@@ -11,19 +12,81 @@
   <chapter id="database_tuning">
     <title>Database tuning</title>
 
+    <para>
+      This chapter explains how to tune &eyedb; to improve performance, either system response time or databases size.
+    </para>
+
+    <para>
+      The first section describes how to build multi-volumes databases
+      that can contain hundred of terabytes of data. The two following
+      sections explains how to manage indexes and collections to improve
+      system response time. The last section describes how to specify a
+      location (i.e. a dataspace) for &eyedb; entities such as class
+      instances, collections...
+    </para>
+
     <section>
       <title>Creating large databases</title>
 
+      <para>
+	Creating large databases (i.e. larger than a terabyte) requires partitionning the database between several volumes, either physical disks or partitions of a disk. &eyedb; supports multi-volumes databases using datafiles (see <xref linkend="managing-datafiles"/>) and dataspaces (see <xref linkend="managing-dataspaces"/>).
+      </para>
+
       <section>
-	<title>Databases and system limits</title>
+	<title>Databases limits</title>
+	
+	<para>
+	</para>
+
       </section>
 
       <section>
 	<title>Tuning the host system</title>
+
+	<para>
+	  An important notice is that the host system imposes to the processes running on it some resource limits, in particular on process memory size and process virtual memory size. As &eyedb; file access relies heavily on virtual memory and file mapping, it is mandatory to either unset these limits or set them to a high value.
+	</para>
+
+	<para>
+	  On Linux, the resource limits can be retrieved and set using functions <function>getrlimit</function> and <function>setrlimit</function>, that can be used from a C or C++ program. For a further description of these functions, consult the <citerefentry><refentrytitle>getrlimit</refentrytitle><manvolnum>2</manvolnum></citerefentry> and <citerefentry><refentrytitle>setrlimit</refentrytitle><manvolnum>2</manvolnum></citerefentry> manual pages.
+	</para>
+
+	<para>
+	  When using command line tools, an easy way to retrieve and set resource limits is to use the bash <command>ulimit</command> command. For a further description of this command, consult the <citerefentry><refentrytitle>bash</refentrytitle><manvolnum>1</manvolnum></citerefentry> manual page.
+	</para>
+
+	<para>
+	  The two mandatory resource limits that must be set are:
+	  <itemizedlist>
+	    <listitem><para>the maximum memory size, which can be retrieved using command <command>ulimit -m</command> </para></listitem>
+	    <listitem><para>the maximum virtual memory size, which can be retrieved using command <command>ulimit -v</command></para></listitem>
+	  </itemizedlist>
+	</para>
+
+	<example id="ulimit">
+	  <title>Retrieving and setting resource limits using <command>ulimit</command></title>
+	  <screen>
+<userinput>ulimit -m</userinput>
+1024
+<userinput>ulimit -m unlimited</userinput>
+<userinput>ulimit -m</userinput>
+unlimited
+<userinput>ulimit -v</userinput>
+8192
+<userinput>ulimit -v unlimited</userinput>
+<userinput>ulimit -v</userinput>
+unlimited
+	  </screen>
+	</example>
+
       </section>
       
       <section>
 	<title>Creating multi-volumes databases using datafiles and dataspaces</title>
+
+	<para>
+	</para>
+
       </section>
 
     </section>
@@ -33,22 +96,42 @@
 
       <section>
 	<title>Where to use indexes?</title>
+
+	<para>
+	</para>
+
       </section>
 
       <section>
 	<title>Creating and deleting indexes</title>
+
+	<para>
+	</para>
+
       </section>
 
       <section>
 	<title>Listing, updating and moving indexes</title>
+
+	<para>
+	</para>
+
       </section>
 
       <section>
 	<title>Getting statistics on indexes, simulating index performances</title>
+
+	<para>
+	</para>
+
       </section>
 
       <section>
 	<title>Getting and setting index dataspace</title>
+
+	<para>
+	</para>
+
       </section>
 
     </section>
@@ -58,14 +141,26 @@
       
       <section>
 	<title>EyeDB collection implementations</title>
+
+	<para>
+	</para>
+
       </section>
 
       <section>
 	<title>Setting and updating a collection implementation</title>
+
+	<para>
+	</para>
+
       </section>
 
       <section>
 	<title>Listing and simulating collections, getting statistics on collections</title>
+
+	<para>
+	</para>
+
       </section>
 
     </section>
@@ -75,22 +170,42 @@
       
       <section>
 	<title>What is a location in EyeDB?</title>
+
+	<para>
+	</para>
+
       </section>
 
       <section>
 	<title>Managing instances locations</title>
+
+	<para>
+	</para>
+
       </section>
 
       <section>
 	<title>Managing attributes locations</title>
+
+	<para>
+	</para>
+
       </section>
 
       <section>
 	<title>Managing collections locations</title>
+
+	<para>
+	</para>
+
       </section>
 
       <section>
 	<title>Managing indexes locations</title>
+
+	<para>
+	</para>
+
       </section>
 
     </section>
