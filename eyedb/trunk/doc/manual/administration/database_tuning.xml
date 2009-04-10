@@ -153,7 +153,26 @@ Done
 	  </cmdsynopsis>
 	</para>
 
-	
+	<para>
+	  Options are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="plain">--propagate=<group><arg choice="plain">on</arg><arg choice="plain">off</arg></group></arg>
+		</cmdsynopsis>
+		propagation mode
+	      </para>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="plain">--type=<replaceable>type</replaceable></arg>
+		</cmdsynopsis>
+		index type (supported types are: hash, btree)
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+
 	<para>
 	  Command arguments are:
 	  <itemizedlist>
@@ -203,6 +222,53 @@ Person.addr.town
 	  <screen>
 <userinput>eyedbadmin index create test Person.age</userinput>
 Creating btree index on Person.age
+<userinput>eyedbadmin index create test Person.addr.town</userinput>
+Creating hash index on Person.addr.town
+<userinput>eyedbadmin index create --type=hash test Person.addr.code</userinput>
+Creating hash index on Person.addr.code
+	  </screen>
+	</example>
+
+	<para>
+	  Deleting an index is done using the &eyedbadmin; command:
+	  <cmdsynopsis>
+	    &eyedbadmin;
+	    <command>index delete</command>
+	    <arg choice="req"><replaceable>database</replaceable></arg>
+	    <arg choice="req"><replaceable>attribute_path</replaceable></arg>
+	  </cmdsynopsis>
+	</para>
+
+
+	<para>
+	  Command arguments are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><replaceable>database</replaceable></arg>
+		</cmdsynopsis>
+		the database
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><replaceable>attribute_path</replaceable></arg>
+		</cmdsynopsis>
+		the path of the attribute on which the index is to be created
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+
+	<example id="eyedbadmin-index-delete">
+	  <title>&eyedbadmin; index delete</title>
+	  <screen>
+<userinput>eyedbadmin index delete test Person.addr.town</userinput>
+Deleting index Person.addr.town
+<userinput>eyedbadmin index delete test Person.addr.street</userinput>
+eyedbadmin: index 'Person.addr.street' not found
 	  </screen>
 	</example>
 
@@ -212,7 +278,52 @@ Creating btree index on Person.age
 	<title>Listing, updating and moving indexes</title>
 
 	<para>
+	  Listing indexes is done using the &eyedbadmin; command:
+	  <cmdsynopsis>
+	    &eyedbadmin;
+	    <command>index list</command>
+	    <arg choice="opt">options</arg>
+	    <arg choice="req"><replaceable>database</replaceable></arg>
+	    <arg choice="opt"><group><arg choice="req"><replaceable>attribute_path</replaceable></arg><arg choice="req"><replaceable>class_name</replaceable></arg></group></arg>
+	  </cmdsynopsis>
 	</para>
+
+	<para>
+	  Command arguments are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><replaceable>database</replaceable></arg>
+		</cmdsynopsis>
+		the database
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="opt"><group><arg choice="req"><replaceable>attribute_path</replaceable></arg><arg choice="req"><replaceable>class_name</replaceable></arg></group></arg>
+		</cmdsynopsis>
+		the index to be listed, specified either as an attribute path or as a class name
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+
+	<example id="eyedbadmin-index-list">
+	  <title>&eyedbadmin; index list</title>
+	  <screen>
+<userinput>eyedbadmin index list test</userinput>
+btree index on Person.age
+hash index on Person.addr.code
+<userinput>eyedbadmin index list test Person</userinput>
+btree index on Person.age
+hash index on Person.addr.code
+<userinput>eyedbadmin index list test Person.age</userinput>
+btree index on Person.age
+	  </screen>
+	</example>
+
 
       </section>
 
