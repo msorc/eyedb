@@ -94,19 +94,117 @@ unlimited
     <section>
       <title>Managing indexes</title>
 
-      <section>
-	<title>Where to use indexes?</title>
+      <para>
+	As a relational database management system does, &eyedb; provides indexes to improve drastically the time needed to retrieve an objet in a database and to improve therefore the performances of queries.
+      </para>
 
-	<para>
-	</para>
+      <para>
+	&eyedb; supports two types of indexes, hash and b-trees. 
+      </para>
 
-      </section>
+      <para>
+	As the description of indexes management needs that the database has a <emphasis>schema</emphasis>, the ODL database schema given in <xref linkend="eyedbadmin-index-odl-example"/> will be used in the index administration commands examples.
+      </para>
+
+      <example id="eyedbadmin-index-odl-example">
+	<title>The ODL database schema</title>
+	<programlisting><![CDATA[
+class Address {
+  attribute int number;
+  attribute string street;
+  attribute string town;
+  attribute int code;
+};
+
+class Person {
+  attribute string firstName;
+  attribute string lastName;
+  attribute int age;
+  attribute Address addr;
+};
+]]></programlisting>
+      </example>
+
+      <example id="eyedbadmin-index-odl">
+	<title>Indexes: updating the schema</title>
+	<screen>
+<userinput>eyedbadmin database create test</userinput>
+<userinput>eyedbodl -u -d test test.odl</userinput>
+Updating 'test' schema in database test...
+Adding class Address
+Adding class Person
+
+Done
+	</screen>
+      </example>
 
       <section>
 	<title>Creating and deleting indexes</title>
 
 	<para>
+	  Creating an index is done using the &eyedbadmin; command:
+	  <cmdsynopsis>
+	    &eyedbadmin;
+	    <command>index create</command>
+	    <arg choice="opt">options</arg>
+	    <arg choice="req"><replaceable>database</replaceable></arg>
+	    <arg choice="req"><replaceable>attribute_path</replaceable></arg>
+	    <arg choice="opt"><replaceable>hints</replaceable></arg>
+	  </cmdsynopsis>
 	</para>
+
+	
+	<para>
+	  Command arguments are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><replaceable>database</replaceable></arg>
+		</cmdsynopsis>
+		the database
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><replaceable>attribute_path</replaceable></arg>
+		</cmdsynopsis>
+		the path of the attribute on which the index is to be created
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><replaceable>hints</replaceable></arg>
+		</cmdsynopsis>
+		index hints, i.e. index configuration values that are implementation specific
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+
+	<para>
+	  An attribute path is an expression built using the <emphasis>.</emphasis> (dot) operator and class names or attribute names.
+	</para>
+	
+	<example id="eyedbadmin-index-paths">
+	  <title>Examples of attribute paths</title>
+      <programlisting><![CDATA[
+Person.firstName
+Person.age
+Address.number
+Person.addr.town
+]]></programlisting>
+	</example>
+
+	<example id="eyedbadmin-index-create">
+	  <title>&eyedbadmin; index create</title>
+	  <screen>
+<userinput>eyedbadmin index create test Person.age</userinput>
+Creating btree index on Person.age
+	  </screen>
+	</example>
 
       </section>
 
