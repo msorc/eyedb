@@ -45,6 +45,14 @@
 		<servlet-name>CreatePersonServlet</servlet-name>
 		<servlet-class>
 		org.eyedb.example.servlet.CreatePersonServlet</servlet-class>
+		<init-param>
+			<param-name>database</param-name>
+			<param-value>testservlet</param-value>
+		</init-param>
+		<init-param>
+			<param-name>tcpPort</param-name>
+			<param-value>6240</param-value>
+		</init-param>
 	</servlet>
 	<servlet>
 		<description>
