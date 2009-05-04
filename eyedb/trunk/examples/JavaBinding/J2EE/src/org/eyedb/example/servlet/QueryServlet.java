@@ -20,7 +20,7 @@ import org.eyedb.Root;
  * Servlet implementation class for Servlet: QueryServlet
  *
  */
-public class QueryServlet extends javax.servlet.http.HttpServlet implements javax.servlet.Servlet {
+public class QueryServlet extends EyeDBServlet implements javax.servlet.Servlet {
     /* (non-Java-doc)
      * @see javax.servlet.http.HttpServlet#HttpServlet()
      */
@@ -29,17 +29,11 @@ public class QueryServlet extends javax.servlet.http.HttpServlet implements java
 	super();
     }   	
 
-    public void init() throws ServletException
+    private void doOQLQuery( String query, PrintWriter out) throws org.eyedb.Exception
     {
-	databaseName = getServletConfig().getInitParameter("database");
-	tcpPort = getServletConfig().getInitParameter("tcpPort");
-    }
+	getDatabase().transactionBegin();
 
-    private void doOQLQuery( Database db, String query, PrintWriter out) throws org.eyedb.Exception
-    {
-	db.transactionBegin();
-
-	OQL q = new org.eyedb.OQL(db, query);
+	OQL q = new org.eyedb.OQL( getDatabase(), query);
 	ObjectArray obj_arr = new ObjectArray();
 	q.execute(obj_arr, RecMode.FullRecurs);
 
@@ -64,7 +58,7 @@ public class QueryServlet extends javax.servlet.http.HttpServlet implements java
 	out.println( "</table>");
 	out.println( "</p>");
 	
-	db.transactionCommit();
+	getDatabase().transactionCommit();
     }
 
     /* (non-Java-doc)
@@ -72,28 +66,8 @@ public class QueryServlet extends javax.servlet.http.HttpServlet implements java
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
     {
-	String[] args = new String[3];
-	int i = 0;
-	args[i++] = "--user=" + System.getProperty( "user.name");
-	args[i++] = "--dbm=default";
-	args[i++] = "--port=" + tcpPort;
-
-	Root.init( databaseName, args);
-
-	Connection conn;
-	Database db;
-
-	try {
-	    conn = new Connection();
-
-	    db = new Database( databaseName);
-
-	    db.open(conn, Database.DBRead);
-	}
-	catch( org.eyedb.Exception e) {
-	    throw new ServletException( e);
-	}
-
+	openDatabase();
+	
 	PrintWriter out = response.getWriter();
 
 	out.println( "<html>");
@@ -108,7 +82,7 @@ public class QueryServlet extends javax.servlet.http.HttpServlet implements java
 	
 	if (query != null && !query.isEmpty()) {
 	    try {
-		doOQLQuery( db, query, out);
+		doOQLQuery( query, out);
 	    }
 	    catch( org.eyedb.Exception e) {
 		throw new ServletException( e);
@@ -118,13 +92,7 @@ public class QueryServlet extends javax.servlet.http.HttpServlet implements java
 	out.println( "</body>");
 	out.println( "</html>");
 
-	try {
-	    db.close();
-	    conn.close();
-	}
-	catch( org.eyedb.Exception e) {
-	    throw new ServletException( e);
-	}
+	closeDatabase();
     }  	
 
     /* (non-Java-doc)
@@ -134,7 +102,4 @@ public class QueryServlet extends javax.servlet.http.HttpServlet implements java
     {
 	// TODO Auto-generated method stub
     }   	  	    
-
-    private String databaseName;
-    private String tcpPort;
 }
