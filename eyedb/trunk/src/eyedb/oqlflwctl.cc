@@ -467,6 +467,13 @@ namespace eyedb {
     do {
       oqmlAtomList *al;
 
+      if (qright) {
+	gbContext *gbctx = oqmlGarbManager::peek();
+	s = qright->eval(db, ctx, &al);
+	oqmlGarbManager::garbage(gbctx);
+	if (s) break;
+      }
+
       s = qleft->eval(db, ctx, &al);
       if (s) break;
     
@@ -485,14 +492,6 @@ namespace eyedb {
       b = OQML_ATOM_BOOLVAL(al->first);
 #endif
     
-      if (qright)
-	{
-	  gbContext *gbctx = oqmlGarbManager::peek();
-	  s = qright->eval(db, ctx, &al);
-	  oqmlGarbManager::garbage(gbctx);
-	  if (s) break;
-	}
-
     } while(b);
 
     --oqmlLoopLevel;
