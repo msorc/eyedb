@@ -23,8 +23,8 @@ public class EyeDBServlet extends javax.servlet.http.HttpServlet implements java
 
     public void init() throws ServletException
     {
-	databaseName = getServletConfig().getInitParameter("database");
-	tcpPort = getServletConfig().getInitParameter("tcpPort");
+	databaseName = getServletConfig().getServletContext().getInitParameter("database");
+	tcpPort = getServletConfig().getServletContext().getInitParameter("tcpPort");
 
 	String[] args = new String[3];
 	int i = 0;
