@@ -66,8 +66,6 @@ public class QueryServlet extends EyeDBServlet implements javax.servlet.Servlet 
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
     {
-	openDatabase();
-	
 	PrintWriter out = response.getWriter();
 
 	out.println( "<html>");
@@ -82,7 +80,11 @@ public class QueryServlet extends EyeDBServlet implements javax.servlet.Servlet 
 	
 	if (query != null && !query.isEmpty()) {
 	    try {
+		openDatabase();
+
 		doOQLQuery( query, out);
+
+		closeDatabase();
 	    }
 	    catch( org.eyedb.Exception e) {
 		throw new ServletException( e);
@@ -91,8 +93,6 @@ public class QueryServlet extends EyeDBServlet implements javax.servlet.Servlet 
 
 	out.println( "</body>");
 	out.println( "</html>");
-
-	closeDatabase();
     }  	
 
     /* (non-Java-doc)

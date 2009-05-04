@@ -18,6 +18,9 @@
     <dependent-module deploy-path="/WEB-INF/lib" handle="module:/classpath/var/EYEDB_LIB">
       <dependency-type>uses</dependency-type>
     </dependent-module>
+    <dependent-module deploy-path="/WEB-INF/lib" handle="module:/classpath/var/EYEDB_BUILDDIR/examples/GettingStarted/person.jar">
+      <dependency-type>uses</dependency-type>
+    </dependent-module>
     
     
     

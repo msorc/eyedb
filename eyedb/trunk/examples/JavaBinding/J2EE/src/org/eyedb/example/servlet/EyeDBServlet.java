@@ -25,10 +25,7 @@ public class EyeDBServlet extends javax.servlet.http.HttpServlet implements java
     {
 	databaseName = getServletConfig().getInitParameter("database");
 	tcpPort = getServletConfig().getInitParameter("tcpPort");
-    }
 
-    protected void openDatabase() throws ServletException
-    {
 	String[] args = new String[3];
 	int i = 0;
 	args[i++] = "--user=" + System.getProperty( "user.name");
@@ -36,36 +33,27 @@ public class EyeDBServlet extends javax.servlet.http.HttpServlet implements java
 	args[i++] = "--port=" + tcpPort;
 
 	Root.init( databaseName, args);
+    }
 
-	try {
-	    conn = new Connection();
-
-	    database = new Database( databaseName);
-
-	    database.open(conn, Database.DBRead);
-	}
-	catch( org.eyedb.Exception e) {
-	    throw new ServletException( e);
-	}
+    protected void openDatabase() throws org.eyedb.Exception
+    {
+	conn = new Connection();
+	database = new Database( databaseName);
+	database.open(conn, Database.DBRW);
     }
 
     protected Database getDatabase()
     {
 	return database;
     }
-    
-    protected void closeDatabase() throws ServletException
+
+    protected void closeDatabase() throws org.eyedb.Exception
     {
-	try {
-	    database.close();
-	    conn.close();
-	}
-	catch( org.eyedb.Exception e) {
-	    throw new ServletException( e);
-	}
+	database.close();
+	conn.close();
     }
 
-	/* (non-Java-doc)
+    /* (non-Java-doc)
      * @see javax.servlet.http.HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
