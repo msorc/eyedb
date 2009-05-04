@@ -22,9 +22,30 @@
 			<param-value>6240</param-value>
 		</init-param>
 	</servlet>
+	<servlet>
+		<description>
+		</description>
+		<display-name>
+		QueryServlet</display-name>
+		<servlet-name>QueryServlet</servlet-name>
+		<servlet-class>
+		org.eyedb.example.servlet.query.QueryServlet</servlet-class>
+		<init-param>
+			<param-name>database</param-name>
+			<param-value>testservlet</param-value>
+		</init-param>
+		<init-param>
+			<param-name>tcpPort</param-name>
+			<param-value>6240</param-value>
+		</init-param>
+	</servlet>
 	<servlet-mapping>
 		<servlet-name>BasicServlet</servlet-name>
 		<url-pattern>/BasicServlet</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>QueryServlet</servlet-name>
+		<url-pattern>/QueryServlet</url-pattern>
 	</servlet-mapping>
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
