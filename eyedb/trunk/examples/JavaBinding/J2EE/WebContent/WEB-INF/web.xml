@@ -28,14 +28,6 @@
 		QueryServlet</display-name>
 		<servlet-name>QueryServlet</servlet-name>
 		<servlet-class>org.eyedb.example.servlet.QueryServlet</servlet-class>
-		<init-param>
-			<param-name>database</param-name>
-			<param-value>testservlet</param-value>
-		</init-param>
-		<init-param>
-			<param-name>tcpPort</param-name>
-			<param-value>6240</param-value>
-		</init-param>
 	</servlet>
 	<servlet>
 		<description>
@@ -45,14 +37,6 @@
 		<servlet-name>CreatePersonServlet</servlet-name>
 		<servlet-class>
 		org.eyedb.example.servlet.CreatePersonServlet</servlet-class>
-		<init-param>
-			<param-name>database</param-name>
-			<param-value>testservlet</param-value>
-		</init-param>
-		<init-param>
-			<param-name>tcpPort</param-name>
-			<param-value>6240</param-value>
-		</init-param>
 	</servlet>
 	<servlet>
 		<description>
@@ -62,18 +46,8 @@
 		<servlet-name>EyeDBServlet</servlet-name>
 		<servlet-class>
 		org.eyedb.example.servlet.EyeDBServlet</servlet-class>
-		<init-param>
-			<description>
-			</description>
-			<param-name>database</param-name>
-			<param-value>testservlet</param-value>
-		</init-param>
-		<init-param>
-			<description>
-			</description>
-			<param-name>tcpPort</param-name>
-			<param-value>6240</param-value>
-		</init-param>
+		
+		
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>BasicServlet</servlet-name>
@@ -99,4 +73,12 @@
 		<welcome-file>default.htm</welcome-file>
 		<welcome-file>default.jsp</welcome-file>
 	</welcome-file-list>
+	<context-param>
+		<param-name>database</param-name>
+		<param-value>testservlet</param-value>
+	</context-param>
+	<context-param>
+		<param-name>tcpPort</param-name>
+		<param-value>6240</param-value>
+	</context-param>
 </web-app>
