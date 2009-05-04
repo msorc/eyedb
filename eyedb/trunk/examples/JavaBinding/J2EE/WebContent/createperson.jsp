@@ -10,9 +10,9 @@
 <body>
 
 <form name="createPersonForm" action="CreatePersonServlet" method="post">
-First name: <input type="text" name="firstname"><br/>
-Last name: <input type="text" name="lastname"><br/>
-<input type="submit" value="Create">
+First name: <input type="text" name="firstname"/><br/>
+Last name: <input type="text" name="lastname"/><br/>
+<input type="submit" value="Create"/>
 </form>
 
 </body>
