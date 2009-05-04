@@ -7,8 +7,7 @@
 		<display-name>
 		BasicServlet</display-name>
 		<servlet-name>BasicServlet</servlet-name>
-		<servlet-class>
-		org.eyedb.example.servlet.basic.BasicServlet</servlet-class>
+		<servlet-class>org.eyedb.example.servlet.BasicServlet</servlet-class>
 		<init-param>
 			<description>
 			</description>
@@ -28,13 +27,42 @@
 		<display-name>
 		QueryServlet</display-name>
 		<servlet-name>QueryServlet</servlet-name>
-		<servlet-class>
-		org.eyedb.example.servlet.query.QueryServlet</servlet-class>
+		<servlet-class>org.eyedb.example.servlet.QueryServlet</servlet-class>
 		<init-param>
 			<param-name>database</param-name>
 			<param-value>testservlet</param-value>
 		</init-param>
 		<init-param>
+			<param-name>tcpPort</param-name>
+			<param-value>6240</param-value>
+		</init-param>
+	</servlet>
+	<servlet>
+		<description>
+		</description>
+		<display-name>
+		CreatePersonServlet</display-name>
+		<servlet-name>CreatePersonServlet</servlet-name>
+		<servlet-class>
+		org.eyedb.example.servlet.CreatePersonServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<description>
+		</description>
+		<display-name>
+		EyeDBServlet</display-name>
+		<servlet-name>EyeDBServlet</servlet-name>
+		<servlet-class>
+		org.eyedb.example.servlet.EyeDBServlet</servlet-class>
+		<init-param>
+			<description>
+			</description>
+			<param-name>database</param-name>
+			<param-value>testservlet</param-value>
+		</init-param>
+		<init-param>
+			<description>
+			</description>
 			<param-name>tcpPort</param-name>
 			<param-value>6240</param-value>
 		</init-param>
@@ -46,6 +74,14 @@
 	<servlet-mapping>
 		<servlet-name>QueryServlet</servlet-name>
 		<url-pattern>/QueryServlet</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>CreatePersonServlet</servlet-name>
+		<url-pattern>/CreatePersonServlet</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>EyeDBServlet</servlet-name>
+		<url-pattern>/EyeDBServlet</url-pattern>
 	</servlet-mapping>
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
