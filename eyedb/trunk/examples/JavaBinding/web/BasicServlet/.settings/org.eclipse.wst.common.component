@@ -1,9 +1,26 @@
 <?xml version="1.0"?>
 <project-modules id="moduleCoreId" project-version="1.5.0">
+  
+  
   <wb-module deploy-name="BasicServlet">
+    
+    
     <wb-resource source-path="/WebContent" deploy-path="/"/>
+    
+    
     <wb-resource source-path="/src" deploy-path="/WEB-INF/classes"/>
+    <dependent-module deploy-path="/WEB-INF/lib" handle="module:/classpath/var/EYEDB_LIB">
+      <dependency-type>uses</dependency-type>
+    </dependent-module>
+    
+    
     <property name="context-root" value="BasicServlet"/>
+    
+    
     <property name="java-output-path" value="build/classes"/>
+    
+  
   </wb-module>
+  
+
 </project-modules>
