@@ -1,0 +1,24 @@
+//
+// schema.odl
+// ODL schema for J2EE examples
+//
+// Copyright (c) SYSRA 2009
+// Eric Viara
+// Francois Dechelle
+
+class Person {
+  attribute string firstname;
+  attribute string lastname;
+  attribute int age;
+  relationship set<Car *> cars inverse Car::owner;
+
+  index on firstname;
+  index on lastname;
+  index on age;
+};
+
+class Car {
+  attribute string model;
+  attribute int num;
+  relationship Person *owner inverse Person::cars;
+};
