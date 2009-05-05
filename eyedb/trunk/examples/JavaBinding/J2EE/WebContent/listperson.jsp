@@ -11,8 +11,8 @@
 
 <%=  pageContext.getServletContext().getInitParameter("database") %>
 
-<jsp:useBean id="query" class="org.eyedb.example.QueryBean" scope="page">
-	<jsp:setProperty property="database" value="${pageContext.getServletContext().getInitParameter("database") %>"/>
+<jsp:useBean id="query" class="org.eyedb.example.EyeDBBean" scope="page">
+	<jsp:setProperty property="database" value='<%= pageContext.getServletContext().getInitParameter("database") %>' />
 </jsp:useBean>
 
 <table border="1">
