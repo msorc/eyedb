@@ -1,14 +1,17 @@
 - add jsp page for person
-	- short view
-	- detailed view
-	- edit/create view
-	- delete view
+	- listperson.jsp: list and short view
+	- viewperson.jsp: detailed view
+	- editperson.jsp: edit view
+	- createperson.jsp: create view
+	- deleteperson.jsp: delete view
 
 Q: how to pass an object to a jsp page?
 
 - add servlet to:
-	- create a person: how to set the collection attributes?
-	- 
+	- create a person
+	- edit a person (mix with create)
+	- delete a person
+	
 	
 	
 	
