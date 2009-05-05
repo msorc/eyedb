@@ -15,66 +15,54 @@ import person.Person;
  *
  */
 public class CreatePersonServlet extends EyeDBServlet implements javax.servlet.Servlet {
-    /* (non-Java-doc)
-     * @see javax.servlet.http.HttpServlet#HttpServlet()
-     */
-    public CreatePersonServlet() {
-	super();
-    }   	
+	/* (non-Java-doc)
+	 * @see javax.servlet.http.HttpServlet#HttpServlet()
+	 */
+	public CreatePersonServlet() {
+		super();
+	}   	
 
-    public void init() throws ServletException
-    {
-	super.init();
+	private void doCreatePerson( String firstname, String lastname) throws org.eyedb.Exception
+	{
+		getDatabase().transactionBegin();
 
-	try {
-	    person.Database.init();
-	}
-	catch( org.eyedb.Exception e) {
-	    throw new ServletException( e);
-	}
-    }
+		Person p = new Person( getDatabase());
 
-    private void doCreatePerson( String firstname, String lastname) throws org.eyedb.Exception
-    {
-	getDatabase().transactionBegin();
+		p.setFirstname( firstname);
+		p.setLastname( lastname);
 
-	Person p = new Person( getDatabase());
+		p.store( RecMode.FullRecurs);
 
-	p.setFirstname( firstname);
-	p.setLastname( lastname);
-
-	p.store( RecMode.FullRecurs);
-
-	getDatabase().transactionCommit();
-    }
-
-    /* (non-Java-doc)
-     * @see javax.servlet.http.HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-     */
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
-    {
-    }  	
-
-    /* (non-Java-doc)
-     * @see javax.servlet.http.HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-     */
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	String firstname = request.getParameter( "firstname");
-	String lastname = request.getParameter( "lastname");
-
-	if (firstname != null && !firstname.isEmpty()) {
-	    try {
-		openDatabase();
-
-		doCreatePerson( firstname, lastname);
-
-		closeDatabase();
-	    }
-	    catch( org.eyedb.Exception e) {
-		throw new ServletException( e);
-	    }
+		getDatabase().transactionCommit();
 	}
 
-	response.sendRedirect("/eyedb/QueryServlet");
-    }   	  	    
+	/* (non-Java-doc)
+	 * @see javax.servlet.http.HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
+	{
+	}  	
+
+	/* (non-Java-doc)
+	 * @see javax.servlet.http.HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String firstname = request.getParameter( "firstname");
+		String lastname = request.getParameter( "lastname");
+
+		if (firstname != null && !firstname.isEmpty()) {
+			try {
+				openDatabase();
+
+				doCreatePerson( firstname, lastname);
+
+				closeDatabase();
+			}
+			catch( org.eyedb.Exception e) {
+				throw new ServletException( e);
+			}
+		}
+
+		response.sendRedirect("/eyedb/QueryServlet");
+	}   	  	    
 }

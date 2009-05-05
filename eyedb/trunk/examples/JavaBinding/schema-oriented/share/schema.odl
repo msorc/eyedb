@@ -4,8 +4,9 @@
 //
 // EyeDB Package
 //
-// Eric Viara Copyright (c) SYSRA Informatique 1995-1998
-//
+// Copyright (c) SYSRA Informatique 1995-1998
+// Eric Viara
+// Francois Dechelle
 
 enum CivilState {
   Lady = 0x10,
@@ -14,6 +15,7 @@ enum CivilState {
 };
 
 class Address {
+  attribute int num;
   attribute string street;
   attribute string<32> town;
   attribute string country;
@@ -22,27 +24,34 @@ class Address {
 };
 
 class Person {
-  attribute string name;
+  attribute string firstname;
+  attribute string lastname;
   attribute int age;
   attribute Address addr;
   attribute Address other_addrs[];
   attribute CivilState cstate;
-  attribute Person * spouse inverse Person::spouse;
-  attribute set<Car *> cars inverse owner;
+  relationship Person * spouse inverse Person::spouse;
+  relationship set<Car *> cars inverse Car::owner;
   attribute array<Person *> children;
 
-  index on name;
+  index on firstname;
+  index on lastname;
+  index on age;
+
   %Java{
-   public Person(org.eyedb.Database db, String name, int age) throws org.eyedb.Exception {
+   public Person(org.eyedb.Database db, String firstname, String lastname, int age) throws org.eyedb.Exception {
       this(db);
 
-      setName(name); 
+      setFirstname(firstname); 
+      setLastname(lastname); 
       setAge(age);
    }
 
    public void checkName() throws org.eyedb.Exception {
-	if (getName().length() > 20)
-		setName("***bad***name***");
+	if (getFirstname().length() > 20)
+		setFirstname("***bad***name***");
+	if (getLastname().length() > 20)
+		setLastname("***bad***name***");
    }
   %}
 };
@@ -50,7 +59,7 @@ class Person {
 class Car {
   attribute string mark;
   attribute int num;
-  Person *owner inverse cars;
+  relationship Person *owner inverse Person::cars;
 };
 
 class Employee extends Person {
