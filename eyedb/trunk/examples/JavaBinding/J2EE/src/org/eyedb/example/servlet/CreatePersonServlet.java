@@ -7,8 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eyedb.RecMode;
-
-import person.Person;
+import org.eyedb.example.schema.Person;
 
 /**
  * Servlet implementation class for Servlet: CreatePersonServlet

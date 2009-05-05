@@ -8,7 +8,11 @@
   
   
   
+  
+  
   <wb-module deploy-name="EyeDB J2EE examples">
+    
+    
     
     
     
@@ -26,7 +30,11 @@
     
     
     
+    
+    
     <wb-resource source-path="/src" deploy-path="/WEB-INF/classes"/>
+    
+    
     
     
     
@@ -34,13 +42,16 @@
     <dependent-module deploy-path="/WEB-INF/lib" handle="module:/classpath/var/EYEDB_BUILDDIR/src/java/eyedb.jar">
       
       
+      
+      
       <dependency-type>uses</dependency-type>
       
+      
+    
     
     </dependent-module>
-    <dependent-module deploy-path="/WEB-INF/lib" handle="module:/classpath/var/EYEDB_BUILDDIR/examples/JavaBinding/schema-oriented/share/person.jar">
-      <dependency-type>uses</dependency-type>
-    </dependent-module>
+    
+    
     
     
     
@@ -56,11 +67,15 @@
     
     
     
+    
+    
     <property name="context-root" value="eyedb"/>
     
     
     
     
+    
+  
   
   
   
@@ -70,6 +85,8 @@
   
   
   
+  
+
 
 
 

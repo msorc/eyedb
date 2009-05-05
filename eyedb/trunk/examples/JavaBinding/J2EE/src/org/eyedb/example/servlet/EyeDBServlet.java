@@ -8,8 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eyedb.Connection;
 import org.eyedb.Root;
-
-import person.Database;
+import org.eyedb.example.schema.Database;
 
 /**
  * Servlet implementation class for Servlet: EyeDBServlet
