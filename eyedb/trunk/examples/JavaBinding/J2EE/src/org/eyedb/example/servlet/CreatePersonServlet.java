@@ -62,6 +62,6 @@ public class CreatePersonServlet extends EyeDBServlet implements javax.servlet.S
 			}
 		}
 
-		response.sendRedirect("/eyedb/QueryServlet");
+		response.sendRedirect("/eyedb/listperson.jsp");
 	}   	  	    
 }
