@@ -12,7 +12,7 @@
 			<description>
 			</description>
 			<param-name>database</param-name>
-			<param-value>testservlet</param-value>
+			<param-value>testj2ee</param-value>
 		</init-param>
 		<init-param>
 			<description>
@@ -75,7 +75,7 @@
 	</welcome-file-list>
 	<context-param>
 		<param-name>database</param-name>
-		<param-value>testservlet</param-value>
+		<param-value>testj2ee</param-value>
 	</context-param>
 	<context-param>
 		<param-name>tcpPort</param-name>

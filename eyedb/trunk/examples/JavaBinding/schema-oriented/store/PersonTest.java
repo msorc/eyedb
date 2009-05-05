@@ -19,7 +19,9 @@
 */
 
 /*
-   Author: Eric Viara <viara@sysra.com>
+   Authors: 
+   Eric Viara <viara@sysra.com>
+   Francois Dechelle <francois@dechelle.net>
 */
 
 import org.eyedb.*;
@@ -104,7 +106,8 @@ public class PersonTest {
     }
 
     static Person makePerson(Person p, int i, String s) throws org.eyedb.Exception {
-	p.setName(prefix + i + "_f_" + s);
+	p.setFirstname(prefix + i + "_f_" + s);
+	p.setLastname(prefix + i + "_l_" + s);
 	p.setAge(i+20);
 	Address addr = p.getAddr();
 	addr.setStreet(prefix + i + "_s_" + s);
@@ -180,8 +183,10 @@ public class PersonTest {
 	}
 
 	// trying user methods
-	Person p = new Person(db, "john wayne", 78);
-	p.setName("john wayne");
+	Person p = new Person(db, "john", "wayne", 78);
+	p.setFirstname("John");
+	p.setLastname("Wayne");
+
 	p.store();
     }
 
@@ -195,7 +200,8 @@ public class PersonTest {
 	    return;
 	}
 
-	System.out.println(indent + "name: " + p.getName() + "\n" +
+	System.out.println(indent + "first name: " + p.getFirstname() + "\n" +
+			   indent + "last name: " + p.getLastname() + "\n" +
 			   indent + "age: " + p.getAge() + "\n" +
 			   indent + "addr.street: " + p.getAddr().getStreet() + "\n" +
 			   indent + "addr.country: " + p.getAddr().getCountry() + "\n" +
@@ -214,7 +220,7 @@ public class PersonTest {
     }
 
     static void test2(org.eyedb.Database db) throws org.eyedb.Exception {
-	String str = "select Person.name ~ \"" + prefix + "\"";
+	String str = "select Person.firstname ~ \"" + prefix + "\"";
 	org.eyedb.OQL q = new org.eyedb.OQL(db, str);
 	org.eyedb.ObjectArray obj_arr = new org.eyedb.ObjectArray();
 	q.execute(obj_arr);
