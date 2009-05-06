@@ -12,7 +12,11 @@
   
   
   
+  
+  
   <wb-module deploy-name="EyeDB J2EE examples">
+    
+    
     
     
     
@@ -38,7 +42,11 @@
     
     
     
+    
+    
     <wb-resource source-path="/src" deploy-path="/WEB-INF/classes"/>
+    
+    
     
     
     
@@ -54,20 +62,28 @@
       
       
       
+      
+      
       <dependency-type>uses</dependency-type>
+      
       
       
       
     
     
     
+    
     </dependent-module>
-    <dependent-module deploy-path="/WEB-INF/lib" handle="module:/classpath/lib//home/francois/softs/src/jakarta-taglibs-standard-1.1.2/lib/jstl.jar">
+    
+    
+    <dependent-module deploy-path="/WEB-INF/lib" handle="module:/classpath/var/JAKARTA_TAGLIBS_STANDARD_HOME/lib/jstl.jar">
       <dependency-type>uses</dependency-type>
     </dependent-module>
-    <dependent-module deploy-path="/WEB-INF/lib" handle="module:/classpath/lib//home/francois/softs/src/jakarta-taglibs-standard-1.1.2/lib/standard.jar">
+    <dependent-module deploy-path="/WEB-INF/lib" handle="module:/classpath/var/JAKARTA_TAGLIBS_STANDARD_HOME/lib/standard.jar">
       <dependency-type>uses</dependency-type>
     </dependent-module>
+    
+    
     
     
     
@@ -91,6 +107,8 @@
     
     
     
+    
+    
     <property name="context-root" value="eyedb"/>
     
     
@@ -98,6 +116,8 @@
     
     
     
+    
+  
   
   
   
@@ -111,6 +131,8 @@
   
   
   
+  
+
 
 
 

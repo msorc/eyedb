@@ -16,81 +16,81 @@ import org.eyedb.Root;
  *
  */
 public class BasicServlet extends javax.servlet.http.HttpServlet implements javax.servlet.Servlet {
-    /* (non-Java-doc)
-     * @see javax.servlet.http.HttpServlet#HttpServlet()
-     */
-    public BasicServlet() 
-    {
-	super();
-    }   	
+	/* (non-Java-doc)
+	 * @see javax.servlet.http.HttpServlet#HttpServlet()
+	 */
+	public BasicServlet() 
+	{
+		super();
+	}   	
 
-    public void init() throws ServletException
-    {
-	databaseName = getServletConfig().getInitParameter("database");
-	tcpPort = getServletConfig().getInitParameter("tcpPort");
-    }
-
-    /* (non-Java-doc)
-     * @see javax.servlet.http.HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-     */
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
-    {
-	String[] args = new String[3];
-	int i = 0;
-	args[i++] = "--user=" + System.getProperty( "user.name");
-	args[i++] = "--dbm=default";
-	args[i++] = "--port=" + tcpPort;
-
-	Root.init( databaseName, args);
-
-	Connection conn;
-	Database db;
-
-	try {
-	    conn = new Connection();
-
-	    db = new Database( databaseName);
-
-	    db.open(conn, Database.DBRead);
-	}
-	catch( org.eyedb.Exception e) {
-	    throw new ServletException( e);
+	public void init() throws ServletException
+	{
+		databaseName = getServletConfig().getInitParameter("database");
+		tcpPort = getServletConfig().getInitParameter("tcpPort");
 	}
 
-	PrintWriter out = response.getWriter();
+	/* (non-Java-doc)
+	 * @see javax.servlet.http.HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
+	{
+		String[] args = new String[3];
+		int i = 0;
+		args[i++] = "--user=" + System.getProperty( "user.name");
+		args[i++] = "--dbm=default";
+		args[i++] = "--port=" + tcpPort;
 
-	out.println( "<html>");
-	out.println( "<body>");
+		Root.init( databaseName, args);
 
-	out.println( "<table>");
-	out.println( "<tr><td>Database</td><td>" + databaseName + "</td></tr>");
-	out.println( "<tr><td>TCP port</td><td>" + tcpPort + "</td></tr>");
-	out.println( "</table>");
+		Connection conn;
+		Database db;
 
-	out.println( "<p>");
-	out.println( "Connected ok, connection: " + conn);
-	out.println( "</p>");
+		try {
+			conn = new Connection();
 
-	out.println( "</body>");
-	out.println( "</html>");
+			db = new Database( databaseName);
 
-	try {
-	    db.close();
-	    conn.close();
-	}
-	catch( org.eyedb.Exception e) {
-	    throw new ServletException( e);
-	}
-    }  	
+			db.open(conn, Database.DBRead);
+		}
+		catch( org.eyedb.Exception e) {
+			throw new ServletException( e);
+		}
 
-    /* (non-Java-doc)
-     * @see javax.servlet.http.HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-     */
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
-    {
-	// TODO Auto-generated method stub
-    }   	  	    
+		PrintWriter out = response.getWriter();
 
-    private String databaseName;
-    private String tcpPort;
+		out.println( "<html>");
+		out.println( "<body>");
+
+		out.println( "<table>");
+		out.println( "<tr><td>Database</td><td>" + databaseName + "</td></tr>");
+		out.println( "<tr><td>TCP port</td><td>" + tcpPort + "</td></tr>");
+		out.println( "</table>");
+
+		out.println( "<p>");
+		out.println( "Connected ok, connection: " + conn);
+		out.println( "</p>");
+
+		out.println( "</body>");
+		out.println( "</html>");
+
+		try {
+			db.close();
+			conn.close();
+		}
+		catch( org.eyedb.Exception e) {
+			throw new ServletException( e);
+		}
+	}  	
+
+	/* (non-Java-doc)
+	 * @see javax.servlet.http.HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
+	{
+		// TODO Auto-generated method stub
+	}   	  	    
+
+	private String databaseName;
+	private String tcpPort;
 }

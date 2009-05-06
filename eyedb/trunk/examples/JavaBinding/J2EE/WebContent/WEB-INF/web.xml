@@ -49,6 +49,24 @@
 		
 		
 	</servlet>
+	<servlet>
+		<description>
+		</description>
+		<display-name>
+		EditPersonServlet</display-name>
+		<servlet-name>EditPersonServlet</servlet-name>
+		<servlet-class>
+		org.eyedb.example.servlet.EditPersonServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<description>
+		</description>
+		<display-name>
+		DeletePersonServlet</display-name>
+		<servlet-name>DeletePersonServlet</servlet-name>
+		<servlet-class>
+		org.eyedb.example.servlet.DeletePersonServlet</servlet-class>
+	</servlet>
 	<servlet-mapping>
 		<servlet-name>BasicServlet</servlet-name>
 		<url-pattern>/BasicServlet</url-pattern>
@@ -64,6 +82,14 @@
 	<servlet-mapping>
 		<servlet-name>EyeDBServlet</servlet-name>
 		<url-pattern>/EyeDBServlet</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>EditPersonServlet</servlet-name>
+		<url-pattern>/EditPersonServlet</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>DeletePersonServlet</servlet-name>
+		<url-pattern>/DeletePersonServlet</url-pattern>
 	</servlet-mapping>
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
