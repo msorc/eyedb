@@ -1,17 +1,18 @@
 - add jsp page for person
-	- listperson.jsp: list and short view
+	- listperson.jsp: list and short view [DONE]
 	- viewperson.jsp: detailed view
 	- editperson.jsp: edit view
 	- createperson.jsp: create view
 	- deleteperson.jsp: delete view
 
-Q: how to pass an object to a jsp page?
+Q: how to pass an Oid in a GET/POST request?
 
 - add servlet to:
 	- create a person
 	- edit a person (mix with create)
 	- delete a person
 	
+- fix JSP tag lib dependency problem (put into project?)
 	
 	
 	
