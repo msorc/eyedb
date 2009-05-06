@@ -1,4 +1,3 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
@@ -15,6 +14,8 @@
 </head>
 <body>
 
+<%@ include file="menu.jsp" %>
+
 <h1>List persons</h1>
 
 <table border="1">
@@ -22,6 +23,8 @@
 <th>#</th>
 <th>First name</th>
 <th>Last name</th>
+<th>&nbsp;</th>
+<th>&nbsp;</th>
 <th>&nbsp;</th>
 </tr>
 <c:set var="counter" value="${1}"/>
@@ -34,6 +37,18 @@
 <form action="viewperson.jsp" method="get">
 <input type="hidden" name="oid" value="${person.oid}"/>
 <input type="submit" value="View"/>
+</form>
+</td>
+<td>
+<form action="editperson.jsp" method="get">
+<input type="hidden" name="oid" value="${person.oid}"/>
+<input type="submit" value="Edit"/>
+</form>
+</td>
+<td>
+<form action="DeletePersonServlet" method="get">
+<input type="hidden" name="oid" value="${person.oid}"/>
+<input type="submit" value="Delete"/>
 </form>
 </td>
 </tr>

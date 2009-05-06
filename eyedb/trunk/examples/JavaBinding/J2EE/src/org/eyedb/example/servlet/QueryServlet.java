@@ -20,7 +20,7 @@ import org.eyedb.Root;
  * Servlet implementation class for Servlet: QueryServlet
  *
  */
-public class QueryServlet extends EyeDBServlet implements javax.servlet.Servlet {
+public class QueryServlet extends javax.servlet.http.HttpServlet implements javax.servlet.Servlet {
 	/* (non-Java-doc)
 	 * @see javax.servlet.http.HttpServlet#HttpServlet()
 	 */
@@ -29,11 +29,25 @@ public class QueryServlet extends EyeDBServlet implements javax.servlet.Servlet 
 		super();
 	}   	
 
+	public void init() throws ServletException
+	{
+		databaseName = getServletConfig().getServletContext().getInitParameter("database");
+		tcpPort = getServletConfig().getServletContext().getInitParameter("tcpPort");
+
+		String[] args = new String[3];
+		int i = 0;
+		args[i++] = "--user=" + System.getProperty( "user.name");
+		args[i++] = "--dbm=default";
+		args[i++] = "--port=" + tcpPort;
+
+		Root.init( databaseName, args);
+	}
+
 	private void doOQLQuery( String query, PrintWriter out) throws org.eyedb.Exception
 	{
-		getDatabase().transactionBegin();
+		database.transactionBegin();
 
-		OQL q = new org.eyedb.OQL( getDatabase(), query);
+		OQL q = new org.eyedb.OQL( database, query);
 		ObjectArray obj_arr = new ObjectArray();
 		q.execute(obj_arr, RecMode.FullRecurs);
 
@@ -58,7 +72,7 @@ public class QueryServlet extends EyeDBServlet implements javax.servlet.Servlet 
 		out.println( "</table>");
 		out.println( "</p>");
 
-		getDatabase().transactionCommit();
+		database.transactionCommit();
 	}
 
 	/* (non-Java-doc)
@@ -80,11 +94,14 @@ public class QueryServlet extends EyeDBServlet implements javax.servlet.Servlet 
 
 		if (query != null && !query.isEmpty()) {
 			try {
-				openDatabase();
+				conn = new Connection();
+				database = new Database( databaseName);
+				database.open(conn, Database.DBRW);
 
 				doOQLQuery( query, out);
 
-				closeDatabase();
+				database.close();
+				conn.close();
 			}
 			catch( org.eyedb.Exception e) {
 				throw new ServletException( e);
@@ -102,4 +119,9 @@ public class QueryServlet extends EyeDBServlet implements javax.servlet.Servlet 
 	{
 		// TODO Auto-generated method stub
 	}   	  	    
+
+	protected String databaseName;
+	protected String tcpPort;
+	private Database database;
+	private Connection conn;
 }

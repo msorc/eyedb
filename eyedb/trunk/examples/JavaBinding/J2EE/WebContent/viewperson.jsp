@@ -16,6 +16,8 @@
 </head>
 <body>
 
+<%@ include file="menu.jsp" %>
+
 <h1>View person</h1>
 
 <c:set var="person" value="${query.person}"/>

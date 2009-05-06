@@ -12,7 +12,7 @@ import org.eyedb.example.EyeDBBean;
  * Servlet implementation class for Servlet: CreatePersonServlet
  *
  */
-public class CreatePersonServlet extends javax.servlet.http.HttpServlet  {
+public class DeletePersonServlet extends javax.servlet.http.HttpServlet  {
 
 	/* (non-Java-doc)
 	 * @see javax.servlet.http.HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -31,11 +31,10 @@ public class CreatePersonServlet extends javax.servlet.http.HttpServlet  {
 		bean.setDatabaseName( getServletConfig().getServletContext().getInitParameter("database"));
 		bean.setTcpPort( getServletConfig().getServletContext().getInitParameter("tcpPort"));
 		
-		bean.setFirstname( request.getParameter( "firstname"));
-		bean.setLastname( request.getParameter( "lastname"));
+		bean.setOid( request.getParameter( "oid"));
 
 		try {
-			bean.createPerson();
+			bean.deletePerson();
 		}
 		catch( org.eyedb.Exception e) {
 			throw new ServletException( e);
