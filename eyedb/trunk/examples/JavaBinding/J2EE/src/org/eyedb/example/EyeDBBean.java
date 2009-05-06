@@ -1,8 +1,17 @@
 package org.eyedb.example;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eyedb.Connection;
+import org.eyedb.OQL;
+import org.eyedb.ObjectArray;
+import org.eyedb.RecMode;
 import org.eyedb.Root;
 import org.eyedb.example.schema.Database;
+import org.eyedb.example.schema.Person;
 
 public class EyeDBBean {
 
@@ -43,17 +52,38 @@ public class EyeDBBean {
 		database.open(connection, Database.DBRW);
 	}
 	
-	public Database getDatabase() throws org.eyedb.Exception
-	{
-		if (database == null)
-			openDatabase();
-		return database;
-	}
-
-	protected void closeDatabase() throws org.eyedb.Exception
+	private void closeDatabase() throws org.eyedb.Exception
 	{
 		database.close();
 		connection.close();
+	}
+
+	private Database getDatabase()
+	{
+		return database;
+	}
+
+	public List<Person> getPersons() throws org.eyedb.Exception
+	{
+		openDatabase();
+		
+		getDatabase().transactionBegin();
+
+		List<Person> result = new ArrayList<Person>();
+	
+		OQL q = new org.eyedb.OQL( getDatabase(), "select p from Person p");
+		ObjectArray a = new ObjectArray();
+		q.execute( a, RecMode.FullRecurs);
+
+		for (int i = 0; i < a.getCount(); i++) {
+			Person p = (Person)a.getObject(i);
+			result.add( p);
+		}
+
+		getDatabase().transactionCommit();
+		closeDatabase();
+		
+		return result;
 	}
 
 	private String databaseName;
