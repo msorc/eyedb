@@ -5,6 +5,7 @@
 <jsp:useBean id="query" class="org.eyedb.example.EyeDBBean" scope="page">
 	<jsp:setProperty name="query" property="databaseName" value='<%= pageContext.getServletContext().getInitParameter("database") %>' />
 	<jsp:setProperty name="query" property="tcpPort" value='<%= pageContext.getServletContext().getInitParameter("tcpPort") %>' />
+	<jsp:setProperty name="query" property="oid" value='<%= request.getParameter("oid") %>' />
 </jsp:useBean>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -15,30 +16,19 @@
 </head>
 <body>
 
-<h1>List persons</h1>
+<h1>View person</h1>
+
+<c:set var="person" value="${query.person}"/>
 
 <table border="1">
 <tr>
-<th>#</th>
 <th>First name</th>
-<th>Last name</th>
-<th>&nbsp;</th>
-</tr>
-<c:set var="counter" value="${1}"/>
-<c:forEach var="person" items="${query.persons}">
-<tr>
-<td>${counter}</td>
 <td>${person.firstname}</td>
-<td>${person.lastname}</td>
-<td>
-<form action="viewperson.jsp" method="get">
-<input type="hidden" name="oid" value="${person.oid}"/>
-<input type="submit" value="View"/>
-</form>
-</td>
 </tr>
-<c:set var="counter" value="${counter + 1}"/>
-</c:forEach>
+<tr>
+<th>Last name</th>
+<td>${person.lastname}</td>
+</tr>
 </table>
 
 </body>
