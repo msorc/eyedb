@@ -1,17 +1,21 @@
 package org.eyedb.example;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eyedb.Connection;
 import org.eyedb.OQL;
 import org.eyedb.ObjectArray;
+import org.eyedb.Oid;
 import org.eyedb.RecMode;
 import org.eyedb.Root;
 import org.eyedb.example.schema.Database;
 import org.eyedb.example.schema.Person;
+
+/**
+ * @author Francois Dechelle <francois@dechelle.net>
+ *
+ */
 
 public class EyeDBBean {
 
@@ -33,6 +37,16 @@ public class EyeDBBean {
 	public void setTcpPort(String tcpPort)
 	{
 		this.tcpPort = tcpPort;
+	}
+
+	public String getOid()
+	{
+		return oid;
+	}
+
+	public void setOid(String oid)
+	{
+		this.oid = oid;
 	}
 
 	private void openDatabase() throws org.eyedb.Exception
@@ -66,7 +80,6 @@ public class EyeDBBean {
 	public List<Person> getPersons() throws org.eyedb.Exception
 	{
 		openDatabase();
-		
 		getDatabase().transactionBegin();
 
 		List<Person> result = new ArrayList<Person>();
@@ -86,8 +99,25 @@ public class EyeDBBean {
 		return result;
 	}
 
+	public Person getPerson() throws org.eyedb.Exception
+	{
+		openDatabase();
+		getDatabase().transactionBegin();
+
+		Oid personOid = new Oid(oid);
+		Person person = (Person)getDatabase().loadObject( personOid);
+		
+		getDatabase().transactionCommit();
+		closeDatabase();
+		
+		return person;
+	}
+	
 	private String databaseName;
 	private String tcpPort;
+	
+	private String oid;
+	
 	private Database database;
 	private Connection connection;
 }
