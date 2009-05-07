@@ -70,7 +70,7 @@ public class EyeDBBean {
 
 	public Map getPersons() throws org.eyedb.Exception
 	{
-		return new ClassMap( this, "Person");
+		return new ClassMap( this, Person.idbclass);
 	}
 	
 	private List<Person> getOldPersons() throws org.eyedb.Exception
