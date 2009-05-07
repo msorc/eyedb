@@ -107,4 +107,9 @@
 		<param-name>tcpPort</param-name>
 		<param-value>6240</param-value>
 	</context-param>
+	<resource-ref>
+		<res-ref-name>eyedb</res-ref-name>
+		<res-type>org.eyedb.dbcp.Connection</res-type>
+		<res-auth>Container</res-auth>
+	</resource-ref>
 </web-app>

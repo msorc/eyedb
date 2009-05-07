@@ -22,14 +22,18 @@
 
 <c:set var="person" value="${query.person}"/>
 
+1: ${param["oid"] }<br/>
+2: ${param.oid }<br/>
+3: ${eyedb.objects[param.oid] }<br/>
+
 <table border="1">
 <tr>
 <th>First name</th>
-<td>${person.firstname}</td>
+<td>${person.firstname} ${person['firstname']}</td>
 </tr>
 <tr>
 <th>Last name</th>
-<td>${person.lastname}</td>
+<td>${person.lastname}  ${person["lastname"]}</td>
 </tr>
 </table>
 

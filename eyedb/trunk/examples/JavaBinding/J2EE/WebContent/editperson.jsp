@@ -20,6 +20,8 @@
 
 <h1>Edit person</h1>
 
+${param[oid]}
+
 <c:set var="person" value="${query.person}"/>
 
 <form name="createPersonForm" action="EditPersonServlet" method="post">
@@ -31,6 +33,10 @@
 <tr>
 <td>Last name</td>
 <td><input type="text" name="lastname" value="${person.lastname}"/></td>
+</tr>
+<tr>
+<td>Age</td>
+<td><input type="text" name="age" value="${person.age}"/></td>
 </tr>
 </table>
 <input type="hidden" name="oid" value="${person.oid}"/>
