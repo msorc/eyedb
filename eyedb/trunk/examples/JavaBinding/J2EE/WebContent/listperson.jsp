@@ -23,6 +23,7 @@
 <th>#</th>
 <th>First name</th>
 <th>Last name</th>
+<th>Age</th>
 <th>&nbsp;</th>
 <th>&nbsp;</th>
 <th>&nbsp;</th>
@@ -33,6 +34,7 @@
 <td>${counter}</td>
 <td>${person.firstname}</td>
 <td>${person.lastname}</td>
+<td>${person.age}</td>
 <td>
 <form action="viewperson.jsp" method="get">
 <input type="hidden" name="oid" value="${person.oid}"/>

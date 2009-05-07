@@ -2,6 +2,7 @@ package org.eyedb.example;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.eyedb.Connection;
 import org.eyedb.OQL;
@@ -39,37 +40,7 @@ public class EyeDBBean {
 		this.tcpPort = tcpPort;
 	}
 
-	public String getOid()
-	{
-		return oid;
-	}
-
-	public void setOid(String oid)
-	{
-		this.oid = oid;
-	}
-
-	public String getFirstname()
-	{
-		return firstname;
-	}
-
-	public void setFirstname(String firstname)
-	{
-		this.firstname = firstname;
-	}
-
-	public String getLastname()
-	{
-		return lastname;
-	}
-
-	public void setLastname(String lastname)
-	{
-		this.lastname = lastname;
-	}
-
-	private void openDatabase() throws org.eyedb.Exception
+	public void openDatabase() throws org.eyedb.Exception
 	{
 		String[] args = new String[3];
 		int i = 0;
@@ -86,18 +57,23 @@ public class EyeDBBean {
 		database.open(connection, Database.DBRW);
 	}
 	
-	private void closeDatabase() throws org.eyedb.Exception
+	public void closeDatabase() throws org.eyedb.Exception
 	{
 		database.close();
 		connection.close();
 	}
 
-	private Database getDatabase()
+	public Database getDatabase()
 	{
 		return database;
 	}
 
-	public List<Person> getPersons() throws org.eyedb.Exception
+	public Map getPersons() throws org.eyedb.Exception
+	{
+		return new ClassMap( this, "Person");
+	}
+	
+	private List<Person> getOldPersons() throws org.eyedb.Exception
 	{
 		openDatabase();
 		getDatabase().transactionBegin();
@@ -119,20 +95,6 @@ public class EyeDBBean {
 		return result;
 	}
 
-	public Person getPerson() throws org.eyedb.Exception
-	{
-		openDatabase();
-		getDatabase().transactionBegin();
-
-		Oid personOid = new Oid(oid);
-		Person person = (Person)getDatabase().loadObject( personOid);
-		
-		getDatabase().transactionCommit();
-		closeDatabase();
-		
-		return person;
-	}
-
 	public Person createPerson() throws org.eyedb.Exception
 	{
 		openDatabase();
@@ -140,10 +102,19 @@ public class EyeDBBean {
 
 		Person person = new Person( getDatabase());
 
-		person.setFirstname( firstname);
-		person.setLastname( lastname);
+		getDatabase().transactionCommit();
+		closeDatabase();
+		
+		return person;
+	}
 
-		person.store( RecMode.FullRecurs);
+	public Person loadPerson( String oid) throws org.eyedb.Exception
+	{
+		openDatabase();
+		getDatabase().transactionBegin();
+
+		Oid personOid = new Oid(oid);
+		Person person = (Person)getDatabase().loadObject( personOid);
 
 		getDatabase().transactionCommit();
 		closeDatabase();
@@ -151,39 +122,26 @@ public class EyeDBBean {
 		return person;
 	}
 
-	public Person updatePerson() throws org.eyedb.Exception
+	public void storePerson( Person person) throws org.eyedb.Exception
 	{
 		openDatabase();
 		getDatabase().transactionBegin();
 
-		Oid personOid = new Oid(oid);
-		Person person = (Person)getDatabase().loadObject( personOid);
-		
-		person.setFirstname( firstname);
-		person.setLastname( lastname);
-		
 		person.store( RecMode.FullRecurs);
 
 		getDatabase().transactionCommit();
 		closeDatabase();
-		
-		return person;
 	}
 	
-	public Person deletePerson() throws org.eyedb.Exception
+	public void deletePerson( Person person) throws org.eyedb.Exception
 	{
 		openDatabase();
 		getDatabase().transactionBegin();
 
-		Oid personOid = new Oid(oid);
-		Person person = (Person)getDatabase().loadObject( personOid);
-		
 		person.remove();
 
 		getDatabase().transactionCommit();
 		closeDatabase();
-		
-		return person;
 	}
 	
 	private String databaseName;
@@ -191,8 +149,4 @@ public class EyeDBBean {
 	
 	private Database database;
 	private Connection connection;
-
-	private String oid;
-	private String firstname;
-	private String lastname;
 }
