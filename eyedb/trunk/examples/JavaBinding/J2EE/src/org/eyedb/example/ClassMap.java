@@ -2,60 +2,48 @@ package org.eyedb.example;
 
 import java.util.AbstractMap;
 import java.util.AbstractSet;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.eyedb.ClassIterator;
 import org.eyedb.Oid;
 
 class ClassMap extends AbstractMap< Oid, org.eyedb.Object> {
 
-	private class ClassEntrySet extends AbstractSet<Map.Entry< Oid, org.eyedb.Object>> {
-
-		private class ClassIterator implements Iterator<Map.Entry< Oid, org.eyedb.Object>> {
-
-			public boolean hasNext()
-			{
-				// TODO Auto-generated method stub
-				return false;
-			}
-
-			public Map.Entry< Oid, org.eyedb.Object> next()
-			{
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			public void remove()
-			{
-				throw new UnsupportedOperationException();
-			}
-		}
-		@Override
-		public Iterator<Map.Entry< Oid, org.eyedb.Object>> iterator()
-		{
-			return new ClassIterator();
-		}
-
-		@Override
-		public int size()
-		{
-			throw new UnsupportedOperationException();
-		}
-
-	}
-
-	ClassMap( EyeDBBean bean, String className)
+	ClassMap( EyeDBBean bean, org.eyedb.Class eyedbClass)
 	{
 		this.bean = bean;
-		this.className = className;
+		this.eyedbClass = eyedbClass;
 	}
 	
 	@Override
 	public Set<Map.Entry< Oid, org.eyedb.Object>> entrySet()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			bean.openDatabase();
+			bean.getDatabase().transactionBegin();
+
+			Set<Map.Entry< Oid, org.eyedb.Object>> set;
+
+			set = new HashSet<Map.Entry< Oid, org.eyedb.Object>>();
+
+			ClassIterator i = new ClassIterator( eyedbClass);
+			org.eyedb.Object o;
+
+			while ((o = i.nextObject()) != null) {
+				set.add( new AbstractMap.SimpleEntry< Oid, org.eyedb.Object>( o.getOid(), o) );
+			}
+
+			bean.getDatabase().transactionCommit();
+			bean.closeDatabase();
+			
+			return set;
+		}
+		catch( org.eyedb.Exception e) {
+			return null;
+		}
 	}
 
 	public org.eyedb.Object get(Object key)
@@ -79,5 +67,5 @@ class ClassMap extends AbstractMap< Oid, org.eyedb.Object> {
 	}
 
 	private EyeDBBean bean;
-	private String className;
+	private org.eyedb.Class eyedbClass;
 }
