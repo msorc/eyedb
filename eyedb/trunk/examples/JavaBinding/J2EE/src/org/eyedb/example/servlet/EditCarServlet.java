@@ -9,13 +9,14 @@ import javax.servlet.http.HttpServletResponse;
 import org.eyedb.Oid;
 import org.eyedb.RecMode;
 import org.eyedb.example.EyeDBBean;
+import org.eyedb.example.schema.Car;
 import org.eyedb.example.schema.Person;
 
 /**
- * Servlet implementation class for Servlet: CreatePersonServlet
+ * Servlet implementation class for Servlet: EditCarServlet
  *
  */
-public class EditPersonServlet extends javax.servlet.http.HttpServlet  {
+public class EditCarServlet extends javax.servlet.http.HttpServlet  {
 
 	/* (non-Java-doc)
 	 * @see javax.servlet.http.HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -38,13 +39,13 @@ public class EditPersonServlet extends javax.servlet.http.HttpServlet  {
 			bean.openDatabase();
 			bean.getDatabase().transactionBegin();
 
-			Oid personOid = new Oid( request.getParameter( "oid"));
-			Person person = (Person)bean.getDatabase().loadObject( personOid);
+			Oid carOid = new Oid( request.getParameter( "oid"));
+			Car car = (Car)bean.getDatabase().loadObject( carOid);
 
-			person.setFirstname( request.getParameter( "firstname"));
-			person.setLastname( request.getParameter( "lastname"));
+			car.setModel( request.getParameter( "model"));
+			car.setNumber( request.getParameter( "number"));
 
-			person.store( RecMode.FullRecurs);
+			car.store( RecMode.FullRecurs);
 
 			bean.getDatabase().transactionCommit();
 			bean.closeDatabase();
@@ -53,6 +54,6 @@ public class EditPersonServlet extends javax.servlet.http.HttpServlet  {
 			throw new ServletException( e);
 		}
 
-		response.sendRedirect("/eyedb/listperson.jsp");
+		response.sendRedirect("/eyedb/listcar.jsp");
 	}   	  	    
 }

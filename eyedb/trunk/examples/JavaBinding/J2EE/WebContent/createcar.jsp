@@ -1,4 +1,3 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
@@ -17,25 +16,13 @@
 
 <%@ include file="menu.jsp" %>
 
-<h1>View person</h1>
+<h1>Create car</h1>
 
-<c:set var="oid" value='${param["oid"]}' />
-<c:set var="person" value="${eyedb.objects[oid]}"/>
-
-<table border="1">
-<tr>
-<th>First name</th>
-<td>${person.firstname}</td>
-</tr>
-<tr>
-<th>Last name</th>
-<td>${person.lastname}</td>
-</tr>
-<tr>
-<th>Age</th>
-<td>${person.age}</td>
-</tr>
-</table>
+<form name="createCarnForm" action="CreateCarServlet" method="post">
+Model: <input type="text" name="model"/><br/>
+Number: <input type="text" name="number"/><br/>
+<input type="submit" value="Create"/>
+</form>
 
 </body>
 </html>

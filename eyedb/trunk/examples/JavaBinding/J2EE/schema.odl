@@ -19,6 +19,6 @@ class Person {
 
 class Car {
   attribute string model;
-  attribute int num;
+  attribute string number;
   relationship Person *owner inverse Person::cars;
 };

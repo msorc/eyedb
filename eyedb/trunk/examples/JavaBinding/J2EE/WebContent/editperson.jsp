@@ -20,8 +20,7 @@
 <h1>Edit person</h1>
 
 <c:set var="oid" value='${param["oid"]}' />
-<c:set var="person" value="${eyedb.persons[oid]}"/>
-oid: ${oid}
+<c:set var="person" value="${eyedb.objects[oid]}"/>
 
 <form name="createPersonForm" action="EditPersonServlet" method="post">
 <table border="0">

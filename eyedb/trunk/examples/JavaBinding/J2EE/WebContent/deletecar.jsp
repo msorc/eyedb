@@ -11,31 +11,32 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>Person</title>
+<title>EyeDB</title>
 </head>
 <body>
 
 <%@ include file="menu.jsp" %>
 
-<h1>View person</h1>
+<h1>Delete car</h1>
 
 <c:set var="oid" value='${param["oid"]}' />
-<c:set var="person" value="${eyedb.objects[oid]}"/>
+<c:set var="car" value="${eyedb.objects[oid]}"/>
 
+<form name="deleteCarForm" action="DeleteCarServlet" method="post">
 <table border="1">
 <tr>
-<th>First name</th>
-<td>${person.firstname}</td>
+<th>Model</th>
+<td>${car.model}</td>
 </tr>
 <tr>
-<th>Last name</th>
-<td>${person.lastname}</td>
-</tr>
-<tr>
-<th>Age</th>
-<td>${person.age}</td>
+<th>Number</th>
+<td>${car.number}</td>
 </tr>
 </table>
+<input type="hidden" name="oid" value="${car.oid}"/>
+<input type="submit" value="Cancel"/>
+<input type="submit" value="Delete"/>
+</form>
 
 </body>
 </html>

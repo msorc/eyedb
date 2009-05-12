@@ -17,23 +17,19 @@
 
 <%@ include file="menu.jsp" %>
 
-<h1>View person</h1>
+<h1>View car</h1>
 
 <c:set var="oid" value='${param["oid"]}' />
-<c:set var="person" value="${eyedb.objects[oid]}"/>
+<c:set var="car" value="${eyedb.objects[oid]}"/>
 
 <table border="1">
 <tr>
-<th>First name</th>
-<td>${person.firstname}</td>
+<th>Model</th>
+<td>${car.model}</td>
 </tr>
 <tr>
-<th>Last name</th>
-<td>${person.lastname}</td>
-</tr>
-<tr>
-<th>Age</th>
-<td>${person.age}</td>
+<th>Number</th>
+<td>${car.number}</td>
 </tr>
 </table>
 

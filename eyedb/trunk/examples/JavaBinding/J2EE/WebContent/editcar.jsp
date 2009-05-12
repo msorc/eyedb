@@ -17,25 +17,25 @@
 
 <%@ include file="menu.jsp" %>
 
-<h1>View person</h1>
+<h1>Edit car</h1>
 
 <c:set var="oid" value='${param["oid"]}' />
-<c:set var="person" value="${eyedb.objects[oid]}"/>
+<c:set var="car" value="${eyedb.objects[oid]}"/>
 
-<table border="1">
+<form name="editCarForm" action="EditCarServlet" method="post">
+<table border="0">
 <tr>
-<th>First name</th>
-<td>${person.firstname}</td>
+<td>Model</td>
+<td><input type="text" name="model" value="${car.model}"/></td>
 </tr>
 <tr>
-<th>Last name</th>
-<td>${person.lastname}</td>
-</tr>
-<tr>
-<th>Age</th>
-<td>${person.age}</td>
+<td>Number</td>
+<td><input type="text" name="number" value="${car.number}"/></td>
 </tr>
 </table>
+<input type="hidden" name="oid" value="${car.oid}"/>
+<input type="submit" value="Ok"/>
+</form>
 
 </body>
 </html>

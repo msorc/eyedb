@@ -1,8 +1,11 @@
 package org.eyedb.example;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eyedb.Connection;
 import org.eyedb.OQL;
@@ -19,6 +22,48 @@ import org.eyedb.example.schema.Person;
  */
 
 public class EyeDBBean {
+	private class ObjectMap extends AbstractMap< Oid, org.eyedb.Object> {
+
+		public Set<Map.Entry< Oid, org.eyedb.Object>> entrySet()
+		{
+			throw new UnsupportedOperationException();
+		}
+
+		public org.eyedb.Object get(Object key)
+		{
+			try {
+				openDatabase();
+				getDatabase().transactionBegin();
+
+				Oid oid = new Oid((String)key);
+				org.eyedb.Object obj = getDatabase().loadObject( oid);
+
+				getDatabase().transactionCommit();
+				closeDatabase();
+
+				return obj;
+			}
+			catch( org.eyedb.Exception e) {
+			}
+
+			return null;
+		}
+	}
+
+	public EyeDBBean() throws org.eyedb.Exception
+	{
+		this.databaseName = "";
+		this.tcpPort = "6240";
+
+		String[] args = new String[3];
+		int i = 0;
+		args[i++] = "--user=" + System.getProperty( "user.name");
+		args[i++] = "--dbm=default";
+
+		Root.init( databaseName, args);
+
+		Database.init();
+	}
 
 	public String getDatabaseName()
 	{
@@ -42,21 +87,11 @@ public class EyeDBBean {
 
 	public void openDatabase() throws org.eyedb.Exception
 	{
-		String[] args = new String[3];
-		int i = 0;
-		args[i++] = "--user=" + System.getProperty( "user.name");
-		args[i++] = "--dbm=default";
-		args[i++] = "--port=" + tcpPort;
-
-		Root.init( databaseName, args);
-
-		Database.init();
-
-		connection = new Connection();
+		connection = new Connection( "localhost", tcpPort);
 		database = new Database( databaseName);
 		database.open(connection, Database.DBRW);
 	}
-	
+
 	public void closeDatabase() throws org.eyedb.Exception
 	{
 		database.close();
@@ -68,72 +103,45 @@ public class EyeDBBean {
 		return database;
 	}
 
-	public Map getPersons() throws org.eyedb.Exception
+	public Map getObjects() throws org.eyedb.Exception
 	{
-		return new ClassMap( this, Person.idbclass);
+		return new ObjectMap();
 	}
-	
-	private List<Person> getOldPersons() throws org.eyedb.Exception
+
+	private List<org.eyedb.Object> getClassObjects( String name) throws org.eyedb.Exception
 	{
 		openDatabase();
 		getDatabase().transactionBegin();
 
-		List<Person> result = new ArrayList<Person>();
-	
-		OQL q = new org.eyedb.OQL( getDatabase(), "select p from Person p");
+		List<org.eyedb.Object> result = new ArrayList<org.eyedb.Object>();
+
+		OQL q = new org.eyedb.OQL( getDatabase(), "select o from " + name + " o");
 		ObjectArray a = new ObjectArray();
 		q.execute( a, RecMode.FullRecurs);
 
 		for (int i = 0; i < a.getCount(); i++) {
-			Person p = (Person)a.getObject(i);
-			result.add( p);
+			result.add( a.getObject(i));
 		}
 
 		getDatabase().transactionCommit();
 		closeDatabase();
-		
+
 		return result;
 	}
-
-	public Person loadPerson( String oid) throws org.eyedb.Exception
-	{
-		openDatabase();
-		getDatabase().transactionBegin();
-
-		Oid personOid = new Oid(oid);
-		Person person = (Person)getDatabase().loadObject( personOid);
-
-		getDatabase().transactionCommit();
-		closeDatabase();
-		
-		return person;
-	}
-
-	public void storePerson( Person person) throws org.eyedb.Exception
-	{
-		openDatabase();
-		getDatabase().transactionBegin();
-
-		person.store( RecMode.FullRecurs);
-
-		getDatabase().transactionCommit();
-		closeDatabase();
-	}
 	
-	public void deletePerson( Person person) throws org.eyedb.Exception
+	public List<org.eyedb.Object> getPersons() throws org.eyedb.Exception
 	{
-		openDatabase();
-		getDatabase().transactionBegin();
-
-		person.remove();
-
-		getDatabase().transactionCommit();
-		closeDatabase();
+		return getClassObjects( "Person");
 	}
-	
+
+	public List<org.eyedb.Object> getCars() throws org.eyedb.Exception
+	{
+		return getClassObjects( "Car");
+	}
+
 	private String databaseName;
 	private String tcpPort;
-	
+
 	private Database database;
 	private Connection connection;
 }
