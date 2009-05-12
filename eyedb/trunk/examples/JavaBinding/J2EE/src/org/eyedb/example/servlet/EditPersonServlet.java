@@ -43,6 +43,7 @@ public class EditPersonServlet extends javax.servlet.http.HttpServlet  {
 
 			person.setFirstname( request.getParameter( "firstname"));
 			person.setLastname( request.getParameter( "lastname"));
+			person.setAge( Integer.parseInt( request.getParameter( "age")));
 
 			person.store( RecMode.FullRecurs);
 

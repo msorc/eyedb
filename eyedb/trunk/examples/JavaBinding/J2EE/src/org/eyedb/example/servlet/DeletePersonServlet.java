@@ -1,6 +1,8 @@
 package org.eyedb.example.servlet;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -28,27 +30,36 @@ public class DeletePersonServlet extends javax.servlet.http.HttpServlet  {
 	 * @see javax.servlet.http.HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		try {
-			EyeDBBean bean = new EyeDBBean();
 
-			bean.setDatabaseName( getServletConfig().getServletContext().getInitParameter("database"));
-			bean.setTcpPort( getServletConfig().getServletContext().getInitParameter("tcpPort"));
-			
-			bean.openDatabase();
-			bean.getDatabase().transactionBegin();
-
-			Oid personOid = new Oid( request.getParameter( "oid"));
-			Person person = (Person)bean.getDatabase().loadObject( personOid);
-
-			person.remove();
-
-			bean.getDatabase().transactionCommit();
-			bean.closeDatabase();
-		}
-		catch( org.eyedb.Exception e) {
-			throw new ServletException( e);
+		if (request.getParameter( "cancel") != null) {
+			response.sendRedirect("/eyedb/listperson.jsp");
+			return;
 		}
 
-		response.sendRedirect("/eyedb/listperson.jsp");
-	}   	  	    
+		if (request.getParameter( "delete") != null) {
+			try {
+				EyeDBBean bean = new EyeDBBean();
+
+				bean.setDatabaseName( getServletConfig().getServletContext().getInitParameter("database"));
+				bean.setTcpPort( getServletConfig().getServletContext().getInitParameter("tcpPort"));
+
+				bean.openDatabase();
+				bean.getDatabase().transactionBegin();
+
+				Oid personOid = new Oid( request.getParameter( "oid"));
+				Person person = (Person)bean.getDatabase().loadObject( personOid);
+
+				person.remove();
+
+				bean.getDatabase().transactionCommit();
+				bean.closeDatabase();
+			}
+			catch( org.eyedb.Exception e) {
+				throw new ServletException( e);
+			}
+
+			response.sendRedirect("/eyedb/listperson.jsp");
+
+		}   	  	    
+	}
 }

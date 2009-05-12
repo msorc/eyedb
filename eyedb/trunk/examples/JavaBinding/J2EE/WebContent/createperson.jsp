@@ -21,6 +21,7 @@
 <form name="createPersonForm" action="CreatePersonServlet" method="post">
 First name: <input type="text" name="firstname"/><br/>
 Last name: <input type="text" name="lastname"/><br/>
+Age: <input type="text" name="age" value="0"/><br/>
 <input type="submit" value="Create"/>
 </form>
 

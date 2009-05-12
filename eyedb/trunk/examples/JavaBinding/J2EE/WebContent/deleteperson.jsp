@@ -22,7 +22,7 @@
 <c:set var="oid" value='${param["oid"]}' />
 <c:set var="person" value="${eyedb.objects[oid]}"/>
 
-<form name="deletePersonForm" action="DeletePersonServlet" method="post">
+<form name="deletePersonForm" action="DeletePersonServlet" method="get">
 <table border="1">
 <tr>
 <th>First name</th>
@@ -38,8 +38,8 @@
 </tr>
 </table>
 <input type="hidden" name="oid" value="${person.oid}"/>
-<input type="submit" value="Cancel"/>
-<input type="submit" value="Delete"/>
+<input type="submit" name="cancel" value="Cancel"/>
+<input type="submit" name="delete" value="Delete"/>
 </form>
 
 </body>

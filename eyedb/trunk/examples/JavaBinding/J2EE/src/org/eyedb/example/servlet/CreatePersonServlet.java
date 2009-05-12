@@ -41,9 +41,9 @@ public class CreatePersonServlet extends javax.servlet.http.HttpServlet  {
 
 			person.setFirstname( request.getParameter( "firstname"));
 			person.setLastname( request.getParameter( "lastname"));
+			person.setAge( Integer.parseInt( request.getParameter( "age")));
 
 			// TODO
-			//person.setAge()
 			//person.setCars()
 			
 			person.store( RecMode.FullRecurs);
