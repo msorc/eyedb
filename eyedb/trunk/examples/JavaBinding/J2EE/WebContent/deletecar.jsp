@@ -34,8 +34,8 @@
 </tr>
 </table>
 <input type="hidden" name="oid" value="${car.oid}"/>
-<input type="submit" value="Cancel"/>
-<input type="submit" value="Delete"/>
+<input type="submit" name="cancel" value="Cancel"/>
+<input type="submit" name="delete" value="Delete"/>
 </form>
 
 </body>

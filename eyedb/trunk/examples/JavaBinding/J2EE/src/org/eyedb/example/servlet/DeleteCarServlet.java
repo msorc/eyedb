@@ -28,27 +28,35 @@ public class DeleteCarServlet extends javax.servlet.http.HttpServlet  {
 	 * @see javax.servlet.http.HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		try {
-			EyeDBBean bean = new EyeDBBean();
 
-			bean.setDatabaseName( getServletConfig().getServletContext().getInitParameter("database"));
-			bean.setTcpPort( getServletConfig().getServletContext().getInitParameter("tcpPort"));
-
-			bean.openDatabase();
-			bean.getDatabase().transactionBegin();
-
-			Oid carOid = new Oid( request.getParameter( "oid"));
-			Car car = (Car)bean.getDatabase().loadObject( carOid);
-
-			car.remove();
-
-			bean.getDatabase().transactionCommit();
-			bean.closeDatabase();
-		}
-		catch( org.eyedb.Exception e) {
-			throw new ServletException( e);
+		if (request.getParameter( "cancel") != null) {
+			response.sendRedirect("/eyedb/listcar.jsp");
+			return;
 		}
 
-		response.sendRedirect("/eyedb/listcar.jsp");
+		if (request.getParameter( "delete") != null) {
+			try {
+				EyeDBBean bean = new EyeDBBean();
+
+				bean.setDatabaseName( getServletConfig().getServletContext().getInitParameter("database"));
+				bean.setTcpPort( getServletConfig().getServletContext().getInitParameter("tcpPort"));
+
+				bean.openDatabase();
+				bean.getDatabase().transactionBegin();
+
+				Oid carOid = new Oid( request.getParameter( "oid"));
+				Car car = (Car)bean.getDatabase().loadObject( carOid);
+
+				car.remove();
+
+				bean.getDatabase().transactionCommit();
+				bean.closeDatabase();
+			}
+			catch( org.eyedb.Exception e) {
+				throw new ServletException( e);
+			}
+
+			response.sendRedirect("/eyedb/listcar.jsp");
+		}
 	}   	  	    
 }
