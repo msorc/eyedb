@@ -95,19 +95,6 @@ public class EyeDBBean {
 		return result;
 	}
 
-	public Person createPerson() throws org.eyedb.Exception
-	{
-		openDatabase();
-		getDatabase().transactionBegin();
-
-		Person person = new Person( getDatabase());
-
-		getDatabase().transactionCommit();
-		closeDatabase();
-		
-		return person;
-	}
-
 	public Person loadPerson( String oid) throws org.eyedb.Exception
 	{
 		openDatabase();
