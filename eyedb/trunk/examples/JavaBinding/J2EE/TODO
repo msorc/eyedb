@@ -13,6 +13,14 @@
 - fix JSP tag lib dependency problem [DONE] (classpath variable)
 
 
-	
+- change bean to separate bean.persons (Collection) from bean.person[oid] (bean.person Map)
+
+- add collection support
+	- problem: how to get collection as a property of an object, as generated Java code does not respect standard interfaces
+	-> class GoodPerson extends Person {
+		Set<Car> getCars(): creates a Set using API
+		void setCars( Set<Car> cars): set the collection
+		}
+		
 	
 	
