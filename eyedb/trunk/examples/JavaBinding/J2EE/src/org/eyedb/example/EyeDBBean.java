@@ -2,7 +2,6 @@ package org.eyedb.example;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,7 +13,6 @@ import org.eyedb.Oid;
 import org.eyedb.RecMode;
 import org.eyedb.Root;
 import org.eyedb.example.schema.Database;
-import org.eyedb.example.schema.Person;
 
 /**
  * @author Francois Dechelle <francois@dechelle.net>
@@ -36,7 +34,7 @@ public class EyeDBBean {
 				getDatabase().transactionBegin();
 
 				Oid oid = new Oid((String)key);
-				org.eyedb.Object obj = getDatabase().loadObject( oid);
+				org.eyedb.Object obj = getDatabase().loadObject( oid, RecMode.FullRecurs);
 
 				getDatabase().transactionCommit();
 				closeDatabase();

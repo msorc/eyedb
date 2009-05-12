@@ -31,6 +31,11 @@
 <th>Number</th>
 <td>${car.number}</td>
 </tr>
+<tr>
+<th>Owner</th>
+<c:set var="owner" value="${car.owner}"/>
+<td><a href="viewperson.jsp?oid=${owner.oid}">${owner.firstname} ${owner.lastname}</a></td>
+</tr>
 </table>
 
 </body>

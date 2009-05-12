@@ -22,7 +22,7 @@
 <c:set var="oid" value='${param["oid"]}' />
 <c:set var="car" value="${eyedb.objects[oid]}"/>
 
-<form name="editCarForm" action="EditCarServlet" method="post">
+<form name="editCarForm" action="EditCarServlet" method="get">
 <table border="0">
 <tr>
 <td>Model</td>
@@ -31,6 +31,16 @@
 <tr>
 <td>Number</td>
 <td><input type="text" name="number" value="${car.number}"/></td>
+</tr>
+<tr>
+<td>Owner</td>
+<td>
+<select name="owner">
+<c:forEach var="person" items="${eyedb.persons}">
+	<option value="${person.oid}" ${(car.owner.oid == person.oid) ? "selected=\"true\"": ""}>${person.firstname} ${person.lastname}</option>
+</c:forEach>
+</select>
+</td>
 </tr>
 </table>
 <input type="hidden" name="oid" value="${car.oid}"/>
