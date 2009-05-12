@@ -45,6 +45,10 @@ public class EditCarServlet extends javax.servlet.http.HttpServlet  {
 			car.setModel( request.getParameter( "model"));
 			car.setNumber( request.getParameter( "number"));
 
+			Oid ownerOid = new Oid( request.getParameter( "owner"));
+			Person owner = (Person)bean.getDatabase().loadObject( ownerOid);
+			car.setOwner( owner);
+			
 			car.store( RecMode.FullRecurs);
 
 			bean.getDatabase().transactionCommit();
