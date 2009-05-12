@@ -6,6 +6,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eyedb.Oid;
 import org.eyedb.example.EyeDBBean;
 import org.eyedb.example.schema.Person;
 
@@ -33,8 +34,16 @@ public class DeletePersonServlet extends javax.servlet.http.HttpServlet  {
 		bean.setTcpPort( getServletConfig().getServletContext().getInitParameter("tcpPort"));
 		
 		try {
-			Person p = bean.loadPerson( request.getParameter( "oid"));
-			bean.deletePerson( p);
+			bean.openDatabase();
+			bean.getDatabase().transactionBegin();
+
+			Oid personOid = new Oid( request.getParameter( "oid"));
+			Person person = (Person)bean.getDatabase().loadObject( personOid);
+
+			person.remove();
+
+			bean.getDatabase().transactionCommit();
+			bean.closeDatabase();
 		}
 		catch( org.eyedb.Exception e) {
 			throw new ServletException( e);

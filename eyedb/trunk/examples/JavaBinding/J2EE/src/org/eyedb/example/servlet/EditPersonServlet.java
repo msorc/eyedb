@@ -6,6 +6,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eyedb.Oid;
+import org.eyedb.RecMode;
 import org.eyedb.example.EyeDBBean;
 import org.eyedb.example.schema.Person;
 
@@ -33,12 +35,19 @@ public class EditPersonServlet extends javax.servlet.http.HttpServlet  {
 		bean.setTcpPort( getServletConfig().getServletContext().getInitParameter("tcpPort"));
 		
 		try {
-			Person p = bean.loadPerson( request.getParameter( "oid"));
+			bean.openDatabase();
+			bean.getDatabase().transactionBegin();
 
-			p.setFirstname( request.getParameter( "firstname"));
-			p.setLastname( request.getParameter( "lastname"));
+			Oid personOid = new Oid( request.getParameter( "oid"));
+			Person person = (Person)bean.getDatabase().loadObject( personOid);
 
-			bean.storePerson( p);
+			person.setFirstname( request.getParameter( "firstname"));
+			person.setLastname( request.getParameter( "lastname"));
+
+			person.store( RecMode.FullRecurs);
+
+			bean.getDatabase().transactionCommit();
+			bean.closeDatabase();
 		}
 		catch( org.eyedb.Exception e) {
 			throw new ServletException( e);

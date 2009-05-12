@@ -8,7 +8,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eyedb.ClassIterator;
+import org.eyedb.OQL;
+import org.eyedb.ObjectArray;
 import org.eyedb.Oid;
+import org.eyedb.RecMode;
+import org.eyedb.example.schema.Person;
 
 class ClassMap extends AbstractMap< Oid, org.eyedb.Object> {
 
@@ -29,13 +33,22 @@ class ClassMap extends AbstractMap< Oid, org.eyedb.Object> {
 
 			set = new HashSet<Map.Entry< Oid, org.eyedb.Object>>();
 
-			ClassIterator i = new ClassIterator( eyedbClass);
+			OQL q = new org.eyedb.OQL( bean.getDatabase(), "select p from Person p");
+			ObjectArray a = new ObjectArray();
+			q.execute( a, RecMode.FullRecurs);
+
+			for (int i = 0; i < a.getCount(); i++) {
+				org.eyedb.Object o = a.getObject(i);
+				set.add( new AbstractMap.SimpleEntry< Oid, org.eyedb.Object>( o.getOid(), o) );
+			}
+
+			/*ClassIterator i = new ClassIterator( eyedbClass);
 			org.eyedb.Object o;
 
 			while ((o = i.nextObject()) != null) {
 				set.add( new AbstractMap.SimpleEntry< Oid, org.eyedb.Object>( o.getOid(), o) );
 			}
-
+*/
 			bean.getDatabase().transactionCommit();
 			bean.closeDatabase();
 			

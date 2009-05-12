@@ -32,24 +32,24 @@
 <c:forEach var="person" items="${eyedb.persons}">
 <tr>
 <td>${counter}</td>
-<td>${person.firstname}</td>
-<td>${person.lastname}</td>
-<td>${person.age}</td>
+<td>${person.value.firstname}</td>
+<td>${person.value.lastname}</td>
+<td>${person.value.age}</td>
 <td>
 <form action="viewperson.jsp" method="get">
-<input type="hidden" name="oid" value="${person.oid}"/>
+<input type="hidden" name="oid" value="${person.value.oid}"/>
 <input type="submit" value="View"/>
 </form>
 </td>
 <td>
 <form action="editperson.jsp" method="get">
-<input type="hidden" name="oid" value="${person.oid}"/>
+<input type="hidden" name="oid" value="${person.value.oid}"/>
 <input type="submit" value="Edit"/>
 </form>
 </td>
 <td>
 <form action="DeletePersonServlet" method="get">
-<input type="hidden" name="oid" value="${person.oid}"/>
+<input type="hidden" name="oid" value="${person.value.oid}"/>
 <input type="submit" value="Delete"/>
 </form>
 </td>
