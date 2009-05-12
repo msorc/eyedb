@@ -6,16 +6,15 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eyedb.Oid;
 import org.eyedb.RecMode;
 import org.eyedb.example.EyeDBBean;
-import org.eyedb.example.schema.Person;
+import org.eyedb.example.schema.Car;
 
 /**
- * Servlet implementation class for Servlet: CreatePersonServlet
+ * Servlet implementation class for Servlet: CreateCarServlet
  *
  */
-public class EditPersonServlet extends javax.servlet.http.HttpServlet  {
+public class CreateCarServlet extends javax.servlet.http.HttpServlet  {
 
 	/* (non-Java-doc)
 	 * @see javax.servlet.http.HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -38,13 +37,15 @@ public class EditPersonServlet extends javax.servlet.http.HttpServlet  {
 			bean.openDatabase();
 			bean.getDatabase().transactionBegin();
 
-			Oid personOid = new Oid( request.getParameter( "oid"));
-			Person person = (Person)bean.getDatabase().loadObject( personOid);
+			Car car= new Car( bean.getDatabase());
 
-			person.setFirstname( request.getParameter( "firstname"));
-			person.setLastname( request.getParameter( "lastname"));
+			car.setModel( request.getParameter( "model"));
+			car.setNumber( request.getParameter( "number"));
 
-			person.store( RecMode.FullRecurs);
+			// TODO
+			//car.setOwner()
+			
+			car.store( RecMode.FullRecurs);
 
 			bean.getDatabase().transactionCommit();
 			bean.closeDatabase();
@@ -53,6 +54,6 @@ public class EditPersonServlet extends javax.servlet.http.HttpServlet  {
 			throw new ServletException( e);
 		}
 
-		response.sendRedirect("/eyedb/listperson.jsp");
+		response.sendRedirect("/eyedb/listcar.jsp");
 	}   	  	    
 }

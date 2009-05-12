@@ -28,12 +28,12 @@ public class CreatePersonServlet extends javax.servlet.http.HttpServlet  {
 	 * @see javax.servlet.http.HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		EyeDBBean bean = new EyeDBBean();
-
-		bean.setDatabaseName( getServletConfig().getServletContext().getInitParameter("database"));
-		bean.setTcpPort( getServletConfig().getServletContext().getInitParameter("tcpPort"));
-		
 		try {
+			EyeDBBean bean = new EyeDBBean();
+
+			bean.setDatabaseName( getServletConfig().getServletContext().getInitParameter("database"));
+			bean.setTcpPort( getServletConfig().getServletContext().getInitParameter("tcpPort"));
+			
 			bean.openDatabase();
 			bean.getDatabase().transactionBegin();
 
@@ -42,6 +42,10 @@ public class CreatePersonServlet extends javax.servlet.http.HttpServlet  {
 			person.setFirstname( request.getParameter( "firstname"));
 			person.setLastname( request.getParameter( "lastname"));
 
+			// TODO
+			//person.setAge()
+			//person.setCars()
+			
 			person.store( RecMode.FullRecurs);
 
 			bean.getDatabase().transactionCommit();

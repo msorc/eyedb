@@ -21,10 +21,7 @@
 <table border="1">
 <tr>
 <th>#</th>
-<th>First name</th>
-<th>Last name</th>
-<th>Age</th>
-<th>&nbsp;</th>
+<th>Person</th>
 <th>&nbsp;</th>
 <th>&nbsp;</th>
 </tr>
@@ -32,24 +29,16 @@
 <c:forEach var="person" items="${eyedb.persons}">
 <tr>
 <td>${counter}</td>
-<td>${person.value.firstname}</td>
-<td>${person.value.lastname}</td>
-<td>${person.value.age}</td>
-<td>
-<form action="viewperson.jsp" method="get">
-<input type="hidden" name="oid" value="${person.value.oid}"/>
-<input type="submit" value="View"/>
-</form>
-</td>
+<td><a href="viewperson.jsp?oid=${person.oid}">${person.firstname} ${person.lastname}</a></td>
 <td>
 <form action="editperson.jsp" method="get">
-<input type="hidden" name="oid" value="${person.value.oid}"/>
+<input type="hidden" name="oid" value="${person.oid}"/>
 <input type="submit" value="Edit"/>
 </form>
 </td>
 <td>
-<form action="DeletePersonServlet" method="get">
-<input type="hidden" name="oid" value="${person.value.oid}"/>
+<form action="deleteperson.jsp" method="get">
+<input type="hidden" name="oid" value="${person.oid}"/>
 <input type="submit" value="Delete"/>
 </form>
 </td>

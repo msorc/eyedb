@@ -3,8 +3,8 @@
 	- viewperson.jsp: detailed view [DONE]
 	- editperson.jsp: edit view [DONE]
 	- createperson.jsp: create view [DONE]
-	- deleteperson.jsp: delete view [NOT YET] (send directly to servlet)
-
+	- deleteperson.jsp: delete view [DONE]
+	
 - add servlets to:
 	- create a person [DONE]
 	- edit a person [DONE]
@@ -12,8 +12,10 @@
 	
 - fix JSP tag lib dependency problem [DONE] (classpath variable)
 
+- idem for person: jsp and servlet for car [DONE]
 
-- change bean to separate bean.persons (Collection) from bean.person[oid] (bean.person Map)
+- change bean to separate bean.persons (getPersons() returning a Collection)
+ from bean.person[oid] (bean.getPerson() returning a Map) [DONE]
 
 - add collection support
 	- problem: how to get collection as a property of an object, as generated Java code does not respect standard interfaces

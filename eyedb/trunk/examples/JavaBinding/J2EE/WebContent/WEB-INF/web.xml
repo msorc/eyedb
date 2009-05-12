@@ -67,6 +67,33 @@
 		<servlet-class>
 		org.eyedb.example.servlet.DeletePersonServlet</servlet-class>
 	</servlet>
+	<servlet>
+		<description>
+		</description>
+		<display-name>
+		CreateCarServlet</display-name>
+		<servlet-name>CreateCarServlet</servlet-name>
+		<servlet-class>
+		org.eyedb.example.servlet.CreateCarServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<description>
+		</description>
+		<display-name>
+		EditCarServlet</display-name>
+		<servlet-name>EditCarServlet</servlet-name>
+		<servlet-class>
+		org.eyedb.example.servlet.EditCarServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<description>
+		</description>
+		<display-name>
+		DeleteCarServlet</display-name>
+		<servlet-name>DeleteCarServlet</servlet-name>
+		<servlet-class>
+		org.eyedb.example.servlet.DeleteCarServlet</servlet-class>
+	</servlet>
 	<servlet-mapping>
 		<servlet-name>BasicServlet</servlet-name>
 		<url-pattern>/BasicServlet</url-pattern>
@@ -90,6 +117,18 @@
 	<servlet-mapping>
 		<servlet-name>DeletePersonServlet</servlet-name>
 		<url-pattern>/DeletePersonServlet</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>CreateCarServlet</servlet-name>
+		<url-pattern>/CreateCarServlet</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>EditCarServlet</servlet-name>
+		<url-pattern>/EditCarServlet</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>DeleteCarServlet</servlet-name>
+		<url-pattern>/DeleteCarServlet</url-pattern>
 	</servlet-mapping>
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
