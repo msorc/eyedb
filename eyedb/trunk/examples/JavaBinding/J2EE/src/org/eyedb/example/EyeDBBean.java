@@ -22,7 +22,9 @@ import org.eyedb.example.schema.Database;
 
 public class EyeDBBean {
 
-	private void logObject( org.eyedb.Object obj)
+	public static Logger logger = Logger.getLogger("org.eyedb");
+
+	public void logObject( org.eyedb.Object obj)
 	{
 		EyeDBBean.logger.info( obj.toString());
 		if (obj instanceof org.eyedb.example.schema.Person) {
@@ -61,7 +63,6 @@ public class EyeDBBean {
 				Oid oid = new Oid((String)key);
 				org.eyedb.Object obj = getDatabase().loadObject( oid, mode);
 
-				logObject( obj);
 				Object ret = wrapObject( obj);
 
 				getDatabase().transactionCommit();
@@ -77,8 +78,6 @@ public class EyeDBBean {
 
 		private RecMode mode;
 	}
-
-	public static Logger logger = Logger.getLogger("org.eyedb");
 
 	public EyeDBBean() throws org.eyedb.Exception
 	{
@@ -153,6 +152,11 @@ public class EyeDBBean {
 
 	private List<Object> getClassObjects( String name) throws org.eyedb.Exception
 	{
+		return getClassObjects( name, RecMode.NoRecurs);
+	}
+	
+	private List<Object> getClassObjects( String name, RecMode mode) throws org.eyedb.Exception
+	{
 		openDatabase();
 		getDatabase().transactionBegin();
 
@@ -160,8 +164,7 @@ public class EyeDBBean {
 
 		OQL q = new org.eyedb.OQL( getDatabase(), "select o from " + name + " o");
 		ObjectArray a = new ObjectArray();
-//		q.execute( a, RecMode.FullRecurs);
-		q.execute( a);
+		q.execute( a, mode);
 
 		for (int i = 0; i < a.getCount(); i++) {
 			logObject( a.getObject(i));
@@ -182,7 +185,7 @@ public class EyeDBBean {
 
 	public List<Object> getCars() throws org.eyedb.Exception
 	{
-		return getClassObjects( "Car");
+		return getClassObjects( "Car", RecMode.FullRecurs);
 	}
 
 	private String databaseName;

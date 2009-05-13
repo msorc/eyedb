@@ -36,6 +36,16 @@
 <td>Age</td>
 <td><input type="text" name="age" value="${person.age}"/></td>
 </tr>
+<tr>
+<td>Cars</td>
+<td>
+<select name="cars" multiple="true">
+<c:forEach var="car" items="${eyedb.cars}">
+	<option value="${car.oid}" ${(car.owner.oid == person.oid) ? "selected=\"true\"": ""} >${car.model} - ${car.number}</option>
+</c:forEach>
+</select>
+</td>
+</tr>
 </table>
 <input type="hidden" name="oid" value="${person.oid}"/>
 <input type="submit" value="Ok"/>
