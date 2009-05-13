@@ -22,6 +22,7 @@
 <tr>
 <th>#</th>
 <th>Car</th>
+<th>Owner</th>
 <th>&nbsp;</th>
 <th>&nbsp;</th>
 </tr>
@@ -30,6 +31,10 @@
 <tr>
 <td>${counter}</td>
 <td><a href="viewcar.jsp?oid=${car.oid}">${car.model} - ${car.number}</a></td>
+<td>
+<c:set var="owner" value="${car.owner}"/>
+<a href="viewperson.jsp?oid=${owner.oid}">${owner.firstname} ${owner.lastname}</a>
+</td>
 <td>
 <form action="editcar.jsp" method="get">
 <input type="hidden" name="oid" value="${car.oid}"/>

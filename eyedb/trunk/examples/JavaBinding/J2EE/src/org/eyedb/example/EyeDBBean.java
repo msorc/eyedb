@@ -167,8 +167,6 @@ public class EyeDBBean {
 		q.execute( a, mode);
 
 		for (int i = 0; i < a.getCount(); i++) {
-			logObject( a.getObject(i));
-
 			result.add( wrapObject(a.getObject(i)));
 		}
 

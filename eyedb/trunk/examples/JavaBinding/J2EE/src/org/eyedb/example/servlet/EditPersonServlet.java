@@ -34,7 +34,7 @@ public class EditPersonServlet extends javax.servlet.http.HttpServlet  {
 
 			bean.setDatabaseName( getServletConfig().getServletContext().getInitParameter("database"));
 			bean.setTcpPort( getServletConfig().getServletContext().getInitParameter("tcpPort"));
-			
+
 			bean.openDatabase();
 			bean.getDatabase().transactionBegin();
 
@@ -45,8 +45,27 @@ public class EditPersonServlet extends javax.servlet.http.HttpServlet  {
 			person.setLastname( request.getParameter( "lastname"));
 			person.setAge( Integer.parseInt( request.getParameter( "age")));
 
-			// TODO
-			//person.setCars()
+			String[] carOids = request.getParameterValues( "cars");
+			{
+				if (carOids != null) {
+					for (int i = 0; i < carOids.length; i++)
+						EyeDBBean.logger.info( "#" + i + " " + carOids[i]);
+				}
+			}
+
+			while (person.getCarsCount() > 0)
+				person.rmvFromCarsColl( person.getCarsAt(0));
+
+			person.store( RecMode.FullRecurs);
+
+			EyeDBBean.logger.info( ""+person.getCarsCount());			
+			
+			if (carOids != null) {
+				for ( int i = 0; i < carOids.length; i++) {
+					EyeDBBean.logger.info( "adding oid " + carOids[i]);
+					person.addToCarsColl( new Oid(carOids[i]));
+				}
+			}
 
 			person.store( RecMode.FullRecurs);
 
