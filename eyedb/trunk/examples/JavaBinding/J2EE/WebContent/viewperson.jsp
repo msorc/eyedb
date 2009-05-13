@@ -35,6 +35,16 @@
 <th>Age</th>
 <td>${person.age}</td>
 </tr>
+<tr>
+<th>Cars</th>
+<td>
+<ul>
+<c:forEach var="car" items="${person.cars}">
+<li><a href="viewcar.jsp?oid=${car.oid}">${car.model} - ${car.number}</a></li>
+</c:forEach>
+</ul>
+</td>
+</tr>
 </table>
 
 </body>
