@@ -23,6 +23,9 @@
 		Set<Car> getCars(): creates a Set using API
 		void setCars( Set<Car> cars): set the collection
 		}
+	- hack EyeDBBean.getObject() to return a GoodPerson if loaded object instanceof Person
+	- JSP to modify: createperson, editperson, viewperson
+	
 		
 	
 	
