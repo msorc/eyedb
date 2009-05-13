@@ -64,7 +64,7 @@ public class Person {
 		return cars;
 	}
 
-	public void setCars( Set<Car> set) throws org.eyedb.Exception
+/*	public void setCars( Set<Car> set) throws org.eyedb.Exception
 	{
 		CollSet cars= person.getCarsColl();
 		
@@ -74,7 +74,7 @@ public class Person {
 		for ( Car car: set)
 			cars.insert( car);
 	}
-	
+*/	
 	private org.eyedb.example.schema.Person person;
 	private Set<Car> cars;
 }
