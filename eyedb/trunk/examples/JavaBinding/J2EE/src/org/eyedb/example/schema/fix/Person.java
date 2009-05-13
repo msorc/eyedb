@@ -5,7 +5,6 @@ import java.util.Set;
 
 import org.eyedb.CollSet;
 import org.eyedb.Oid;
-import org.eyedb.example.EyeDBBean;
 import org.eyedb.example.schema.Car;
 
 public class Person {
@@ -14,9 +13,7 @@ public class Person {
 	{
 		cars = new HashSet<Car>();
 		
-		EyeDBBean.logger.info( getFirstname() + " " + getLastname() + " : " + person.getCarsCount());
 		for (int i = 0; i < person.getCarsCount(); i++) {
-			EyeDBBean.logger.info( "Adding car" + person.getCarsAt(i));
 			cars.add( person.getCarsAt(i));
 		}
 	}
