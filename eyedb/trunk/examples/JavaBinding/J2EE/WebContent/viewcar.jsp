@@ -20,7 +20,7 @@
 <h1>View car</h1>
 
 <c:set var="oid" value='${param["oid"]}' />
-<c:set var="car" value="${eyedb.objects[oid]}"/>
+<c:set var="car" value="${eyedb.car[oid]}"/>
 
 <table border="1">
 <tr>

@@ -20,7 +20,7 @@
 <h1>Delete car</h1>
 
 <c:set var="oid" value='${param["oid"]}' />
-<c:set var="car" value="${eyedb.objects[oid]}"/>
+<c:set var="car" value="${eyedb.car[oid]}"/>
 
 <form name="deleteCarForm" action="DeleteCarServlet" method="post">
 <table border="1">
