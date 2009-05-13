@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <jsp:useBean id="eyedb" class="org.eyedb.example.EyeDBBean" scope="page">
 	<jsp:setProperty name="eyedb" property="databaseName" value='<%= pageContext.getServletContext().getInitParameter("database") %>' />
@@ -22,6 +23,7 @@
 <tr>
 <th>#</th>
 <th>Person</th>
+<th>Cars #</th>
 <th>&nbsp;</th>
 <th>&nbsp;</th>
 </tr>
@@ -30,6 +32,7 @@
 <tr>
 <td>${counter}</td>
 <td><a href="viewperson.jsp?oid=${person.oid}">${person.firstname} ${person.lastname}</a></td>
+<td>${fn:length(person.cars)}</td>
 <td>
 <form action="editperson.jsp" method="get">
 <input type="hidden" name="oid" value="${person.oid}"/>

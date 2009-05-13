@@ -5,12 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.eyedb.Connection;
 import org.eyedb.OQL;
 import org.eyedb.ObjectArray;
 import org.eyedb.Oid;
-import org.eyedb.RecMode;
 import org.eyedb.Root;
 import org.eyedb.example.schema.Database;
 
@@ -20,26 +20,43 @@ import org.eyedb.example.schema.Database;
  */
 
 public class EyeDBBean {
-	private class ObjectMap extends AbstractMap< Oid, org.eyedb.Object> {
 
-		public Set<Map.Entry< Oid, org.eyedb.Object>> entrySet()
+	private void logObject( org.eyedb.Object obj)
+	{
+		EyeDBBean.logger.info( obj.toString());
+		if (obj instanceof org.eyedb.example.schema.Person) {
+			try {
+				org.eyedb.example.schema.Person p = (org.eyedb.example.schema.Person)obj;
+				EyeDBBean.logger.info(p.getFirstname() + " "
+						+ p.getLastname() + " : getCarsCount() -> " + p.getCarsCount());
+			} catch (org.eyedb.Exception e) {
+			}				
+		}
+	}
+
+	private class ObjectMap extends AbstractMap< Oid, Object> {
+
+		public Set<Map.Entry< Oid, Object>> entrySet()
 		{
 			throw new UnsupportedOperationException();
 		}
 
-		public org.eyedb.Object get(Object key)
+		public Object get(Object key)
 		{
 			try {
 				openDatabase();
 				getDatabase().transactionBegin();
 
 				Oid oid = new Oid((String)key);
-				org.eyedb.Object obj = getDatabase().loadObject( oid, RecMode.FullRecurs);
+				org.eyedb.Object obj = getDatabase().loadObject( oid);
+
+				logObject( obj);
+				Object ret = wrapObject( obj);
 
 				getDatabase().transactionCommit();
 				closeDatabase();
 
-				return obj;
+				return ret;
 			}
 			catch( org.eyedb.Exception e) {
 			}
@@ -47,6 +64,8 @@ public class EyeDBBean {
 			return null;
 		}
 	}
+
+	public static Logger logger = Logger.getLogger("org.eyedb");
 
 	public EyeDBBean() throws org.eyedb.Exception
 	{
@@ -106,19 +125,30 @@ public class EyeDBBean {
 		return new ObjectMap();
 	}
 
-	private List<org.eyedb.Object> getClassObjects( String name) throws org.eyedb.Exception
+	private Object wrapObject( org.eyedb.Object obj) throws org.eyedb.Exception
+	{
+		if (obj instanceof org.eyedb.example.schema.Person)
+			return new org.eyedb.example.schema.fix.Person( (org.eyedb.example.schema.Person)obj);
+
+		return obj;
+	}
+
+	private List<Object> getClassObjects( String name) throws org.eyedb.Exception
 	{
 		openDatabase();
 		getDatabase().transactionBegin();
 
-		List<org.eyedb.Object> result = new ArrayList<org.eyedb.Object>();
+		List<Object> result = new ArrayList<Object>();
 
 		OQL q = new org.eyedb.OQL( getDatabase(), "select o from " + name + " o");
 		ObjectArray a = new ObjectArray();
-		q.execute( a, RecMode.FullRecurs);
+//		q.execute( a, RecMode.FullRecurs);
+		q.execute( a);
 
 		for (int i = 0; i < a.getCount(); i++) {
-			result.add( a.getObject(i));
+			logObject( a.getObject(i));
+
+			result.add( wrapObject(a.getObject(i)));
 		}
 
 		getDatabase().transactionCommit();
@@ -126,13 +156,13 @@ public class EyeDBBean {
 
 		return result;
 	}
-	
-	public List<org.eyedb.Object> getPersons() throws org.eyedb.Exception
+
+	public List<Object> getPersons() throws org.eyedb.Exception
 	{
 		return getClassObjects( "Person");
 	}
 
-	public List<org.eyedb.Object> getCars() throws org.eyedb.Exception
+	public List<Object> getCars() throws org.eyedb.Exception
 	{
 		return getClassObjects( "Car");
 	}
