@@ -20,7 +20,7 @@
 <h1>Edit car</h1>
 
 <c:set var="oid" value='${param["oid"]}' />
-<c:set var="car" value="${eyedb.objects[oid]}"/>
+<c:set var="car" value="${eyedb.car[oid]}"/>
 
 <form name="editCarForm" action="EditCarServlet" method="get">
 <table border="0">

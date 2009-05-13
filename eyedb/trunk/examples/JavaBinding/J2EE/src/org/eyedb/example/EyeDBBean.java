@@ -11,6 +11,7 @@ import org.eyedb.Connection;
 import org.eyedb.OQL;
 import org.eyedb.ObjectArray;
 import org.eyedb.Oid;
+import org.eyedb.RecMode;
 import org.eyedb.Root;
 import org.eyedb.example.schema.Database;
 
@@ -36,6 +37,16 @@ public class EyeDBBean {
 
 	private class ObjectMap extends AbstractMap< Oid, Object> {
 
+		ObjectMap()
+		{
+			this.mode = RecMode.NoRecurs;
+		}
+		
+		ObjectMap( RecMode mode)
+		{
+			this.mode = mode;
+		}
+		
 		public Set<Map.Entry< Oid, Object>> entrySet()
 		{
 			throw new UnsupportedOperationException();
@@ -48,7 +59,7 @@ public class EyeDBBean {
 				getDatabase().transactionBegin();
 
 				Oid oid = new Oid((String)key);
-				org.eyedb.Object obj = getDatabase().loadObject( oid);
+				org.eyedb.Object obj = getDatabase().loadObject( oid, mode);
 
 				logObject( obj);
 				Object ret = wrapObject( obj);
@@ -63,6 +74,8 @@ public class EyeDBBean {
 
 			return null;
 		}
+
+		private RecMode mode;
 	}
 
 	public static Logger logger = Logger.getLogger("org.eyedb");
@@ -120,9 +133,14 @@ public class EyeDBBean {
 		return database;
 	}
 
-	public Map getObjects() throws org.eyedb.Exception
+	public Map getPerson() throws org.eyedb.Exception
 	{
 		return new ObjectMap();
+	}
+
+	public Map getCar() throws org.eyedb.Exception
+	{
+		return new ObjectMap(  RecMode.FullRecurs);
 	}
 
 	private Object wrapObject( org.eyedb.Object obj) throws org.eyedb.Exception
