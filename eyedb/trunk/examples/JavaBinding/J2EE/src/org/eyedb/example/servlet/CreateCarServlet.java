@@ -6,9 +6,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eyedb.Oid;
 import org.eyedb.RecMode;
 import org.eyedb.example.EyeDBBean;
 import org.eyedb.example.schema.Car;
+import org.eyedb.example.schema.Person;
 
 /**
  * Servlet implementation class for Servlet: CreateCarServlet
@@ -42,9 +44,10 @@ public class CreateCarServlet extends javax.servlet.http.HttpServlet  {
 			car.setModel( request.getParameter( "model"));
 			car.setNumber( request.getParameter( "number"));
 
-			// TODO
-			//car.setOwner()
-			
+			Oid ownerOid = new Oid( request.getParameter( "owner"));
+			Person owner = (Person)bean.getDatabase().loadObject( ownerOid);
+			car.setOwner( owner);
+						
 			car.store( RecMode.FullRecurs);
 
 			bean.getDatabase().transactionCommit();

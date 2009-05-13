@@ -21,6 +21,11 @@
 <form name="createCarnForm" action="CreateCarServlet" method="post">
 Model: <input type="text" name="model"/><br/>
 Number: <input type="text" name="number"/><br/>
+Owner: <select name="owner">
+<c:forEach var="person" items="${eyedb.persons}">
+	<option value="${person.oid}">${person.firstname} ${person.lastname}</option>
+</c:forEach>
+</select>
 <input type="submit" value="Create"/>
 </form>
 
