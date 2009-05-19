@@ -67,7 +67,7 @@
   </chapter>
 
   <chapter id="server-management">
-    <title>&eyedb; server management</title>
+    <title>&eyedb; server</title>
 
     <section>
       <title>Checking server status</title>
@@ -121,7 +121,7 @@ No EyeDB Server is running on localhost:6240
       <title>Starting and stopping server</title>
 
       <para>
-	To start a server, just do this:
+	To start a server, just launch the following command:
 	<informalexample>
 	  <screen>
 $ <userinput>eyedbctl start</userinput>
@@ -147,7 +147,7 @@ Starting EyeDB Server
       </para>
 
       <para>
-	Stopping the server is done using the &eyedbctl; command with the "stop" sub-command/
+	Stopping the server is done using the &eyedbctl; <command>stop</command> command:
 	<informalexample>
 	  <screen>
 $ <userinput>eyedbctl stop</userinput>
@@ -280,16 +280,16 @@ class Employee extends Person {
 	    <para>
 	      the <classname>Person</classname> class contains six attributes: two strings, one 32-bits integer, one <classname>Person</classname> object and one set of <classname>Person</classname> objects:
 	      <itemizedlist>
-		<listitem><para>the third attribute \texttt{addr} is of <classname>Address</classname> type and is a litteral because there is no \texttt{*} before the attribute name. A litteral is an object without identifier: the \texttt{addr} attribute is tied to a <classname>Person</classname> instance, it has no proper existence.</para></listitem>
-		<listitem><para>the \texttt{spouse} attribute is an object, not a litteral, because it is preceded by a \texttt{*}. An object has an identifier and has its proper existence. The \texttt{*} means a reference or pointer to an object. The directive after the attribute name \texttt{inverse Person::spouse} is a relationship directive.</para></listitem>
-		<listitem><para>the \texttt{children} attribute is a collection set of \texttt{Person} objects</para></listitem>
+		<listitem><para>the third attribute <varname>addr</varname> is of <classname>Address</classname> type and is a litteral because there is no <varname>*</varname> before the attribute name. A litteral is an object without identifier: the <varname>addr</varname> attribute is tied to a <classname>Person</classname> instance, it has no proper existence.</para></listitem>
+		<listitem><para>the <varname>spouse</varname> attribute is an object, not a litteral, because it is preceded by a <varname>*</varname>. An object has an identifier and has its proper existence. The <varname>*</varname> means a reference or pointer to an object. The directive after the attribute name <varname>inverse Person::spouse</varname> is a relationship directive.</para></listitem>
+		<listitem><para>the <varname>children</varname> attribute is a collection set of <classname>Person</classname> objects</para></listitem>
 	      </itemizedlist>
 	    </para>
 	  </listitem>
 
 	  <listitem>
 	    <para>
-	      the <classname>Employee</classname> contains seven attributes: the six <classname>Person</classname> attributes because <classname>Employee</classname> inherits from <classname>Person</classname> and 64-bits integer attribute: \texttt{salary}.
+	      the <classname>Employee</classname> contains seven attributes: the six <classname>Person</classname> attributes because <classname>Employee</classname> inherits from <classname>Person</classname> and 64-bits integer attribute: <varname>salary</varname>.
 	    </para>
 	  </listitem>
 	</itemizedlist>
@@ -358,7 +358,7 @@ class Employee (implementation <hash, hints = "key_count = 2048;">) extends Pers
       </para>
 
       <para>
-	By default, &eyedbodl; generates the ODL on the standard output. You see here that the displayed ODL is very similar to the original ODL except that the keywords \texttt{attribute} and \texttt{relationship} have been added before each attribute declaration. The \texttt{relationship} keyword means that the attribute has an \texttt{inverse} directive.
+	By default, &eyedbodl; generates the ODL on the standard output. You see here that the displayed ODL is very similar to the original ODL except that the keywords <varname>attribute</varname> and <varname>relationship</varname> have been added before each attribute declaration. The <varname>relationship</varname> keyword means that the attribute has an <varname>inverse</varname> directive.
       </para>
 
       <para>
@@ -407,7 +407,7 @@ struct Employee {2568.2.515951:oid} : Person : struct : agregat : instance : obj
       </para>
 
       <para>
-	Note that the object identifiers (\texttt{oid}) of the classes are displayed.
+	Note that the object identifiers (<emphasis>oid</emphasis>) of the classes are displayed.
       </para>
 
     </section>
@@ -448,19 +448,17 @@ Welcome to eyedboql.
       </para>
 
       <para>
-Note the \texttt{-w} option on the &eyedboql; command line, specifying that you open the \texttt{foo} database in write mode.
+Note the <command>-w</command> option on the &eyedboql; command line, specifying that you open the <database>foo</database> database in write mode.
       </para>
 
       <para>
 	A few comments:
-\idt \texttt{?} is the &eyedboql; prompt: of course, do not type
-this string!
-\idt \texttt{:=} is the affectation operator.
-\idt each time you create an object, its identifier (\texttt{oid}) is displayed
-on your terminal.
-\idt because of the relationship integrity constraint on the \texttt{spouse}
-attribute, the operation \texttt{john.spouse := mary} is equivalent to
-\texttt{mary.spouse := john}.
+	<itemizedlist>
+	  <listitem><para><command>?</command> is the &eyedboql; prompt: of course, do not type this string!</para></listitem>
+	  <listitem><para><command>:=</command> is the affectation operator</para></listitem>
+	  <listitem><para>each time you create an object, its identifier (<emphasis>oid</emphasis>) is displayed on your terminal</para></listitem>
+	  <listitem><para>because of the relationship integrity constraint on the <varname>spouse</varname> attribute, the operation <command>john.spouse := mary</command> is equivalent to <command>mary.spouse := john</command></para></listitem>
+	</itemizedlist>
       </para>
 
       <para>
@@ -478,7 +476,7 @@ attribute, the operation \texttt{john.spouse := mary} is equivalent to
       </para>
 
       <para>
-	At this stage, it is interesting to perform the following operation: in another terminal, launch another &eyedboql; command on the same database \texttt{foo} and query all persons, as follows:
+	At this stage, it is interesting to perform the following operation: in another terminal, launch another &eyedboql; command on the same database <database>foo</database> and query all persons, as follows:
 	<informalexample>
 	  <screen>
 % <userinput>eyedboql -d foo -w -c "select Person;"</userinput>
@@ -488,7 +486,7 @@ attribute, the operation \texttt{john.spouse := mary} is equivalent to
       </para>
 
       <para>
-	It may seem surprising that no person instance is returned, but in fact it is not: each interaction with the database occurs within a \emph{transaction}, and as long as this transaction has not been \emph{committed}, the database is not modified by the operations that have been done since the beginning of the transaction. To perform effectively these operations, you must \emph{commit} the transaction, by typing in the first &eyedboql; session:
+	It may seem surprising that no person instance is returned, but in fact it is not: each interaction with the database occurs within a <emphasis>transaction</emphasis>, and as long as this transaction has not been <emphasis>committed</emphasis>, the database is not modified by the operations that have been done since the beginning of the transaction. To perform effectively these operations, you must <emphasis>commit</emphasis> the transaction, by typing in the first &eyedboql; session:
 	<informalexample>
 	  <screen>
 ? <userinput>\commit</userinput>
@@ -563,11 +561,11 @@ Welcome to eyedboql.
       </para>
 
       <para>
-	Note that the \texttt{print} command allows to display the contains of the
+	Note that the <command>print</command> command allows to display the contains of the
 	last objects returned on your terminal.
       </para>
 
-      <para>To query all persons whose firstname contains a \texttt{y}:
+      <para>To query all persons whose firstname contains a <command>y</command>:
       <informalexample>
 	<screen>
 ? <userinput>select Person.firstname ~ "y";</userinput>
@@ -601,7 +599,7 @@ Welcome to eyedboql.
       </para>
 
       <para>
-	To change the \texttt{lastname} attribute of the person whose firstname is \texttt{mary}:
+	To change the <varname>lastname</varname> attribute of the person whose firstname is <command>mary</command>:
 	<informalexample>
 	  <screen>
 ? <userinput>(select Person.firstname = "mary").lastname := "stuart";</userinput>
@@ -611,7 +609,7 @@ Welcome to eyedboql.
       </para>
 
       <para>
-	To increment the \texttt{age} attribute of all persons, we use a \texttt{for} loop to iterate on the result of a query:
+	To increment the <varname>age</varname> attribute of all persons, we use a <command>for</command> loop to iterate on the result of a query:
 	<informalexample>
 	  <screen>
 ? <userinput>select Person.age;</userinput>
@@ -653,11 +651,11 @@ Welcome to eyedboql.
 	</para>
 
 	<para>
-	  A good idea is to affect an index on the attributes - for instance \texttt{firstname}, \texttt{lastname} and \texttt{age} - for which one wants to perform efficient query.
+	  A good idea is to affect an index on the attributes - for instance <varname>firstname</varname>, <varname>lastname</varname> and <varname>age</varname> - for which one wants to perform efficient query.
 	</para>
 
 	<para>
-	  The first step to add an index is to add the index specification to the class \texttt{Person} in the ODL schema \texttt{person.odl} as follows:
+	  The first step to add an index is to add the index specification to the class <classname>Person</classname> in the ODL schema <filename>person.odl</filename> as follows:
 	  <informalexample>
 	    <programlisting>
 <![CDATA[class Person {
@@ -693,7 +691,7 @@ Done
 	</para>
 
 	<para>
-	  Now, you can try again to query Person instances according to its firstname, lastname or age, and you will notice that these operations are immediate.:
+	  Now, you can try again to query <classname>Person</classname> instances according to its <varname>firstname</varname>, <varname>lastname</varname> or <varname>age</varname>, and you will notice that these operations are immediate.:
 	  <informalexample>
 	    <screen>
 % <userinput>eyedboql -d foo -w</userinput>
@@ -711,11 +709,11 @@ Done
 	<title>Adding constraints</title>
 
 	<para>
-	  In the same way, you can add a \texttt{notnull} and an \texttt{unique} constraint on the \texttt{lastname} attribute within the class \texttt{Person}.
+	  In the same way, you can add a <command>notnull</command> and an <command>unique</command> constraint on the <varname>lastname</varname> attribute within the class <classname>Person</classname>.
 	</para>
 
 	<para>
-	  First steop is to add the constraint specification to the class \texttt{Person} in the \texttt{person.odl} file as follows:
+	  First step is to add the constraint specification to the class <classname>Person</classname> in the <filename>person.odl</filename> file as follows:
 	  <informalexample>
 	    <programlisting>
 <![CDATA[class Person {
@@ -752,7 +750,7 @@ Done
 	</para>
 
 	<para>
-	  Now try to create two person instances with the same \texttt{lastname} attribute:
+	  Now try to create two person instances with the same <varname>lastname</varname> attribute:
 	  <informalexample>
 	    <screen>
 % <userinput>eyedboql -d foo -w</userinput>
@@ -766,7 +764,7 @@ Done
 	</para>
 
 	<para>
-	  or with no \texttt{lastname} attribute:
+	  or with no <varname>lastname</varname> attribute:
 	  <informalexample>
 	    <screen>
 ? <userinput>new Person();</userinput>
@@ -781,7 +779,7 @@ Done
       <section>
 	<title>Removing classes and schema</title>
 
-	<para>It is possible to remove a class in a schema using &eyedbodl;. For instance, to remove the class \texttt{Employee} in the already introduced schema:
+	<para>It is possible to remove a class in a schema using &eyedbodl;. For instance, to remove the class <classname>Employee</classname> in the already introduced schema:
 	<informalexample>
 	  <screen>
 % <userinput>eyedbodl -d foo -u --rmcls=Employee</userinput>
@@ -868,7 +866,9 @@ Done
 	    </screen>
 	  </informalexample>
 	</para>
+
       </section>
+
     </section>
 
   </chapter>
@@ -883,10 +883,10 @@ Done
 
     <para>
       There are two ways to use the C++ binding: 
-      \begin{enumerate}
-      \item using the generic C++ binding
-      \item using both the generic C++ binding and the specific \texttt{Person} C++ code generated from the ODL schema
-      \end{enumerate}
+      <itemizedlist>
+	<listitem><para>using the generic C++ binding</para></listitem>
+	<listitem><para>using both the generic C++ binding and the specific <classname>Person</classname> C++ code generated from the ODL schema</para></listitem>
+      </itemizedlist>
     </para>
 
     <para>
@@ -895,15 +895,15 @@ Done
 
     <para>
       Writing a C++ program that can create, retrieve, modify and delete person instances that are stored in an &eyedb; database involves the following steps:
-      \begin{enumerate}
-      \item generates the specific \texttt{Person} binding using the &eyedbodl; tool
-      \item write the C++ client program
-      \item compile the generated binding and the client program
-      \end{enumerate}
+      <itemizedlist>
+	<listitem><para>generates the specific <classname>Person</classname> binding using the &eyedbodl; tool</para></listitem>
+	<listitem><para>write the C++ client program</para></listitem>
+	<listitem><para>compile the generated binding and the client program</para></listitem>
+      </itemizedlist>
     </para>
 
     <para>
-      This example is located in the \texttt{examples/GettingStarted} subdirectory.
+      This example is located in the <filename>examples/GettingStarted</filename> subdirectory.
     </para>
 
     <section>
@@ -919,27 +919,27 @@ Done
       </para>
 
       <para>
-	The \texttt{--package} option is mandatory: you may give any name you want, this name will be used as the prefix for generated files names. Without the \texttt{--package} option, the prefix used will be the name of the ODL file without its extension.
+	The <command>--package</command> option is mandatory: you may give any name you want, this name will be used as the prefix for generated files names. Without the <command>--package</command> option, the prefix used will be the name of the ODL file without its extension.
       </para>
 
       <para>
-	&eyedbodl; generates a few files, all prefixed by \texttt{person}, the most important being \texttt{person.h} and \texttt{person.cc}.
+	&eyedbodl; generates a few files, all prefixed by <command>person</command>, the most important being <filename>person.h</filename> and <filename>person.cc</filename>.
       </para>
 
       <para>
-	If you have a look to the file \texttt{person.h}, you will notice that the following classes have been generated:
-	\begin{enumerate}
-	\item the class \texttt{person}
-	\item the class \texttt{personDatabase}
-	\item the class \texttt{Root}
-	\item the class \texttt{Address}
-	\item the class \texttt{Person}
-	\item the class \texttt{Employee}
-	\end{enumerate}
+	If you have a look to the file <filename>person.h</filename>, you will notice that the following classes have been generated:
+	<itemizedlist>
+	  <listitem><para>the class <classname>person</classname></para></listitem>
+	  <listitem><para>the class <classname>personDatabase</classname></para></listitem>
+	  <listitem><para>the class <classname>Root</classname></para></listitem>
+	  <listitem><para>the class <classname>Address</classname></para></listitem>
+	  <listitem><para>the class <classname>Person</classname></para></listitem>
+	  <listitem><para>the class <classname>Employee</classname></para></listitem>
+	</itemizedlist>
       </para>
 
       <para>
-	The first class, \texttt{person}, is the package class:
+	The first class, <classname>person</classname>, is the package class:
 	<informalexample>
 	  <programlisting>  
 <![CDATA[class person {
@@ -955,28 +955,28 @@ Done
       </para>
 
       <para>
-	It is used to perform package initialization and schema update. Before any use of the \texttt{person} package, you need to call \texttt{person::init}.
+	It is used to perform package initialization and schema update. Before any use of the <classname>person</classname> package, you need to call <function>person::init</function>.
       </para>
 
       <para>
-	The second class, \texttt{personDatabase} is used to open, close and
-	manipulate objects within a database containing the \texttt{person} schema.
+	The second class, <classname>personDatabase</classname> is used to open, close and
+	manipulate objects within a database containing the <classname>person</classname> schema.
       </para>
 
       <para>
-	The \texttt{open} method has two purposes: the first one is to open the database, as the standard \texttt{eyedb::Database} will do; the second one is to check that the database schema is consistant with the generated runtime schema. Although it is possible to use the standard \texttt{Database} class to open a database containing the \texttt{person} schema, it is strongly recommended to use the \texttt{personDatabase} class.
+	The <function>open</function> method has two purposes: the first one is to open the database, as the standard <classname>eyedb::Database</classname> will do; the second one is to check that the database schema is consistant with the generated runtime schema. Although it is possible to use the standard <classname>Database</classname> class to open a database containing the <classname>person</classname> schema, it is strongly recommended to use the <classname>personDatabase</classname> class.
       </para>
 
       <para>
-	The third class, \texttt{Root}, is the root class for all the generated classes. This class is useful to perform safe down-casting during object loading.
+	The third class, <classname>Root</classname>, is the root class for all the generated classes. This class is useful to perform safe down-casting during object loading.
       </para>
 
       <para>
-	The three last classes, \texttt{Address}, \texttt{Person} and \texttt{Employee} are generated from the \texttt{person.odl} class specifications: for each attribute in the \texttt{person.odl}, a set of get and set methods is generated.
+	The three last classes, <classname>Address</classname>, <classname>Person</classname> and <classname>Employee</classname> are generated from the <filename>person.odl</filename> class specifications: for each attribute in the <filename>person.odl</filename>, a set of get and set methods is generated.
       </para>
 
       <para>
-	For instance, for the \texttt{firstname} attribute, the following methods are generated:
+	For instance, for the <varname>firstname</varname> attribute, the following methods are generated:
 	<informalexample>
 	  <programlisting>
 <![CDATA[eyedb::Status setFirstname(const std::string &);
@@ -989,10 +989,11 @@ char getFirstname(unsigned int a0, eyedb::Bool *isnull = 0, eyedb::Status * = 0)
       </para>
 
       <para>
-	The two first methods manipulate the \texttt{firstname} attribute as a string while the two last ones manipulate each character within this string.
+	The two first methods manipulate the <varname>firstname</varname> attribute as a string while the two last ones manipulate each character within this string.
       </para>
 
-      <para>There are two \texttt{set} methods and two \texttt{get} methods.
+      <para>
+	There are two <function>set</function> methods and two <function>get</function> methods.
       </para>
 
     </section>
@@ -1003,13 +1004,13 @@ char getFirstname(unsigned int a0, eyedb::Bool *isnull = 0, eyedb::Status * = 0)
       <para>
 	We are now going to write a minimal client program which will perform
 	the following operations:
-	\begin{enumerate}
-	\item initialize the &eyedb; package and the \texttt{person} package
-	\item open a connection with the &eyedb; server
-	\item open a database
-	\item perform error management
-	\item release the &eyedb; package and the \texttt{person} package
-	\end{enumerate}
+	<itemizedlist>
+	  <listitem><para>initialize the &eyedb; package and the <classname>person</classname> package</para></listitem>
+	  <listitem><para>open a connection with the &eyedb; server</para></listitem>
+	  <listitem><para>open a database</para></listitem>
+	  <listitem><para>perform error management</para></listitem>
+	  <listitem><para>release the &eyedb; package and the <classname>person</classname> package</para></listitem>
+	</itemizedlist>
       </para>
 
       <para>
@@ -1053,19 +1054,24 @@ main(int argc, char *argv[])
 
 
       <para>
-	Note that statement \texttt{Exception::setMode(...)} is mandatory if you want to use the exception error policy.
+	Note that statement <command>Exception::setMode(...)</command> is mandatory if you want to use the exception error policy.
+      </para>
+
+    </section>
+
+    <section>
+      <title>Compiling and running the application</title>
+
+      <para>
+	To use this client, you must first compile it: &eyedbodl; has generated a makefile called <filename>Makefile.&lt;&lt;package&gt;&gt;</filename> which can be used as is or can help you to design your own makefile.
       </para>
 
       <para>
-	To use this client, you must first compile it: &eyedbodl; has generated a makefile called Makefile.\emph{package} which can be used as is or can help you to design your own makefile.
+	A template C++ file (<filename>template_&lt;&lt;package&gt;&gt;.cc</filename>) has also been generated, closed to the previous minimal client program, which can be compiled with the generated makefile.
       </para>
 
       <para>
-	A template C++ file (\texttt{template\_}\emph{package}\texttt{.cc}) has also been generated, closed to the previous minimal client program, which can be compiled with the generated makefile.
-      </para>
-
-      <para>
-	<xref linkend="cxx-generated-makefile"/> the generated \texttt{Makefile.person} ((\texttt{&lt;&lt;datadir&gt;&gt;} is the data directory, usually /usr/share):
+	<xref linkend="cxx-generated-makefile"/> shows the generated <filename>Makefile.person</filename> (<filename>&lt;&lt;datadir&gt;&gt;</filename> is the data directory, usually <filename>/usr/share</filename>):
       </para>
 
       <example id="cxx-generated-makefile">
@@ -1114,13 +1120,13 @@ $(client_program): person.o $(client_program).o
       </para>
 
       <para>
-	We are going now to add a function to manipulate \texttt{Person} instances:
-	\begin{enumerate}
-	\item create a person named "john wayne"
-	\item create a person named "mary poppins"
-	\item mary them
-	\item create 3 "john wayne" children named "baby1", "baby2" and "baby3"
-	\end{enumerate}
+	We are going now to add a function to manipulate <classname>Person</classname> instances:
+	<itemizedlist>
+	  <listitem><para>create a person named "john wayne"</para></listitem>
+	  <listitem><para>create a person named "mary poppins"</para></listitem>
+	  <listitem><para>mary them</para></listitem>
+	  <listitem><para>create 3 "john wayne" children named "baby1", "baby2" and "baby3"</para></listitem>
+	</itemizedlist>
       </para>
 
       <para>
@@ -1181,17 +1187,17 @@ create(eyedb::Database *db)
 	<itemizedlist>
 	  <listitem>
 	    <para>
-	      all operations - setting, getting attributes, storing, querying instances	in a database - must be performed within a transaction.	A transaction is initiated using the \texttt{Database::transactionBegin} method and is committed (resp. aborted) using the \texttt{Database::transactionCommit}	(resp. \texttt{Database::transactionAbort}) method.
+	      all operations - setting, getting attributes, storing, querying instances	in a database - must be performed within a transaction.	A transaction is initiated using the <function>Database::transactionBegin</function> method and is committed (resp. aborted) using the <function>Database::transactionCommit</function> (resp. <function>Database::transactionAbort</function>) method.
 	    </para>
 	  </listitem>
 	  <listitem>
 	    <para>
-	      to store any instance in the database, you need to call the emph{store} (or \texttt{realize}) method on this instance. In our case, we use the argument \texttt{FullRecurs} indicating that we want all related instances (through relationship or indirect attribute) to be stored in the database.
+	      to store any instance in the database, you need to call the <function>store</function> (or <function>realize</function>) method on this instance. In our case, we use the argument <varname>FullRecurs</varname> indicating that we want all related instances (through relationship or indirect attribute) to be stored in the database.
 	    </para>
 	  </listitem>
 	  <listitem>
 	    <para>
-	      all runtime pointers allocated with the \texttt{new} operator must be deleted using the \texttt{release} method. The \texttt{delete} operator is forbidden: if you try to use it, an exception will be thrown at runtime.
+	      all runtime pointers allocated with the <function>new</function> operator must be deleted using the <function>release</function> method. The <function>delete</function> operator is forbidden: if you try to use it, an exception will be thrown at runtime.
 	    </para>
 	  </listitem>
 	</itemizedlist>
@@ -1228,7 +1234,7 @@ read(eyedb::Database *db, const char *s)
       </example>
 
       <para>
-	An OQL construct can be used within the C++ code using the \texttt{OQL(Database *, const char *fmt, ...)} constructor. For instance, in the above example, assuming \texttt{s} is equal to \texttt{baby}, the following code will send the query \texttt{select Person.lastname ~ "baby"} to the OQL interpreter:
+	An OQL construct can be used within the C++ code using the <command>OQL(Database *, const char *fmt, ...)</command> constructor. For instance, in the above example, assuming <varname>s</varname> is equal to <varname>baby</varname>, the following code will send the query <command>select Person.lastname ~ "baby"</command> to the OQL interpreter:
 	<informalexample>
 	  <programlisting>
 eyedb::OQL q(db, "select Person.lastname ~ \"%s\"", s);
@@ -1237,7 +1243,7 @@ eyedb::OQL q(db, "select Person.lastname ~ \"%s\"", s);
       </para>
 
       <para>
-	This interpreter will perform the query and returned all the found objects. The returned objects can be found using the \texttt{OQL::execute} method as follows:
+	This interpreter will perform the query and returned all the found objects. The returned objects can be found using the <function>OQL::execute</function> method as follows:
 	<informalexample>
 	  <programlisting>
   eyedb::ObjectArray obj_arr;
@@ -1247,7 +1253,7 @@ eyedb::OQL q(db, "select Person.lastname ~ \"%s\"", s);
       </para>
 
       <para>
-	The returned objects are of type \texttt{eyedb::Object}, so you cannot use the \texttt{Person} methods such as \texttt{getFirstname()}, \texttt{getAge()}\ldots To use them, you need to perform a down-cast using the \texttt{Person\_c} static function as follows:
+	The returned objects are of type <classname>eyedb::Object</classname>, so you cannot use the <classname>Person</classname> methods such as <function>getFirstname()</function>, <classname>getAge()</classname>\ldots To use them, you need to perform a down-cast using the <classname>Person\_c</classname> static function as follows:
 	<informalexample>
 	  <programlisting>
   for (int i = 0; i &lt; obj_arr.getCount(); i++) {
@@ -1258,7 +1264,7 @@ eyedb::OQL q(db, "select Person.lastname ~ \"%s\"", s);
       </para>
 
       <para>
-	If the object \texttt{obj\_arr[i]} is not of type \texttt{Person}, the returned pointer will be null. It is why we make a test on the value of \texttt{p}. If \texttt{p} is not null, we can use all the \texttt{Person} methods as follows:
+	If the object <varname>obj_arr[i]</varname> is not of type <classname>Person</classname>, the returned pointer will be null. It is why we make a test on the value of <varname>p</varname>. If <classname>p</classname> is not null, we can use all the <classname>Person</classname> methods as follows:
 	<informalexample>
 	  <programlisting>
 	    printf("person = %s %s, age = %d\n", p->getFirstname(),
@@ -1273,78 +1279,84 @@ eyedb::OQL q(db, "select Person.lastname ~ \"%s\"", s);
 
     </section>
 
+  </chapter>
+
+  <chapter>
+
+    <title>Using the Java Binding</title>
+
+    <para>
+      Although the C++ binding is more complete than the Java binding - essentially according to the administrative operations - the Java bindings allow to manipulate data without limitations.
+    </para>
+
+    <para>
+      Using the Java binding is very similar to the C++ binding. Writing a Java program that can create, retrieve, modify and delete person instances that are stored in an &eyedb; database involves the following steps:
+      <itemizedlist>
+	<listitem><para>generates the specific <classname>Person</classname> binding using the &eyedbodl; tool</para></listitem>
+	<listitem><para>write the Java client program</para></listitem>
+	<listitem><para>compile the generated binding and the client program</para></listitem>
+      </itemizedlist>
+    </para>
+
+    <para>
+      This example is located in the <filename>examples/GettingStarted</filename> subdirectory.
+    </para>
+
     <section>
-      <title>Using the Java Binding</title>
+      <title>Generating the Java code</title>
 
       <para>
-	Although the C++ binding is more complete than the Java binding - essentially according to the administrative operations - the Java bindings allow to manipulate data without limitations.
-      </para>
-
-      <para>
-	Using the Java binding is very similar to the C++ binding. Writing a Java program that can create, retrieve, modify and delete person instances that are stored in an &eyedb; database involves the following steps:
-	\begin{enumerate}
-	\item generates the specific \texttt{Person} binding using the &eyedbodl; tool
-	\item write the Java client program
-	\item compile the generated binding and the client program
-	\end{enumerate}
-      </para>
-
-      <para>
-	This example is located in the \texttt{examples/GettingStarted} subdirectory.
-      </para>
-
-      <section>
-	<title>Generating the Java code</title>
-
-	<para>
-	  The Java code is generated from the ODL schema definition using the following command:
-	  <informalexample>
-	    <screen>
+	The Java code is generated from the ODL schema definition using the following command:
+	<informalexample>
+	  <screen>
 % eyedbodl --gencode=Java --package=person person.odl
-	    </screen>
-	  </informalexample>
-	</para>
+	  </screen>
+	</informalexample>
+      </para>
 
-	<para>
-	  The \texttt{--package} option is mandatory: this name will be used as the name of the Java package to which all generated Java classes will belong.
-	</para>
+      <para>
+	The <command>--package</command> option is mandatory: this name will be used as the name of the Java package to which all generated Java classes will belong.
+      </para>
 
-	<para>
-	  This command will generate a number of Java file in subdirectory \texttt{person/}, each generated file containing a Java class having the same name.
-	</para>
+      <para>
+	This command will generate a number of Java file in subdirectory <filename>person/</filename>, each generated file containing a Java class having the same name.
+      </para>
 
-	<para>
-	  If you have a look to the files in sub-directory \texttt{person}, you will notice that the following classes have been generated:
-	  \begin{enumerate}
-	  \item the class \texttt{Address}
-	  \item the class \texttt{Database}
-	  \item the class \texttt{Employee}
-	  \item the class \texttt{Person}
-	  \item the class \texttt{set\_class\_Person\_ref}
-	  \end{enumerate}
-	</para>
+      <para>
+	If you have a look to the files in sub-directory <filename>person</filename>, you will notice that the following classes have been generated:
+	<itemizedlist>
+	  <listitem><para>the class <classname>Address</classname></para></listitem>
+	  <listitem><para>the class <classname>Database</classname></para></listitem>
+	  <listitem><para>the class <classname>Employee</classname></para></listitem>
+	  <listitem><para>the class <classname>Person</classname></para></listitem>
+	  <listitem><para>the class <classname>set\_class\_Person\_ref</classname></para></listitem>
+	</itemizedlist>
+      </para>
 
-	<section>
-	  <title>A minimal client program</title>
+    </section>
 
-	  <para>
-	    We are now going to write a minimal client program which will perform the following operations:
-	    \begin{enumerate}
-	    \item initialize the &eyedb; and \texttt{person} packages
-	    \item connect to the &eyedb; server
-	    \item open a database
-	    \item creates two person instances and mary them
-	    \end{enumerate}
-	  </para>
+    <section>
+      <title>A minimal client program</title>
 
-	  <para>
-	    <xref linkend="java-minimal-client"/> shows the code for a minimal Java client:
-	  </para>
+      <para>
+	We are now going to write a minimal client program which will perform the following operations:
+	<itemizedlist>
+	  <listitem><para>initialize the &eyedb; and <classname>person</classname> packages</para></listitem>
+	  <listitem><para>connect to the &eyedb; server</para></listitem>
+	  <listitem><para>open a database</para></listitem>
+	  <listitem><para>creates two person instances and mary them</para></listitem>
+	</itemizedlist>
+      </para>
 
-	  <example id="java-minimal-client">
-	    <title>A Java minimal client</title>
-	    <programlisting>
-<![CDATA[//
+      <para>
+	<xref linkend="java-minimal-client"/> shows the code for a minimal Java client:
+      </para>
+
+      <example id="java-minimal-client">
+	<title>A Java minimal client</title>
+	<programlisting>
+<![CDATA[
+//
 // Persontest.java
 //
 import person.*;
@@ -1403,13 +1415,19 @@ class PersonTest {
   }
 }
 ]]>
-	    </programlisting>
-	  </example>
+	</programlisting>
+      </example>
 
-	  <para>
-	    To use this client, you must first compile it using a standard Makefile, as follows (replace \texttt{&lt;&lt;datadir&gt;&gt;} with the data directory, usually /usr/share):
-	    <informalexample>
-	      <programlisting>
+
+    </section>
+
+    <section>
+      <title>Compiling and running the application</title>
+
+      <para>
+	To use this client, you must first compile it using a standard Makefile, as follows (replace <filename>&lt;&lt;datadir&gt;&gt;</filename> with the data directory, usually <filename>/usr/share</filename>):
+	<informalexample>
+	  <programlisting>
 <![CDATA[include <<datadir>>/eyedb/Makefile.eyedb
 
 all: PersonTest.class
@@ -1420,73 +1438,73 @@ person/Database.java: schema.odl
 PersonTest.class: PersonTest.java person/Database.java
         CLASSPATH=$(EYEDB_CLASSPATH):. javac *.java person/*.java
 ]]>
-	      </programlisting>
-	    </informalexample>
-	  </para>
-	  
-	  <para>
-	    Once compiled, you can execute the program as follows:
-	    <informalexample>
-	      <screen>
-% <userinput>CLASSPATH=. eyedbjrun PersonTest person_g</userinput>
-	      </screen>
-	    </informalexample>
-	  </para>
+	  </programlisting>
+	</informalexample>
+      </para>
+      
+      <para>
+	Once compiled, you can execute the program as follows:
+	<informalexample>
+	  <screen>
+	    % <userinput>CLASSPATH=. eyedbjrun PersonTest person_g</userinput>
+	  </screen>
+	</informalexample>
+      </para>
 
-	  <para>
-	    The \texttt{eyedbjrun} script is a helper script that wraps the call to the Java 
-	    virtual machine with an appropriate CLASSPATH environment variable containing the path to \texttt{eyedb.jar} and passes the necessary options to the \texttt{PersonTest} class.
-	  </para>
+      <para>
+	The <command>eyedbjrun</command> script is a helper script that wraps the call to the Java 
+	virtual machine with an appropriate CLASSPATH environment variable containing the path to <filename>eyedb.jar</filename> and passes the necessary options to the <classname>PersonTest</classname> class.
+      </para>
 
-	  <para>
-	    A few remarks about the Java code:
-	    <itemizedlist>
-	      <listitem>
-		<para>
-		  all operations - setting, getting attributes, storing, querying instances in a database - must be performed within a transaction. A transaction is initiated using the \texttt{Database::transactionBegin} method and is committed (resp. aborted) using the \texttt{Database::transactionCommit} (resp. \texttt{Database::transactionAbort}) method.
-		</para>
-	      </listitem>
-	      <listitem>
-		<para>
-		  to store any instance in the database, you need to call the emph{store} (or \texttt{realize}) method on this instance. In our case, we use the argument \texttt{FullRecurs} indicating that we want all related instances (through relationship or indirect attribute) to be stored in the database.
-		</para>
-	      </listitem>
-	    </itemizedlist>
-	  </para>
+      <para>
+	A few remarks about the Java code:
+	<itemizedlist>
+	  <listitem>
+	    <para>
+	      all operations - setting, getting attributes, storing, querying instances in a database - must be performed within a transaction. A transaction is initiated using the <function>Database::transactionBegin</function> method and is committed (resp. aborted) using the <function>Database::transactionCommit</function> (resp. <function>Database::transactionAbort</function>) method.
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      to store any instance in the database, you need to call the <function>store</function> (or <function>realize</function>) method on this instance. In our case, we use the argument <varname>FullRecurs</varname> indicating that we want all related instances (through relationship or indirect attribute) to be stored in the database.
+	    </para>
+	  </listitem>
+	</itemizedlist>
+      </para>
 
-	  <para>
-	    The Java binding support both the standalone applications and the applets.
-	  </para>
+      <para>
+	The Java binding support both the standalone applications and the applets.
+      </para>
 
-	  <para>
-	    To have more information about the Java binding, please refer to the
-	    &eyedb; Java binding manual.
-	  </para>
+      <para>
+	To have more information about the Java binding, please refer to the
+	&eyedb; Java binding manual.
+      </para>
 
-	</section>
-	<section>
-	  <title>Learning more about &eyedb;</title>
-
-	  <para>
-	    We have briefly introduce in this manual some of the main features
-	    of &eyedb;. More detailled information can be found in the other &eyedb; manuals:
-	    <itemizedlist>
-	      <listitem><para>administration guide</para></listitem>
-	      <listitem><para>Object Definition Language (ODL) manual</para></listitem>
-	      <listitem><para>Object Query Language (OQL) manual</para></listitem>
-	      <listitem><para>C++ Binding manual</para></listitem>
-	      <listitem><para>Java Binding manual</para></listitem>
-	    </itemizedlist>
-	  </para>
-
-	  <index>
-	    <title>Index</title>
-	  </index>
-
-	</section>
-      </section>
     </section>
+
   </chapter>
+
+  <chapter>
+    <title>Learning more about &eyedb;</title>
+
+    <para>
+      We have briefly introduce in this manual some of the main features
+      of &eyedb;. More detailled information can be found in the other &eyedb; manuals:
+      <itemizedlist>
+	<listitem><para>administration guide</para></listitem>
+	<listitem><para>Object Definition Language (ODL) manual</para></listitem>
+	<listitem><para>Object Query Language (OQL) manual</para></listitem>
+	<listitem><para>C++ Binding manual</para></listitem>
+	<listitem><para>Java Binding manual</para></listitem>
+      </itemizedlist>
+    </para>
+
+  </chapter>
+
+  <index>
+    <title>Index</title>
+  </index>
 
 <!--
 ;;; Local Variables: ***

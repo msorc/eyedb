@@ -1,6 +1,6 @@
 MANUAL=GettingStarted
 PDF_PREFIX=EyeDB
-MANUAL_XML_FILES=introduction.xml 
+MANUAL_XML_FILES=
 
 if COND_DBLATEX
 pdfmanualdir=$(datadir)/doc/$(PACKAGE)/manual/pdf
