@@ -561,6 +561,7 @@ doc/manual/administration/Makefile dnl
 doc/manual/administration.old/Makefile dnl
 doc/manual/cpp-programming/Makefile dnl
 doc/manual/getting-started/Makefile dnl
+doc/manual/getting-started.old/Makefile dnl
 doc/manual/installation/Makefile dnl
 doc/manual/java-programming/Makefile dnl
 doc/manual/latex-common/Makefile dnl

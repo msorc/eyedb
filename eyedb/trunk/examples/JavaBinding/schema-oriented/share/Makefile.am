@@ -26,7 +26,7 @@ check-local: $(JARFILE)
 	$(EDIT) '$(srcdir)/$@.in' >$@.tmp
 	mv $@.tmp $@
 
-init:
+init: init.sh
 	sh init.sh $(srcdir)/schema.odl
 .PHONY: init
 
