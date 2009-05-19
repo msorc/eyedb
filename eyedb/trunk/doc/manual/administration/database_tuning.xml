@@ -331,7 +331,101 @@ btree index on Person.age
 	<title>Getting statistics on indexes, simulating index performances</title>
 
 	<para>
+	  Getting statistics on indexes is done using the &eyedbadmin; command:
+	  <cmdsynopsis>
+	    &eyedbadmin;
+	    <command>index stats</command>
+	    <arg choice="opt">options</arg>
+	    <arg choice="req"><replaceable>database</replaceable></arg>
+	    <arg choice="opt"><group><arg choice="req"><replaceable>attribute_path</replaceable></arg><arg choice="req"><replaceable>class_name</replaceable></arg></group></arg>
+	  </cmdsynopsis>
 	</para>
+
+	<para>
+	  Command arguments are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><replaceable>database</replaceable></arg>
+		</cmdsynopsis>
+		the database
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="opt"><group><arg choice="req"><replaceable>attribute_path</replaceable></arg><arg choice="req"><replaceable>class_name</replaceable></arg></group></arg>
+		</cmdsynopsis>
+		the index on which to print statistics, specified either as an attribute path or as a class name
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+
+	<para>
+	  Options are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="plain">--full</arg>
+		</cmdsynopsis>
+		displays all index entries statistics
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="plain">--format=<replaceable>format</replaceable></arg>
+		</cmdsynopsis>
+		statistics format; <replaceable>format</replaceable> is a printf-like string where:
+		<itemizedlist>
+		  <listitem><para>%n denotes the number of keys</para></listitem>
+		  <listitem><para>%O denotes the count of object entries for this key</para></listitem>
+		  <listitem><para>%o denotes the count of hash objects for this key</para></listitem>
+		  <listitem><para>%s denotes the size of hash objects for this key</para></listitem>
+		  <listitem><para>%b denotes the busy size of hash objects for this key</para></listitem>
+		  <listitem><para>%f denotes the free size of hash objects for this key</para></listitem>
+		</itemizedlist>
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+
+	<example id="eyedbadmin-index-stats">
+	  <title>&eyedbadmin; index statistics</title>
+	  <screen>
+	    <userinput>eyedbadmin index stats --full testindex</userinput>
+Index on Person.age:
+  Propagation: on
+  Type: BTree
+  Degree: 128
+  Statistics:
+    Total object count: 0
+...
+Index on Person.addr.town:
+  Propagation: on
+  Type: Hash
+...
+Index on Person.addr.code:
+  Propagation: on
+  Type: Hash
+...
+<userinput>eyedbadmin index stats --format="%n %O\n" testindex Person.addr.code</userinput>
+0 0
+1 0
+2 0
+3 0
+...
+<userinput>eyedbadmin index stats --format="%n -> %O, %o, %s\n" testindex Person.addr.town</userinput>
+0 -> 0, 0, 0
+1 -> 0, 0, 0
+2 -> 0, 0, 0
+3 -> 0, 0, 0
+...
+	  </screen>
+	</example>
 
       </section>
 
