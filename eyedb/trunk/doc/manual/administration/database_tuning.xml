@@ -372,6 +372,14 @@ btree index on Person.age
 
       </section>
 
+      <section>
+	<title>Getting and setting collection dataspace</title>
+
+	<para>
+	</para>
+
+      </section>
+
     </section>
 
     <section id="managing-locations">
@@ -423,7 +431,7 @@ btree index on Person.age
 
 <!--
 ;;; Local Variables: ***
-;;; eval: (load-file "emacs-macro") ***
+;;; eval: (load-file "../docbook-common/emacs-macro") ***
 ;;; End: ***
 -->
 

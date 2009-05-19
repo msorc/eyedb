@@ -752,7 +752,7 @@ r2.somewhere.org   + !eyedbroot
 
 <!--
 ;;; Local Variables: ***
-;;; eval: (load-file "emacs-macro") ***
+;;; eval: (load-file "../docbook-common/emacs-macro") ***
 ;;; End: ***
 -->
 
