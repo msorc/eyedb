@@ -26,13 +26,13 @@ echo Creating a few instances in the database $DATABASE ...
 echo $bindir/eyedboql -d $DATABASE -w
 $bindir/eyedboql -d $DATABASE -w << EOF
 john := new Person(
-    name        : "john", 
+    firstname   : "john", 
     age         : 32,
     addr.street : "clichy",
     addr.town   : "Paris",
     cstate      : Sir);
 mary := new Person(
-    name        : "mary", 
+    firstname   : "mary", 
     age         : 30,
     addr.street : "clichy",
     addr.town   : "Paris",
@@ -41,14 +41,14 @@ mary := new Person(
 for (x in interval(1, 4))
  add (new Car(mark : "renault", num : x+100)) to john->cars;
 henry := new Employee(
-   name        : "henry",
+   firstname   : "henry",
    salary      : 100000,
    age         : 32,
    addr.street : "parmentier",
    addr.town   : "Paris",
    cstate      : Sir);
 nadou := new Employee(
-   name        : "nadou",
+   firstname   : "nadou",
    salary      : 20000,
    age         : 30,
    addr.street : "parmentier",
