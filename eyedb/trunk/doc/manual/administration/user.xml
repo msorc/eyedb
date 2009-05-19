@@ -621,7 +621,7 @@ dbaccess  : (dbname : "test2", access : READ_WRITE_DBACCESS_MODE)
 
 <!--
 ;;; Local Variables: ***
-;;; eval: (load-file "emacs-macro") ***
+;;; eval: (load-file "../docbook-common/emacs-macro") ***
 ;;; End: ***
 -->
 

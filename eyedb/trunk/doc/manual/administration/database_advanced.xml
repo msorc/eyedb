@@ -1168,10 +1168,10 @@ Name DSP1
 
   </chapter>
 
-  <!--
-      ;;; Local Variables: ***
-      ;;; eval: (load-file "emacs-macro") ***
-      ;;; End: ***
-  -->
+<!--
+;;; Local Variables: ***
+;;; eval: (load-file "../docbook-common/emacs-macro") ***
+;;; End: ***
+-->
 
 </book>
