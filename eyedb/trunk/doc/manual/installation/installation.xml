@@ -40,9 +40,9 @@
 
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="introduction.xml" xpointer="introduction"/>
 
-  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="compiling.xml" xpointer="compiling"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="compiling.xml" xpointer="compiling-eyedb"/>
 
-  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="installing.xml" xpointer="installing"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="installing.xml" xpointer="installing-eyedb"/>
 
   <index>
     <title>Index</title>
