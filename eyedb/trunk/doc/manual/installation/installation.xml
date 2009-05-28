@@ -4,7 +4,48 @@
 <book>
   <title>EyeDB Installation Guide</title>
 
+  <bookinfo>
+    <author>
+      <firstname>François</firstname>
+      <surname>Déchelle</surname>
+    </author>
+    <address>
+      <email>francois@dechelle.net</email>
+    </address>
+    <pubdate>2009</pubdate>
+    <copyright>
+      <year>2009</year>
+      <holder>Sysra, Inc.</holder>
+    </copyright>
+    <legalnotice>
+      <para>
+	This document is distributed under the terms of the Creative Commons BY-SA 3.0 unported Licence.
+      </para>
+      <para>
+	<ulink url="http://creativecommons.org/licenses/by-sa/3.0/"/>
+      </para>
+    </legalnotice>
+  </bookinfo>
+
+  <dedication>
+    <note>
+      <title>TODO</title>
+    <para>
+      <itemizedlist>
+	<listitem><para></para></listitem>
+      </itemizedlist>
+    </para>
+    </note>
+  </dedication>
+
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="introduction.xml" xpointer="introduction"/>
+
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="compiling.xml" xpointer="compiling"/>
+
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="installing.xml" xpointer="installing"/>
+
   <index>
     <title>Index</title>
   </index>
+
 </book>
