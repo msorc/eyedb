@@ -460,7 +460,7 @@ AM_CONDITIONAL(COND_DOCBOOK_MANPAGES, test x"$COND_DOCBOOK_MANPAGES" = xyes)
 
 # Docbook manuals: HTML output
 AC_MSG_CHECKING(for Docbook HTML XSL stylesheet)
-HTML_XSL_STYLESHEET_LOCATIONS="/usr/share/sgml/docbook/xsl-stylesheets/manpages /usr/share/xml/docbook/stylesheet/nwalsh/html"
+HTML_XSL_STYLESHEET_LOCATIONS="/usr/share/sgml/docbook/xsl-stylesheets/html /usr/share/xml/docbook/stylesheet/nwalsh/html"
 for d in $HTML_XSL_STYLESHEET_LOCATIONS ; do
     if test -f $d/docbook.xsl ; then
        HTML_XSL_STYLESHEET_DIR=$d

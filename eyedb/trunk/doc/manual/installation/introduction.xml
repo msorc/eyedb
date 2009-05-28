@@ -11,12 +11,16 @@
   <chapter id="introduction">
     <title>Introduction</title>
 
+    <para>
+      This manual describes how to compile and install &eyedb; from the source code distribution. If you are using a packaged distribution such as a RPM or a Debian package, please refer to the distribution instructions instead of this manual.
+    </para>
+
   </chapter>
+
+</book>
 
 <!--
 ;;; Local Variables: ***
 ;;; eval: (load-file "../docbook-common/emacs-macro") ***
 ;;; End: ***
 -->
-
-</book>

@@ -8,11 +8,44 @@
 <book>
   <title>EyeDB Installation Guide</title>
 
-  <chapter id="compiling">
+  <chapter id="compiling-eyedb">
     <title>Compiling &eyedb;</title>
 
-    <section>
-      <title></title>
+    <section id="getting-sources">
+      <title>Getting &eyedb; sources</title>
+
+      <para>
+	The &eyedb; sources can be downloaded from project page on sourceforge (<ulink url="http://sourceforge.net/projects/eyedb"/>). By following the "download" link, you will get to the list of releases available for downloads. Source archives are provided under .tar.bz2 and .tar.gz format.
+      </para>
+
+    </section>
+
+    <section id="compilation-prerequisites">
+      <title>Compilation prerequisites</title>
+
+      <para>
+	For building &eyedb; the following software packages are required:
+	<itemizedlist>
+	  <listitem><para>GNU make; other make programs will <emphasis>not</emphasis> work.</para></listitem>
+	  <listitem><para>ANSI C++ compiler. Most platforms use GNU C++ compiler.</para></listitem>
+	  <listitem><para>flex lexical analyzer generator</para></listitem>
+	  <listitem><para>bison parser generator</para></listitem>
+	  <listitem><para>GNU readline library will be used if available for command line editing in the OQL monitor</para></listitem>
+	  <listitem><para>Python and the pexpect python module, if running &eyedb; test suites</para></listitem>
+	  <listitem><para>Java Development Kit, if building the Java binding</para></listitem>
+	  <listitem><para>xsltproc and XSL manpages stylesheet, if building the man pages</para></listitem>
+	  <listitem><para>xsltproc and XSL stylesheet, if building the HTML version of docbook manuals</para></listitem>
+	  <listitem><para>dblatex, if building PDF version of docbook manuals</para></listitem>
+	  <listitem><para>LaTeX, if building the documentation</para></listitem>
+	  <listitem><para>doxygen, if building the documentation for the C++ binding</para></listitem>
+	  <listitem><para>javadoc, if building the documentation for the C++ binding</para></listitem>
+	</itemizedlist>
+      </para>
+
+    </section>
+
+    <section id="configuring-compiling-eyedb-from-sources">
+      <title>Configuring and compiling &eyedb; from sources</title>
 
       <para>
       </para>
