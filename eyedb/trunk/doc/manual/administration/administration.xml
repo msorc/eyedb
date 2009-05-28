@@ -40,7 +40,8 @@
 	<listitem><para>make list of eyedbadmin shortcuts</para></listitem>
 	<listitem><para>make a full example showing: indexes, collections, datafiles, dataspaces</para></listitem>
 	<listitem><para>creating multi-volumes databases</para></listitem>
-	<listitem><para>complete index: stats, simulate, dataspace</para></listitem>
+	<listitem><para>complete datafile: defragment</para></listitem>
+	<listitem><para>complete index: simulate, move</para></listitem>
       </itemizedlist>
     </para>
     </note>

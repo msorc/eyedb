@@ -1,14 +1,6 @@
 MANUAL=Installation
 PDF_PREFIX=EyeDB
+MAIN_XML_FILE=installation.xml
+OTHER_XML_FILES=introduction.xml compiling.xml installing.xml
 
-if COND_DBLATEX
-manualdir=$(datadir)/doc/$(PACKAGE)/manual/pdf
-manual_DATA=$(PDF_PREFIX)$(MANUAL).pdf
-endif
-
-XSL_PARAMS = $(top_srcdir)/doc/manual/docbook-common/params.xsl
-DBLATEXFLAGS = -p $(XSL_PARAMS)
-
-$(PDF_PREFIX)$(MANUAL).pdf: installation.xml
-	$(DBLATEX) $(DBLATEXFLAGS) -o $@ $<
-
+include $(top_srcdir)/doc/manual/docbook-common/Makefile.include
