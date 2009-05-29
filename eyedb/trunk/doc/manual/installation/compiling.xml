@@ -192,6 +192,31 @@
 
     </section>
 
+    <section id="installing">
+      <title>Installing &eyedb;</title>
+
+      <para>
+	After building, install &eyedb; by running <command>make install</command>. This will install the files in the directories specified when <link linkend="configuring-eyedb">configuring</link> &eyedb;.
+      </para>
+
+      <para>
+	Installing requires having write permission in the specified directories.
+      </para>
+
+      <para>
+	Uninstalling can be done by running <command>make uninstall</command>. Note that this command will not remove created directories.
+      </para>
+
+    </section>
+
+    <section id="post-installation">
+      <title>Post-installation setup</title>
+
+      <para>
+      </para>
+
+    </section>
+
   </chapter>
 
 <!--
