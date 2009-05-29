@@ -53,8 +53,8 @@
 
     </section>
 
-    <section id="configuring-compiling-eyedb-from-sources">
-      <title>Configuring and compiling &eyedb; from sources</title>
+    <section id="configuring-eyedb">
+      <title>Configuring &eyedb;</title>
 
       <para>
 	&eyedb; use GNU autotools (autoconf, automake, libtool) to ease compilation.
@@ -77,6 +77,14 @@
 		<arg choice="plain">--prefix=<replaceable>prefix</replaceable></arg>
 	      </cmdsynopsis>
 	      install all files and directories under directory <filename class="directory">prefix</filename> instead of default (<filename class="directory">/usr</filename>)
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      <cmdsynopsis>
+		<arg choice="plain">--srcdir=<replaceable>DIR</replaceable></arg>
+	      </cmdsynopsis>
+	      find the sources in DIR (default is configure dir or ..)
 	    </para>
 	  </listitem>
 	  <listitem>
@@ -168,6 +176,18 @@
 	    </para>
 	  </listitem>
 	</itemizedlist>
+      </para>
+
+    </section>
+    <section id="building-eyedb">
+      <title>Building &eyedb;</title>
+
+      <para>
+	Building &eyedb; is simply done by running <command>make</command>. Remember that the <command>make</command> utility must be GNU make, which on some systems may be called <command>gmake</command>.
+      </para>
+
+      <para>
+	&eyedb; supports compiling in a separate build directory, which can be usefull if the source tree must be kept clean, is shared between several architecture or compilation options (for instance debug and profile), is mounted read-only... To compile in a separate build directory, run &configure; with options --srcdir.
       </para>
 
     </section>
