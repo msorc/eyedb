@@ -2,6 +2,7 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN" "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd"
 [
 <!ENTITY eyedb "EyeDB">
+<!ENTITY configure "<command>configure</command>">
 ]
 >
 
@@ -16,6 +17,10 @@
 
       <para>
 	The &eyedb; sources can be downloaded from project page on sourceforge (<ulink url="http://sourceforge.net/projects/eyedb"/>). By following the "download" link, you will get to the list of releases available for downloads. Source archives are provided under .tar.bz2 and .tar.gz format.
+      </para>
+
+      <para>
+	After downloading the source archive, unpack it using <command>tar</command>. This will create a directory named <filename class="directory">eyedb-VERSION</filename> where VERSION is the version number of &eyedb;, for example eyedb-2.8.7.
       </para>
 
     </section>
@@ -42,12 +47,127 @@
 	</itemizedlist>
       </para>
 
+      <para>
+	These software packages are available on all the platforms supported by &eyedb;. For more information on how to install these packages, refer to the documentation of your operating system distribution.
+      </para>
+
     </section>
 
     <section id="configuring-compiling-eyedb-from-sources">
       <title>Configuring and compiling &eyedb; from sources</title>
 
       <para>
+	&eyedb; use GNU autotools (autoconf, automake, libtool) to ease compilation.
+      </para>
+
+      <para>
+	First step is to configure the source tree by running the &configure; script located at the root of the source tree.
+      </para>
+
+      <para>
+	The &configure; script accepts many options that allow fine grain control of the compilation and installation. For full help on options, run <command>configure --help</command>.
+      </para>
+
+      <para>
+	The following options of the &configure; script are the most usefull:
+	<itemizedlist>
+	  <listitem>
+	    <para>
+	      <cmdsynopsis>
+		<arg choice="plain">--prefix=<replaceable>prefix</replaceable></arg>
+	      </cmdsynopsis>
+	      install all files and directories under directory <filename class="directory">prefix</filename> instead of default (<filename class="directory">/usr</filename>)
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      <cmdsynopsis>
+		<arg choice="plain">--enable-debug</arg>
+	      </cmdsynopsis>
+	      compile with debug (default is no)
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      <cmdsynopsis>
+		<arg choice="plain">--enable-optimize=<replaceable>flag</replaceable></arg>
+	      </cmdsynopsis>
+	      compile with given optimization flag (default is no)
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      <cmdsynopsis>
+		<arg choice="plain">--enable-profile</arg>
+	      </cmdsynopsis>
+	      compile with profile (default is no)
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      <cmdsynopsis>
+		<arg choice="plain">--enable-java</arg>
+	      </cmdsynopsis>
+	      enable Java code compilation (default is yes)
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      <cmdsynopsis>
+		<arg choice="plain">--enable-doc</arg>
+	      </cmdsynopsis>
+	      enable documentation generation (default is yes)
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      <cmdsynopsis>
+		<arg choice="plain">--enable-swig</arg>
+	      </cmdsynopsis>
+	      enable SWIG bindings generation (default is no)
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      <cmdsynopsis>
+		<arg choice="plain">--with-semaphore-policy=<replaceable>posix|sysv_ipc</replaceable></arg>
+	      </cmdsynopsis>
+	      force semaphore implementation (if none given, the semaphore implementation is guessed by the &configure; script)
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      <cmdsynopsis>
+		<arg choice="plain">--with-databasedir=<replaceable>DIRECTORY</replaceable></arg>
+	      </cmdsynopsis>
+	      give databases directory (default is <filename class="directory">LOCALSTATEDIR/lib/eyedb/db</filename>)
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      <cmdsynopsis>
+		<arg choice="plain">--with-pipedir=<replaceable>DIRECTORY</replaceable></arg>
+	      </cmdsynopsis>
+	      give pipes directory (default is <filename class="directory">LOCALSTATEDIR/lib/eyedb/pipes</filename>)
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      <cmdsynopsis>
+		<arg choice="plain">--with-tmpdir=<replaceable>DIRECTORY</replaceable></arg>
+	      </cmdsynopsis>
+	      give temporary directory (default is <filename class="directory">LOCALSTATEDIR/lib/eyedb/tmp</filename>)
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      <cmdsynopsis>
+		<arg choice="plain">--with-readline=<replaceable>readline|editline</replaceable></arg>
+	      </cmdsynopsis>
+	      use GNU readline or BSD editline for line editing (default is readline if available)
+	    </para>
+	  </listitem>
+	</itemizedlist>
       </para>
 
     </section>
