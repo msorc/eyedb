@@ -97,8 +97,8 @@ AC_ARG_WITH(readline,
 # config header file
 AM_CONFIG_HEADER(eyedbconfig.h)
 
-# by default we install in /usr
-AC_PREFIX_DEFAULT(/usr)
+# by default we install in /usr/local/eyedb
+AC_PREFIX_DEFAULT(/usr/local/eyedb)
 
 # check for GNU make
 CHECK_GNU_MAKE
