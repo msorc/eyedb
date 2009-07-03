@@ -40,7 +40,7 @@ clean-local:
 	mv $@.tmp $@
 
 init:
-	sh $(srcdir)/init.sh $(srcdir)/schema.odl
+	sh init.sh $(srcdir)/schema.odl
 .PHONY: init
 
 # Dependencies
