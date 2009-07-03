@@ -590,7 +590,8 @@ namespace eyedb {
     if (isRTInitialized)
       return Success;
 
-    const char *s = getEx()->getExtrefBody().c_str();
+    std::string str = getEx()->getExtrefBody();
+    const char *s = str.c_str();
 
     tmpbuf = strdup(s);
     char *q = strchr(tmpbuf, ':');
@@ -719,7 +720,8 @@ namespace eyedb {
 
   Status CardinalityConstraint::check(Class *cl) const
   {
-    const char *atname = getAttrname().c_str();
+    std::string atname_s = getAttrname();
+    const char *atname = atname_s.c_str();
     if (!atname || !*atname)
       return Exception::make(IDB_ERROR, "attribute name is not set for"
 			     " cardinality constraint in class '%s'",
