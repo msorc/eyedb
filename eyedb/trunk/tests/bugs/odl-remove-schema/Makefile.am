@@ -4,9 +4,10 @@ TESTS=\
 test_odl_remove_schema.py
 
 DATABASE=bugs_odl_remove_schema
-SCHEMA=$(top_srcdir)/examples/GettingStarted/schema.odl
+SCHEMA=$(srcdir)/schema.odl
 
 init:
+	-$(bindir)/eyedbadmin database delete $(DATABASE)
 	$(bindir)/eyedbadmin database create $(DATABASE)
 	$(bindir)/eyedbodl --update --database=$(DATABASE) $(SCHEMA)
 .PHONY: init
