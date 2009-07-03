@@ -664,6 +664,7 @@ src/www/eyedb.conf dnl
 src/www/html/Makefile dnl
 src/www/icons/Makefile dnl
 tests/Makefile dnl
+tests/bugs/odl-remove-schema/Makefile dnl
 tests/examples/Makefile dnl
 tests/examples/GettingStarted/Makefile dnl
 tests/examples/JavaBinding/Makefile dnl
