@@ -1,9 +1,12 @@
 TESTS_ENVIRONMENT= $(SHELL) 
 
 TESTS=\
-test_odl_remove_schema.sh
+test_oql_update_trigger_crash.sh \
+test_oql_update_trigger_same_values.sh \
+test_oql_load_before_trigger_crash.sh \
+test_oql_load_after_trigger_message.sh 
 
-DATABASE=bugs_odl_remove_schema
+DATABASE=bugs_oql_triggers
 SCHEMA=$(srcdir)/schema.odl
 
 init:

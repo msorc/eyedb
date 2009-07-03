@@ -1,0 +1,7 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+bindir=@bindir@
+
+database='bugs_odl_remove_schema'
+
+$bindir/eyedbodl -u -d $database --rmsch

@@ -12,7 +12,7 @@
 //
 
 function make_car(i, j) {
-  return new Car(mark : "mark" + string(i) + "_" + string(j),
+  return new Car(brand : "brand" + string(i) + "_" + string(j),
 		 num : i + 1000);
 }
 
