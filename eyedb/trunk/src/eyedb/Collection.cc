@@ -22,7 +22,7 @@
 */
 
 
-// 15/08/06 : avoid use of exists method
+// 15/08/06 : avoid use of exists() method
 #define NEW_GET_ELEMENTS
 
 #include "eyedb_p.h"
@@ -313,25 +313,22 @@ namespace eyedb {
 #ifdef CARD_TRACE
     printf("Collection::setCardinalityConstraint(%p)\n", _card);
 #endif
-    if (!_card)
-      {
-	card = NULL;
+    if (!_card) {
+      card = NULL;
+      card_oid.invalidate();
+      return;
+    }
+
+    if (!strcmp(_card->getClass()->getName(), "cardinality_constraint")) {
+      card = ((CardinalityConstraint *)_card)->getCardDesc();
+      if (!card) {
 	card_oid.invalidate();
 	return;
       }
-
-    if (!strcmp(_card->getClass()->getName(), "cardinality_constraint"))
-      {
-	card = ((CardinalityConstraint *)_card)->getCardDesc();
-	if (!card)
-	  {
-	    card_oid.invalidate();
-	    return;
-	  }
-      }
+    }
     else
       card = (CardinalityDescription *)_card;
-  
+    
     card_oid = _card->getOid();
     card_bottom = card->getBottom();
     card_bottom_excl = card->getBottomExcl();
@@ -577,11 +574,10 @@ namespace eyedb {
 
     Database *odb = db;
 
-    if (odb && odb != mdb)
-      {
-	assert(0);
-	return Exception::make(IDB_ERROR, "cannot change dynamically database of an object");
-      }
+    if (odb && odb != mdb) {
+      assert(0);
+      return Exception::make(IDB_ERROR, "cannot change dynamically database of an object");
+    }
 
     db = mdb;
 
@@ -1083,23 +1079,21 @@ namespace eyedb {
     touch();
     ValueItem *item;
 
-    if (cache && (item = cache->get(item_oid)))
-      {
-	int s = item->getState();
-	if (s == removed)
-	  {
-	    if (checkFirst)
-	      return Success;
-	    return Exception::make(IDB_COLLECTION_SUPPRESS_ERROR, "item '%s' is already suppressed", item_oid.getString());
-	  }
-	else if (s == coherent)
-	  item->setState(removed);
-	else if (s == added)
-	  cache->suppressOid(item);
-
-	v_items_cnt--;
-	return Success;
+    if (cache && (item = cache->get(item_oid))) {
+      int s = item->getState();
+      if (s == removed) {
+	if (checkFirst)
+	  return Success;
+	return Exception::make(IDB_COLLECTION_SUPPRESS_ERROR, "item '%s' is already suppressed", item_oid.getString());
       }
+      else if (s == coherent)
+	item->setState(removed);
+      else if (s == added)
+	cache->suppressOid(item);
+
+      v_items_cnt--;
+      return Success;
+    }
 
     if (!getOidC().isValid())
       return Exception::make(IDB_COLLECTION_SUPPRESS_ERROR, "collection oid is invalid (collection has not been stored)");
@@ -1111,15 +1105,13 @@ namespace eyedb {
     if ((rpc_status = collectionGetByOid(db->getDbHandle(),
 					 getOidC().getOid(),
 					 item_oid.getOid(), &found, &ind)) ==
-	RPCSuccess)
-      {
-	if (!found)
-	  {
-	    if (checkFirst)
-	      return Success;
-	    return Exception::make(IDB_COLLECTION_SUPPRESS_ERROR, "item '%s' not found in collection '%s'", item_oid.getString(), name);
-	  }
+	RPCSuccess) {
+      if (!found) {
+	if (checkFirst)
+	  return Success;
+	return Exception::make(IDB_COLLECTION_SUPPRESS_ERROR, "item '%s' not found in collection '%s'", item_oid.getString(), name);
       }
+    }
     else
       return StatusMake(IDB_COLLECTION_SUPPRESS_ERROR, rpc_status);
 
@@ -1169,46 +1161,42 @@ namespace eyedb {
     touch();
     ValueItem *item;
 
-    if (cache && (item = cache->get(item_o)))
-      {
-	int s = item->getState();
-	if (s == removed)
-	  {
-	    if (checkFirst)
-	      return Success;
-	    return Exception::make(IDB_COLLECTION_SUPPRESS_ERROR, "object 0x%x has already been suppressed", item_o);
-	  }
-	else if (s == coherent)
-	  item->setState(removed);
-	else if (s == added)
-	  cache->suppressObject(item);
-
-	v_items_cnt--;
-	return Success;
+    if (cache && (item = cache->get(item_o))) {
+      int s = item->getState();
+      if (s == removed) {
+	if (checkFirst)
+	  return Success;
+	return Exception::make(IDB_COLLECTION_SUPPRESS_ERROR, "object 0x%x has already been suppressed", item_o);
       }
+      else if (s == coherent)
+	item->setState(removed);
+      else if (s == added)
+	cache->suppressObject(item);
+
+      v_items_cnt--;
+      return Success;
+    }
 
     Oid item_oid = item_o->getOid();
 
     if (!item_oid.isValid())
       return Exception::make(IDB_COLLECTION_SUPPRESS_ERROR, "oid item of object 0x%x is invalid", item_o);
 
-    if (cache && (item = cache->get(item_oid)))
-      {
-	int s = item->getState();
-	if (s == removed)
-	  {
-	    if (checkFirst)
-	      return Success;
-	    return Exception::make(IDB_COLLECTION_SUPPRESS_ERROR, "item '%s' has been already suppressed", item_oid.getString());
-	  }
-	else if (s == coherent)
-	  item->setState(removed);
-	else if (s == added)
-	  item->setState(removed); /* cache->suppress(item); */
-
-	v_items_cnt--;
-	return Success;
+    if (cache && (item = cache->get(item_oid))) {
+      int s = item->getState();
+      if (s == removed) {
+	if (checkFirst)
+	  return Success;
+	return Exception::make(IDB_COLLECTION_SUPPRESS_ERROR, "item '%s' has been already suppressed", item_oid.getString());
       }
+      else if (s == coherent)
+	item->setState(removed);
+      else if (s == added)
+	item->setState(removed); /* cache->suppress(item); */
+
+      v_items_cnt--;
+      return Success;
+    }
 
     if (!getOidC().isValid())
       return Exception::make(IDB_COLLECTION_SUPPRESS_ERROR, "collection oid is invalid (collection has not been stored)");
@@ -1220,15 +1208,13 @@ namespace eyedb {
     if ((rpc_status = collectionGetByOid(db->getDbHandle(),
 					 getOidC().getOid(),
 					 item_oid.getOid(), &found, &ind)) ==
-	RPCSuccess)
-      {
-	if (!found)
-	  {
-	    if (checkFirst)
-	      return Success;
-	    return Exception::make(IDB_COLLECTION_SUPPRESS_ERROR, "item '%s' not found in collection", item_oid.toString());
-	  }
+	RPCSuccess) {
+      if (!found) {
+	if (checkFirst)
+	  return Success;
+	return Exception::make(IDB_COLLECTION_SUPPRESS_ERROR, "item '%s' not found in collection", item_oid.toString());
       }
+    }
     else
       return StatusMake(IDB_COLLECTION_SUPPRESS_ERROR, rpc_status);
 
@@ -1266,13 +1252,12 @@ namespace eyedb {
 
     IDB_COLL_LOAD_DEFERRED();
     touch();
-    if (!getOidC().isValid())
-      {
-	p_items_cnt = 0;
-	v_items_cnt = 0;
-	top = bottom = 0;
-	return Success;
-      }
+    if (!getOidC().isValid()) {
+      p_items_cnt = 0;
+      v_items_cnt = 0;
+      top = bottom = 0;
+      return Success;
+    }
 
     Status s;
     Iterator q(this, True);
@@ -1383,20 +1368,18 @@ namespace eyedb {
 
     ValueItem *item;
 
-    if (cache && (item = cache->get(item_o)) && item->getState() != removed)
-      {
-	found = True;
-	return Success;
-      }
+    if (cache && (item = cache->get(item_o)) && item->getState() != removed) {
+      found = True;
+      return Success;
+    }
       
     Oid item_oid = item_o->getOid();
 
     if (item_oid.isValid() && cache && (item = cache->get(item_oid)) &&
-	item->getState() != removed)
-      {
-	found = True;
-	return Success;
-      }
+	item->getState() != removed) {
+      found = True;
+      return Success;
+    }
 
     if (!getOidC().isValid())
       return Success;
@@ -1552,11 +1535,10 @@ namespace eyedb {
   void Collection::cardCode(Data &data, Offset &offset, Size &alloc_size)
   {
     //  printf("collection_realize(card_code = %s)\n", card_oid.toString());
-    if (card_oid.isValid())
-      {
-	oid_code(&data, &offset, &alloc_size, card_oid.getOid());
-	return;
-      }
+    if (card_oid.isValid()) {
+      oid_code(&data, &offset, &alloc_size, card_oid.getOid());
+      return;
+    }
 
     oid_code(&data, &offset, &alloc_size, getInvalidOid());
   }
@@ -1578,17 +1560,16 @@ namespace eyedb {
 
     Status status = db->loadObject(&coid, &card);
 
-    if (status)
-      {
-	status->print();
-	return NULL;
-      }
+    if (status) {
+      status->print();
+      return NULL;
+    }
 
     return card;
   }
 
   Status Collection::codeCollImpl(Data &data, Offset &offset,
-				   Size &alloc_size)
+				  Size &alloc_size)
   {
     return IndexImpl::code(data, offset, alloc_size, collimpl->getIndexImpl(), collimpl->getType());
   }
@@ -2011,18 +1992,17 @@ namespace eyedb {
     }
 #endif
 
-    if (is_literal && !literal_oid.isValid() && getUserData() != IDB_MAGIC_COLL)
-      {
+    if (is_literal && !literal_oid.isValid() && getUserData() != IDB_MAGIC_COLL) {
 #ifdef COLLTRACE
-	printf("collection realizing master_object %p\n",
-	       getMasterObject(true));
+      printf("collection realizing master_object %p\n",
+	     getMasterObject(true));
 #endif
-	assert(getMasterObject(true));
-	void *ud = setUserData(IDB_MAGIC_COLL2);
-	Status s = getMasterObject(true)->realize(rcm);
-	(void)setUserData(ud);
-	return s;
-      }
+      assert(getMasterObject(true));
+      void *ud = setUserData(IDB_MAGIC_COLL2);
+      Status s = getMasterObject(true)->realize(rcm);
+      (void)setUserData(ud);
+      return s;
+    }
 
     Status s;
     IDB_COLL_LOAD_DEFERRED();
@@ -2088,45 +2068,41 @@ namespace eyedb {
     int ind;
 
     unsigned int cnt = array.getCount();
-    for (int i = 0; i < cnt; i += inc)
-      {
-	IDB_CHECK_INTR();
-	Value value = array[i+value_off]; //Value value = array.values[i+value_off];
+    for (int i = 0; i < cnt; i += inc) {
+      IDB_CHECK_INTR();
+      Value value = array[i+value_off]; //Value value = array.values[i+value_off];
+
+      if (isidx)
+	ind = array[i].l; // ind = array.values[i].l;
+
+      if (value.type == Value::tOid) {
+	Object *o;
+	s = db->loadObject(value.oid, &o, rcm);
+	if (s) {
+	  delete_indent(indent_str);
+	  return s;
+	}
 
 	if (isidx)
-	  ind = array[i].l; // ind = array.values[i].l;
-
-	if (value.type == Value::tOid)
-	  {
-	    Object *o;
-	    s = db->loadObject(value.oid, &o, rcm);
-	    if (s)
-	      {
-		delete_indent(indent_str);
-		return s;
-	      }
-
-	    if (isidx)
-	      fprintf(fd, "%s[%d] = %s %s ", indent_str, ind,
-		      value.oid->getString(), o->getClass()->getName());
-	    else
-	      fprintf(fd, "%s%s %s = ", indent_str, value.oid->getString(),
-		      o->getClass()->getName());
-	    s = ObjectPeer::trace_realize(o, fd, indent + INDENT_INC, flags, rcm);
-	    if (s)
-	      {
-		delete_indent(indent_str);
-		return s;
-	      }
-
-	    o->release();
-	  }
-	else if (isidx)
-	  fprintf(fd, "%s[%d] = %s;\n", indent_str, ind, value.getString());
+	  fprintf(fd, "%s[%d] = %s %s ", indent_str, ind,
+		  value.oid->getString(), o->getClass()->getName());
 	else
-	  fprintf(fd, "%s%s;\n", indent_str, value.getString());
-      }
+	  fprintf(fd, "%s%s %s = ", indent_str, value.oid->getString(),
+		  o->getClass()->getName());
+	s = ObjectPeer::trace_realize(o, fd, indent + INDENT_INC, flags, rcm);
+	if (s) {
+	  delete_indent(indent_str);
+	  return s;
+	}
 
+	o->release();
+      }
+      else if (isidx)
+	fprintf(fd, "%s[%d] = %s;\n", indent_str, ind, value.getString());
+      else
+	fprintf(fd, "%s%s;\n", indent_str, value.getString());
+    }
+    
     delete_indent(indent_str);
     return Success;
   }
@@ -2139,18 +2115,16 @@ namespace eyedb {
     Status s = Success;
     char *indent_str = make_indent(indent);
 
-    if (state & Tracing)
-      {
-	fprintf(fd, "%s%s;\n", indent_str, oid.getString());
-	delete_indent(indent_str);
-	return Success;
-      }
-
-    if (!is_complete)
-      {
-	s = const_cast<Collection *>(this)->loadDeferred();
-	if (s) return s;
-      }
+    if (state & Tracing) {
+      fprintf(fd, "%s%s;\n", indent_str, oid.getString());
+      delete_indent(indent_str);
+      return Success;
+    }
+    
+    if (!is_complete) {
+      s = const_cast<Collection *>(this)->loadDeferred();
+      if (s) return s;
+    }
 
     const_cast<Collection *>(this)->state |= Tracing;
 
@@ -2162,70 +2136,66 @@ namespace eyedb {
     trace_flags(fd, flags);
     fprintf(fd, "\n");
 
-    if ((flags & NativeTrace) == NativeTrace)
-      {
-	if (rcm->getType() == RecMode_FullRecurs)
-	  {
-	    fprintf(fd, "%s%s class = { ", indent_str,
-		    getClass()->getOid().getString());
+    if ((flags & NativeTrace) == NativeTrace) {
+      if (rcm->getType() == RecMode_FullRecurs) {
+	fprintf(fd, "%s%s class = { ", indent_str,
+		getClass()->getOid().getString());
 	  
-	    if (s = ObjectPeer::trace_realize(getClass(), fd, indent + INDENT_INC, flags, rcm))
-	      goto out;
+	if (s = ObjectPeer::trace_realize(getClass(), fd, indent + INDENT_INC, flags, rcm))
+	  goto out;
 
-	    fprintf(fd, "%s};\n", indent_str);
+	fprintf(fd, "%s};\n", indent_str);
 
-	    fprintf(fd, "%s%s collclass = { ", indent_str,
-		    coll_class->getOid().getString());
+	fprintf(fd, "%s%s collclass = { ", indent_str,
+		coll_class->getOid().getString());
 
-	    if (s = ObjectPeer::trace_realize(coll_class, fd, indent + INDENT_INC, flags, rcm))
-	      goto out;
+	if (s = ObjectPeer::trace_realize(coll_class, fd, indent + INDENT_INC, flags, rcm))
+	  goto out;
 
-	    fprintf(fd, "%s};\n", indent_str);
-	  }
-	else
-	  {
-	    fprintf(fd, "%sclass = %s;\n", indent_str,
-		    getClass()->getOid().getString());
+	fprintf(fd, "%s};\n", indent_str);
+      } else {
+	fprintf(fd, "%sclass = %s;\n", indent_str,
+		getClass()->getOid().getString());
   
-	    fprintf(fd, "%scollclass = %s;\n", indent_str,
-		    coll_class->getOid().getString());
+	fprintf(fd, "%scollclass = %s;\n", indent_str,
+		coll_class->getOid().getString());
 
-	    fprintf(fd, "%sreference = %s;\n", indent_str, (isref ? "true" : "false"));
-	    if (isPureLiteral())
-	      fprintf(fd, "%stype = pure_literal;\n", indent_str);
-	    else if (isLiteral())
-	      fprintf(fd, "%stype = object_literal;\n", indent_str);
-	    else
-	      fprintf(fd, "%stype = object;\n", indent_str);
+	fprintf(fd, "%sreference = %s;\n", indent_str, (isref ? "true" : "false"));
+	if (isPureLiteral())
+	  fprintf(fd, "%stype = pure_literal;\n", indent_str);
+	else if (isLiteral())
+	  fprintf(fd, "%stype = object_literal;\n", indent_str);
+	else
+	  fprintf(fd, "%stype = object;\n", indent_str);
 
-	    if (isLiteral())
-	      fprintf(fd, "%sliteral_oid = %s;\n", indent_str, getOidC().toString());
+	if (isLiteral())
+	  fprintf(fd, "%sliteral_oid = %s;\n", indent_str, getOidC().toString());
 
-	    if (collimpl->getType() == CollAttrImpl::NoIndex) {
-	      fprintf(fd, "%sidxtype = 'noindex';\n", indent_str);
-	    }
-	    else if (collimpl->getType() == CollAttrImpl::HashIndex) {
-	      fprintf(fd, "%sidxtype = 'hasindex';\n", indent_str);
-	    }
-	    else if (collimpl->getType() == CollAttrImpl::BTreeIndex) {
-	      fprintf(fd, "%sidxtype = 'btreeindex';\n", indent_str);
-	    }
+	if (collimpl->getType() == CollAttrImpl::NoIndex) {
+	  fprintf(fd, "%sidxtype = 'noindex';\n", indent_str);
+	}
+	else if (collimpl->getType() == CollAttrImpl::HashIndex) {
+	  fprintf(fd, "%sidxtype = 'hasindex';\n", indent_str);
+	}
+	else if (collimpl->getType() == CollAttrImpl::BTreeIndex) {
+	  fprintf(fd, "%sidxtype = 'btreeindex';\n", indent_str);
+	}
 
-	    if (collimpl->getIndexImpl()) {
-	      std::string hints = collimpl->getIndexImpl()->getHintsString();
-	      if (hints.size())
-		fprintf(fd, "%shints = \"%s\";\n", indent_str,
-			hints.c_str());
-	    }
+	if (collimpl->getIndexImpl()) {
+	  std::string hints = collimpl->getIndexImpl()->getHintsString();
+	  if (hints.size())
+	    fprintf(fd, "%shints = \"%s\";\n", indent_str,
+		    hints.c_str());
+	}
 
-	    if (idx1_oid.isValid())
-	      fprintf(fd, "%sidx1oid = %s;\n", indent_str,
-		      idx1_oid.toString());
-	    if (idx2_oid.isValid())
-	      fprintf(fd, "%sidx2oid = %s;\n", indent_str,
-		      idx2_oid.toString());
-	  }
+	if (idx1_oid.isValid())
+	  fprintf(fd, "%sidx1oid = %s;\n", indent_str,
+		  idx1_oid.toString());
+	if (idx2_oid.isValid())
+	  fprintf(fd, "%sidx2oid = %s;\n", indent_str,
+		  idx2_oid.toString());
       }
+    }
 
     fprintf(fd, "%sname = \"%s\";\n", indent_str, name);
     fprintf(fd, "%scount = %d;\n", indent_str, v_items_cnt);
@@ -2236,12 +2206,11 @@ namespace eyedb {
     if (card)
       fprintf(fd, "%sconstraint = (%s);\n", indent_str, card->getString());
 
-    if (flags & ContentsFlag)
-      {
-	fprintf(fd, "%scontents = {\n", indent_str);
-	s = trace_contents_realize(fd, indent + INDENT_INC, flags, rcm);
-	fprintf(fd, "%s};\n", indent_str);
-      }
+    if (flags & ContentsFlag) {
+      fprintf(fd, "%scontents = {\n", indent_str);
+      s = trace_contents_realize(fd, indent + INDENT_INC, flags, rcm);
+      fprintf(fd, "%s};\n", indent_str);
+    }
 
   out:
     const_cast<Collection *>(this)->state &= ~Tracing;
@@ -2295,23 +2264,21 @@ namespace eyedb {
 
     delete read_cache.oid_arr;
     read_cache.oid_arr = new OidArray();
-    if (getOidC().isValid())
-      {
-	Iterator q(this);
-	if (q.getStatus())
-	  return q.getStatus();
+    if (getOidC().isValid()) {
+      Iterator q(this);
+      if (q.getStatus())
+	return q.getStatus();
       
-	Status s = q.scan(*read_cache.oid_arr);
-	if (s || read_cache_state_oid == coherent) return s;
-      }
+      Status s = q.scan(*read_cache.oid_arr);
+      if (s || read_cache_state_oid == coherent) return s;
+    }
     else if (read_cache_state_oid == coherent)
       return Success;
 
-    if (read_cache_state_oid == coherent)
-      {
-	assert(CACHE_LIST_COUNT(cache) == 0);
-	return Success;
-      }
+    if (read_cache_state_oid == coherent) {
+      assert(CACHE_LIST_COUNT(cache) == 0);
+      return Success;
+    }
 
     ValueItem *item;
     OidList *oid_list = read_cache.oid_arr->toList();
@@ -2924,31 +2891,27 @@ namespace eyedb {
     Data temp;
     Oid _oid(hdr->oid_cl);
 
-    if (_oid.isValid())
-      {
-	Oid xoid(hdr->oid_cl);
-	if (!_class)
-	  _class = db->getSchema()->getClass(hdr->oid_cl, True);
-	if (!_class)
-	  return Exception::make(IDB_CLASS_NOT_FOUND, "collection class '%s'",
-				 OidGetString(&hdr->oid_cl));
-      }
+    if (_oid.isValid()) {
+      Oid xoid(hdr->oid_cl);
+      if (!_class)
+	_class = db->getSchema()->getClass(hdr->oid_cl, True);
+      if (!_class)
+	return Exception::make(IDB_CLASS_NOT_FOUND, "collection class '%s'",
+			       OidGetString(&hdr->oid_cl));
+    }
     else
       _class = 0;
 
-    if (!idr)
-      {
-	temp = (unsigned char *)malloc(hdr->size);
-	object_header_code_head(temp, hdr);
+    if (!idr) {
+      temp = (unsigned char *)malloc(hdr->size);
+      object_header_code_head(temp, hdr);
       
-	rpc_status = objectRead(db->getDbHandle(), temp, 0, 0, oid->getOid(),
-				0, lockmode, 0);
-      }
-    else
-      {
-	temp = idr;
-	rpc_status = RPCSuccess;
-      }
+      rpc_status = objectRead(db->getDbHandle(), temp, 0, 0, oid->getOid(),
+			      0, lockmode, 0);
+    } else {
+      temp = idr;
+      rpc_status = RPCSuccess;
+    }
 
     if (rpc_status != RPCSuccess)
       return StatusMake(rpc_status);
@@ -2974,8 +2937,7 @@ namespace eyedb {
       collimpl = 0;
       items_cnt = bottom = top = 0;
       name = "";
-    }
-    else {
+    } else {
       Offset offset = IDB_OBJ_HEAD_SIZE;
     
       char_decode (temp, &offset, &locked);
@@ -3153,13 +3115,12 @@ namespace eyedb {
     card_top_excl = o->card_top_excl;
     card_oid = o->card_oid;
 
-    if (db && db->isBackEnd())
-      {
-	idx1_oid = o->idx1_oid;
-	idx2_oid = o->idx2_oid;
-	idx1 = o->idx1;
-	idx2 = o->idx2;
-      }
+    if (db && db->isBackEnd()) {
+      idx1_oid = o->idx1_oid;
+      idx2_oid = o->idx2_oid;
+      idx1 = o->idx1;
+      idx2 = o->idx2;
+    }
 
     // added the 25/11/99
     delete cache;
@@ -3265,15 +3226,14 @@ namespace eyedb {
     if (literal_oid.isValid())
       is_complete = False;
 
-    if (rcm == RecMode::NoRecurs)
-      {
-	// 17/09/01: moved this code above ^
-	/*
-	  if (literal_oid.isValid())
-	  is_complete = False;
-	*/
-	return Success;
-      }
+    if (rcm == RecMode::NoRecurs) {
+      // 17/09/01: moved this code above ^
+      /*
+	if (literal_oid.isValid())
+	is_complete = False;
+      */
+      return Success;
+    }
 
     return Collection::loadDeferred(lockmode, rcm);
   }

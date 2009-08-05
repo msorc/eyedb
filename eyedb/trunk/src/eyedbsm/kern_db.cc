@@ -120,6 +120,9 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
     if ((fd = creat(file, file_mode)) < 0)
       return -1;
 
+    if (chmod(file, file_mode) < 0)
+      return -1;
+
     if (file_gid != (gid_t)-1) {
       if (chown(file, (uid_t)-1, file_gid) < 0) {
 	close(fd);

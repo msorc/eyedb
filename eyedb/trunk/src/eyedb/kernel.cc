@@ -655,8 +655,8 @@ namespace eyedb {
       sscanf(file_mask_str, "%o", &fmask);
       if (!fmask) {
 	return rpcStatusMake(IDB_ERROR, "invalid file mode: %s", file_mask_str);
-	file_mask = fmask;
       }
+      file_mask = fmask;
     }
 
     file_group = ServerConfig::getSValue("default_file_group");
