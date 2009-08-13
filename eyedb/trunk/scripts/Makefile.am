@@ -20,6 +20,9 @@ eyedbtoolsdir=$(pkgdatadir)/tools
 eyedbtools_SCRIPTS=\
 eyedb-postinstall.sh
 
+pkgdata_SCRIPTS= \
+eyedb.rc.in
+
 dist_noinst_SCRIPTS= \
 eyedb-lex \
 eyedb.init
