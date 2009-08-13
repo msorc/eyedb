@@ -9,9 +9,10 @@ EDIT = sed \
         -e 's,@eyedb_pipedir\@,$(eyedb_pipedir),g' \
         -e 's,@eyedb_tmpdir\@,$(eyedb_tmpdir),g' \
         -e 's,@prefix\@,$(prefix),g' \
-        -e 's,@sysconfdir\@,$(sysconfdir),g'
+        -e 's,@sysconfdir\@,$(sysconfdir),g' \
+        -e 's,@EYEDBD_USER\@,$(EYEDBD_USER),g'
 
-eyedb-postinstall.sh: Makefile $(srcdir)/eyedb-postinstall.sh.in
+%: Makefile $(srcdir)/%.in
 	rm -f $@ $@.tmp
 	$(EDIT) '$(srcdir)/$@.in' >$@.tmp
 	mv $@.tmp $@
@@ -21,7 +22,7 @@ eyedbtools_SCRIPTS=\
 eyedb-postinstall.sh
 
 pkgdata_SCRIPTS= \
-eyedb.rc.in
+eyedb.rc
 
 dist_noinst_SCRIPTS= \
 eyedb-lex \

@@ -85,6 +85,12 @@ AC_ARG_WITH( tmpdir,
 	     AS_HELP_STRING([--with-tmpdir=DIRECTORY],[give temporary directory (default is LOCALSTATEDIR/lib/eyedb/tmp)]),
 	     ac_eyedb_tmpdir="$withval",
 	     ac_eyedb_tmpdir='${localstatedir}/lib/eyedb/tmp')
+# User under which EyeDB server should run
+AC_ARG_WITH(eyedbd-user,
+	AS_HELP_STRING([--with-eyedbd-user=USERNAME],[user the EyeDB server shall be run as (default is eyedb)]),
+	EYEDBD_USER="$withval",
+	EYEDBD_USER=eyedb)
+AC_SUBST(EYEDBD_USER)
 # readline
 AC_ARG_WITH(readline, 
 	     AS_HELP_STRING([--with-readline=(readline|editline)],[use GNU readline or BSD editline for line editing (default is readline if available)]),
