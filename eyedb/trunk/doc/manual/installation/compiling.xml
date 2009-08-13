@@ -76,7 +76,7 @@
 	      <cmdsynopsis>
 		<arg choice="plain">--prefix=<replaceable>prefix</replaceable></arg>
 	      </cmdsynopsis>
-	      install all files and directories under directory <filename class="directory">prefix</filename> instead of default (<filename class="directory">/usr</filename>)
+	      install all files and directories under directory <filename class="directory">prefix</filename> instead of default (<filename class="directory">/usr/local/eyedb</filename>)
 	    </para>
 	  </listitem>
 	  <listitem>

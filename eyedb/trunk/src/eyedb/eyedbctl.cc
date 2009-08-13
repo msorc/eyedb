@@ -25,13 +25,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <eyedb/eyedb.h>
-#include "SessionLog.h"
 #include <unistd.h>
+#include <sys/types.h>
 #include <sys/wait.h>
 #include <signal.h>
+
+#include <eyedb/eyedb.h>
 #include <eyedbsm/smd.h>
 #include <eyedblib/strutils.h>
+#include "SessionLog.h"
 #include "comp_time.h"
 #include "lib/compile_builtin.h"
 
@@ -46,7 +48,7 @@ static int
 usage(const char *prog)
 {
   cerr << "usage: " << prog << " ";
-  cerr << "[-h|--help|-v|--version] [start|stop|status] [-f] [--creating-dbm] ";
+  cerr << "[-h|--help|-v|--version] [start|stop|status] [-f] [--creating-dbm] [--allow-root] ";
   print_common_usage(cerr, true);
   cerr << endl;
   return 1;
@@ -60,6 +62,7 @@ static void help(const char *prog)
   cerr << "  stop [-f]      Stop the server. Set -f to force stop\n";
   cerr << "  status         Display status on the running server\n";
   cerr << "  --creating-dbm Bootstrap option for DBM database creation\n";
+  cerr << "  --allow-root   Allow running as root (not allowed by default)\n";
   print_common_help(cerr, true);
 }
 
@@ -265,13 +268,26 @@ static int checkPostInstall(Bool creatingDbm)
   if (!creatingDbm) {
     const char *dbm = Database::getDefaultServerDBMDB();
     if (!dbm || access(dbm, R_OK)) {
-      fprintf(stderr, "\nThe EYEDBDBM database file '%s' is not accessible\n",
-	      dbm);
+      fprintf(stderr, "\nThe EYEDBDBM database file '%s' is not accessible\n", dbm);
       fprintf(stderr, "Did you run the post install script 'eyedb-postinstall.sh' ?\n");
       fprintf(stderr, "If yes, check your configuration or launch eyedbctl with option --creating-dbm\n");
       return 1;
     }
   }
+
+  return 0;
+}
+
+static int checkRoot( Bool allowRoot)
+{
+  if (!allowRoot) {
+    if (!getuid()) {
+      fprintf(stderr, "\nLaunching EyeDB server as root is not allowed for security.\n");
+      fprintf(stderr, "You can overide this by launching eyedbctl with option --allow-root\n");
+      return 1;
+    }
+  }
+
   return 0;
 }
 
@@ -282,6 +298,7 @@ main(int argc, char *argv[])
   eyedbsm::Status status;
   Bool force = False;
   Bool creatingDbm = False;
+  Bool allowRoot = False;
   string sv_host, sv_port;
 
   string sv_listen;
@@ -320,11 +337,12 @@ main(int argc, char *argv[])
 	force = True;
       else if (!strcmp(s, "--creating-dbm"))
 	creatingDbm = True;
+      else if (!strcmp(s, "--allow-root"))
+	allowRoot = True;
       else
 	break;
     }
 
-    std::string s_l;
     if (!*listen && (s = eyedb::ServerConfig::getSValue("listen")))
       listen = s;
 
@@ -334,17 +352,19 @@ main(int argc, char *argv[])
       unlink_ports(smdport, listen);
     }
 
-    //    sbindir = eyedblib::CompileBuiltin::getSbindir();
     sbindir = ServerConfig::getSValue("@sbindir");
 
     int ac;
     char **av;
 
     if (cmd == Start) {
-      int st = force + creatingDbm;
+      if (checkRoot( allowRoot))
+	return 1;
 
       if (checkPostInstall(creatingDbm))
 	return 1;
+
+      int st = force + creatingDbm + allowRoot;
 
       ac = argc - st;
       av = &argv[st+1];

@@ -23,6 +23,9 @@ decrypt_options()
           usage
 	  exit 0
 	  ;;
+	  --allow-root)
+	  ALLOW_ROOT_OPTION=--allow-root
+	  ;;
 	  *)
           usage
 	  exit 2
@@ -40,7 +43,8 @@ usage()
     echo "usage: $PROGNAME [OPTION]"
     echo
     echo "Options:"
-    echo "  -h, --help               display this help and exit"
+    echo "  -h, --help    Display this help and exit"
+    echo "  --allow-root  Allow running as root (not allowed by default)\n";
     echo
 }
 
@@ -56,10 +60,15 @@ create_directories() {
     chmod a+w $eyedb_tmpdir
 }
 
+status_server()
+{
+    $sbindir/eyedbctl status
+}
+
 start_server()
 {
     echo ==== Starting EyeDB server
-    $sbindir/eyedbctl start --creating-dbm --nod
+    $sbindir/eyedbctl start $ALLOW_ROOT_OPTION --creating-dbm --nod
 }
 
 create_dbm()
@@ -99,3 +108,4 @@ sleep 4
 create_dbm
 
 stop_server
+
