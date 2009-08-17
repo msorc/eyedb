@@ -25,7 +25,6 @@ pkgdata_SCRIPTS= \
 eyedb.rc
 
 dist_noinst_SCRIPTS= \
-eyedb-lex \
-eyedb.init
+eyedb-lex 
 
-EXTRA_DIST=eyedb-postinstall.sh.in
+EXTRA_DIST=eyedb-postinstall.sh.in eyedb.rc.in
