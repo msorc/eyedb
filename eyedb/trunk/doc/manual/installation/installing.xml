@@ -203,7 +203,7 @@ Starting EyeDB Server
 	</para>
 
 	<para>
-	  The final step is to allow, on Linux systems, &eyedb; to start automatically at boot time. A System-V init script is provided to start and stop &eyedb; this script is located after installation in <filename>/usr/local/eyedb/share/eyedb/eyedb.rc</filename> (if prefix was <filename class="directory">/usr/local/eyedb</filename>). This script uses only LSB logging function and can therefore be used on any Linux distribution. The following steps are needed:
+	  The final step is to allow, on Linux systems, &eyedb; to start automatically at boot time. A System-V init script is provided to start and stop &eyedb;; this script is located after installation in <filename>/usr/local/eyedb/share/eyedb/eyedb.rc</filename> (if prefix was <filename class="directory">/usr/local/eyedb</filename>). This script uses only LSB logging function and can therefore be used on any Linux distribution. The following steps are needed:
 	  <itemizedlist>
 	    <listitem><para>copy the given script to the init scripts directory (for instance <filename class="directory">/etc/init.d</filename>, but this may vary depending on your distribution)</para></listitem>
 	    <listitem><para>update the system init scripts configuration by making the appropriate links between the runlevel directories and the init script (this is usually done by a distribution specific command such as <command>update-rc.d</command> or <command>chkconfig</command></para></listitem>
