@@ -43,7 +43,7 @@
 	  <listitem><para>dblatex, if building PDF version of docbook manuals</para></listitem>
 	  <listitem><para>LaTeX, if building the documentation</para></listitem>
 	  <listitem><para>doxygen, if building the documentation for the C++ binding</para></listitem>
-	  <listitem><para>javadoc, if building the documentation for the C++ binding</para></listitem>
+	  <listitem><para>javadoc, if building the documentation for the Java binding</para></listitem>
 	</itemizedlist>
       </para>
 
@@ -187,32 +187,7 @@
       </para>
 
       <para>
-	&eyedb; supports compiling in a separate build directory, which can be usefull if the source tree must be kept clean, is shared between several architecture or compilation options (for instance debug and profile), is mounted read-only... To compile in a separate build directory, run &configure; with options --srcdir.
-      </para>
-
-    </section>
-
-    <section id="installing">
-      <title>Installing &eyedb;</title>
-
-      <para>
-	After building, install &eyedb; by running <command>make install</command>. This will install the files in the directories specified when <link linkend="configuring-eyedb">configuring</link> &eyedb;.
-      </para>
-
-      <para>
-	Installing requires having write permission in the specified directories.
-      </para>
-
-      <para>
-	Uninstalling can be done by running <command>make uninstall</command>. Note that this command will not remove created directories.
-      </para>
-
-    </section>
-
-    <section id="post-installation">
-      <title>Post-installation setup</title>
-
-      <para>
+	&eyedb; supports compiling in a separate build directory, which can be usefull if the source tree must be kept clean, is shared between several architecture or several compilation options (for instance debug and profile), is mounted read-only... To compile in a separate build directory, run &configure; with options --srcdir.
       </para>
 
     </section>
