@@ -149,6 +149,7 @@ topics/bugs/bigoql/Makefile dnl
 topics/bugs/quicktour/Makefile dnl
 topics/collections/basic/Makefile dnl
 topics/collections/general/Makefile dnl
+topics/collections/implementation/Makefile dnl
 topics/collections/literal/Makefile dnl
 topics/collections/set/Makefile dnl
 topics/dict/Makefile dnl

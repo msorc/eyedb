@@ -1,7 +1,7 @@
 #!/bin/sh
 
 db=collbasic
-dbdelete $db
-dbcreate $db
-odl -d $db -u schema.odl
+eyedb_dbdelete $db
+eyedb_dbcreate $db
+eyedbodl -d $db -u schema.odl
 
