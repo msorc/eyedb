@@ -2,10 +2,11 @@
                                    EyeDB examples README
 
 
-EyeDB examples are organized in 3 directories:
+EyeDB examples are organized in the following directories:
 - GettingStarted/ : self-contained simple example with a schema, C++ and Java code
 - C++Binding/ : examples using the EyeDB C++ API
 - JavaBinding/ : examples using the EyeDB Java API
+- JavaBinding/J2EE : example of a web application using the EyeDB Java API, JSP and servlets
 
 
 GettingStarted
@@ -124,3 +125,43 @@ generic/appli/schema      CLASSPATH=. eyedbjrun SchemaDump person_j
 ----------------------------------------------------------------
 schema-oriented/store     CLASSPATH=.:../share/person.jar eyedbjrun PersonTest person_j <prefix>
 ----------------------------------------------------------------
+
+
+
+J2EE application
+================
+
+This example shows a simple web application build using JSP and servlets, and the EyeDB Java API. The application allows to create, view, edit, delete objects in an EyeDB database. The database schema is simple, with 2 classes and a many-to-one relationship.
+
+The example can be run using either the Eclipse J2EE plugin, or directly using a Tomcat installation.
+
+Running with Eclipse
+--------------------
+
+To run the example with Eclipse, the J2EE Standard Tools (JST) plugin
+must be installed and configured. Refer to the Eclipse documentation
+(http://www.eclipse.org/webtools/jst/main.php) for more information on
+how to install this plugin and configure it with an application
+server.
+
+In order to allow Eclipse to run the eyedbodl tool, the Eclipse
+configuration must be updated to add a string substitution variable as
+follow:
+- go to Eclipse menu 'Preferences'
+- select Run/Debug->String substitution
+- click on "New" button
+- enter the following values:
+Name: EYEDB_INSTALLDIR
+Value: EyeDB toplevel installation directory (you can select it using the "Browse" button of the dialog
+Description: EyeDB installation directory (this is not mandatory, just for documentation purpose)
+- click on "Ok"
+
+Once this configuration step completed, you can open the Eclipse
+project located in subdirectory examples/JavaBinding/J2EE of the EyeDB
+source tree.
+
+
+
+Running with Tomcat
+-------------------
+
