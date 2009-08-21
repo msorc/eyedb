@@ -46,10 +46,26 @@ perform eyedbadmin dataspace add    $db DSP_3 alpha09 alpha10
 list_datafiles DSP_3
 
 
+perform eyedbadmin dataspace update $db DSP_1 alpha11 --migrate-orphan=DSP_1
+
+list_datafiles DSP_1
+list_datafiles DSP_3
+
+
 perform eyedbadmin dataspace update $db DSP_1 alpha11 --migrate-orphan=DSP_3
 
 list_datafiles DSP_1
 list_datafiles DSP_3
+
+perform eyedbadmin dataspace add    $db DSP_3 alpha09 alpha10
+list_datafiles DSP_3
+perform eyedbadmin dataspace add    $db DSP_3 alpha09 alpha10
+list_datafiles DSP_3
+perform eyedbadmin dataspace add    $db DSP_3 alpha09 alpha10
+list_datafiles DSP_3
+
+perform eyedbadmin dataspace create $db DSP_4 alpha12 alpha13 alpha13 alpha13 alpha12
+list_datafiles DSP_4
 
 
 
