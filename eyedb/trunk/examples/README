@@ -12,8 +12,7 @@ EyeDB examples are organized in the following directories:
 GettingStarted
 ==============
 
-This directory contains a simple schema and two simple programs 
-using the EyEDB C++ and Java APIs.
+This directory contains a simple schema and two simple programs using the EyEDB C++ and Java APIs.
 
 To run the C++ and Java examples in the GettingStarted/ directory:
 
@@ -29,10 +28,7 @@ NOTE: this must be done only once.
 4) run the 'PersonTest Java program using the eyedbjrun script:
 CLASSPATH=. eyedbjrun PersonTest person_g
 
-'eyedbjrun' is a script that calls the Java virtual machine and passes
-the right options (for instance to define the hostname and the TCP
-port used to connect to the EyEDB server). 'eyedbjrun' is located in
-the binaries installation directory.
+'eyedbjrun' is a script that calls the Java virtual machine and passes the right options (for instance to define the hostname and the TCP port used to connect to the EyEDB server). 'eyedbjrun' is located in the binaries installation directory.
 
 5) check the database using eyedboql:
 % eyedboql -d person_g
@@ -47,22 +43,19 @@ the binaries installation directory.
 C++Binding
 ==========
 
-This directory contains C++ programs that use the EyEDB C++ API.
-This API is described in EyeDB 'C++ Binding' manual.
+This directory contains C++ programs that use the EyEDB C++ API. This API is described in EyeDB 'C++ Binding' manual.
 
 To run the C++ examples in the C++Binding/ directory:
 
 1) compile them with 'make check'
 
-2) run the init.sh script located in C++Binding/schema-oriented/share
-with 'make init'
+2) run the init.sh script located in C++Binding/schema-oriented/share with 'make init'
 This script creates the database 'person_c' and insert a few objects.
 NOTE: this must be done only once.
 
 3) run the programs
 
-To run the examples, cd to the following directories and
-run the indicated commands:
+To run the examples, cd to the following directories and run the indicated commands:
 
 DIRECTORY               COMMANDS
 -------------------------------------------------------
@@ -90,22 +83,19 @@ schema-oriented/admin   ./admin
 JavaBinding
 ===========
 
-This directory contains Java programs that use the EyEDB Java API.
-This API is described in EyeDB 'Java Binding' manual.
+This directory contains Java programs that use the EyEDB Java API. This API is described in EyeDB 'Java Binding' manual.
 
 To run the Java examples in the JavaBinding/ directory:
 
 1) compile them with 'make check'
 
-2) run the init.sh script located in JavaBinding/schema-oriented/share
-with 'make init'
+2) run the init.sh script located in JavaBinding/schema-oriented/share with 'make init'
 This script creates the database 'person_j' and insert a few objects.
 NOTE: this must be done only once.
 
 3) run the programs
 
-To run the examples, cd to the following directories and
-run the indicated commands:
+To run the examples, cd to the following directories and run the indicated commands:
 
 DIRECTORY                   RUNNING EXAMPLES
 ----------------------------------------------------------------
@@ -138,28 +128,53 @@ The example can be run using either the Eclipse J2EE plugin, or directly using a
 Running with Eclipse
 --------------------
 
-To run the example with Eclipse, the J2EE Standard Tools (JST) plugin
-must be installed and configured. Refer to the Eclipse documentation
-(http://www.eclipse.org/webtools/jst/main.php) for more information on
-how to install this plugin and configure it with an application
-server.
+* Prerequisites
 
-In order to allow Eclipse to run the eyedbodl tool, the Eclipse
-configuration must be updated to add a string substitution variable as
-follow:
+To run the example with Eclipse, the J2EE Standard Tools (JST) plugin must be installed and configured. Refer to the Eclipse documentation (http://www.eclipse.org/webtools/jst/main.php) for more information on how to install this plugin and configure it with an application server.
+
+The example uses the JSP Standard Tag Library (JSTL). You must first download an implementation of the JSTL, for example Apache Jakarta implementation (http://jakarta.apache.org/taglibs/index.html).
+
+* Eclipse configuration
+
+In order to allow Eclipse to run the eyedbodl tool, the Eclipse configuration must be updated to add a string substitution variable as follow:
 - go to Eclipse menu 'Preferences'
 - select Run/Debug->String substitution
 - click on "New" button
 - enter the following values:
 Name: EYEDB_INSTALLDIR
-Value: EyeDB toplevel installation directory (you can select it using the "Browse" button of the dialog
+Value: EyeDB toplevel installation directory (you can select it using the "Browse" button of the dialog)
 Description: EyeDB installation directory (this is not mandatory, just for documentation purpose)
 - click on "Ok"
 
-Once this configuration step completed, you can open the Eclipse
-project located in subdirectory examples/JavaBinding/J2EE of the EyeDB
-source tree.
+Eclipse must also be configured to access the EyeDB Java binding jar, and the JSTL jars:
+- Edit the Project properties (right click on the 'EyeDB J2EE example' project and select 'Properties'),
+- Select tab J2EE Module Dependencies
+- Click on "Add External JARs…", select EyeDB Java binding JAR
+- Repeat previous step to add JSTL implementation JARs (for Jakarta implementation, this means 2 jars: jstl.jar and standard.jar)
+- Click on "Apply" then "OK"
 
+The added libraries can be seen in project Properties > Java Build Path > Libraries > Web App Libraries.
+
+* Starting EyeDB, creating the database
+
+Once Eclipse configured, EyeDB must be started and the database must be created (refer to 'EyeDB Getting Started' for more information):
+% eyedbctl start
+% eyedbadmin database create testj2ee
+% eyedbodl -u -d testj2ee schema.odl
+
+The name of the EyeDB database is defined in web application deployment descriptor and can be changed here if necessary.
+
+The ODL schema for the database is located in examples/JavaBinding/J2EE/schema.odl in the EyeDB source tree.
+
+* Running the application
+
+Once this configuration step completed, you can open the Eclipse project named 'EyeDB J2EE example' located in subdirectory examples/JavaBinding/J2EE of the EyeDB source tree.
+
+To run the application:
+- start the server: click on tab "Servers", right click on the appropriate server and select "Start"
+- open the application menu: in the project, right click on "menu.jsp" under WebContent, select "Run As"->"Run on Server"
+
+A simple web page with 4 items ("List all persons", "Create a person", "List all cars" and "Create a car") should be displayed.
 
 
 Running with Tomcat

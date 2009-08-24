@@ -4,6 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.eclipse.jst.server.tomcat.runtimeTarget/Apache Tomcat v5.5"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
-	<classpathentry kind="var" path="EYEDB_BUILDDIR/src/java/eyedb.jar"/>
+	<classpathentry kind="lib" path="/home/francois/projects/eyedb/build/src/java/eyedb.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
