@@ -16,7 +16,15 @@
   
   
   
-  <wb-module deploy-name="EyeDB J2EE examples">
+  
+  
+  
+  
+  <wb-module deploy-name="EyeDB J2EE example">
+    
+    
+    
+    
     
     
     
@@ -50,6 +58,10 @@
     
     
     
+    
+    
+    
+    
     <wb-resource source-path="/src" deploy-path="/WEB-INF/classes"/>
     
     
@@ -63,34 +75,11 @@
     
     
     
-    <dependent-module deploy-path="/WEB-INF/lib" handle="module:/classpath/var/EYEDB_BUILDDIR/src/java/eyedb.jar">
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      <dependency-type>uses</dependency-type>
-      
-      
-      
-      
-      
     
     
     
     
-    
-    </dependent-module>
-    
-    
-    
-    
-    <dependent-module deploy-path="/WEB-INF/lib" handle="module:/classpath/var/JAKARTA_TAGLIBS_STANDARD_HOME/lib/jstl.jar">
+    <dependent-module deploy-path="/WEB-INF/lib" handle="module:/classpath/lib//home/francois/softs/src/jakarta-taglibs-standard-1.1.2/lib/jstl.jar">
       
       
       <dependency-type>uses</dependency-type>
@@ -99,13 +88,26 @@
     </dependent-module>
     
     
-    <dependent-module deploy-path="/WEB-INF/lib" handle="module:/classpath/var/JAKARTA_TAGLIBS_STANDARD_HOME/lib/standard.jar">
+    <dependent-module deploy-path="/WEB-INF/lib" handle="module:/classpath/lib//home/francois/softs/src/jakarta-taglibs-standard-1.1.2/lib/standard.jar">
       
       
       <dependency-type>uses</dependency-type>
       
     
     </dependent-module>
+    
+    
+    <dependent-module deploy-path="/WEB-INF/lib" handle="module:/classpath/lib//home/francois/projects/eyedb/build/src/java/eyedb.jar">
+      
+      
+      <dependency-type>uses</dependency-type>
+      
+    
+    </dependent-module>
+    
+    
+    
+    
     
     
     
@@ -123,6 +125,10 @@
     
     
     <property name="java-output-path" value="build/classes"/>
+    
+    
+    
+    
     <property name="context-root" value="eyedb"/>
     
     
@@ -132,6 +138,10 @@
     
     
     
+    
+    
+  
+  
   
   
   
@@ -149,6 +159,10 @@
   
   
   
+  
+  
+
+
 
 
 
