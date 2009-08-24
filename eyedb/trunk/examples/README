@@ -180,3 +180,7 @@ A simple web page with 4 items ("List all persons", "Create a person", "List all
 Running with Tomcat
 -------------------
 
+To run the application with Tomcat, a WAR file must first be build. The simplest way to build this WAR file is to use Eclipse and to export the 'EyeDB J2EE Example' project as a WAR file. To do this, right click on the project, select Export->WAR file, choose the file name (which will be also the name of the web application) and click on "Finish".
+
+To deploy the WAR file, start Tomcat, use Tomcat manager to deploy the generated WAR file. Once deployed, the application will appear in Tomcat web applications list. Clicking on the application path will direct to the application menu.jsp page.
+
