@@ -829,7 +829,6 @@ int IDXSimulateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &a
 //
 // IDXMoveCmd
 //
-//  # index move: ajouter une option --collapse + une info dans le protocole
 //  eyedbadmin index move <dbname> <index name> <dest dataspace>
 void IDXMoveCmd::init()
 {
