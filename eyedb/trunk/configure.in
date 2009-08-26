@@ -699,6 +699,7 @@ tests/examples/C++Binding/schema-oriented/share/Makefile dnl
 tests/examples/C++Binding/schema-oriented/store/Makefile dnl
 tests/eyedb/Makefile dnl
 tests/eyedb/admin/Makefile dnl
+tests/eyedb/admin/collection/Makefile dnl
 tests/eyedb/admin/database/Makefile dnl
 tests/eyedb/admin/datafile/Makefile dnl
 tests/eyedb/admin/dataspace/Makefile dnl
