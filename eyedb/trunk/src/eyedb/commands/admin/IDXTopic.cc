@@ -38,31 +38,6 @@
 using namespace eyedb;
 using namespace std;
 
-IDXTopic::IDXTopic() : Topic("index")
-{
-  addAlias("idx");
-
-  addCommand(new IDXCreateCmd(this));
-  addCommand(new IDXDeleteCmd(this));
-  addCommand(new IDXUpdateCmd(this));
-  addCommand(new IDXListCmd(this));
-  addCommand(new IDXStatsCmd(this));
-  addCommand(new IDXSimulateCmd(this));
-  addCommand(new IDXMoveCmd(this));
-  addCommand(new IDXSetdefdspCmd(this));
-  addCommand(new IDXGetdefdspCmd(this));
-  addCommand(new IDXGetlocaCmd(this));
-
-}
-
-static const std::string PROPAGATE_OPT("propagate");
-static const std::string TYPE_OPT("type");
-static const std::string FULL_OPT("full");
-static const std::string FORMAT_OPT("format");
-static const std::string COLLAPSE_OPT("collapse");
-static const std::string LOCA_OPT("loca");
-
-
 //
 // Helper functions
 //
@@ -170,6 +145,36 @@ indexGetAll(Database *db, LinkedList &indexlist, bool all)
   
   return 0;
 }
+
+
+//
+// Topic definition
+//
+
+IDXTopic::IDXTopic() : Topic("index")
+{
+  addAlias("idx");
+
+  addCommand(new IDXCreateCmd(this));
+  addCommand(new IDXDeleteCmd(this));
+  addCommand(new IDXUpdateCmd(this));
+  addCommand(new IDXListCmd(this));
+  addCommand(new IDXStatsCmd(this));
+  addCommand(new IDXSimulateCmd(this));
+  addCommand(new IDXMoveCmd(this));
+  addCommand(new IDXSetdefdspCmd(this));
+  addCommand(new IDXGetdefdspCmd(this));
+  addCommand(new IDXGetlocaCmd(this));
+
+}
+
+static const std::string PROPAGATE_OPT("propagate");
+static const std::string TYPE_OPT("type");
+static const std::string FULL_OPT("full");
+static const std::string FORMAT_OPT("format");
+static const std::string COLLAPSE_OPT("collapse");
+static const std::string LOCA_OPT("loca");
+
 
 // 
 // IDXCreateCmd
@@ -892,13 +897,6 @@ get_op(const char *s, int &offset)
   offset = 0;
   return "=";
 }
-
-#define CHECK(S) \
-  if (S) { \
-   print_prog(); \
-   (S)->print(); \
-   return 1; \
-   }
 
 static int
 get_idxs(Database *db, const char *attrpath, ObjectArray &obj_arr)
