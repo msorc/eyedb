@@ -18,12 +18,12 @@ eyedbadmin collection update DATABASE COLLECTION hash|btree [HINTS]   [DONE]
 eyedbadmin collection simulate [--full] [--format=FORMAT] DATABASE COLLECTION hash|btree [HINTS]   [DONE]
 eyedbadmin collection list DATABASE COLLECTION...   [DONE]
 eyedbadmin collection stats [--full] [--format=FORMAT] DATABASE COLLECTION...   [DONE]
-eyedbadmin collection getdefdsp DATABASE COLLECTION
-eyedbadmin collection setdefdsp DATABASE COLLECTION DATASPACE
-eyedbadmin collection setdefimpl DATABASE ATTRIBUTE_PATH hash|btree [HINTS] [propagate=on|off]
-eyedbadmin collection getdefimpl DATABASE [CLASSNAME|ATTRIBUTE_PATH]...
-eyedbadmin collection getloca [--stats] [--loca] DATABASE COLLECTION 
-(replaces eyedbloca getcollloca <dbname> --stats|--loca|--all <name>|<oid>)
+eyedbadmin collection getdefdsp DATABASE COLLECTION   [DONE]
+eyedbadmin collection setdefdsp DATABASE COLLECTION DATASPACE   [DONE]
+eyedbadmin collection getdefimpl DATABASE [CLASSNAME|ATTRIBUTE_PATH]...   [DONE]
+eyedbadmin collection setdefimpl DATABASE ATTRIBUTE_PATH hash|btree [HINTS] [propagate=on|off]   [DONE]
+eyedbadmin collection getloca [--stats] [--loca] DATABASE COLLECTION   [NOT IMPLEMENTED in eyedbloca]
+(replaces eyedbloca getcollloca <dbname> --stats|--loca|--all <name>|<oid>)   [NOT IMPLEMENTED in eyedbloca]
 eyedbadmin collection setloca ???
 
 Others:
