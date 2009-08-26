@@ -14,10 +14,10 @@ eyedbadmin TODO list:
 
 
 - implement 'eyedbadmin collection *': 
-eyedbadmin collection update DATABASE COLLECTION hash|btree [HINTS]
-eyedbadmin collection simulate [--full] [--format=FORMAT] DATABASE COLLECTION hash|btree [HINTS]
-eyedbadmin collection list DATABASE COLLECTION...
-eyedbadmin collection stats [--full] [--format=FORMAT] DATABASE COLLECTION...
+eyedbadmin collection update DATABASE COLLECTION hash|btree [HINTS]   [DONE]
+eyedbadmin collection simulate [--full] [--format=FORMAT] DATABASE COLLECTION hash|btree [HINTS]   [DONE]
+eyedbadmin collection list DATABASE COLLECTION...   [DONE]
+eyedbadmin collection stats [--full] [--format=FORMAT] DATABASE COLLECTION...   [DONE]
 eyedbadmin collection getdefdsp DATABASE COLLECTION
 eyedbadmin collection setdefdsp DATABASE COLLECTION DATASPACE
 eyedbadmin collection setdefimpl DATABASE ATTRIBUTE_PATH hash|btree [HINTS] [propagate=on|off]
