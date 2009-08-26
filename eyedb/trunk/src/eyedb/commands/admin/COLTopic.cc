@@ -50,6 +50,8 @@ static const Class *cls;
 // Helper functions and macros
 //
 
+static const char *get_op(const char *s, int &offset);
+
 static int
 get_collimpl(const char *attrpath, CollAttrImpl *&collimpl)
 {
@@ -167,6 +169,100 @@ collection_trace(Collection *coll)
 }
 
 
+static int
+get_colls(const char *name, ObjectArray &obj_arr)
+{
+  Oid oid(name);
+  if (oid.isValid()) {
+    Object *o;
+    Status s = db->loadObject(oid, o);
+
+    if (!o->asCollection()) {
+      fprintf(stderr, "%s is not a collection\n", oid.toString());
+      return 1;
+    }
+    Object **xo = new Object *[1];
+    xo[0] = o;
+    obj_arr.set(xo, 1);
+    return 0;
+  }
+
+  int offset;
+  const char *op = get_op(name, offset);
+  OQL q(db, "select collection.name %s \"%s\"", op, &name[offset]);
+  Status s = q.execute(obj_arr);
+
+  if (!obj_arr.getCount()) {
+    fprintf(stderr, "no collection %s found\n", name);
+    return 1;
+  }
+
+  return 0;
+}
+
+static void
+print(const Dataspace *dataspace, Bool def = False)
+{
+  if (!dataspace) {
+    Status s = db->getDefaultDataspace(dataspace);
+    if (s) {
+      s->print();
+      return;
+    }
+    //    printf("Default ");
+    print(dataspace, True);
+    return;
+  }
+  printf("  Dataspace #%d", dataspace->getId());
+  if (def) printf(" (default)");
+  printf("\n");
+  printf("   Name %s\n", dataspace->getName());
+  unsigned int datafile_cnt;
+  const Datafile **datafiles = dataspace->getDatafiles(datafile_cnt);
+  printf("   Composed of {\n", datafile_cnt);
+  for (int i = 0; i < datafile_cnt; i++) {
+    printf("     Datafile #%d\n", datafiles[i]->getId());
+    if (*datafiles[i]->getName())
+      printf("       Name %s\n", datafiles[i]->getName());
+    printf("       File %s\n", datafiles[i]->getFile());
+  }
+  printf("   }\n");
+}
+
+const char *
+get_op(const char *s, int &offset)
+{
+  if (s[0] == '~')
+    {
+      if (s[1] == '~')
+	{
+	  offset = 2;
+	  return "~~";
+	}
+
+      offset = 1;
+      return "~";
+    }
+
+  if (s[0] == '!')
+    {
+      if (s[1] == '~')
+	{
+	  if (s[2] == '~')
+	    {
+	      offset = 3;
+	      return "!~~";
+	    }
+
+	  offset = 2;
+	  return "!~";
+	}
+    }
+
+  offset = 0;
+  return "=";
+}
+
 //
 // Topic definition
 //
@@ -189,6 +285,7 @@ COLTopic::COLTopic() : Topic("collection")
 
 static const std::string FULL_OPT("full");
 static const std::string FORMAT_OPT("format");
+static const std::string PROPAGATE_OPT("propagate");
 static const std::string TYPE_OPT("type");
 
 //eyedbadmin collection update DATABASE COLLECTION hash|btree [HINTS]
@@ -635,7 +732,7 @@ void COLGetDefDSPCmd::init()
 int COLGetDefDSPCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " DBNAME ...\n";
+  std::cerr << " DBNAME COLLECTION\n";
   return 1;
 }
 
@@ -643,6 +740,7 @@ int COLGetDefDSPCmd::help()
 {
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
+  getopt->displayOpt("COLLECTION", "Collection (can be a collection name, a collection oid or an OQL query)");
   return 1;
 }
 
@@ -660,6 +758,7 @@ int COLGetDefDSPCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
     return usage();
 
   const char *dbName = argv[0].c_str();
+  const char *collection = argv[1].c_str();
 
   conn.open();
 
@@ -669,7 +768,21 @@ int COLGetDefDSPCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
   
   db->transactionBeginExclusive();
 
-  // stuff here...
+  ObjectArray obj_arr;
+  if (get_colls(collection, obj_arr)) 
+    return 1;
+
+  for (int i = 0; i < obj_arr.getCount(); i++) {
+    Collection *coll = (Collection *)obj_arr[i];
+    const Dataspace *dataspace;
+    Status s = coll->getDefaultDataspace(dataspace);
+
+    if (i) printf("\n");
+    printf("Default dataspace for collection ");
+    if (*coll->getName()) printf("'%s' ", coll->getName());
+    printf("{%s}\n", coll->getOid().toString());
+    print(dataspace);
+  }
 
   db->transactionCommit();
 
@@ -690,7 +803,7 @@ void COLSetDefDSPCmd::init()
 int COLSetDefDSPCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " DBNAME ...\n";
+  std::cerr << " DBNAME COLLECTION DSPNAME\n";
   return 1;
 }
 
@@ -698,6 +811,8 @@ int COLSetDefDSPCmd::help()
 {
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
+  getopt->displayOpt("COLLECTION", "Collection (can be a collection name, a collection oid or an OQL query)");
+  getopt->displayOpt("DSPNAME", "Dataspace name");
   return 1;
 }
 
@@ -715,6 +830,8 @@ int COLSetDefDSPCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
     return usage();
 
   const char *dbName = argv[0].c_str();
+  const char *collection = argv[1].c_str();
+  const char *dspName = argv[2].c_str();
 
   conn.open();
 
@@ -724,62 +841,16 @@ int COLSetDefDSPCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
   
   db->transactionBeginExclusive();
 
-  // stuff here...
+  const Dataspace *dataspace;
+  Status s = db->getDataspace(dspName, dataspace);
 
-  db->transactionCommit();
+  ObjectArray obj_arr;
+  if (get_colls(collection, obj_arr)) return 1;
 
-  return 0;
-}
-
-//eyedbadmin collection setdefimpl DATABASE ATTRIBUTE_PATH hash|btree [HINTS] [propagate=on|off]
-// 
-// COLSetDefImplCmd
-//
-void COLSetDefImplCmd::init()
-{
-  std::vector<Option> opts;
-  opts.push_back(HELP_OPT);
-  getopt = new GetOpt(getExtName(), opts);
-}
-
-int COLSetDefImplCmd::usage()
-{
-  getopt->usage("", "");
-  std::cerr << " DBNAME ...\n";
-  return 1;
-}
-
-int COLSetDefImplCmd::help()
-{
-  stdhelp();
-  getopt->displayOpt("DBNAME", "Database name");
-  return 1;
-}
-
-int COLSetDefImplCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
-{
-  if (! getopt->parse(PROGNAME, argv))
-    return usage();
-
-  GetOpt::Map &map = getopt->getMap();
-
-  if (map.find("help") != map.end())
-    return help();
-
-  if (argv.size() < 2)
-    return usage();
-
-  const char *dbName = argv[0].c_str();
-
-  conn.open();
-
-  Database *db = new Database(dbName);
-
-  db->open(&conn, Database::DBRW);
-  
-  db->transactionBeginExclusive();
-
-  // stuff here...
+  for (int i = 0; i < obj_arr.getCount(); i++) {
+    Collection *coll = (Collection *)obj_arr[i];
+    Status s = coll->setDefaultDataspace(dataspace);
+  }
 
   db->transactionCommit();
 
@@ -800,7 +871,7 @@ void COLGetDefImplCmd::init()
 int COLGetDefImplCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " DBNAME ...\n";
+  std::cerr << " DBNAME ATTRPATH...\n";
   return 1;
 }
 
@@ -808,6 +879,7 @@ int COLGetDefImplCmd::help()
 {
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
+  getopt->displayOpt("ATTRPATH", "Attribute path");
   return 1;
 }
 
@@ -828,13 +900,167 @@ int COLGetDefImplCmd::perform(eyedb::Connection &conn, std::vector<std::string> 
 
   conn.open();
 
-  Database *db = new Database(dbName);
+  db = new Database(dbName);
 
   db->open(&conn, Database::DBRW);
   
   db->transactionBeginExclusive();
 
-  // stuff here...
+  int nn = 0;
+  for (int n = 1; n < argv.size(); n++) {
+    const char *info = argv[n].c_str();
+    LinkedList list;
+    if (get_collimpls(info, list))
+      return 1;
+
+    if (list.getCount()) {
+      LinkedListCursor c(list);
+      CollAttrImpl *collattrimpl;
+      
+      for (; c.getNext((void *&)collattrimpl); nn++) {
+	if (nn) fprintf(stdout, "\n");
+	fprintf(stdout, "Default implementation on %s:\n",
+		collattrimpl->getAttrpath().c_str());
+	const CollImpl *collimpl = 0;
+	Status s = collattrimpl->getImplementation(db, collimpl);
+
+	if (collimpl->getIndexImpl()) {
+	  fprintf(stdout, collimpl->getIndexImpl()->toString("  ").c_str());
+	}
+      }
+    }
+    else if (strchr(info, '.')) {
+      fprintf(stdout, "Default implementation on %s:\n", info);
+      fprintf(stdout, "  System default\n");
+    }
+  }
+
+  db->transactionCommit();
+
+  return 0;
+}
+
+//eyedbadmin collection setdefimpl DATABASE ATTRIBUTE_PATH hash|btree [HINTS] [propagate=on|off]
+// 
+// COLSetDefImplCmd
+//
+void COLSetDefImplCmd::init()
+{
+  std::vector<Option> opts;
+
+  opts.push_back(HELP_OPT);
+
+  std::vector<std::string> propagate_choices;
+  const std::string ON("on");
+  const std::string OFF("off");
+  propagate_choices.push_back(ON);
+  propagate_choices.push_back(OFF);
+  opts.push_back(Option(PROPAGATE_OPT, 
+			OptionChoiceType("on_off",propagate_choices,ON),
+			Option::MandatoryValue,
+			OptionDesc("Propagation type", "on|off")));
+
+  opts.push_back(Option(TYPE_OPT, 
+			OptionStringType(),
+			Option::MandatoryValue,
+			OptionDesc("Collection type (supported types are: hash, btree)", "TYPE")));
+
+  getopt = new GetOpt(getExtName(), opts);
+}
+
+int COLSetDefImplCmd::usage()
+{
+  getopt->usage("", "");
+  std::cerr << " DBNAME ATTRPATH [HINTS]\n";
+  return 1;
+}
+
+int COLSetDefImplCmd::help()
+{
+  stdhelp();
+  getopt->displayOpt("DBNAME", "Database name");
+  getopt->displayOpt("ATTRPATH", "Attribute path");
+  getopt->displayOpt("HINTS", "Collection hints");
+  return 1;
+}
+
+int COLSetDefImplCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+{
+  if (! getopt->parse(PROGNAME, argv))
+    return usage();
+
+  GetOpt::Map &map = getopt->getMap();
+
+  if (map.find("help") != map.end())
+    return help();
+
+  if (argv.size() < 2)
+    return usage();
+
+  const char *dbName = argv[0].c_str();
+  const char *attrpath = argv[1].c_str();
+
+  const char *hints = "";
+  if (argv.size() > 2)
+    hints = argv[2].c_str();
+
+  IndexImpl::Type type;
+  if (map.find(TYPE_OPT) != map.end()) {
+    const char *typeOption = map[TYPE_OPT].value.c_str();
+
+    if (!strcmp(typeOption, "hash"))
+      type = IndexImpl::Hash;
+    else if (!strcmp(typeOption, "btree"))
+      type = IndexImpl::BTree;
+    else
+      return help();
+  }
+
+  Bool propag = eyedb::True;
+    
+  if (map.find(PROPAGATE_OPT) != map.end()) {
+    if( !strcmp(map[PROPAGATE_OPT].value.c_str(), "on"))
+      propag = eyedb::True;
+    else if( !strcmp(map[PROPAGATE_OPT].value.c_str(), "off"))
+      propag = eyedb::False;
+    else
+      return help();
+  }
+
+  conn.open();
+
+  db = new Database(dbName);
+
+  db->open(&conn, Database::DBRW);
+  
+  db->transactionBegin();
+
+  Status s;
+  const Attribute *attr;
+  const Class *cls;
+  s = Attribute::checkAttrPath(db->getSchema(), cls, attr, attrpath);
+
+  IndexImpl *idximpl;
+  s = IndexImpl::make(db, type, hints, idximpl);
+
+  CollAttrImpl *collimpl;
+  if (get_collimpl(attrpath, collimpl))
+    return 1;
+
+  if (collimpl) {
+    s = collimpl->remove();
+  }
+
+  unsigned int impl_hints_cnt;
+  const int *impl_hints = idximpl->getImplHints(impl_hints_cnt);
+  collimpl = new CollAttrImpl(db, const_cast<Class *>(cls), attrpath, propag, idximpl->getDataspace(),
+			      (CollAttrImpl::Type)idximpl->getType(),
+			      idximpl->getType() == IndexImpl::Hash ?
+			      idximpl->getKeycount() : idximpl->getDegree(),
+			      idximpl->getHashMethod(),
+			      impl_hints, impl_hints_cnt);
+    
+  s = collimpl->store();
 
   db->transactionCommit();
 
