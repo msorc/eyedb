@@ -4014,7 +4014,7 @@ namespace eyedb {
     printf("idximpl->getType() %d %d\n", idximpl->getType(), IndexImpl::BTree);
     */
 
-    if (impl_type == CollAttrImpl::BTreeIndex) {
+    if (impl_type == CollImpl::BTreeIndex) {
       eyedbsm::BIdx::KeyType ktypes;
 
       ktypes.type   = eyedbsm::Idx::tUnsignedChar;
@@ -4025,7 +4025,7 @@ namespace eyedb {
 			       idximpl->getDegree());
       idx1->asBIdx()->open();
     }
-    else if (impl_type == CollAttrImpl::HashIndex) {
+    else if (impl_type == CollImpl::HashIndex) {
       eyedbsm::Idx::KeyType ktype;
       if (coll_hidx_oid) {
 	ktype.type = eyedbsm::Idx::tOid;
@@ -4043,7 +4043,7 @@ namespace eyedb {
 			       impl_hints, impl_hints_cnt);
       idx1->asHIdx()->open();
     }
-    else if (impl_type == CollAttrImpl::NoIndex) {
+    else if (impl_type == CollImpl::NoIndex) {
       return rpcStatusMake(IDB_ERROR, "collection: noindex implementation is not yet supported");
     }
     else {
@@ -5568,7 +5568,7 @@ namespace eyedb {
 	int32_decode(idr, &offset, &mag_order);
       */
     
-      CollImpl *collimpl = new CollImpl((CollAttrImpl::Type)impl_type, idximpl);
+      CollImpl *collimpl = new CollImpl((CollImpl::Type)impl_type, idximpl);
       rpc_status = IDB_collClassCreate(dbh, idr, oid, name, collimpl);
     
       collimpl->release();

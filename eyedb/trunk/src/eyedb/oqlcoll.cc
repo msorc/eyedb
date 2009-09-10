@@ -370,7 +370,7 @@ namespace eyedb {
     Bool isref = coll_spec->isref;
 
     IndexImpl *idximpl = 0;
-    CollAttrImpl::Type impl_type = CollAttrImpl::NoIndex;
+    CollImpl::Type impl_type = CollImpl::NoIndex;
     if (coll_spec->impl_hints) {
       Status status = IndexImpl::make(db, coll_spec->ishash ?
 				      IndexImpl::Hash :
@@ -378,7 +378,7 @@ namespace eyedb {
 				      coll_spec->impl_hints, idximpl);
       if (status) return new oqmlStatus(this, status);
       if (idximpl) {
-	impl_type = (CollAttrImpl::Type)idximpl->getType();
+	impl_type = (CollImpl::Type)idximpl->getType();
       }
     }
 

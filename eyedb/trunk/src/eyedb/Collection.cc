@@ -64,7 +64,7 @@ namespace eyedb {
 
   //#define COLLTRACE
 
-  static int COLLIMPL_DEFAULT = (int)CollAttrImpl::HashIndex;
+  static int COLLIMPL_DEFAULT = (int)CollImpl::HashIndex;
 
   const Size Collection::defaultSize = (Size)-1;
 
@@ -85,15 +85,15 @@ namespace eyedb {
   {
     static CollImpl *defCollImpl_noindex;
     static CollImpl *defCollImpl_hashindex;
-    if (impl_type == CollAttrImpl::NoIndex) {
+    if (impl_type == CollImpl::NoIndex) {
       if (!defCollImpl_noindex) {
-	defCollImpl_noindex = new CollImpl(CollAttrImpl::NoIndex);
+	defCollImpl_noindex = new CollImpl(CollImpl::NoIndex);
       }
       return defCollImpl_noindex;
     }
 
     if (!defCollImpl_hashindex) {
-      defCollImpl_hashindex = new CollImpl(CollAttrImpl::HashIndex, getDefaultIndexImpl());
+      defCollImpl_hashindex = new CollImpl(getDefaultIndexImpl());
     }
     return defCollImpl_hashindex;
   }
@@ -2171,13 +2171,13 @@ namespace eyedb {
 	if (isLiteral())
 	  fprintf(fd, "%sliteral_oid = %s;\n", indent_str, getOidC().toString());
 
-	if (collimpl->getType() == CollAttrImpl::NoIndex) {
+	if (collimpl->getType() == CollImpl::NoIndex) {
 	  fprintf(fd, "%sidxtype = 'noindex';\n", indent_str);
 	}
-	else if (collimpl->getType() == CollAttrImpl::HashIndex) {
+	else if (collimpl->getType() == CollImpl::HashIndex) {
 	  fprintf(fd, "%sidxtype = 'hasindex';\n", indent_str);
 	}
-	else if (collimpl->getType() == CollAttrImpl::BTreeIndex) {
+	else if (collimpl->getType() == CollImpl::BTreeIndex) {
 	  fprintf(fd, "%sidxtype = 'btreeindex';\n", indent_str);
 	}
 
@@ -2949,7 +2949,12 @@ namespace eyedb {
       Status s = IndexImpl::decode(db, temp, offset, idximpl, &impl_type);
       if (s) return s;
 
-      collimpl = new CollImpl((CollAttrImpl::Type)impl_type, idximpl);
+      if (idximpl) {
+	collimpl = new CollImpl(idximpl);
+      }
+      else {
+	collimpl = new CollImpl((CollImpl::Type)impl_type);
+      }
 
       oid_decode (temp, &offset, idx1_oid.getOid());
       oid_decode (temp, &offset, idx2_oid.getOid());
@@ -3057,7 +3062,12 @@ namespace eyedb {
       if (collimpl->getIndexImpl()) {
 	idximpl->setHashMethod(collimpl->getIndexImpl()->getHashMethod());
       }
-      _collimpl = new CollImpl(collimpl->getType(), idximpl);
+      if (idximpl) {
+	_collimpl = new CollImpl(idximpl);
+      }
+      else {
+	_collimpl = new CollImpl(collimpl->getType());
+      }
     }
 
     return Success;
@@ -3473,12 +3483,10 @@ namespace eyedb {
 
   CollImpl *CollImpl::clone() const
   {
-    IndexImpl *_idximpl = 0;
-
     if (idximpl) {
-      _idximpl = idximpl->clone();
+      return new CollImpl(idximpl->clone());
     }
 
-    return new CollImpl(impl_type, _idximpl);
+    return new CollImpl(impl_type);
   }
 }

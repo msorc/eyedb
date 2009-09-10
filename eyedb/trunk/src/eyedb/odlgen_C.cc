@@ -2249,9 +2249,14 @@ do { \
 		ATTRNAME_1(name, (ordered ? GenCodeHints::tSetItemInColl : GenCodeHints::tAddItemToColl), hints), where);
 
 	dimArgsGen(fdh, ndims);
+	fprintf(fdh, "%sconst char *%s, const eyedb::CollImpl * = 0);\n",
+		comma,
+		(!*where ? ", eyedb::Bool noDup = eyedb::False" : ""));
+	/*
 	fprintf(fdh, "%sconst char *%s, const eyedb::IndexImpl * = 0);\n",
 		comma,
 		(!*where ? ", eyedb::Bool noDup = eyedb::False" : ""));
+	*/
 	if (ordered)
 	  fprintf(fdh, "%seyedb::Status %s(", ctxH->get(),
 		  ATTRNAME(name, tUnsetItemInColl, hints));
@@ -2832,10 +2837,10 @@ do { \
 		ctx->get(), collimpl->getAttrpath().c_str(),
 		IDBBOOL_STR(collimpl->getPropagate()),
 		(collimpl->getImplType() == IndexImpl::Hash ?
-		 "eyedb::CollAttrImpl::HashIndex" :
-		 (collimpl->getImplType() == CollAttrImpl::NoIndex ?
-		  "eyedb::CollAttrImpl::NoIndex" :
-		  "eyedb::CollAttrImpl::BTreeIndex")),
+		 "eyedb::CollImpl::HashIndex" :
+		 (collimpl->getImplType() == CollImpl::NoIndex ?
+		  "eyedb::CollImpl::NoIndex" :
+		  "eyedb::CollImpl::BTreeIndex")),
 		collimpl->getKeyCountOrDegree());
       
 	if (collimpl->getHashMethod())

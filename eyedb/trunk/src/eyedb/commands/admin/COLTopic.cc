@@ -372,7 +372,7 @@ int COLUpdateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   LinkedListCursor c(list);
   Collection *coll;
   while (c.getNext((void *&)coll)) {
-    coll->setImplementation(new CollImpl(CollAttrImpl::Unknown, idximpl)); // 0: must be correct implementation 2009-03-31
+    coll->setImplementation(new CollImpl(idximpl)); // 0: must be correct implementation 2009-03-31
     s = coll->store();
   }
     
@@ -479,7 +479,7 @@ int COLSimulateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &a
 
   LinkedListCursor c(list);
   Collection *coll;
-  CollImpl *collimpl = new CollImpl((CollAttrImpl::Type)idximpl->getType(), idximpl);
+  CollImpl *collimpl = new CollImpl((CollImpl::Type)idximpl->getType(), idximpl);
 
   int nn = 0;
   for (; c.getNext((void *&)coll); nn++) {
@@ -1054,7 +1054,7 @@ int COLSetDefImplCmd::perform(eyedb::Connection &conn, std::vector<std::string> 
   unsigned int impl_hints_cnt;
   const int *impl_hints = idximpl->getImplHints(impl_hints_cnt);
   collimpl = new CollAttrImpl(db, const_cast<Class *>(cls), attrpath, propag, idximpl->getDataspace(),
-			      (CollAttrImpl::Type)idximpl->getType(),
+			      (CollImpl::Type)idximpl->getType(),
 			      idximpl->getType() == IndexImpl::Hash ?
 			      idximpl->getKeycount() : idximpl->getDegree(),
 			      idximpl->getHashMethod(),

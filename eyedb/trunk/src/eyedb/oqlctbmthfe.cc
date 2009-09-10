@@ -2005,7 +2005,7 @@ __method__OUT_void_setLiteralObject_collection(eyedb::Database *_db, eyedb::FEMe
     if (collimpl->getIndexImpl()) {
       retarg = strdup(collimpl->getIndexImpl()->toString().c_str());
     }
-    else if (collimpl->getType() == CollAttrImpl::NoIndex) {
+    else if (collimpl->getType() == CollImpl::NoIndex) {
       retarg = strdup("noindex");
     }
     else {
@@ -2029,7 +2029,7 @@ __method__OUT_void_setLiteralObject_collection(eyedb::Database *_db, eyedb::FEMe
     if (s) return s;
 
     std::string stats;
-    CollImpl *collimpl = new CollImpl((CollAttrImpl::Type)idxtype, idximpl);
+    CollImpl *collimpl = new CollImpl((CollImpl::Type)idxtype, idximpl);
     s = coll->simulate(*collimpl, stats, True, full);
     if (s) return s;
     collimpl->release();
@@ -2049,12 +2049,12 @@ __method__OUT_void_setLiteralObject_collection(eyedb::Database *_db, eyedb::FEMe
     Collection *coll = (Collection *)_o;
 
     IndexImpl *idximpl = 0;
-    if (idxtype == CollAttrImpl::HashIndex || idxtype == CollAttrImpl::BTreeIndex) {
+    if (idxtype == CollImpl::HashIndex || idxtype == CollImpl::BTreeIndex) {
       s = getIndexImpl(_db, idxtype, hints, idximpl);
       if (s) return s;
     }
       
-    CollImpl *collimpl = new CollImpl((CollAttrImpl::Type)idxtype, idximpl);
+    CollImpl *collimpl = new CollImpl((CollImpl::Type)idxtype, idximpl);
     coll->setImplementation(collimpl);
 
     if (idximpl) {
