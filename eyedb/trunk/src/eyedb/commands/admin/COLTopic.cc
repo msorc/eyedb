@@ -38,8 +38,9 @@
 using namespace eyedb;
 using namespace std;
 
-
+//
 // Global variables...
+//
 
 static Connection *conn;
 static Database *db;
@@ -271,10 +272,10 @@ COLTopic::COLTopic() : Topic("collection")
 {
   addAlias("coll");
 
-  addCommand( new COLUpdateCmd(this));
-  addCommand( new COLSimulateCmd(this));
-  addCommand( new COLListCmd(this));
-  addCommand( new COLStatsCmd(this));
+  addCommand( new COLUpdateimplCmd(this));
+  addCommand( new COLSimulimplCmd(this));
+  addCommand( new COLGetimplCmd(this));
+  addCommand( new COLStatsimplCmd(this));
   addCommand( new COLGetDefDSPCmd(this));
   addCommand( new COLSetDefDSPCmd(this));
   addCommand( new COLSetDefImplCmd(this));
@@ -288,11 +289,11 @@ static const std::string FORMAT_OPT("format");
 static const std::string PROPAGATE_OPT("propagate");
 static const std::string TYPE_OPT("type");
 
-//eyedbadmin collection update DATABASE COLLECTION hash|btree [HINTS]
+//eyedbadmin collection updateimpl DATABASE COLLECTION hashindex|btreeindex [HINTS]
 // 
-// COLUpdateCmd
+// COLUpdateimplCmd
 //
-void COLUpdateCmd::init()
+void COLUpdateimplCmd::init()
 {
   std::vector<Option> opts;
 
@@ -301,19 +302,19 @@ void COLUpdateCmd::init()
   opts.push_back(Option(TYPE_OPT, 
 			OptionStringType(),
 			Option::MandatoryValue,
-			OptionDesc("Collection type (supported types are: hash, btree)", "TYPE")));
+			OptionDesc("Collection type (supported types are: hashindex, btreeindex)", "TYPE")));
 
   getopt = new GetOpt(getExtName(), opts);
 }
 
-int COLUpdateCmd::usage()
+int COLUpdateimplCmd::usage()
 {
   getopt->usage("", "");
   std::cerr << " DBNAME COLLECTION [HINTS]\n";
   return 1;
 }
 
-int COLUpdateCmd::help()
+int COLUpdateimplCmd::help()
 {
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
@@ -322,7 +323,7 @@ int COLUpdateCmd::help()
   return 1;
 }
 
-int COLUpdateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+int COLUpdateimplCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
   if (! getopt->parse(PROGNAME, argv))
     return usage();
@@ -346,10 +347,11 @@ int COLUpdateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   if (map.find(TYPE_OPT) != map.end()) {
     const char *typeOption = map[TYPE_OPT].value.c_str();
 
-    if (!strcmp(typeOption, "hash"))
+    if (!strcmp(typeOption, "hashindex"))
       type = IndexImpl::Hash;
-    else if (!strcmp(typeOption, "btree"))
+    else if (!strcmp(typeOption, "btreeindex"))
       type = IndexImpl::BTree;
+    // TODO: add "noindex" case
     else
       return help();
   }
@@ -366,13 +368,16 @@ int COLUpdateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   if (get_collections(collection, list))
     return 1;
 
+  // TODO: set collimpl according to implementation type
   IndexImpl *idximpl;
   Status s = IndexImpl::make(db, type, hints, idximpl);
+  CollImpl collimpl(idximpl);
 
   LinkedListCursor c(list);
   Collection *coll;
+
   while (c.getNext((void *&)coll)) {
-    coll->setImplementation(new CollImpl(idximpl)); // 0: must be correct implementation 2009-03-31
+    coll->setImplementation( &collimpl);
     s = coll->store();
   }
     
@@ -381,11 +386,11 @@ int COLUpdateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   return 0;
 }
 
-//eyedbadmin collection simulate [--full] [--format=FORMAT] DATABASE COLLECTION hash|btree [HINTS]
+//eyedbadmin collection simulimpl [--full] [--format=FORMAT] DATABASE COLLECTION hash|btree [HINTS]
 // 
-// COLSimulateCmd
+// COLSimulimplCmd
 //
-void COLSimulateCmd::init()
+void COLSimulimplCmd::init()
 {
   std::vector<Option> opts;
 
@@ -402,19 +407,19 @@ void COLSimulateCmd::init()
   opts.push_back(Option(TYPE_OPT, 
 			OptionStringType(),
 			Option::MandatoryValue,
-			OptionDesc("Index type (supported types are: hash, btree)", "TYPE")));
+			OptionDesc("Index type (supported types are: hashindex, btreeindex)", "TYPE")));
 
   getopt = new GetOpt(getExtName(), opts);
 }
 
-int COLSimulateCmd::usage()
+int COLSimulimplCmd::usage()
 {
   getopt->usage("", "");
   std::cerr << " DBNAME COLLECTION [HINTS]\n";
   return 1;
 }
 
-int COLSimulateCmd::help()
+int COLSimulimplCmd::help()
 {
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
@@ -423,7 +428,7 @@ int COLSimulateCmd::help()
   return 1;
 }
 
-int COLSimulateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+int COLSimulimplCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
   if (! getopt->parse(PROGNAME, argv))
     return usage();
@@ -447,9 +452,9 @@ int COLSimulateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &a
   if (map.find(TYPE_OPT) != map.end()) {
     const char *typeOption = map[TYPE_OPT].value.c_str();
 
-    if (!strcmp(typeOption, "hash"))
+    if (!strcmp(typeOption, "hashindex"))
       type = IndexImpl::Hash;
-    else if (!strcmp(typeOption, "btree"))
+    else if (!strcmp(typeOption, "btreeindex"))
       type = IndexImpl::BTree;
     else
       return help();
@@ -525,25 +530,25 @@ int COLSimulateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &a
   return 0;
 }
 
-//eyedbadmin collection list DATABASE COLLECTION...
+//eyedbadmin collection getimpl DATABASE COLLECTION...
 // 
-// COLListCmd
+// COLGetimplCmd
 //
-void COLListCmd::init()
+void COLGetimplCmd::init()
 {
   std::vector<Option> opts;
   opts.push_back(HELP_OPT);
   getopt = new GetOpt(getExtName(), opts);
 }
 
-int COLListCmd::usage()
+int COLGetimplCmd::usage()
 {
   getopt->usage("", "");
   std::cerr << " DBNAME COLLECTION...\n";
   return 1;
 }
 
-int COLListCmd::help()
+int COLGetimplCmd::help()
 {
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
@@ -551,7 +556,7 @@ int COLListCmd::help()
   return 1;
 }
 
-int COLListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+int COLGetimplCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
   if (! getopt->parse(PROGNAME, argv))
     return usage();
@@ -568,7 +573,7 @@ int COLListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 
   conn.open();
 
-  Database *db = new Database(dbName);
+  db = new Database(dbName);
 
   db->open(&conn, Database::DBRW);
   
@@ -600,11 +605,11 @@ int COLListCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
   return 0;
 }
 
-//eyedbadmin collection stats [--full] [--format=FORMAT] DATABASE COLLECTION...
+//eyedbadmin collection statsimpl [--full] [--format=FORMAT] DATABASE COLLECTION...
 // 
-// COLStatsCmd
+// COLStatsimplCmd
 //
-void COLStatsCmd::init()
+void COLStatsimplCmd::init()
 {
   std::vector<Option> opts;
 
@@ -621,14 +626,14 @@ void COLStatsCmd::init()
   getopt = new GetOpt(getExtName(), opts);
 }
 
-int COLStatsCmd::usage()
+int COLStatsimplCmd::usage()
 {
   getopt->usage("", "");
   std::cerr << " DBNAME COLLECTION...\n";
   return 1;
 }
 
-int COLStatsCmd::help()
+int COLStatsimplCmd::help()
 {
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
@@ -636,7 +641,7 @@ int COLStatsCmd::help()
   return 1;
 }
 
-int COLStatsCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+int COLStatsimplCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
   if (! getopt->parse(PROGNAME, argv))
     return usage();
@@ -940,7 +945,7 @@ int COLGetDefImplCmd::perform(eyedb::Connection &conn, std::vector<std::string> 
   return 0;
 }
 
-//eyedbadmin collection setdefimpl DATABASE ATTRIBUTE_PATH hash|btree [HINTS] [propagate=on|off]
+//eyedbadmin collection setdefimpl DATABASE ATTRIBUTE_PATH hashindex|btreeindex [HINTS] [propagate=on|off]
 // 
 // COLSetDefImplCmd
 //
@@ -963,7 +968,7 @@ void COLSetDefImplCmd::init()
   opts.push_back(Option(TYPE_OPT, 
 			OptionStringType(),
 			Option::MandatoryValue,
-			OptionDesc("Collection type (supported types are: hash, btree)", "TYPE")));
+			OptionDesc("Collection type (supported types are: hashindex, btreeindex)", "TYPE")));
 
   getopt = new GetOpt(getExtName(), opts);
 }
@@ -1008,9 +1013,9 @@ int COLSetDefImplCmd::perform(eyedb::Connection &conn, std::vector<std::string> 
   if (map.find(TYPE_OPT) != map.end()) {
     const char *typeOption = map[TYPE_OPT].value.c_str();
 
-    if (!strcmp(typeOption, "hash"))
+    if (!strcmp(typeOption, "hashindex"))
       type = IndexImpl::Hash;
-    else if (!strcmp(typeOption, "btree"))
+    else if (!strcmp(typeOption, "btreeindex"))
       type = IndexImpl::BTree;
     else
       return help();

@@ -51,10 +51,9 @@ TopicSet::TopicSet()
   addTopic(new USRTopic());
   addTopic(new IDXTopic());
   addTopic(new COLTopic());
+  addTopic(new CLSTopic());
 
   // not yet implemented
-  //addTopic(new CLSTopic());
-  //addTopic(new COLTopic());
   //addTopic(new ATRTopic());
   //addTopic(new OBJTopic());
   //addTopic(new CNSTopic());

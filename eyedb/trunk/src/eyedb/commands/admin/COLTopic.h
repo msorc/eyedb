@@ -33,10 +33,10 @@ public:
   COLTopic();
 };
 
-CMDCLASS_GETOPT(COLUpdateCmd, "update");
-CMDCLASS_GETOPT(COLSimulateCmd, "simulate");
-CMDCLASS_GETOPT(COLListCmd, "list");
-CMDCLASS_GETOPT(COLStatsCmd, "stats");
+CMDCLASS_GETOPT(COLUpdateimplCmd, "updateimpl");
+CMDCLASS_GETOPT(COLSimulimplCmd, "simulimpl");
+CMDCLASS_GETOPT(COLGetimplCmd, "getimpl");
+CMDCLASS_GETOPT(COLStatsimplCmd, "statsimpl");
 
 CMDCLASS_GETOPT(COLGetDefDSPCmd, "getdefdsp");
 CMDCLASS_GETOPT(COLSetDefDSPCmd, "setdefdsp");

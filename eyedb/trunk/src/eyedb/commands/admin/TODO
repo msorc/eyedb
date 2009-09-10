@@ -14,46 +14,32 @@ eyedbadmin TODO list:
 
 
 - implement 'eyedbadmin collection *': 
-eyedbadmin collection update DATABASE COLLECTION hash|btree [HINTS]   [DONE]
-eyedbadmin collection simulate [--full] [--format=FORMAT] DATABASE COLLECTION hash|btree [HINTS]   [DONE]
-eyedbadmin collection list DATABASE COLLECTION...   [DONE]
-eyedbadmin collection stats [--full] [--format=FORMAT] DATABASE COLLECTION...   [DONE]
+eyedbadmin collection updateimpl DATABASE COLLECTION hash|btree [HINTS]   [DONE]
+eyedbadmin collection simulimpl [--full] [--format=FORMAT] DATABASE COLLECTION hash|btree [HINTS]   [DONE]
+eyedbadmin collection listimpl DATABASE COLLECTION...   [DONE]
+eyedbadmin collection statsimpl [--full] [--format=FORMAT] DATABASE COLLECTION...   [DONE]
 eyedbadmin collection getdefdsp DATABASE COLLECTION   [DONE]
 eyedbadmin collection setdefdsp DATABASE COLLECTION DATASPACE   [DONE]
 eyedbadmin collection getdefimpl DATABASE [CLASSNAME|ATTRIBUTE_PATH]...   [DONE]
 eyedbadmin collection setdefimpl DATABASE ATTRIBUTE_PATH hash|btree [HINTS] [propagate=on|off]   [DONE]
+
 eyedbadmin collection getloca [--stats] [--loca] DATABASE COLLECTION   [NOT IMPLEMENTED in eyedbloca]
 (replaces eyedbloca getcollloca <dbname> --stats|--loca|--all <name>|<oid>)   [NOT IMPLEMENTED in eyedbloca]
-eyedbadmin collection setloca ???
-
-Others:
-from eyedbloca
-eyedbadmin collection getelemloca
-eyedbadmin collection moveelems
-
-from eyedbcollimpladmin
-eyedbadmin collection listimpl
-eyedbadmin collection updateimpl
-eyedbadmin collection simulimpl
-eyedbadmin collection implstats
+eyedbadmin collection move DATABASE COLLECTION DESTDATASPACE [NOT IMPLEMENTED in eyedbloca]
 
 
 - implement 'eyedbadmin class *'
-eyedbadmin class getdefdsp DATABASE CLASS
+eyedbadmin class getdefdsp DATABASE CLASS   [DONE]
 (replaces eyedbloca getdefinstdsp <dbname> <class name>)
-eyedbadmin class getinstdefdsp ??? what's that?
 
-eyedbadmin class setdefdsp DATABASE CLASS DATASPACE
+eyedbadmin class setdefdsp DATABASE CLASS DATASPACE   [DONE]
 (replaces eyedbloca setdefinstdsp <dbname> <class name> <dest dataspace>)
-eyedbadmin class setinstdefdsp ??? what's that?
 
-eyedbadmin class move [--subclasses] DATABASE CLASS DATASPACE
+eyedbadmin class move [--subclasses] DATABASE CLASS DATASPACE   [DONE]
 (replaces eyedbloca mvinst <dbname> [--subclasses] <class name> <dest dataspace>)
-eyedbadmin class moveinst ???
 
-eyedbadmin class getloca [--stats] [--loca] [--subclasses] DATABASE CLASS
+eyedbadmin class getloca [--stats] [--loca] [--subclasses] DATABASE CLASS   [DONE]
 (replaces eyedbloca getinstloca --stats|--loca|--all [--subclasses] <dbname> <class name>)
-eyedbadmin class getinstloca ???
 
 
 - implement 'eyedbadmin attribute *'
