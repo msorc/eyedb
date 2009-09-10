@@ -3437,6 +3437,16 @@ namespace eyedb {
     return db->moveObjects(oid_arr, dataspace);
   }
 
+  Status Collection::getElementLocations(ObjectLocationArray &locarr)
+  {
+    OidArray oid_arr;
+    Status s = getElements(oid_arr);
+    if (s)
+      return s;
+
+    return db->getObjectLocations(oid_arr, locarr);
+  }
+
   Status Collection::getDefaultDataspace(const Dataspace *&dataspace) const
   {
     RPCStatus rpc_status;
