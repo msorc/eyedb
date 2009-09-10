@@ -377,7 +377,7 @@ perform_cache(Database &db)
   Class *cls = db.getSchema()->getClass("int64");
   IndexImpl *idximpl = new IndexImpl(IndexImpl::Hash, 0, 10000);
 
-  COLLECTION *coll = new COLLECTION(&db, "", cls, 1, idximpl);
+  COLLECTION *coll = new COLLECTION(&db, "", cls, 1, new CollImpl(idximpl));
 
   eyedblib::int64 n;
 
@@ -496,7 +496,7 @@ perform_lit(Database &db)
 
   //IndexImpl *idximpl = new IndexImpl(IndexImpl::BTree);
 
-  COLLECTION *coll = new COLLECTION(&db, "", cls, DIM, idximpl);
+  COLLECTION *coll = new COLLECTION(&db, "", cls, DIM, new CollImpl(idximpl));
 
   eyedblib::int64 n[DIM];
 

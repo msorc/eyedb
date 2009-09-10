@@ -1677,16 +1677,16 @@ namespace eyedb {
       db = odl_get_dummy_db(m);
 
     CollAttrImpl *impl;
-    CollAttrImpl::Type impltype;
+    CollImpl::Type impltype;
 
     if (type == odlCollImplSpecItem::HashIndex) {
-      impltype = CollAttrImpl::HashIndex;
+      impltype = CollImpl::HashIndex;
     }
     else if (type == odlCollImplSpecItem::BTreeIndex) {
-      impltype = CollAttrImpl::BTreeIndex;
+      impltype = CollImpl::BTreeIndex;
     }
     else if (type == odlCollImplSpecItem::NoIndex) {
-      impltype = CollAttrImpl::NoIndex;
+      impltype = CollImpl::NoIndex;
     }
     else {
       odl_add_error("unknown implementation type for attribute %s", attrpath);

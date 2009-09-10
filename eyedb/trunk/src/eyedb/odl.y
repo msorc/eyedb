@@ -665,6 +665,18 @@ coll_impl_spec_item : HASHINDEX
   $$.init();
   $$.type = odlCollImplSpecItem::NoIndex;
 }
+| TYPE '=' HASH
+{
+  fprintf(stderr, "collection implementation warning: 'type = hash' is deprecated, use 'type = hashindex'\n");
+  $$.init();
+  $$.type = odlCollImplSpecItem::HashIndex;
+}
+| TYPE '=' BTREE
+{
+  fprintf(stderr, "collection implementation warning: 'type = btree' is deprecated, use 'type = btreeindex'\n");
+  $$.init();
+  $$.type = odlCollImplSpecItem::BTreeIndex;
+}
 | HINTS '=' string
 {
   $$.init();

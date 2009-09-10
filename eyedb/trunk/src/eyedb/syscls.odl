@@ -264,16 +264,10 @@ class collection_attribute_implementation [CollAttrImpl] extends attribute_compo
   int impl_hints[];
 
   %C++{
-    enum Type {
-      Unknown = 0,
-      HashIndex = 1,
-      BTreeIndex = 2,
-      NoIndex = 3
-    };
 
     CollAttrImpl(Database *, Class *, const char *attrpath,
 		 Bool propagate, const Dataspace * = 0,
-		 Type impl_type = HashIndex,
+		 CollImpl::Type impl_type = CollImpl::HashIndex,
 		 int key_count_or_degree = 0,
 		 BEMethod_C * = 0,
 		 const int *impl_hints = 0, int impl_hints_cnt = 0);
@@ -283,7 +277,7 @@ class collection_attribute_implementation [CollAttrImpl] extends attribute_compo
     Status makeDataspace(Database *db, const Dataspace *&) const;
     static Status make(Database *, Class *, const char *attrpath,
 		       Bool propagate,
-		       Type impl_type, const char *hints,
+		       CollImpl::Type impl_type, const char *hints,
 		       CollAttrImpl *&);
     Status getImplementation(Database *, const CollImpl *&);
     virtual AttributeComponent *xclone(Database *, const Class *);

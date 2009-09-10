@@ -2141,7 +2141,7 @@ namespace eyedb {
 			     const char *attrpath,
 			     Bool propagate,
 			     const Dataspace *dataspace,
-			     CollAttrImpl::Type impl_type,
+			     CollImpl::Type impl_type,
 			     int key_count_or_degree,
 			     BEMethod_C *mth,
 			     const int *impl_hints,
@@ -2186,7 +2186,7 @@ namespace eyedb {
 	setImplHints(i, impl_hints[i]);
     }
     else {
-      setImplType(NoIndex);
+      setImplType(CollImpl::NoIndex);
     }
 
     setPropagate(propagate);
@@ -2206,12 +2206,12 @@ namespace eyedb {
 
   Status
   CollAttrImpl::make(Database *db, Class *cls, const char *attrpath,
-		     Bool propagate, CollAttrImpl::Type impl_type,
+		     Bool propagate, CollImpl::Type impl_type,
 		     const char *hints, CollAttrImpl *&impl)
   {
     impl = 0;
     IndexImpl *idximpl;
-    if (impl_type == HashIndex || impl_type == BTreeIndex) {
+    if (impl_type == CollImpl::HashIndex || impl_type == CollImpl::BTreeIndex) {
       Status s = IndexImpl::make(db, (IndexImpl::Type)impl_type, hints, idximpl);
       if (s) return s;
     }
@@ -2242,7 +2242,7 @@ namespace eyedb {
     std::string str = makeAttrpath(cls);
     return new CollAttrImpl(db, (Class *)cls, str.c_str(),
 			    getPropagate(),
-			    dataspace, (Type)getImplType(),
+			    dataspace, (CollImpl::Type)getImplType(),
 			    getKeyCountOrDegree(),
 			    getHashMethod(), impl_hints, impl_hints_cnt);
   }
@@ -2369,10 +2369,10 @@ namespace eyedb {
 				  const CollImpl *&_collimpl)
 
   {
-    CollAttrImpl::Type impl_type = (CollAttrImpl::Type)getImplType();
+    CollImpl::Type impl_type = (CollImpl::Type)getImplType();
     const IndexImpl *idximpl = 0;
     if (!collimpl) {
-      if (impl_type == HashIndex || impl_type == BTreeIndex) {
+      if (impl_type == CollImpl::HashIndex || impl_type == CollImpl::BTreeIndex) {
 	const Dataspace *dataspace;
 	Status s = makeDataspace(db, dataspace);
 	if (s) return s;
@@ -2386,8 +2386,11 @@ namespace eyedb {
 				dataspace, getKeyCountOrDegree(),
 				getHashMethod(), impl_hints,
 				impl_hints_cnt);
+	collimpl = new CollImpl(idximpl);
       }
-      collimpl = new CollImpl(impl_type, idximpl);
+      else {
+	collimpl = new CollImpl(impl_type);
+      }
     }
 
     _collimpl = collimpl;

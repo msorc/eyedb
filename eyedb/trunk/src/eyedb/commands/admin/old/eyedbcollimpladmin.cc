@@ -401,7 +401,7 @@ collimpl_update_realize(int argc, char *argv[])
     LinkedListCursor c(list);
     Collection *coll;
     while (c.getNext((void *&)coll)) {
-      coll->setImplementation(new CollImpl(CollAttrImpl::Unknown, idximpl)); // 0: must be correct implementation 2009-03-31
+      coll->setImplementation(new CollImpl(CollImpl::Unknown, idximpl)); // 0: must be correct implementation 2009-03-31
       s = coll->store();
       CHECK(s);
     }
@@ -491,7 +491,7 @@ collimpl_simulate_realize(int argc, char *argv[])
 
     LinkedListCursor c(list);
     Collection *coll;
-    CollImpl *collimpl = new CollImpl((CollAttrImpl::Type)idximpl->getType(), idximpl);
+    CollImpl *collimpl = new CollImpl((CollImpl::Type)idximpl->getType(), idximpl);
     for (; c.getNext((void *&)coll); nn++) {
       if (fmt && idximpl->getType() == IndexImpl::Hash) {
 	IndexStats *stats1, *stats2 = 0;
@@ -711,7 +711,7 @@ collimpl_setdef_realize(int argc, char *argv[])
     collimpl = new CollAttrImpl
       (db, const_cast<Class *>(cls), attrpath,
        propag, idximpl->getDataspace(),
-       (CollAttrImpl::Type)idximpl->getType(),
+       (CollImpl::Type)idximpl->getType(),
        idximpl->getType() == IndexImpl::Hash ?
        idximpl->getKeycount() : idximpl->getDegree(),
        idximpl->getHashMethod(),
