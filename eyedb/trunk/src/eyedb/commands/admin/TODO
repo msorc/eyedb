@@ -23,9 +23,9 @@ eyedbadmin collection setdefdsp DATABASE COLLECTION DATASPACE   [DONE]
 eyedbadmin collection getdefimpl DATABASE [CLASSNAME|ATTRIBUTE_PATH]...   [DONE]
 eyedbadmin collection setdefimpl DATABASE ATTRIBUTE_PATH hash|btree [HINTS] [propagate=on|off]   [DONE]
 
-eyedbadmin collection getloca [--stats] [--loca] DATABASE COLLECTION   [NOT IMPLEMENTED in eyedbloca]
-(replaces eyedbloca getcollloca <dbname> --stats|--loca|--all <name>|<oid>)   [NOT IMPLEMENTED in eyedbloca]
-eyedbadmin collection move DATABASE COLLECTION DESTDATASPACE [NOT IMPLEMENTED in eyedbloca]
+eyedbadmin collection getloca [--stats] [--loca] DATABASE COLLECTION   [DONE]
+(replaces eyedbloca getcollloca <dbname> --stats|--loca|--all <name>|<oid>)
+eyedbadmin collection move DATABASE COLLECTION DESTDATASPACE [DONE]
 
 
 - implement 'eyedbadmin class *'
@@ -42,18 +42,6 @@ eyedbadmin class getloca [--stats] [--loca] [--subclasses] DATABASE CLASS   [DON
 (replaces eyedbloca getinstloca --stats|--loca|--all [--subclasses] <dbname> <class name>)
 
 
-- implement 'eyedbadmin attribute *'
-eyedbadmin attribute getdefdsp DATABASE CLASS::ATTRIBUTE
-(replaces eyedbloca getdefattrdsp <dbname> <class>::<attr>)
-
-eyedbadmin attribute setdefdsp DATABASE CLASS::ATTRIBUTE DATASPACE
-(replaces eyedbloca setdefattrdsp <dbname> <class>::<attr> <dest dataspace>)
-
-eyedbadmin attribute move ???
-
-eyedbadmin attribute getloca ???
-
-
 - implement 'eyedbadmin object *'
 eyedbadmin object getloca [--stats] [--loca] DBNAME OQL
 (replaces eyedbloca getobjloca --stats|--loca|--all <dbname> <oql construct>)
@@ -67,3 +55,13 @@ eyedbadmin constraint create ???
 eyedbadmin constraint delete ???
 eyedbadmin constraint list ???
 
+- implement 'eyedbadmin attribute *'  [NOT YET]
+eyedbadmin attribute getdefdsp DATABASE CLASS::ATTRIBUTE
+(replaces eyedbloca getdefattrdsp <dbname> <class>::<attr>)
+
+eyedbadmin attribute setdefdsp DATABASE CLASS::ATTRIBUTE DATASPACE
+(replaces eyedbloca setdefattrdsp <dbname> <class>::<attr> <dest dataspace>)
+
+eyedbadmin attribute move ???
+
+eyedbadmin attribute getloca ???

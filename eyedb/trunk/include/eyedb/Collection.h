@@ -304,7 +304,7 @@ namespace eyedb {
     */
     Status moveElements(const Dataspace *dataspace);
 
-    Status getLocations(ObjectLocationArray &);
+    Status getElementLocations(ObjectLocationArray &);
 
     Bool isLiteral() const {return is_literal;}
     Bool isPureLiteral() const {return is_pure_literal;}

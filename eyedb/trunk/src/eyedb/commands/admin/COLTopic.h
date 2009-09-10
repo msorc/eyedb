@@ -45,6 +45,6 @@ CMDCLASS_GETOPT(COLSetDefImplCmd, "setdefimpl");
 CMDCLASS_GETOPT(COLGetDefImplCmd, "getdefimpl");
 
 CMDCLASS_GETOPT(COLGetLocaCmd, "getloca");
-CMDCLASS_GETOPT(COLSetLocaCmd, "setloca");
+CMDCLASS_GETOPT(COLMoveCmd, "move");
 
 #endif

@@ -281,11 +281,12 @@ COLTopic::COLTopic() : Topic("collection")
   addCommand( new COLSetDefImplCmd(this));
   addCommand( new COLGetDefImplCmd(this));
   addCommand( new COLGetLocaCmd(this));
-  addCommand( new COLSetLocaCmd(this));
+  addCommand( new COLMoveCmd(this));
 }
 
 static const std::string FULL_OPT("full");
 static const std::string FORMAT_OPT("format");
+static const std::string LOCA_OPT("loca");
 static const std::string PROPAGATE_OPT("propagate");
 static const std::string TYPE_OPT("type");
 
@@ -782,9 +783,12 @@ int COLGetDefDSPCmd::perform(eyedb::Connection &conn, std::vector<std::string> &
     const Dataspace *dataspace;
     Status s = coll->getDefaultDataspace(dataspace);
 
-    if (i) printf("\n");
+    if (i)
+      printf("\n");
     printf("Default dataspace for collection ");
-    if (*coll->getName()) printf("'%s' ", coll->getName());
+
+    if (*coll->getName())
+      printf("'%s' ", coll->getName());
     printf("{%s}\n", coll->getOid().toString());
     print(dataspace);
   }
@@ -1072,21 +1076,27 @@ int COLSetDefImplCmd::perform(eyedb::Connection &conn, std::vector<std::string> 
   return 0;
 }
 
-//eyedbadmin collection getloca [--stats] [--loca] DATABASE COLLECTION
+//eyedbadmin collection getloca [--stats|--loca|--all] DATABASE COLLECTION
 // 
 // COLGetLocaCmd
 //
 void COLGetLocaCmd::init()
 {
   std::vector<Option> opts;
+
   opts.push_back(HELP_OPT);
+
+  opts.push_back( Option(ALL_OPT, OptionBoolType()));
+  opts.push_back( Option(LOCA_OPT, OptionBoolType()));
+  opts.push_back( Option(STATS_OPT, OptionBoolType()));
+
   getopt = new GetOpt(getExtName(), opts);
 }
 
 int COLGetLocaCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " DBNAME ...\n";
+  std::cerr << " DBNAME COLLECTION\n";
   return 1;
 }
 
@@ -1094,8 +1104,12 @@ int COLGetLocaCmd::help()
 {
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
+  getopt->displayOpt("COLLECTION", "Collection (can be a collection name, a collection oid or an OQL query)");
   return 1;
 }
+
+static const unsigned int LocaOpt = 1;
+static const unsigned int StatsOpt = 2;
 
 int COLGetLocaCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
@@ -1111,48 +1125,78 @@ int COLGetLocaCmd::perform(eyedb::Connection &conn, std::vector<std::string> &ar
     return usage();
 
   const char *dbName = argv[0].c_str();
+  const char *collection = argv[1].c_str();
+
+  unsigned int lopt = 0;
+  if (map.find( STATS_OPT) != map.end())
+    lopt = StatsOpt;
+  else if (map.find( LOCA_OPT) != map.end())
+    lopt = LocaOpt;
+  else if (map.find( ALL_OPT) != map.end())
+    lopt = StatsOpt|LocaOpt;
+  else
+    return help();
 
   conn.open();
 
-  Database *db = new Database(dbName);
+  db = new Database(dbName);
 
   db->open(&conn, Database::DBRW);
   
   db->transactionBeginExclusive();
 
-  // stuff here...
+  ObjectArray obj_arr;
+  if (get_colls(collection, obj_arr)) 
+    return 1;
+
+  for (int i = 0; i < obj_arr.getCount(); i++) {
+    Collection *coll = (Collection *)obj_arr[i];
+    ObjectLocationArray locarr;
+    Status s = coll->getElementLocations(locarr);
+
+    if (lopt & LocaOpt)
+      cout << locarr(db) << endl;
+
+    if (lopt & StatsOpt) {
+      PageStats *pgs = locarr.computePageStats(db);
+      cout << *pgs;
+      delete pgs;
+    }
+  }
 
   db->transactionCommit();
 
   return 0;
 }
 
-// eyedbadmin collection setloca [--stats] [--loca] DATABASE COLLECTION DATASPACE
+//eyedbadmin collection move [--stats] [--loca] DATABASE COLLECTION
 // 
-// COLSetLocaCmd
+// COLMoveCmd
 //
-void COLSetLocaCmd::init()
+void COLMoveCmd::init()
 {
   std::vector<Option> opts;
   opts.push_back(HELP_OPT);
   getopt = new GetOpt(getExtName(), opts);
 }
 
-int COLSetLocaCmd::usage()
+int COLMoveCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " DBNAME ...\n";
+  std::cerr << " DBNAME COLLECTION DESTDATASPACE\n";
   return 1;
 }
 
-int COLSetLocaCmd::help()
+int COLMoveCmd::help()
 {
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
+  getopt->displayOpt("COLLECTION", "Collection (can be a collection name, a collection oid or an OQL query)");
+  getopt->displayOpt("DESTDATASPACE", "Destination dataspace name");
   return 1;
 }
 
-int COLSetLocaCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+int COLMoveCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
   if (! getopt->parse(PROGNAME, argv))
     return usage();
@@ -1166,74 +1210,30 @@ int COLSetLocaCmd::perform(eyedb::Connection &conn, std::vector<std::string> &ar
     return usage();
 
   const char *dbName = argv[0].c_str();
+  const char *collection = argv[1].c_str();
+  const char *dspname = argv[2].c_str();
 
   conn.open();
 
-  Database *db = new Database(dbName);
+  db = new Database(dbName);
 
   db->open(&conn, Database::DBRW);
   
   db->transactionBeginExclusive();
 
-  // stuff here...
+  const Dataspace *dataspace;
+  Status s = db->getDataspace(dspname, dataspace);
+
+  ObjectArray obj_arr;
+  if (get_colls(collection, obj_arr)) 
+    return 1;
+
+  for (int i = 0; i < obj_arr.getCount(); i++) {
+    Collection *coll = (Collection *)obj_arr[i];
+    Status s = coll->moveElements( dataspace);
+  }
 
   db->transactionCommit();
 
   return 0;
 }
-
-#if 0
-// 
-// XXXTemplateCmd
-//
-void XXXTemplateCmd::init()
-{
-  std::vector<Option> opts;
-  opts.push_back(HELP_OPT);
-  getopt = new GetOpt(getExtName(), opts);
-}
-
-int XXXTemplateCmd::usage()
-{
-  getopt->usage("", "");
-  std::cerr << " DBNAME ...\n";
-  return 1;
-}
-
-int XXXTemplateCmd::help()
-{
-  stdhelp();
-  getopt->displayOpt("DBNAME", "Database name");
-  return 1;
-}
-
-int XXXTemplateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
-{
-  if (! getopt->parse(PROGNAME, argv))
-    return usage();
-
-  GetOpt::Map &map = getopt->getMap();
-
-  if (map.find("help") != map.end())
-    return help();
-
-  if (argv.size() < 2)
-    return usage();
-
-  const char *dbName = argv[0].c_str();
-
-  conn.open();
-
-  Database *db = new Database(dbName);
-
-  db->open(&conn, Database::DBRW);
-  
-  db->transactionBeginExclusive();
-
-  // stuff here...
-
-  db->transactionCommit();
-
-  return 0;
-}
-#endif

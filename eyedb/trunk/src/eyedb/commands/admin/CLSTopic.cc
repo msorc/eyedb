@@ -318,7 +318,7 @@ void CLSMoveCmd::init()
 int CLSMoveCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " DBNAME CLASSNAME DESTDATASPACE\n";
+  std::cerr << " DBNAME COLLECTION DESTDATASPACE\n";
   return 1;
 }
 
@@ -326,7 +326,7 @@ int CLSMoveCmd::help()
 {
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
-  getopt->displayOpt("CLASSNAME", "Class name");
+  getopt->displayOpt("COLLECTION", "Collection (can be a collection name, a collection oid or an OQL query)");
   getopt->displayOpt("DESTDATASPACE", "Destination dataspace name");
   return 1;
 }
