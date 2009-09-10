@@ -33,7 +33,7 @@ public:
   OBJTopic();
 };
 
-CMDCLASS(OBJGetLocaCmd, "getloca");
-CMDCLASS(OBJMoveCmd, "move");
+CMDCLASS_GETOPT(OBJGetLocaCmd, "getloca");
+CMDCLASS_GETOPT(OBJMoveCmd, "move");
 
 #endif
