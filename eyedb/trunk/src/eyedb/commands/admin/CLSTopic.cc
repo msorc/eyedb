@@ -36,45 +36,141 @@
 #include "GetOpt.h"
 #include "CLSTopic.h"
 
+
 using namespace eyedb;
 using namespace std;
+
+//
+// Global variables...
+//
+
+static Connection *conn;
+static Database *db;
+
+//
+// Helper functions and macros
+//
+
+static const char *get_op(const char *s, int &offset);
+
+static int
+get_cls(const char *name, ObjectArray &obj_arr)
+{
+  int offset;
+  const char *op = get_op(name, offset);
+  OQL q(db, "select class.name %s \"%s\"", op, &name[offset]);
+  Status s = q.execute(obj_arr);
+
+  if (!obj_arr.getCount()) {
+    fprintf(stderr, "no class %s found\n", name);
+    return 1;
+  }
+
+  return 0;
+}
+
+static void
+print(const Dataspace *dataspace, Bool def = False)
+{
+  if (!dataspace) {
+    Status s = db->getDefaultDataspace(dataspace);
+    if (s) {
+      s->print();
+      return;
+    }
+    //    printf("Default ");
+    print(dataspace, True);
+    return;
+  }
+  printf("  Dataspace #%d", dataspace->getId());
+  if (def) printf(" (default)");
+  printf("\n");
+  printf("   Name %s\n", dataspace->getName());
+  unsigned int datafile_cnt;
+  const Datafile **datafiles = dataspace->getDatafiles(datafile_cnt);
+  printf("   Composed of {\n", datafile_cnt);
+  for (int i = 0; i < datafile_cnt; i++) {
+    printf("     Datafile #%d\n", datafiles[i]->getId());
+    if (*datafiles[i]->getName())
+      printf("       Name %s\n", datafiles[i]->getName());
+    printf("       File %s\n", datafiles[i]->getFile());
+  }
+  printf("   }\n");
+}
+
+
+const char *
+get_op(const char *s, int &offset)
+{
+  if (s[0] == '~')
+    {
+      if (s[1] == '~')
+	{
+	  offset = 2;
+	  return "~~";
+	}
+
+      offset = 1;
+      return "~";
+    }
+
+  if (s[0] == '!')
+    {
+      if (s[1] == '~')
+	{
+	  if (s[2] == '~')
+	    {
+	      offset = 3;
+	      return "!~~";
+	    }
+
+	  offset = 2;
+	  return "!~";
+	}
+    }
+
+  offset = 0;
+  return "=";
+}
+
+//
+// Topic definition
+//
 
 CLSTopic::CLSTopic() : Topic("class")
 {
   addAlias("cls");
 
-  addCommand(new CLSGetInstDefDSPCmd(this));
-  addCommand(new CLSSetInstDefDSPCmd(this));
-  addCommand(new CLSMoveInstCmd(this));
-  addCommand(new CLSGetInstLocaCmd(this));
+  addCommand(new CLSGetDefDSPCmd(this));
+  addCommand(new CLSSetDefDSPCmd(this));
+  addCommand(new CLSMoveCmd(this));
+  addCommand(new CLSGetLocaCmd(this));
 }
 
 static const std::string LOCA_OPT("loca");
 static const std::string SUBCLASSES_OPT("subclasses");
 
 //
-// CLSGetInstDefDSPCmd
+// CLSGetDefDSPCmd
 //
-// eyedbloca getdefinstdsp <dbname> <class name>
-void CLSGetInstDefDSPCmd::init()
+// eyedbadmin class getdefdsp DATABASE CLASSNAME
+void CLSGetDefDSPCmd::init()
 {
   std::vector<Option> opts;
 
   opts.push_back(HELP_OPT);
 
-  opts.push_back( Option(STATS_OPT, OptionBoolType()));
-
   getopt = new GetOpt(getExtName(), opts);
 }
 
-int CLSGetInstDefDSPCmd::usage()
+int CLSGetDefDSPCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " DBNAME CLASSNAME\n";
+  std::cerr << " DBNAME [CLASSNAME]\n";
   return 1;
 }
 
-int CLSGetInstDefDSPCmd::help()
+int CLSGetDefDSPCmd::help()
 {
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
@@ -82,7 +178,7 @@ int CLSGetInstDefDSPCmd::help()
   return 1;
 }
 
-int CLSGetInstDefDSPCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+int CLSGetDefDSPCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
   if (! getopt->parse(PROGNAME, argv))
     return usage();
@@ -96,31 +192,34 @@ int CLSGetInstDefDSPCmd::perform(eyedb::Connection &conn, std::vector<std::strin
     return usage();
 
   const char *dbname = argv[0].c_str();
-  const char *classname = argv[1].c_str();
+
+  const char *classname = "~";
+  if (argv.size() > 1)
+    classname = argv[1].c_str();
 
   conn.open();
 
-  Database *db = new Database(dbname);
+  db = new Database(dbname);
 
   db->open( &conn, Database::DBRW);
   
   db->transactionBeginExclusive();
   
-#if 0
   ObjectArray obj_arr;
-  const char *str = (argc == 2 ? argv[1] : "~");
-  if (get_cls(str, obj_arr)) return 1;
+  if (get_cls(classname, obj_arr)) 
+    return 1;
 
   for (int i = 0; i < obj_arr.getCount(); i++) {
     Class *cls = (Class *)obj_arr[i];
     const Dataspace *dataspace;
     Status s = cls->getDefaultInstanceDataspace(dataspace);
-    CHECK(s);
-    if (i) printf("\n");
+
+    if (i)
+      printf("\n");
+
     printf("Default dataspace for instances of class '%s':\n", cls->getName());
     print(dataspace);
   }
-#endif
 
   db->transactionCommit();
 
@@ -128,10 +227,10 @@ int CLSGetInstDefDSPCmd::perform(eyedb::Connection &conn, std::vector<std::strin
 }
 
 //
-// CLSSetInstDefDSPCmd
+// CLSSetDefDSPCmd
 //
-// eyedbloca setdefinstdsp <dbname> <class name> <dest dataspace>
-void CLSSetInstDefDSPCmd::init()
+// eyedbadmin class setdefdsp DATABASE CLASSNAME DATASPACE
+void CLSSetDefDSPCmd::init()
 {
   std::vector<Option> opts;
 
@@ -142,22 +241,23 @@ void CLSSetInstDefDSPCmd::init()
   getopt = new GetOpt(getExtName(), opts);
 }
 
-int CLSSetInstDefDSPCmd::usage()
+int CLSSetDefDSPCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " DBNAME CLASSNAME\n";
+  std::cerr << " DBNAME CLASSNAME DSPNAME\n";
   return 1;
 }
 
-int CLSSetInstDefDSPCmd::help()
+int CLSSetDefDSPCmd::help()
 {
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("CLASSNAME", "Class name");
+  getopt->displayOpt("DSPNAME", "Dataspace name");
   return 1;
 }
 
-int CLSSetInstDefDSPCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+int CLSSetDefDSPCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
   if (! getopt->parse(PROGNAME, argv))
     return usage();
@@ -172,16 +272,27 @@ int CLSSetInstDefDSPCmd::perform(eyedb::Connection &conn, std::vector<std::strin
 
   const char *dbname = argv[0].c_str();
   const char *classname = argv[1].c_str();
+  const char *dspname = argv[2].c_str();
 
   conn.open();
 
-  Database *db = new Database(dbname);
+  db = new Database(dbname);
 
   db->open( &conn, Database::DBRW);
   
   db->transactionBeginExclusive();
   
-  // ...
+  const Dataspace *dataspace;
+  Status s = db->getDataspace(dspname, dataspace);
+
+  ObjectArray obj_arr;
+  if (get_cls(classname, obj_arr)) 
+    return 1;
+
+  for (int i = 0; i < obj_arr.getCount(); i++) {
+    Class *cls = (Class *)obj_arr[i];
+    Status s = cls->setDefaultInstanceDataspace(dataspace);
+  }
 
   db->transactionCommit();
 
@@ -189,36 +300,38 @@ int CLSSetInstDefDSPCmd::perform(eyedb::Connection &conn, std::vector<std::strin
 }
 
 //
-// CLSMoveInstCmd
+// CLSMoveCmd
 //
+// eyedbadmin class move [--subclasses] DATABASE CLASSNAME DESTDATASPACE
 // eyedbloca mvinst <dbname> [--subclasses] <class name> <dest dataspace>
-void CLSMoveInstCmd::init()
+void CLSMoveCmd::init()
 {
   std::vector<Option> opts;
 
   opts.push_back(HELP_OPT);
 
-  opts.push_back( Option(STATS_OPT, OptionBoolType()));
+  opts.push_back( Option(SUBCLASSES_OPT, OptionBoolType()));
 
   getopt = new GetOpt(getExtName(), opts);
 }
 
-int CLSMoveInstCmd::usage()
+int CLSMoveCmd::usage()
 {
   getopt->usage("", "");
-  std::cerr << " DBNAME CLASSNAME\n";
+  std::cerr << " DBNAME CLASSNAME DESTDATASPACE\n";
   return 1;
 }
 
-int CLSMoveInstCmd::help()
+int CLSMoveCmd::help()
 {
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
   getopt->displayOpt("CLASSNAME", "Class name");
+  getopt->displayOpt("DESTDATASPACE", "Destination dataspace name");
   return 1;
 }
 
-int CLSMoveInstCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+int CLSMoveCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
   if (! getopt->parse(PROGNAME, argv))
     return usage();
@@ -233,20 +346,30 @@ int CLSMoveInstCmd::perform(eyedb::Connection &conn, std::vector<std::string> &a
 
   const char *dbname = argv[0].c_str();
   const char *classname = argv[1].c_str();
+  const char *dspname = argv[2].c_str();
 
-  bool locaOpt = false;
-  if (map.find(LOCA_OPT) != map.end())
-    locaOpt = true;
+  bool subclassesOpt = false;
+  if (map.find(SUBCLASSES_OPT) != map.end())
+    subclassesOpt = true;
 
   conn.open();
 
-  Database *db = new Database(dbname);
+  db = new Database(dbname);
 
   db->open( &conn, Database::DBRW);
   
   db->transactionBeginExclusive();
   
-  // ...
+  const Dataspace *dataspace;
+  Status s = db->getDataspace(dspname, dataspace);
+
+  ObjectArray obj_arr;
+  if (get_cls(classname, obj_arr)) return 1;
+
+  for (int i = 0; i < obj_arr.getCount(); i++) {
+    Class *cls = (Class *)obj_arr[i];
+    Status s = cls->moveInstances(dataspace, (subclassesOpt)? eyedb::True : eyedb::False);
+  }
 
   db->transactionCommit();
 
@@ -254,28 +377,32 @@ int CLSMoveInstCmd::perform(eyedb::Connection &conn, std::vector<std::string> &a
 }
 
 //
-// CLSGetInstLocaCmd
+// CLSGetLocaCmd
 //
-// eyedbloca getinstloca --stats|--loca|--all [--subclasses] <dbname> <class name>
-void CLSGetInstLocaCmd::init()
+// eyedbadmin class getloca [--stats|--loca|--all] [--subclasses] DATABASE CLASSNAME
+void CLSGetLocaCmd::init()
 {
   std::vector<Option> opts;
 
   opts.push_back(HELP_OPT);
 
+  opts.push_back( Option(ALL_OPT, OptionBoolType()));
+  opts.push_back( Option(LOCA_OPT, OptionBoolType()));
   opts.push_back( Option(STATS_OPT, OptionBoolType()));
+
+  opts.push_back( Option(SUBCLASSES_OPT, OptionBoolType()));
 
   getopt = new GetOpt(getExtName(), opts);
 }
 
-int CLSGetInstLocaCmd::usage()
+int CLSGetLocaCmd::usage()
 {
   getopt->usage("", "");
   std::cerr << " DBNAME CLASSNAME\n";
   return 1;
 }
 
-int CLSGetInstLocaCmd::help()
+int CLSGetLocaCmd::help()
 {
   stdhelp();
   getopt->displayOpt("DBNAME", "Database name");
@@ -283,7 +410,10 @@ int CLSGetInstLocaCmd::help()
   return 1;
 }
 
-int CLSGetInstLocaCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
+static const unsigned int LocaOpt = 1;
+static const unsigned int StatsOpt = 2;
+
+int CLSGetLocaCmd::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
 {
   if (! getopt->parse(PROGNAME, argv))
     return usage();
@@ -293,25 +423,52 @@ int CLSGetInstLocaCmd::perform(eyedb::Connection &conn, std::vector<std::string>
   if (map.find("help") != map.end())
     return help();
 
-  if (argv.size() < 1)
+  if (argv.size() < 2)
     return usage();
 
   const char *dbname = argv[0].c_str();
   const char *classname = argv[1].c_str();
 
-  bool locaOpt = false;
-  if (map.find(LOCA_OPT) != map.end())
-    locaOpt = true;
+  unsigned int lopt = 0;
+  if (map.find( STATS_OPT) != map.end())
+    lopt = StatsOpt;
+  else if (map.find( LOCA_OPT) != map.end())
+    lopt = LocaOpt;
+  else if (map.find( ALL_OPT) != map.end())
+    lopt = StatsOpt|LocaOpt;
+  else
+    return help();
+
+  bool subclassesOpt = false;
+  if (map.find(SUBCLASSES_OPT) != map.end())
+    subclassesOpt = true;
 
   conn.open();
 
-  Database *db = new Database(dbname);
+  db = new Database(dbname);
 
   db->open( &conn, Database::DBRW);
   
   db->transactionBeginExclusive();
   
-  // ...
+  ObjectArray obj_arr;
+  if (get_cls(classname, obj_arr))
+    return 1;
+
+  for (int i = 0; i < obj_arr.getCount(); i++) {
+    Class *cls = (Class *)obj_arr[i];
+    ObjectLocationArray locarr;
+    Status s = cls->getInstanceLocations(locarr, (subclassesOpt)? eyedb::True : eyedb::False);
+
+    if (lopt & LocaOpt)
+      cout << locarr(db) << endl;
+
+    if (lopt & StatsOpt) {
+      PageStats *pgs = locarr.computePageStats(db);
+      cout << *pgs;
+      delete pgs;
+    }
+  }
 
   db->transactionCommit();
 
