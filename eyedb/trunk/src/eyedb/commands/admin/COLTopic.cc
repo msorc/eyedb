@@ -1169,7 +1169,7 @@ int COLGetLocaCmd::perform(eyedb::Connection &conn, std::vector<std::string> &ar
   return 0;
 }
 
-//eyedbadmin collection move [--stats] [--loca] DATABASE COLLECTION
+//eyedbadmin collection move DATABASE COLLECTION DESTDATASPACE
 // 
 // COLMoveCmd
 //

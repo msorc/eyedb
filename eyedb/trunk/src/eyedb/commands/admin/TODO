@@ -43,10 +43,10 @@ eyedbadmin class getloca [--stats] [--loca] [--subclasses] DATABASE CLASS   [DON
 
 
 - implement 'eyedbadmin object *'
-eyedbadmin object getloca [--stats] [--loca] DBNAME OQL
+eyedbadmin object getloca [--stats] [--loca] DBNAME OQL   [DONE]
 (replaces eyedbloca getobjloca --stats|--loca|--all <dbname> <oql construct>)
 
-eyedbadmin object move DATABASE OQL DATASPACE
+eyedbadmin object move DATABASE OQL DATASPACE   [DONE]
 (replaces eyedbloca mvobj <dbname> <oql construct> <dest dataspace>)
 
 
