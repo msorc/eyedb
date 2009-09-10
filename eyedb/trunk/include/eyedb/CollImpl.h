@@ -59,6 +59,7 @@ namespace eyedb {
 	this->impl_hints_cnt = 0;
       }
       else {
+	idximpl = 0;
 	this->impl_hints_cnt = impl_hints_cnt;
 	this->impl_hints = new int[impl_hints_cnt];
 	memcpy(this->impl_hints, impl_hints, sizeof(int) * impl_hints_cnt);
