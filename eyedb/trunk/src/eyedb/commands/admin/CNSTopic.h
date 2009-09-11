@@ -33,8 +33,8 @@ public:
   CNSTopic();
 };
 
-CMDCLASS(CNSCreateCmd, "create");
-CMDCLASS(CNSDeleteCmd, "delete");
-CMDCLASS(CNSListCmd, "list");
+CMDCLASS_GETOPT( CNSCreateCmd, "create");
+CMDCLASS_GETOPT( CNSDeleteCmd, "delete");
+CMDCLASS_GETOPT( CNSListCmd, "list");
 
 #endif

@@ -55,8 +55,8 @@ TopicSet::TopicSet()
   addTopic(new OBJTopic());
 
   // not yet implemented
-  //addTopic(new ATRTopic());
   //addTopic(new CNSTopic());
+  //addTopic(new ATRTopic());
 }
 
 int TopicSet::perform(eyedb::Connection &conn, std::vector<std::string> &argv)
