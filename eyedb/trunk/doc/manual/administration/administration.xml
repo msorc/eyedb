@@ -36,7 +36,7 @@
     <para>
       <itemizedlist>
 	<listitem><para>large databases: database limits, multi-volumes databases</para></listitem>
-	<listitem><para>complete index: simulate</para></listitem>
+	<listitem><para>complete index: sefdefdsp, getdefdsp</para></listitem>
 	<listitem><para>complete collections</para></listitem>
 	<listitem><para>complete locations</para></listitem>
 	<listitem><para>make a full example showing: indexes, collections, datafiles, dataspaces</para></listitem>
@@ -55,9 +55,9 @@
 
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="user.xml" xpointer="user"/>
 
-  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="database_advanced.xml" xpointer="database_advanced"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="database_advanced.xml" xpointer="database-advanced"/>
 
-  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="database_tuning.xml" xpointer="database_tuning"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="database_tuning.xml" xpointer="database-tuning"/>
 
   <index>
     <title>Index</title>

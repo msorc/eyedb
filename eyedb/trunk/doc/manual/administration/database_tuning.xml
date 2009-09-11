@@ -9,7 +9,7 @@
 <book>
   <title>EyeDB Administration Guide</title>
 
-  <chapter id="database_tuning">
+  <chapter id="database-tuning">
     <title>Database tuning</title>
 
     <para>
@@ -332,7 +332,7 @@ btree index on Person.age
       </section>
 
       <section>
-	<title>Getting statistics on indexes, simulating index performances</title>
+	<title>Getting statistics on indexes</title>
 
 	<para>
 	  Getting statistics on indexes is done using the &eyedbadmin; command:
@@ -427,15 +427,121 @@ btree index on Person.age
 	  </screen>
 	</example>
 
-
-
       </section>
 
       <section>
 	<title>Getting and setting index default dataspace</title>
 
 	<para>
+	  An index has a <emphasis>default dataspace</emphasis> (see <xref linkend="database-advanced"/>). This default dataspace determines in which dataspace index data will be inserted when index is updated, for instance when objects are inserted into the database.
 	</para>
+
+	<para>
+	   Getting index default dataspace is done using command <command>eyedbadmin index getdefdsp</command>:
+	  <cmdsynopsis>
+	    <command>eyedbadmin index getdefdsp</command>
+	    <arg choice="req"><replaceable>database</replaceable></arg>
+	    <arg choice="req"><group><arg choice="req"><replaceable>attribute_path</replaceable></arg><arg choice="req"><replaceable>class_name</replaceable></arg></group></arg>
+	  </cmdsynopsis>
+	</para>
+
+	<para>
+	  Command arguments are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><replaceable>database</replaceable></arg>
+		</cmdsynopsis>
+		the database
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="opt"><group><arg choice="req"><replaceable>attribute_path</replaceable></arg><arg choice="req"><replaceable>class_name</replaceable></arg></group></arg>
+		</cmdsynopsis>
+		the index on which to print statistics, specified either as an attribute path or as a class name
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+
+	<para>
+	   Setting index default dataspace is done using command <command>eyedbadmin index setdefdsp</command>:
+	  <cmdsynopsis>
+	    <command>eyedbadmin index setdefdsp</command>
+	    <arg choice="req"><replaceable>database</replaceable></arg>
+	    <arg choice="opt"><group><arg choice="req"><replaceable>attribute_path</replaceable></arg><arg choice="req"><replaceable>class_name</replaceable></arg></group></arg>
+	    <arg choice="req"><replaceable>dataspace</replaceable></arg>
+	  </cmdsynopsis>
+	</para>
+
+	<para>
+	  Command arguments are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><replaceable>database</replaceable></arg>
+		</cmdsynopsis>
+		the database
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="opt"><group><arg choice="req"><replaceable>attribute_path</replaceable></arg><arg choice="req"><replaceable>class_name</replaceable></arg></group></arg>
+		</cmdsynopsis>
+		the index on which to print statistics, specified either as an attribute path or as a class name
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><replaceable>dataspace</replaceable></arg>
+		</cmdsynopsis>
+		the name of the dataspace to be created
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+
+
+	<example id="eyedbadmin-index-getdefdsp-setdefdsp">
+	  <title>&eyedbadmin; index getdefdsp/setdefdsp</title>
+	  <screen>
+# get default dataspace for index on Person.age
+<userinput>eyedbadmin index getdefdsp test_index Person.age</userinput>
+Default dataspace for index 'Person.age':
+  Dataspace #0 (default)
+   Name DEFAULT
+   Composed of {
+     Datafile #0
+       Name DEFAULT
+       File test_index.dat
+   }
+# create a datafile
+<userinput>eyedbadmin datafile create --name=DAT1 test_index test_index_data1.dat</userinput>
+# create a dataspace containing this file
+<userinput>eyedbadmin dataspace create test_index DSP1 DAT1</userinput>
+# set default dataspace for index on Person.age
+<userinput>eyedbadmin index setdefdsp test_index Person.age DSP1</userinput>
+# get default dataspace for index on Person.age
+<userinput>eyedbadmin index getdefdsp test_index Person.age</userinput>
+Default dataspace for index 'Person.age':
+  Dataspace #1
+   Name DSP1
+   Composed of {
+     Datafile #1
+       Name DAT1
+       File test_index_data1.dat
+   }
+	  </screen>
+	</example>
+
+
+
 
       </section>
 
