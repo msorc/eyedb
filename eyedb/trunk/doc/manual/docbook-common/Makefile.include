@@ -20,7 +20,10 @@ endif
 
 XSLTPROC=@XSLTPROC@
 XSLTPROCFLAGS=--novalid --nonet --xinclude
-HTML_XSL_STYLESHEET=@HTML_XSL_STYLESHEET_DIR@/docbook.xsl
+#HTML as a single file
+#HTML_XSL_STYLESHEET=@HTML_XSL_STYLESHEET_DIR@/docbook.xsl
+#HTML chunked
+HTML_XSL_STYLESHEET=@HTML_XSL_STYLESHEET_DIR@/chunk.xsl
 
 html/index.html: $(MAIN_XML_FILE)
 	test -d html || mkdir html
