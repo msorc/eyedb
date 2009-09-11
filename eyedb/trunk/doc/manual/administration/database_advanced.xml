@@ -541,49 +541,53 @@
 	  </screen>
 	</example>
 
-	<!--
-	    <para>
-	    Datafiles can become fragmented because of object deletion; the allocator used inside datafile is a bitmap allocator for better efficiency, but as a consequence there can be holes in the datafile that can impact performance. Defragmenting can be done using the &eyedbadmin; command:
-	    <cmdsynopsis>
+	<para>
+	  Datafiles can become fragmented because of object deletion; the allocator used inside datafile is a bitmap allocator for better efficiency, but as a consequence there can be holes in the datafile that can impact performance. Defragmenting can be done using the &eyedbadmin; command:
+	  <cmdsynopsis>
 	    &eyedbadmin;
 	    <command>datafile defragment</command>
 	    <arg choice="req"><replaceable>database</replaceable></arg>
 	    <arg choice="req"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
-	    </cmdsynopsis>
-	    </para>
+	  </cmdsynopsis>
+	</para>
 
-<para>
-Command arguments are:
-<itemizedlist>
-<listitem>
-<para>
-<cmdsynopsis>
-<arg choice="req"><replaceable>database</replaceable></arg>
-</cmdsynopsis>
-the database to which the datafile belongs
-</para>
-</listitem>
-<listitem>
-<para>
-<cmdsynopsis>
-<arg choice="req"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
-</cmdsynopsis>
-the datafile to be defragmented, that can be specified either by its id or by its name
-</para>
-</listitem>
-</itemizedlist>
-</para>
+	<para>
+	  Command arguments are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><replaceable>database</replaceable></arg>
+		</cmdsynopsis>
+		the database to which the datafile belongs
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<cmdsynopsis>
+		  <arg choice="req"><group><arg choice="req"><replaceable>datafile_id</replaceable></arg><arg choice="req"><replaceable>datafile_name</replaceable></arg></group></arg>
+		</cmdsynopsis>
+		the datafile to be defragmented, that can be specified either by its id or by its name
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
 
-<example id="eyedbadmin-datafile-defragment">
-<title>&eyedbadmin; datafile defragment</title>
-<screen>
-...
-</screen>
-</example>
-	-->
+	<example id="eyedbadmin-datafile-defragment">
+	  <title>&eyedbadmin; datafile defragment</title>
+	  <screen>
+	    ## datafile can be given by their id
+	    <userinput>eyedbadmin datafile defragment test3 0</userinput>
+	    ## datafile can also be given by their name
+	    <userinput>eyedbadmin datafile defragment test3 DEFAULT</userinput>
+	    ## giving a non-existing datafile
+	    <userinput>eyedbadmin datafile defragment test3 42</userinput>
+	    eyedb error: datafile #42 not found in database test3
+	  </screen>
+	</example>
 
       </section>
-
+      
     </section>
 
     <section id="managing-dataspaces">
