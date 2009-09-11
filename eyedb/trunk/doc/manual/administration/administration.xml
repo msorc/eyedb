@@ -36,7 +36,6 @@
     <para>
       <itemizedlist>
 	<listitem><para>large databases: database limits, multi-volumes databases</para></listitem>
-	<listitem><para>complete index: sefdefdsp, getdefdsp</para></listitem>
 	<listitem><para>complete collections</para></listitem>
 	<listitem><para>complete locations</para></listitem>
 	<listitem><para>make a full example showing: indexes, collections, datafiles, dataspaces</para></listitem>
