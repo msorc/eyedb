@@ -430,7 +430,7 @@ Index on Person.addr.code:
       </section>
 
       <section>
-	<title>Getting and setting index dataspace</title>
+	<title>Getting and setting index default dataspace</title>
 
 	<para>
 	</para>
@@ -467,7 +467,7 @@ Index on Person.addr.code:
       </section>
 
       <section>
-	<title>Getting and setting collection dataspace</title>
+	<title>Getting and setting collection default dataspace</title>
 
 	<para>
 	</para>

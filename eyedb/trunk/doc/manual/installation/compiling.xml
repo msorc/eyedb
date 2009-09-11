@@ -167,6 +167,16 @@
 	      give temporary directory (default is <filename class="directory">LOCALSTATEDIR/lib/eyedb/tmp</filename>)
 	    </para>
 	  </listitem>
+
+	  <listitem>
+	    <para>
+	      <cmdsynopsis>
+		<arg choice="plain">--with-eyedbd-user=<replaceable>USERNAME</replaceable></arg>
+	      </cmdsynopsis>
+	      give user the EyeDB server shall be run as (default is <computeroutput>eyedb</computeroutput>)
+	    </para>
+	  </listitem>
+
 	  <listitem>
 	    <para>
 	      <cmdsynopsis>

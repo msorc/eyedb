@@ -87,7 +87,7 @@ AC_ARG_WITH( tmpdir,
 	     ac_eyedb_tmpdir='${localstatedir}/lib/eyedb/tmp')
 # User under which EyeDB server should run
 AC_ARG_WITH(eyedbd-user,
-	AS_HELP_STRING([--with-eyedbd-user=USERNAME],[user the EyeDB server shall be run as (default is eyedb)]),
+	AS_HELP_STRING([--with-eyedbd-user=USERNAME],[give user the EyeDB server shall be run as (default is eyedb)]),
 	EYEDBD_USER="$withval",
 	EYEDBD_USER=eyedb)
 AC_SUBST(EYEDBD_USER)
