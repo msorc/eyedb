@@ -9,7 +9,7 @@
 <book>
   <title>EyeDB Administration Guide</title>
 
-  <chapter id="database_advanced">
+  <chapter id="database-advanced">
     <title>Database advanced administration</title>
     
     <para>
@@ -125,7 +125,7 @@
 		<cmdsynopsis>
 		  <arg choice="plain">--physical</arg>
 		</cmdsynopsis>
-		to specify that this datafile will contain physical Oids (see <xref linkend="database_tuning"/>)
+		to specify that this datafile will contain physical Oids (see <xref linkend="database-tuning"/>)
 	      </para>
 	    </listitem>
 	  </itemizedlist>
