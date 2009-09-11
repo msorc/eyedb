@@ -35,9 +35,8 @@
       <title>TODO</title>
     <para>
       <itemizedlist>
-	<listitem><para>document standard options of eyedbadmin</para></listitem>
-	<listitem><para>creating multi-volumes databases</para></listitem>
 	<listitem><para>complete datafile: defragment</para></listitem>
+	<listitem><para>creating multi-volumes databases</para></listitem>
 	<listitem><para>complete index: simulate</para></listitem>
 	<listitem><para>complete collections</para></listitem>
 	<listitem><para>complete locations</para></listitem>
