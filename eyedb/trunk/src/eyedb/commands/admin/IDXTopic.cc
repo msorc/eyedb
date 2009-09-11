@@ -777,13 +777,19 @@ int IDXSimulateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &a
   if (argv.size() > 2)
     hints = argv[2].c_str();
 
-  const char *typeOption = 0;
+  IndexImpl::Type type;
   if (map.find(TYPE_OPT) != map.end()) {
-    typeOption = map[TYPE_OPT].value.c_str();
+    const char *typeOption = map[TYPE_OPT].value.c_str();
 
-    if (strcmp(typeOption, "hash") && strcmp(typeOption, "btree"))
+    if (!strcmp(typeOption, "hash"))
+      type = IndexImpl::Hash;
+    else if (!strcmp(typeOption, "btree"))
+      type = IndexImpl::BTree;
+    else
       return help();
   }
+  else
+    return help();
 
   bool full = map.find(FULL_OPT) != map.end();
 
@@ -803,12 +809,6 @@ int IDXSimulateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &a
 
   if (indexGet(db, attributePath, indexList))
     return 1;
-
-  IndexImpl::Type type;
-  if (!strcmp(typeOption, "hash"))
-    type = IndexImpl::Hash;
-  else if (!strcmp(typeOption, "btree"))
-    type = IndexImpl::BTree;
 
   Index *index = (Index *)indexList.getObject(0);
   IndexImpl *impl;
