@@ -157,6 +157,167 @@ Common Options:
 
       </section>
 
+      <section>
+	<title>&eyedbadmin; shortcuts</title>
+
+	<para>
+	  A set of shortcuts have been defined for &eyedbadmin; most used topics and subcommands. These shortcuts are symbolic links, created at installation time and located in binaries installation directories. Shorcuts can be used as any shell command and accept the same arguments and options as their &eyedbadmin; equivalents.
+	</para>
+
+	<para>
+	  The list of &eyedbadmin; shortcuts is the following:
+
+	<table id="eyedbadmin-shortcuts">
+	  <title>
+	    List of &eyedbadmin; shortcuts
+	  </title>
+	  <tgroup cols="2">
+	    <thead>
+	      <row>
+		<entry>
+		  Shortcut
+		</entry>
+		<entry>
+		  &eyedbadmin; equivalent
+		</entry>
+	      </row>
+	    </thead>
+	    <tbody>
+	      <row>
+		<entry>
+		  eyedb_dbcreate
+		</entry>
+		<entry>
+		  eyedbadmin database create
+		</entry>
+	      </row>
+	      <row>
+		<entry>
+		  eyedb_dbdelete
+		</entry>
+		<entry>
+		  eyedbadmin database delete
+		</entry>
+	      </row>
+	      <row>
+		<entry>
+		  eyedb_dblist
+		</entry>
+		<entry>
+		  eyedbadmin database list
+		</entry>
+	      </row>
+	      <row>
+		<entry>
+		  eyedb_dbrename
+		</entry>
+		<entry>
+		  eyedbadmin database rename
+		</entry>
+	      </row>
+	      <row>
+		<entry>
+		  eyedb_dbexport
+		</entry>
+		<entry>
+		  eyedbadmin database export
+		</entry>
+	      </row>
+	      <row>
+		<entry>
+		  eyedb_dbimport
+		</entry>
+		<entry>
+		  eyedbadmin database import
+		</entry>
+	      </row>
+	      <row>
+		<entry>
+		  eyedb_dtfcreate
+		</entry>
+		<entry>
+		  eyedbadmin datafile create
+		</entry>
+	      </row>
+	      <row>
+		<entry>
+		  eyedb_dtfdelete
+		</entry>
+		<entry>
+		  eyedbadmin datafile delete
+		</entry>
+	      </row>
+	      <row>
+		<entry>
+		  eyedb_dtflist
+		</entry>
+		<entry>
+		  eyedbadmin datafile list
+		</entry>
+	      </row>
+	      <row>
+		<entry>
+		  eyedb_dspcreate
+		</entry>
+		<entry>
+		  eyedbadmin dataspace create
+		</entry>
+	      </row>
+	      <row>
+		<entry>
+		  eyedb_dspdelete
+		</entry>
+		<entry>
+		  eyedbadmin dataspace delete
+		</entry>
+	      </row>
+	      <row>
+		<entry>
+		  eyedb_dsplist
+		</entry>
+		<entry>
+		  eyedbadmin dataspace list
+		</entry>
+	      </row>
+	      <row>
+		<entry>
+		  eyedb_useradd
+		</entry>
+		<entry>
+		  eyedbadmin user add
+		</entry>
+	      </row>
+	      <row>
+		<entry>
+		  eyedb_userdelete
+		</entry>
+		<entry>
+		  eyedbadmin user delete
+		</entry>
+	      </row>
+	      <row>
+		<entry>
+		  eyedb_userlist
+		</entry>
+		<entry>
+		  eyedbadminuser list
+		</entry>
+	      </row>
+	      <row>
+		<entry>
+		  eyedb_userpasswd 
+		</entry>
+		<entry>
+		  eyedbadmin user passwd 
+		</entry>
+	      </row>
+	    </tbody>
+	  </tgroup>
+	</table>
+	</para>
+
+      </section>
+
     </section>
 
   </chapter>
