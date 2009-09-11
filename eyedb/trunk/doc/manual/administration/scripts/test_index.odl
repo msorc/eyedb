@@ -1,0 +1,13 @@
+class Address {
+  attribute int number;
+  attribute string street;
+  attribute string town;
+  attribute int code;
+};
+
+class Person {
+  attribute string firstName;
+  attribute string lastName;
+  attribute int age;
+  attribute Address addr;
+};

@@ -128,8 +128,8 @@ class Person {
       <example id="eyedbadmin-index-odl">
 	<title>Indexes: updating the schema</title>
 	<screen>
-<userinput>eyedbadmin database create test</userinput>
-<userinput>eyedbodl -u -d test test.odl</userinput>
+<userinput>eyedbadmin database create test_index</userinput>
+<userinput>eyedbodl -u -d test_index test_index.odl</userinput>
 Updating 'test' schema in database test...
 Adding class Address
 Adding class Person
@@ -220,11 +220,13 @@ Person.addr.town
 	<example id="eyedbadmin-index-create">
 	  <title>&eyedbadmin; index create</title>
 	  <screen>
-<userinput>eyedbadmin index create test Person.age</userinput>
+<userinput>eyedbadmin index create test_index Person.age</userinput>
 Creating btree index on Person.age
-<userinput>eyedbadmin index create test Person.addr.town</userinput>
+<userinput>eyedbadmin index create test_index Person.addr.town</userinput>
 Creating hash index on Person.addr.town
-<userinput>eyedbadmin index create --type=hash test Person.addr.code</userinput>
+<userinput>eyedbadmin index create test_index Person.addr.number</userinput>
+Creating btree index on Person.addr.number
+<userinput>eyedbadmin index create --type=hash test_index Person.addr.code</userinput>
 Creating hash index on Person.addr.code
 	  </screen>
 	</example>
@@ -265,9 +267,9 @@ Creating hash index on Person.addr.code
 	<example id="eyedbadmin-index-delete">
 	  <title>&eyedbadmin; index delete</title>
 	  <screen>
-<userinput>eyedbadmin index delete test Person.addr.town</userinput>
-Deleting index Person.addr.town
-<userinput>eyedbadmin index delete test Person.addr.street</userinput>
+<userinput>eyedbadmin index delete test_index Person.addr.number</userinput>
+Deleting index Person.addr.number
+<userinput>eyedbadmin index delete test_index Person.addr.street</userinput>
 eyedbadmin: index 'Person.addr.street' not found
 	  </screen>
 	</example>
@@ -313,13 +315,15 @@ eyedbadmin: index 'Person.addr.street' not found
 	<example id="eyedbadmin-index-list">
 	  <title>&eyedbadmin; index list</title>
 	  <screen>
-<userinput>eyedbadmin index list test</userinput>
+<userinput>eyedbadmin index list test_index</userinput>
 btree index on Person.age
+hash index on Person.addr.town
 hash index on Person.addr.code
-<userinput>eyedbadmin index list test Person</userinput>
+<userinput>eyedbadmin index list test_index Person</userinput>
 btree index on Person.age
+hash index on Person.addr.town
 hash index on Person.addr.code
-<userinput>eyedbadmin index list test Person.age</userinput>
+<userinput>eyedbadmin index list test_index Person.age</userinput>
 btree index on Person.age
 	  </screen>
 	</example>
@@ -396,36 +400,34 @@ btree index on Person.age
 	<example id="eyedbadmin-index-stats">
 	  <title>&eyedbadmin; index statistics</title>
 	  <screen>
-	    <userinput>eyedbadmin index stats --full testindex</userinput>
-Index on Person.age:
-  Propagation: on
-  Type: BTree
-  Degree: 128
-  Statistics:
-    Total object count: 0
+<userinput>eyedbadmin index stats --full test_index</userinput>
+    Total hash object count: 1
+    Total hash object size: 98376B, ~96KB
+    Total hash object busy size: 0B
+    Total hash object free size: 98376B, ~96KB
+    Busy entry count: 0
+    Free entry count: 4096
 ...
-Index on Person.addr.town:
-  Propagation: on
-  Type: Hash
+<userinput>eyedbadmin index stats '--format=%n %O\n' test_index Person.addr.code</userinput>
+4090 0
+4091 0
+4092 0
+4093 0
+4094 0
+4095 0
 ...
-Index on Person.addr.code:
-  Propagation: on
-  Type: Hash
-...
-<userinput>eyedbadmin index stats --format="%n %O\n" testindex Person.addr.code</userinput>
-0 0
-1 0
-2 0
-3 0
-...
-<userinput>eyedbadmin index stats --format="%n -> %O, %o, %s\n" testindex Person.addr.town</userinput>
-0 -> 0, 0, 0
-1 -> 0, 0, 0
-2 -> 0, 0, 0
-3 -> 0, 0, 0
+<userinput>eyedbadmin index stats '--format=%n -> %O, %o, %s\n' test_index Person.addr.town</userinput>
+4090 -> 0, 0, 0
+4091 -> 0, 0, 0
+4092 -> 0, 0, 0
+4093 -> 0, 0, 0
+4094 -> 0, 0, 0
+4095 -> 0, 0, 0
 ...
 	  </screen>
 	</example>
+
+
 
       </section>
 
