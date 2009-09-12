@@ -143,7 +143,7 @@ namespace eyedb {
       if (type == Value::tOid)
 	x = new oqmlAtom_oid(*v.oid, (Class *)cls);
       else if (type == Value::tObject) {
-	v.o->trace();
+	//v.o->trace();
 	x = oqmlObjectManager::registerObject(v.o->clone());
       }
       else if (type == Value::tString)
