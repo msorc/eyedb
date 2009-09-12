@@ -490,10 +490,6 @@ namespace eyedb {
   void StdServerMessageDisplayer::display(const char *msg) const
   {
     if (fd) {
-      /*
-	fprintf(fd, msg);
-	fflush(fd);
-      */
       write(fileno(fd), msg, strlen(msg));
       return;
     }

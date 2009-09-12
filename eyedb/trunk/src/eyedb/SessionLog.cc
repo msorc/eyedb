@@ -227,7 +227,6 @@ namespace eyedb {
     int sx_alloc = 0;
     char **sx = 0;
     char *p;
-    char *r = (char *)malloc(strlen(s)+1);
 
     if (*s == '/')
       s++;
@@ -261,12 +260,23 @@ namespace eyedb {
       s = p+1;
     }
 
+#if 1
+    std::string str;
+    for (int i = 0; i < sx_cnt; i++) {
+      str += "/";
+      str += sx[i];
+      free(sx[i]);
+    }
+    char* r = strdup(str.c_str());
+#else
+    char *r = (char *)malloc(strlen(s)+1);
     *r = 0;
     for (int i = 0; i < sx_cnt; i++) {
       strcat(r, "/");
       strcat(r, sx[i]);
       free(sx[i]);
     }
+#endif
 
     free(sx);
     free(os);
@@ -278,7 +288,7 @@ namespace eyedb {
   {
     static const char conn_prefix[] = ".eyedb_";
     static const char conn_suffix[] = ".con";
-    char hostname[256];
+    char hostname[256] = {0};
     char *file;
 
     if (!_logdir || !_port)
@@ -287,7 +297,9 @@ namespace eyedb {
     port = strdup(_port);
     host = strdup(_host);
 
-    char *port_file = truedir((std::string(host) + ":" + _port).c_str());
+    //char *port_file = truedir((std::string(host) + ":" + _port).c_str());
+    std::string host_port = std::string(host) + ":" + _port;
+    char *port_file = truedir(host_port.c_str());
       
     char *p = port_file;
     while (p = strchr(p, '/'))

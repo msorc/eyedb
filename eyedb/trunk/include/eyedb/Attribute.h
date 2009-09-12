@@ -608,20 +608,6 @@ namespace eyedb {
     */
     virtual Status setDefaultDataspace(const Dataspace *dataspace);
 
-    /**
-       Not yet documented
-       @param ??
-       @return
-    */
-    virtual Status getLocations(ObjectLocationArray &);
-
-    /**
-       Not yet documented
-       @param dataspace
-       @return
-    */
-    virtual Status move(const Dataspace *dataspace);
-
     // BE
     static unsigned char idxNull, idxNotNull;
 

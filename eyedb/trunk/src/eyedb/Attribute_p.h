@@ -145,8 +145,6 @@ namespace eyedb {
     virtual Bool isSizeChanged(const Object *) const = 0;
     virtual Status getDefaultDataspace(const Dataspace *&) const;
     virtual Status setDefaultDataspace(const Dataspace *);
-    virtual Status getLocations(ObjectLocationArray &);
-    virtual Status move(const Dataspace *);
 
   protected:
     AttrVD(const Attribute*, const Class *, const Class *, const Class *, int);

@@ -5230,30 +5230,6 @@ namespace eyedb {
     return Success;
   }
 
-  Status
-  Attribute::move(Dataspace const *)
-  {
-    return Success;
-  }
-
-  Status
-  Attribute::getLocations(ObjectLocationArray &)
-  {
-    return Success;
-  }
-
-  Status
-  AttrVD::getLocations(ObjectLocationArray &)
-  {
-    return Success;
-  }
-
-  Status
-  AttrVD::move(Dataspace const *)
-  {
-    return Success;
-  }
-
   /*
     Status AttrVD::getField(Database *db, const Oid *data_oid,
     Oid *doid, int *roffset, int offset,
