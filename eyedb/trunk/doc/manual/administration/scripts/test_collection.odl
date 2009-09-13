@@ -1,0 +1,9 @@
+class Person {
+  attribute string firstName;
+  attribute string lastName;
+};
+
+class Diary {
+  attribute string name;
+  attribute set<Person *> persons;
+};
