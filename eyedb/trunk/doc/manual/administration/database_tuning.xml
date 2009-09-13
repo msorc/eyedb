@@ -540,9 +540,6 @@ Default dataspace for index 'Person.age':
 	  </screen>
 	</example>
 
-
-
-
       </section>
 
     </section>
@@ -551,7 +548,85 @@ Default dataspace for index 'Person.age':
       <title>Managing collections</title>
       
       <section>
-	<title>EyeDB collection implementations</title>
+	<title>&eyedb; collection implementations</title>
+
+	<para>
+	  &eyedb; supports several types of collections:
+	  <itemizedlist>
+	    <listitem><para><classname>set</classname>: unordered collection without element duplication</para></listitem>
+	    <listitem><para><classname>bag</classname>: unordered collection with element duplication</para></listitem>
+	    <listitem><para><classname>array</classname>: ordered collection</para></listitem>
+	  </itemizedlist>
+	</para>
+
+	<para>
+	  Independentely from its type, a collection has an <emphasis>implementation</emphasis>, i.e. the data structure that supports the collection. &eyedb; supports several types of implementation, either indexed or non-indexed:
+	  <itemizedlist>
+	    <listitem><para>hash index</para></listitem>
+	    <listitem><para>btree index</para></listitem>
+	    <!-- <listitem><para>no index</para></listitem> -->
+	  </itemizedlist>
+	</para>
+
+	<para>
+	  The choice of the collection implementation will have of course an impact on the collection performance for inserting, deleting retrieving objects. For example, having a <classname>bag</classname> collection containing a large number of elements and <emphasis>not</emphasis> using an indexed implementation will have poor performance for element insertion: when inserting an element in a <classname>bag</classname> collection, &eyedb; must lookup the element in the collection to check for duplication and this will have poor performance if the lookup is not accelerated using an index.
+	</para>
+
+	<example id="eyedbadmin-collection-odl-example">
+	  <title>The ODL database schema for collections</title>
+	  <programlisting><![CDATA[
+class Person {
+  attribute string firstName;
+  attribute string lastName;
+};
+
+class Diary {
+  attribute string name;
+  attribute set<Person *> persons;
+};
+]]></programlisting>
+	</example>
+
+	<example id="eyedbadmin-collection-odl">
+	  <title>Collections: updating the schema</title>
+	  <screen>
+## create database
+<userinput>eyedbadmin database create test_collection</userinput>
+<userinput>eyedbodl -u -d test_collection test_collection.odl</userinput>
+Updating 'test_collection' schema in database test_collection...
+Adding class Person
+Adding class Diary
+
+Done
+	  </screen>
+	</example>
+
+      </section>
+
+      <section>
+	<title>Getting and setting collection default implementation</title>
+
+	<para>
+	</para>
+
+	<example id="eyedbadmin-collection-getdefimpl-setdefimpl">
+	  <title>&eyedbadmin; </title>
+	  <screen>
+## getting and setting default implementation
+<userinput>eyedbadmin collection getdefimpl test_collection Diary.persons</userinput>
+Default implementation on Diary.persons:
+  System default
+<userinput>eyedbadmin collection setdefimpl --type=hashindex test_collection Diary.persons</userinput>
+<userinput>eyedbadmin collection getdefimpl test_collection Diary.persons</userinput>
+Default implementation on Diary.persons:
+  Type: Hash
+	  </screen>
+	</example>
+
+      </section>
+
+      <section>
+	<title>Getting and updating a particular collection implementation</title>
 
 	<para>
 	</para>
@@ -559,15 +634,7 @@ Default dataspace for index 'Person.age':
       </section>
 
       <section>
-	<title>Setting and updating a collection implementation</title>
-
-	<para>
-	</para>
-
-      </section>
-
-      <section>
-	<title>Listing and simulating collections, getting statistics on collections</title>
+	<title>Getting statistics on a collection implementation</title>
 
 	<para>
 	</para>
