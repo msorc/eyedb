@@ -1,0 +1,10 @@
+p1 := new Person( firstName: "Robert", lastName: "Dupond");
+p2 := new Person( firstName: "Raymond", lastName: "Dupont");
+p := new set<Person *>();
+d := new Diary( name:"myDiary", persons:p);
+add p1 to d.persons;
+add p2 to d.persons;
+
+a := new A( name:"a");
+a.p := p1;
+\commit

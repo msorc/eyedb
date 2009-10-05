@@ -1,0 +1,9 @@
+p1 := new Person( firstName: "Robert", lastName: "Dupond");
+p2 := new Person( firstName: "Raymond", lastName: "Dupont");
+d := new Diary( name:"myDiary");
+add p1 to d.persons;
+add p2 to d.persons;
+
+a := new A( name:"a");
+a.p := p1;
+\commit
