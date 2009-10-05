@@ -5,5 +5,10 @@ class Person {
 
 class Diary {
   attribute string name;
-  attribute set<Person *> *persons;
+  attribute set<Person *> persons;
+};
+
+class A {
+  attribute string name;
+  attribute Person *p;
 };
