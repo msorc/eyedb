@@ -10,9 +10,9 @@
 The \eyedb Object Definition Language (ODL) is a specification language
 to define the specifications of object types based on the ODMG ODL (but not compliant).\\
 ODL \footnote{ODL is used for shortness to denote \eyedb ODL} 
-is not intented to be a full programming language. It is
+is not intended to be a full programming language. It is
 a definition language for object specifications. Database management
-systems traditionaly provide facilities that support
+systems traditionally provide facilities that support
 data definition (using a Data Definition Language (DDL)). The DDL allows
 users to define their data types and interfaces while the
 Data Manipulation Language (DML) allows to create, delete, read update
@@ -24,7 +24,7 @@ ODL defines only the signatures of operations defined in C++ and does not
 address definitions of the methods that implements those operations.
 Operations defined in OQL can be defined in the ODL.
 \\
-ODL is intented to define object types that can be implemented
+ODL is intended to define object types that can be implemented
 in a variety of programming languages. Therefore, ODL is not tied
 to the syntax of a particular programming language.\\\\
 \eyedb ODL differs from ODMG ODL from several points:
@@ -49,7 +49,7 @@ and whether it is a class or instance method.
 \sect{The Language Specifications}
 
 The basic concept of the \eyedb object model is the class which, as in any
-traditionnal object model, modelize a set
+traditional object model, model a set
 of objects of similar properties (attributes) and behaviors (methods).
 The attributes can be basic types, user types, references, arrays, collections.
 The methods can be defined in C++ or in OQL (Object Query Language).
@@ -164,15 +164,15 @@ class C {
 };
 \end{verbatim}
 \subsect{Array types}
-The object model supports multi-dimensionnal fixed or variable size arrays
+The object model supports multi-dimensional fixed or variable size arrays
 of any type. For instance:
 \vspace{-0.2cm}
 \begin{verbatim}
 class C {
-  attribute byte b_a[4];      // fixed length mono-dimensionnal array
-  attribute char str[];       // variable size mono-dimensionnal array
-  attribute int i_a[3][4][8]; // multi-dimensionnal fixed size array
-  attribute long l_a[][4][8]; // multi-dimensionnal variable size array
+  attribute byte b_a[4];      // fixed length mono-dimensional array
+  attribute char str[];       // variable size mono-dimensional array
+  attribute int i_a[3][4][8]; // multi-dimensional fixed size array
+  attribute long l_a[][4][8]; // multi-dimensional variable size array
 };
 \end{verbatim}
 %\vspace{-0.2cm}
@@ -186,7 +186,7 @@ class C {
 };
 \end{verbatim}
 %\vspace{-0.2cm}
-Note that in a multi-dimensionnal array, only the extreme left dimension can be
+Note that in a multi-dimensional array, only the extreme left dimension can be
 variable:
 \vspace{-0.2cm}
 \begin{verbatim}
@@ -243,7 +243,7 @@ manner that the construct \texttt{C1 \&\&oc1} makes no sense in C++.\\
 \hline
 \end{tabular}\\
 \\
-One can have arrays of litteral or object as follows:
+One can have arrays of literal or object as follows:
 \vspace{-0.2cm}
 \begin{verbatim}
 class C {
@@ -290,7 +290,7 @@ class C {
   attribute array<C1 *> o_c1_larr;   // literal array of C1 objects
   attribute bag<C1 *>   o_c1_lbag[]; // array of literal bag of C1 objects
 
-  // multi-dimensionnal array of literal bag of set of array of C1 objects
+  // multi-dimensional array of literal bag of set of array of C1 objects
   attribute bag<set<array<set<C1 *> > > > x[2][3][4]; 
 };
 \end{verbatim}
@@ -303,7 +303,7 @@ an attribute array exists only within a class
 \item the implementation is very different:
 \bi
 \item one can have a big collection array (thousand or millions of elements)
-without loss of performance (if the collection is well parametered, see
+without loss of performance (if the collection is well parameterised, see
 below)). Big attribute array are unefficient
 \item collection array can have ``holes'' without loss of performance, for instance an element at index 1 and another one at index 1000000 and nothing between. An attribute array with holes are unefficient as they are stored
 consecutively
@@ -409,7 +409,7 @@ This means that one can have a \texttt{C} object with a given value
 for \texttt{s2} and a \texttt{C2} object with the same value for \texttt{s2}.
 \\
 This is not the expected default behavior and will
-can be parametrised in a next version.
+be parameterised in a next version.
 \\
 \\
 If you do no want to propagate automatically a constraint to the subclasses,
@@ -470,7 +470,7 @@ types according to the cardinality of the relationship:
 \item one-to-many : \texttt{A} contains an attribute of type \emph{collection}\texttt{<B *>} (\emph{collection} is a set or a bag) and
 \texttt{A} contains an attribute  of type \texttt{B *}
 \item many-to-many : \texttt{A} contains an attribute of type \emph{collection}\texttt{<B *>} and
-\texttt{A} contains an attribute  of type \emph{collection}\texttt{<B *}
+\texttt{A} contains an attribute  of type \emph{collection}\texttt{<B *>}
 \ei
 For instance for a one-to-one relationship:
 \vspace{-0.2cm}
@@ -485,7 +485,7 @@ class B {
   attribute A *a;
 };
 \end{verbatim}
-In the previous cas, \eyedb maintains only partially the referential
+In the previous case, \eyedb maintains only partially the referential
 integrity: for instance, one cannot create an object \texttt{A}
 with an attribute \texttt{b} which refers an non-existent \texttt{B}
 object. But, if the referenced \texttt{B} object is removed, the attribute
@@ -540,12 +540,12 @@ class B {
 \end{verbatim}
 
 \subsect{Methods}
-In ODL, one can declared the signature of C++ and OQL methods
+In ODL, one can declare the signature of C++ and OQL methods
 and one can defined the body of OQL methods.
 By default, a method is executed on the server side.
 \\
 A method argument can be any basic type, reference on a composite type or
-mono-dimensionnal array of basic or composite type. An argument
+mono-dimensional array of basic or composite type. An argument
 can be \texttt{in}, \texttt{out} or \texttt{inout}.
 Argument may be named or unnamed (only type is given), for instance:
 \vspace{-0.2cm}
@@ -578,7 +578,7 @@ class C2 {
   int perform(in double, out string mystr);
 };
 \end{verbatim}
-One can defined OQL methods in ODL. In this case, the name of the
+One can define OQL methods in ODL. In this case, the name of the
 arguments must be given:
 \vspace{-0.2cm}
 \begin{verbatim}
@@ -656,7 +656,7 @@ class C {
 
 
 \subsect{Indexes}
-Indexes can be defined in ODL or with the tool \texttt{eyedbidxadmin}.
+Indexes can be either defined in ODL or with the tool \texttt{eyedbidxadmin}.
 To define indexes on attributes:
 \begin{verbatim}
 class C {
@@ -729,9 +729,9 @@ class C {
 };
 \end{verbatim}
 \subsubsect{Index specifications}
-By default, index on number attribute (char, short, int, long and double)
-are implemented as BTree, while index on string or bounded string are
-implemented as Hash.
+By default, an index on a number attribute (char, short, int, long and double)
+is implemented as a BTree, while an index on either a string or a bounded string is
+implemented as a Hash index.
 \\
 The differences between BTree and Hash are as follows:
 \bi
@@ -740,14 +740,14 @@ entries with values greater or lesser than a given value. Hash indexes
 does not allows this in a efficient way.
 \item On big volume of data, BTree indexes are more efficient 
 with the default parameters than Hash indexes with the default parameters
-\item On the other hand, for exact match search a Hash index
-with good parameters is more efficient than as BTree index
-\item At least, Hash indexes creation is about four times faster
-than BTree indexes
+\item On the other hand, for exact match search, a Hash index
+with good parameters is more efficient than a BTree index
+\item Usually, Hash index creation is at least four times faster
+than creating a BTree index
 \ei
 The ODL index specification allows one to change the default index
-type and parameters of a given attribute.
-To set the type of a given index:
+type and parameters of a given target attribute.
+To set the type of an index on a given attribute, one uses:
 \begin{verbatim}
 class C {
   attribute string<32> s;
@@ -757,7 +757,7 @@ class C {
   index<type = hash> on i;  // default is btree: change to hash
 };
 \end{verbatim}
-Important note: one cannot set a BTree index on non bounded string.
+Important note: one cannot create a BTree index on a non bounded string.
 One can set implementation parameters for indexes as follows:
 \begin{verbatim}
 class C {
