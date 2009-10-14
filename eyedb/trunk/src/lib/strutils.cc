@@ -23,6 +23,7 @@
 
 #include <eyedbconfig.h>
 
+#include <stdio.h>
 #include <eyedblib/strutils.h>
 
 std::string str_convert(char c, const char *fmt)
