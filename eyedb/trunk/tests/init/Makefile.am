@@ -1,8 +1,7 @@
 TESTS_ENVIRONMENT= $(SHELL) 
 
 TESTS=\
-test_init_schema.sh \
-test_odl_remove_schema.sh
+test_init_dbm.sh 
 
 # Code snippet from autoconf documentation:
 # http://www.gnu.org/software/autoconf/manual/autoconf.html#Installation-Directory-Variables
@@ -19,8 +18,4 @@ EDIT= sed \
 	mv $@.tmp $@
 
 EXTRA_DIST=\
-test_init_schema.sh.in \
-test_odl_remove_schema.sh.in \
-schema.odl
-
-
+test_init_dbm.sh.in 
