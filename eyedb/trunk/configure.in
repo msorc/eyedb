@@ -719,6 +719,8 @@ tests/lib/Makefile dnl
 tests/lib/python/Makefile dnl
 tests/lib/python/eyedb/Makefile dnl
 tests/lib/python/eyedb/test/Makefile dnl
+tests/lib/shell/Makefile dnl
+tests/init/Makefile dnl
 )
 AC_OUTPUT
 

@@ -34,18 +34,18 @@ doc-archive:
 	(cd doc && $(MAKE) $(AM_MAKEFLAGS) doc-archive)
 .PHONY: doc-archive
 
-check-ascii:
-	( \
-		cd $(top_srcdir) ; \
-		for f in `find . -name '*.java'` ; \
-		do \
-			echo $$f ; \
-			iconv --to-code=ASCII -c --output=- $$f | diff --brief - $$f ; \
-			if test $$? != 0 ; then echo $$f not ASCII; exit 1; fi ; \
-		done ; \
-		echo No non-ASCII java file found ; \
-	)
+#check-ascii:
+#	( \
+#		cd $(top_srcdir) ; \
+#		for f in `find . -name '*.java'` ; \
+#		do \
+#			echo $$f ; \
+#			iconv --to-code=ASCII -c --output=- $$f | diff --brief - $$f ; \
+#			if test $$? != 0 ; then echo $$f not ASCII; exit 1; fi ; \
+#		done ; \
+#		echo No non-ASCII java file found ; \
+#	)
 
-dist-hook: check-ascii
+#dist-hook: check-ascii
 
 AUTOMAKE_OPTIONS=dist-bzip2

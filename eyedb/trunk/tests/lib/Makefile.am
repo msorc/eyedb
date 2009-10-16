@@ -1,1 +1,2 @@
-SUBDIRS=python
+SUBDIRS=python shell
+
