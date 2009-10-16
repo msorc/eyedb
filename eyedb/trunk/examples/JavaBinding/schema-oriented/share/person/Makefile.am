@@ -14,7 +14,7 @@ clean-local:
 #
 # ODL to Java translation
 #
-EYEDBODL_exe=$(bindir)/eyedbodl
+EYEDBODL_exe=$(top_builddir)/src/eyedb/eyedbodl
 EYEDBODL = $(EYEDBODL_exe) --gencode=java
 EYEDBODLFLAGS= --no-rootclass --package=person --output-dir=$(top_builddir)/examples/JavaBinding/schema-oriented/share/person
 
