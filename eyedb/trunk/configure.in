@@ -566,6 +566,7 @@ doc/manual/Makefile dnl
 doc/manual/administration/Makefile dnl
 doc/manual/administration.old/Makefile dnl
 doc/manual/cpp-programming/Makefile dnl
+doc/manual/docbook-common/Makefile dnl
 doc/manual/getting-started/Makefile dnl
 doc/manual/getting-started.old/Makefile dnl
 doc/manual/installation/Makefile dnl
@@ -670,6 +671,7 @@ src/www/eyedb.conf dnl
 src/www/html/Makefile dnl
 src/www/icons/Makefile dnl
 tests/Makefile dnl
+tests/bugs/Makefile dnl
 tests/bugs/odl-remove-schema/Makefile dnl
 tests/bugs/oql-triggers/Makefile dnl
 tests/examples/Makefile dnl
