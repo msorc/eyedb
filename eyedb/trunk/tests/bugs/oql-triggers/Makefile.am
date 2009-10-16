@@ -26,3 +26,10 @@ EDIT= sed \
 	rm -f $@ $@.tmp
 	$(EDIT) '$(srcdir)/$@.in' >$@.tmp
 	mv $@.tmp $@
+
+EXTRA_DIST= \
+schema.odl \
+test_oql_load_after_trigger_message.sh.in \
+test_oql_load_before_trigger_crash.sh.in \
+test_oql_update_trigger_crash.sh.in \
+test_oql_update_trigger_same_values.sh.in

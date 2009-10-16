@@ -1,3 +1,5 @@
+EXTRA_DIST=$(MAIN_XML_FILE) $(OTHER_XML_FILES)
+
 # PDF
 if COND_DBLATEX
 manualdir=$(datadir)/doc/$(PACKAGE)/manual/pdf
@@ -33,3 +35,4 @@ html/index.html: $(OTHER_XML_FILES)
 
 clean-local:
 	-rm -rf *.pdf html/
+

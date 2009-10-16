@@ -23,3 +23,7 @@ EDIT= sed \
 	rm -f $@ $@.tmp
 	$(EDIT) '$(srcdir)/$@.in' >$@.tmp
 	mv $@.tmp $@
+
+EXTRA_DIST=test_odl_remove_schema.sh.in schema.odl
+
+
