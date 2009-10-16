@@ -1,2 +1,2 @@
-SUBDIRS=eyedbsm eyedb examples lib
+SUBDIRS=bugs eyedbsm eyedb examples lib
 

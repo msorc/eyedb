@@ -1,27 +1,24 @@
 man1_MANS= \
-eyedb-options.1 \
+eyedbadmin-collection.xml \
+eyedbadmin-database.xml \
+eyedbadmin-datafile.xml \
+eyedbadmin-dataspace.xml \
+eyedbadmin-index.xml \
+eyedbadmin-user.xml \
 eyedbadmin.1 \
-eyedbcollimpladmin.1 \
-eyedbconsadmin.1 \
-eyedbgetenv.1 \
-eyedbidxadmin.1 \
 eyedbjrun.1 \
-eyedbloca.1 \
 eyedbodl.1 \
-eyedboql.1 \
-eyedbpasswd.1 \
-eyedbprotadmin.1 
+eyedb-options.1 \
+eyedboql.1 
 
-man5_MANS= \
-eyedb-config.5
+#man5_MANS= \
+#eyedb-config.5
 
 man7_MANS= \
 eyedb.7
 
 man8_MANS= \
-eyedbctl.8 \
-eyedbd.8 \
-eyedbsmd.8 
+eyedbctl.8 
 
 XSLTPROC=@XSLTPROC@
 XSLTPROCFLAGS=--novalid --nonet
