@@ -49,3 +49,18 @@ doc-archive:
 #dist-hook: check-ascii
 
 AUTOMAKE_OPTIONS=dist-bzip2
+
+
+# distcheck cannot work for eyedb, so we make our own
+mydistcheck: dist
+	bunzip2 -c $(distdir).tar.bz2 | $(am__untar)
+	mkdir $(distdir)/_build
+	mkdir $(distdir)/_inst
+	dc_install_base=`$(am__cd) $(distdir)/_inst && pwd | sed -e 's,^[^:\\/]:[\\/],/,'` \
+	  && dc_destdir="$${TMPDIR-/tmp}/am-dc-$$$$/" \
+	  && cd $(distdir)/_build \
+	  && ../configure --srcdir=.. --prefix="$$dc_install_base" $(DISTCHECK_CONFIGURE_FLAGS)
+	cd $(distdir)/_build ; $(MAKE) $(AM_MAKEFLAGS)
+	cd $(distdir)/_build ; $(MAKE) $(AM_MAKEFLAGS) install
+	$(SHELL) $(distdir)/_inst/share/eyedb/tools/eyedb-postinstall.sh
+	cd $(distdir)/_build ; $(MAKE) $(AM_MAKEFLAGS) check
