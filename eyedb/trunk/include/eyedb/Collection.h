@@ -332,6 +332,7 @@ namespace eyedb {
     Bool string_coll;
     int bottom, top;
     Bool implModified;
+    Bool nameModified; 
 
     Class *coll_class;
     Bool isref;

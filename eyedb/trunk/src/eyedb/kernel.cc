@@ -709,7 +709,7 @@ namespace eyedb {
 					      dbname, userauth,
 					      AdminDBAccessMode)) !=
 	    RPCSuccess) {
-	  printf("rpc_status %p\n", rpc_status);
+	  //printf("rpc_status %p\n", rpc_status);
 	  return rpc_status;
 	}
 
@@ -4242,15 +4242,32 @@ namespace eyedb {
 			    items_top)
 
   static RPCStatus
+  IDB_collNameManage(DbHandle *dbh, const eyedbsm::Oid *oid,
+		     Data idr, short code, Offset &offset)
+  {
+    if (code & IDB_COLL_NAME_CHANGED) {
+      char *name;
+      // 2009-11-15: cannot easily change name because should change size of
+      // object
+      string_decode(idr, &offset, (char **)&name);
+      unsigned int size;
+      eyedbsm::Status se_status = eyedbsm::objectSizeGet(dbh->sedbh, &size, eyedbsm::DefaultLock, oid);
+      if (se_status) {
+	return rpcStatusMake_se(se_status);
+      }
+      //printf("NAME CHANGED [%s] size=%u, headsize=%u %u\n", name, size, IDB_COLL_SIZE_HEAD, IDB_OBJ_HEAD_SIZE);
+    }
+    return RPCSuccess;
+  }
+
+  static RPCStatus
   IDB_collImplManage(DbHandle *dbh, const eyedbsm::Oid *oid,
 		     eyedbsm::Idx *idx1, eyedbsm::Idx *idx2,
-		     Data idr, Offset offset)
+		     Data idr, short code, Offset &offset)
   {
     Database *db = (Database *)dbh->db;
-    short c;
-    int16_decode (idr, &offset, &c);
 
-    if (c == IDB_COLL_IMPL_CHANGED) {
+    if (code & IDB_COLL_IMPL_CHANGED) {
       IndexImpl *idximpl;
       Offset offset_impl = offset;
       Status status = IndexImpl::decode(db, idr, offset, idximpl);
@@ -4332,9 +4349,11 @@ namespace eyedb {
 			   &idr[offset_impl], oid, 0);
     }
 
-    if (c != IDB_COLL_IMPL_UNCHANGED)
+    /*
+    if (!(code & IDB_COLL_IMPL_UNCHANGED))
       return rpcStatusMake(IDB_ERROR, "collection write internal error: "
-			   "unexpected magic number %x", c);
+			   "unexpected flags %x", c);
+    */
 
     return RPCSuccess;
   }
@@ -4601,9 +4620,16 @@ namespace eyedb {
 	}
       }
 
-    RPCStatus rpc_status = 
-      IDB_collImplManage(dbh, oid, idx1, idx2, idr, offset);
-    if (rpc_status) return rpc_status;
+    RPCStatus rpc_status;
+    short code;
+    int16_decode (idr, &offset, &code);
+    if ((rpc_status = IDB_collImplManage(dbh, oid, idx1, idx2, idr, code, offset)) != 0) {
+      return rpc_status;
+    }
+
+    if ((rpc_status = IDB_collNameManage(dbh, oid, idr, code, offset)) != 0) {
+      return rpc_status;
+    }
 
     return UPDATE_COUNT();
   }

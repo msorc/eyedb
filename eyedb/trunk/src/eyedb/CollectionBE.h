@@ -126,8 +126,8 @@ namespace eyedb {
 
 #define IDB_COLL_SIZE_HEAD       (IDB_COLL_OFF_COLL_NAME)
 
-#define IDB_COLL_IMPL_CHANGED   (short)0x1273
-#define IDB_COLL_IMPL_UNCHANGED (short)0x4e1a
+#define IDB_COLL_IMPL_CHANGED   (short)0x0001
+#define IDB_COLL_NAME_CHANGED   (short)0x0002
 }
 
 #endif

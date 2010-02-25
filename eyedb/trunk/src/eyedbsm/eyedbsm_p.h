@@ -103,7 +103,7 @@ namespace eyedbsm {
     unsigned int xid;
     eyedblib::int64 hostid;
     char hostname[64];
-    char arch[16];
+    char arch[16]; // why not 32 or more ?
     MutexP main_mp;
 #ifdef USE_SHM_REFCNT
     int refcnt;

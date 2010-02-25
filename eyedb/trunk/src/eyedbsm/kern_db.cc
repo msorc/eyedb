@@ -1313,12 +1313,11 @@ x = (u_long *)(((u_long)(x)&0x3) ? ((u_long)(x) + 0x4-((u_long)(x)&0x3)) : (u_lo
       Boolean mustUnlock = True;
       if (x2h_u32((unsigned int)shmh->hostid) != (unsigned int)gethostid() ||
 	  strncmp(shmh->arch, eyedblib::CompileBuiltin::getArch(), sizeof( shmh->arch))) {
-	//MUTEX_UNLOCK(mp, 0);
 	return statusMake(DATABASE_OPEN_FAILED,
 			  "cannot open database %s on "
-			  "computer %s [architecture %s]: "
-			  "database hold by computer %s [architecture %s]",
-			  dbfile, hostname, eyedblib::CompileBuiltin::getArch(), shmh->hostname,
+			  "computer %s (hostid=%d) [architecture %s]: "
+			  "database hold by computer %s (hostid=%d) [architecture %s]",
+			  dbfile, hostname, gethostid(), eyedblib::CompileBuiltin::getArch(), shmh->hostname, x2h_u32((unsigned int)shmh->hostid),
 			  shmh->arch);
       }
     }
