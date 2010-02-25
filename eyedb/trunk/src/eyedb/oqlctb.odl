@@ -340,14 +340,14 @@ class database [OqlCtbDatabase] {
 							    in dataspace *);
 
   instance_method<client, called_from=OQL>
-     void updateScheme(in string odlfile, in string package);
+     void updateSchema(in string odlfile, in string package);
 
   instance_method<client, called_from=OQL>
-     void updateScheme(in string odlfile, in string package,
+     void updateSchema(in string odlfile, in string package,
 		       in string schname, in string db_prefix);
 
   instance_method<client, called_from=OQL>
-     void updateScheme(in string odlfile, in string package,
+     void updateSchema(in string odlfile, in string package,
 		       in string schname, in string db_prefix,
 		       in string cpp_cmd, in string cpp_flags);
 

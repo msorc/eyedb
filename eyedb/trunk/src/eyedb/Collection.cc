@@ -151,6 +151,7 @@ namespace eyedb {
     idx_data = 0;
     idx_data_size = 0;
     implModified = False;
+    nameModified = False;
 #ifdef INIT_IDR
     inv_oid_offset = 0;
     init_idr();
@@ -404,6 +405,7 @@ namespace eyedb {
     idx_data = (idx_data_size ? (Data)malloc(idx_data_size) : 0);
     memcpy(idx_data, _idx_data, idx_data_size);
     implModified = False;
+    nameModified = False;
 #ifdef INIT_IDR
     inv_oid_offset = 0;
     init_idr();
@@ -1499,6 +1501,8 @@ namespace eyedb {
       (void)const_cast<Collection *>(this)->loadDeferred();
     free(name);
     name = strdup(_name);
+    touch();
+    nameModified = True;
   }
 
   void Collection::garbage()
@@ -1888,7 +1892,8 @@ namespace eyedb {
 #endif
 
     if (wr_size) {
-      short x = IDB_COLL_IMPL_UNCHANGED;
+      //short x = IDB_COLL_IMPL_UNCHANGED;
+      short x = 0;
       int16_code(&temp, &cache_offset, &wr_size, &x);
 
       hdr.type = type;
@@ -1905,6 +1910,7 @@ namespace eyedb {
       cache = 0;
       emptyReadCache();
       implModified = False;
+      nameModified = False;
       modify = False;
     }
 
@@ -1943,12 +1949,23 @@ namespace eyedb {
     ObjectHeader hdr;
     memset(&hdr, 0, sizeof(hdr));
 
-    short c = (implModified ? IDB_COLL_IMPL_CHANGED : IDB_COLL_IMPL_UNCHANGED);
+    short c = 0;
+    if (implModified) {
+      c |=  IDB_COLL_IMPL_CHANGED;
+    }
+    if (nameModified) {
+      c |= IDB_COLL_NAME_CHANGED;
+    }
     int16_code(&temp, &offset, &alloc_size, &c);
     if (implModified) {
       _status = IndexImpl::code(temp, offset, alloc_size, collimpl->getIndexImpl(), collimpl->getType());
-      if (_status)
+      if (_status) {
 	return _status;
+      }
+    }
+
+    if (nameModified) {
+      string_code(&temp, &offset, &alloc_size, name);
     }
 
     hdr.type = type;
@@ -1965,6 +1982,7 @@ namespace eyedb {
       emptyReadCache();
       modify = False;
       implModified = False;
+      nameModified = False;
     }
 
     return StatusMake(IDB_COLLECTION_ERROR, rpc_status);

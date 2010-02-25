@@ -370,19 +370,21 @@ namespace eyedb {
     Bool isref = coll_spec->isref;
 
     IndexImpl *idximpl = 0;
-    CollImpl::Type impl_type = CollImpl::NoIndex;
+    CollImpl *collimpl = 0;
     if (coll_spec->impl_hints) {
+      CollImpl::Type impl_type = CollImpl::Unknown;
       Status status = IndexImpl::make(db, coll_spec->ishash ?
 				      IndexImpl::Hash :
 				      IndexImpl::BTree,
 				      coll_spec->impl_hints, idximpl);
-      if (status) return new oqmlStatus(this, status);
+      if (status) {
+	return new oqmlStatus(this, status);
+      }
       if (idximpl) {
 	impl_type = (CollImpl::Type)idximpl->getType();
       }
+      collimpl = new CollImpl(impl_type, idximpl);
     }
-
-    CollImpl *collimpl = new CollImpl(impl_type, idximpl);
 
     if (what == collset)
       coll = new CollSet(ident, cls, isref, collimpl);
