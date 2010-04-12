@@ -79,9 +79,9 @@ class Store {
 	    System.exit(1);
 	}
 
-	name_attr = person_cls.getAttribute("name");
+	name_attr = person_cls.getAttribute("firstname");
 	if (name_attr == null) {
-	    System.out.println("Attribute name not found");
+	    System.out.println("Attribute firstname not found");
 	    System.exit(1);
 	}
 
