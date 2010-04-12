@@ -97,10 +97,10 @@ class Collections {
       return;
 
     person_cls = db.getSchema().getClass("Person");
-    name_attr = person_cls.getAttribute("name");
+    name_attr = person_cls.getAttribute("firstname");
     if (name_attr == null)
       {
-	display_("Attribute name not found");
+	display_("Attribute firstname not found");
 	System.exit(1);
       }
 
