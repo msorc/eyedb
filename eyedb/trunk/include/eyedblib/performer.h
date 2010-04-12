@@ -25,6 +25,7 @@
 #ifndef _EYEDBLIB_PERFORMER_H
 #define _EYEDBLIB_PERFORMER_H
 
+#include <stdio.h>
 #include <eyedblib/thread.h>
 
 namespace eyedblib {

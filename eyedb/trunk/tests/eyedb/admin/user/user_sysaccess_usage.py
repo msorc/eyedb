@@ -6,7 +6,7 @@ command="%s/eyedbadmin user sysaccess" % (os.environ['bindir'],)
 
 child = pexpect.spawn( command)
 child.logfile = sys.stdout
-r = child.expect("eyedbadmin user sysaccess \[--help\] USER \['\+' combination of\] dbcreate\|adduser\|deleteuser\|setuserpasswd\|admin\|superuser\|no")
+r = child.expect("eyedbadmin user sysaccess \[--help\] USER dbcreate\|adduser\|deleteuser\|setuserpasswd\|admin\|superuser\|no")
 r = child.expect( pexpect.EOF)
 child.close()
 if child.exitstatus == 1:
