@@ -1,0 +1,53 @@
+
+HOWTO Release EyeDB
+
+
+This mini-howto explains how to make a release of EyeDB.
+
+
+1) Creating the tarballs and checking the distribution
+
+1-1) Creating the tarballs
+
+Creating the tarballs is done simply by:
+'make dist'
+
+This will create 2 tarballs, eyedb-RELEASE.tar.bz2 and
+eyedb-RELEASE.tar.gz (where RELEASE is replaced by the current release
+number, for instance 2.8.8).
+
+
+1-2) Checking the distribution
+
+This is done by:
+'make mydistcheck'
+
+Standard automake 'make distcheck' cannot work for EyeDB, which
+requires being installed first.
+
+Running 'make mydistcheck' will:
+- create the tarballs
+- untar a tarball in a new, empty directory
+- run 'configure', 'make', 'make install' in this directory
+- run 'eyedb-post-install.sh'
+- run 'make check' to run the test suites on the distribution
+
+
+2) Uploading the tarballs to sourceforge
+
+Once created and checked, uploading the tarballs is done by:
+- logging in to sourceforge
+- go to EyeDB project page
+- go to the File Manager (under Project Admin menu)
+- create a folder for the new release (use the 'gear' menu)
+- upload the tarballs in this folder (use the 'gear' menu)
+
+That's all, the project news will be updated automatically.
+
+
+3) Posting to eyedb-general
+
+Once the release done, it is convenient to send a mail to
+eyedb-general@lists.sourceforge.net to announce the new release.
+
+
