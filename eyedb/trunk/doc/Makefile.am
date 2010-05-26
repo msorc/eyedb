@@ -49,38 +49,34 @@ htmldir=$(datadir)/doc/$(PACKAGE)
 dist_html_DATA=index.html eyedbdoc.css
 
 if COND_DOC
-DOC_EXPORT_DIRS= $(DOXYGEN_EXPORT_DIR) $() $(JAVADOC_EXPORT_DIR) $(MANPAGES_EXPORT_DIR) $(MANUAL_EXPORT_DIR) $(HTML_MANUAL_EXPORT_DIR) $(EXAMPLES_EXPORT_DIR)
+DOC_EXPORT_DIRS= $(DOXYGEN_EXPORT_DIR) $(JAVADOC_EXPORT_DIR) $(MANPAGES_EXPORT_DIR) $(MANUAL_EXPORT_DIR) $(HTML_MANUAL_EXPORT_DIR) $(EXAMPLES_EXPORT_DIR)
 endif
 
-doc-export-check:
+doc-archive-check:
 if !COND_DOC
-	echo "*** Error: documentation building must be enabled to export documentation"
+	echo "*** Error: documentation building must be enabled"
 	exit 1
 endif
 if !COND_DOXYGEN
-	echo "*** Error: C++ documentation building using Doxygen must be enabled to export documentation"
+	echo "*** Error: C++ documentation building using Doxygen must be enabled"
 	exit 1
 endif
 if !COND_JAVADOC
-	echo "*** Error: Java documentation building using javadoc must be enabled to export documentation"
+	echo "*** Error: Java documentation building using javadoc must be enabled"
 	exit 1
 endif
 if !COND_DOCBOOK_MANPAGES
-	echo "*** Error: man pages building using docbook must be enabled to export documentation"
+	echo "*** Error: man pages building using docbook must be enabled"
 	exit 1
 endif
 if !COND_LATEX
-	echo "*** Error: PDF manuals building using Latex must be enabled to export documentation"
+	echo "*** Error: PDF manuals building using Latex must be enabled"
 	exit 1
 endif
 if !COND_LATEX2HTML
-	echo "*** Error: HTML manuals building using latex2html must be enabled to export documentation"
+	echo "*** Error: HTML manuals building using latex2html must be enabled"
 	exit 1
 endif
-	if test -z "$(EYEDB_WEB_HOST)" ; then \
-		echo "*** Error: EYEDB_WEB_HOST must be defined (make EYEDB_WEB_HOST=some.where)" ; \
-		exit 1 ; \
-	fi
 	for d in $(DOC_EXPORT_DIRS) ; do \
 		if test ! -d $(datadir)/doc/$(PACKAGE)/$$d ; then \
 			echo "*** Error: directory $$d missing" ; \
@@ -88,11 +84,7 @@ endif
 		fi ; \
 	done
 
-doc-export: doc-export-check install
-	ssh $(EYEDB_WEB_HOST) cd eyedb.org/www/wordpress/wp-content/uploads/documentation \; rm -rf $(DOC_EXPORT_DIRS)
-	cd $(datadir)/doc/$(PACKAGE) ; tar czf - $(DOC_EXPORT_DIRS) | ssh $(EYEDB_WEB_HOST) cd eyedb.org/www/wordpress/wp-content/uploads/documentation \; tar xvzf -
-
-doc-archive: install
+doc-archive: install doc-archive-check
 	-rm -rf /var/tmp/eyedb-doc-$(EYEDB_VERSION)
 	cp -r $(datadir)/doc/$(PACKAGE) /var/tmp/eyedb-doc-$(EYEDB_VERSION)
 	tar cvzf eyedb-doc-$(EYEDB_VERSION).tar.gz -C /var/tmp eyedb-doc-$(EYEDB_VERSION)
