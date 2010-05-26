@@ -10,4 +10,7 @@
 <!-- List the examples and equations too -->
 <xsl:param name="doc.lot.show">figure,table,example</xsl:param>
 
+<xsl:param name="chunker.output.encoding">UTF-8</xsl:param>
+<xsl:param name="textdata.default.encoding">UTF-8</xsl:param>
+
 </xsl:stylesheet>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN" "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd"
 [
 <!ENTITY eyedb "EyeDB">
@@ -10,8 +10,8 @@
 
   <bookinfo>
     <author>
-      <firstname>François</firstname>
-      <surname>Déchelle</surname>
+      <firstname>FranÃ§ois</firstname>
+      <surname>DÃ©chelle</surname>
     </author>
     <address>
       <email>francois@dechelle.net</email>
