@@ -7,7 +7,7 @@ manual_DATA=$(PDF_PREFIX)$(MANUAL).pdf
 endif
 
 XSL_PARAMS = $(top_srcdir)/doc/manual/docbook-common/params.xsl
-DBLATEXFLAGS = -p $(XSL_PARAMS)
+DBLATEXFLAGS = -p $(XSL_PARAMS) 
 
 $(PDF_PREFIX)$(MANUAL).pdf: $(MAIN_XML_FILE)
 	$(DBLATEX) $(DBLATEXFLAGS) -o $@ $<
@@ -21,7 +21,7 @@ htmlmanual_DATA=html/index.html
 endif
 
 XSLTPROC=@XSLTPROC@
-XSLTPROCFLAGS=--novalid --nonet --xinclude
+XSLTPROCFLAGS=--novalid --nonet --xinclude --stringparam chunker.output.encoding "UTF-8"
 #HTML as a single file
 #HTML_XSL_STYLESHEET=@HTML_XSL_STYLESHEET_DIR@/docbook.xsl
 #HTML chunked
