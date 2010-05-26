@@ -36,3 +36,9 @@ html/index.html: $(OTHER_XML_FILES)
 clean-local:
 	-rm -rf *.pdf html/
 
+install-data-hook:
+if COND_DOCBOOK_HTML
+	(cd html; \
+		for f in *.html ; do $(INSTALL_DATA) $$f "$(DESTDIR)$(htmlmanualdir)/$$f" ; done \
+	)
+endif
