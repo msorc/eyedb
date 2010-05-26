@@ -41,18 +41,6 @@
     </legalnotice>
   </bookinfo>
 
-  <dedication>
-    <note>
-      <title>TODO</title>
-      <para>
-	<itemizedlist>
-	  <listitem><para>do something...</para></listitem>
-	</itemizedlist>
-      </para>
-    </note>
-  </dedication>
-
-
   <chapter id="introduction">
     <title>Introduction</title>
     
