@@ -1,5 +1,5 @@
 if COND_LATEX
-LATEX_DIRS= administration.old cpp-programming getting-started.old java-programming latex-common odl oql overview 
+LATEX_DIRS= cpp-programming java-programming latex-common odl oql overview 
 else
 LATEX_DIRS= 
 endif
