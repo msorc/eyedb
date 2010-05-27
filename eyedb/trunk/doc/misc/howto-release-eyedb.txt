@@ -5,7 +5,7 @@ HOWTO Release EyeDB
 This mini-howto explains how to make a release of EyeDB.
 
 
-1) Creating the tarballs and checking the distribution
+1) Creating the EyeDB sources tarballs and checking the distribution
 
 1-1) Creating the tarballs
 
@@ -33,7 +33,10 @@ Running 'make mydistcheck' will:
 - run 'make check' to run the test suites on the distribution
 
 
-2) Uploading the tarballs to sourceforge
+2) Creating the EyeDB documentation tarballs
+
+
+3) Uploading the EyeDB sources tarballs to sourceforge
 
 Once created and checked, uploading the tarballs is done by:
 - logging in to sourceforge
@@ -45,7 +48,10 @@ Once created and checked, uploading the tarballs is done by:
 That's all, the project news will be updated automatically.
 
 
-3) Posting to eyedb-general
+4) Uploading the EyeDB documentation to www.eyedb.org
+
+
+5) Posting to eyedb-general
 
 Once the release done, it is convenient to send a mail to
 eyedb-general@lists.sourceforge.net to announce the new release.
