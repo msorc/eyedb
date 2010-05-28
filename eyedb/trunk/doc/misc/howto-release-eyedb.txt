@@ -16,7 +16,6 @@ This will create 2 tarballs, eyedb-RELEASE.tar.bz2 and
 eyedb-RELEASE.tar.gz (where RELEASE is replaced by the current release
 number, for instance 2.8.8).
 
-
 1-2) Checking the distribution
 
 This is done by:
@@ -35,20 +34,63 @@ Running 'make mydistcheck' will:
 
 2) Creating the EyeDB documentation tarballs
 
+To create the EyeDB documentation tarballs, the documentation must 
+first be compiled.
+In order to produce a full EyeDB documentation, the following 
+packages must be installed:
+- xsltproc and XSL manpages stylesheet, to build the man pages
+- xsltproc and XSL stylesheet, to build the HTML version of docbook 
+  manuals
+- dblatex, to build PDF version of docbook manuals
+- LaTeX, to build the PDF version of LaTeX manuals
+- doxygen, to build the documentation for the C++ binding
+- javadoc, to build the documentation for the Java binding
 
-3) Uploading the EyeDB sources tarballs to sourceforge
+Refer to "EyeDB compilation and installation" documentation for further
+information.
+
+The EyeDB documentation tarballs can be created by running:
+'make doc-archive'
+in subdirectory doc/ under the build top directory.
+Running 'make doc-archive' will first check that all the necessary tools
+are configured to produce a full documentation, then will compile and 
+install the documentation and make tarballs of the installed documentation.
+
+The created tarballs are in:
+doc/eyedb-doc-VERSION.tar.gz
+doc/eyedb-doc-VERSION.tar.bz2 
+
+
+3) Uploading the EyeDB sources and documentation tarballs to sourceforge
 
 Once created and checked, uploading the tarballs is done by:
 - logging in to sourceforge
 - go to EyeDB project page
 - go to the File Manager (under Project Admin menu)
-- create a folder for the new release (use the 'gear' menu)
-- upload the tarballs in this folder (use the 'gear' menu)
+- create folders for the new release (use the 'gear' menu). The name
+of the forlders is the release number, 2 folders must be created, one
+for the sources, under EyeDB/, and one for the documentation, under
+EyeDB documentation/
+- upload the tarballs in these folders (use the 'gear' menu)
 
 That's all, the project news will be updated automatically.
+The 'download' links on www.eyedb.org web site will be updated 
+automatically as well, with a slight delay because of wordpress cache. 
 
 
 4) Uploading the EyeDB documentation to www.eyedb.org
+
+One uploaded to sourceforge, the EyeDB documentation must be uploaded to
+www.eyedb.org in order to be available online.
+This is done by:
+- copying the documentation tarball (either the .tar.gz or the .tar.bz2), 
+using scp to the server hosting www.eyedb.org
+- extracting the documentation in the wp-contents/uploads/ subdirectory 
+of the wordpress installation
+- update the symbolic link eyedb-doc-current/ to point to the newly created
+documentation directory, which is named eyedb-doc-VERSION (as the wordpress
+documentation page uses URLs that point to eyedb-doc-current, there is no
+need to update the wordpress page for each release).
 
 
 5) Posting to eyedb-general
