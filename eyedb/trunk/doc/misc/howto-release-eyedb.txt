@@ -51,9 +51,9 @@ information.
 
 The EyeDB documentation tarballs can be created by running:
 'make doc-archive'
-in subdirectory doc/ under the build top directory.
-Running 'make doc-archive' will first check that all the necessary tools
-are configured to produce a full documentation, then will compile and 
+in top build directory.
+Running 'make doc-archive' will check that all the necessary tools
+are configured to produce a full documentation. It will then compile and 
 install the documentation and make tarballs of the installed documentation.
 
 The created tarballs are in:
