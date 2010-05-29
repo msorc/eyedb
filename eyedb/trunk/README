@@ -36,14 +36,14 @@ GNU General Public License. Refer to file COPYING for full text of the
 license.
 
 
-What's new?
------------
+What's new since last release?
+------------------------------
 
 Release notes are available in the source tree, in file:
 doc/release-notes/EyeDBReleaseNotes.html
 
-
-
+It is highly recommended to browse the release notes before installing
+a new release.
 
 
 Compiling EyeDB
