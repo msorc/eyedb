@@ -1,1 +1,3 @@
-EXTRA_DIST=EyeDBReleaseNotes.html
+docdir=$(datadir)/doc/$(PACKAGE)/release-notes
+doc_DATA=EyeDBReleaseNotes.html
+

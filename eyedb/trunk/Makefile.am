@@ -21,16 +21,13 @@ doc:
 	(cd examples && $(MAKE) $(AM_MAKEFLAGS) all)
 .PHONY: doc
 
-doc-install:
+doc-install: doc
 	(cd doc && $(MAKE) $(AM_MAKEFLAGS) install)
 	(cd examples && $(MAKE) $(AM_MAKEFLAGS) install)
 .PHONY: doc-install
 
-doc-export:
-	(cd doc && $(MAKE) $(AM_MAKEFLAGS) doc-export)
-.PHONY: doc-export
-
-doc-archive:
+doc-archive: doc-install
+	(cd doc && $(MAKE) $(AM_MAKEFLAGS) doc-archive-check)
 	(cd doc && $(MAKE) $(AM_MAKEFLAGS) doc-archive)
 .PHONY: doc-archive
 
