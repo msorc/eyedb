@@ -77,7 +77,10 @@ void DBSCreateCmd::init()
   opts.push_back(Option(DBFILE_OPT, OptionStringType(), /*Option::Mandatory|*/Option::MandatoryValue, OptionDesc("Database file", "DBFILE")));
   opts.push_back(Option(FILEDIR_OPT, OptionStringType(), Option::MandatoryValue, OptionDesc("Database file directory", "FILEDIR")));
   opts.push_back(Option(MAXOBJCNT_OPT, OptionIntType(), Option::MandatoryValue, OptionDesc("Maximum database object count", "OBJECT_COUNT")));
-
+  opts.push_back(Option(DTF_FILE_OPT, OptionStringType(), Option::MandatoryValue, OptionDesc("Datafile filename", "FILE")));
+  opts.push_back(Option(DTF_NAME_OPT, OptionStringType(), Option::MandatoryValue, OptionDesc("Datafile name", "NAME")));
+  opts.push_back(Option(DTF_SIZE_OPT, OptionIntType(), Option::MandatoryValue, OptionDesc("Datafile size (in mega-bytes)", "SIZE")));
+  opts.push_back(Option(DTF_SLOTSIZE_OPT, OptionIntType(), Option::MandatoryValue, OptionDesc("Datafile slot size (in bytes)", "SLOTSIZE")));
   getopt = new GetOpt(getExtName(), opts);
 }
 
@@ -161,15 +164,33 @@ int DBSCreateCmd::perform(eyedb::Connection &conn, std::vector<std::string> &arg
   d->ndat = 1;
   eyedbsm::Datafile *dat = &d->dat[0];
 
-  std::string datfile = dbname + DTF_EXT;
-  strcpy(dat->file, datfile.c_str());
-  strcpy(dat->name, DEFAULT_DTFNAME);
-  d->dat[0].maxsize = DEFAULT_DTFSIZE * ONE_K;
+  if (map.find(DTF_FILE_OPT) != map.end()) {
+    strcpy(dat->file, map[DTF_FILE_OPT].value.c_str());
+  } else {
+    std::string datfile = dbname + DTF_EXT;
+    strcpy(dat->file, datfile.c_str());
+  }
+
+  if (map.find(DTF_NAME_OPT) != map.end()) {
+    strcpy(dat->name, map[DTF_NAME_OPT].value.c_str());
+  } else {
+    strcpy(dat->name, DEFAULT_DTFNAME);
+  }
+
+  if (map.find(DTF_SIZE_OPT) != map.end()) {
+    d->dat[0].maxsize = atoi(map[DTF_SIZE_OPT].value.c_str()) * ONE_K;
+  } else {
+    d->dat[0].maxsize = DEFAULT_DTFSIZE * ONE_K;
+  }
+
+  if (map.find(DTF_SLOTSIZE_OPT) != map.end()) {
+    dat->sizeslot = atoi(map[DTF_SLOTSIZE_OPT].value.c_str());
+  } else {
+    dat->sizeslot = DEFAULT_DTFSZSLOT;
+  }
 
   dat->mtype = eyedbsm::BitmapType;
-  dat->sizeslot = DEFAULT_DTFSZSLOT;
   dat->dtype = eyedbsm::LogicalOidType;
-
   dat->dspid = 0;
 
   db->create(&conn, &dbdesc);
