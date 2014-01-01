@@ -819,7 +819,8 @@ namespace eyedb {
 
     if (type == INT32_TYPE)
       {
-	const char *clname = argtype->getClname().c_str();
+	std::string clname_str = argtype->getClname();
+	const char *clname = clname_str.c_str();
 	if (clname && *clname)
 	  return strcat(strcat(rettype, clname), array);
 

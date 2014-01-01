@@ -794,8 +794,10 @@ namespace eyedb {
       if (!userauth)
 	userauth = "";
 
-      strcpy(clinfo->dbs[clinfo->n_dbs].dbname, name);
-      strcpy(clinfo->dbs[clinfo->n_dbs].userauth, userauth);
+      strncpy(clinfo->dbs[clinfo->n_dbs].dbname, name, sizeof(clinfo->dbs[clinfo->n_dbs].dbname)-1);
+      clinfo->dbs[clinfo->n_dbs].dbname[sizeof(clinfo->dbs[clinfo->n_dbs].dbname)] = 0;
+      strncpy(clinfo->dbs[clinfo->n_dbs].userauth, userauth, sizeof(clinfo->dbs[clinfo->n_dbs].userauth)-1);
+      clinfo->dbs[clinfo->n_dbs].userauth[sizeof(clinfo->dbs[clinfo->n_dbs].userauth)] = 0;
       clinfo->dbs[clinfo->n_dbs].flags = flags;
       clinfo->n_dbs++;
     }
