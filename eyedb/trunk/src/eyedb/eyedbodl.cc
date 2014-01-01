@@ -471,7 +471,7 @@ getOpts(int argc, char *argv[], Bool &dirname_set)
 	return usage("cannot specified two databases");
     }
     else if (GetOpt::parseLongOpt(s, "cpp", &value)) {
-      cpp_cmd = value.c_str();
+      cpp_cmd = strdup(value.c_str());
     }
     else if (GetOpt::parseLongOpt(s, "nocpp", &value)) {
       cpp_cmd = 0;
