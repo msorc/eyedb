@@ -21,7 +21,7 @@ bin_PROGRAMS= eyedbwconf
 sbin_PROGRAMS= eyedbwwwd
 eyedbcgibin_PROGRAMS= eyedbcgiclean eyedbcgife 
 
-EYEDBLIBS=$(top_builddir)/src/eyedb/libeyedb.la $(top_builddir)/src/lib/libeyedbrpcbe.la $(top_builddir)/src/lib/libeyedbrpcfe.la $(top_builddir)/src/eyedbsm/libeyedbsm.la $(top_builddir)/src/lib/libeyedbutils.la
+EYEDBLIBS=$(top_builddir)/src/eyedb/libeyedb.la $(top_builddir)/src/lib/libeyedbrpcbe.la $(top_builddir)/src/lib/libeyedbrpcfe.la $(top_builddir)/src/eyedbsm/libeyedbsm.la $(top_builddir)/src/lib/libeyedbutils.la $(top_builddir)/src/eyedb/libeyedb.la
 
 eyedbwwwd_SOURCES=eyedbwwwd.cc
 eyedbwwwd_LDADD=libeyedbcgi.la $(EYEDBLIBS)
